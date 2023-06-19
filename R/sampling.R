@@ -58,7 +58,8 @@
 #' @examples
 #' \donttest{
 #' # The INLA package is required
-#' if (bru_safe_inla(quietly = TRUE)) {
+#' if (bru_safe_inla(quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   vertices <- seq(0, 3, by = 0.1)
 #'   mesh <- INLA::inla.mesh.1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
@@ -70,10 +71,10 @@
 #' }
 #'
 #' \donttest{
-#' # The INLA package and PROJ6 are required
+#' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
-#'   fm_has_PROJ6() &&
-#'   require(ggplot2, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   data("gorillas", package = "inlabru")
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
@@ -115,7 +116,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       Npoints <- rpois(1, lambda = area * exp(wmax))
       if (Npoints > 0) {
         points <- runif(n = Npoints, min = xmin, max = xmax)
-        proj <- INLA::inla.mesh.project(mesh, points)
+        proj <- fm_evaluator(mesh, points)$proj
         if (length(loglambda) == 1) {
           lambda_ratio <- exp(as.vector(Matrix::rowSums(proj$A) * loglambda) - wmax)
         } else {
@@ -184,7 +185,6 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      space.units <- fm_length_unit(input.crs)
       internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
@@ -202,7 +202,15 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       area.R <- R
     } else {
       if (use.crs) {
+        #        if (is.na(input.crs)) {
+        #          space.units <- fm_length_unit(input.crs)
+        #        }
         area.R <- 6371
+        if (is.geocent) {
+          if (abs(1 - space.R / area.R) > 1e-2) {
+            warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
+          }
+        }
       } else if (is.geocent) {
         area.R <- space.R
       }
@@ -264,7 +272,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (sum(Npoints) > 0) {
           points <- sp::SpatialPoints(points, proj4string = target.crs)
 
-          A <- INLA::inla.mesh.project(mesh, points)$A
+          A <- fm_evaluator(mesh, points)$proj$A
           lambda_ratio <- exp(as.vector(A %*% loglambda) - loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
@@ -301,7 +309,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           )
 
           # Do some thinning
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -332,7 +340,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           coordinates(points) <- c("x", "y", "z")
           proj4string(points) <- internal.crs
 
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -384,7 +392,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           coordinates(points) <- c("x", "y", "z")
           proj4string(points) <- internal.crs
 
-          proj <- INLA::inla.mesh.project(mesh, points)
+          proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           sampled.points[[k]] <- points[keep]
@@ -446,10 +454,14 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     # Only retain points within the samplers
     if (!is.null(samplers) && (length(ret) > 0)) {
       if (inherits(samplers, "inla.mesh")) {
-        proj <- INLA::inla.mesh.project(samplers, points)
-        ret <- ret[proj$ok]
+        proj <- fm_evaluator(samplers, points)
+        ret <- ret[proj$proj$ok]
+      } else if (inherits(samplers, "Spatial")) {
+        ret <- ret[!is.na(sp::over(ret, samplers))]
       } else {
-        ret <- ret[!is.na(over(ret, samplers))]
+        idx <- sf::st_within(sf::st_as_sf(ret), samplers)
+        ok <- vapply(idx, function(x) length(x) > 0, TRUE)
+        ret <- ret[ok]
       }
     }
   } else {

@@ -4,7 +4,15 @@
 \alias{evaluate_predictor}
 \title{Evaluate component effects or expressions}
 \usage{
-evaluate_predictor(model, state, data, effects, predictor, format = "auto")
+evaluate_predictor(
+  model,
+  state,
+  data,
+  effects,
+  predictor,
+  used = NULL,
+  format = "auto"
+)
 }
 \arguments{
 \item{state}{A list where each element is a list of named latent state
@@ -17,6 +25,8 @@ and covariates needed to evaluate the model.}
 as computed by \code{\link[=evaluate_effect_multi_state.component_list]{evaluate_effect_multi_state.component_list()}}}
 
 \item{predictor}{Either a formula or expression}
+
+\item{used}{A \code{\link[=bru_used]{bru_used()}} object, or NULL (default)}
 
 \item{format}{character; determines the storage format of the output.
 Available options:

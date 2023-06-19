@@ -1,4 +1,3 @@
-
 # Linearisation ----
 
 #' Compute inlabru model linearisation information
@@ -47,15 +46,27 @@ bru_compute_linearisation.component <- function(cmp,
                                                 ...) {
   label <- cmp[["label"]]
 
-  if (!inherits(comp_simple, "bru_mapper_taylor")) {
-    warning("Non-linear component mappers not fully supported!", immediate. = TRUE)
+  if (!is.null(comp_simple) &&
+    !inherits(comp_simple, "bru_mapper_taylor")) {
+    warning(paste0(
+      "Non-linear component mappers not fully supported!",
+      "\nClass for '", label, "': '",
+      paste0(class(comp_simple), collapse = "', '"),
+      "'"
+    ), immediate. = TRUE)
   }
-  A <- ibm_jacobian(comp_simple,
-    input = input[[label]],
-    state = state[[label]]
-  )
+  if (is.null(comp_simple)) {
+    A <- NULL
+    assume_rowwise <- FALSE
+  } else {
+    A <- ibm_jacobian(
+      comp_simple,
+      input = input[[label]],
+      state = state[[label]]
+    )
 
-  assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+    assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+  }
 
   if (assume_rowwise) {
     if (NROW(A) == 1) {
@@ -83,11 +94,24 @@ bru_compute_linearisation.component <- function(cmp,
     j = integer(0),
     x = numeric(0)
   )
+
+  symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
-    row_subset <- which(A[, k] != 0.0)
+    if (is.null(A)) {
+      row_subset <- seq_len(NROW(pred0))
+    } else {
+      Ak <- A[, k, drop = TRUE]
+      row_subset <- which(Ak != 0.0)
+    }
     if (length(row_subset) > 0) {
-      state_eps <- state
-      state_eps[[label]][k] <- state[[label]][k] + eps
+      if (symmetric_diffs) {
+        state_eps <- list(state, state)
+        state_eps[[1]][[label]][k] <- state[[label]][k] - eps
+        state_eps[[2]][[label]][k] <- state[[label]][k] + eps
+      } else {
+        state_eps <- state
+        state_eps[[label]][k] <- state[[label]][k] + eps
+      }
       # TODO:
       # Option: filter out the data and effect rows for which
       # the rows of A have some non-zeros, or all if allow_combine
@@ -95,39 +119,85 @@ bru_compute_linearisation.component <- function(cmp,
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
 
-      if (assume_rowwise) {
-        effects_eps <- list()
-        for (label_loop in names(effects)) {
-          if (NROW(effects[[label_loop]]) == 1) {
-            effects_eps[[label_loop]] <-
-              rep(effects[[label_loop]], length(row_subset))
+      if (is.null(A)) {
+        effects_eps <- NULL
+      } else {
+        if (assume_rowwise) {
+          if (symmetric_diffs) {
+            effects_eps <- list(list(), list())
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[1]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+                effects_eps[[2]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
+                effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
+            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
           } else {
-            effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+            effects_eps <- list()
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
+          }
+        } else {
+          if (symmetric_diffs) {
+            effects_eps <- list(effects, effects)
+            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
+            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
+          } else {
+            effects_eps <- effects
+            effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
           }
         }
-        effects_eps[[label]] <- effects_eps[[label]] + A[row_subset, k] * eps
-      } else {
-        effects_eps <- effects
-        effects_eps[[label]] <- effects_eps[[label]] + A[, k] * eps
       }
       pred_eps <- evaluate_predictor(
         model,
-        state = list(state_eps),
+        state = if (symmetric_diffs) {
+          state_eps
+        } else {
+          list(state_eps)
+        },
         data =
           if (assume_rowwise) {
             data[row_subset, , drop = FALSE]
           } else {
             data
           },
-        effects = list(effects_eps),
+        effects =
+          if (is.null(effects_eps)) {
+            NULL
+          } else if (symmetric_diffs) {
+            effects_eps
+          } else {
+            list(effects_eps)
+          },
         predictor = lhood_expr,
         format = "matrix"
       )
       # Store sparse triplet information
-      if (assume_rowwise) {
-        values <- (pred_eps - pred0[row_subset])
+      if (symmetric_diffs) {
+        if (assume_rowwise) {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        } else {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        }
       } else {
-        values <- (pred_eps - pred0)
+        if (assume_rowwise) {
+          values <- (pred_eps - pred0[row_subset])
+        } else {
+          values <- (pred_eps - pred0)
+        }
       }
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
@@ -165,17 +235,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
                                                comp_simple,
                                                eps,
                                                ...) {
-  allow_latent <- lhood[["allow_latent"]]
+  used <- bru_used(lhood)
   allow_combine <- lhood[["allow_combine"]]
-  included <- parse_inclusion(
-    names(model[["effects"]]),
-    lhood[["include_components"]],
-    lhood[["exclude_components"]]
-  )
   effects <- evaluate_effect_single_state(
-    comp_simple[included],
-    input = input[included],
-    state = state[included],
+    comp_simple[used[["effect"]]],
+    input = input[used[["effect"]]],
+    state = state[used[["effect"]]],
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
@@ -208,7 +273,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   offset <- pred0
   # Either this loop or the internal bru_component specific loop
   # can in principle be parallelised.
-  for (label in included) {
+  for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
       if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
         # If linear and no combinations allowed, just need to copy the
@@ -239,7 +304,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             comp_simple = comp_simple[[label]],
             effects = effects,
             pred0 = pred0,
-            allow_latent = lhood[["allow_latent"]],
+            allow_latent = label %in% used[["latent"]],
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
             ...

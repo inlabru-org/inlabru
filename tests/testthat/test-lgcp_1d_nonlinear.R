@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Mexdolphin: Hazard rate detection function", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -10,7 +8,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   }
   cmp <- ~ lsig(1) + Intercept(1)
   form <- distance ~ log(hr(distance, lsig)) + Intercept
-  ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
+  ips <- fm_int(list(distance = INLA::inla.mesh.1d(seq(0, 8, by = 0.1))))
 
   pts <-
     mexdolphin$points
@@ -44,7 +42,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_max_iter = 10,
       verbose = FALSE,
       bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "experimental"
+      inla.mode = "compact"
     )
   )
 
@@ -162,7 +160,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 #   }
 #   cmp <- ~ lsig(1) + Intercept(1)
 #   form <- distance ~ log(hr(distance, lsig)) + Intercept
-#   ips <- ipoints(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
+#   ips <- fm_int(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
 #   local_bru_options_set(bru_verbose = FALSE)
 #   bench::mark(
 #     pandemic = {
@@ -224,7 +222,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_max_iter = 10,
       verbose = FALSE,
       bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "experimental"
+      inla.mode = "compact"
     )
   )
 
@@ -242,7 +240,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_max_iter = 10,
       verbose = FALSE,
       bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "experimental"
+      inla.mode = "compact"
     )
   )
 

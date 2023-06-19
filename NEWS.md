@@ -1,3 +1,82 @@
+# inlabru 2.8.0
+
+## Feature updates
+
+* The iterative inla method has been given both sharper internal `inla()` optimisation
+  criteria for the iterations (thanks to Haavard Rue), _and_ a more relaxed
+  nonlinear iteration stopping criterion; the default `bru_method$rel_tol`
+  values has been changed from 1 to 10 percent change. The iterations are
+  terminated when all latent and hyper-parameter mode changes fullfil
+  `|change|/SD < rel_tol`, and the non-linear line search is inactive.
+  This seems to strike a useful balance between the different optimisation
+  criteria, allowing the iterations to converge faster and also detect that
+  convergence sooner.
+
+* The logic for which components are needed for a predictor expression
+  (in `like()` or `generate()`/`predict()`) has been updated to when possible
+  extract the list of components from the expression itself.
+  The user can override this default if necessary, using the `include`/`exclude` arguments.
+  
+  The `bru_used()` methods are used to guess the needed component names, applied
+  to the right-hand side of the `formula` arguments.  The `allow_latent` argument
+  to `like()` has been deprecated in favour of `include_latent`
+  (by default auto-detected for use of `_latent` and `_eval`).
+  
+  The internal information storage is handled by the new `bru_used()`
+  methods, that can also be used directly by the user and supplied via the
+  `used` argument to `like()`/`generate()`/`predict()`.
+
+* Add `fm_int()` integration methods, replacing the old `ipmaker()` and `ipoints()` methods.
+  Supports both `sf` and `sp` sampler objects.
+  
+* Add `fm_pixels()` methods for gridded points. The old 
+  `pixels()` method now calls `fm_pixels(..., format = "sp")`
+
+* `eval_spatial` support for sf objects (for point-in-polygon data lookups)
+
+* Allow precomputed spatial covariates in the data for point process observations
+
+* Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh` #188
+
+* Rename the `predict()` and `generate()` `data` arguments to `newdata`, for
+  better compatibility with other `predict()` methods.  The old argument name
+  will still be accepted, but give a warning.  Code that does not name the `data`
+  argument is not affected.
+
+* Note: Coordinate names for `Spatial*` objects have been inconsistently
+  available in the predictor expression evaluation. However, due to how internal
+  conversions might inadvertently change these names, they can not be relied
+  on, and they are no longer being made available to the predictor expression.
+  As a side effect, this change also speeds up some `bru()` runs by around a
+  factor 2, since it avoids converting the `Spatial*` to a regular `data.frame`
+  in time-sensitive core evaluation code.
+  
+  If you need access to the raw coordinate values, use explicit calls to
+  `sp::coordinates(.data.)` (e.g. for custom spatial covariate evaluation.).
+  When possible, use the built-in covariate evaluation method, `eval_spatial()`,
+  either implicitly with `comp(covariate, ...)` or explicitly,
+  `comp(eval_spatial(covariate, where = .data.), ...)`, that handles `crs` information
+  correctly.  Also consider transitioning from `sp` to `sf` data storage, using
+  `geometry` instead of raw coordinates.
+
+## Bug and dependency updates
+
+* Remove `rgdal` and `maptools` dependencies #178
+
+* Add `bru_safe_sp()` to check if `sp` can be used safely (checks `rgdal` availability
+  and `sp` evolution status, optionally forcing use of `sf`) #178
+
+* Remove PROJ4 support #178
+
+* Change `rgl.*` functions to `*3d`. Thanks to Duncan Murdoch #181
+
+* Speed up `ibm_jacobian.bru_mapper_harmonics` for large models
+
+* Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
+  calls that don't account for the `geos` canonical representation being CW,
+  whereas the canonical Simple Features representation being CCW. See
+  https://github.com/r-spatial/sf/issues/2096
+  
 # inlabru 2.7.0
 
 ## Feature overview
@@ -6,7 +85,7 @@
 
 * Expanded geometry and mesh handling methods
 
-* Expanded `bru_mapper` system
+* Expanded `bru_mapper()` system
 
 * Added convergence diagnostics plot with `bru_convergence_plot()`
 
@@ -15,20 +94,20 @@
 * Allow `NA` input for default 1D mappers to generate effect zero, like
   in `inla()`.
   
-* New and expanded methods `fm_crs`, `fm_CRS`, `fm_transform`,
-  `fm_ellipsoid_radius`, and `fm_length_unit` to further support `sf` objects.
-  The `fm_crs` extraction method also supports `terra` objects.
+* New and expanded methods `fm_crs()`, `fm_CRS()`, `fm_transform()`,
+  `fm_ellipsoid_radius()`, and `fm_length_unit()` to further support `sf` objects.
+  The `fm_crs()` extraction method also supports `terra` objects.
 
-* `bru_fill_missing` now supports `terra` `SpatRaster` data and and `sf` locations.
+* `bru_fill_missing()` now supports `terra` `SpatRaster` data and and `sf` locations.
   
-* New experimental methods `fm_evaluator` and `fm_evaluate`, replacing the
+* New experimental methods `fm_evaluator()` and `fm_evaluate()`, replacing the
   `INLA` `inla.mesh.projector` and `inla.mesh.project` methods.
   
 * Experimental integration support for sphere and globe meshes.
   
 * Allow `sf` input to `family="cp"` models.
 
-* Further `bru_mapper` method updates;
+* Further `bru_mapper()` method updates;
 
   * Deprecated `ibm_amatrix()` and `names()`
   methods, replaced by `ibm_jacobian()` and `ibm_names()`.
@@ -43,7 +122,7 @@
     providing the weights as log-weights, and uses block-wise shifts to
     avoid potential overflow.
   
-  * `summary` methods for `bru_mapper` objects
+  * `summary` methods for `bru_mapper` objects (`summary.bru_mapper()`)
   
   * Removed `methods` argument from `bru_mapper_define()`.  Implementations
     should register S3 methods instead.
@@ -52,11 +131,11 @@
 
 * Remove unused `spatstat.core` dependency. Fixes #165
 
-* Fixed issue with plain mapper evaluation in the `ibm_eval.default`
-  and `ibm_eval.bru_mapper_collect` methods, where they would return zeros
+* Fixed issue with plain mapper evaluation in the `ibm_eval.default()`
+  and `ibm_eval.bru_mapper_collect()` methods, where they would return zeros
   instead of the intended values.
   The main component evaluation and estimation code was not directly affected
-  as that is based on the `bru_mapper_multi` class methods that rely on the
+  as that is based on the `bru_mapper_multi()` class methods that rely on the
   Jacobians instead.  The bug would therefore mainly have impacted the future,
   not yet supported nonlinear mapper extensions.
   

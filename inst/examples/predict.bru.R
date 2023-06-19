@@ -1,5 +1,7 @@
 \donttest{
 if (bru_safe_inla(multicore = FALSE) &&
+    bru_safe_sp() &&
+    require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE)) {
 
   # Load the Gorilla data
@@ -55,7 +57,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # objects as well as Spatial objects. For instance, we might want to predict
   # 'mySmooth' at the locations of the mesh vertices. Using
 
-  vrt <- vertices.inla.mesh(gorillas$mesh)
+  vrt <- fm_vertices(gorillas$mesh, format = "sp")
 
   # we obtain these vertices as a SpatialPointsDataFrame
 
@@ -89,7 +91,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
   # SpatialPixels object covering the mesh
 
-  pxl <- pixels(gorillas$mesh)
+  pxl <- fm_pixels(gorillas$mesh, format = "sp")
   mySmooth2 <- predict(fit, pxl, ~mySmooth)
 
   # This will give us a SpatialPixelDataFrame with the columns we are looking for

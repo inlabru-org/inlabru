@@ -26,13 +26,19 @@ Generate \code{SpatialPixels} covering an \code{inla.mesh}
 \donttest{
 if (require(ggplot2, quietly = TRUE)) {
   data("mrsea", package = "inlabru")
-  pxl <- pixels(mrsea$mesh, nx = 50, ny = 50, mask = mrsea$boundary)
+  pxl <- fm_pixels(mrsea$mesh,
+    nx = 50, ny = 50, mask = mrsea$boundary,
+    format = "sp"
+  )
   ggplot() +
     gg(pxl, fill = "grey", alpha = 0.5) +
     gg(mrsea$mesh)
 }
 }
 
+}
+\seealso{
+\code{\link[=fm_pixels]{fm_pixels()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

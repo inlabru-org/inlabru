@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Aggregated Gaussian observations", {
   local_bru_safe_inla()
 

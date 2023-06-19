@@ -61,7 +61,7 @@ You can install the development version of inlabru from [GitHub](https://github.
 # install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
-or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
+or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
 ```{r universe-installation, eval = FALSE}
 # Enable universe(s) by inlabru-org
 options(repos = c(
@@ -78,11 +78,15 @@ install.packages("inlabru")
 
 This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
 and predicts its intensity:
+```{r special-setup, echo=FALSE}
+suppressPackageStartupMessages(library(sp))
+```
 ```{r example}
 # Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
 # Load the data
 data(gorillas, package = "inlabru")
@@ -92,7 +96,7 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.01, 0.01)
 )
-cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
@@ -110,7 +114,7 @@ fit <- bru(
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  pixels(gorillas$mesh, mask = gorillas$boundary),
+  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
   ~ exp(mySmooth + Intercept)
 )
 
@@ -121,8 +125,3 @@ ggplot() +
   coord_equal() +
   ggtitle("Nest intensity per km squared")
 ```
-If you have an R installation with PROJ6/GDAL3, and INLA >= 20.06.18, and
-loading old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The data objects in `inlabru` have
-been updated, so should not need this conversion anymore.
-

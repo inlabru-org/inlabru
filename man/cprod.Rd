@@ -2,28 +2,45 @@
 % Please edit documentation in R/bru.integration.R
 \name{cprod}
 \alias{cprod}
-\title{Cross product of integration points}
+\title{(Blockwise) cross product of integration points}
 \usage{
-cprod(...)
+cprod(..., na.rm = NULL, .blockwise = FALSE)
 }
 \arguments{
-\item{...}{\code{data.frame} or \code{SpatialPointsDataFrame} objects, each one usually obtained by a call to the \link{ipoints} function.}
+\item{...}{\code{data.frame}, \code{sf}, or \code{SpatialPointsDataFrame} objects, each one
+usually obtained by a call to an \code{\link[=fm_int]{fm_int()}} method.}
+
+\item{na.rm}{logical; if \code{TRUE}, the rows with weight \code{NA} from the
+non-overlapping full_join will be removed; if \code{FALSE}, set the undefined weights to \code{NA}.
+If \code{NULL} (default), act as \code{TRUE}, but warn if any elements needed removing.}
+
+\item{.blockwise}{logical; if \code{FALSE}, computes full tensor product integration.
+If \code{TRUE}, computes within-block tensor product integration (used internally
+by \code{\link[=fm_int]{fm_int()}}).
+Default \code{FALSE}}
 }
 \value{
-A \code{data.frame} or \code{SpatialPointsDataFrame} of multidimensional integration points and their weights
+A \code{data.frame}, \code{sf}, or \code{SpatialPointsDataFrame} of multidimensional
+integration points and their weights
 }
 \description{
-Calculates the cross product of integration points in different dimensions
-and multiplies their weights accordingly. If the object defining points in a particular
-dimension has no weights attached to it all weights are assumed to be 1.
+Calculates the groupwise cross product of integration points in different
+dimensions and multiplies their weights accordingly.
+If the object defining points in a particular dimension has no
+weights attached to it all weights are assumed to be 1.
+
+Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
 }
 \examples{
 \donttest{
 # ipoints needs INLA
 if (bru_safe_inla()) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-  ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
-  ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+  ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
+    rbind(c(0, 3), c(3, 8)),
+    name = "myDim"
+  )
+  ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 
   # Calculate the cross product
   ips <- cprod(ips1, ips2)
@@ -34,6 +51,7 @@ if (bru_safe_inla()) {
 }
 
 }
-\author{
-Fabian E. Bachl \email{bachlfab@gmail.com}
+\seealso{
+\code{\link[=fm_cprod]{fm_cprod()}}
 }
+\keyword{internal}

@@ -69,17 +69,24 @@ the domain.}
 
 \item{lattice}{An \code{inla.mesh.lattice()} object.}
 }
-\value{
-For \code{fm_evaluate(mesh, ...)}, a list with projection
-information.  For \code{fm_evaluator(mesh, ...)}, an
-\code{fm_evaluator} object.  For \code{fm_evaluate(projector, field, ...)}, a field projected from the mesh onto the locations given by
-the projector object.
-}
 \description{
-Calculate a lattice projection to/from an \code{inla.mesh}
+Calculate evaluation information and/or evaluate a function
+defined on an \code{inla.mesh} or \code{inla.mesh.1d} object.
 }
 \section{Functions}{
 \itemize{
+\item \code{fm_evaluate()}: Returns the field function evaluated at the locations determined by an
+\code{fm_evaluator} object. \code{fm_evaluate(mesh, field = field, ...)} is a
+shortcut to \code{fm_evaluate(fm_evaluator(mesh, ...), field = field)}.
+
+\item \code{fm_evaluator()}: Returns the and \code{fm_evaluator} list object with evaluation information.
+The \code{proj} element contains a mapping matrix \code{A} and a logical vector \code{ok},
+that indicates which locations were mappable to the input mesh. For \code{inla.mesh}
+input, \code{proj} also contains a matrix \code{bary} and vector \code{t}, with the
+barycentric coordinates within the triangle each input location falls in.
+
+\item \code{fm_evaluator_lattice()}: Creates an \code{inla.mesh.lattice}, by default covering the input mesh.
+
 \item \code{fm_evaluator(inla.mesh)}: The \code{...} arguments are passed on to \code{fm_evaluator_lattice()}
 if no \code{loc} or \code{lattice} is provided.
 
@@ -95,10 +102,12 @@ if (bru_safe_inla()) {
 }
 \donttest{
 if (bru_safe_inla() &&
-  require(rgl)) {
-  plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
+  require("ggplot2") &&
+  bru_safe_sp()) {
+  ggplot() + gg(mesh, col = field)
 }
 }
+
 }
 \seealso{
 \code{inla.mesh}, \code{inla.mesh.1d},

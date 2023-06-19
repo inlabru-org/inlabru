@@ -1,86 +1,6 @@
-#' Split lines at mesh edges
-#'
-#' @aliases split_lines
-#' @export
-#' @param mesh An inla.mesh object
-#' @param sp Start points of lines
-#' @param ep End points of lines
-#' @param filter.zero.length Filter out segments with zero length? (Bool)
-#' @param ... argments to int.quadrature
-#' @return List of start and end points resulting from splitting the given lines
-#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-#' @keywords internal
-split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
-  idx <- seq_len(NROW(sp))
-  if (NROW(sp) > 0) {
-    # Filter out segments not on the mesh
-    t1 <- INLA::inla.fmesher.smorg(
-      loc = mesh$loc, tv = mesh$graph$tv,
-      points2mesh = as.matrix(data.frame(sp, z = 0))
-    )$p2m.t
-    t2 <- INLA::inla.fmesher.smorg(
-      loc = mesh$loc, tv = mesh$graph$tv,
-      points2mesh = as.matrix(data.frame(ep, z = 0))
-    )$p2m.t
-    # if (any(t1==0) | any(t2==0)) { warning("points outside boundary! filtering...")}
-    sp <- sp[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
-    ep <- ep[!((t1 == 0) | (t2 == 0)), , drop = FALSE]
-    idx <- idx[!((t1 == 0) | (t2 == 0))]
-  }
-
-  if (NROW(sp) == 0) {
-    return(list(
-      sp = sp, ep = ep,
-      split.origin = NULL,
-      idx = idx,
-      split.loc = NULL
-    ))
-  }
-
-  loc <- as.matrix(rbind(sp, ep))
-
-  # Split the segments into parts
-  if (NCOL(loc) == 2) {
-    loc <- cbind(loc, rep(0, NROW(loc)))
-  }
-  np <- dim(sp)[1]
-  sp.idx <- t(rbind(seq_len(np), np + seq_len(np)))
-  splt <- INLA::inla.fmesher.smorg(
-    mesh$loc, mesh$graph$tv,
-    splitlines = list(loc = loc, idx = sp.idx)
-  )
-  # plot(data$mesh)
-  # points(loc)
-  # points(splt$split.loc,col="blue)
-
-  # Start points of new segments
-  sp <- splt$split.loc[splt$split.idx[, 1], seq_len(dim(sp)[2]), drop = FALSE]
-  # End points of new segments
-  ep <- splt$split.loc[splt$split.idx[, 2], seq_len(dim(ep)[2]), drop = FALSE]
-  idx <- idx[splt$split.idx[, 1]]
-  origin <- splt$split.origin
-
-  # Filter out zero length segments
-  if (filter.zero.length) {
-    sl <- apply((ep - sp)^2, MARGIN = 1, sum)
-    sp <- sp[!(sl == 0), , drop = FALSE]
-    ep <- ep[!(sl == 0), , drop = FALSE]
-    origin <- origin[!(sl == 0)]
-    idx <- idx[!(sl == 0)]
-  }
-
-  return(list(
-    sp = sp, ep = ep,
-    split.origin = origin,
-    idx = idx,
-    split.loc = splt$split.loc
-  ))
-}
-
-
 # Gaussian quadrature and other integration point constructors
 #
-# Contruct integration points for each of lines defined by the start and end points provided.
+# Construct integration points for each of lines defined by the start and end points provided.
 # The following schemes are available:
 # "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
 # "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
@@ -90,7 +10,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 # @export
 # @param sp Start points of lines
 # @param ep End points of lines
-# @param scheme Integration scheme (gaussian or equdistant)
+# @param scheme Integration scheme (gaussian or equidistant)
 # @param n Number of integration points
 # @return List with integration poins (ips), weights (w) and weights including line length (wl)
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
@@ -237,7 +157,7 @@ sphere_geodesic_length <- function(sp, ep) {
 }
 
 # 2022-11-29: Currently assumes the data is Spatial
-int.slines <- function(data, mesh, group = NULL, project = TRUE) {
+int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
   # Extract start and end coordinates
   qq <- coordinates(data)
   sp <- do.call(
@@ -330,7 +250,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     )
   }
 
-  # Wrap everything up and perform projection according to distance and given group argument
+  # Wrap everything up and perform projection according to distance and given .block argument
   ips <- data.frame(ips)
   d_ips <- ncol(ips)
   # Temporary names
@@ -342,8 +262,8 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
     ips$weight <- ips$weight * data$weight[idx[, 1]]
   }
 
-  if (!is.null(group)) {
-    ips <- cbind(ips, as.data.frame(data)[idx[, 1], group, drop = FALSE])
+  if (!is.null(.block)) {
+    ips <- cbind(ips, as.data.frame(data)[idx[, 1], .block, drop = FALSE])
   }
 
   ips <- sp::SpatialPointsDataFrame(
@@ -361,7 +281,7 @@ int.slines <- function(data, mesh, group = NULL, project = TRUE) {
 
   # Project to mesh vertices
   if (project && !is.null(mesh)) {
-    ips <- vertex.projection(ips, mesh, columns = "weight", group = group)
+    ips <- fm_vertex_projection(ips, mesh)
   }
 
   ips
@@ -474,8 +394,8 @@ intersection_mesh <- function(mesh, poly) {
       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 2], , drop = FALSE] +
       mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 3], , drop = FALSE]) / 3
   ok_tri <-
-    INLA::inla.mesh.projector(mesh, loc = loc_tri)$proj$ok &
-      INLA::inla.mesh.projector(mesh_poly, loc = loc_tri)$proj$ok
+    fm_evaluator(mesh, loc = loc_tri)$proj$ok &
+      fm_evaluator(mesh_poly, loc = loc_tri)$proj$ok
   if (any(ok_tri)) {
     loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop = FALSE])))
     new_idx <- integer(mesh$n)
@@ -496,54 +416,20 @@ intersection_mesh <- function(mesh, poly) {
   mesh_subset
 }
 
-#' Aggregate integration weights onto mesh nodes
-#'
-#' @param mesh Mesh on which to integrate
-#' @param integ `list` of `loc`, integration points,
-#'   and `weight`, integration weights,
-#'   or a `SpatialPointsDataFrame`. Only the coordinates and `weight` column
-#'   are handled.
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
-#' @export
-integration_weight_aggregation <- function(mesh, integ) {
-  if (inherits(integ, "SpatialPointsDataFrame")) {
-    loc <- coordinates(integ)
-  } else {
-    loc <- integ$loc
-  }
-  # Locate points onto the mesh
-  proj <- fm_evaluator(mesh, loc = loc)
-
-  # Convert integration weights to mesh points
-  weight <- as.vector(as.vector(integ$weight) %*% proj$proj$A)
-
-  ok <- weight > 0
-
-  if (inherits(integ, "SpatialPointsDataFrame")) {
-    sp::SpatialPointsDataFrame(mesh$loc[ok, , drop = FALSE],
-      data = data.frame(weight = weight[ok]),
-      proj4string = fm_sp_get_crs(integ),
-      match.ID = FALSE
-    )
-  } else {
-    list(loc = mesh$loc[ok, , drop = FALSE], weight = weight[ok])
-  }
-}
 
 
-#' Basic robust integration weights for mesh/polygon intersections
-#'
-#' @param mesh Mesh on which to integrate
-#' @param bnd `inla.mesh.segment` defining the integration domain
-#' @param nsub number of subdivision points along each triangle edge, giving
-#'    `(nsub + 1)^2` proto-integration points used to compute
-#'   the vertex weights
-#'   (default `NULL=9`, giving 100 integration points for each triangle)
-#' @return `list` with elements `loc` and `weight` with
-#'   integration points for the intersection of the mesh and polygon
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Basic robust integration weights for mesh/polygon intersections
+#
+# @param mesh Mesh on which to integrate
+# @param bnd `inla.mesh.segment` defining the integration domain
+# @param nsub number of subdivision points along each triangle edge, giving
+#    `(nsub + 1)^2` proto-integration points used to compute
+#   the vertex weights
+#   (default `nsub=9`, giving 100 integration points for each triangle)
+# @return `list` with elements `loc` and `weight` with
+#   integration points for the intersection of the mesh and polygon
+# @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   # Construct a barycentric grid of subdivision triangle midpoints
   if (is.null(nsub)) {
@@ -579,7 +465,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
 
   # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
-  ok <- INLA::inla.mesh.projector(mesh_bnd, loc = loc)$proj$ok
+  ok <- fm_evaluator(mesh_bnd, loc = loc)$proj$ok
 
   list(
     loc = loc[ok, , drop = FALSE],
@@ -587,18 +473,18 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   )
 }
 
-#' Integration points for polygons inside an inla.mesh
-#'
-#' This method doesn't handle polygons with holes. Use [bru_int_polygon()]
-#' instead.
-#'
-#' @param mesh An inla.mesh object
-#' @param loc Locations defining the polygons
-#' @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-#' @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Integration points for polygons inside an inla.mesh
+#
+# This method doesn't handle polygons with holes. Use [bru_int_polygon()]
+# instead.
+#
+# @param mesh An inla.mesh object
+# @param loc Locations defining the polygons
+# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
+# @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
+# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 
 int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
   if (is.null(group)) {
@@ -617,19 +503,19 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
-      integ <- integration_weight_aggregation(mesh, integ)
+      integ <- fm_vertex_projection(integ, mesh)
     }
 
     # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      fm_evaluator(mesh, integ$loc)$proj$ok &
         (integ$weight > 0)
 
     ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
     colnames(ips) <- c("x", "y")
     ips$weight <- integ$weight[ok]
 
-    ips$group <- rep(g, nrow(ips))
+    ips$.block <- rep(g, nrow(ips))
     ipsl <- c(ipsl, list(ips))
   }
 
@@ -638,16 +524,15 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
 
 
 
-#' Integration points for polygons inside an inla.mesh
-#'
-#' @export
-#' @param mesh An inla.mesh object
-#' @param polylist A list of `inla.mesh.segment` objects
-#' @param method Which integration method to use ("stable",
-#'   with aggregation to mesh vertices, or "direct")
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
+# Integration points for polygons inside an inla.mesh
+#
+# @param mesh An inla.mesh object
+# @param polylist A list of `inla.mesh.segment` objects
+# @param method Which integration method to use ("stable",
+#   with aggregation to mesh vertices, or "direct")
+# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+# @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+# @keywords internal
 
 bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
   method <- match.arg(method, c("stable", "direct"))
@@ -662,7 +547,7 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 
     # Keep points inside the mesh with positive weights
     ok <-
-      INLA::inla.mesh.project(mesh, integ$loc)$ok &
+      fm_evaluator(mesh, integ$loc)$proj$ok &
         (integ$weight > 0)
 
     if (any(ok)) {
@@ -680,7 +565,7 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
         x = integ$loc[, 1],
         y = integ$loc[, 2],
         weight = integ$weight,
-        group = g
+        .block = g
       )
 
       ipsl <- c(ipsl, list(ips))
@@ -693,7 +578,35 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 
 # New integration methods ----
 
+
+
+
+
+#' Aggregate integration weights onto mesh nodes
+#'
+#' `r lifecycle::badge("deprecated")` Use [fm_vertex_projection()] instead.
+#'
+#' @param mesh Mesh on which to integrate
+#' @param integ `list` of `loc`, integration points,
+#'   and `weight`, integration weights,
+#'   or a `SpatialPointsDataFrame`. Only the coordinates and `weight` column
+#'   are handled.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @keywords internal
+#' @export
+integration_weight_aggregation <- function(mesh, integ) {
+  lifecycle::deprecate_warn(
+    "2.8.0",
+    "integration_weight_aggregation()",
+    "fm_vertex_projection()"
+  )
+
+  fm_vertex_projection(points = integ, mesh = mesh)
+}
+
 #' Integration scheme for mesh triangle interiors
+#'
+#' `r lifecycle::badge("deprecated")` Use [fm_int_inla_mesh_core()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param tri_subset Optional triangle index vector for integration on a subset
@@ -707,62 +620,15 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
-  # Construct a barycentric grid of subdivision triangle midpoints
-  if (is.null(nsub)) {
-    nsub <- 9
-  }
-  stopifnot(nsub >= 0)
-  nB <- (nsub + 1)^2
-
-  nT <- nrow(mesh$graph$tv)
-  if (is.null(tri_subset)) {
-    tri_subset <- seq_len(nT)
-  }
-
-  is_spherical <- identical(mesh$manifold, "S2")
-
-  # Barycentric integration coordinates
-  b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
-  bb <- as.matrix(expand.grid(b, b))
-  # Points above the diagonal should be reflected into the lower triangle:
-  refl <- rowSums(bb) > 1
-  if (any(refl)) {
-    bb[refl, ] <- cbind(1 - bb[refl, 2], 1 - bb[refl, 1])
-  }
-  # Construct complete barycentric coordinates:
-  barycentric_grid <- cbind(1 - rowSums(bb), bb)
-
-  # Construct integration points
-  loc <- matrix(0.0, length(tri_subset) * nB, ncol(mesh$loc))
-  idx_end <- 0
-  for (tri in tri_subset) {
-    idx_start <- idx_end + 1
-    idx_end <- idx_start + nB - 1
-    loc[seq(idx_start, idx_end, length = nB), ] <-
-      as.matrix(barycentric_grid %*%
-        mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
-  }
-
-  if (is_spherical) {
-    # Normalise
-    radius <- sum(mesh$loc[1, ]^2)^0.5
-    mesh$loc <- mesh$loc / radius
-    loc <- loc / rowSums(loc^2)^0.5
-  }
-
-  # Construct integration weights
-  tri_area <- INLA::inla.mesh.fem(mesh, order = 1)$ta[tri_subset]
-
-  if (is_spherical) {
-    tri_area <- tri_area * radius^2
-    loc <- loc * radius
-  }
-
-  list(
-    loc = loc,
-    weight = rep(tri_area / nB, each = nB)
+  lifecycle::deprecate_warn(
+    "2.8.0",
+    "mesh_triangle_integration()",
+    "fm_int_inla_mesh_core()"
   )
+
+  fm_int_inla_mesh_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
 }
+
 
 
 #' Integration points for polygons inside an inla.mesh
@@ -771,8 +637,8 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 #' @param mesh An inla.mesh object
 #' @param method Which integration method to use ("stable",
 #'   with aggregation to mesh vertices, or "direct")
-#' @param samplers If non-NULL, a SpatialPolygons* object, used instead of polylist
-#' @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
+#' @param samplers If non-NULL, a SpatialPolygons* object
+#' @param ... Arguments passed to the low level integration method (`make_triangle_integration`)
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 
@@ -787,7 +653,7 @@ bru_int_polygon <- function(mesh,
   # Compute direct integration points
   # TODO: Allow blockwise construction to avoid
   # overly large temporary coordinate matrices (via tri_subset)
-  integ <- mesh_triangle_integration(mesh, ...)
+  integ <- fm_int_inla_mesh_core(mesh, ...)
 
   # Keep points with positive weights (This should be all,
   # but if there's a degenerate triangle, this gets rid of it)
@@ -808,7 +674,10 @@ bru_int_polygon <- function(mesh,
       )
     }
 
-    idx <- sp::over(samplers, integ_sp, returnList = TRUE)
+    #    idx_ <- sp::over(samplers, integ_sp, returnList = TRUE)
+    samplers_sf <- sf::st_as_sf(samplers)
+    integ_sp_sf <- sf::st_as_sf(integ_sp)
+    idx <- sf::st_contains(samplers_sf, integ_sp_sf, sparse = TRUE)
 
     for (g in seq_along(idx)) {
       if (length(idx[[g]]) > 0) {
@@ -819,7 +688,7 @@ bru_int_polygon <- function(mesh,
 
         if (method %in% c("stable")) {
           # Project integration points and weights to mesh nodes
-          integ_ <- integration_weight_aggregation(mesh, integ_)
+          integ_ <- fm_vertex_projection(integ_, mesh)
         }
 
         if (ncol(integ_$loc) > 2) {
@@ -827,18 +696,15 @@ bru_int_polygon <- function(mesh,
             x = integ_$loc[, 1],
             y = integ_$loc[, 2],
             z = integ_$loc[, 3],
-            # TODO: figure out how to deal with 3D points without
-            # breaking sp::over later
-            #          coordinateZ = if (ncol(integ_$loc) > 2) integ_$loc[, 3] else NULL,
             weight = integ_$weight,
-            group = g
+            .block = g
           )
         } else {
           ips <- data.frame(
             x = integ_$loc[, 1],
             y = integ_$loc[, 2],
             weight = integ_$weight,
-            group = g
+            .block = g
           )
         }
 
@@ -848,7 +714,7 @@ bru_int_polygon <- function(mesh,
   } else {
     if (method %in% c("stable")) {
       # Project integration points and weights to mesh nodes
-      integ <- integration_weight_aggregation(mesh, integ)
+      integ <- fm_vertex_projection(integ, mesh)
     }
 
     if (ncol(integ$loc) > 2) {
@@ -857,20 +723,26 @@ bru_int_polygon <- function(mesh,
         y = integ$loc[, 2],
         z = integ$loc[, 3],
         weight = integ$weight,
-        group = 1
+        .block = 1
       ))
     } else {
       ipsl <- list(data.frame(
         x = integ$loc[, 1],
         y = integ$loc[, 2],
         weight = integ$weight,
-        group = 1
+        .block = 1
       ))
     }
   }
 
   do.call(rbind, ipsl)
 }
+
+
+
+
+
+
 
 # From plotsample test, comparing before and after code refactor to avoid
 # recreating the full integration scheme for every polygon

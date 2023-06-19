@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 latent_spde1D_testdata <- function() {
   local_bru_safe_inla()
   data(Poisson2_1D, package = "inlabru", envir = environment())

@@ -37,6 +37,7 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
+bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -79,7 +80,6 @@ not do, because you would not have seen them all).
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 plotwithall <- ggplot() +
   gg(boundary) +
   gg(sample$plots) +
@@ -120,7 +120,8 @@ fit <- lgcp(cmp, sample$nests, samplers = sample$plots, domain = list(coordinate
 Plot the density surface from your fitted model
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-lambda.sample <- predict(fit, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
+pxl <- fm_pixels(mesh, mask = boundary, format = "sp")
+lambda.sample <- predict(fit, pxl, ~ exp(my.spde + Intercept))
 ```
 
 ```{r warning=FALSE,message=FALSE}
@@ -139,12 +140,12 @@ intensity, representative of an imagined new realisation of the point process,
 and the conditional expectation that takes the actually observed nests into account,
 by recognising that we have complete information in the surveyed plots. 
 ```{r results="hide",warning=FALSE,message=FALSE}
-Lambda <- predict(fit, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda <- predict(fit, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
 Lambda.empirical <- predict(
   fit,
   rbind(
-    cbind(ipoints(boundary, mesh), data.frame(all = TRUE)),
-    cbind(ipoints(sample$plots, mesh), data.frame(all = FALSE))
+    cbind(fm_int(mesh, boundary), data.frame(all = TRUE)),
+    cbind(fm_int(mesh, sample$plots), data.frame(all = FALSE))
   ),
   ~ (sum(weight * exp(my.spde + Intercept) * all) -
     sum(weight * exp(my.spde + Intercept) * !all) +
@@ -161,13 +162,12 @@ Fit the same model to the full dataset (the points in `gorillas$nests`), or get 
 fit, if you kept it. Plot the intensity surface and estimate the integrated intensity
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-
 fit.all <- lgcp(cmp, gorillas$nests,
   samplers = gorillas$boundary,
   domain = list(coordinates = mesh)
 )
-lambda.all <- predict(fit.all, pixels(mesh, mask = boundary), ~ exp(my.spde + Intercept))
-Lambda.all <- predict(fit.all, ipoints(boundary, mesh), ~ sum(weight * exp(my.spde + Intercept)))
+lambda.all <- predict(fit.all, pxl, ~ exp(my.spde + Intercept))
+Lambda.all <- predict(fit.all, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
 ```
 
 Your plot should look like this:

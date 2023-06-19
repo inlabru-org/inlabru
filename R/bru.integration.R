@@ -61,17 +61,19 @@
 #'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
 #'   Points per knot segment: `nsub1`
 #' * `poly_method`: if set to "legacy", selects an old polygon integration method
-#'   that doesn't handle holes. Currently only used for debugging purposes.
-#' @param project Deprecated in favour of `int.args(method=...)`.
+#'   that doesn't handle holes. Only used for debugging purposes.
+#' @param project `r lifecycle::badge("deprecated")` Deprecated in favour of `int.args(method=...)`.
 #' If TRUE, aggregate the integration points to mesh vertices. Default:
 #' `project = (identical(int.args$method, "stable"))`
 #'
-#' @return A `data.frame` or `SpatialPointsDataFrame` of 1D and 2D integration points, respectively.
+#' @return A `data.frame`, `tibble`, `sf`, or `SpatialPointsDataFrame` of 1D and
+#' 2D integration points, including a `weight` column and `.block` column.
 #'
 #' @examples
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_sp()) {
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -121,6 +123,30 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = NULL) {
+  #  lifecycle::deprecate_soft("2.8.0",
+  #                            "ipoints()",
+  #                            "fm_int()",
+  #                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+
+  if (!is.null(group)) {
+    if (is.null(name) && inherits(domain, "inla.mesh")) {
+      if (inherits(samplers, "sf")) {
+        name <- "geometry"
+      } else {
+        name <- "coordinates"
+      }
+    }
+    domain <- c(list(domain), as.list(as.data.frame(samplers[group]))[group])
+    names(domain) <- c(name, group)
+    ips <- fm_int(
+      domain = domain,
+      samplers = samplers,
+      int.args = int.args
+    )
+    return(ips)
+  }
+
+
   int.args.default <- list(method = "stable", nsub1 = 30, nsub2 = 9)
   if (is.null(int.args)) {
     int.args <- list()
@@ -135,16 +161,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (!is.null(project)) {
-    if (project && !identical(int.args$method, "stable")) {
-      stop("ipoints(project=TRUE) is deprecated, and int.args$methods != 'stable'")
-    } else if (!project && identical(int.args$method, "stable")) {
-      stop("ipoints(project=FALSE) is deprecated, and int.args$methods == 'stable'")
-    }
-    warning(
-      "ipoints(project=", ifelse(project, "TRUE", "FALSE"),
-      ") is deprecated. Will use int.args$method = '",
-      int.args[["method"]],
-      "' instead."
+    lifecycle::deprecate_warn(
+      "2.7.0",
+      "ipoints(project)",
+      details = paste0(
+        "For project=", project,
+        ", use int.args$method = '",
+        list(
+          "TRUE" = "stable",
+          "FALSE" = "direct"
+        )[as.character(project)],
+        "' instead."
+      )
     )
   }
 
@@ -178,10 +206,14 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   is_1d <- !is_2d &&
     (
       (!is.null(samplers) &&
-        is.numeric(samplers)) ||
+        (is.numeric(samplers) ||
+          is.character(samplers) ||
+          is.factor(samplers)) ||
         (!is.null(domain) &&
           (is.numeric(domain) ||
-            inherits(domain, "inla.mesh.1d")))
+            is.character(domain) ||
+            is.factor(domain)) ||
+          inherits(domain, "inla.mesh.1d")))
     )
   if (!is_1d && !is_2d) {
     stop("Unable to determine integration domain definition")
@@ -217,13 +249,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers$weight <- 1
     }
     ips <- samplers
-  } else if (is_1d && is.null(samplers) && is.numeric(domain)) {
+  } else if (is_1d && is.null(samplers) && (is.numeric(domain) ||
+    is.character(domain) ||
+    is.factor(domain))) {
     ips <- data.frame(
       x = as.vector(domain),
       weight = 1
     )
     colnames(ips) <- c(name, "weight")
-  } else if (is_1d && is.null(domain) && is.integer(samplers)) {
+    # TODO samplers numeric and you do not have domain, it is not safe to forget to supply domain, if stored in integer
+  } else if (is_1d && is.null(domain) && (is.integer(samplers) ||
+    is.character(samplers) ||
+    is.factor(samplers))) {
     ips <- data.frame(
       x = as.vector(samplers),
       weight = 1
@@ -231,12 +268,23 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     colnames(ips) <- c(name, "weight")
   } else if (is_1d && is.null(samplers) && inherits(domain, "inla.mesh.1d") &&
     identical(int.args[["method"]], "stable")) {
+    if (isTRUE(domain$cyclic)) {
+      loc_trap <- c(domain$loc, domain$interval[2])
+    } else {
+      loc_trap <- domain$loc
+    }
+    loc_mid <- (loc_trap[-1] + loc_trap[-length(loc_trap)]) / 2
+    weight_mid <- diff(loc_trap)
+    weight_trap <- c(weight_mid / 2, 0) + c(0, weight_mid / 2)
+    loc_simpson <- c(loc_trap, loc_mid)
+    weight_simpson <- c(weight_trap / 3, weight_mid * 2 / 3)
+
     ips <- data.frame(
-      x = domain$loc,
-      weight = Matrix::diag(INLA::inla.mesh.fem(domain)$c0),
-      group = 1
+      x = loc_simpson,
+      weight = weight_simpson,
+      .block = 1
     )
-    colnames(ips) <- c(name, "weight", "group")
+    colnames(ips) <- c(name, "weight", ".block")
   } else if (is_1d) {
     domain_range <-
       if (inherits(domain, "inla.mesh.1d")) {
@@ -284,17 +332,14 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       subsamplers <- samplers[j, ]
 
       if (identical(int.args[["method"]], "stable")) {
-        A_w <- INLA::inla.spde.make.A(domain,
-          int_loc,
-          weights =
-            int_w *
-              (int_loc >= min(subsamplers)) *
-              (int_loc <= max(subsamplers))
-        )
+        A_ <- fm_evaluator(domain, int_loc)$proj$A
+        w <- as.vector((int_w *
+          (int_loc >= min(subsamplers)) *
+          (int_loc <= max(subsamplers))) %*% A_)
         ips[[j]] <- data.frame(
-          loc = domain$loc,
-          weight = Matrix::colSums(A_w),
-          group = j
+          loc = domain$loc[w > 0],
+          weight = w[w > 0],
+          .block = j
         )
       } else {
         inside <-
@@ -304,10 +349,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         ips[[j]] <- data.frame(
           loc = int_loc[inside],
           weight = int_w[inside],
-          group = j
+          .block = j
         )
       }
-      colnames(ips[[j]]) <- c(name, "weight", "group")
+      colnames(ips[[j]]) <- c(name, "weight", ".block")
     }
 
     ips <- do.call(rbind, ips)
@@ -325,7 +370,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
-    ips <- vertices.inla.mesh(domain)
+    ips <- fm_vertices(domain, format = "sp")
     ips$weight <- INLA::inla.mesh.fem(domain, order = 1)$va
 
     # backtransform
@@ -362,16 +407,16 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips <- int.slines(
       samplers,
       domain,
-      group = group,
+      .block = group,
       project = identical(int.args[["method"]], "stable")
     )
 
     coord_names <- c("x", "y", "z")
-    if (!is.null(coordnames(samplers))) {
-      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-    } else if (!is.null(name)) {
-      coord_names[seq_along(name)] <- name
-    }
+    #    if (!is.null(coordnames(samplers))) {
+    #      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+    #    } else if (!is.null(name)) {
+    #      coord_names[seq_along(name)] <- name
+    #    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else if (is_2d &&
     (inherits(samplers, c(
@@ -394,7 +439,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     cnames <- coordnames(samplers)
-    samplers_crs <- fm_sp_get_crs(samplers)
+    samplers_crs <- fm_CRS(samplers)
 
     # Convert samplers and domain to equal area CRS
     if (!fm_crs_is_null(domain$crs)) {
@@ -414,7 +459,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ))
 
     # This handles holes
-    poly_segm <- INLA::inla.sp2segment(samplers, join = FALSE)
+    poly_segm <- fm_as_inla_mesh_segment(samplers, join = FALSE)
     poly_segm <- lapply(
       seq_along(poly_segm),
       function(k) {
@@ -430,14 +475,14 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- INLA::inla.mesh.2d(boundary = samplers, max.edge = max.edge)
-      domain$crs <- fm_sp_get_crs(samplers)
+      domain$crs <- fm_CRS(samplers)
+      domain_crs <- fm_CRS(domain$crs)
     } else {
+      domain_crs <- fm_CRS(domain$crs)
       if (!fm_crs_is_null(domain$crs)) {
         domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }
-    domain_crs <- fm_crs(domain$crs)
-    domain_crs <- fm_CRS(domain_crs)
 
 
     if (identical(int.args[["poly_method"]], "legacy")) {
@@ -464,32 +509,40 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
 
-    df <- data.frame(
-      samplers@data[ips$group, group, drop = FALSE],
-      weight = ips[, "weight"] * samplers@data[ips$group, "weight"]
-    )
+    if (is.null(group)) {
+      df <- data.frame(
+        weight = ips[, "weight"] * samplers@data[ips$.block, "weight"],
+        .block = ips$.block
+      )
+    } else {
+      df <- data.frame(
+        samplers@data[ips$.block, group, drop = FALSE],
+        weight = ips[, "weight"] * samplers@data[ips$.block, "weight"],
+        .block = ips$.block
+      )
+    }
     if (is.null(ips$z)) {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y")],
         data = df,
-        match.ID = FALSE, proj4string = domain_crs
+        match.ID = FALSE, proj4string = fm_CRS(domain)
       )
     } else {
       ips <- sp::SpatialPointsDataFrame(ips[, c("x", "y", "z")],
         data = df,
-        match.ID = FALSE, proj4string = domain_crs
+        match.ID = FALSE, proj4string = fm_CRS(domain)
       )
     }
 
     if (!fm_crs_is_null(domain_crs) && !fm_crs_is_null(samplers_crs)) {
-      ips <- fm_transform(ips, crs = samplers_crs)
+      ips <- fm_transform(ips, crs = domain_crs)
     }
 
     coord_names <- c("x", "y", "z")
-    if (!is.null(coordnames(samplers))) {
-      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
-    } else if (!is.null(name)) {
-      coord_names[seq_along(name)] <- name
-    }
+    #    if (!is.null(coordnames(samplers))) {
+    #      coord_names[seq_along(coordnames(samplers))] <- coordnames(samplers)
+    #    } else if (!is.null(name)) {
+    #      coord_names[seq_along(name)] <- name
+    #    }
     coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
@@ -502,28 +555,47 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   ips
 }
 
-#' @title Cross product of integration points
+
+
+
+
+#' @title (Blockwise) cross product of integration points
 #'
 #' @description
-#' Calculates the cross product of integration points in different dimensions
-#' and multiplies their weights accordingly. If the object defining points in a particular
-#' dimension has no weights attached to it all weights are assumed to be 1.
+#' Calculates the groupwise cross product of integration points in different
+#' dimensions and multiplies their weights accordingly.
+#' If the object defining points in a particular dimension has no
+#' weights attached to it all weights are assumed to be 1.
 #'
-#' @aliases cprod
+#' Legacy wrapper for [fm_cprod()]
+#'
+#' @seealso [fm_cprod()]
 #' @export
+#' @keywords internal
 #'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param ... `data.frame` or `SpatialPointsDataFrame` objects, each one usually obtained by a call to the [ipoints] function.
-#' @return A `data.frame` or `SpatialPointsDataFrame` of multidimensional integration points and their weights
+#' @param ... `data.frame`, `sf`, or `SpatialPointsDataFrame` objects, each one
+#' usually obtained by a call to an [fm_int()] method.
+#' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
+#' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
+#' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
+#' @param .blockwise logical; if `FALSE`, computes full tensor product integration.
+#' If `TRUE`, computes within-block tensor product integration (used internally
+#' by [fm_int()]).
+#' Default `FALSE`
+#' @return A `data.frame`, `sf`, or `SpatialPointsDataFrame` of multidimensional
+#' integration points and their weights
 #'
 #' @examples
 #' \donttest{
 #' # ipoints needs INLA
 #' if (bru_safe_inla()) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- ipoints(rbind(c(0, 3), c(3, 8)), 17, name = "myDim")
-#'   ips2 <- ipoints(domain = c(1, 2, 4), name = "myDiscreteDim")
+#'   ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
+#'     rbind(c(0, 3), c(3, 8)),
+#'     name = "myDim"
+#'   )
+#'   ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 #'
 #'   # Calculate the cross product
 #'   ips <- cprod(ips1, ips2)
@@ -533,44 +605,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #' }
 #'
-cprod <- function(...) {
-  ipl <- list(...)
-  ipl <- ipl[!vapply(ipl, is.null, TRUE)]
-  if (length(ipl) == 0) {
-    return(NULL)
-  }
-
-  if (length(ipl) == 1) {
-    ips <- ipl[[1]]
-  } else {
-    ips1 <- ipl[[1]]
-    if (length(ipl) > 2) {
-      ips2 <- do.call(cprod, ipl[2:length(ipl)])
-    } else {
-      ips2 <- ipl[[2]]
-    }
-    if (!"weight" %in% names(ips1)) {
-      ips1$weight <- 1
-    }
-    if (!"weight" %in% names(ips2)) {
-      ips2$weight <- 1
-    }
-
-    by <- setdiff(intersect(names(ips1), names(ips2)), "weight")
-    if (inherits(ips1, "Spatial")) {
-      ips <- sp::merge(ips1, ips2, by = by, duplicateGeoms = TRUE)
-    } else if (inherits(ips2, "Spatial")) {
-      ips <- sp::merge(ips2, ips1, by = by, duplicateGeoms = TRUE)
-    } else {
-      ips <- base::merge(ips1, ips2, by = by)
-    }
-    ips$weight <- ips$weight.x * ips$weight.y
-    ips[["weight.x"]] <- NULL
-    ips[["weight.y"]] <- NULL
-    row.names(ips) <- as.character(seq_len(NROW(ips)))
-  }
-  ips
+cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
+  # lifecycle::deprecate_soft("2.8.0")
+  fm_cprod(..., na.rm = na.rm, .blockwise = .blockwise)
 }
+
+
+
+
+
+
+
+
 
 # Integration points for log Gaussian Cox process models using INLA
 #
@@ -611,9 +657,19 @@ cprod <- function(...) {
 
 ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
+  lifecycle::deprecate_soft("2.8.0",
+    "ipmaker()",
+    "fm_int()",
+    details = c("ipmaker(samplers, domain, ...) has been replaced by more versatile fm_int(domain, samplers, ...) methods.")
+  )
+
   # To allow sf geometry support, should likely change the logic to
   # use the domain specification to determine the type of integration
   # method to call, so that it doesn't need to rely on the domain name.
+
+  if (missing(dnames)) {
+    dnames <- names(domain)
+  }
 
   if ("coordinates" %in% dnames) {
     spatial <- TRUE
@@ -658,202 +714,4 @@ ipmaker <- function(samplers, domain, dnames,
 
   lips <- lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
   ips <- do.call(cprod, c(list(ips), lips))
-}
-
-
-
-
-# Project data to mesh vertices under the assumption of linearity
-#
-#
-# @aliases vertex.projection
-# @export
-# @param points A SpatialPointsDataFrame object
-# @param mesh An inla.mesh object
-# @param columns A character array of the points columns which whall be projected
-# @param group Character array identifying columns in \code{points}. These
-# columns are interpreted as factors and the projection is performed
-# independently for each combination of factor levels.
-# @return SpatialPointsDataFrame of mesh vertices with projected data attached
-
-vertex.projection <- function(points, mesh, columns = names(points), group = NULL, fill = NULL) {
-  if (is.null(group) || (length(group) == 0)) {
-    res <- INLA::inla.fmesher.smorg(mesh$loc, mesh$graph$tv, points2mesh = coordinates(points))
-    tri <- res$p2m.t
-    ok <- tri > 0
-    if (any(!ok)) {
-      warning("Some integration points were outside the mesh; check your coordinate systems.")
-    }
-
-    data <- list()
-    for (k in seq_along(columns)) {
-      cn <- columns[k]
-      nw <- points@data[ok, cn] * res$p2m.b[ok, , drop = FALSE]
-      w.by <- by(as.vector(nw), as.vector(mesh$graph$tv[tri[ok], ]), sum, simplify = TRUE)
-      data[[cn]] <- as.vector(w.by)
-    }
-
-    data <- data.frame(data)
-    coords <- mesh$loc[as.numeric(names(w.by)), seq_along(coordnames(points)), drop = FALSE]
-    data$vertex <- as.numeric(names(w.by))
-
-    ret <- sp::SpatialPointsDataFrame(coords,
-      proj4string = fm_CRS(points),
-      data = data,
-      match.ID = FALSE
-    )
-    coordnames(ret) <- coordnames(points)
-
-    # If fill is not NULL, add vertices to which no data was projected
-    # and set their projected data according to `fill`
-
-    if (!is.null(fill)) {
-      vrt <- vertices.inla.mesh(mesh)
-      vrt <- vrt[setdiff(vrt$vertex, data$vertex), ]
-      if (nrow(vrt) > 0) {
-        for (nm in setdiff(names(data), "vertex")) vrt[[nm]] <- fill
-        ret <- rbind(ret, vrt)
-      }
-      ret <- ret[match(1:mesh$n, ret$vertex), ]
-    }
-  } else {
-    fn <- function(X) {
-      ret <- vertex.projection(X, mesh, columns = columns)
-      for (g in group) {
-        ret[[g]] <- X[[g]][1]
-      }
-      ret
-    }
-    ret <- lapply(
-      unique(points[[group]]),
-      function(x) {
-        fn(points[points[[group]] == x, , drop = FALSE])
-      }
-    )
-    ret <- do.call(rbind, ret)
-  }
-  ret
-}
-
-
-# Project data to mesh vertices under the assumption of linearity
-#
-#
-# @aliases vertex.projection
-# @export
-# @param points A SpatialPointsDataFrame object
-# @param mesh An inla.mesh object
-# @param columns A character array of the points columns which whall be projected
-# @param group Character array identifying columns in \code{points}. These
-# columns are interpreted as factors and the projection is performed
-# independently for each combination of factor levels.
-# @return SpatialPointsDataFrame of mesh vertices with projected data attached
-# @example
-#
-# pts = data.frame(x = 50 * runif(10), weight = abs(rnorm(100)))
-# msh = inla.mesh.1d(seq(0,50,by=1))
-# pts$year = c(rep(1,5), rep(2,5))
-# ip =  vertex.projection.1d(pts, msh)
-# ggplot(ip) + geom_point(aes(x=x, y=weight))
-#
-# ip =  vertex.projection.1d(pts, msh, group = "year", fill = 0, column = "weight")
-# head(ip)
-# ggplot(ip) + geom_point(aes(x=x, y=weight, color = year))
-
-vertex.projection.1d <- function(points, mesh, group = NULL, column = "weight", simplify = TRUE, fill = NULL) {
-  dname <- setdiff(names(points), c(column, group))
-  if (length(dname) > 1) {
-    dname <- dname[1]
-  }
-
-  xx <- points[, dname]
-  ww <- points[, column]
-  iv <- findInterval(xx, mesh$loc)
-
-  # Left and right vertex location
-  left <- mesh$loc[iv]
-  right <- mesh$loc[iv + 1]
-
-  # Relative location within the two neighboring vertices
-  w.right <- (xx - left) / (right - left)
-  w.left <- 1 - w.right
-
-  # Projected integration points
-  ips <- rbind(
-    data.frame(x = left, vertex = iv),
-    data.frame(x = right, vertex = iv + 1)
-  )
-  ips[column] <- c(ww * w.left, ww * w.right)
-
-
-  # Simplify
-  if (simplify) {
-    bygroup <- list(vertex = ips$vertex)
-    if (!is.null(group)) {
-      bygroup <- c(bygroup, as.list(rbind(points[, group, drop = FALSE], points[, group, drop = FALSE])))
-    }
-    ips <- aggregate(ips[, column, drop = FALSE], by = bygroup, FUN = sum)
-  }
-
-  # Add x-coordinate
-  ips[dname] <- mesh$loc[ips$vertex]
-
-  # Fill
-  if (!is.null(fill)) {
-    miss <- setdiff(seq_len(length(mesh$loc)), ips$vertex)
-    mips <- data.frame(vertex = miss, x = mesh$loc[miss])
-    mips[, column] <- fill
-    ips <- rbind(ips, merge(mips, ips[, group, drop = FALSE]))
-  }
-
-  ips
-}
-
-
-#' Weighted summation (integration) of data frame subsets
-#'
-#' A typical task in statistical inference to integrate a (multivariate) function along one or
-#' more dimensions of its domain. For this purpose, the function is evaluated at some points
-#' in the domain and the values are summed up using weights that depend on the area being
-#' integrated over. This function performs the weighting and summation conditional for each level
-#' of the dimensions that are not integrated over. The parameter `dims` states the the
-#' dimensions to integrate over. The set of dimensions that are held fixed is the set difference
-#' of all column names in `data` and the dimensions stated by `dims`.
-#'
-#' @aliases int
-#' @export
-#' @param data A `data.frame` or `Spatial` object. Has to have a `weight` column with numeric values.
-#' @param values Numerical values to be summed up, usually the result of function evaluations.
-#' @param dims Column names (dimension names) of the `data` object to integrate over.
-#' @return A `data.frame` of integrals, one for each level of the cross product of all dimensions not being integrated over.
-#'
-#' @examples
-#' \donttest{
-#' # ipoints needs INLA
-#' if (bru_safe_inla(quietly = TRUE)) {
-#'   # Create integration points in two dimensions, x and y
-#'
-#'   ips <- cprod(
-#'     ipoints(c(0, 10), 10, name = "x"),
-#'     ipoints(c(1, 5), 10, name = "y")
-#'   )
-#'
-#'   # The sizes of the domains are 10 and 4 for x and y, respectively.
-#'   # Integrating f(x,y) = 1 along x and y should result in the total
-#'   # domain size 40
-#'
-#'   int(ips, rep(1, nrow(ips)), c("x", "y"))
-#' }
-#' }
-#'
-int <- function(data, values, dims = NULL) {
-  keep <- setdiff(names(data), c(dims, "weight"))
-  if (length(keep) > 0 && !is.null(dims)) {
-    agg <- aggregate(values * data$weight, by = as.list(data[, keep, drop = FALSE]), FUN = sum)
-    names(agg)[ncol(agg)] <- "integral" # paste0("integral_{",dims,"}(",deparse(values),")")
-  } else {
-    agg <- sum(data$weight * values)
-  }
-
-  agg
 }

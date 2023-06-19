@@ -2,12 +2,9 @@
 % Please edit documentation in R/local_testthat.R
 \name{local_testthat}
 \alias{local_testthat}
-\alias{local_testthat_assign}
-\alias{local_testthat_tolerances}
+\alias{local_bru_testthat_assign}
+\alias{local_bru_testthat_tolerances}
 \alias{local_bru_options_set}
-\alias{local_set_PROJ6_warnings}
-\alias{local_get_rgdal_options}
-\alias{local_disable_PROJ6_warnings}
 \alias{local_basic_intercept_testdata}
 \alias{local_basic_fixed_effect_testdata}
 \alias{local_mrsea_convert}
@@ -15,20 +12,14 @@
 \alias{local_bru_testthat_setup}
 \title{Unit test helpers}
 \usage{
-local_testthat_assign(x, values, envir = parent.frame())
+local_bru_testthat_assign(x, values, envir = parent.frame())
 
-local_testthat_tolerances(
+local_bru_testthat_tolerances(
   tolerances = c(1e-04, 0.01, 0.1),
   envir = parent.frame()
 )
 
 local_bru_options_set(..., .reset = FALSE, envir = parent.frame())
-
-local_set_PROJ6_warnings(proj4 = FALSE, thin = TRUE, envir = parent.frame())
-
-local_get_rgdal_options()
-
-local_disable_PROJ6_warnings(envir = parent.frame())
 
 local_basic_intercept_testdata()
 
@@ -52,11 +43,6 @@ local_bru_testthat_setup(envir = parent.frame())
 \item{.reset}{For \code{local_bru_options_set}, logical indicating if the global
 override options list should be emptied before setting the new option(s).}
 
-\item{proj4}{logical; whether to show PROJ4 conversion warnings. Default \code{FALSE}}
-
-\item{thin}{logical; whether to show only a thinned version of rgdal PROJ6
-warnings. Default \code{TRUE}}
-
 \item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
 INLA \code{num.threads} option is not checked or altered. Default: \code{FALSE}, multicore
 not allowed (used for examples and unit tests).}
@@ -77,31 +63,23 @@ Local helper functions for package unit tests
 }
 \section{Functions}{
 \itemize{
-\item \code{local_testthat_assign()}: Assign local variable. Useful for easy cleanup
+\item \code{local_bru_testthat_assign()}: Assign local variable. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
-\item \code{local_testthat_tolerances()}: Assign test tolerances
+\item \code{local_bru_testthat_tolerances()}: Assign test tolerances
 Assign local tolerance variables. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
 \item \code{local_bru_options_set()}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
 
-\item \code{local_set_PROJ6_warnings()}: Disable PROJ4/6 warnings.
-To be used within package tests. Restores state on exit.
-
-\item \code{local_get_rgdal_options()}: Return a list of the current rgdal warning options
-
-\item \code{local_disable_PROJ6_warnings()}: Disable rgdal PROJ4 conversion warnings and thin
-PROJ6 warnings.
-
 \item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
 within-system repeatability by calling \code{local_bru_safe_inla()};
 see also \code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
 \item \code{local_bru_testthat_setup()}: Initialise environment for tests.
-Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
+Assigns tolerance variables.
 To be called either at the top of a testfile, or inside tests.
 Does \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, since that may invoke a skip and
 should be called inside each test that relies on INLA.

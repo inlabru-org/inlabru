@@ -373,7 +373,7 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 
 
 
-start.end.points.segments.f <- function(seg = NULL, use.tran = FALSE, tran = NULL, geometry = "euc") {
+start_end_points_segments_f <- function(seg = NULL, use.tran = FALSE, tran = NULL, geometry = "euc") {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
   # same for: tran=transect.quadrant
@@ -563,7 +563,7 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 
 
 
-generate.obs.location.f <- function(seg = NULL, dists = NULL, geometry = "euc",
+generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
                                     do.plot = FALSE) {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues

@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("bru: linear component", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -19,6 +17,7 @@ test_that("bru: linear component", {
   expect_equal(fit$summary.fixed["myLin", "mean"], 2.002273, tolerance = midtol)
   expect_equal(fit$summary.fixed["myLin", "sd"], 0.01323361, tolerance = hitol)
 
+  skip_if_not_installed("sn")
   pr <- predict(
     fit,
     data.frame(x = c(1, 2)),

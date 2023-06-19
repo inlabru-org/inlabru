@@ -4,11 +4,25 @@
 \alias{component_eval}
 \title{Evaluate component values in predictor expressions}
 \usage{
-component_eval(main, group = NULL, replicate = NULL, .state = NULL)
+component_eval(
+  main,
+  group = NULL,
+  replicate = NULL,
+  weights = NULL,
+  .state = NULL
+)
 }
 \arguments{
-\item{main, group, replicate}{Specification of where to evaluate a component.
-The three inputs are passed on to the respective \code{bru_mapper} methods.}
+\item{main, group, replicate, weights}{Specification of where to evaluate a component.
+The four inputs are passed on to the joint \code{bru_mapper} for the component,
+as
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(mapper = list(
+       main = main,
+       group = group,
+       replicate = replicate),
+     scale = weights)
+}\if{html}{\out{</div>}}}
 
 \item{.state}{The internal component state. Normally supplied automatically
 by the internal methods for evaluating inlabru predictor expressions.}

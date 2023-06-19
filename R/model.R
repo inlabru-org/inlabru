@@ -68,19 +68,9 @@ bru_model <- function(components, lhoods) {
 
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
-  linear <- TRUE
-  included <- character(0)
-  for (lh in lhoods) {
-    linear <- linear && lh[["linear"]]
-    included <- union(
-      included,
-      parse_inclusion(
-        names(components),
-        include = lh[["include_components"]],
-        exclude = lh[["exclude_components"]]
-      )
-    )
-  }
+  included <- bru_used(lhoods)
+  included <- union(included[["effect"]], included[["latent"]])
+  linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
 
   for (cmp in included) {
     if (linear ||
@@ -170,23 +160,22 @@ evaluate_model <- function(model,
                            comp_simple = NULL,
                            predictor = NULL,
                            format = NULL,
-                           include = NULL,
-                           exclude = NULL,
+                           used = NULL,
                            ...) {
-  included <- parse_inclusion(names(model$effects), include, exclude)
+  used <- bru_used(used, labels = names(model$effects))
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
   }
-  if (is.null(input) && !is.null(data)) {
+  if (is.null(input)) {
     input <- input_eval(
-      components = model$effects[included],
+      components = model$effects[used$effect],
       data = data,
       inla_f = TRUE
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
-    comp_simple <- evaluate_comp_simple(model$effects[included],
+    comp_simple <- evaluate_comp_simple(model$effects[used$effect],
       input = input,
       inla_f = TRUE
     )
@@ -211,7 +200,8 @@ evaluate_model <- function(model,
     data = data,
     effects = effects,
     predictor = predictor,
-    format = format
+    format = format,
+    used = used
   )
 
   values
@@ -373,6 +363,7 @@ evaluate_effect_multi_state.component_list <- function(components, input, state,
 #' @param effects A list where each element is list of named evaluated effects,
 #' as computed by [evaluate_effect_multi_state.component_list()]
 #' @param predictor Either a formula or expression
+#' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,
@@ -395,6 +386,7 @@ evaluate_predictor <- function(model,
                                data,
                                effects,
                                predictor,
+                               used = NULL,
                                format = "auto") {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
@@ -412,6 +404,8 @@ evaluate_predictor <- function(model,
       parent.frame()
     }
 
+  used <- bru_used(used, labels = names(model$effects))
+
   envir <- new.env(parent = enclos)
   # Find .data. first,
   # then data variables,
@@ -420,15 +414,11 @@ evaluate_predictor <- function(model,
   #  for (nm in names(pred.envir)) {
   #    assign(nm, pred.envir[[nm]], envir = envir)
   #  }
-  if (is.list(data)) {
-    for (nm in names(data)) {
-      assign(nm, data[[nm]], envir = envir)
-    }
-  } else {
-    data_df <- as.data.frame(data)
-    for (nm in names(data_df)) {
-      assign(nm, data_df[[nm]], envir = envir)
-    }
+  #
+  # Note: Since 2.7.0.9019, no longer converts Spatial*DataFrame to data frame
+  # here; coordinates must be accessed via sp::coordinates() if needed.
+  for (nm in names(data)) {
+    assign(nm, data[[nm]], envir = envir)
   }
   assign(".data.", data, envir = envir)
 
@@ -588,8 +578,16 @@ evaluate_predictor <- function(model,
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
 #' the effect of a component called "name".
 #'
-#' @param main,group,replicate Specification of where to evaluate a component.
-#'   The three inputs are passed on to the respective `bru_mapper` methods.
+#' @param main,group,replicate,weights Specification of where to evaluate a component.
+#'   The four inputs are passed on to the joint `bru_mapper` for the component,
+#'   as
+#'  ```
+#'  list(mapper = list(
+#'         main = main,
+#'         group = group,
+#'         replicate = replicate),
+#'       scale = weights)
+#' ````
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
@@ -622,6 +620,7 @@ evaluate_predictor <- function(model,
 component_eval <- function(main,
                            group = NULL,
                            replicate = NULL,
+                           weights = NULL,
                            .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",
@@ -784,11 +783,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
   lapply(
     lhoods,
     function(lh) {
-      included <- parse_inclusion(
-        names(model[["effects"]]),
-        lh[["include_components"]],
-        lh[["exclude_components"]]
-      )
+      included <- bru_used(lh)[["effect"]]
 
       input_eval(
         model$effects[included],
@@ -804,7 +799,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' Computes the index values matrices for included components
 #'
 #' @param model A `bru_model` object
-#' @param lhoods A `bru__like_list` object
+#' @param lhoods A `bru_like_list` object. Deprecated and ignored
 #' @return A named list of `idx_full` and `idx_inla`,
 #' named list of indices, and `inla_subset`, and `inla_subset`,
 #' a named list of logical subset specifications for extracting the `INLA::f()`
@@ -812,20 +807,8 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' @rdname evaluate_index
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  included <-
-    unique(do.call(
-      c,
-      lapply(
-        lhoods,
-        function(lh) {
-          parse_inclusion(
-            names(model[["effects"]]),
-            lh[["include_components"]],
-            lh[["exclude_components"]]
-          )
-        }
-      )
-    ))
+  included <- bru_used(lhoods)
+  included <- union(included[["effect"]], included[["latent"]])
 
   list(
     idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),

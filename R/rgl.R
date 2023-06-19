@@ -70,15 +70,15 @@ glplot <- function(object, ...) {
 #' Visualize SpatialPoints using RGL
 #'
 #' This function will calculate the cartesian coordinates of the points provided
-#' and use rgl.points() in order to render them.
+#' and use points3d() in order to render them.
 #'
 #' @export
 #' @name glplot.SpatialPoints
 #'
 #' @param object a SpatialPoints or SpatialPointsDataFrame object.
 #' @param add If TRUE, add the points to an existing plot. If FALSE, create new plot.
-#' @param color vector of R color characters. See rgl.material() for details.
-#' @param ... Parameters passed on to rgl.points()
+#' @param color vector of R color characters. See material3d() for details.
+#' @param ... Parameters passed on to points3d()
 #'
 #' @family inlabru RGL tools
 #'
@@ -90,20 +90,20 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- fm_sp_get_crs(object)
+    proj4string(ll) <- fm_CRS(object)
     object <- ll
   }
 
   object <- fm_transform(object, crs = fm_crs("sphere"))
   cc <- coordinates(object)
   requireNamespace("rgl")
-  rgl::rgl.points(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
+  rgl::points3d(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
 
 #' Visualize SpatialLines using RGL
 #'
 #' This function will calculate a cartesian representation of the lines provided
-#' and use rgl.linestrip() in order to render them.
+#' and use lines3d() in order to render them.
 #'
 #'
 #' @export
@@ -111,7 +111,7 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
 #'
 #' @param object a SpatialLines or SpatialLinesDataFrame object.
 #' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
-#' @param ... Parameters passed on to rgl.linestrips().
+#' @param ... Parameters passed on to lines3d().
 #'
 #' @family inlabru RGL tools
 #'
@@ -126,8 +126,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   coordinates(sp) <- c("x", "y", "z")
   coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- fm_sp_get_crs(object)
-  proj4string(ep) <- fm_sp_get_crs(object)
+  proj4string(sp) <- fm_CRS(object)
+  proj4string(ep) <- fm_CRS(object)
 
   sp <- fm_transform(sp, crs = fm_crs("sphere"))
   ep <- fm_transform(ep, crs = fm_crs("sphere"))
@@ -140,7 +140,7 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   requireNamespace("rgl")
 
-  rgl::rgl.linestrips(mm, add = add, ...)
+  rgl::lines3d(mm, add = add, ...)
 }
 
 
@@ -171,6 +171,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     proj4string(ll) <- object$crs
     ll <- fm_transform(ll, crs = fm_crs("sphere"))
     object$loc <- coordinates(ll)
+    object$crs <- fm_CRS(fm_crs("sphere"))
   }
 
   if (is.null(col)) {
@@ -179,6 +180,3 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     plot(object, rgl = TRUE, add = add, col = col, ...)
   }
 }
-
-
-

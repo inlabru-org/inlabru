@@ -42,3 +42,30 @@ dlaplace <- function(x, mean = 0, rate = 1, log = FALSE) {
   }
 }
 
+plaplace <- function(q, mean = 0, rate = 1, lower.tail = TRUE, log.p = FALSE) {
+  p <- numeric(length(q))
+  if (log.p) {
+    upper <- q > mean
+    if (lower.tail) {
+      p[upper] <- log1p(-exp(-(q[upper] - mean) * rate) / 2)
+      p[!upper] <- ((q[!upper] - mean) * rate) - log(2)
+    } else {
+      p[upper] <- (-(q[upper] - mean) * rate) - log(2)
+      p[!upper] <- log1p(-exp((q[!upper] - mean) * rate) / 2)
+    }
+  } else {
+    upper <- q > mean
+    if (lower.tail) {
+      p[upper] <- 1 - exp(-(q[upper] - mean) * rate) / 2
+      p[!upper] <- exp((q[!upper] - mean) * rate) / 2
+    } else {
+      p[upper] <- exp(-(q[upper] - mean) * rate) / 2
+      p[!upper] <- 1 - exp((q[!upper] - mean) * rate) / 2
+    }
+  }
+  p
+}
+
+rlaplace <- function(n, mean = 0, rate = 1) {
+  mean + rexp(n, rate = rate) * sign(runif(n) * 2 - 1)
+}

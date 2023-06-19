@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Linear mapper", {
   mapper <- bru_mapper_linear()
 
@@ -247,6 +245,11 @@ test_that("logsumexp mapper", {
     tolerance = lowtol
   )
   expect_equal(
+    ibm_eval(mapper, input = input, state = state, log = FALSE),
+    exp(val),
+    tolerance = lowtol
+  )
+  expect_equal(
     ibm_jacobian(mapper, input = input, state = state),
     A,
     tolerance = midtol
@@ -276,6 +279,11 @@ test_that("logsumexp mapper", {
   expect_equal(
     ibm_eval(mapper, input = input, state = state),
     val,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state, log = FALSE),
+    exp(val),
     tolerance = lowtol
   )
   expect_equal(
@@ -333,33 +341,6 @@ test_that("Multi-mapper bru input", {
   expect_equal(ibm_jacobian(mapper, omatrix_data), A)
 
   data <- cbind(df_data, y = 1:3)
-
-  skip_on_cran()
-  local_bru_safe_inla()
-
-  cmp1 <- y ~ indep(list(space = space, time = time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit1 <- bru(cmp1, family = "gaussian", data = data)
-
-  cmp2 <- y ~ indep(list(space, time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit2 <- bru(cmp2, family = "gaussian", data = data)
-
-  cmp3 <- y ~ indep(data.frame(time = time, space = space),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit3 <- bru(cmp3, family = "gaussian", data = data)
-
-  cmp4 <- y ~ indep(cbind(space, time),
-    model = "ar1", mapper = mapper
-  ) - 1
-  fit4 <- bru(cmp4, family = "gaussian", data = data)
-
-  expect_equal(fit1$summary.random, fit2$summary.random)
-  expect_equal(fit1$summary.random, fit3$summary.random)
-  expect_equal(fit1$summary.random, fit4$summary.random)
 })
 
 
@@ -504,8 +485,8 @@ test_that("Collect mapper, automatic construction", {
   lik <- like(formula = y ~ ., data = data)
 
   # This tests do not trigger INLA:inla.mesh.1d usage:
-  cmp1 <- component_list(cmp1, lhoods = list(lik))
-  cmp2 <- component_list(cmp2, lhoods = list(lik))
+  cmp1 <- component_list(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- component_list(cmp2, lhoods = like_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
     expect_identical(

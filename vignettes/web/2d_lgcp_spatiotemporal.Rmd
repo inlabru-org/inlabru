@@ -34,6 +34,7 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
+sp::set_evolution_status(2L)
 ```
 
 Get the data
@@ -60,15 +61,17 @@ ggplot() +
 Integration points
 -----------------------------------
 
-The `inlbru` point process model known how to construct the numerical integration
+The `inlabru` point process model knows how to construct the numerical integration
 scheme for the LGCP likelihood.  We can also call the internal functions directly to see
-what the integration scheme will look like.  Because our model will take time (season) into account we have to construct the integration points for the LGCP accordingly. Using the `group` parameter we can let the `ipoints()` function know that we would like to construct the integration points for each season independently. Note that omitting this step would simply aggregate all sampling regions over time.
+what the integration scheme will look like.  Because our model will take time (season)
+into account we have to construct the integration points for the LGCP accordingly.
+Using the `fm_int()` we can specify the product domain space. Note that omitting
+this step would simply aggregate all sampling regions over time.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips <- ipoints(
-  samplers = mrsea$samplers,
-  domain = mrsea$mesh,
-  group = "season"
+ips <- fm_int(
+  domain = list(coordinates = mrsea$mesh, season = 1:4),
+  samplers = mrsea$samplers
 )
 ```
 Plot the integration points:
@@ -76,6 +79,7 @@ Plot the integration points:
 ggplot() +
   gg(mrsea$mesh) +
   gg(ips, aes(size = weight)) +
+  scale_size_area(max_size = 1) +
   facet_wrap(~season) +
   coord_fixed()
 ```
@@ -112,14 +116,18 @@ fit <- lgcp(cmp,
 Predict and plot the intensity for all seasons:
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ppxl <- pixels(mrsea$mesh, mask = mrsea$boundary)
-ppxl_all <- cprod(ppxl, data.frame(season = seq_len(4)))
+ppxl <- fm_pixels(mrsea$mesh, mask = mrsea$boundary, format = "sp")
+ppxl_all <- fm_cprod(ppxl, data.frame(season = seq_len(4)))
 
-lambda1 <- predict(fit, ppxl_all, ~ data.frame(season = season, lambda = exp(mySmooth + Intercept)))
+lambda1 <- predict(
+  fit,
+  ppxl_all,
+  ~ data.frame(season = season, lambda = exp(mySmooth + Intercept))
+)
 ```
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 pl1 <- ggplot() +
-  gg(lambda1, aes(fill = mean)) +
+  gg(as(lambda1, "SpatialPixelsDataFrame"), aes(fill = q0.5)) +
   gg(mrsea$points, size = 0.3) +
   facet_wrap(~season) +
   coord_equal()

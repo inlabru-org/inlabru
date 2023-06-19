@@ -63,7 +63,8 @@ been observed completely.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-  require(ggplot2, quietly = TRUE)) {
+  require(ggplot2, quietly = TRUE) &&
+  bru_safe_sp()) {
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 
@@ -92,7 +93,11 @@ if (bru_safe_inla() &&
   )
 
   # Predict the spatial intensity surface
-  lambda <- predict(fit, pixels(gorillas$mesh), ~ exp(mySmooth + Intercept))
+  lambda <- predict(
+    fit,
+    fm_pixels(gorillas$mesh, format = "sp"),
+    ~ exp(mySmooth + Intercept)
+  )
 
   # Plot the intensity
   ggplot() +

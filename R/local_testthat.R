@@ -12,7 +12,7 @@ NULL
 #' @describeIn local_testthat Assign local variable. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_assign <- function(x, values, envir = parent.frame()) {
+local_bru_testthat_assign <- function(x, values, envir = parent.frame()) {
   exist <- exists(x, envir = envir)
   if (exist) {
     old_value <- envir[[x]]
@@ -29,11 +29,11 @@ local_testthat_assign <- function(x, values, envir = parent.frame()) {
 #' Assign local tolerance variables. Useful for easy cleanup
 #' of global workspace with `withr::deferred_run()` when running tests
 #' interactively.
-local_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
-                                      envir = parent.frame()) {
-  local_testthat_assign("lowtol", tolerances[1], envir = envir)
-  local_testthat_assign("midtol", tolerances[2], envir = envir)
-  local_testthat_assign("hitol", tolerances[3], envir = envir)
+local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
+                                          envir = parent.frame()) {
+  local_bru_testthat_assign("lowtol", tolerances[1], envir = envir)
+  local_bru_testthat_assign("midtol", tolerances[2], envir = envir)
+  local_bru_testthat_assign("hitol", tolerances[3], envir = envir)
 }
 
 
@@ -70,68 +70,6 @@ local_bru_options_set <- function(...,
 
 
 
-#' @describeIn local_testthat Disable PROJ4/6 warnings.
-#' To be used within package tests. Restores state on exit.
-#'
-#' @param proj4 logical; whether to show PROJ4 conversion warnings. Default `FALSE`
-#' @param thin logical; whether to show only a thinned version of rgdal PROJ6
-#' warnings. Default `TRUE`
-#' @export
-local_set_PROJ6_warnings <- function(proj4 = FALSE,
-                                     thin = TRUE,
-                                     envir = parent.frame()) {
-  withr::local_options(
-    list(
-      "rgdal_show_exportToProj4_warnings" =
-        if (!proj4) {
-          "none"
-        } else if (thin) {
-          "thin"
-        } else {
-          "all"
-        }
-    ),
-    .local_envir = envir
-  )
-  requireNamespace("rgdal", quietly = TRUE)
-  if (fm_has_PROJ6()) {
-    old1 <- rgdal::get_rgdal_show_exportToProj4_warnings()
-    withr::defer(
-      rgdal::set_rgdal_show_exportToProj4_warnings(old1),
-      envir = envir
-    )
-    rgdal::set_rgdal_show_exportToProj4_warnings(proj4)
-
-    old2 <- rgdal::get_thin_PROJ6_warnings()
-    withr::defer(
-      rgdal::set_thin_PROJ6_warnings(old2),
-      envir = envir
-    )
-    rgdal::set_thin_PROJ6_warnings(thin)
-  }
-}
-
-
-#' @export
-#' @describeIn local_testthat Return a list of the current rgdal warning options
-local_get_rgdal_options <- function() {
-  requireNamespace("rgdal", quietly = TRUE)
-  list(
-    option_rgdal_show_exportToProj4_warnings =
-      getOption("rgdal_show_exportToProj4_warnings"),
-    rgdal_show_exportToProj4_warnings = rgdal::get_rgdal_show_exportToProj4_warnings(),
-    thin_PROJ6_warnings = rgdal::get_thin_PROJ6_warnings()
-  )
-}
-
-#' @export
-#' @describeIn local_testthat Disable rgdal PROJ4 conversion warnings and thin
-#' PROJ6 warnings.
-local_disable_PROJ6_warnings <- function(envir = parent.frame()) {
-  local_set_PROJ6_warnings(proj4 = FALSE, thin = TRUE, envir = envir)
-}
-
-
 #' @export
 #' @rdname local_testthat
 local_basic_intercept_testdata <- function() {
@@ -141,7 +79,6 @@ local_basic_intercept_testdata <- function() {
     y = rnorm(100)
   )
 }
-
 
 #' @export
 #' @rdname local_testthat
@@ -219,6 +156,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
       INLA::inla.setOption(num.threads = old_threads),
       envir
     )
+
     # Save the fmesher.timeout option so it can be restored
     old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
     withr::defer(
@@ -226,6 +164,16 @@ local_bru_safe_inla <- function(multicore = FALSE,
       envir
     )
     INLA::inla.setOption(fmesher.timeout = 30)
+
+    if ("fmesher.evolution" %in% names(INLA::inla.getOption())) {
+      # Save the fmesher.evolution option so it can be restored
+      old_fmesher_evolution <- INLA::inla.getOption("fmesher.evolution")
+      withr::defer(
+        INLA::inla.setOption(fmesher.evolution = old_fmesher_evolution),
+        envir
+      )
+      INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
+    }
   }
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)
@@ -235,19 +183,28 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
 
 #' @describeIn local_testthat Initialise environment for tests.
-#' Disables PROJ4/PROJ6 warnings, and assigns tolerance variables.
+#' Assigns tolerance variables.
 #' To be called either at the top of a testfile, or inside tests.
 #' Does *not* call [local_bru_safe_inla()], since that may invoke a skip and
 #' should be called inside each test that relies on INLA.
 #' @export
 local_bru_testthat_setup <- function(envir = parent.frame()) {
-  local_disable_PROJ6_warnings(envir = envir)
-  local_testthat_tolerances(envir = envir)
+  local_bru_testthat_tolerances(envir = envir)
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
-    control.compute = list(dic = FALSE, waic = FALSE, smtp = "taucs"),
-    inla.mode = "experimental",
+    control.compute = list(smtp = "taucs"),
+    inla.mode = "compact",
     envir = envir
   )
+  if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
+    old_sp_evolution_status <- sp::get_evolution_status()
+    withr::defer(
+      sp::set_evolution_status(old_sp_evolution_status),
+      envir = envir
+    )
+    bru_safe_sp(quietly = TRUE, force = TRUE)
+  }
+
+  invisible()
 }

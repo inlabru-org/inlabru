@@ -1,9 +1,6 @@
-local_bru_testthat_setup()
-
 test_that("2D modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   set.seed(123L)
 
@@ -62,7 +59,6 @@ test_that("2D modelling on the globe", {
 test_that("2D LGCP modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   set.seed(123L)
 
@@ -72,7 +68,7 @@ test_that("2D LGCP modelling on the globe", {
     )
   )
 
-  mesh <- INLA::inla.mesh.create(globe = 2)
+  mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_CRS("sphere"))
 
   data <- data.frame(
     Long = seq(-179, 179, length.out = 100),
@@ -81,16 +77,17 @@ test_that("2D LGCP modelling on the globe", {
   coordinates(data) <- c("Long", "Lat")
   proj4string(data) <- fm_CRS("longlat_globe")
   data <- fm_transform(data, crs = fm_CRS("sphere"))
+  data <- sf::st_as_sf(data)
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
     prior.range = c(0.1, 0.01),
     prior.sigma = c(0.1, 0.01)
   )
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) - 1
+  cmp <- geometry ~ mySmooth(main = geometry, model = matern) - 1
 
   expect_equal(
-    sum(ipoints(mesh)$weight),
+    sum(fm_int(mesh)$weight),
     4 * pi
   )
 
@@ -98,7 +95,7 @@ test_that("2D LGCP modelling on the globe", {
     cmp,
     data = data,
     family = "cp",
-    domain = list(coordinates = mesh),
+    domain = list(geometry = mesh),
     options = options
   )
 

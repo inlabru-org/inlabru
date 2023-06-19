@@ -68,7 +68,7 @@ remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 
 or track the development version builds via
-[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/ui#builds):
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
 
 ``` r
 # Enable universe(s) by inlabru-org
@@ -90,15 +90,12 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 ``` r
 # Load libraries
 library(inlabru)
-#> Loading required package: sp
 library(INLA)
 #> Loading required package: Matrix
-#> Loading required package: foreach
-#> Loading required package: parallel
-#> This is INLA_22.11.28-1 built 2022-11-28 08:04:58 UTC.
+#> This is INLA_23.06.15 built 2023-06-15 06:01:53 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
-#>  - To enable PARDISO sparse library; see inla.pardiso()
 library(ggplot2)
+bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
 
 # Load the data
 data(gorillas, package = "inlabru")
@@ -108,7 +105,7 @@ matern <- inla.spde2.pcmatern(gorillas$mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.01, 0.01)
 )
-cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
@@ -122,11 +119,26 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
+#> Please note that rgdal will be retired during October 2023,
+#> plan transition to sf/stars/terra functions using GDAL and PROJ
+#> at your earliest convenience.
+#> See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution
+#> rgdal: version: 1.6-7, (SVN revision 1203)
+#> Geospatial Data Abstraction Library extensions to R successfully loaded
+#> Loaded GDAL runtime: GDAL 3.4.1, released 2021/12/27
+#> Path to GDAL shared files: /usr/share/gdal
+#> GDAL binary built with GEOS: TRUE 
+#> Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]
+#> Path to PROJ shared files: /home/flindgre/.local/share/proj:/usr/share/proj
+#> PROJ CDN enabled: FALSE
+#> Linking to sp version:1.6-1
+#> To mute warnings of possible GDAL/OSR exportToProj4() degradation,
+#> use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.
 
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  pixels(gorillas$mesh, mask = gorillas$boundary),
+  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
   ~ exp(mySmooth + Intercept)
 )
 
@@ -138,8 +150,4 @@ ggplot() +
   ggtitle("Nest intensity per km squared")
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" /> If you have
-an R installation with PROJ6/GDAL3, and INLA \>= 20.06.18, and loading
-old spatial objects, you may need to apply the `rgdal::rebuild_CRS()`
-method on them before they are fully usable. The data objects in
-`inlabru` have been updated, so should not need this conversion anymore.
+<img src="man/figures/README-example-1.png" width="100%" />

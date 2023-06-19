@@ -103,7 +103,8 @@ setting some options.
 library(maps)
 library(ggplot2)
 library(sf)
-library(raster)
+library(terra)
+library(tidyterra) # raster plotting
 library(tidyr)
 library(scales)
 library(inlabru)
@@ -255,11 +256,12 @@ of the spatial terms in the model.
 In plain `R-INLA`, we would also need to create index vectors and projector matrices
 (or **A matrices** as they are often called).  However, in `inlabru`, these objects
 are created automatically, and the user does not need to deal with them directly.
-This qorks by an automatic creation of a `bru_mapper` object that knows how
+This works by an automatic creation of a `bru_mapper` object that knows how
 to map between mesh nodes and spatial data locations.  Thus, the only two
 `R-INLA` functions needed in the user code of the SPDE modelling steps are
 `inla.mesh.2D()` and `inla.spde2.pcmatern()`, and the `inla.spde.make.index()`
-and `inla.spde.make.A()` are only called internally by the `inlabru` code itself.
+and `inla.spde.make.A()` functions are only called
+internally by the `inlabru` code itself, or rather `fm_evaluator()` is used instead.
 
 ## Modeling mesh
 
@@ -375,16 +377,13 @@ as:
 # components
 svc_components <- ~ -1 +
   kappa(site_idx, model = "iid", constr = TRUE, hyper = list(prec = pc_prec)) +
-  alpha(st_coordinates, model = spde) +
-  eps(st_coordinates, weights = log_hrs, model = spde) +
-  tau(st_coordinates, weights = std_yr, model = spde)
+  alpha(geometry, model = spde) +
+  eps(geometry, weights = log_hrs, model = spde) +
+  tau(geometry, weights = std_yr, model = spde)
 # formula, with "." meaning "add all the model components":
 svc_formula <- count ~ .
 ```
-Specifying the function `st_coordinates` as input causes `inlabru` to extracts
-the spatial coordinates of the observation locations from the internal `.data.`
-object.  Alternatively, we can specify that explicitly as input, with
-`st_coordinates(.data.)`, or with `cbind(easting, northing)`.
+Specifying the `sf` column `geometry` as input causes `inlabru` to textract the spatial coordinate information for the observation locations from. Alternatively, we could specify the function `st_coordinates` instead, but that would extract the raw coordinates, potentially losing important coordinate reference system information..  Alternatively, we can specify that CRS-free information explicitly as input, with `cbind(easting, northing)` or `st_coordinates(.data.)`.
 
 Here, we define the response as `count`, remove the automatic global 
 intercept with a `-1`, and then specify the other terms in the model 
@@ -433,9 +432,8 @@ res <- bru(svc_components,
     data = count_dat
   ),
   options = list(
-    inla.mode = "experimental",
     control.compute = list(waic = TRUE, cpo = TRUE),
-    control.inla = list(strategy = "simplified.laplace", int.strategy = "eb"),
+    control.inla = list(int.strategy = "eb"),
     verbose = FALSE
   )
 )
@@ -529,26 +527,29 @@ pred_grids <- lapply(
   list(alpha = alph, epsilon = epsi, tau = taus),
   function(x) as.matrix(fm_evaluate(mesh_proj, x))
 )
+```
 
-# make a raster stack with the posterior median and range95
-out_stk <- stack()
+
+```{r map_rast}
+# make a terra raster stack with the posterior median and range95
+out_stk <- rast()
 for (j in 1:3) {
-  mean_j <- cbind(expand.grid(X = mesh_proj$x, Y = mesh_proj$y),
+  mean_j <- cbind(expand.grid(x = mesh_proj$x, y = mesh_proj$y),
     Z = c(matrix(pred_grids[[j]][, 1], grd_dims[1]))
   )
-  mean_j <- rasterFromXYZ(mean_j, crs = epsg6703km)
+  mean_j <- rast(mean_j, crs = epsg6703km)
   range95_j <- cbind(expand.grid(X = mesh_proj$x, Y = mesh_proj$y),
     Z = c(matrix(pred_grids[[j]][, 2], grd_dims[1]))
   )
-  range95_j <- rasterFromXYZ(range95_j, crs = epsg6703km)
-  out_j <- stack(mean_j, range95_j)
-  out_stk <- addLayer(out_stk, out_j)
+  range95_j <- rast(range95_j, crs = epsg6703km)
+  out_j <- c(mean_j, range95_j)
+  terra::add(out_stk) <- out_j
 }
 names(out_stk) <- c(
   "alpha_median", "alpha_range95", "epsilon_median",
   "epsilon_range95", "tau_median", "tau_range95"
 )
-out_stk <- mask(out_stk, as(states, "Spatial"))
+out_stk <- terra::mask(out_stk, states, touches = FALSE)
 ```
 
 Finally, we plot the SVCs with the following code. We plot the posterior median and 95% uncertainty width ("range95")
@@ -556,15 +557,15 @@ for $\exp(\kappa_s)$, $\exp(\alpha_s)$, $\epsilon_s$, and $100(\exp(\tau_s)-1)$.
 
 ```{r svc_plot_construction, warning=F, message=F}
 make_plot_field <- function(data_stk, scale_label) {
-  spdf <- as(data_stk, "SpatialPixelsDataFrame")
-  df <- as.data.frame(spdf)
-  colnames(df) <- c("value", "x", "y")
   ggplot(states) +
     geom_sf(fill = NA) +
     coord_sf(datum = NA) +
-    geom_tile(data = df, aes(x = x, y = y, fill = value)) +
+    geom_spatraster(data = data_stk) +
     labs(x = "", y = "") +
-    scale_fill_distiller(scale_label, palette = "Spectral") +
+    scale_fill_distiller(scale_label,
+      palette = "Spectral",
+      na.value = "transparent"
+    ) +
     theme_bw() +
     geom_sf(fill = NA)
 }

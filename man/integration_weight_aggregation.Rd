@@ -15,7 +15,7 @@ or a \code{SpatialPointsDataFrame}. Only the coordinates and \code{weight} colum
 are handled.}
 }
 \description{
-Aggregate integration weights onto mesh nodes
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_vertex_projection]{fm_vertex_projection()}} instead.
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

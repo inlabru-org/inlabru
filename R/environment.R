@@ -33,6 +33,7 @@ bru_env_get <- function() {
 
 
 
+
 # inlabru log methods ----
 
 #' @title inlabru log message methods
@@ -189,7 +190,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 #' \item{rel_tol}{Stop the iterations when the largest change in linearisation point
 #' (the conditional latent state mode) in relation to the estimated posterior
-#' standard deviation is less than `rel_tol`. Default 0.01 (one percent).}
+#' standard deviation is less than `rel_tol`. Default 0.1 (ten percent).}
 #' \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 #' full INLA step. Default is 2.}
 #' \item{lin_opt_method}{Which method to use for the line search optimisation step.
@@ -203,6 +204,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
 #' part of the Poisson process likelihood (`family="cp"`) into a single term, with \eqn{y=n}{y=n},
 #' and predictor `mean(eta)`. Default: `TRUE`}
+#' \item{bru_debug}{logical; when `TRUE`, activate temporary debug features for
+#' package development. Default: `FALSE`}
 #' \item{`inla()` options}{
 #' All options not starting with `bru_` are passed on to `inla()`, sometimes
 #' after altering according to the needs of the inlabru method.
@@ -297,11 +300,12 @@ bru_options_default <- function() {
       taylor = "pandemic",
       search = "all",
       factor = (1 + sqrt(5)) / 2,
-      rel_tol = 0.01,
+      rel_tol = 0.1,
       max_step = 2,
       lin_opt_method = "onestep"
     ),
     bru_compress_cp = TRUE,
+    bru_debug = FALSE,
     # bru_initial: NULL
     # inla options
     E = 1,
@@ -369,6 +373,7 @@ bru_options_deprecated <- function(args) {
   class(args) <- cl
   args
 }
+
 
 
 #' Additional bru options
@@ -777,7 +782,7 @@ bru_log_active <- function(activation = NULL) {
 #' }
 #'
 init.tutorial <- function() {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.5.0",
     I("init.tutorial()"),
     I(

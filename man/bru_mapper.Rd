@@ -19,6 +19,7 @@
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
 \alias{bru_mapper_harmonics}
+\alias{bru_mapper_mesh_B}
 \title{Constructors for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
@@ -68,6 +69,8 @@ bru_mapper_harmonics(
   interval = c(0, 1),
   ...
 )
+
+bru_mapper_mesh_B(mesh, B, ...)
 }
 \arguments{
 \item{\dots}{Deprecated, alternative way to supply optional method definitions.}
@@ -77,7 +80,7 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{Deprecated.}
+\item{methods}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
@@ -150,6 +153,8 @@ basis function is a constant. (Default \code{TRUE})}
 
 \item{interval}{numeric length-2 vector specifying a domain interval.
 Default \code{c(0, 1)}.}
+
+\item{B}{a square or tall basis conversion matrix}
 }
 \description{
 Constructors for \code{bru_mapper} objects
@@ -235,9 +240,9 @@ shifting the state blockwise with
 \code{(state-log_weights)[block] - max((state-log_weights)[block])},
 and shifting the result back afterwards.
 
-\item \code{bru_mapper_pipe()}: Create a pipe mapper, where, \code{mappers} is a list of mappers,
-where the evaluated output of each mapper is handed as the state to the next
-mapper..
+\item \code{bru_mapper_pipe()}: Create a pipe mapper, where \code{mappers} is a list of mappers,
+and the evaluated output of each mapper is handed as the state to the next
+mapper.
 The \code{input} format for the \code{ibm_eval} and \code{ibm_jacobian} methods is
 a list of inputs, one for each mapper.
 

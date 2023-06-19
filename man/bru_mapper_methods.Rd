@@ -73,6 +73,9 @@
 \alias{ibm_names<-.bru_mapper_collect}
 \alias{ibm_n.bru_mapper_harmonics}
 \alias{ibm_jacobian.bru_mapper_harmonics}
+\alias{ibm_n.bru_mapper_mesh_B}
+\alias{ibm_values.bru_mapper_mesh_B}
+\alias{ibm_jacobian.bru_mapper_mesh_B}
 \title{Methods for bru_mapper objects}
 \usage{
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
@@ -153,7 +156,7 @@
 
 \method{ibm_jacobian}{bru_mapper_logsumexp}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
 
 \method{ibm_linear}{bru_mapper_logsumexp}(mapper, input, state, ...)
 
@@ -240,13 +243,19 @@
 \method{ibm_n}{bru_mapper_harmonics}(mapper, inla_f = FALSE, ...)
 
 \method{ibm_jacobian}{bru_mapper_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+\method{ibm_n}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_mesh_B}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_mesh_B}(mapper, input, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
 \item{...}{Arguments passed on to other methods}
 
-\item{input}{Data input for the mapper.}
+\item{input}{The values for which to produce a mapping matrix}
 
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
@@ -266,6 +275,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 that have state dependent output size.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+
+\item{log}{logical; control \code{log} output. Default \code{TRUE}, see the \code{ibm_eval()} details
+for \code{logsumexp} mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
@@ -383,6 +395,9 @@ with unnamed but ordered columns.
 }
 \section{Functions}{
 \itemize{
+\item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
+the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
+
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 
 }}

@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -69,9 +67,10 @@ test_that("2D LGCP fitting", {
 
   # test_that("2D LGCP fitting: predicted random field", {
   loc <- SpatialPoints(gorillas$mesh$loc[, c(1, 2)],
-    proj4string = INLA::inla.sp_get_crs(gorillas$nests)
+    proj4string = fm_CRS(gorillas$nests)
   )
   set.seed(123L)
+  skip_if_not_installed("sn")
   pr <- predict(fit, loc, ~mySmooth,
     n.samples = 5, seed = 5657L,
     parallel.configs = FALSE
@@ -90,7 +89,7 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
-  ips <- ipoints(gorillas$boundary, gorillas$mesh)
+  ips <- fm_int(gorillas$mesh, gorillas$boundary)
   set.seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
     n.samples = 10, seed = 5657L
@@ -108,7 +107,7 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("Supplying integration points instead of samplers&domains", {
-  ips <- ipoints(gorillas$boundary, gorillas$mesh)
+  ips <- fm_int(gorillas$mesh, gorillas$boundary)
   fit_ips <- lgcp(
     cmp,
     gorillas$nests,

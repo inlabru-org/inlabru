@@ -22,8 +22,10 @@ check_spatstat <- function(pkg = "spatstat.geom") {
         pkg,
         "'. Please update 'spatstat' (or uninstall it)."
       ))
+      return(FALSE)
     }
   }
+  return(TRUE)
 }
 
 #' Convert SpatialPoints and boundary polygon to spatstat ppp object
@@ -40,7 +42,8 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #'
 #' @examples
 #' \donttest{
-#' if (require("spatstat.geom")) {
+#' if (require("spatstat.geom") &&
+#'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
 #'   data("gorillas", package = "inlabru")

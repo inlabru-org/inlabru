@@ -11,7 +11,7 @@
 \alias{fm_CRS.sfg}
 \alias{fm_CRS.inla.mesh}
 \alias{fm_CRS.inla.mesh.lattice}
-\alias{fm_CRS.inla.segment}
+\alias{fm_CRS.inla.mesh.segment}
 \alias{fm_CRS.CRS}
 \alias{fm_CRS.default}
 \title{Create a coordinate reference system object}
@@ -36,13 +36,13 @@ fm_CRS(...)
 
 \method{fm_CRS}{inla.mesh.lattice}(x, ..., crsonly = FALSE)
 
-\method{fm_CRS}{inla.segment}(x, ..., crsonly = FALSE)
+\method{fm_CRS}{inla.mesh.segment}(x, ..., crsonly = FALSE)
 
 \method{fm_CRS}{CRS}(x, oblique = NULL, ...)
 
 \method{fm_CRS}{default}(
   projargs = NULL,
-  doCheckCRSArgs = TRUE,
+  doCheckCRSArgs = NULL,
   args = NULL,
   oblique = NULL,
   SRS_string = NULL,
@@ -66,9 +66,7 @@ Details section below.}
 reference string to a predefined projection; run
 \code{names(fm_wkt_predef())} for valid predefined projections.}
 
-\item{doCheckCRSArgs}{default TRUE, must be set to FALSE by package
-developers including \code{CRS} in an S4 class definition to avoid
-uncontrollable loading of the \code{rgdal} namespace.}
+\item{doCheckCRSArgs}{ignored.}
 
 \item{args}{An optional list of name/value pairs to add to and/or override
 the PROJ4 arguments in \code{projargs}.  \code{name=value} is converted to
@@ -116,28 +114,12 @@ When \code{oblique[2]} or \code{oblique[3]} are non-zero, the resulting
 projection is only correct for perfect spheres.
 }
 \examples{
-
-if (require(rgdal)) {
-  if (fm_has_PROJ6()) {
-    crs1 <- fm_CRS("longlat_globe")
-    crs2 <- fm_CRS("lambert_globe")
-    crs3 <- fm_CRS("mollweide_norm")
-    crs4 <- fm_CRS("hammer_globe")
-    crs5 <- fm_CRS("sphere")
-    crs6 <- fm_CRS("globe")
-  } else {
-    # Old definitions for pre-PROJ6:
-    # Old radius-1 projections have a added "_norm" in the PROJ6 version of
-    # the fm_CRS() predefined projections. They are detected and converted
-    # to the new versions when RPOJ6 is available.
-    crs1 <- fm_CRS("longlat") # PROJ6: longlat_norm
-    crs2 <- fm_CRS("lambert") # PROJ6: lambert_norm
-    crs3 <- fm_CRS("mollweide") # PROJ6: mollweide_norm
-    crs4 <- fm_CRS("hammer") # PROJ6: hammer_norm
-    crs5 <- fm_CRS("sphere")
-    crs6 <- fm_CRS("globe")
-  }
-}
+crs1 <- fm_CRS("longlat_globe")
+crs2 <- fm_CRS("lambert_globe")
+crs3 <- fm_CRS("mollweide_norm")
+crs4 <- fm_CRS("hammer_globe")
+crs5 <- fm_CRS("sphere")
+crs6 <- fm_CRS("globe")
 }
 \seealso{
 \code{\link[sp:CRS-class]{sp::CRS()}}, \code{\link{fm_crs_wkt}},

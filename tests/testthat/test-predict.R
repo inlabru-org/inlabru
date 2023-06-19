@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("bru: factor component", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -20,9 +18,10 @@ test_that("bru: factor component", {
 
   # Predict posterior statistics of 'x'
 
+  skip_if_not_installed("sn")
   xpost <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ x_latent + fit$summary.random$z$mean[1],
     n.samples = 5,
     seed = 12345L
@@ -30,7 +29,7 @@ test_that("bru: factor component", {
 
   xpost2 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ {
       tmp <- c(
         a = x_latent,
@@ -44,7 +43,7 @@ test_that("bru: factor component", {
 
   xpost3 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ {
       tmp <- c(
         a = x_latent,
@@ -67,7 +66,7 @@ test_that("bru: factor component", {
 
 
   xipost <- generate(fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
       x = x_latent
@@ -84,7 +83,7 @@ test_that("bru: factor component", {
 
   xpost4 <- generate(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ c(
       z_eval(c(1, 2, 11, 12, 12)),
       z_eval(c(1, 2, 11, 12, 12))
@@ -112,7 +111,7 @@ test_that("bru: factor component", {
 
   xpost5 <- predict(
     fit,
-    data = NULL,
+    newdata = NULL,
     formula = ~ z_eval(c(1, 11)) * Precision_for_z^0.5,
     n.samples = 500,
     seed = 12345L
@@ -149,9 +148,11 @@ test_that("bru: predict with _eval", {
     family = "gaussian",
     data = data
   )
+
+  skip_if_not_installed("sn")
   pred <- predict(
     fit,
-    data = data.frame(u = seq(-1, 6, by = 0.1)),
+    newdata = data.frame(u = seq(-1, 6, by = 0.1)),
     formula = ~ data.frame(
       A = fun,
       B = fun_eval(u)

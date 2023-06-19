@@ -6,7 +6,7 @@
 \usage{
 \method{predict}{bru}(
   object,
-  data = NULL,
+  newdata = NULL,
   formula = NULL,
   n.samples = 100,
   seed = 0L,
@@ -14,14 +14,16 @@
   num.threads = NULL,
   include = NULL,
   exclude = NULL,
+  used = NULL,
   drop = FALSE,
-  ...
+  ...,
+  data = NULL
 )
 }
 \arguments{
 \item{object}{An object obtained by calling \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}.}
 
-\item{data}{A data.frame or SpatialPointsDataFrame of covariates needed for
+\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates needed for
 the prediction.}
 
 \item{formula}{A formula where the right hand side defines an R expression
@@ -43,22 +45,31 @@ computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
 \item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded)}
+predictor expression; Default: the result of \verb{[all.vars()]} on the
+predictor expression, unless the expression is not ".", in which case
+\code{include=NULL}, to include all components that are not
+explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
+to extract the variable names, followed by removal of non-component names
+when the components are available.}
 
 \item{exclude}{Character vector of component labels that are not used by the
 predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{drop}{logical; If \code{keep=FALSE}, \code{data} is a \code{Spatial*DataFrame}, and the
-prediciton summary has the same number of rows as \code{data}, then the output is
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and \code{exclude}.
+Default \code{NULL}}
+
+\item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and the
+prediciton summary has the same number of rows as \code{newdata}, then the output is
 a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
+
+\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated. Use \code{newdata} instead.}
 }
 \value{
-a data.frame or Spatial* object with predicted mean values and other
+a \code{data.frame} or \verb{Spatial*} object with predicted mean values and other
 summary statistics attached.
 }
 \description{
@@ -85,13 +96,15 @@ and the suffix function \verb{_eval} can be used to evaluate a component at
 other input values than the expressions defined in the component definition
 itself, e.g. \code{field_eval(cbind(x, y))} for a component that was defined with
 \code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
-
+f
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
 if (bru_safe_inla(multicore = FALSE) &&
+    bru_safe_sp() &&
+    require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE)) {
 
   # Load the Gorilla data
@@ -147,7 +160,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # objects as well as Spatial objects. For instance, we might want to predict
   # 'mySmooth' at the locations of the mesh vertices. Using
 
-  vrt <- vertices.inla.mesh(gorillas$mesh)
+  vrt <- fm_vertices(gorillas$mesh, format = "sp")
 
   # we obtain these vertices as a SpatialPointsDataFrame
 
@@ -181,7 +194,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
   # SpatialPixels object covering the mesh
 
-  pxl <- pixels(gorillas$mesh)
+  pxl <- fm_pixels(gorillas$mesh, format = "sp")
   mySmooth2 <- predict(fit, pxl, ~mySmooth)
 
   # This will give us a SpatialPixelDataFrame with the columns we are looking for

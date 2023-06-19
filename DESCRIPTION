@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.7.0
+Version: 2.8.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -26,9 +26,11 @@ Authors@R: c(
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
          comment = "Pierre Roudier contributed general quantile summaries"),
   person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
-         comment = "Tim Meehan contributed the SVC vignette and robins data")
+         comment = "Tim Meehan contributed the SVC vignette and robins data"),
+  person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
+         comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette")
   )
-URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/
+URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
 BugReports: https://github.com/inlabru-org/inlabru/issues
 Description: Facilitates spatial and general latent Gaussian modeling using
   integrated nested Laplace approximation via the INLA package (<https://www.r-inla.org>).
@@ -44,7 +46,7 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
     methods,
@@ -52,29 +54,29 @@ Depends:
     sp (>= 1.4-5),
     stats
 Imports:
-    MatrixModels,
+    dplyr,
+    lifecycle,
     magrittr,
+    MatrixModels,
     Matrix,
-    patchwork,
     plyr,
-    rgdal (>= 1.5.8),
     rlang,
     sf,
+    terra,
+    tibble,
     utils,
-    withr,
-    lifecycle
+    withr
 Suggests:
     covr,
-    dplyr,
     ggmap,
     ggplot2,
     ggpolypath,
     graphics,
-    INLA (>= 21.08.31),
+    INLA (>= 23.01.31),
     knitr,
     maps,
-    maptools,
     mgcv,
+    patchwork,
     raster,
     RColorBrewer,
     rgl,
@@ -84,10 +86,9 @@ Suggests:
     sn,
     spatstat.geom,
     spatstat.data,
-    spatstat (>= 2.0-0),
     sphereplot,
     splancs,
-    terra,
+    tidyterra,
     testthat,
     tidyr,
     DiagrammeR
@@ -96,12 +97,10 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
-    'bru.covariate.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru.integration.R'
     'bru.spatial.R'
-    'covariate.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
     'data.Poisson3_1D.R'
@@ -121,12 +120,14 @@ Collate:
     'environment.R'
     'fmesher_crs.R'
     'fmesher_evaluator.R'
+    'fmesher_integration.R'
+    'fmesher_mesh.R'
     'fmesher_sf_mesh.R'
     'fmesher_sp_mesh.R'
     'fmesher_utils.R'
     'ggplot.R'
     'inla.R'
-    'inlabru.R'
+    'inlabru-package.R'
     'integration.R'
     'local_testthat.R'
     'mappers.R'
@@ -134,11 +135,9 @@ Collate:
     'model.R'
     'nlinla.R'
     'plotsample.R'
-    'prediction.R'
     'rgl.R'
     'sampling.R'
     'sf_utils.R'
-    'shapefile.R'
     'spatstat.R'
     'spde.R'
     'stack.R'

@@ -11,19 +11,20 @@
 
 \item{add}{If TRUE, add the points to an existing plot. If FALSE, create new plot.}
 
-\item{color}{vector of R color characters. See rgl.material() for details.}
+\item{color}{vector of R color characters. See material3d() for details.}
 
-\item{...}{Parameters passed on to rgl.points()}
+\item{...}{Parameters passed on to points3d()}
 }
 \description{
 This function will calculate the cartesian coordinates of the points provided
-and use rgl.points() in order to render them.
+and use points3d() in order to render them.
 }
 \examples{
 \dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE)) {
+  require("sphereplot", quietly = TRUE) &&
+  bru_safe_sp()) {
 
   # Load pantropoical dolphin data
 

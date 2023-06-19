@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("Linearisation", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -11,19 +9,31 @@ test_that("Linearisation", {
   })
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
+  # NOTE: Need explicit include specification to allow mapper construction for Int_y
   lhoods <-
     like_list(
       like(
-        formula = y ~ exp(x) + Int_y_latent, data = data,
-        include = c("x", "Int_y")
+        formula = y ~ exp(x) + Int_y_latent, data = data
       ),
       like(
-        formula = z ~ exp(x) + Int_z, data = data, family = "poisson",
-        include = c("x", "Int_z")
+        formula = z ~ exp(x) + Int_z, data = data, family = "poisson"
       )
     )
-  model <- bru_model(component_list(cmp, lhoods), lhoods)
+  lhoods <- bru_used_update(lhoods, names(component_list(cmp)))
 
+  used <- bru_used(lhoods[[1]])
+  expect_equal(used[["effect"]], "x")
+  expect_equal(used[["latent"]], "Int_y")
+
+  used <- bru_used(lhoods[[2]])
+  expect_equal(used[["effect"]], c("x", "Int_z"))
+  expect_equal(used[["latent"]], character(0))
+
+  used <- bru_used(lhoods)
+  expect_equal(used[["effect"]], c("x", "Int_z"))
+  expect_equal(used[["latent"]], "Int_y")
+
+  model <- bru_model(component_list(cmp, lhoods), lhoods)
 
   idx <- evaluate_index(model, lhoods)
   inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)

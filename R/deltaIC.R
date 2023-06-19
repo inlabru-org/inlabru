@@ -24,8 +24,18 @@
 #'   )
 #'
 #'   # Fit two models
-#'   fit1 <- bru(y ~ x, family = "poisson", data = input.df)
-#'   fit2 <- bru(y ~ x + rand(idx, model = "iid"), family = "poisson", data = input.df)
+#'   fit1 <- bru(
+#'     y ~ x,
+#'     family = "poisson",
+#'     data = input.df,
+#'     options = list(control.compute = list(dic = TRUE))
+#'   )
+#'   fit2 <- bru(
+#'     y ~ x + rand(idx, model = "iid"),
+#'     family = "poisson",
+#'     data = input.df,
+#'     options = list(control.compute = list(dic = TRUE))
+#'   )
 #'
 #'   # Compare DIC
 #'

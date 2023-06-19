@@ -130,7 +130,7 @@ flowchart TD
   eval_spatial["eval_spatial"]
   eval_coordinates["SpatialPoints(value, crs)"]
   style eval_coordinates color:#f00
-  eval_crs["crs=fm_sp_get_crs(.data.)"]
+  eval_crs["crs=fm_CRS(.data.)"]
 
   res{"Type of<br/>result"}
   null_on_fail{"null_on_fail?"}
@@ -173,5 +173,178 @@ flowchart TD
 ',
   width = 900,
   height = 700
+)
+```
+
+
+
+## Intergration point construction
+
+Classic integration structure
+
+```{r, eval=FALSE,echo=FALSE}
+DiagrammeR::mermaid('
+%%{init: {"securityLevel": "loose", "theme":"base"}}%%
+classDiagram
+
+    ipmaker --|> ipoints : Call
+    ipmaker --> samp_dim
+    ipmaker --> nosamp_dim
+    samp_dim --> ips : if_spatial = TRUE
+    samp_dim --> cprod : if_spatial = FALSE, <br> ips = NULL
+    nosamp_dim --> lips
+    ips --> cprod
+    lips --> cprod
+
+    cprod --|> ips2
+    ipoints --> is_2D
+    is_2D --> nsub2 : is_2D = TRUE && is.numeric(domain) = TRUE
+    is_2D --> inla_mesh_segment: is_2D = TRUE && samplers || domain =/= NULL
+    inla_mesh_segment --> inla_mesh_2d
+    inla_mesh_2d --> bru_int_polygon
+    bru_int_polygon --> ips2
+    ipoints .. ips
+    ipoints .. lips
+    ipoints --> domain : domain = NULL
+    is_2D--|> is_1D : is_2D = FALSE
+    is_1D --> nsub1 : is_1D = TRUE
+    nsub1 --> inla_mesh_1d
+    inla_mesh_1d --> ips2
+
+    class ipoints{
+        Generate integration points
+        ipoints(samplers, domain, name, group, int.args, project)
+        }
+    class ipmaker{
+        Integration points for log Gaussian Cox process models
+        ipmaker(samplers, domain, dnames, int.args = list(method = "stable", nsub = NULL))
+        }
+
+    class cprod{
+        Cross product of integration points with weights and Spatial arguments
+        fm_cprod(...) with weight = weight.x * weight.y and sp::merge
+        }
+    class ips{
+        integration points via samplers except "coordinates"
+        ipoints(samplers, domain$coordinates, group = samp.dim, int.args = int.args
+        }
+    class lips{
+        integration points provided via domain but not via samplers
+        lapply(nosamp.dim, function(nm) ipoints(NULL, domain[[nm]], name = nm, int.args = int.args))
+        }
+    class ips2{
+        ipoints output
+        do.call(cprod, c(list(ips), lips))
+        }
+    class is_2D{
+        2D Check
+        (!is.null(samplers) && inherits(samplers, sp ojbect)) || inherits(domain, "inla.mesh")
+        }
+    class is_1D{
+        1D Check
+        ((!is.null(samplers) && is.numeric(samplers)) ||
+        (!is.null(domain) && (is.numeric(domain) || inherits(domain,
+        "inla.mesh.1d"))))
+        }
+    class nsub1{
+        Number of integration points along a triangle edge for 1D
+        (int.args[["nsub1"]] <- domain; domain <- NULL; int.args[["method"]] <- "direct")
+        }
+    class nsub2{
+        Number of integration points along a triangle edge for 2D
+        (int.args[["nsub2"]] <- domain; domain <- NULL; int.args[["method"]] <- "direct")
+        }
+    class samp_dim{
+        Dimensions provided via samplers (except "coordinates")
+        intersect(names(samplers), dnames)
+    }
+    class nosamp_dim{
+        Dimensions provided via domain but not via samplers
+        setdiff(names(domain), c(samp.dim, "coordinates"))
+    }
+    class domain{
+        domain check
+        (domain <- samplers; samplers <- NULL)
+    }
+    class inla_mesh_1d{
+        impute domain with inla.mesh.1d
+        (domain <- INLA::inla.mesh.1d(sort(unique(as.vector(samplers)))))
+    }
+    class inla_mesh_segment{
+        Convert sp curve objects to inla.mesh.segment objects
+        (INLA::inla.sp2segment(samplers, join = FALSE))
+    }
+    class inla_mesh_2d{
+        Create a triangle mesh based on initial point locations,
+        specified or automatic boundaries, and mesh quality parameters.
+        (domain <- INLA::inla.mesh.2d(boundary = samplers,
+        max.edge = max.edge))
+    }
+    class bru_int_polygon{
+        Integration points for polygons inside an inla.mesh
+        bru_int_polygon(domain, polylist = poly_segm,
+          method = int.args$method, nsub = int.args$nsub2,
+          samplers = samplers)
+    }
+',
+  width = 2000,
+  height = 1200
+)
+```
+
+Flow diagram for new integration scheme construction, implemented as `fm_int(domain, samplers)`
+methods.
+
+```{r, eval=TRUE,echo=FALSE}
+DiagrammeR::mermaid('
+flowchart TD
+
+samplers[(samplers)]
+domains[(domains)]
+samplers --> multi_samplers[("multi domain
+samplers")]
+samplers --> single_samplers[("single domain
+samplers")]
+samplers --> calc_full_samplers["remove sampler
+domains"]
+domains --> calc_full_samplers --> full_samplers[("full domain
+samplers")]
+domains --> multi_samplers
+domains --> single_samplers
+domains --> full_samplers
+
+subgraph "single sampler"
+  ipoints_single_rowwise["compute ips
+for each row"] -->
+  single_sampler_ips([ips])
+end
+
+subgraph "multi sampler"
+  ipoints_domainwise["compute ips
+for each domain"] -->
+  ipoints_single_rowwise
+
+  ips_domain_list[("ips
+for each domain")] -->
+  cprod_row["cprod within
+each sampler row"] -->
+  multi_sampler_ips([ips])
+end
+
+multi_samplers -->|for each| ipoints_domainwise
+single_samplers -->|for each| ipoints_single_rowwise
+full_samplers -->|for each| ipoints_single_rowwise
+
+
+
+multi_sampler_ips --> ips_list[(ips list)]
+single_sampler_ips --> ips_list
+
+single_sampler_ips --> ips_domain_list
+
+ips_list --> cprod_joint[cprod] --> joint_ips([joint ips])
+',
+  width = 900,
+  height = 1200
 )
 ```

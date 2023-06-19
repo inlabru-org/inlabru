@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -73,7 +71,7 @@ test_that("2D LGCP fitting", {
 
   f.elev <- function(x, y) {
     spp <- SpatialPoints(data.frame(x = x, y = y),
-      proj4string = INLA::inla.sp_get_crs(elev)
+      proj4string = fm_CRS(elev)
     )
     v <- over(spp, elev)
     v[is.na(v)] <- 0 # NAs are a problem! Remove them

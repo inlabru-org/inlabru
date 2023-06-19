@@ -90,10 +90,9 @@ ggplot(data.frame(mexdolphin$points)) +
 ```
 
 We need to define a half-normal detection probability function. This must take distance as its first
-arguent and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
+argument and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-
 hn <- function(distance, lsig) {
   exp(-0.5 * (distance / exp(lsig))^2)
 }
@@ -157,7 +156,7 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
+pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sp")
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -180,10 +179,12 @@ providing distances and no spatial coordinates, so we cannot evaluate the
 spatial random field in this `predict()` call. We can specify this by providing
 a vector of component names to include in the prediction calculations, here only
 "lsig", with `include = "lsig"`. See `?predict.bru` for more information.
+From version `2.8.0`, inlabru attmepts to automatically detect which components
+are used by the predictor expression, and the `include` argument can usually be left out.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig), include = "lsig")
+dfun <- predict(fit, distdf, ~ hn(distance, lsig))
 plot(dfun)
 ```
 The average detection probability within the maximum detection distance is estimated to be
@@ -193,7 +194,7 @@ The average detection probability within the maximum detection distance is estim
 We can look at the posterior for expected number of dolphins as usual:
 
 ```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 ```
@@ -217,7 +218,16 @@ Nest <- predict(fit, predpts,
 Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ggplot(data = Nest) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
 ```
 
 Hazard-rate Detection Function
@@ -250,13 +260,11 @@ fit1 <- lgcp(
 ```
 Plots:
 ```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
 plot(spde.logvar)
 
-pxl <- pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -275,7 +283,7 @@ distdf <- data.frame(distance = seq(0, 8, length = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
-predpts <- ipoints(mexdolphin$ppoly, mexdolphin$mesh)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 
@@ -295,16 +303,24 @@ Nest1 <- predict(
 Nest1$plugin_estimate <- dpois(Nest1$N, lambda = Lambda1$mean)
 ggplot(data = Nest1) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
 ```
 
 Comparing the models
 -----------------------
 
-```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-deltaIC(fit1, fit)
 
-# Look at the goodness-of-fit of the two models in the distance dimension
+Look at the goodness-of-fit of the two models in the distance dimension
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
@@ -353,11 +369,6 @@ dfit1 <- lgcp(
 detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))
 ```
 
-Compare detection function models by DIC:
-
-```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-deltaIC(dfit1, dfit)
-```
 
 Plot both lines on histogram of observations
 First scale lines to have same area as that of histogram

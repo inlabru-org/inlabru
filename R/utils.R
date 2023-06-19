@@ -9,6 +9,9 @@
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 23.1.31 (should always match the requirement in the package
+#' DESCRIPTION)
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'
@@ -20,51 +23,160 @@
 #' }
 #'
 bru_safe_inla <- function(multicore = NULL,
-                          quietly = FALSE) {
-  if (requireNamespace("INLA", quietly = TRUE)) {
-    if (is.null(multicore)) {
-      multicore <-
-        !identical(Sys.getenv("TESTTHAT"), "true") ||
-          interactive()
-    }
-    if (!multicore) {
-      n.t <- tryCatch(
-        INLA::inla.getOption("num.threads"),
-        error = function(e) {
-          e
-        }
-      )
-      if (inherits(n.t, "simpleError")) {
-        if (!quietly) {
-          message("inla.getOption() failed. INLA not installed correctly.")
-        }
-        return(FALSE)
-      }
-      if (!quietly) {
-        message(paste0("Current num.threads is '", n.t, "'."))
-      }
-      if (!identical(n.t, "1:1")) {
-        if (!quietly) {
-          message(paste0(
-            "Setting INLA option num.threads to '1:1'.",
-            " Previous value '", n.t, "'."
-          ))
-        }
-        INLA::inla.setOption(num.threads = "1:1")
-      } else {
-        if (!quietly) {
-          message("No num.threads change needed.")
-        }
-      }
-    }
-    TRUE
-  } else {
-    if (!quietly) {
-      message("INLA not loaded safely.")
-    }
-    FALSE
+                          quietly = FALSE,
+                          minimum_version = "23.1.31") {
+  inla_version <-
+    check_package_version_and_load(
+      pkg = "INLA",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(inla_version)) {
+    return(FALSE)
   }
+
+  if (is.null(multicore)) {
+    multicore <-
+      !identical(Sys.getenv("TESTTHAT"), "true") ||
+        interactive()
+  }
+  if (!multicore) {
+    n.t <- tryCatch(
+      INLA::inla.getOption("num.threads"),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(n.t, "simpleError")) {
+      if (!quietly) {
+        message("inla.getOption() failed. INLA not installed correctly.")
+      }
+      return(FALSE)
+    }
+    if (!quietly) {
+      message(paste0("Current num.threads is '", n.t, "'."))
+    }
+    if (!identical(n.t, "1:1")) {
+      if (!quietly) {
+        message(paste0(
+          "Setting INLA option num.threads to '1:1'.",
+          " Previous value '", n.t, "'."
+        ))
+      }
+      INLA::inla.setOption(num.threads = "1:1")
+    } else {
+      if (!quietly) {
+        message("No num.threads change needed.")
+      }
+    }
+  }
+  return(TRUE)
 }
+
+
+
+
+
+check_package_version_and_load <-
+  function(pkg, minimum_version, quietly = FALSE) {
+    version <- tryCatch(utils::packageVersion(pkg),
+      error = function(e) NA_character_
+    )
+    if (is.na(version)) {
+      if (!quietly) {
+        message(paste0("Package '", pkg, "' is not installed."))
+      }
+      return(NA_character_)
+    }
+    if (version < minimum_version) {
+      if (!quietly) {
+        message(paste0(
+          "Installed '", pkg, "' version is ", version, " but ",
+          "version >= ", minimum_version, " is required."
+        ))
+      }
+      return(NA_character_)
+    }
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      if (!quietly) {
+        message("Package '", pkg, "' not loaded safely.")
+      }
+      return(NA_character_)
+    }
+    return(version)
+  }
+
+
+#' Check for potential `sp` version compatibility issues
+#'
+#' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
+#' checks and optionally sets the `sp` evolution status flag if `rgdal` is unavailable.
+#'
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default `FALSE`
+#' @param force logical; If `rgdal` is unavailable
+#' and evolution status is less that `2L`, return `FALSE` if `force` is `FALSE`.
+#' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
+#' potentially after forcing the evolution status to `2L`.
+#' Default `FALSE`
+#' @param minimum_version character; the minimum required INLA version.
+#' Default 1.4-5 (should always match the requirement in the package
+#' DESCRIPTION)
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and give a
+#' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_sp()) {
+#'   # Run sp dependent calculations
+#' }
+#' }
+#'
+bru_safe_sp <- function(quietly = FALSE,
+                        force = FALSE,
+                        minimum_version = "1.4-5") {
+  sp_version <-
+    check_package_version_and_load(
+      pkg = "sp",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(sp_version)) {
+    return(invisible(FALSE))
+  }
+
+  if (sp_version >= "1.6-0") {
+    # Default to 2L to allow future sp to stop supporting
+    # get_evolution_status; assume everything is fine if it fails.
+    evolution_status <- tryCatch(sp::get_evolution_status(),
+      error = function(e) 2L
+    )
+    rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
+      error = function(e) NA_character_
+    )
+    if ((evolution_status < 2L) && is.na(rgdal_version)) {
+      if (!quietly) {
+        message("'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.")
+      }
+      if (!force) {
+        if (!quietly) {
+          message(
+            "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
+          )
+        }
+        return(invisible(FALSE))
+      }
+
+      sp::set_evolution_status(2L)
+      if (!quietly) {
+        message(
+          "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
+        )
+      }
+    }
+  }
+  return(invisible(TRUE))
+}
+
 
 
 #' Expand labels
@@ -188,10 +300,10 @@ extract_layer <- function(where, layer, selector) {
 
 #' Evaluate spatial covariates
 #'
-#' @param data Spatial grid-like data
+#' @param data Spatial data
 #' @param where Where to evaluate the data
 #' @param layer Which `data` layer to extract (as integer or character).
-#' May be a vector, specifying a separate layer for each `where` point.
+#' May be a vector, specifying a separate layer for each `where` item.
 #' @param selector The name of a variable in `where` specifying the `layer`
 #' information.
 #'
@@ -202,13 +314,53 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
 eval_SpatialDF <- function(...) {
-  lifecycle::deprecate_warn("2.6.0", "eval_spatial()")
+  lifecycle::deprecate_stop("2.6.0", "eval_spatial()")
   eval_spatial(...)
 }
 
 #' @export
+#' @describeIn eval_spatial Compatibility wrapper for `eval_spatial.sf`
+eval_spatial.SpatialPolygonsDataFrame <- function(data,
+                                                  where,
+                                                  layer = NULL,
+                                                  selector = NULL) {
+  eval_spatial(
+    sf::st_as_sf(data),
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
 #' @rdname eval_spatial
-eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
+eval_spatial.SpatialPixelsDataFrame <- function(data,
+                                                where,
+                                                layer = NULL,
+                                                selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.SpatialGridDataFrame <- function(data,
+                                              where,
+                                              layer = NULL,
+                                              selector = NULL) {
+  eval_spatial_Spatial(
+    data = data,
+    where = where,
+    layer = layer,
+    selector = selector
+  )
+}
+
+eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
   stopifnot(inherits(
     data,
     c(
@@ -220,7 +372,7 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
-        proj4string = fm_sp_get_crs(where)
+        proj4string = fm_CRS(where)
       )
     }
   }
@@ -239,6 +391,57 @@ eval_spatial.Spatial <- function(data, where, layer = NULL, selector = NULL) {
         where[layer == l, , drop = FALSE],
         data
       )[, l, drop = TRUE]
+    }
+  }
+  val
+}
+
+
+#' @export
+#' @describeIn eval_spatial Supports point-in-polygon information lookup.
+#' Other combinations are untested.
+eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
+  if (inherits(where, "SpatialPoints")) {
+    where <- sf::st_as_sf(where)
+  }
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  unique_layer <- unique(layer)
+  data_example <- data[1, unique_layer[1], drop = TRUE]
+  data_NA <- data_example
+  is.na(data_NA) <- TRUE
+  if (length(unique_layer) == 1) {
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    val <- vapply(
+      idx,
+      function(i) {
+        if (is.null(i) || (length(i) == 0)) {
+          data_NA
+        } else {
+          data[min(i), unique_layer, drop = TRUE]
+        }
+      },
+      data_example
+    )
+  } else {
+    val <- numeric(NROW(where))
+    idx <- sf::st_intersects(where, data, sparse = TRUE)
+    for (l in unique(layer)) {
+      val[layer == l] <- sp::over(
+        where[layer == l, , drop = FALSE],
+        data
+      )[, l, drop = TRUE]
+      val[layer == l] <- vapply(
+        idx[layer == l],
+        function(i) {
+          if (is.null(i) || (length(i) == 0)) {
+            data_NA
+          } else {
+            data[min(i), unique_layer, drop = TRUE]
+          }
+        },
+        data_example
+      )
     }
   }
   val
@@ -383,7 +586,7 @@ bru_fill_missing <- function(data, where, values,
   layer <- layers
 
   if (inherits(data, "SpatRaster")) {
-    data_values <- as.vector(terra::values(data[[layer]]))
+    data_values <- terra::values(data[[layer]], dataframe = TRUE)[[layer]]
     data_coord <- as.data.frame(terra::crds(data))
     data_coord <- sf::st_as_sf(data_coord,
       coords = seq_len(ncol(data_coord)),

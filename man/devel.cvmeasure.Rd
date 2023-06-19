@@ -25,7 +25,9 @@ Calculates local and integrated variance and correlation measures as introduced 
 }
 \examples{
 \donttest{
-if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
+if (bru_safe_inla() &&
+    require(ggplot2, quietly = TRUE) &&
+    bru_safe_sp()) {
 
   # Load Gorilla data
 
@@ -56,7 +58,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Predict SPDE and vegetation at the mesh vertex locations
 
-  vrt <- vertices.inla.mesh(gorillas$mesh)
+  vrt <- fm_vertices(gorillas$mesh, format = "sp")
   pred <- predict(
     fit,
     vrt,
@@ -145,7 +147,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Variance and correlation integrated over space
 
   vm.int <- devel.cvmeasure(pred$joint, pred$field, pred$veg,
-    samplers = ipoints(gorillas$boundary, gorillas$mesh),
+    samplers = fm_int(gorillas$mesh, gorillas$boundary),
     mesh = gorillas$mesh
   )
   vm.int

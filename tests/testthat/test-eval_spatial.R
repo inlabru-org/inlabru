@@ -1,5 +1,3 @@
-local_bru_testthat_setup()
-
 test_that("eval_spatial.SpatRaster", {
   skip_if_not_installed("terra")
 
@@ -64,7 +62,7 @@ test_that("eval_spatial.SpatRaster", {
 })
 
 
-test_that("eval_spatial.Spatial", {
+test_that("eval_spatial.Spatial*", {
   # Load the Gorilla data
   data(gorillas, package = "inlabru", envir = environment())
 
@@ -120,4 +118,28 @@ test_that("eval_spatial.Spatial", {
 
   expect_equal(A2_val, A_val[5])
   expect_equal(B2_val, B_val[5])
+})
+
+
+
+
+
+test_that("eval_spatial.sf", {
+  # Load the Gorilla data
+  data(gorillas, package = "inlabru", envir = environment())
+
+  nests <- sf::st_as_sf(gorillas$nests)
+  plots <- sf::st_as_sf(gorillas$plotsample$plots)
+  plots$something_num <- seq_len(nrow(plots))
+  nests$something_num <- eval_spatial(plots, nests, layer = "something_num")
+
+  expect_equal(
+    sort(unique(nests$something), na.last = TRUE),
+    c(7, 12, 13, 14, 15, 17, 18, 19, 20, 23, 24, NA)
+  )
+
+  plots$something_char <- as.character(seq_len(nrow(plots)))
+  nests$something_char <- eval_spatial(plots, nests, layer = "something_char")
+
+  expect_equal(nests$something_char, as.character(nests$something_num))
 })

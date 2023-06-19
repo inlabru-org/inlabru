@@ -66,7 +66,14 @@ A.loc <- inla.spde.make.A(mesh, loc = loc)
 A.loc
 ```
 
-With a `bru_mapper`, this becomes
+A basic conversion of this becomes
+```{r}
+A.loc <- fm_evaluator(mesh, loc = loc)$proj$A
+A.loc
+```
+but this is limited to just the basic case of evaluating on only a mesh.
+
+With a `bru_mapper`, this becomes the more generally useful
 ```{r}
 mapper <- bru_mapper(mesh)
 A.loc <- ibm_jacobian(mapper, input = loc)
@@ -106,15 +113,26 @@ ibm_jacobian(mapper, input = list(main = loc, group = group.values))
 ```
 ### Blockwise aggregation
 
-```{r, eval=FALSE}
-block_rescale <- # one of "none", "count", "weights", "sum"
-  inla.spde.make.A(...,
-    weights = weights,
-    block = block,
-    block.rescale = block_rescale,
-    n.block = n_block
-  )
+Blockwise aggregation can be implemented with a `bru_mapper_aggregate` mapper.
 
+```{r, eval=FALSE}
+block_rescale <- "none" # one of "none", "count", "weights", "sum"
+inla.spde.make.A(...,
+  weights = weights,
+  block = block,
+  block.rescale = block_rescale,
+  n.block = n_block
+)
+```
+Rescaling options:
+
+* `block_rescale = "none"` corresponds to `rescale = FALSE`
+* `block_rescale = "count"` corresponds to `rescale = TRUE` and providing no
+`weights`, as that is interpreted as all weights being `1`, so rescaling by
+the sum of the weights is equivalent to dividing by the number of elements in each block.
+* `block_rescale = "weights"` corresponds to `rescale = TRUE`
+* `block_rescale = "sum"` is not supported by the aggregation mapper.
+```{r, eval = FALSE}
 mapper <- bru_mapper_pipe(
   list(
     main = bru_mapper_multi(list(main = bru_mapper(mesh), ...)),

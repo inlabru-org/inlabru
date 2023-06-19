@@ -267,14 +267,14 @@ component.character <- function(object,
                                 weights_layer = NULL,
                                 weights_selector = NULL,
                                 # Group model parameters
-                                group = NULL,
+                                group = 1L,
                                 group_mapper = NULL,
                                 group_layer = NULL,
                                 group_selector = NULL,
                                 ngroup = NULL,
                                 control.group = NULL,
                                 # Replicate model parameters
-                                replicate = NULL,
+                                replicate = 1L,
                                 replicate_mapper = NULL,
                                 replicate_layer = NULL,
                                 replicate_selector = NULL,
@@ -303,7 +303,8 @@ component.character <- function(object,
   # Force evaluation of explicit inputs
   force(values)
 
-  if (!is.null(substitute(group))) {
+  if (!is.null(substitute(group)) &&
+    !identical(deparse(substitute(group)), "1L")) {
     if (is.null(control.group)) {
       control.group <- INLA::inla.set.control.group.default()
     }
@@ -689,6 +690,7 @@ component_list.list <- function(object,
   class(object) <- c("component_list", "list")
   environment(object) <- .envir
   if (!is.null(lhoods)) {
+    lhoods <- bru_used_update(lhoods, names(object))
     object <- add_mappers(object, lhoods = lhoods)
   }
   object
@@ -751,15 +753,16 @@ component_list.list <- function(object,
 
 
 
-#' @description FUNCTION_DESCRIPTION
-#' @param component PARAM_DESCRIPTION
-#' @param lhoods PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Equip components with mappers
+#' @description Equip component(s) with mappers for subcomponents that do not
+#' have predefined mappers. When needed, the data in `lhoods` is used to determine
+#' the appropriate mapper(s).
+#' @param component A `component` object
+#' @param lhoods A `bru_like_list` object
+#' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'   # EXAMPLE1
 #' }
 #' }
 #' @rdname add_mappers
@@ -771,11 +774,7 @@ add_mappers.component <- function(component, lhoods, ...) {
   keep_lh <-
     vapply(lhoods,
       function(lh, label) {
-        label %in% parse_inclusion(
-          label,
-          lh[["include_components"]],
-          lh[["exclude_components"]]
-        )
+        label %in% bru_used(lh)[["effect"]]
       },
       TRUE,
       label = component$label
@@ -856,6 +855,8 @@ add_mappers.component <- function(component, lhoods, ...) {
 
   component
 }
+
+#' @param components A `component_list` object
 #' @export
 #' @rdname add_mappers
 add_mappers.component_list <- function(components, lhoods, ...) {
@@ -988,17 +989,12 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_sp_get_crs)
-    if (fm_has_PROJ6()) {
-      crs_info <- lapply(inp_crs, fm_crs_get_wkt)
-      null_crs <- vapply(crs_info, is.null, logical(1))
-      inconsistent_crs <-
-        (length(unique(unlist(crs_info))) > 1) ||
-          (any(null_crs) && !all(null_crs))
-    } else {
-      crs_info <- vapply(inp_crs, fm_CRSargs, "")
-      inconsistent_crs <- length(unique(crs_info)) > 1
-    }
+    inp_crs <- lapply(inp, fm_CRS)
+    crs_info <- lapply(inp_crs, fm_wkt)
+    null_crs <- vapply(crs_info, is.null, logical(1))
+    inconsistent_crs <-
+      (length(unique(unlist(crs_info))) > 1) ||
+        (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
       stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
     }
@@ -1082,6 +1078,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
                        require_indexed = FALSE) {
+  if (is.null(subcomp[["mapper"]])) {
+    if (!inherits(subcomp[["model"]], "character")) {
+      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
+    }
+  }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
       stop(paste0(
@@ -1100,17 +1101,32 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
     )
   } else {
     if (!is.null(lhoods)) {
-      inp <- lapply(
-        lhoods,
-        function(lh) {
+      if (length(lhoods) > 0) {
+        inp <- lapply(
+          lhoods,
+          function(lh) {
+            input_eval(subcomp$input,
+              data = lh$data,
+              env = env,
+              label = subcomp$input$label,
+              null.on.fail = TRUE
+            )
+          }
+        )
+      } else {
+        # Component not directly used in any likelihood.
+        # Attempt to evaluate with no data;
+        # useful for intercept-like components only used via the
+        # *_latent technique.
+        inp <- list(
           input_eval(subcomp$input,
-            data = lh$data,
+            data = NULL,
             env = env,
             label = subcomp$input$label,
             null.on.fail = TRUE
           )
-        }
-      )
+        )
+      }
       # Check for
       # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,
       #              intercepts should be notated explicitly with label(1)
@@ -1144,7 +1160,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
 
         unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
       }
-      if (unique_inputs$n_values < 1) {
+      if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1
         subcomp$values <- NULL
         inp_values <- NULL
@@ -1889,8 +1905,10 @@ input_eval.bru_input <- function(input, data, env = NULL,
   }
   assign(".data.", data, envir = envir)
 
-  e_input <- tryCatch(eval(input$input, envir = envir, enclos = enclos),
+  e_input <- tryCatch(
+    eval(input$input, envir = envir, enclos = enclos),
     error = function(e) {
+      e
     }
   )
 
@@ -1910,31 +1928,58 @@ input_eval.bru_input <- function(input, data, env = NULL,
   # ## A matrix.
   #  n <- nrow(as.data.frame(data))
 
-  if (is.null(e_input)) {
-    if (null.on.fail) {
+  handle_problems <- function(val) {
+    if (is.null(val)) {
       return(NULL)
     }
-    #    val <- rep(1, n)
-    val <- 1
-  } else if (is.function(e_input)) {
+    if (inherits(e_input, "simpleError")) {
+      if (null.on.fail) {
+        return(NULL)
+      }
+
+      val <- 1
+      warning(
+        paste0(
+          "The input evaluation '",
+          deparse(input$input),
+          "' for '", input$label,
+          "' failed. Perhaps the data object doesn't contain the needed variables?",
+          " Falling back to '1'."
+        ),
+        immediate. = TRUE
+      )
+      return(val)
+    }
+    return(val)
+  }
+
+  e_input <- handle_problems(e_input)
+  if (is.null(e_input)) {
+    return(NULL)
+  }
+
+  if (is.function(e_input)) {
     # Allow but detect failures:
-    val <- tryCatch(e_input(data),
+    val <- tryCatch(
+      e_input(data),
       error = function(e) {
+        e
       }
     )
+
+    val <- handle_problems(val)
     if (is.null(val)) {
-      # TODO: figure out if we need to do something else in this case.
-      # Returning NULL seems like a good way to keep track of these failures
-      # that are likely to happen for multilikelihood models; A component only
-      # needs to be evaluable for at least one of the likelihoods.
-    } else if (identical(as.character(input$input), "coordinates")) {
+      return(NULL)
+    }
+
+    if (identical(as.character(input$input), "coordinates")) {
       tryCatch(
         expr = {
           # Return SpatialPoints instead of a matrix
           val <- as.data.frame(val)
           coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_sp_get_crs(data),
+          data_crs <- tryCatch(fm_CRS(data),
             error = function(e) {
             }
           )
@@ -1950,22 +1995,24 @@ input_eval.bru_input <- function(input, data, env = NULL,
     }
   } else if (inherits(e_input, "formula")) {
     # Allow but detect failures:
-    val <- tryCatch(MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
+    val <- tryCatch(
+      MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
       error = function(e) {
+        e
       }
     )
+    val <- handle_problems(val)
     if (is.null(val)) {
-      # TODO: figure out if we need to do something else in this case.
-      # Returning NULL seems like a good way to keep track of these failures
-      # that are likely to happen for multilikelihood models; A component only
-      # needs to be evaluable for at least one of the likelihoods.
+      return(NULL)
     }
+    val <- as(val, "Matrix")
   } else if (inherits(
     e_input,
     c(
       "SpatialGridDataFrame",
       "SpatialPixelsDataFrame",
-      "SpatRaster"
+      "SpatRaster",
+      "sf"
     )
   )) {
     input_layer <-

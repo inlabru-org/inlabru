@@ -133,7 +133,7 @@ available for \code{taylor="legacy"}.}
 multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 \item{rel_tol}{Stop the iterations when the largest change in linearisation point
 (the conditional latent state mode) in relation to the estimated posterior
-standard deviation is less than \code{rel_tol}. Default 0.01 (one percent).}
+standard deviation is less than \code{rel_tol}. Default 0.1 (ten percent).}
 \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.}
 \item{lin_opt_method}{Which method to use for the line search optimisation step.
@@ -147,6 +147,8 @@ this is slow and intended for debugging purposes only.}
 \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
 part of the Poisson process likelihood (\code{family="cp"}) into a single term, with \eqn{y=n}{y=n},
 and predictor \code{mean(eta)}. Default: \code{TRUE}}
+\item{bru_debug}{logical; when \code{TRUE}, activate temporary debug features for
+package development. Default: \code{FALSE}}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.

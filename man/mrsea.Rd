@@ -25,7 +25,7 @@ Library \code{MRSea}.
 data(mrsea)
 }
 \description{
-Data imported from package MRSea, see \url{http://creem2.st-andrews.ac.uk/software/}
+Data imported from package MRSea, see \url{https://www.creem.st-andrews.ac.uk/software/}
 }
 \examples{
 if (bru_safe_inla() &&

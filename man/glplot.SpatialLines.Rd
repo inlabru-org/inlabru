@@ -11,17 +11,18 @@
 
 \item{add}{If TRUE, add the lines to an existing plot. If FALSE, create new plot.}
 
-\item{...}{Parameters passed on to rgl.linestrips().}
+\item{...}{Parameters passed on to lines3d().}
 }
 \description{
 This function will calculate a cartesian representation of the lines provided
-and use rgl.linestrip() in order to render them.
+and use lines3d() in order to render them.
 }
 \examples{
 \dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE)) {
+  require("sphereplot", quietly = TRUE) &&
+  bru_safe_sp()) {
 
   # Load pantropoical dolphin data
 

@@ -5,7 +5,7 @@ output:
   rmarkdown::html_vignette:
   rmarkdown::pdf_document:
 vignette: >
-  %\VignetteIndexEntry{Apptainer}
+  %\VignetteIndexEntry{Installation of INLA and inlabru with Apptainer on HPC}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -22,38 +22,43 @@ Docker images. Despite its convenience, the image size can be large.
 1. Check if [Apptainer](https://apptainer.org/docs/user/main/cli/apptainer_version.html)
    is available on your HPC. If not, ask the administrator to install it. Type 
    on your HPC terminal to check which version is installed. 
-```{shell apptainer check, eval=FALSE}
-$ apptainer version
+```{bash apptainer check, eval=FALSE}
+apptainer version
 ```
 
 2. Type the code below to pull the 
 [rocker/geospatial](https://rocker-project.org/images/versioned/rstudio.html) 
 Singularity Image Format (SIF) file with the latest R version.
-For illustration, we'll assume the file is stored at `./your_container.sif`.
+For illustration, we will assume the file is stored at `./your_container.sif`.
 
-```{shell apptainer, eval=FALSE}
-# To pull the docker image 
-$ apptainer pull your_container.sif docker://rocker/geospatial:latest
-# once the sif is downloaded, get into an interactive shell 
-$ apptainer shell your_container.sif
+In a shell:
+```{bash apptainer-shell, eval=FALSE}
+# To pull the docker image
+apptainer pull your_container.sif docker://rocker/geospatial:latest
+# once the sif is downloaded, get into an interactive shell
+apptainer shell your_container.sif
 # Inside the interactive shell, one can install INLA on a personal library path
-$ R --verbose 
+R --verbose
+```
+In R:
+```{r apptainer-R, eval=FALSE}
 # Now, in a R environment
-> options(repos = c(
-    INLA = 'https://inla.r-inla-download.org/R/testing',
-    CRAN = 'https://cloud.r-project.org'))
-> install.packages("INLA") 
+options(repos = c(
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  CRAN = "https://cloud.r-project.org"
+))
+install.packages("INLA")
 # One may be asked to create a personal library path.
-> install.packages("inlabru") 
+install.packages("inlabru")
 # quit R
-> q()
+q()
 ```
 
 3. Put the following in your job script to execute an R file non-interactively.
 
-```{shell exec, eval=FALSE}
+```{bash exec, eval=FALSE}
 # To execute an R file with apptainer
-$ apptainer exec ./your_container.sif Rscript --no-restore --no-save --verbose file_to_run.R
+apptainer exec ./your_container.sif Rscript --no-restore --no-save --verbose file_to_run.R
 ```
 
 Note: Use `inla.setOption(num.threads = ncpu)` to limit the number of threads (ncpu) 

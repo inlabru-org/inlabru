@@ -1,6 +1,3 @@
-local_bru_testthat_setup()
-
-
 test_that("Georeferenced data with sp", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -122,9 +119,11 @@ test_that("Georeferenced data with sp", {
     tolerance = midtol
   )
 
-  pred_df <- pixels(mesh)
+  pred_df <- fm_pixels(mesh, format = "sp")
   coordnames(pred_df) <- coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
+
+  skip_if_not_installed("sn")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
   expect_s4_class(pred, "SpatialPixelsDataFrame")
 })
@@ -145,7 +144,13 @@ latent_spde2D_group_testdata <- function() {
   mrsea$samplers <- mrsea$samplers[mrsea$samplers$season %in% c(1, 2), ]
 
   # Integration points
-  ips <- ipoints(mrsea$samplers, domain = mrsea$mesh, group = "season")
+  ips <- fm_int(
+    domain = list(
+      coordinates = mrsea$mesh,
+      season = seq_len(2)
+    ),
+    samplers = mrsea$samplers
+  )
 
   # Run the model
   matern <- INLA::inla.spde2.pcmatern(mrsea$mesh,
@@ -179,15 +184,10 @@ latent_spde2D_group_testdata <- function() {
 test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(fm_has_PROJ6())
 
   suppressWarnings(
     data_ <- latent_spde2D_group_testdata()
   )
-  # For rgdal 1.5-23:
-  # "export to PROJ failed: generic error of unknown origin"
-  # For rgdal 1.5-27
-  # proj_as_proj_string: GeodeticCRS::exportToPROJString() only supports metre unit
 
   # Check Intercept
   expect_snapshot_value(
