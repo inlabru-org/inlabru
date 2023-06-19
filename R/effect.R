@@ -1771,15 +1771,21 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' @section Spatial Covariates:
 #'
 #' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-#' surface temperature or elevation. Although it is straight forward to add this data to the input
+#' surface temperature or elevation. Although it is straightforward to add this data to the input
 #' data frame or write a covariate function like in the previous section there is an even more
 #' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
 #' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the input expressions if the [like()] data is a `SpatialPointsDataFrame` object.
-#' inlabru will automatically
+#' the input expressions if they are supported by [eval_spatial()], and
+#' the [like()] data is an `sf` or `SpatialPointsDataFrame` object.
+#' `inlabru` will then automatically
 #' evaluate and/or interpolate the covariate at your data locations when using code like
 #' ```
 #' components = y ~ psi(mySpatialPixels, model = "linear")
+#' ```
+#' For more precise control, use the the `layer` and `selector` arguments (see [component()]),
+#' or call `eval_spatial()` directly, e.g.:
+#' ```
+#' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.), model = "linear")
 #' ```
 #'
 #' @section Coordinates:

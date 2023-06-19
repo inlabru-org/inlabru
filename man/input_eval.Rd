@@ -90,15 +90,22 @@ needed output. For example,
 
 
 When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-surface temperature or elevation. Although it is straight forward to add this data to the input
+surface temperature or elevation. Although it is straightforward to add this data to the input
 data frame or write a covariate function like in the previous section there is an even more
 convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelsDataFrame},
 \code{SpatialPixelsDataFrame} or \code{RasterLayer} objects. These can be provided directly via
-the input expressions if the \code{\link[=like]{like()}} data is a \code{SpatialPointsDataFrame} object.
-inlabru will automatically
+the input expressions if they are supported by \code{\link[=eval_spatial]{eval_spatial()}}, and
+the \code{\link[=like]{like()}} data is an \code{sf} or \code{SpatialPointsDataFrame} object.
+\code{inlabru} will then automatically
 evaluate and/or interpolate the covariate at your data locations when using code like
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(mySpatialPixels, model = "linear")
+}\if{html}{\out{</div>}}
+
+For more precise control, use the the \code{layer} and \code{selector} arguments (see \code{\link[=component]{component()}}),
+or call \code{eval_spatial()} directly, e.g.:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.), model = "linear")
 }\if{html}{\out{</div>}}
 }
 
