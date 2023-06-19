@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+# inlabru 2.8.0
+
 ## Feature updates
 
 * The iterative inla method has been given both sharper internal `inla()` optimisation

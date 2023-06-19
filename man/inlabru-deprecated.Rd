@@ -77,7 +77,7 @@ to the parameter \code{crs}. In addition to the usual spatial objects this funct
 also capable of transforming \code{INLA::inla.mesh} objects that are equipped with a coordinate
 system. Returns a list of Spatial* objects.
 
-Deprecated in favour of the \code{fm_transform} methods.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of the \code{fm_transform} methods.
 
 \item \code{init.tutorial()}: Global setting for tutorial sessions.
 

@@ -23,7 +23,8 @@ and use points3d() in order to render them.
 \dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE)) {
+  require("sphereplot", quietly = TRUE) &&
+  bru_safe_sp()) {
 
   # Load pantropoical dolphin data
 

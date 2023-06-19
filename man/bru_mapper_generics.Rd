@@ -117,7 +117,8 @@ would be interpretable by an \code{INLA::f(..., values = ...)} specification.
 The exception is the method for \code{bru_mapper_multi}, that returns a
 multi-column data frame.
 
-\item \code{ibm_amatrix()}: will become deprecated in 2.7.0. Use \code{ibm_jacobian}
+\item \code{ibm_amatrix()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Deprecated since 2.7.0. Use \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 instead.
 Implementations must return a (sparse) matrix of size \code{ibm_n_output(...)}
 by \code{ibm_n(...)}. The \code{inla_f=TRUE} argument should only affect
