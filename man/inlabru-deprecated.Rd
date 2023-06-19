@@ -18,19 +18,11 @@
 \alias{fm_spTransform.inla.mesh.lattice}
 \alias{fm_spTransform.inla.mesh.segment}
 \alias{fm_spTransform.inla.mesh}
+\alias{ibm_amatrix}
 \alias{ibm_valid_input}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_2d}
-\alias{ibm_amatrix.bru_mapper_inla_mesh_1d}
-\alias{ibm_amatrix.bru_mapper_index}
-\alias{ibm_amatrix.bru_mapper_linear}
-\alias{ibm_amatrix.bru_mapper_matrix}
-\alias{ibm_amatrix.bru_mapper_factor}
 \alias{bru_mapper_offset}
 \alias{ibm_n.bru_mapper_offset}
 \alias{ibm_values.bru_mapper_offset}
-\alias{ibm_amatrix.bru_mapper_offset}
-\alias{ibm_amatrix.bru_mapper_multi}
-\alias{ibm_amatrix.bru_mapper_collect}
 \alias{vertices.inla.mesh}
 \alias{eval_SpatialDF}
 \title{Deprecated functions in inlabru}
@@ -65,31 +57,15 @@ fm_spTransform(x, ...)
 
 \method{fm_spTransform}{inla.mesh}(x, CRSobj, passthrough = FALSE, ...)
 
+ibm_amatrix(...)
+
 ibm_valid_input(...)
-
-\method{ibm_amatrix}{bru_mapper_inla_mesh_2d}(...)
-
-\method{ibm_amatrix}{bru_mapper_inla_mesh_1d}(...)
-
-\method{ibm_amatrix}{bru_mapper_index}(...)
-
-\method{ibm_amatrix}{bru_mapper_linear}(...)
-
-\method{ibm_amatrix}{bru_mapper_matrix}(...)
-
-\method{ibm_amatrix}{bru_mapper_factor}(...)
 
 bru_mapper_offset(...)
 
 \method{ibm_n}{bru_mapper_offset}(...)
 
 \method{ibm_values}{bru_mapper_offset}(...)
-
-\method{ibm_amatrix}{bru_mapper_offset}(...)
-
-\method{ibm_amatrix}{bru_mapper_multi}(...)
-
-\method{ibm_amatrix}{bru_mapper_collect}(...)
 
 vertices.inla.mesh(...)
 
@@ -173,31 +149,17 @@ reference systems of sp::CRS or INLA::inla.CRS class.
 \item \code{fm_spTransform(default)}: The default method handles low level transformation of raw
 coordinates.
 
+\item \code{ibm_amatrix()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Deprecated since 2.7.0. Use \code{\link[=ibm_jacobian]{ibm_jacobian()}}
+instead.
+
 \item \code{ibm_valid_input()}: Use case changed to \code{\link[=ibm_invalid_output]{ibm_invalid_output()}}
-
-\item \code{ibm_amatrix(bru_mapper_inla_mesh_2d)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_inla_mesh_1d)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_index)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_linear)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_matrix)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_factor)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 
 \item \code{bru_mapper_offset()}: Creates a \code{\link[=bru_mapper_const]{bru_mapper_const()}} mapper.
 
 \item \code{ibm_n(bru_mapper_offset)}: Replaced by \link{bru_mapper_const} methods
 
 \item \code{ibm_values(bru_mapper_offset)}: Replaced by \link{bru_mapper_const} methods
-
-\item \code{ibm_amatrix(bru_mapper_offset)}: Replaced by \link{bru_mapper_const} methods
-
-\item \code{ibm_amatrix(bru_mapper_multi)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-
-\item \code{ibm_amatrix(bru_mapper_collect)}: Replaced by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 
 \item \code{vertices.inla.mesh()}: Extract vertex locations from an \code{inla.mesh}.
 Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.

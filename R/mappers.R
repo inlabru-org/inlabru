@@ -98,21 +98,17 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
 
-#' @describeIn bru_mapper_generics
+#' @describeIn inlabru-deprecated
 #' `r lifecycle::badge("deprecated")`
 #' Deprecated since 2.7.0. Use [ibm_jacobian()]
 #' instead.
-#' Implementations must return a (sparse) matrix of size `ibm_n_output(...)`
-#' by `ibm_n(...)`. The `inla_f=TRUE` argument should only affect
-#' the allowed type of input format.
 #' @export
-ibm_amatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
-  lifecycle::deprecate_warn(
+ibm_amatrix <- function(...) {
+  lifecycle::deprecate_stop(
     "2.7.0",
     "ibm_amatrix()",
     "ibm_jacobian()"
   )
-  UseMethod("ibm_amatrix")
 }
 
 #' @describeIn bru_mapper_generics
@@ -589,21 +585,6 @@ ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
 }
 
 #' @describeIn bru_mapper_generics
-#' Gives an error message.
-#' Mapper classes must implement their own `ibm_jacobian` or
-#' `ibm_amatrix` methods. New implementations should use
-#' a `ibm_jacobian` method. `ibm_amatrix` may become deprecated
-#' in a future version.
-#' @export
-ibm_amatrix.default <- function(mapper, ...) {
-  stop(paste0(
-    "Missing implementation of 'ibm_jacobian()/ibm_amatrix()' for mapper of class '",
-    paste0(class(mapper), collapse = ", "), "'.\n",
-    "New implementations should implement a 'ibm_jacobian()' method."
-  ))
-}
-
-#' @describeIn bru_mapper_generics
 #' Returns logical
 #' `is_linear` from the mapper object if it exists, and otherwise `TRUE`.
 #' @export
@@ -616,9 +597,7 @@ ibm_is_linear.default <- function(mapper, ...) {
 }
 
 #' @describeIn bru_mapper_generics
-#' Calls `ibm_amatrix`, which
-#' by default gives an error.
-#' Mapper classes should implement their own `ibm_jacobian` method.
+#' Mapper classes must implement their own `ibm_jacobian` method.
 #' @export
 ibm_jacobian.default <- function(mapper, input, state, ...) {
   if (is.null(mapper)) {
@@ -755,13 +734,6 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 }
 
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_inla_mesh_2d <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
 ## inla.mesh.1d ####
 
 #' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
@@ -813,13 +785,6 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
   A
 }
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_inla_mesh_1d <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
 ## _index ####
 
 #' @param n Size of a model for `bru_mapper_index`
@@ -854,13 +819,6 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
     x = rep(1, length(ok)),
     dims = c(NROW(input), ibm_n(mapper))
   )
-}
-
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_index <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
 }
 
 ## _taylor ####
@@ -1104,14 +1062,6 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
   A
 }
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_linear <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
-
 ## _matrix ####
 
 #' @param labels Column labels for matrix mappings
@@ -1171,14 +1121,6 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
   colnames(A) <- mapper$labels
   A
 }
-
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_matrix <- function(...) {
-  lifecycle::deprecate_warn("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
 
 
 ## _factor ####
@@ -1280,14 +1222,6 @@ ibm_jacobian.bru_mapper_factor <- function(mapper, input, ...) {
 }
 
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_factor <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
-
 
 ## _const ####
 
@@ -1346,14 +1280,6 @@ ibm_n.bru_mapper_offset <- function(...) {
 #' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
 ibm_values.bru_mapper_offset <- function(...) {
   lifecycle::deprecate_warn("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
-  NextMethod()
-}
-
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
-ibm_amatrix.bru_mapper_offset <- function(...) {
-  lifecycle::deprecate_warn("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
   NextMethod()
 }
 
@@ -2289,13 +2215,6 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
   return(A_)
 }
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_multi <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
-}
-
 
 
 #' @param pre_A Internal; precomputed Jacobian matrix
@@ -2680,13 +2599,6 @@ ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
     return(A_)
   }
   A
-}
-
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [ibm_jacobian()]
-ibm_amatrix.bru_mapper_collect <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "ibm_amatrix()", "ibm_jacobian()")
-  ibm_jacobian(...)
 }
 
 
