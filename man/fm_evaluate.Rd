@@ -104,7 +104,8 @@ if (bru_safe_inla()) {
 if (bru_safe_inla() &&
   require("ggplot2") &&
   bru_safe_sp()) {
-  ggplot() + gg(mesh, col = field)
+  ggplot() +
+    gg(mesh, col = field)
 }
 }
 

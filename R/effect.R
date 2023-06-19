@@ -1880,9 +1880,20 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 }
 
 
+#' @describeIn input_eval Attempts to evaluate a component input (e.g. `main`,
+#' `group`, `replicate`, or `weight`), and process the results:
+#' 1. Eval failed. Return NULL or map everything to 1. This should normally not
+#'    happen, unless the component use logic is incorrect (e.g. via `include`/`exclude`)
+#'    e.g. leading to missing columns for a certain likelihood in a
+#'    multi-`like()` model.
+#' 2. If we obtain a function, apply the function to the data object
+#' 3. If we obtain an object supported by [eval_spatial()], extract the values
+#'    of that data frame at the point locations
+#' 4. Else we obtain a vector and return as-is. This happens when input
+#'    references a column of the data points, or some other complete expression
+#'
+#' @seealso [component()]
 #' @export
-#' @rdname input_eval
-
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
   # Evaluate the map with the data in an environment
@@ -1911,16 +1922,6 @@ input_eval.bru_input <- function(input, data, env = NULL,
       e
     }
   )
-
-  # 0) Eval failed. map everything to 1. This happens for automatically
-  #    added Intercept, and for some components that cannot be evaluated
-  #    based on the data, e.g. missing columns for a certain likelihood in a
-  #    multilikelihood model.
-  # 1) If we obtain a function, apply the function to the data
-  # 2) If we obtain a SpatialGridDataFrame extract the values of that data
-  #    frame at the point locations using the over() function
-  # 3) Else we obtain a vector and return as-is. This happens when input
-  #    references a column of the data points, or some other complete expression
 
   # ## Need to handle varying input lengths.
   # ## auto-expansion of scalars needs to happen elsewhere, where it's needed,
@@ -2008,11 +2009,10 @@ input_eval.bru_input <- function(input, data, env = NULL,
     val <- as(val, "Matrix")
   } else if (inherits(
     e_input,
-    c(
-      "SpatialGridDataFrame",
-      "SpatialPixelsDataFrame",
-      "SpatRaster",
-      "sf"
+    gsub(
+      pattern = "^eval_spatial\\.([^*]*)\\*?",
+      replacement = "\\1",
+      x = format(utils::.S3methods("eval_spatial"))
     )
   )) {
     input_layer <-

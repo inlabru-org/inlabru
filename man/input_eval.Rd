@@ -30,6 +30,23 @@ An list of mapper input values, formatted for the full component mapper
 \description{
 Obtain component inputs
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{input_eval(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},
+\code{group}, \code{replicate}, or \code{weight}), and process the results:
+\enumerate{
+\item Eval failed. Return NULL or map everything to 1. This should normally not
+happen, unless the component use logic is incorrect (e.g. via \code{include}/\code{exclude})
+e.g. leading to missing columns for a certain likelihood in a
+multi-\code{like()} model.
+\item If we obtain a function, apply the function to the data object
+\item If we obtain an object supported by \code{\link[=eval_spatial]{eval_spatial()}}, extract the values
+of that data frame at the point locations
+\item Else we obtain a vector and return as-is. This happens when input
+references a column of the data points, or some other complete expression
+}
+
+}}
 \section{Simple covariates and the map parameter}{
 
 
@@ -100,6 +117,9 @@ this would look as follows:
 }\if{html}{\out{</div>}}
 }
 
+\seealso{
+\code{\link[=component]{component()}}
+}
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren \email{finn.lindgren@gmail.com}
 }
