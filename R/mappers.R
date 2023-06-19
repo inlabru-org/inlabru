@@ -609,12 +609,14 @@ ibm_jacobian.default <- function(mapper, input, state, ...) {
     stop(paste0(
       "Non-linear mappers must implement their own 'ibm_jacobian()' method.",
       " Missing method for class '",
-      class(mapper)[1], "'."
+      paste0(class(mapper), collapse = ", "),
+      "'."
     ))
   }
   stop(paste0(
     "Missing ibm_jacobian() method for class '",
-    class(mapper)[1], "'."
+    paste0(class(mapper), collapse = ", "),
+    "'."
   ))
 }
 
