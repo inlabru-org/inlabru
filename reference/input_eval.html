@@ -118,6 +118,21 @@ If <code>NULL</code>, return the component's map.</p></dd>
 (of type <code>bru_mapper_pipe</code>)</p>
     </div>
     <div class="section level2">
+    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
+    
+<ul><li><p><code>input_eval(bru_input)</code>: Attempts to evaluate a component input (e.g. <code>main</code>,
+<code>group</code>, <code>replicate</code>, or <code>weight</code>), and process the results:</p><ol><li><p>Eval failed. Return NULL or map everything to 1. This should normally not
+happen, unless the component use logic is incorrect (e.g. via <code>include</code>/<code>exclude</code>)
+e.g. leading to missing columns for a certain likelihood in a
+multi-<code><a href="like.html">like()</a></code> model.</p></li>
+<li><p>If we obtain a function, apply the function to the data object</p></li>
+<li><p>If we obtain an object supported by <code><a href="eval_spatial.html">eval_spatial()</a></code>, extract the values
+of that data frame at the point locations</p></li>
+<li><p>Else we obtain a vector and return as-is. This happens when input
+references a column of the data points, or some other complete expression</p></li>
+</ol></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="simple-covariates-and-the-map-parameter">Simple covariates and the map parameter<a class="anchor" aria-label="anchor" href="#simple-covariates-and-the-map-parameter"></a></h2>
     
 
@@ -175,7 +190,19 @@ values at the mesh vertices to values at the data locations. For this purpose, t
 can be set to <code>coordinates</code>, which is the <code>sp</code> package function that extracts point
 coordinates from the <code>SpatialPointsDataFrame</code> that was provided as input to <code><a href="like.html">like()</a></code>. The code for
 this would look as follows:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">mySPDE</span>(<span class="at">main =</span> coordinates, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(coordinates, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
+<p>Since <code>coordinates</code> is a function from the <code>sp</code> package, this results in
+evaluation of <code>sp::coordinates(.data.)</code>, which loses any CRS information
+from the data object.</p>
+<p>For <code>sf</code> data with a geometry column (by default named <code>geometry</code>), use</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(geometry, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
+<p>Since the CRS information is part of the geometry column of the <code>sf</code> object,
+this retains CRS information, so this is more robust, and allows the model
+to be built on a different CRS than the observation data.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="component.html">component()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
