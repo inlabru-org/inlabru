@@ -41,7 +41,8 @@ This funciton requires the \code{rgl} and \code{sphereplot} packages.
 \dontrun{
 if (bru_safe_inla() &&
   require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE)) {
+  require("sphereplot", quietly = TRUE) &&
+  bru_safe_sp()) {
 
   # Load pantropoical dolphin data
 

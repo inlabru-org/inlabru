@@ -171,6 +171,7 @@ glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
     proj4string(ll) <- object$crs
     ll <- fm_transform(ll, crs = fm_crs("sphere"))
     object$loc <- coordinates(ll)
+    object$crs <- fm_CRS(fm_crs("sphere"))
   }
 
   if (is.null(col)) {
