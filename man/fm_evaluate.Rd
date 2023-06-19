@@ -102,8 +102,9 @@ if (bru_safe_inla()) {
 }
 \donttest{
 if (bru_safe_inla() &&
-  require(rgl)) {
-  plot(mesh, rgl = TRUE, col = field, draw.edges = FALSE, draw.vertices = FALSE)
+  require("ggplot2") &&
+  bru_safe_sp()) {
+  ggplot() + gg(mesh, col = field)
 }
 }
 
