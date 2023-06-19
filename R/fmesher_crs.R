@@ -1263,6 +1263,7 @@ fm_list_as_CRS <- function(x, ...) {
 
 #' Show expanded CRS arguments
 #'
+#' `r lifecycle::badge("deprecated")`
 #' Wrappers for `sp::CRS` and `inla.CRS` objects to handle the
 #' coordinate reference system argument string.
 #' These methods should no longer be used with PROJ6/rgdal3;
@@ -1369,7 +1370,8 @@ fm_proj4string <- function(crs) {
 }
 
 #' @export
-#' @rdname fm_crs_wkt
+#' @describeIn fm_crs_wkt `r lifecycle::badge("deprecated")` Use [fm_wkt()]
+#' instead.
 
 fm_crs_get_wkt <- function(crs) {
   lifecycle::deprecate_warn(

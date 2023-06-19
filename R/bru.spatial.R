@@ -169,7 +169,7 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
 #' also capable of transforming `INLA::inla.mesh` objects that are equipped with a coordinate
 #' system. Returns a list of Spatial* objects.
 #'
-#' Deprecated in favour of the `fm_transform` methods.
+#' `r lifecycle::badge("deprecated")` Deprecated in favour of the `fm_transform` methods.
 #'
 #' @export
 #' @param splist list of Spatial* objects

@@ -62,7 +62,7 @@
 #'   Points per knot segment: `nsub1`
 #' * `poly_method`: if set to "legacy", selects an old polygon integration method
 #'   that doesn't handle holes. Only used for debugging purposes.
-#' @param project Deprecated in favour of `int.args(method=...)`.
+#' @param project `r lifecycle::badge("deprecated")` Deprecated in favour of `int.args(method=...)`.
 #' If TRUE, aggregate the integration points to mesh vertices. Default:
 #' `project = (identical(int.args$method, "stable"))`
 #'

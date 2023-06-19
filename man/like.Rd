@@ -108,7 +108,7 @@ auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include}, \code{exclude},
 and \code{include_latent}.}
 
-\item{allow_latent}{logical, deprecated. Use \code{include_latent} instead.}
+\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated. Use \code{include_latent} instead.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.

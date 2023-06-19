@@ -56,7 +56,7 @@ Points per knot segment: \code{nsub1}
 that doesn't handle holes. Only used for debugging purposes.
 }}
 
-\item{project}{Deprecated in favour of \code{int.args(method=...)}.
+\item{project}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of \code{int.args(method=...)}.
 If TRUE, aggregate the integration points to mesh vertices. Default:
 \code{project = (identical(int.args$method, "stable"))}}
 }

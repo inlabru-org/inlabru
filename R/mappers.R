@@ -99,7 +99,8 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 }
 
 #' @describeIn bru_mapper_generics
-#' will become deprecated in 2.7.0. Use `ibm_jacobian`
+#' `r lifecycle::badge("deprecated")`
+#' Deprecated since 2.7.0. Use [ibm_jacobian()]
 #' instead.
 #' Implementations must return a (sparse) matrix of size `ibm_n_output(...)`
 #' by `ibm_n(...)`. The `inla_f=TRUE` argument should only affect
@@ -468,7 +469,7 @@ print.summary_bru_mapper <- function(x, ...) {
 #' For `bru_mapper_scale`, a mapper to be scaled.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
 #' @param \dots Deprecated, alternative way to supply optional method definitions.
-#' @param methods Deprecated.
+#' @param methods `r lifecycle::badge("deprecated")` Deprecated.
 #'
 #' @describeIn bru_mapper Adds the `new_class` and "bru_mapper" class
 #' names to the inheritance list for the input `mapper` object, unless the object
@@ -632,7 +633,10 @@ ibm_jacobian.default <- function(mapper, input, state, ...) {
       class(mapper)[1], "'."
     ))
   }
-  ibm_amatrix(mapper, input = input, state = state, ...)
+  stop(paste0(
+    "Missing ibm_jacobian() method for class '",
+    class(mapper)[1], "'."
+  ))
 }
 
 #' @describeIn bru_mapper_generics

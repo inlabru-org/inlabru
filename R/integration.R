@@ -584,6 +584,8 @@ bru_int_polygon_old <- function(mesh, polylist, method = NULL, ...) {
 
 #' Aggregate integration weights onto mesh nodes
 #'
+#' `r lifecycle::badge("deprecated")` Use [fm_vertex_projection()] instead.
+#'
 #' @param mesh Mesh on which to integrate
 #' @param integ `list` of `loc`, integration points,
 #'   and `weight`, integration weights,
@@ -603,6 +605,8 @@ integration_weight_aggregation <- function(mesh, integ) {
 }
 
 #' Integration scheme for mesh triangle interiors
+#'
+#' `r lifecycle::badge("deprecated")` Use [fm_int_inla_mesh_core()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param tri_subset Optional triangle index vector for integration on a subset
