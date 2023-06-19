@@ -169,14 +169,18 @@ needed output. For example,</p>
 
 
 <p>When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-surface temperature or elevation. Although it is straight forward to add this data to the input
+surface temperature or elevation. Although it is straightforward to add this data to the input
 data frame or write a covariate function like in the previous section there is an even more
 convenient way in inlabru. Spatial covariates are often stored as <code>SpatialPixelsDataFrame</code>,
 <code>SpatialPixelsDataFrame</code> or <code>RasterLayer</code> objects. These can be provided directly via
-the input expressions if the <code><a href="like.html">like()</a></code> data is a <code>SpatialPointsDataFrame</code> object.
-inlabru will automatically
+the input expressions if they are supported by <code><a href="eval_spatial.html">eval_spatial()</a></code>, and
+the <code><a href="like.html">like()</a></code> data is an <code>sf</code> or <code>SpatialPointsDataFrame</code> object.
+<code>inlabru</code> will then automatically
 evaluate and/or interpolate the covariate at your data locations when using code like</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(mySpatialPixels, <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
+<p>For more precise control, use the the <code>layer</code> and <code>selector</code> arguments (see <code><a href="component.html">component()</a></code>),
+or call <code><a href="eval_spatial.html">eval_spatial()</a></code> directly, e.g.:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(<span class="fu">eval_spatial</span>(mySpatialPixels, <span class="at">where =</span> .data.), <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
     </div>
     <div class="section level2">
     <h2 id="coordinates">Coordinates<a class="anchor" aria-label="anchor" href="#coordinates"></a></h2>
