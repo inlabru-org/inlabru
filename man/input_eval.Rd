@@ -113,8 +113,21 @@ can be set to \code{coordinates}, which is the \code{sp} package function that e
 coordinates from the \code{SpatialPointsDataFrame} that was provided as input to \code{\link[=like]{like()}}. The code for
 this would look as follows:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ field(coordinates, model = inla.spde2.matern(...))
 }\if{html}{\out{</div>}}
+
+Since \code{coordinates} is a function from the \code{sp} package, this results in
+evaluation of \code{sp::coordinates(.data.)}, which loses any CRS information
+from the data object.
+
+For \code{sf} data with a geometry column (by default named \code{geometry}), use
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ field(geometry, model = inla.spde2.matern(...))
+}\if{html}{\out{</div>}}
+
+Since the CRS information is part of the geometry column of the \code{sf} object,
+this retains CRS information, so this is more robust, and allows the model
+to be built on a different CRS than the observation data.
 }
 
 \seealso{

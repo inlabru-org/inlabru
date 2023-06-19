@@ -1792,8 +1792,20 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
 #' this would look as follows:
 #' ```
-#' components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+#' components = y ~ field(coordinates, model = inla.spde2.matern(...))
 #' ```
+#' Since `coordinates` is a function from the `sp` package, this results in
+#' evaluation of `sp::coordinates(.data.)`, which loses any CRS information
+#' from the data object.
+#'
+#' For `sf` data with a geometry column (by default named `geometry`), use
+#' ```
+#' components = y ~ field(geometry, model = inla.spde2.matern(...))
+#' ```
+#' Since the CRS information is part of the geometry column of the `sf` object,
+#' this retains CRS information, so this is more robust, and allows the model
+#' to be built on a different CRS than the observation data.
+#'
 #'
 #' @export
 #' @keywords internal
