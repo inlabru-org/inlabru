@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9021</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -201,7 +201,8 @@ that can accept <code><a href="https://rdrr.io/r/base/list.html" class="external
 would be interpretable by an <code>INLA::f(..., values = ...)</code> specification.
 The exception is the method for <code>bru_mapper_multi</code>, that returns a
 multi-column data frame.</p></li>
-<li><p><code>ibm_amatrix()</code>: will become deprecated in 2.7.0. Use <code>ibm_jacobian</code>
+<li><p><code>ibm_amatrix()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a>
+Deprecated since 2.7.0. Use <code>ibm_jacobian()</code>
 instead.
 Implementations must return a (sparse) matrix of size <code>ibm_n_output(...)</code>
 by <code>ibm_n(...)</code>. The <code>inla_f=TRUE</code> argument should only affect

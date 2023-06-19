@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.7.0.9021</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,8 +78,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.8.0" id="inlabru-280">inlabru 2.8.0<a class="anchor" aria-label="anchor" href="#inlabru-280"></a></h2>
 <div class="section level3">
-<h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
+<h3 id="feature-updates-2-8-0">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-2-8-0"></a></h3>
 <ul><li><p>The iterative inla method has been given both sharper internal <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> optimisation criteria for the iterations (thanks to Haavard Rue), <em>and</em> a more relaxed nonlinear iteration stopping criterion; the default <code>bru_method$rel_tol</code> values has been changed from 1 to 10 percent change. The iterations are terminated when all latent and hyper-parameter mode changes fullfil <code>|change|/SD &lt; rel_tol</code>, and the non-linear line search is inactive. This seems to strike a useful balance between the different optimisation criteria, allowing the iterations to converge faster and also detect that convergence sooner.</p></li>
 <li>
 <p>The logic for which components are needed for a predictor expression (in <code><a href="../reference/like.html">like()</a></code> or <code><a href="../reference/generate.html">generate()</a></code>/<code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>) has been updated to when possible extract the list of components from the expression itself. The user can override this default if necessary, using the <code>include</code>/<code>exclude</code> arguments.</p>
@@ -98,7 +101,7 @@
 </li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-and-dependency-updates-development-version">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-development-version"></a></h3>
+<h3 id="bug-and-dependency-updates-2-8-0">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-2-8-0"></a></h3>
 <ul><li><p>Remove <code>rgdal</code> and <code>maptools</code> dependencies <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
 <li><p>Add <code><a href="../reference/bru_safe_sp.html">bru_safe_sp()</a></code> to check if <code>sp</code> can be used safely (checks <code>rgdal</code> availability and <code>sp</code> evolution status, optionally forcing use of <code>sf</code>) <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
 <li><p>Remove PROJ4 support <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
