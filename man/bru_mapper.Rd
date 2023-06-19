@@ -80,7 +80,7 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
 
-\item{methods}{Deprecated.}
+\item{methods}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated.}
 
 \item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 

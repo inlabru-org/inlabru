@@ -22,7 +22,7 @@ the vertex weights
 integration points for the mesh
 }
 \description{
-Integration scheme for mesh triangle interiors
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_int_inla_mesh_core]{fm_int_inla_mesh_core()}} instead.
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

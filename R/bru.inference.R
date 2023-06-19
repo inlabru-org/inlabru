@@ -1166,7 +1166,7 @@ extended_bind_rows <- function(...) {
 #' auto-detects use of `_latent` and `_eval` in the predictor expression.
 #' @param used Either `NULL` or a [bru_used()] object, overriding `include`, `exclude`,
 #' and `include_latent`.
-#' @param allow_latent logical, deprecated. Use `include_latent` instead.
+#' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated. Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
@@ -1866,7 +1866,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
-#' @param data Deprecated. Use `newdata` instead.
+#' @param data `r lifecycle::badge("deprecated")` Deprecated. Use `newdata` instead.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`

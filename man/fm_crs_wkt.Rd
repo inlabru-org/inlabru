@@ -151,6 +151,9 @@ Get and set CRS object or WKT string properties.
 
 \item \code{fm_proj4string()}: Returns a proj4 string, for any input supported by \code{\link[=fm_crs]{fm_crs()}}.
 
+\item \code{fm_crs_get_wkt()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_wkt]{fm_wkt()}}
+instead.
+
 }}
 \examples{
 \dontrun{
