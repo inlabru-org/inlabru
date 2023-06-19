@@ -205,12 +205,12 @@ that may not be the same as the locations at which the effect should be
 evaluated.</p>
 <p>The appropriate weights required to evaluate the effect at the
 observation locations can be constructed using
-<code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">INLA::inla.spde.make.A()</a></code>. The mapper for this model
-component takes the information in the component definition, in this
-case the minimum information required is an SPDE model object, and the
-2-column matrix that <code>main</code> is evaluated to. The mapper then
-calls <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">INLA::inla.spde.make.A()</a></code> with appropriate arguments
-extracted from this information.</p>
+<code><a href="../reference/fm_evaluate.html">fm_evaluator()</a></code>. The mapper for this model component takes
+the information in the component definition, in this case the minimum
+information required is an SPDE model object, and the 2-column matrix
+that <code>main</code> is evaluated to. The mapper then calls
+<code><a href="../reference/fm_evaluate.html">fm_evaluator()</a></code> with appropriate arguments extracted from
+this information.</p>
 <p>(NOTE: Deliberately not going into huge detail here; the <a href="bru_mapper.html">bru_mapper</a> vignette will have more
 details.)</p>
 </div>
@@ -223,8 +223,9 @@ details.)</p>
 <code>replicate</code> can all take a general <code>R</code> expression
 as an input. This expression is then evaluated in an environment that
 consists of the named variables in the data (note: for <code>sp</code>
-objects this includes the column names from the <code>@coords</code>
-slot as well as the columns in <code>@data</code>).</p>
+objects this does <em>not</em> include the column names from the
+<code>@coords</code> slot, but does include the columns in
+<code>@data</code>).</p>
 <p>If the names are not found in the data then the global environment is
 searched for objects of that name.</p>
 <p>For example, suppose the data has columns named <code>x</code> and
