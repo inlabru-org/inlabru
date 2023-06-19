@@ -242,6 +242,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
       val <- max(abs(a - b[(shift + seq_len(n) - 1L) %% n + 1L, ]))
       if (val < minimum) {
         minimal_shift <- shift
+        minimum <- val
       }
     }
     b[(minimal_shift + seq_len(n) - 1L) %% n + 1L, ]
