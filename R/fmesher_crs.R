@@ -5,9 +5,10 @@
 #' @export
 
 fm_has_PROJ6 <- function() {
-  lifecycle::deprecate_stop("2.8.0",
+  lifecycle::deprecate_warn("2.8.0",
     "fm_has_PROJ6()",
     details = c(
+      i = "Since inlabru 2.7.1, fm_has_PROJ6() always returns TRUE",
       i = "rgdal/PROJ4 is no longer supported."
     )
   )

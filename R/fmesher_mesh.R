@@ -239,12 +239,14 @@ fm_store_points <- function(loc, crs = NULL, info = NULL, format = NULL) {
   if (identical(format, "df")) {
     points <- cbind(points, info)
   } else if (identical(format, "sp")) {
-    points <- sp::SpatialPointsDataFrame(points,
+    points <- sp::SpatialPointsDataFrame(
+      points,
       data = info,
       proj4string = fm_CRS(crs)
     )
   } else if (identical(format, "sf")) {
-    points <- sf::st_as_sf(cbind(points, info),
+    points <- sf::st_as_sf(
+      cbind(points, info),
       coords = seq_len(ncol(points)),
       crs = crs
     )

@@ -333,8 +333,8 @@ test_that("globe polygon integration", {
     mesh <- INLA::inla.mesh.create(globe = 1, crs = fm_CRS("globe"))
   )
 
-  poly <- SpatialPolygons(
-    list(Polygons(list(Polygon(rbind(
+  poly <- sp::SpatialPolygons(
+    list(sp::Polygons(list(sp::Polygon(rbind(
       c(-45, -45), c(-45, 45), c(45, 45), c(45, -45)
     ))), ID = "A")),
     proj4string = fm_CRS("longlat_globe")
