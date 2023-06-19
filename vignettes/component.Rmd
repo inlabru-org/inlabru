@@ -78,13 +78,13 @@ The advantage of specifying mapper methods is that it supports automatic 'stack 
 
 The mapper for the 2D SPDE effect takes as an input a 2-column matrix of coordinates that represent the locations are which to evaluate the effect.  The parameters of the SPDE component are defined at mesh nodes that may not be the same as the locations at which the effect should be evaluated.  
 
-The appropriate weights required to evaluate the effect at the observation locations can be constructed using `INLA::inla.spde.make.A()`.  The mapper for this model component takes the information in the component definition, in this case the minimum information required is an SPDE model object, and the 2-column matrix that `main` is evaluated to. The mapper then calls `INLA::inla.spde.make.A()` with appropriate arguments extracted from this information.
+The appropriate weights required to evaluate the effect at the observation locations can be constructed using `fm_evaluator()`.  The mapper for this model component takes the information in the component definition, in this case the minimum information required is an SPDE model object, and the 2-column matrix that `main` is evaluated to. The mapper then calls `fm_evaluator()` with appropriate arguments extracted from this information.
 
 (NOTE: Deliberately not going into huge detail here; the [bru_mapper](bru_mapper.html) vignette will have more details.)
 
 ### Defining `main`, `group`, and `replicate`.
 
-The arguments `main`, `group`, and `replicate` can all take a general `R` expression as an input.  This expression is then evaluated in an environment that consists of the named variables in the data (note: for `sp` objects this includes the column names from the `@coords` slot as well as the columns in `@data`).  
+The arguments `main`, `group`, and `replicate` can all take a general `R` expression as an input.  This expression is then evaluated in an environment that consists of the named variables in the data (note: for `sp` objects this does _not_ include the column names from the `@coords` slot, but does include the columns in `@data`).  
 
 If the names are not found in the data then the global environment is searched for objects of that name.
 
