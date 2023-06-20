@@ -78,6 +78,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-and-dependency-updates-development-version">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-development-version"></a></h3>
+<ul><li>Covariate object component inputs of type <code>SpatialPolygonsDataFrame</code> were not automatically passed on to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. The logic has now changed so that any object with a <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> method will trigger a call to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. See <code><a href="../reference/input_eval.html">?input_eval</a></code> for further information.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.8.0" id="inlabru-280">inlabru 2.8.0<a class="anchor" aria-label="anchor" href="#inlabru-280"></a></h2>
@@ -129,7 +133,7 @@
 <li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
 <li>
 <p>Further <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> method updates;</p>
-<ul><li><p>Deprecated <code><a href="../reference/bru_mapper_generics.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</p></li>
+<ul><li><p>Deprecated <code><a href="../reference/inlabru-deprecated.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</p></li>
 <li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</p></li>
 <li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</p></li>
 <li><p><code>summary</code> methods for <code>bru_mapper</code> objects (<code><a href="../reference/bru_mapper_summary.html">summary.bru_mapper()</a></code>)</p></li>

@@ -101,8 +101,6 @@ available (see Details). Otherwise the
 <span></span>
 <span><span class="fu">ibm_values</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">ibm_is_linear</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">ibm_jacobian</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -127,9 +125,6 @@ available (see Details). Otherwise the
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_values</span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_is_linear</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -201,12 +196,6 @@ that can accept <code><a href="https://rdrr.io/r/base/list.html" class="external
 would be interpretable by an <code>INLA::f(..., values = ...)</code> specification.
 The exception is the method for <code>bru_mapper_multi</code>, that returns a
 multi-column data frame.</p></li>
-<li><p><code>ibm_amatrix()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a>
-Deprecated since 2.7.0. Use <code>ibm_jacobian()</code>
-instead.
-Implementations must return a (sparse) matrix of size <code>ibm_n_output(...)</code>
-by <code>ibm_n(...)</code>. The <code>inla_f=TRUE</code> argument should only affect
-the allowed type of input format.</p></li>
 <li><p><code>ibm_is_linear()</code>: Implementations must return <code>TRUE</code> or <code>FALSE</code>.
 If <code>TRUE</code> (returned by the default method unless the mapper
 contains an <code>is_linear</code> variable), users of the mapper
@@ -248,16 +237,9 @@ first checks for a 'n_inla' element.</p></li>
 <li><p><code>ibm_values(default)</code>: Returns a non-null element
 'values' from the mapper object, and <code>seq_len(ibm_n(mapper))</code> if
 it doesn't exist.</p></li>
-<li><p><code>ibm_amatrix(default)</code>: Gives an error message.
-Mapper classes must implement their own <code>ibm_jacobian</code> or
-<code>ibm_amatrix</code> methods. New implementations should use
-a <code>ibm_jacobian</code> method. <code>ibm_amatrix</code> may become deprecated
-in a future version.</p></li>
 <li><p><code>ibm_is_linear(default)</code>: Returns logical
 <code>is_linear</code> from the mapper object if it exists, and otherwise <code>TRUE</code>.</p></li>
-<li><p><code>ibm_jacobian(default)</code>: Calls <code>ibm_amatrix</code>, which
-by default gives an error.
-Mapper classes should implement their own <code>ibm_jacobian</code> method.</p></li>
+<li><p><code>ibm_jacobian(default)</code>: Mapper classes must implement their own <code>ibm_jacobian</code> method.</p></li>
 <li><p><code>ibm_linear(default)</code>: Calls <code>ibm_eval()</code> and <code>ibm_jacobian()</code>
 and returns a <code>bru_mapper_taylor</code> object.
 The <code>state0</code> information in the affine mapper indicates for which state

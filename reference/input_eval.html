@@ -106,7 +106,8 @@
 
 
 <dt>data</dt>
-<dd><p>A <code>data.frame</code> or <code>Spatial*</code> object of covariates and/or point locations.
+<dd><p>A <code>data.frame</code>, <code>tibble</code>, <code>sf</code>, <code>list</code>, or <code>Spatial*</code> object of
+covariates and/or point locations.
 If <code>NULL</code>, return the component's map.</p></dd>
 
 </dl></div>
@@ -121,9 +122,11 @@ If <code>NULL</code>, return the component's map.</p></dd>
     <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
     
 <ul><li><p><code>input_eval(bru_input)</code>: Attempts to evaluate a component input (e.g. <code>main</code>,
-<code>group</code>, <code>replicate</code>, or <code>weight</code>), and process the results:</p><ol><li><p>Eval failed. Return NULL or map everything to 1. This should normally not
-happen, unless the component use logic is incorrect (e.g. via <code>include</code>/<code>exclude</code>)
-e.g. leading to missing columns for a certain likelihood in a
+<code>group</code>, <code>replicate</code>, or <code>weight</code>), and process the results:</p><ol><li><p>If <code><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval()</a></code> failed, return NULL or map everything to 1
+(see the <code>null.on.fail</code> argument). This should normally not
+happen, unless the component use logic is incorrect,
+(e.g. via <code>include</code>/<code>exclude</code>)
+leading to missing columns for a certain likelihood in a
 multi-<code><a href="like.html">like()</a></code> model.</p></li>
 <li><p>If we obtain a function, apply the function to the data object</p></li>
 <li><p>If we obtain an object supported by <code><a href="eval_spatial.html">eval_spatial()</a></code>, extract the values

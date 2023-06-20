@@ -75,7 +75,7 @@ future version."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Deprecated functions in inlabru</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 4 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 5 more</small>
       <div class="d-none name"><code>inlabru-deprecated.Rd</code></div>
     </div>
 
@@ -122,25 +122,15 @@ future version.</p>
 <span><span class="co"># S3 method for inla.mesh</span></span>
 <span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for inla</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for inla</span></span>
+<span><span class="fu"><a href="generate.html">generate</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ibm_amatrix</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">ibm_valid_input</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_inla_mesh_2d</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_inla_mesh_1d</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_index</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_linear</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_matrix</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_factor</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_offset</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -149,15 +139,6 @@ future version.</p>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_offset</span></span>
 <span><span class="fu"><a href="bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_offset</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_multi</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_collect</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_amatrix</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">vertices.inla.mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -245,23 +226,29 @@ to using old PROJ4 methods when a PROJ6 method hasn't been implemented</p></li>
 is required but not available</p></li>
 <li><p><code>fm_sp_get_crs()</code>: Wrapper for CRS(projargs) (PROJ4) and CRS(wkt) for
 <code><a href="https://rdrr.io/pkg/sp/man/Spatial-class.html" class="external-link">sp::Spatial</a></code> objects.</p></li>
-<li><p><code>fm_spTransform()</code>: Handle transformation of various inla objects according to coordinate
-reference systems of sp::CRS or INLA::inla.CRS class.</p></li>
+<li><p><code>fm_spTransform()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> (See <code><a href="fm_transform.html">fm_transform()</a></code> instead)
+Handle transformation of various inla objects according to coordinate
+reference systems of <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> or <code><a href="https://rdrr.io/pkg/INLA/man/inla.CRS.html" class="external-link">INLA::inla.CRS</a></code> class.</p></li>
 <li><p><code>fm_spTransform(default)</code>: The default method handles low level transformation of raw
 coordinates.</p></li>
+<li><p><code>predict(inla)</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> since version <code>2.1.0</code>.
+Prediction from fitted inla model. This method is not supported for plain
+inla objects. Please see <code><a href="predict.bru.html">predict.bru()</a></code> instead.
+See <a href="https://github.com/inlabru-org/inlabru/issues/78" class="external-link">#78</a> for more
+information related to <code><a href="https://rdrr.io/pkg/INLA/man/rerun.html" class="external-link">INLA::inla.rerun()</a></code>; use <code><a href="bru.html">bru_rerun()</a></code> instead.</p></li>
+<li><p><code>generate(inla)</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> since version <code>2.1.0</code>.
+Sampling based on inla posteriors.
+This method is not supported for plain inla objects.
+Please see <code><a href="generate.html">generate.bru()</a></code> instead.
+See <a href="https://github.com/fbachl/inlabru/issues/78" class="external-link">#78</a> for more information
+related to <code><a href="https://rdrr.io/pkg/INLA/man/rerun.html" class="external-link">INLA::inla.rerun()</a></code>; use <code><a href="bru.html">bru_rerun()</a></code> instead.</p></li>
+<li><p><code>ibm_amatrix()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a>
+Deprecated since 2.7.0. Use <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code>
+instead.</p></li>
 <li><p><code>ibm_valid_input()</code>: Use case changed to <code><a href="bru_mapper_generics.html">ibm_invalid_output()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_2d)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_inla_mesh_1d)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_index)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_linear)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_matrix)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_factor)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
 <li><p><code>bru_mapper_offset()</code>: Creates a <code><a href="bru_mapper.html">bru_mapper_const()</a></code> mapper.</p></li>
 <li><p><code>ibm_n(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_values(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
-<li><p><code>ibm_amatrix(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
-<li><p><code>ibm_amatrix(bru_mapper_multi)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
-<li><p><code>ibm_amatrix(bru_mapper_collect)</code>: Replaced by <code><a href="bru_mapper_generics.html">ibm_jacobian()</a></code></p></li>
 <li><p><code>vertices.inla.mesh()</code>: Extract vertex locations from an <code>inla.mesh</code>.
 Converts the vertices of an <code>inla.mesh</code> object into a <code>SpatialPointsDataFrame</code>.
 Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code></p></li>
@@ -269,7 +256,9 @@ Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="fm_transform.html">fm_transform()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="fm_transform.html">fm_transform()</a></code></p>
+<p><code><a href="predict.bru.html">predict.bru()</a></code></p>
+<p><code><a href="generate.html">generate.bru()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
