@@ -20,7 +20,8 @@ input_eval(...)
 
 \item{component}{A component.}
 
-\item{data}{A \code{data.frame} or \verb{Spatial*} object of covariates and/or point locations.
+\item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
+covariates and/or point locations.
 If \code{NULL}, return the component's map.}
 }
 \value{
@@ -35,9 +36,11 @@ Obtain component inputs
 \item \code{input_eval(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},
 \code{group}, \code{replicate}, or \code{weight}), and process the results:
 \enumerate{
-\item Eval failed. Return NULL or map everything to 1. This should normally not
-happen, unless the component use logic is incorrect (e.g. via \code{include}/\code{exclude})
-e.g. leading to missing columns for a certain likelihood in a
+\item If \code{eval()} failed, return NULL or map everything to 1
+(see the \code{null.on.fail} argument). This should normally not
+happen, unless the component use logic is incorrect,
+(e.g. via \code{include}/\code{exclude})
+leading to missing columns for a certain likelihood in a
 multi-\code{like()} model.
 \item If we obtain a function, apply the function to the data object
 \item If we obtain an object supported by \code{\link[=eval_spatial]{eval_spatial()}}, extract the values

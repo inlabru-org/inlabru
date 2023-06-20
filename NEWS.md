@@ -1,5 +1,12 @@
 # inlabru (development version)
 
+## Bug and dependency updates
+
+* Covariate object component inputs of type `SpatialPolygonsDataFrame`
+  were not automatically passed on to `eval_spatial()`. The logic has now changed
+  so that any object with a `eval_spatial()` method will trigger a call to
+  `eval_spatial()`. See `?input_eval` for further information.
+
 # inlabru 2.8.0
 
 ## Feature updates

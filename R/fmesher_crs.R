@@ -1966,8 +1966,10 @@ fm_transform.inla.mesh.segment <- function(x, crs = fm_crs(x), ..., passthrough 
 
 # fm_spTransform ----
 
-#' @describeIn inlabru-deprecated Handle transformation of various inla objects according to coordinate
-#' reference systems of sp::CRS or INLA::inla.CRS class.
+#' @describeIn inlabru-deprecated
+#' `r lifecycle::badge("deprecated")` (See [fm_transform()] instead)
+#' Handle transformation of various inla objects according to coordinate
+#' reference systems of `sp::CRS` or `INLA::inla.CRS` class.
 #'
 #' @param x
 #' The object that should be transformed from it's current CRS to a new CRS

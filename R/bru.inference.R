@@ -1865,8 +1865,8 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
 #' prediciton summary has the same number of rows as `newdata`, then the output is
 #' a `Spatial*DataFrame` object. Default `FALSE`.
-#' @param \dots Additional arguments passed on to `inla.posterior.sample`
-#' @param data `r lifecycle::badge("deprecated")` Deprecated. Use `newdata` instead.
+#' @param \dots Additional arguments passed on to `inla.posterior.sample()`
+#' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @details
 #' In addition to the component names (that give the effect
 #' of each component evaluated for the input data), the suffix `_latent`
