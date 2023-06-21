@@ -38,6 +38,7 @@
 \alias{fm_wkt_projection_type}
 \alias{fm_crs_projection_type}
 \alias{fm_crs_bounds}
+\alias{fm_crs_detect_manifold}
 \title{Handling CRS/WKT}
 \usage{
 fm_wkt_is_geocent(wkt)
@@ -111,6 +112,8 @@ fm_wkt_projection_type(wkt)
 fm_crs_projection_type(crs)
 
 fm_crs_bounds(crs, warn.unknown = FALSE)
+
+fm_crs_detect_manifold(crs)
 }
 \arguments{
 \item{wkt}{A WKT2 character string}
@@ -180,6 +183,9 @@ instead.
 \item \code{fm_crs_bounds()}: Returns bounds information for a projection, as
 a list with elements \code{type} ("rectangle" or "ellipse"), \code{xlim}, \code{ylim}, and
 \code{polygon}.
+
+\item \code{fm_crs_detect_manifold()}: Detect if a crs is on "R2" or "S2"
+(if \link{fm_crs_is_geocent(crs)} is \code{TRUE})
 
 }}
 \examples{

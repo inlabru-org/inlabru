@@ -1944,7 +1944,9 @@ fm_transform.Spatial <- function(x, crs = fm_crs(x), ..., passthrough = FALSE) {
 }
 
 
-
+#' @export
+#' @describeIn fm_crs_wkt Detect if a crs is on "R2" or "S2"
+#' (if [fm_crs_is_geocent(crs)] is `TRUE`)
 fm_crs_detect_manifold <- function(crs) {
   if (fm_crs_is_geocent(crs)) {
     manifold <- "S2"
