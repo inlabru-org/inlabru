@@ -34,6 +34,10 @@
 \alias{fm_wkt}
 \alias{fm_proj4string}
 \alias{fm_crs_get_wkt}
+\alias{fm_wkt_tree_projection_type}
+\alias{fm_wkt_projection_type}
+\alias{fm_crs_projection_type}
+\alias{fm_crs_bounds}
 \title{Handling CRS/WKT}
 \usage{
 fm_wkt_is_geocent(wkt)
@@ -99,6 +103,14 @@ fm_wkt(crs)
 fm_proj4string(crs)
 
 fm_crs_get_wkt(crs)
+
+fm_wkt_tree_projection_type(wt)
+
+fm_wkt_projection_type(wkt)
+
+fm_crs_projection_type(crs)
+
+fm_crs_bounds(crs, warn.unknown = FALSE)
 }
 \arguments{
 \item{wkt}{A WKT2 character string}
@@ -120,6 +132,9 @@ supported)}
 \item{params}{Length unit definitions, in the list format produced by
 \code{fm_wkt_unit_params()}, Default: NULL, which invokes
 \code{fm_wkt_unit_params()}}
+
+\item{warn.unknown}{logical, default \code{FALSE}. Produce warning if the shape
+of the projection bounds is unknown.}
 }
 \value{
 For \code{fm_wkt_unit_params}, a
@@ -153,6 +168,16 @@ Get and set CRS object or WKT string properties.
 
 \item \code{fm_crs_get_wkt()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_wkt]{fm_wkt()}}
 instead.
+
+\item \code{fm_wkt_tree_projection_type()}: Returns "longlat", "lambert", "mollweide", "hammer", "tmerc", or \code{NULL}
+
+\item \code{fm_wkt_projection_type()}: See \code{fm_wkt_tree_projection_type}
+
+\item \code{fm_crs_projection_type()}: See \code{fm_wkt_tree_projection_type}
+
+\item \code{fm_crs_bounds()}: Returns bounds information for a projection, as
+a list with elements \code{type} ("rectangle" or "ellipse"), \code{xlim}, \code{ylim}, and
+\code{polygon}.
 
 }}
 \examples{

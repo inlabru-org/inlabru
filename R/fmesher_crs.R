@@ -1481,6 +1481,8 @@ fm_crs_transform_oblique <- function(x, oblique, to.oblique = TRUE) {
 
 
 
+#' @describeIn fm_crs_wkt Returns "longlat", "lambert", "mollweide", "hammer", "tmerc", or `NULL`
+#' @export
 fm_wkt_tree_projection_type <- function(wt) {
   axis1 <- fm_wkt_tree_get_item(wt, "AXIS", 1)
   axis2 <- fm_wkt_tree_get_item(wt, "AXIS", 2)
@@ -1491,7 +1493,7 @@ fm_wkt_tree_projection_type <- function(wt) {
   conversion <- fm_wkt_tree_get_item(wt, "CONVERSION")
   if (!is.null(conversion)) {
     method <- fm_wkt_tree_get_item(conversion, "METHOD")
-    if (identical(method[["params"]][[1]], '"Lambert Cylindrical Equal Area (Sherical)"')) {
+    if (identical(method[["params"]][[1]], '"Lambert Cylindrical Equal Area (Spherical)"')) {
       return("lambert")
     }
     if (identical(method[["params"]][[1]], '"Mollweide"')) {
@@ -1507,11 +1509,15 @@ fm_wkt_tree_projection_type <- function(wt) {
   NULL
 }
 
+#' @describeIn fm_crs_wkt See `fm_wkt_tree_projection_type`
+#' @export
 fm_wkt_projection_type <- function(wkt) {
   wt <- fm_wkt_as_wkt_tree(wkt)
   fm_wkt_tree_projection_type(wt)
 }
 
+#' @describeIn fm_crs_wkt See `fm_wkt_tree_projection_type`
+#' @export
 fm_crs_projection_type <- function(crs) {
   wkt <- fm_wkt(crs)
   fm_wkt_projection_type(wkt)
@@ -1520,6 +1526,12 @@ fm_crs_projection_type <- function(crs) {
 ## +proj=longlat in (-180,180)x(-90,90)
 ## +proj=moll in (-2,2)x(-1,1) scaled by +a and +b, and +units
 ## +proj=lambert in (-pi,pi)x(-1,1) scaled by +a and +b, and +units
+#' @describeIn fm_crs_wkt Returns bounds information for a projection, as
+#' a list with elements `type` ("rectangle" or "ellipse"), `xlim`, `ylim`, and
+#' `polygon`.
+#' @param warn.unknown logical, default `FALSE`. Produce warning if the shape
+#' of the projection bounds is unknown.
+#' @export
 fm_crs_bounds <- function(crs, warn.unknown = FALSE) {
   wkt <- fm_wkt(crs)
   wt <- fm_wkt_as_wkt_tree(wkt)
