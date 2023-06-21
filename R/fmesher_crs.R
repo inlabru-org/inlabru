@@ -1833,7 +1833,7 @@ fm_transform.matrix <- function(x, crs = NULL, ..., passthrough = FALSE, crs0 = 
   x <- fm_transform_raw(
     x,
     from = current_crs,
-    to = crs1
+    to = fm_crs(crs1, crsonly = TRUE)
   )
 
   if (!all(ok)) {
