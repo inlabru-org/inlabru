@@ -84,7 +84,7 @@
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.8.0" id="inlabru-280">inlabru 2.8.0<a class="anchor" aria-label="anchor" href="#inlabru-280"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.8.0" id="inlabru-280">inlabru 2.8.0<a class="anchor" aria-label="anchor" href="#inlabru-280"></a></h2><p class="text-muted">CRAN release: 2023-06-20</p>
 <div class="section level3">
 <h3 id="feature-updates-2-8-0">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-2-8-0"></a></h3>
 <ul><li><p>The iterative inla method has been given both sharper internal <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> optimisation criteria for the iterations (thanks to Haavard Rue), <em>and</em> a more relaxed nonlinear iteration stopping criterion; the default <code>bru_method$rel_tol</code> values has been changed from 1 to 10 percent change. The iterations are terminated when all latent and hyper-parameter mode changes fullfil <code>|change|/SD &lt; rel_tol</code>, and the non-linear line search is inactive. This seems to strike a useful balance between the different optimisation criteria, allowing the iterations to converge faster and also detect that convergence sooner.</p></li>
