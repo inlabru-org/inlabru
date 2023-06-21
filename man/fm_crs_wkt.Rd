@@ -133,6 +133,8 @@ supported)}
 \code{fm_wkt_unit_params()}, Default: NULL, which invokes
 \code{fm_wkt_unit_params()}}
 
+\item{wt}{A parsed wkt tree, see \code{\link[=fm_wkt_as_wkt_tree]{fm_wkt_as_wkt_tree()}}}
+
 \item{warn.unknown}{logical, default \code{FALSE}. Produce warning if the shape
 of the projection bounds is unknown.}
 }

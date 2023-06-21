@@ -1482,6 +1482,7 @@ fm_crs_transform_oblique <- function(x, oblique, to.oblique = TRUE) {
 
 
 #' @describeIn fm_crs_wkt Returns "longlat", "lambert", "mollweide", "hammer", "tmerc", or `NULL`
+#' @param wt A parsed wkt tree, see [fm_wkt_as_wkt_tree()]
 #' @export
 fm_wkt_tree_projection_type <- function(wt) {
   axis1 <- fm_wkt_tree_get_item(wt, "AXIS", 1)
