@@ -92,13 +92,26 @@ fm_sp_get_crs <- function(x) {
 }
 
 
-#' @describeIn fm_crs Check if an object is or has `NULL` or `NA` CRS information
+#' @describeIn fm_crs Check if a `fm_crs` has `NA` crs information
+#' @export
+is.na.fm_crs <- function(x) {
+  is.na(fm_crs(x, crsonly = TRUE))
+}
+
+#' @describeIn fm_crs Check if a `inla.CRS` has `NA` crs information
+#' @export
+is.na.inla.CRS <- function(x) {
+  is.na(fm_crs(x, crsonly = TRUE))
+}
+
+#' @describeIn fm_crs Check if an object is or has `NULL` or `NA` CRS information.
+#' If not `NULL`, `is.na(fm_crs(x))` is returned. This allows the input to be e.g.
+#' a proj4string or epsg number, since the default [fm_crs()] method passes
+#' its argument on to `sf::st_crs()`.
+#'
 #' @export
 fm_crs_is_null <- function(x) {
-  if (is.null(x)) {
-    return(TRUE)
-  }
-  is.na(fm_crs(x))
+  is.null(x) || is.na(fm_crs(x))
 }
 
 

@@ -7,6 +7,9 @@
   so that any object with a `eval_spatial()` method will trigger a call to
   `eval_spatial()`. See `?input_eval` for further information.
 
+* `fm_crs_is_null()` now supports oblique `fm_crs` CRS objects, and `is.na()`
+  methods for the `fm_crs` and `inla.CRS` classes have been added.
+
 # inlabru 2.8.0
 
 ## Feature updates
