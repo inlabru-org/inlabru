@@ -6,9 +6,14 @@
   were not automatically passed on to `eval_spatial()`. The logic has now changed
   so that any object with a `eval_spatial()` method will trigger a call to
   `eval_spatial()`. See `?input_eval` for further information.
+  (version `2.8.0.9001)
 
 * `fm_crs_is_null()`, `fm_transform()` now supports oblique `fm_crs` CRS objects,
   and `is.na()` methods for the `fm_crs` and `inla.CRS` classes have been added.
+  (version `2.8.0.9003)
+  
+* Significant speed up `predict()` by using `quantile(..., names = FALSE)`
+  (version `2.8.0.9004`)
 
 # inlabru 2.8.0
 

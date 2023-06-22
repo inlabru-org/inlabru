@@ -2292,14 +2292,16 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
       smy <- data.frame(
         apply(data, MARGIN = 1, mean, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        as.matrix(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+        as.matrix(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+                        names = FALSE))
       )
       qs_names <- paste0("q", probs)
     } else {
       smy <- data.frame(
         apply(data, MARGIN = 1, mean, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+        t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+                names = FALSE))
       )
       qs_names <- paste0("q", probs)
     }
