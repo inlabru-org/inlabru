@@ -48,7 +48,7 @@ see \code{\link[=fm_wkt]{fm_wkt()}} and \code{\link[=fm_proj4string]{fm_proj4str
 }
 \examples{
 
-crs0 <- fm_CRS("longlat")
+crs0 <- fm_CRS("longlat_norm")
 p4s <- fm_proj4string(crs0)
 lst <- fm_CRSargs_as_list(p4s)
 crs1 <- fm_list_as_CRS(lst)

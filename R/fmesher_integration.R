@@ -1161,7 +1161,7 @@ fm_int_inla_mesh_core <- function(mesh, tri_subset = NULL, nsub = NULL) {
   for (tri in tri_subset) {
     idx_start <- idx_end + 1
     idx_end <- idx_start + nB - 1
-    loc[seq(idx_start, idx_end, length = nB), ] <-
+    loc[seq(idx_start, idx_end, length.out = nB), ] <-
       as.matrix(barycentric_grid %*%
         mesh$loc[mesh$graph$tv[tri, ], , drop = FALSE])
   }
