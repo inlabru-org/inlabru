@@ -3148,23 +3148,31 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       inla.options[["control.inla"]]$step.factor <- 1
       inla.options[["control.inla"]]$tolerance.step <- 1e-10
 
-      if (result$.args$control.inla$stencil ==
-        INLA::inla.set.control.inla.default()$stencil) {
+      if (identical(
+        result$.args$control.inla[["stencil"]],
+        INLA::inla.set.control.inla.default()$stencil
+      )) {
         inla.options$control.inla$stencil <- 9
       }
 
       h.def <- INLA::inla.set.control.inla.default()$h
-      if (result$.args$control.inla$h == h.def) {
-        inla.options$control.inla$h <- 0.2 * result$.args$control.inla$h
+      if (identical(
+        result$.args$control.inla[["h"]], h.def
+      )) {
+        inla.options$control.inla$h <-
+          0.2 * result$.args$control.inla[["h"]]
       } else {
-        inla.options$control.inla$h <- max(0.1 * h.def, 0.75 * result$.args$control.inla$h)
+        inla.options$control.inla$h <-
+          max(0.1 * h.def, 0.75 * result$.args$control.inla[["h"]])
       }
 
       tol.def <- INLA::inla.set.control.inla.default()$tolerance
-      if (result$.args$control.inla$tolerance == tol.def) {
-        inla.options$control.inla$tolerance <- result$.args$control.inla$tolerance * 0.01
+      if (identical(result$.args$control.inla[["tolerance"]], tol.def)) {
+        inla.options$control.inla$tolerance <-
+          result$.args$control.inla[["tolerance"]] * 0.01
       } else {
-        inla.options$control.inla$tolerance <- max(tol.def^2, result$.args$control.inla$tolerance * 0.1)
+        inla.options$control.inla$tolerance <-
+          max(tol.def^2, result$.args$control.inla[["tolerance"]] * 0.1)
       }
     }
     if ((!is.null(result) && !is.null(result$mode))) {
