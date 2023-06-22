@@ -185,7 +185,7 @@ a list with elements \code{type} ("rectangle" or "ellipse"), \code{xlim}, \code{
 \code{polygon}.
 
 \item \code{fm_crs_detect_manifold()}: Detect if a crs is on "R2" or "S2"
-(if \link{fm_crs_is_geocent(crs)} is \code{TRUE})
+(if \code{fm_crs_is_geocent(crs)} is \code{TRUE})
 
 }}
 \examples{
