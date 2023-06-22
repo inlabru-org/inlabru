@@ -151,8 +151,7 @@ name/value pairs.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">crs0</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Use of old predefined projection 'longlat' is deprecated. Converting to 'longlat_norm'</span>
+<span class="r-in"><span><span class="va">crs0</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"longlat_norm"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p4s</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_crs_wkt.html">fm_proj4string</a></span><span class="op">(</span><span class="va">crs0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">lst</span> <span class="op">&lt;-</span> <span class="fu">fm_CRSargs_as_list</span><span class="op">(</span><span class="va">p4s</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">crs1</span> <span class="op">&lt;-</span> <span class="fu">fm_list_as_CRS</span><span class="op">(</span><span class="va">lst</span><span class="op">)</span></span></span>
