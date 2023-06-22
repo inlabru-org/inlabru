@@ -167,7 +167,9 @@
 <span></span>
 <span><span class="fu">fm_crs_projection_type</span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fm_crs_bounds</span><span class="op">(</span><span class="va">crs</span>, warn.unknown <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fm_crs_bounds</span><span class="op">(</span><span class="va">crs</span>, warn.unknown <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fm_crs_detect_manifold</span><span class="op">(</span><span class="va">crs</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -256,6 +258,8 @@ instead.</p></li>
 <li><p><code>fm_crs_bounds()</code>: Returns bounds information for a projection, as
 a list with elements <code>type</code> ("rectangle" or "ellipse"), <code>xlim</code>, <code>ylim</code>, and
 <code>polygon</code>.</p></li>
+<li><p><code>fm_crs_detect_manifold()</code>: Detect if a crs is on "R2" or "S2"
+(if fm_crs_is_geocent(crs) is <code>TRUE</code>)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
