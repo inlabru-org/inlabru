@@ -37,12 +37,12 @@ fm_pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE,
   }
 
   if (length(nx) == 1) {
-    x <- seq(min(mesh$loc[, 1]), max(mesh$loc[, 1]), length = nx)
+    x <- seq(min(mesh$loc[, 1]), max(mesh$loc[, 1]), length.out = nx)
   } else {
     x <- nx
   }
   if (length(ny) == 1) {
-    y <- seq(min(mesh$loc[, 2]), max(mesh$loc[, 2]), length = ny)
+    y <- seq(min(mesh$loc[, 2]), max(mesh$loc[, 2]), length.out = ny)
   } else {
     y <- ny
   }
