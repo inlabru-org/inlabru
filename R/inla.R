@@ -33,43 +33,53 @@ bru_standardise_names <- function(x) {
 
 
 
-#' Prediction from fitted inla model
+#' @describeIn inlabru-deprecated
+#' `r lifecycle::badge("deprecated")` since version `2.1.0`.
+#' Prediction from fitted inla model. This method is not supported for plain
+#' inla objects. Please see [predict.bru()] instead.
+#' See [#78](https://github.com/inlabru-org/inlabru/issues/78) for more
+#' information related to `INLA::inla.rerun()`; use [bru_rerun()] instead.
 #'
-#' This method is not supported for plain inla objects. Please see [predict.bru()] instead.
-#'
-#' @aliases predict.inla
+#' @seealso [predict.bru()]
 #' @export
-#' @param object A `bru` object obtained by calling [bru()] or [lgcp()].
-#' @param ... Arguments passed on to [predict.bru()].
-#' @return A `prediction` object.
-#' @seealso [predict.inla()]
 #' @keywords internal
 predict.inla <- function(object, ...) {
-  stop("predict() is not supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
+  lifecycle::deprecate_stop(
+    when = "2.1.0",
+    what = "predict.inla()",
+    with = "predict.bru()",
+    details = c(
+      "The `predict()` method is not supported for plain inla objects.",
+      "Also see https://github.com/inlabru-org/inlabru/issues/78 ; use `bru_rerun()` instead of `inla.rerun()`"
+    )
+  )
 }
 
 
 
-#' Sampling based on inla posteriors
+#' @describeIn inlabru-deprecated
+#' `r lifecycle::badge("deprecated")` since version `2.1.0`.
+#' Sampling based on inla posteriors.
+#' This method is not supported for plain inla objects.
+#' Please see [generate.bru()] instead.
+#' See [#78](https://github.com/fbachl/inlabru/issues/78) for more information
+#' related to `INLA::inla.rerun()`; use [bru_rerun()] instead.
 #'
-#' @description
-#' This method is not supported for plain inla objects. Please see [generate.bru()] instead.
-#' See https://github.com/fbachl/inlabru/issues/78 for more information.
-#' @aliases generate.inla
-#' @rdname predict.inla
-#' @export
-#' @seealso [generate.inla()]
-#' @param object An `inla` object obtained by calling `INLA::inla()`.
-#' @param ... additional arguments passed on to[generate.bru].
-#'
-#' @return List of generated samples
-#' @seealso [predict.bru()]
+#' @seealso [generate.bru()]
 #'
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @export
 #' @keywords internal
-generate.inla <- function(object,
-                          ...) {
-  stop("generate() is no longer supported for plain inla objects. See https://github.com/fbachl/inlabru/issues/78")
+generate.inla <- function(...) {
+  lifecycle::deprecate_stop(
+    when = "2.1.0",
+    what = "generate.inla()",
+    with = "generate.bru()",
+    details = c(
+      "The `generate()` method is not supported for plain inla objects.",
+      "Also see https://github.com/inlabru-org/inlabru/issues/78 ; use `bru_rerun()` instead of `inla.rerun()`"
+    )
+  )
 }
 
 

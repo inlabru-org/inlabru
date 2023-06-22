@@ -1816,7 +1816,8 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
+#' covariates and/or point locations.
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component mapper
@@ -1900,9 +1901,11 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 
 #' @describeIn input_eval Attempts to evaluate a component input (e.g. `main`,
 #' `group`, `replicate`, or `weight`), and process the results:
-#' 1. Eval failed. Return NULL or map everything to 1. This should normally not
-#'    happen, unless the component use logic is incorrect (e.g. via `include`/`exclude`)
-#'    e.g. leading to missing columns for a certain likelihood in a
+#' 1. If `eval()` failed, return NULL or map everything to 1
+#'    (see the `null.on.fail` argument). This should normally not
+#'    happen, unless the component use logic is incorrect,
+#'    (e.g. via `include`/`exclude`)
+#'    leading to missing columns for a certain likelihood in a
 #'    multi-`like()` model.
 #' 2. If we obtain a function, apply the function to the data object
 #' 3. If we obtain an object supported by [eval_spatial()], extract the values

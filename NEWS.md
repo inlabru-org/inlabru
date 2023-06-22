@@ -1,5 +1,15 @@
 # inlabru (development version)
 
+## Bug and dependency updates
+
+* Covariate object component inputs of type `SpatialPolygonsDataFrame`
+  were not automatically passed on to `eval_spatial()`. The logic has now changed
+  so that any object with a `eval_spatial()` method will trigger a call to
+  `eval_spatial()`. See `?input_eval` for further information.
+
+* `fm_crs_is_null()`, `fm_transform()` now supports oblique `fm_crs` CRS objects,
+  and `is.na()` methods for the `fm_crs` and `inla.CRS` classes have been added.
+
 # inlabru 2.8.0
 
 ## Feature updates

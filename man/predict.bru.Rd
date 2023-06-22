@@ -64,9 +64,9 @@ Default \code{NULL}}
 prediciton summary has the same number of rows as \code{newdata}, then the output is
 a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 
-\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
+\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 
-\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated. Use \code{newdata} instead.}
+\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 }
 \value{
 a \code{data.frame} or \verb{Spatial*} object with predicted mean values and other
