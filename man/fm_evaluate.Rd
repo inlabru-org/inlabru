@@ -103,7 +103,8 @@ if (bru_safe_inla()) {
 \donttest{
 if (bru_safe_inla() &&
   require("ggplot2") &&
-  bru_safe_sp()) {
+  bru_safe_sp() &&
+  require("ggpolypath")) {
   ggplot() +
     gg(mesh, col = field)
 }
