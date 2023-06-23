@@ -14,6 +14,9 @@
   
 * Significant speed up `predict()` by using `quantile(..., names = FALSE)`
   (version `2.8.0.9004`)
+  
+* Improved `row_kron` code, causing speedups of a factor 2-30 in randomised
+  test cases. (version `2.8.0.9005`)
 
 # inlabru 2.8.0
 
