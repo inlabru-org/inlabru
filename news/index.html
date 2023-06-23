@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,6 +83,7 @@
 <ul><li><p>Covariate object component inputs of type <code>SpatialPolygonsDataFrame</code> were not automatically passed on to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. The logic has now changed so that any object with a <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> method will trigger a call to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. See <code><a href="../reference/input_eval.html">?input_eval</a></code> for further information. (version `2.8.0.9001)</p></li>
 <li><p><code><a href="../reference/fm_crs.html">fm_crs_is_null()</a></code>, <code><a href="../reference/fm_transform.html">fm_transform()</a></code> now supports oblique <code>fm_crs</code> CRS objects, and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> methods for the <code>fm_crs</code> and <code>inla.CRS</code> classes have been added. (version `2.8.0.9003)</p></li>
 <li><p>Significant speed up <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> by using <code>quantile(..., names = FALSE)</code> (version <code>2.8.0.9004</code>)</p></li>
+<li><p>Improved <code>row_kron</code> code, causing speedups of a factor 2-30 in randomised test cases. (version <code>2.8.0.9005</code>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
