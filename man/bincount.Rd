@@ -56,7 +56,7 @@ if (require(ggplot2)) {
     coord_fixed(ratio = 1)
 
   # Fit an LGCP model
-  x <- seq(0, 55, length = 50)
+  x <- seq(0, 55, length.out = 50)
   mesh1D <- inla.mesh.1d(x, boundary = "free")
   mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
   fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
@@ -65,7 +65,7 @@ if (require(ggplot2)) {
   bc <- bincount(
     result = fit.spde,
     observations = pts2,
-    breaks = seq(0, max(pts2), length = 12),
+    breaks = seq(0, max(pts2), length.out = 12),
     predictor = x ~ exp(spde1D + Intercept)
   )
 

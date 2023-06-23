@@ -207,7 +207,7 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
 
       n <- dim(loc)[1L]
       if (reverse) {
-        idx <- seq(n, 1L, length = n)
+        idx <- seq(n, 1L, length.out = n)
       } else {
         idx <- seq_len(n)
       }

@@ -1585,7 +1585,7 @@ fm_crs_bounds <- function(crs, warn.unknown = FALSE) {
       bounds$ylim[c(1, 1, 2, 2, 1)]
     )
   } else if (bounds$type == "ellipse") {
-    theta <- seq(0, 2 * pi, length = 1000)
+    theta <- seq(0, 2 * pi, length.out = 1000)
     bounds$polygon <- cbind(
       bounds$center[1] + bounds$axis[1] * cos(theta),
       bounds$center[2] + bounds$axis[2] * sin(theta)

@@ -1145,7 +1145,7 @@ fm_int_inla_mesh_core <- function(mesh, tri_subset = NULL, nsub = NULL) {
   is_spherical <- identical(mesh$manifold, "S2")
 
   # Barycentric integration coordinates
-  b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
+  b <- seq(1 / 3, 1 / 3 + nsub, length.out = nsub + 1) / (nsub + 1)
   bb <- as.matrix(expand.grid(b, b))
   # Points above the diagonal should be reflected into the lower triangle:
   refl <- rowSums(bb) > 1

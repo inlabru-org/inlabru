@@ -438,7 +438,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   stopifnot(nsub >= 0)
   nB <- (nsub + 1)^2
 
-  b <- seq(1 / 3, 1 / 3 + nsub, length = nsub + 1) / (nsub + 1)
+  b <- seq(1 / 3, 1 / 3 + nsub, length.out = nsub + 1) / (nsub + 1)
   bb <- as.matrix(expand.grid(b, b))
   # Points above the diagonal should be reflected into the lower triangle:
   refl <- rowSums(bb) > 1

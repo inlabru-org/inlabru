@@ -131,7 +131,7 @@ fm_as_inla_mesh_segment.Line <-
     loc <- sp@coords
     n <- dim(loc)[1L]
     if (reverse) {
-      idx <- seq(n, 1L, length = n)
+      idx <- seq(n, 1L, length.out = n)
       if (!is.null(grp)) {
         grp <- rev(grp)
       }
