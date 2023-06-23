@@ -689,7 +689,9 @@ resave_package_data <- function() {
 #' @return A `Matrix::sparseMatrix` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
-row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
+row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL # ,
+                     # method. = 1
+) {
   if (!inherits(M1, "Matrix")) {
     M1 <- as(M1, "Matrix")
   }
@@ -736,10 +738,17 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     x = 1L, dims = c(n, 1)
   )))
 
-  M <- (Matrix::sparseMatrix(
-    i = integer(0), j = integer(0), x = numeric(0),
-    dims = c(n, ncol(M2) * ncol(M1) * n.repl)
-  ))
+  # if (identical(method., 1)) {
+  #   M <- (Matrix::sparseMatrix(
+  #     i = integer(0), j = integer(0), x = numeric(0),
+  #     dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+  #   ))
+  # } else {
+  iii <- integer(0)
+  jjj <- integer(0)
+  xxx <- numeric(0)
+  # }
+
   n1 <- n1[1L + M1@i]
   for (k in unique(n1)) {
     sub <- which(n1 == k)
@@ -769,18 +778,89 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
       ii <- rep(i, times = k)
       repl.i <- repl[ii]
 
-      M <- (M +
-        Matrix::sparseMatrix(
-          i = ii,
-          j = (1L + rep(M2@j[sub2], times = k) +
-            ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
-            ncol(M2) * ncol(M1) * (repl.i - 1L)),
-          x = (rep(M2@x[sub2], times = k) *
-            as.vector(x.sub[i, ])),
-          dims = c(n, ncol(M2) * ncol(M1) * n.repl)
-        ))
+      # if (identical(method., 1)) {
+      #   M <- (M +
+      #           Matrix::sparseMatrix(
+      #             i = ii,
+      #             j = (1L + rep(M2@j[sub2], times = k) +
+      #                    ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
+      #                    ncol(M2) * ncol(M1) * (repl.i - 1L)),
+      #             x = (rep(M2@x[sub2], times = k) *
+      #                    as.vector(x.sub[i, ])),
+      #             dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+      #           ))
+      # } else {
+      iii <- c(iii, ii)
+      jjj <- c(
+        jjj,
+        (1L + rep(M2@j[sub2], times = k) +
+          ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
+          ncol(M2) * ncol(M1) * (repl.i - 1L))
+      )
+      xxx <- c(
+        xxx,
+        (rep(M2@x[sub2], times = k) *
+          as.vector(x.sub[i, ]))
+      )
+      # }
     }
   }
 
+  #  if (!identical(method., 1)) {
+  M <- Matrix::sparseMatrix(
+    i = iii, j = jjj, x = xxx,
+    dims = c(n, ncol(M2) * ncol(M1) * n.repl)
+  )
+  #  }
+
   return(M)
 }
+
+# row_kron_time_test <- function(N = c(1000, 1000), n = 10) {
+#   A1 <- Matrix::sparseMatrix(
+#     i = sample(seq_len(N[1]), size = N[1] * n, replace = TRUE),
+#     j = sample(seq_len(N[2]), size = N[1] * n, replace = TRUE),
+#     x = rnorm(N[1] * n),
+#     dims = N
+#   )
+#   A2 <- Matrix::sparseMatrix(
+#     i = sample(seq_len(N[1]), size = N[1] * n, replace = TRUE),
+#     j = sample(seq_len(N[2]), size = N[1] * n, replace = TRUE),
+#     x = rnorm(N[1] * n),
+#     dims = N
+#   )
+#   bench::mark(
+#     Method1 = row_kron(A1, A2, method. = 1),
+#     Method2 = row_kron(A1, A2, method. = 2)
+#   )
+# }
+
+# Speed comparisons show the new method can be between 2 to 30 times faster
+#
+# > row_kron_time_test(N=c(1000,1000),n=10)
+# # A tibble: 2 × 13
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result               memory time
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list>               <list> <list>
+#   1 Method1     193.1ms  195.3ms      5.14        NA     17.1     3    10      584ms <dgCMatrx[,1000000]> <NULL> <bench_tm>
+#   2 Method2      39.5ms   46.7ms     22.0         NA     16.0    11     8      501ms <dgCMatrx[,1000000]> <NULL> <bench_tm>
+#   # ℹ 1 more variable: gc <list>
+#   Warning message:
+#   Some expressions had a GC in every iteration; so filtering is disabled.
+# > row_kron_time_test(N=c(100,10000),n=10)
+# # A tibble: 2 × 13
+# expression     min  median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result                 memory time
+# <bch:expr> <bch:t> <bch:t>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list>                 <list> <list>
+#   1 Method1      12.4s   12.4s    0.0810        NA     1.21     1    15      12.4s <dgCMatrx[,100000000]> <NULL> <bench_tm>
+#   2 Method2    306.1ms 439.7ms    2.27          NA     2.27     2     2    879.4ms <dgCMatrx[,100000000]> <NULL> <bench_tm>
+#   # ℹ 1 more variable: gc <list>
+#   Warning message:
+#   Some expressions had a GC in every iteration; so filtering is disabled.
+# > row_kron_time_test(N=c(10000,100),n=10)
+# # A tibble: 2 × 13
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result             memory time
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list>             <list> <list>
+#   1 Method1       609ms    609ms      1.64        NA     1.64     1     1      609ms <dgCMatrx[,10000]> <NULL> <bench_tm>
+#   2 Method2       199ms    216ms      4.69        NA     1.56     3     1      640ms <dgCMatrx[,10000]> <NULL> <bench_tm>
+#   # ℹ 1 more variable: gc <list>
+#   Warning message:
+#   Some expressions had a GC in every iteration; so filtering is disabled.
