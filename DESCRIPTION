@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.8.0.9006
+Version: 2.8.0.9007
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -92,6 +92,8 @@ Suggests:
     testthat,
     tidyr,
     DiagrammeR
+Enhances:
+    stars
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3

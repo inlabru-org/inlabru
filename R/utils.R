@@ -427,10 +427,6 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
     val <- numeric(NROW(where))
     idx <- sf::st_intersects(where, data, sparse = TRUE)
     for (l in unique(layer)) {
-      val[layer == l] <- sp::over(
-        where[layer == l, , drop = FALSE],
-        data
-      )[, l, drop = TRUE]
       val[layer == l] <- vapply(
         idx[layer == l],
         function(i) {
@@ -482,6 +478,35 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   } else {
     val <- val[["value"]]
   }
+  val
+}
+
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  if (!inherits(where, c("sf", "sfc"))) {
+    where <- sf::st_as_sf(where)
+  }
+  val <- stars::st_extract(
+    data,
+    sf::st_geometry(where)
+  )
+  val <- sf::st_as_sf(val)
+
+  unique_layer <- unique(layer)
+  if (length(unique_layer) == 1) {
+    val <- val[, unique_layer, drop = TRUE]
+  } else {
+    val_ <- numeric(NROW(where))
+    for (l in unique(layer)) {
+      val_[layer == l] <- val[layer == l, l, drop = TRUE]
+    }
+    val <- val_
+  }
+
   val
 }
 
