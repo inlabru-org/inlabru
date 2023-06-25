@@ -162,19 +162,19 @@ test_that("eval_spatial.stars", {
   # Multirow
   where <- gorillas$nests[seq_len(5), , drop = FALSE]
   A_val <- eval_spatial(covs,
-                        where = where,
-                        layer = rep("A", nrow(where))
+    where = where,
+    layer = rep("A", nrow(where))
   )
   B_val <- eval_spatial(covs,
-                        where = where,
-                        layer = rep("B", nrow(where))
+    where = where,
+    layer = rep("B", nrow(where))
   )
   AB_val <- eval_spatial(covs,
-                         where = where,
-                         layer = rep(
-                           c("A", "B"),
-                           c(2, nrow(where) - 2)
-                         )
+    where = where,
+    layer = rep(
+      c("A", "B"),
+      c(2, nrow(where) - 2)
+    )
   )
 
   expect_equal(A_val + 10000L, B_val)
@@ -183,12 +183,12 @@ test_that("eval_spatial.stars", {
   # Multirow
   where <- gorillas$nests[seq_len(5), , drop = FALSE]
   A1_val <- eval_spatial(covs,
-                         where = where,
-                         layer = "A"
+    where = where,
+    layer = "A"
   )
   B1_val <- eval_spatial(covs,
-                         where = where,
-                         layer = "B"
+    where = where,
+    layer = "B"
   )
 
   expect_equal(A1_val, A_val)
@@ -197,16 +197,14 @@ test_that("eval_spatial.stars", {
   # Single row
   where <- gorillas$nests[5, , drop = FALSE]
   A2_val <- eval_spatial(covs,
-                         where = where,
-                         layer = "A"
+    where = where,
+    layer = "A"
   )
   B2_val <- eval_spatial(covs,
-                         where = where,
-                         layer = "B"
+    where = where,
+    layer = "B"
   )
 
   expect_equal(A2_val, A_val[5], ignore_attr = "class")
   expect_equal(B2_val, B_val[5], ignore_attr = "class")
 })
-
-
