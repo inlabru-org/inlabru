@@ -3330,7 +3330,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         effect = label,
         index = 1,
         iteration = track_size + k,
-        mode = result[["mode"]][["log.posterior.mode"]],
+        mode = result[["misc"]][["configs"]][["max.log.posterior"]],
         sd = Inf
       )
     track[[k]] <- do.call(rbind, track_df)
