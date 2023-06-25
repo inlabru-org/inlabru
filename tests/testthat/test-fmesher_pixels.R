@@ -2,8 +2,10 @@ test_that("fm_pixels sp vs sf", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  mesh <- INLA::inla.mesh.2d(cbind(0,0), offset = 10, max.edge = 1,
-                             crs = fm_CRS("longlat_globe"))
+  mesh <- INLA::inla.mesh.2d(cbind(0, 0),
+    offset = 10, max.edge = 1,
+    crs = fm_CRS("longlat_globe")
+  )
 
   mydata <- sp::SpatialPointsDataFrame(
     mesh$loc,
@@ -33,25 +35,26 @@ test_that("fm_pixels sp vs sf", {
     set.seed(1234L)
     surface1 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sp")
     density1 <- predict(fit,
-                        surface1,
-                        ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
-                        n.samples = 10,
-                        seed = 12345L)
+      surface1,
+      ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
+      n.samples = 10,
+      seed = 12345L
+    )
   })
 
   system.time({
     set.seed(1234L)
     surface2 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sf")
     density2 <- predict(fit,
-                        surface2,
-                        ~ exp(field_eval(geometry) + Intercept),
-                        n.samples = 10,
-                        seed = 12345L)
+      surface2,
+      ~ exp(field_eval(geometry) + Intercept),
+      n.samples = 10,
+      seed = 12345L
+    )
   })
 
   expect_equal(
     density1$mean,
     density2$mean
   )
-
 })
