@@ -21,19 +21,21 @@ lgcp(
 
 \item{data}{A data frame or \code{SpatialPoints(DataFrame)} object}
 
-\item{samplers}{A data frame or \verb{Spatial[Points/Lines/Polygons]DataFrame} objects}
+\item{samplers}{A data frame or \verb{Spatial[Points/Lines/Polygons]DataFrame}
+objects}
 
 \item{domain}{Named list of domain definitions}
 
 \item{ips}{Integration points (overrides \code{samplers})}
 
-\item{formula}{If NULL, the linear combination implied by the \code{components}
-is used as a predictor for the point location intensity. If a (possibly
+\item{formula}{If NULL, the linear combination implied by the \code{components} is
+used as a predictor for the point location intensity. If a (possibly
 non-linear) expression is provided the respective Taylor approximation is
 used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.}
 
-\item{E}{Single numeric used rescale all integration weights by a fixed factor}
+\item{E}{Single numeric used rescale all integration weights by a fixed
+factor}
 
 \item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}}
 
@@ -44,21 +46,20 @@ An \code{\link[=bru]{bru()}} object
 }
 \description{
 This function performs inference on a LGCP observed via points residing
-possibly multiple dimensions. These dimensions are defined via the left
-hand side of the formula provided via the model parameter.
-The left hand side determines the intensity function that is assumed to
-drive the LGCP. This may include effects that lead to a thinning (filtering)
-of the point process. By default, the log intensity is assumed to be a linear
-combination of the effects defined by the formula's RHS. More sophisticated
-models, e.g. non-linear thinning, can be achieved by using the predictor
-argument. The latter requires multiple runs of INLA for improving the
-required approximation of the predictor. In many applications the LGCP is
-only observed through subsets of the dimensions the process is living in.
-For example, spatial point realizations may only be known in sub-areas of
-the modelled space. These observed subsets of the LGCP
-domain are called samplers and can be provided via the respective parameter.
-If samplers is NULL it is assumed that all of the LGCP's dimensions have
-been observed completely.
+possibly multiple dimensions. These dimensions are defined via the left hand
+side of the formula provided via the model parameter. The left hand side
+determines the intensity function that is assumed to drive the LGCP. This may
+include effects that lead to a thinning (filtering) of the point process. By
+default, the log intensity is assumed to be a linear combination of the
+effects defined by the formula's RHS. More sophisticated models, e.g.
+non-linear thinning, can be achieved by using the predictor argument. The
+latter requires multiple runs of INLA for improving the required
+approximation of the predictor. In many applications the LGCP is only
+observed through subsets of the dimensions the process is living in. For
+example, spatial point realizations may only be known in sub-areas of the
+modelled space. These observed subsets of the LGCP domain are called samplers
+and can be provided via the respective parameter. If samplers is NULL it is
+assumed that all of the LGCP's dimensions have been observed completely.
 }
 \examples{
 \donttest{

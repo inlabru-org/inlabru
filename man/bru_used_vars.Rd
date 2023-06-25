@@ -26,8 +26,8 @@ If successful, a character vector, otherwise \code{NULL}
 \description{
 Extracts the variable names from an R expression by pre- and post-processing
 around \code{\link[=all.vars]{all.vars()}}.
-First replaces \code{$} with \code{[[} indexing, so that internal column/variable names are ignored,
-then calls \code{all.vars()}.
+First replaces \code{$} with \code{[[} indexing, so that internal column/variable names
+are ignored, then calls \code{all.vars()}.
 }
 \section{Methods (by class)}{
 \itemize{

@@ -41,15 +41,15 @@ multiple enhancements.
 
 \itemize{
 \item
-Easy usage of spatial covariates and automatic construction
-of inla projection matrices for (spatial) SPDE models. This feature is
-accessible via the \code{components} parameter. Practical examples on how
-to use spatial data by means of the components parameter can also be found
+Easy usage of spatial covariates and automatic construction of inla
+projection matrices for (spatial) SPDE models. This feature is
+accessible via the \code{components} parameter. Practical examples on how to
+use spatial data by means of the components parameter can also be found
 by looking at the \link{lgcp} function's documentation.
 \item
-Constructing multiple likelihoods is straight forward. See \link{like} for more
-information on how to provide additional likelihoods to \code{bru} using
-the \code{...} parameter list.
+Constructing multiple likelihoods is straight forward. See \link{like} for
+more information on how to provide additional likelihoods to \code{bru}
+using the \code{...} parameter list.
 \item
 Support for non-linear predictors. See example below.
 \item

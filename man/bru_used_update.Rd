@@ -23,7 +23,8 @@ bru_used_update(x, labels, ...)
 \item{...}{Unused}
 }
 \description{
-Merge available component labels information with used components information.
+Merge available component labels information with used components
+information.
 }
 \seealso{
 Other bru_used: 

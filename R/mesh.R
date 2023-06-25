@@ -10,9 +10,12 @@
 #' @export
 #' @keywords internal
 #' @param mesh an inla.mesh object.
-#' @param loc Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.
-#' @param mesh.coords Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.
-#' @return Single column matrix of Boolean values indicating if a point is inside the mesh.
+#' @param loc Points in space stored either as data.frame, a two-column matrix
+#'   of x and y coordinates or a SpatialPoints object.
+#' @param mesh.coords Coordinate names of the mesh. Use only if loc is a
+#'   data.frame with respective column names.
+#' @return Single column matrix of Boolean values indicating if a point is
+#'   inside the mesh.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @examples

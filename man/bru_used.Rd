@@ -84,10 +84,9 @@ and \code{latent}), or a list of such objects
 (for methods with \code{join = FALSE})
 }
 \description{
-Create or extract information about which components are used by a model, or its
-individual observation models. If a non-NULL \code{labels} argument
-is supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \code{bru_used}
-objects.
+Create or extract information about which components are used by a model, or
+its individual observation models. If a non-NULL \code{labels} argument is
+supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \code{bru_used} objects.
 }
 \section{Methods (by class)}{
 \itemize{
