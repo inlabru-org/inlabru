@@ -55,10 +55,10 @@ fm_internal_sp2segment_join <- function(inp, grp = NULL, closed = TRUE) {
 
 
 #' @export
-#' @rdname fm_as
-#' @param sp An `sp` style S4 object to be converted
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` in favour of
+#' [fm_as_inla_mesh_segment()]
 fm_sp2segment <-
-  function(sp, ...) {
+  function(...) {
     UseMethod("fm_as_inla_mesh_segment")
   }
 
@@ -66,13 +66,13 @@ fm_sp2segment <-
 
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @param crs A crs object
 #' @param closed logical; whether to treat a point sequence as a closed polygon.
 #' Default: `FALSE`
 fm_as_inla_mesh_segment.matrix <-
-  function(sp, reverse = FALSE, grp = NULL, is.bnd = FALSE, crs = NULL, closed = FALSE, ...) {
-    loc <- sp
+  function(x, reverse = FALSE, grp = NULL, is.bnd = FALSE, crs = NULL, closed = FALSE, ...) {
+    loc <- x
     n <- dim(loc)[1L]
     if (closed) {
       idx <- c(seq_len(n), 1L)
@@ -86,17 +86,17 @@ fm_as_inla_mesh_segment.matrix <-
       }
     }
     INLA::inla.mesh.segment(
-      loc = loc, idx = idx, grp = grp, is.bnd = is.bnd, crs = crs
+      loc = loc, idx = idx, grp = grp, is.bnd = is.bnd, crs = fm_CRS(crs)
     )
   }
 
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialPoints <-
-  function(sp, reverse = FALSE, grp = NULL, is.bnd = TRUE, closed = FALSE, ...) {
-    crs <- fm_CRS(sp)
-    loc <- coordinates(sp)
+  function(x, reverse = FALSE, grp = NULL, is.bnd = TRUE, closed = FALSE, ...) {
+    crs <- fm_CRS(x)
+    loc <- sp::coordinates(x)
 
     n <- dim(loc)[1L]
     if (closed) {
@@ -116,19 +116,19 @@ fm_as_inla_mesh_segment.SpatialPoints <-
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialPointsDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialPoints(sp, ...)
+  function(x, ...) {
+    fm_as_inla_mesh_segment.SpatialPoints(x, ...)
   }
 
 
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.Line <-
-  function(sp, reverse = FALSE, grp = NULL, crs = NULL, ...) {
-    loc <- sp@coords
+  function(x, reverse = FALSE, grp = NULL, crs = NULL, ...) {
+    loc <- x@coords
     n <- dim(loc)[1L]
     if (reverse) {
       idx <- seq(n, 1L, length.out = n)
@@ -139,18 +139,18 @@ fm_as_inla_mesh_segment.Line <-
       idx <- seq_len(n)
     }
     INLA::inla.mesh.segment(
-      loc = loc, idx = idx, grp = grp, is.bnd = FALSE, crs = crs
+      loc = loc, idx = idx, grp = grp, is.bnd = FALSE, crs = fm_CRS(crs)
     )
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.Lines <-
-  function(sp, join = TRUE, grp = NULL, crs = NULL, ...) {
+  function(x, join = TRUE, grp = NULL, crs = NULL, ...) {
     segm <- as.list(lapply(
-      seq_len(length(sp@Lines)),
+      seq_len(length(x@Lines)),
       function(k) {
-        x <- sp@Lines[[k]]
+        x <- x@Lines[[k]]
         if (!is.null(grp)) {
           grp_ <- grp[k]
         } else {
@@ -166,13 +166,13 @@ fm_as_inla_mesh_segment.Lines <-
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialLines <-
-  function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_CRS(sp)
+  function(x, join = TRUE, grp = NULL, ...) {
+    crs <- fm_CRS(x)
     segm <- list()
-    for (k in seq_len(length(sp@lines))) {
-      segm[[k]] <- fm_as_inla_mesh_segment(sp@lines[[k]],
+    for (k in seq_len(length(x@lines))) {
+      segm[[k]] <- fm_as_inla_mesh_segment(x@lines[[k]],
         join = TRUE,
         crs = crs, ...
       )
@@ -187,20 +187,21 @@ fm_as_inla_mesh_segment.SpatialLines <-
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialLinesDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialLines(sp, ...)
+  function(x, ...) {
+    fm_as_inla_mesh_segment.SpatialLines(x, ...)
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialPolygons <-
-  function(sp, join = TRUE, grp = NULL, ...) {
-    crs <- fm_CRS(sp)
+  function(x, join = TRUE, grp = NULL, ...) {
+    crs <- fm_CRS(x)
     segm <- list()
-    for (k in seq_len(length(sp@polygons))) {
-      segm[[k]] <- fm_as_inla_mesh_segment(sp@polygons[[k]], join = TRUE, crs = crs)
+    for (k in seq_len(length(x@polygons))) {
+      segm[[k]] <-
+        fm_as_inla_mesh_segment(x@polygons[[k]], join = TRUE, crs = crs)
     }
     if (join) {
       if (missing(grp)) {
@@ -212,19 +213,19 @@ fm_as_inla_mesh_segment.SpatialPolygons <-
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.SpatialPolygonsDataFrame <-
-  function(sp, ...) {
-    fm_as_inla_mesh_segment.SpatialPolygons(sp, ...)
+  function(x, ...) {
+    fm_as_inla_mesh_segment.SpatialPolygons(x, ...)
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.Polygons <-
-  function(sp, join = TRUE, crs = NULL, grp = NULL, ...) {
+  function(x, join = TRUE, crs = NULL, grp = NULL, ...) {
     segm <- as.list(lapply(
-      sp@Polygons,
-      function(x) fm_as_inla_mesh_segment(x, crs = crs, ...)
+      x@Polygons,
+      function(x) fm_as_inla_mesh_segment(x, crs = fm_CRS(crs), ...)
     ))
     if (join) {
       if (missing(grp)) {
@@ -236,21 +237,26 @@ fm_as_inla_mesh_segment.Polygons <-
   }
 
 #' @export
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 fm_as_inla_mesh_segment.Polygon <-
-  function(sp, crs = NULL, ...) {
-    loc <- sp@coords[-dim(sp@coords)[1L], , drop = FALSE]
+  function(x, crs = NULL, ...) {
+    loc <- x@coords[-dim(x@coords)[1L], , drop = FALSE]
     n <- dim(loc)[1L]
-    if (sp@hole) {
-      if (sp@ringDir == 1) {
+    if (x@hole) {
+      if (x@ringDir == 1) {
         idx <- c(1L:n, 1L)
       } else {
         idx <- c(1L, seq(n, 1L, length.out = n))
       }
-    } else if (sp@ringDir == 1) {
+    } else if (x@ringDir == 1) {
       idx <- c(1L, seq(n, 1L, length.out = n))
     } else {
       idx <- c(1L:n, 1L)
     }
-    INLA::inla.mesh.segment(loc = loc, idx = idx, is.bnd = TRUE, crs = crs)
+    INLA::inla.mesh.segment(
+      loc = loc,
+      idx = idx,
+      is.bnd = TRUE,
+      crs = fm_CRS(crs)
+    )
   }

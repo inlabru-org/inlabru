@@ -1,5 +1,6 @@
-#' @title Coercion methods to and from meshes
-#' @rdname fm_as
+#' @title Conversion methods from mesh related objects to sfc
+#' @rdname fm_as_sfc
+#' @family fm_as
 #' @param x An object to be coerced/transformed/converted into another class
 #' @param ... Arguments passed on to other methods
 #' @export
@@ -7,21 +8,7 @@ fm_as_sfc <- function(x, ...) {
   UseMethod("fm_as_sfc")
 }
 
-#' @rdname fm_as
-#' @export
-fm_as_inla_mesh_segment <-
-  function(...) {
-    UseMethod("fm_as_inla_mesh_segment")
-  }
-
-#' @rdname fm_as
-#' @export
-fm_as_inla_mesh <- function(...) {
-  UseMethod("fm_as_inla_mesh")
-}
-
-
-#' @describeIn fm_as `r lifecycle::badge("experimental")`
+#' @describeIn fm_as_sfc `r lifecycle::badge("experimental")`
 #'
 #' @param multi logical; if `TRUE`, attempt to a `sfc_MULTIPOLYGON`, otherwise
 #' a set of `sfc_POLYGON`. Default `FALSE`
@@ -61,7 +48,7 @@ fm_as_sfc.inla.mesh <- function(x, ..., multi = FALSE) {
 }
 
 
-#' @describeIn fm_as `r lifecycle::badge("experimental")`
+#' @describeIn fm_as_sfc `r lifecycle::badge("experimental")`
 #'
 #' @exportS3Method fm_as_sfc inla.mesh.segment
 #' @export
@@ -140,10 +127,20 @@ fm_as_sfc.inla.mesh.segment <- function(x, ..., multi = FALSE) {
 }
 
 
-#' @rdname fm_as
-#' @aliases fm_as_inla_mesh fm_as_inla_mesh.sfc_MULTIPOLYGON
+#' @title Conversion to inla.mesh
+#' @rdname fm_as_inla_mesh
+#' @family fm_as
+#' @param x An object to be coerced/transformed/converted into another class
+#' @param ... Arguments passed on to other methods
+#' @returns An `inla.mesh` object
+#' @export
+fm_as_inla_mesh <- function(...) {
+  UseMethod("fm_as_inla_mesh")
+}
+
+
+#' @rdname fm_as_inla_mesh
 #'
-#' @returns * `fm_as_inla_mesh`: An `inla.mesh` mesh object
 #' @export
 fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
   if (length(x) > 1) {
@@ -176,8 +173,7 @@ fm_as_inla_mesh.sfc_MULTIPOLYGON <- function(x, ...) {
   mesh
 }
 
-#' @rdname fm_as
-#' @aliases fm_as_inla_mesh fm_as_inla_mesh.sfc_POLYGON
+#' @rdname fm_as_inla_mesh
 #'
 #' @export
 fm_as_inla_mesh.sfc_POLYGON <- function(x, ...) {
@@ -206,11 +202,30 @@ fm_as_inla_mesh.sfc_POLYGON <- function(x, ...) {
   mesh
 }
 
+#' @rdname fm_as_inla_mesh
+#' @export
+fm_as_inla_mesh.sf <-
+  function(x, ...) {
+    sfc <- sf::st_geometry(x)
+    fm_as_inla_mesh(sfc, ...)
+  }
 
 
 
 
-#' @rdname fm_as
+#' @title Conversion to inla.mesh.segment
+#' @rdname fm_as_inla_mesh_segment
+#' @family fm_as
+#' @param x An object to be coerced/transformed/converted into another class
+#' @param ... Arguments passed on to other methods
+#' @returns An `inla.mesh.segment` object
+#' @export
+fm_as_inla_mesh_segment <-
+  function(x, ...) {
+    UseMethod("fm_as_inla_mesh_segment")
+  }
+
+#' @rdname fm_as_inla_mesh_segment
 #' @param reverse logical; When TRUE, reverse the order of the input points.
 #'   Default `FALSE`
 #' @param grp if non-null, should be an integer vector of grouping labels for
@@ -254,7 +269,7 @@ fm_as_inla_mesh_segment.sfc_POINT <-
     )
   }
 
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @param join logical; if `TRUE`, join input segments with common vertices.
 #'    Default `TRUE`
 #' @export
@@ -304,7 +319,7 @@ fm_as_inla_mesh_segment.sfc_LINESTRING <-
     segm
   }
 
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @export
 fm_as_inla_mesh_segment.sfc_POLYGON <-
   function(x, join = TRUE, grp = NULL, ...) {
@@ -353,7 +368,7 @@ fm_as_inla_mesh_segment.sfc_POLYGON <-
     segm
   }
 
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @export
 fm_as_inla_mesh_segment.sfc_MULTIPOLYGON <-
   function(x, join = TRUE, grp = NULL, ...) {
@@ -403,7 +418,7 @@ fm_as_inla_mesh_segment.sfc_MULTIPOLYGON <-
     segm
   }
 
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @export
 fm_as_inla_mesh_segment.sfc_GEOMETRY <-
   function(x, grp = NULL, join = TRUE, ...) {
@@ -423,7 +438,7 @@ fm_as_inla_mesh_segment.sfc_GEOMETRY <-
     segm
   }
 
-#' @rdname fm_as
+#' @rdname fm_as_inla_mesh_segment
 #' @export
 fm_as_inla_mesh_segment.sf <-
   function(x, ...) {
@@ -431,10 +446,3 @@ fm_as_inla_mesh_segment.sf <-
     fm_as_inla_mesh_segment(sfc, ...)
   }
 
-#' @rdname fm_as
-#' @export
-fm_as_inla_mesh.sf <-
-  function(x, ...) {
-    sfc <- sf::st_geometry(x)
-    fm_as_inla_mesh(sfc, ...)
-  }

@@ -59,9 +59,14 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 }
 
 
-#' @rdname fm_as
+#' @describeIn inlabru-deprecated Wrapper for [fm_CRS()]
+#' `sp::Spatial` and `sp::CRS` objects.
 #' @export
 fm_as_sp_crs <- function(x, ...) {
+  lifecycle::deprecate_soft("2.8.0.9007",
+                            "fm_as_sp_crs()",
+                            "fm_CRS()"
+  )
   fm_CRS(x, ...)
 }
 
@@ -76,12 +81,12 @@ fm_as_sp_crs <- function(x, ...) {
 #' @details This function is a convenience method to workaround PROJ4/PROJ6
 #' differences, and the lack of a crs extraction method for Spatial objects.
 #' For newer code, use [fm_crs()] instead, that returns `crs` objects,
-#' and use [fm_as_sp_crs()] to convert to old style `sp::CRS` objects.
+#' and use [fm_CRS()] to extract/construct/convert to old style `sp::CRS` objects.
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
 #'   s <- sp::SpatialPoints(matrix(1:6, 3, 2), proj4string = fm_CRS("sphere"))
-#'   fm_sp_get_crs(s)
+#'   fm_CRS(s)
 #' }
 #' }
 #' @export

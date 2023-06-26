@@ -20,8 +20,10 @@ test_that("Conversion from matrix to inla.mesh.segment", {
 
   # matrix version
   loc.bnd <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), 4, 2, byrow = TRUE)
-  segm.bnd <- INLA::inla.mesh.segment(loc.bnd,
-    is.bnd = TRUE
+  segm.bnd <- INLA::inla.mesh.segment(
+    loc.bnd,
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   segm.bnd.sp <- fm_as_inla_mesh_segment(loc.bnd, is.bnd = TRUE, closed = TRUE)
@@ -40,13 +42,15 @@ test_that("Conversion from Lines to inla.mesh.segment", {
   seg1 <- INLA::inla.mesh.segment(
     loc = pts1,
     idx = seq_len(nrow(pts1)),
-    is.bnd = FALSE
+    is.bnd = FALSE,
+    crs = fm_CRS()
   )
 
   seg2 <- INLA::inla.mesh.segment(
     loc = pts2,
     idx = seq_len(nrow(pts2)),
-    is.bnd = FALSE
+    is.bnd = FALSE,
+    crs = fm_CRS()
   )
 
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
@@ -90,12 +94,14 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
   pts2 <- rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)) # hole
   seg1 <- INLA::inla.mesh.segment(
     loc = pts1[1:4, , drop = FALSE],
-    is.bnd = TRUE
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   seg2 <- INLA::inla.mesh.segment(
     loc = pts2[1:4, , drop = FALSE],
-    is.bnd = TRUE
+    is.bnd = TRUE,
+    crs = fm_CRS()
   )
 
   poly1 <- sp::Polygon(pts1[5:1, ], hole = FALSE)
@@ -128,12 +134,14 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
     pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2))
     seg1 <- INLA::inla.mesh.segment(
       loc = pts1[1:4, , drop = FALSE],
-      is.bnd = TRUE
+      is.bnd = TRUE,
+      crs = fm_CRS()
     )
 
     seg2 <- INLA::inla.mesh.segment(
       loc = pts2[1:4, , drop = FALSE],
-      is.bnd = TRUE
+      is.bnd = TRUE,
+      crs = fm_CRS()
     )
 
     seg <- fm_internal_sp2segment_join(list(seg1, seg2),
