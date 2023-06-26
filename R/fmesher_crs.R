@@ -63,9 +63,10 @@ fm_requires_PROJ6 <- function(fun = NULL) {
 #' `sp::Spatial` and `sp::CRS` objects.
 #' @export
 fm_as_sp_crs <- function(x, ...) {
-  lifecycle::deprecate_soft("2.8.0.9007",
-                            "fm_as_sp_crs()",
-                            "fm_CRS()"
+  lifecycle::deprecate_soft(
+    "2.8.0.9007",
+    "fm_as_sp_crs()",
+    "fm_CRS()"
   )
   fm_CRS(x, ...)
 }

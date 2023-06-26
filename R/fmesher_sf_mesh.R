@@ -445,4 +445,3 @@ fm_as_inla_mesh_segment.sf <-
     sfc <- sf::st_geometry(x)
     fm_as_inla_mesh_segment(sfc, ...)
   }
-
