@@ -130,8 +130,8 @@ posterior of the estimated random effects.</p>
 
 
 <dt>newdata</dt>
-<dd><p>A data.frame or SpatialPointsDataFrame of covariates needed for
-sampling.</p></dd>
+<dd><p>A data.frame or SpatialPointsDataFrame of covariates needed
+for sampling.</p></dd>
 
 
 <dt>formula</dt>
@@ -148,7 +148,8 @@ The default, 100, is rather low but provides a quick approximate result.</p></dd
 
 
 <dt>seed</dt>
-<dd><p>Random number generator seed passed on to <code><a href="https://rdrr.io/pkg/INLA/man/posterior.sample.html" class="external-link">INLA::inla.posterior.sample</a></code></p></dd>
+<dd><p>Random number generator seed passed on to
+<code><a href="https://rdrr.io/pkg/INLA/man/posterior.sample.html" class="external-link">INLA::inla.posterior.sample</a></code></p></dd>
 
 
 <dt>num.threads</dt>
@@ -171,7 +172,8 @@ any components from the inclusion list)</p></dd>
 
 
 <dt>used</dt>
-<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and <code>exclude</code>.</p></dd>
+<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and
+<code>exclude</code>.</p></dd>
 
 
 <dt>data</dt>
@@ -192,12 +194,12 @@ of data.frames (if the prediction formula generates a list)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix <code>_latent</code>
-variable name can be used to directly access the latent state for a component,
-and the suffix function <code>_eval</code> can be used to evaluate a component at
-other input values than the expressions defined in the component definition
-itself, e.g. <code>field_eval(cbind(x, y))</code> for a component that was defined with
+    <p>In addition to the component names (that give the effect of each component
+evaluated for the input data), the suffix <code>_latent</code> variable name can be used
+to directly access the latent state for a component, and the suffix function
+<code>_eval</code> can be used to evaluate a component at other input values than the
+expressions defined in the component definition itself, e.g.
+<code>field_eval(cbind(x, y))</code> for a component that was defined with
 <code>field(coordinates, ...)</code> (see also <code><a href="component_eval.html">component_eval()</a></code>).</p>
 <p>For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> is used to
 generate new realisations for indices greater than <code>n</code>.</p>

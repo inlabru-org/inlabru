@@ -120,8 +120,8 @@ posterior of the estimated random effects.</p>
 
 
 <dt>newdata</dt>
-<dd><p>A <code>data.frame</code> or <code>SpatialPointsDataFrame</code> of covariates needed for
-the prediction.</p></dd>
+<dd><p>A <code>data.frame</code> or <code>SpatialPointsDataFrame</code> of covariates
+needed for the prediction.</p></dd>
 
 
 <dt>formula</dt>
@@ -170,14 +170,14 @@ any components from the inclusion list)</p></dd>
 
 
 <dt>used</dt>
-<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and <code>exclude</code>.
-Default <code>NULL</code></p></dd>
+<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code> and
+<code>exclude</code>. Default <code>NULL</code></p></dd>
 
 
 <dt>drop</dt>
-<dd><p>logical; If <code>keep=FALSE</code>, <code>newdata</code> is a <code>Spatial*DataFrame</code>, and the
-prediciton summary has the same number of rows as <code>newdata</code>, then the output is
-a <code>Spatial*DataFrame</code> object. Default <code>FALSE</code>.</p></dd>
+<dd><p>logical; If <code>keep=FALSE</code>, <code>newdata</code> is a <code>Spatial*DataFrame</code>, and
+the prediciton summary has the same number of rows as <code>newdata</code>, then the
+output is a <code>Spatial*DataFrame</code> object. Default <code>FALSE</code>.</p></dd>
 
 
 <dt>...</dt>
@@ -192,8 +192,8 @@ a <code>Spatial*DataFrame</code> object. Default <code>FALSE</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>a <code>data.frame</code> or <code>Spatial*</code> object with predicted mean values and other
-summary statistics attached.</p>
+<p>a <code>data.frame</code> or <code>Spatial*</code> object with predicted mean values and
+other summary statistics attached.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -204,15 +204,14 @@ minimum and maximum sample
 value drawn in course of estimating the statistics.</p>
 <p>Internally, this method calls <code><a href="generate.html">generate.bru()</a></code> in order to draw samples from
 the model.</p>
-<p>In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix <code>_latent</code>
-variable name can be used to directly access the latent state for a component,
-and the suffix function <code>_eval</code> can be used to evaluate a component at
-other input values than the expressions defined in the component definition
-itself, e.g. <code>field_eval(cbind(x, y))</code> for a component that was defined with
-<code>field(coordinates, ...)</code> (see also <code><a href="component_eval.html">component_eval()</a></code>).
-f
-For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> is used to
+<p>In addition to the component names (that give the effect of each component
+evaluated for the input data), the suffix <code>_latent</code> variable name can be used
+to directly access the latent state for a component, and the suffix function
+<code>_eval</code> can be used to evaluate a component at other input values than the
+expressions defined in the component definition itself, e.g.
+<code>field_eval(cbind(x, y))</code> for a component that was defined with
+<code>field(coordinates, ...)</code> (see also <code><a href="component_eval.html">component_eval()</a></code>).</p>
+<p>For "iid" models with <code>mapper = bru_mapper_index(n)</code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> is used to
 generate new realisations for indices greater than <code>n</code>.</p>
     </div>
 
