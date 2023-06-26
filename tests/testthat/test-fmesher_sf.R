@@ -85,7 +85,7 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
 test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   local_bru_safe_inla()
 
-  ## scf_LINESTRING ##
+  ## sfc_LINESTRING ##
 
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5))
   pts2 <- rbind(c(1, 1), c(0, 0), c(0, -1), c(-2, -2))
@@ -112,9 +112,15 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   line_str2 <- sf::st_linestring(pts2)
   line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
   line_sf <- sf::st_sf(geometry = line_sfc)
-  seg_sf <- fm_as_inla_mesh_segment(line_sf)
 
-  expect_identical(seg_sf, seg)
+  seg_from_sf <- fm_as_inla_mesh_segment(line_sf)
+  expect_identical(seg_from_sf, seg)
+
+  seg_to_sf <- fm_as_sfc(seg)
+  expect_identical(seg_to_sf, sf::st_geometry(line_sf))
+
+  seg_to_sf2 <- fm_as_sfc(seg, multi = TRUE)
+  expect_identical(seg_to_sf2, sf::st_union(sf::st_geometry(line_sf)))
 
   #  str(seg)
   #  str(seg_sf)
@@ -293,7 +299,8 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
     crs = fm_CRS()
   )
 
-  seg_1 <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b, seg0b),
+  seg_1 <- fm_internal_sp2segment_join(
+    list(seg0, seg1, seg2, seg0b, seg0b),
     grp = c(1, 1, 1, 1, 2)
   )
   expect_identical(seg_1$grp, as.matrix(rep(c(1L, 2L), times = c(16, 4))))
@@ -301,7 +308,9 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
   line_str2 <- sf::st_polygon(list(pts0b))
 
-  line_sfc1 <- sf::st_combine(sf::st_sfc(list(line_str1, line_str2), check_ring_dir = TRUE))
+  line_sfc1 <- sf::st_combine(sf::st_sfc(list(line_str1, line_str2),
+    check_ring_dir = TRUE
+  ))
   line_sfc2 <- sf::st_sfc(list(line_str2), check_ring_dir = TRUE)
   line_sfc <- c(line_sfc1, line_sfc2)
 

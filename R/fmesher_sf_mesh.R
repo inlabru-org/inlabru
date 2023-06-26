@@ -1,5 +1,6 @@
 #' @title Coercion methods to and from meshes
 #' @rdname fm_as
+#' @param x An object to be coerced/transformed/converted into another class
 #' @param ... Arguments passed on to other methods
 #' @export
 fm_as_sfc <- function(x, ...) {
@@ -20,10 +21,8 @@ fm_as_inla_mesh <- function(...) {
 }
 
 
-#' @rdname fm_as
-#' @aliases fm_as_sfc fm_as_sfc.inla.mesh
+#' @describeIn fm_as `r lifecycle::badge("experimental")`
 #'
-#' @param x An object to be coerced/transformed/converted into another class
 #' @param multi logical; if `TRUE`, attempt to a `sfc_MULTIPOLYGON`, otherwise
 #' a set of `sfc_POLYGON`. Default `FALSE`
 #' @returns * `fm_as_sfc`: An `sfc_MULTIPOLYGON` or `sfc_POLYGON` object
@@ -57,6 +56,85 @@ fm_as_sfc.inla.mesh <- function(x, ..., multi = FALSE) {
       )
     )
   }
+  sf::st_crs(geom) <- fm_crs(x$crs)
+  geom
+}
+
+
+#' @describeIn fm_as `r lifecycle::badge("experimental")`
+#'
+#' @exportS3Method fm_as_sfc inla.mesh.segment
+#' @export
+fm_as_sfc.inla.mesh.segment <- function(x, ..., multi = FALSE) {
+  stopifnot(inherits(x, "inla.mesh.segment"))
+
+  group_segments <- list()
+  used_seg <- c()
+  active_group <- 0L
+  group <- integer(nrow(x$idx))
+  closed_loop <- logical(0)
+  while (any(group == 0L)) {
+    active_group <- active_group + 1L
+    closed_loop <- c(closed_loop, FALSE)
+    curr_seg <- which.min(group)
+    group[curr_seg] <- active_group
+    group_segments[[active_group]] <- curr_seg
+    used_seg <- c(used_seg, curr_seg)
+    repeat {
+      next_seg <- which(x$idx[, 1] == x$idx[curr_seg, 2])
+      if (length(next_seg) == 0) {
+        break
+      }
+      if (any(next_seg %in% used_seg)) {
+        closed_loop[active_group] <- TRUE
+        break
+      }
+      curr_seg <- min(next_seg)
+      group[curr_seg] <- active_group
+      group_segments[[active_group]] <-
+        c(group_segments[[active_group]], curr_seg)
+      used_seg <- c(used_seg, curr_seg)
+    }
+  }
+
+  if (multi) {
+    geom <- sf::st_sfc(
+      sf::st_multilinestring(
+        lapply(
+          seq_along(group_segments),
+          function(k) {
+            x$loc[
+              c(
+                x$idx[group_segments[[k]], 1],
+                x$idx[group_segments[[k]][length(group_segments[[k]])], 2]
+              ), ,
+              drop = FALSE
+            ]
+          }
+        ),
+        dim = "XYZ"
+      )
+    )
+  } else {
+    geom <- sf::st_sfc(
+      lapply(
+        seq_along(group_segments),
+        function(k) {
+          sf::st_linestring(
+            x$loc[
+              c(
+                x$idx[group_segments[[k]], 1],
+                x$idx[group_segments[[k]][length(group_segments[[k]])], 2]
+              ), ,
+              drop = FALSE
+            ],
+            dim = "XYZ"
+          )
+        }
+      )
+    )
+  }
+
   sf::st_crs(geom) <- fm_crs(x$crs)
   geom
 }

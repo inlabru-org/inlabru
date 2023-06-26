@@ -7,6 +7,7 @@
 \alias{fm_as_inla_mesh_segment}
 \alias{fm_as_inla_mesh}
 \alias{fm_as_sfc.inla.mesh}
+\alias{fm_as_sfc.inla.mesh.segment}
 \alias{fm_as_inla_mesh.sfc_MULTIPOLYGON}
 \alias{fm_as_inla_mesh.sfc_POLYGON}
 \alias{fm_as_inla_mesh_segment.sfc_POINT}
@@ -39,6 +40,8 @@ fm_as_inla_mesh_segment(...)
 fm_as_inla_mesh(...)
 
 \method{fm_as_sfc}{inla.mesh}(x, ..., multi = FALSE)
+
+\method{fm_as_sfc}{inla.mesh.segment}(x, ..., multi = FALSE)
 
 \method{fm_as_inla_mesh}{sfc_MULTIPOLYGON}(x, ...)
 
@@ -137,3 +140,10 @@ Default: \code{FALSE}}
 \description{
 Coercion methods to and from meshes
 }
+\section{Functions}{
+\itemize{
+\item \code{fm_as_sfc(inla.mesh)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+\item \code{fm_as_sfc(inla.mesh.segment)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+}}

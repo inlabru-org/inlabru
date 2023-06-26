@@ -55,11 +55,12 @@ if (require(ggplot2)) {
 
   ggplot(pts2) +
     geom_histogram(
-    aes(x = x),
-    binwidth = 55 / 20,
-    boundary = 0,
-    fill = NA,
-    color = "black") +
+      aes(x = x),
+      binwidth = 55 / 20,
+      boundary = 0,
+      fill = NA,
+      color = "black"
+    ) +
     geom_point(aes(x), y = 0, pch = "|", cex = 4) +
     coord_fixed(ratio = 1)
 
