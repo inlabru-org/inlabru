@@ -1,6 +1,7 @@
 test_that("fm_pixels sp vs sf", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not_installed("sn")
 
   mesh <- INLA::inla.mesh.2d(cbind(0, 0),
     offset = 10, max.edge = 1,
