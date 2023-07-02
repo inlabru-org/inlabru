@@ -1,10 +1,12 @@
-#' @name gorillas
 #' @title Gorilla nesting sites
 #' @docType data
 #' @description This is the `gorillas` dataset from the package `spatstat.data`, reformatted
 #' as point process data for use with `inlabru`.
 #'
-#' @usage data(gorillas)
+#' @usage
+#' gorillas
+#' # To avoid the name clash with spatstat.data::gorillas, use
+#' data(gorillas, package = "inlabru")
 #'
 #' @format The data are a list that contains these elements:
 #'  \describe{
@@ -86,12 +88,9 @@
 #' @return gorilla data
 
 import.gorillas <- function() {
-  if (!check_spatstat("spatstat.data")) {
-    # Load Gorilla data from spatstat
-    gorillas <- NULL
-  }
-  gorillas.extra <- NULL
-  data(gorillas, package = "spatstat.data", envir = environment())
+  stopifnot(check_spatstat("spatstat.data"))
+  gorillas <- spatstat.data::gorillas
+  gorillas.extra <- spatstat.data::gorillas.extra
 
   # Create SpatialPoints representing nest locations
   requireNamespace("spatstat.geom")

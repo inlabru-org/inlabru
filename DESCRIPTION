@@ -148,4 +148,5 @@ Collate:
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
-LazyData: false
+LazyData: true
+LazyDataCompression: xz

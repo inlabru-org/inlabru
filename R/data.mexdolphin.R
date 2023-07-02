@@ -8,8 +8,6 @@
 #' the time of the observation. Transect width is 16 km, i.e. maximal detection
 #' distance 8 km (transect half-width 8 km).
 #'
-#' @usage data(mexdolphin)
-#'
 #' @format A list of objects:
 #'  \describe{
 #'    \item{`points`:}{ A `SpatialPointsDataFrame` object containing the locations of

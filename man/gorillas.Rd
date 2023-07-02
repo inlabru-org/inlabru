@@ -45,7 +45,9 @@ plot and the area of each plot.}
 Library \code{spatstat.data}.
 }
 \usage{
-data(gorillas)
+gorillas
+# To avoid the name clash with spatstat.data::gorillas, use
+data(gorillas, package = "inlabru")
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted

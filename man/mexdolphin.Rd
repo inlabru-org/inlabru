@@ -25,7 +25,7 @@ size information.}
 Library \code{dsm}.
 }
 \usage{
-data(mexdolphin)
+mexdolphin
 }
 \description{
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted

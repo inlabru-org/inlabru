@@ -44,7 +44,7 @@ unique record identifier.
 https://github.com/tmeeha/inlaSVCBC
 }
 \usage{
-data(robins_subset)
+robins_subset
 }
 \description{
 This is the \code{robins_subset} dataset, which is a subset of the
@@ -68,3 +68,4 @@ Meehan, T.D., Michel, N.L., and Rue, H. 2019. Spatial modeling of Audubon
 Christmas Bird Counts reveals fine-scale patterns and drivers of relative
 abundance trends. Ecosphere, 10(4), p.e02707.
 }
+\keyword{datasets}
