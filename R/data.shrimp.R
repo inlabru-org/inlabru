@@ -33,7 +33,7 @@
 #'     coord_equal()
 #' }
 #' }
-NULL
+"shrimp"
 
 #' Shrimp data import
 #'

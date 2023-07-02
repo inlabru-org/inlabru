@@ -75,7 +75,7 @@
 #'     gg(gorillas$plotsample$plots) +
 #'     gg(gorillas$plotsample$nests)
 #' }
-NULL
+"gorillas"
 
 #' Gorilla data import
 #'

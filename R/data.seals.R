@@ -29,7 +29,7 @@
 #'     gg(seals$mesh) +
 #'     gg(seals$points)
 #' }
-NULL
+"seals"
 
 #' Seal pup edata import
 #'

@@ -35,7 +35,7 @@
 #'     gg(mrsea$points) +
 #'     gg(mrsea$boundary)
 #' }
-NULL
+"mrsea"
 
 #' MRSea data import
 #'

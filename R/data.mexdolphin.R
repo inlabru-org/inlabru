@@ -70,7 +70,7 @@
 #'     gm(mexdolphin$ppoly)
 #' }
 #' }
-NULL
+"mexdolphin"
 
 #' Mexdolphin data import
 #'

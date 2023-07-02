@@ -53,3 +53,4 @@ if (require(ggplot2, quietly = TRUE)) {
 }
 }
 }
+\keyword{datasets}

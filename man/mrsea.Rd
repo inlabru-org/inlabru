@@ -42,3 +42,4 @@ if (bru_safe_inla() &&
 \references{
 NONE YET
 }
+\keyword{datasets}
