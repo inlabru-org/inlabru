@@ -7,7 +7,7 @@
 \usage{
 import.gorillas()
 
-import.gorillas.sf()
+import.gorillas.sf(overwrite = FALSE)
 }
 \value{
 gorilla data

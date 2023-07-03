@@ -105,7 +105,8 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 #' @examples
 #' \donttest{
 #' # fm_int needs INLA
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() &&
+#'     require("ggplot2")) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
 #'   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
 #'     rbind(c(0, 3), c(3, 8)),
@@ -117,7 +118,9 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 #'   ips <- fm_cprod(ips1, ips2)
 #'
 #'   # Plot the integration points
-#'   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+#'   ggplot(ips) +
+#'     geom_point(aes(myDim, myDiscreteDim, size = weight)) +
+#'     scale_size_area()
 #' }
 #' }
 #'
@@ -129,6 +132,7 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   # TODO make a test. and give a warning for NA non-overlapping outcome?
   # check for each element, or on the subset, change only for sp anonymous function on lapply
   ipl_sp <- vapply(ipl, function(x) inherits(x, "Spatial"), TRUE)
+  ipl_sf <- vapply(ipl, function(x) inherits(x, c("sf", "sfc")), TRUE)
   ipl[ipl_sp] <- lapply(ipl[ipl_sp], sf::st_as_sf)
 
   ipl <- ipl[!vapply(ipl, is.null, TRUE)]
@@ -226,13 +230,13 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   # It does not make sense to revert certain indices back after merging. Hence, I revert the entire object back to sp.
   if (any(ipl_sp)) {
     ips <- sf::as_Spatial(ips)
-    # WARNING SHOULD BE HERE, MORE FRIENDLY ERROR, METHOD ST_AS_SF
-    # TODO deprecated_soft warning for `sp` presence
-    # lifecycle::deprecate_soft(
-    #   when = "2.7.0",
-    #   what = "inlabru::ipl_sp()", # ipl_sp() does not exist but it does not allow mentioning deprecated function in another package
-    #   details = "Support for `sp` is gradually deprecated in favour of `sf` and `terra`"
-    # )
+    if (any(ipl_sf)) {
+     lifecycle::deprecate_soft(
+       when = "2.7.0",
+       what = "fm_cprod('...'='should not mix `sp` and `sf` objects')",
+       details = c("Converting to `sp` since there was at least one `sp` input object.")
+     )
+    }
   }
   ips
 }

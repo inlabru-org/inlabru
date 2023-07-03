@@ -32,7 +32,8 @@ weights attached to it all weights are assumed to be 1.
 \examples{
 \donttest{
 # fm_int needs INLA
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+    require("ggplot2")) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
     rbind(c(0, 3), c(3, 8)),
@@ -44,7 +45,9 @@ if (bru_safe_inla()) {
   ips <- fm_cprod(ips1, ips2)
 
   # Plot the integration points
-  plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
+  ggplot(ips) +
+    geom_point(aes(myDim, myDiscreteDim, size = weight)) +
+    scale_size_area()
 }
 }
 
