@@ -92,7 +92,8 @@ an appropriate predictor specification. The locations at which to predict can be
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(mesh,
+matern <- inla.spde2.pcmatern(
+  mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(5, 0.01)
 )
@@ -101,10 +102,12 @@ cmp <- geometry ~
   mySmooth(geometry, model = matern) +
   Intercept(1)
 
-fit <- lgcp(cmp,
-            data = nests,
-            samplers = boundary,
-            domain = list(geometry = mesh))
+fit <- lgcp(
+  cmp,
+  data = nests,
+  samplers = boundary,
+  domain = list(geometry = mesh)
+)
 ```
 
 Predicting intensity

@@ -94,14 +94,14 @@ an appropriate predictor specification. The locations at which to predict can be
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(mesh,
+matern <- inla.spde2.pcmatern(
+  mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(5, 0.01)
 )
 
-cmp <- coordinates ~ mySmooth(coordinates,
-  model = matern
-) +
+cmp <- coordinates ~
+  mySmooth(coordinates, model = matern) +
   Intercept(1)
 
 fit <- lgcp(cmp, nests, samplers = boundary, domain = list(coordinates = mesh))

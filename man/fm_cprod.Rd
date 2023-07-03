@@ -33,7 +33,7 @@ weights attached to it all weights are assumed to be 1.
 \donttest{
 # fm_int needs INLA
 if (bru_safe_inla() &&
-    require("ggplot2")) {
+  require("ggplot2")) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
     rbind(c(0, 3), c(3, 8)),

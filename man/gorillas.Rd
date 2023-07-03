@@ -48,8 +48,6 @@ Library \code{spatstat.data}.
 gorillas
 # To avoid the name clash with spatstat.data::gorillas, use
 data(gorillas, package = "inlabru")
-# or
-inlabru::gorillas
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted

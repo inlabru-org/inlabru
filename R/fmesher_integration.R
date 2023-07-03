@@ -106,7 +106,7 @@ split_lines <- function(mesh, sp, ep, filter.zero.length = TRUE) {
 #' \donttest{
 #' # fm_int needs INLA
 #' if (bru_safe_inla() &&
-#'     require("ggplot2")) {
+#'   require("ggplot2")) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
 #'   ips1 <- fm_int(INLA::inla.mesh.1d(1:20),
 #'     rbind(c(0, 3), c(3, 8)),
@@ -231,11 +231,11 @@ fm_cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   if (any(ipl_sp)) {
     ips <- sf::as_Spatial(ips)
     if (any(ipl_sf)) {
-     lifecycle::deprecate_soft(
-       when = "2.7.0",
-       what = "fm_cprod('...'='should not mix `sp` and `sf` objects')",
-       details = c("Converting to `sp` since there was at least one `sp` input object.")
-     )
+      lifecycle::deprecate_soft(
+        when = "2.7.0",
+        what = "fm_cprod('...'='should not mix `sp` and `sf` objects')",
+        details = c("Converting to `sp` since there was at least one `sp` input object.")
+      )
     }
   }
   ips

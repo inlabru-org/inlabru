@@ -50,7 +50,6 @@ Library \code{spatstat.data}.
 \usage{
 gorillas_sf
 data(gorillas_sf, package = "inlabru")
-inlabru::gorillas_sf
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
@@ -63,12 +62,13 @@ if (interactive() &&
   require(ggplot2, quietly = TRUE) &&
   require(ggpolypath, quietly = TRUE) &&
   requireNamespace("terra")) {
-
   # plot all the nests, mesh and boundary
   ggplot() +
     gg(gorillas_sf$mesh) +
-    geom_sf(data = gorillas_sf$boundary,
-            alpha = 0.1, fill = "blue") +
+    geom_sf(
+      data = gorillas_sf$boundary,
+      alpha = 0.1, fill = "blue"
+    ) +
     geom_sf(data = gorillas_sf$nests)
 
   # Plot the elevation covariate
