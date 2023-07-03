@@ -14,6 +14,7 @@ articles:
   2d_lgcp_multilikelihood: web/2d_lgcp_multilikelihood.html
   2d_lgcp_plotsampling: web/2d_lgcp_plotsampling.html
   2d_lgcp_residuals: web/2d_lgcp_residuals.html
+  2d_lgcp_sf: web/2d_lgcp_sf.html
   2d_lgcp_spatiotemporal: web/2d_lgcp_spatiotemporal.html
   Apptainer: web/Apptainer.html
   devel_flow: web/devel_flow.html
@@ -23,7 +24,7 @@ articles:
   random_fields_2d: web/random_fields_2d.html
   svc: web/svc.html
   website_examples: website_examples.html
-last_built: 2023-07-02T23:41Z
+last_built: 2023-07-03T22:09Z
 urls:
   reference: https://inlabru-org.github.io/inlabru/reference
   article: https://inlabru-org.github.io/inlabru/articles
