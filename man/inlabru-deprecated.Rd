@@ -203,18 +203,6 @@ Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}}
 }}
 \examples{
 \dontrun{
-# Note: Only run this if you want to change the inlabru options for this session
-
-# Determine current bru defaults:
-bo <- bru_options_get()
-
-init.tutorial()
-
-# Check if it worked:
-bru_options_get("control.inla")
-}
-
-\dontrun{
 if (interactive()) {
   s <- sp::SpatialPoints(matrix(1:6, 3, 2), proj4string = fm_CRS("sphere"))
   fm_CRS(s)
