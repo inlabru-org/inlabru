@@ -113,12 +113,12 @@
 #'       integers 1 to 6 (in order of increasing expected habitat suitability)}
 #'       \item{`waterdist`}{ Euclidean distance from nearest water body, in metres.}
 #'     }
-#'     Load with
-#'     ```
+#'     Loading of the covariates can be done with `gorillas_sf_gcov()` or
+#'
 #'     gorillas_sf$gcov <- terra::rast(
 #'       system.file(gorillas_sf$gcov_file, package = "inlabru")
 #'     )
-#'     ```
+#'
 #'    }
 #'    \item{`plotsample`}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\% coverage. Components:
 #'    \describe{
@@ -306,10 +306,26 @@ import.gorillas.sf <- function(overwrite = FALSE) {
     if (file.exists(filename)) {
       message(paste0("Overwriting existing ", filename))
     }
-    terra::writeRaster(gcov, filename = filename)
+    terra::writeRaster(
+      gcov,
+      filename = filename,
+      overwrite = overwrite,
+      gdal = c("COMPRESS=LZW")
+    )
   }
 
   gorillas_sf
+}
+
+#' @describeIn gorillas_sf Access the `gorillas_sf` covariates data as a
+#' `terra::rast()` object.
+#' @export
+#' @examples
+#' \dontrun{
+#'   gorillas_sf$gcov <- gorillas_sf_gcov()
+#' }
+gorillas_sf_gcov <- function() {
+  terra::rast(system.file(inlabru::gorillas_sf$gcov_file, package = "inlabru"))
 }
 
 

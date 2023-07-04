@@ -56,7 +56,7 @@ don't have to keep typing '`gorillas_sf$`', and optionally load the covariates f
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
-gcov <- terra::rast(system.file(gorillas_sf$gcov_file, package = "inlabru"))
+gcov <- gorillas_sf_gcov()
 ```
 
 Plot the points (the nests).
@@ -64,7 +64,7 @@ Plot the points (the nests).
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
   gg(mesh) +
-  geom_sf(data = boundary, alhpa = 0.1, fill = "blue") +
+  geom_sf(data = boundary, alpha = 0.1, fill = "blue") +
   geom_sf(data = nests) +
   ggtitle("Points")
 ```

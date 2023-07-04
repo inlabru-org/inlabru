@@ -3,6 +3,7 @@
 \docType{data}
 \name{gorillas_sf}
 \alias{gorillas_sf}
+\alias{gorillas_sf_gcov}
 \title{Gorilla nesting sites in sf format}
 \format{
 The data are a list that contains these elements:
@@ -30,8 +31,13 @@ Flat, Midslope, Upper and Ridge. These are coded as integers 1 to 6.}
 integers 1 to 6 (in order of increasing expected habitat suitability)}
 \item{\code{waterdist}}{ Euclidean distance from nearest water body, in metres.}
 }
-Load with
-\code{gorillas_sf$gcov <- terra::rast( system.file(gorillas_sf$gcov_file, package = "inlabru") )}
+Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{gorillas_sf$gcov <- terra::rast(
+  system.file(gorillas_sf$gcov_file, package = "inlabru")
+)
+}\if{html}{\out{</div>}}
+
 }
 \item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\\% coverage. Components:
 \describe{
@@ -50,11 +56,19 @@ Library \code{spatstat.data}.
 \usage{
 gorillas_sf
 data(gorillas_sf, package = "inlabru")
+
+gorillas_sf_gcov()
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
 as point process data for use with \code{inlabru}.
 }
+\section{Functions}{
+\itemize{
+\item \code{gorillas_sf_gcov()}: Access the \code{gorillas_sf} covariates data as a
+\code{terra::rast()} object.
+
+}}
 \examples{
 if (interactive() &&
   bru_safe_inla() &&
@@ -81,6 +95,9 @@ if (interactive() &&
   ggplot() +
     geom_sf(data = gorillas_sf$plotsample$plots) +
     geom_sf(data = gorillas_sf$plotsample$nests)
+}
+\dontrun{
+  gorillas_sf$gcov <- gorillas_sf_gcov()
 }
 }
 \references{
