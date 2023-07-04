@@ -131,16 +131,18 @@ print.bru_log <- function(x, ...) {
 #' @examples
 #' if (interactive()) {
 #'   code_runner <- function() {
-#'     ov <- bru_options_get("bru_verbose")
-#'     ovs <- bru_options_get("bru_verbose_store")
-#'     on.exit(bru_options_set(bru_verbose = ov))
-#'     on.exit(bru_options_set(bru_verbose_store = ovs), add = TRUE)
-#'     bru_options_set(bru_verbose = 3)
-#'     bru_options_set(bru_verbose_store = 2)
+#'     local_bru_options_set(
+#'       # Show messages up to and including level 3 (default 0)
+#'       bru_verbose = 3,
+#'       # Store messages to an including level 2 (default Inf, storing all)
+#'       bru_options_set(bru_verbose_store = 2)
+#'     )
+#'
 #'     bru_log_message("Test message 1", verbosity = 1)
 #'     bru_log_message("Test message 2", verbosity = 2)
 #'     bru_log_message("Test message 3", verbosity = 3)
 #'     bru_log_message("Test message 4", verbosity = 4)
+#'
 #'     invisible()
 #'   }
 #'   message("Run code")
@@ -736,12 +738,17 @@ print.summary_bru_options <- function(x, ...) {
 #' options instead instead.  In versions <= 2.1.15, this function set the INLA
 #' integration strategy to "eb" to speed up calculations. This is normally not
 #' needed since version 2.2.0, since the only the final iteration will use
-#' other than "eb".
+#' other than "eb".  Therefore, to recreate the main options set by `init.tutorial()`,
+#' the following is sufficient:
+#' ```
+#' bru_options_set(
+#'   bru_verbose = TRUE,
+#'   control.compute = list(dic = TRUE, waic = TRUE)
+#' )
+#' ```
 #'
-#' @aliases init.tutorial
 #' @export
 #'
-#' @return NULL
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 init.tutorial <- function() {
   lifecycle::deprecate_stop(
@@ -750,10 +757,5 @@ init.tutorial <- function() {
     I(
       "bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))"
     )
-  )
-  message("Setting defaults for tutorial session.")
-  local_bru_options_set(
-    bru_verbose = TRUE,
-    control.compute = list(dic = TRUE, waic = TRUE)
   )
 }

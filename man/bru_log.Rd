@@ -93,16 +93,18 @@ if (interactive()) {
 }
 if (interactive()) {
   code_runner <- function() {
-    ov <- bru_options_get("bru_verbose")
-    ovs <- bru_options_get("bru_verbose_store")
-    on.exit(bru_options_set(bru_verbose = ov))
-    on.exit(bru_options_set(bru_verbose_store = ovs), add = TRUE)
-    bru_options_set(bru_verbose = 3)
-    bru_options_set(bru_verbose_store = 2)
+    local_bru_options_set(
+      # Show messages up to and including level 3 (default 0)
+      bru_verbose = 3,
+      # Store messages to an including level 2 (default Inf, storing all)
+      bru_options_set(bru_verbose_store = 2)
+    )
+
     bru_log_message("Test message 1", verbosity = 1)
     bru_log_message("Test message 2", verbosity = 2)
     bru_log_message("Test message 3", verbosity = 3)
     bru_log_message("Test message 4", verbosity = 4)
+
     invisible()
   }
   message("Run code")
