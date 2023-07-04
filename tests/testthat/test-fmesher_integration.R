@@ -303,7 +303,7 @@ test_that("flat SpatialPolygons integration", {
 
   mesh <- INLA::inla.mesh.2d(cbind(0, 0), offset = 2, max.edge = 4)
 
-  poly <- SpatialPolygons(list(Polygons(list(Polygon(rbind(
+  poly <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(rbind(
     c(-1, -1), c(-1, 1), c(1, 1), c(1, -1)
   ))), ID = "A")))
   poly <- sf::st_as_sf(poly)
