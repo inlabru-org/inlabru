@@ -48,7 +48,8 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
     <a class="dropdown-item" href="../../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
+    <a class="dropdown-item" href="../../articles/web/2d_lgcp_sf.html">LGCPs - An example in two dimensions (sf version)</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
     <a class="dropdown-item" href="../../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
@@ -68,6 +69,8 @@
     <a class="dropdown-item" href="../../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
     <a class="dropdown-item" href="../../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../../articles/website_examples.html">Website articles</a>
   </div>
 </li>
 <li class="nav-item">
@@ -101,7 +104,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-07-04</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-07-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -248,14 +251,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 656.2959 44.69964 567.3972 655.2726 746.9360 655.2726        4.469964</span></span>
-<span><span class="co">#&gt; 2 648.0104 37.30228 577.9520 648.3990 723.7328 648.3990        3.730228</span></span>
-<span><span class="co">#&gt; 3 668.6113 25.90758 613.7393 669.7341 713.7049 669.7341        2.590758</span></span>
+<span><span class="co">#&gt; 1 664.1383 49.29183 575.3451 669.6009 749.7099 669.6009        4.929183</span></span>
+<span><span class="co">#&gt; 2 636.5132 37.68444 562.9824 640.7364 705.4033 640.7364        3.768444</span></span>
+<span><span class="co">#&gt; 3 670.4797 28.71075 618.0069 669.6860 723.4050 669.6860        2.871075</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.807556</span></span>
-<span><span class="co">#&gt; 2      2.507849</span></span>
-<span><span class="co">#&gt; 3      1.745033</span></span>
+<span><span class="co">#&gt; 1      5.029098</span></span>
+<span><span class="co">#&gt; 2      2.555415</span></span>
+<span><span class="co">#&gt; 3      2.034691</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
