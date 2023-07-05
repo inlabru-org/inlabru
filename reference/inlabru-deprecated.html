@@ -218,7 +218,12 @@ system. Returns a list of Spatial* objects.</p>
 options instead instead.  In versions &lt;= 2.1.15, this function set the INLA
 integration strategy to "eb" to speed up calculations. This is normally not
 needed since version 2.2.0, since the only the final iteration will use
-other than "eb".</p></li>
+other than "eb".  Therefore, to recreate the main options set by <code>init.tutorial()</code>,
+the following is sufficient:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bru_options_set</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">bru_verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">control.compute =</span> <span class="fu">list</span>(<span class="at">dic =</span> <span class="cn">TRUE</span>, <span class="at">waic =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre><p></p></div></li>
 <li><p><code>fm_has_PROJ6()</code>: Detect whether PROJ6 is available</p></li>
 <li><p><code>fm_not_for_PROJ6()</code>: <code>fm_not_for_PROJ6</code> is called to warn about using old PROJ4
 features even though PROJ6 is available</p></li>
@@ -277,18 +282,6 @@ Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Note: Only run this if you want to change the inlabru options for this session</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Determine current bru defaults:</span></span></span>
-<span class="r-in"><span><span class="va">bo</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">init.tutorial</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Check if it worked:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="bru_options.html">bru_options_get</a></span><span class="op">(</span><span class="st">"control.inla"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>

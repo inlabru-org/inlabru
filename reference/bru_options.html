@@ -149,7 +149,7 @@ options list should be emptied before setting the new option(s).</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>bru_options()</code> returns an <code>bru_options</code> object.</p>
+<p><code>bru_options()</code> returns a <code>bru_options</code> object.</p>
 
 
 <p>For <code>as.bru_options()</code>, <code>NULL</code> or no input returns an empty
@@ -176,13 +176,16 @@ name strings.</p>
 invisibly (as <code>bru_options_get(include_default = FALSE)</code>).</p>
     </div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>bru_options_check</code> checks for valid contents of an <code>bru_options</code>
-object</p>
-<p><code>bru_options_check()</code> produces warnings for invalid options.</p>
-<p><code>bru_options_set()</code> is used to set global package options.</p>
-<p><code>bru_options_reset()</code> clears the global option overrides.</p>
-    </div>
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+    
+<ul><li><p><code>as.bru_options()</code>: coerces inputs to a <code>bru_options</code> object.</p></li>
+<li><p><code>bru_options_default()</code>: returns the default options.</p></li>
+<li><p><code>bru_options_check()</code>: checks for valid contents of a <code>bru_options</code>
+object, and produces warnings for invalid options.</p></li>
+<li><p><code>bru_options_get()</code>: used to access global package options.</p></li>
+<li><p><code>bru_options_set()</code>: used to set global package options.</p></li>
+<li><p><code>bru_options_reset()</code>: clears the global option overrides.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="valid-options">Valid options<a class="anchor" aria-label="anchor" href="#valid-options"></a></h2>
     
@@ -321,19 +324,11 @@ effect. Until a more elegant alternative has been implemented, use explicit
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># EXAMPLE1</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">bru_options_check</span><span class="op">(</span><span class="fu">bru_options</span><span class="op">(</span>bru_max_iter <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># EXAMPLE1</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu">bru_options_get</span><span class="op">(</span><span class="st">"bru_verbose"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">bru_options_set</span><span class="op">(</span></span></span>
