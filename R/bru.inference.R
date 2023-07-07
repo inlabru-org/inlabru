@@ -2522,7 +2522,8 @@ bru_line_search <- function(model,
       idx = seq_along(lin_pred0),
       lin0 = lin_pred0,
       lin1 = lin_pred1,
-      nonlin1 = nonlin_pred
+      nonlin1 = nonlin_pred,
+      weights = weights
     )
   }
 
@@ -2772,60 +2773,133 @@ bru_line_search <- function(model,
     requireNamespace("ggplot2")
     requireNamespace("patchwork")
     pl1 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$lin0 - .data$lin1), col = "start", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlin1 - .data$lin1), col = "full", shape = "nonlin")) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlinopt - .data$lin1), col = "opt", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin0 - .data$lin1), col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin1 - .data$lin1), col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlin1 - .data$lin1), col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlinopt - .data$lin1), col = "opt")) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("eta - lin1")
     pl2 <- ggplot2::ggplot(df_debug) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
         (.data$lin0 - .data$lin1) * .data$weights^0.5,
-        col = "start",
-        shape = "linear"
+        col = "start"
       )) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
+        (.data$lin1 - .data$lin1) * .data$weights^0.5,
+        col = "inla"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$nonlin1 - .data$lin1) * .data$weights^0.5,
-        col = "full",
-        shape = "nonlin"
+        col = "full"
       )) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
         (.data$nonlinopt - .data$lin1) * .data$weights^0.5,
-        col = "opt",
-        shape = "nonlin"
+        col = "opt"
       )) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("(eta - lin1) * sqrt(w)")
     pl3 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "full", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full", shape = "nonlin")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt")) +
       ggplot2::geom_ribbon(
         ggplot2::aes(
-          .data$idx,
+          as.numeric(.data$idx),
           ymin = .data$lin1 - 2 * .data$weights^-0.5,
           ymax = .data$lin1 + 2 * .data$weights^-0.5
         ),
         alpha = 0.1
       ) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("eta")
     pl4 <- ggplot2::ggplot(data.frame(
       idx = seq_along(unlist(state0)),
       state0 = unlist(state0),
-      state1 = unlist(state1),
-      state = unlist(state)
+      state1 = unlist(state1)[names(unlist(state0))],
+      state = unlist(state)[names(unlist(state0))]
     )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state0, col = "start")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state1, col = "full")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state, col = "opt")) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state, col = "opt")) +
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("state")
     print(((pl1 | pl2) / (pl3 | pl4)) +
       patchwork::plot_layout(guides = "collect") &
       ggplot2::theme(legend.position = "right"))
+
+    # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
+    # delta = lin1-lin0
+    delta <- lin_pred1 - lin_pred0
+    delta_norm <- pred_norm(delta)
+
+    # <eta-lin0, delta>/|delta|
+    along_opt <- pred_scalprod(nonlin_pred - lin_pred0, delta) / delta_norm
+    # |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>|
+    ortho_opt <- pred_norm(
+      nonlin_pred - lin_pred0 - delta * along_opt / delta_norm
+    )
+
+    step_scaling_range <- seq(0, step_scaling * fact, length.out = 20)
+    along <- ortho <- distance <- numeric(length(step_scaling_range))
+    for (iii in seq_along(step_scaling_range)) {
+      step_scaling_ <- step_scaling_range[iii]
+      state_ <- scale_state(state0, state1, step_scaling_)
+      nonlin_pred_ <- nonlin_predictor(
+        param = nonlin_param,
+        state = state_
+      )
+      # <eta-lin0, delta>/|delta|
+      along[iii] <- pred_scalprod(nonlin_pred_ - lin_pred0, delta) / delta_norm
+      # |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>|
+      ortho[iii] <- pred_norm(
+        nonlin_pred_ - lin_pred0 - delta * along[iii] / delta_norm
+      )
+      distance[iii] <-
+        line_search_optimisation_target_exact(
+          step_scaling_,
+          param = list(
+            lin = lin_pred1,
+            state0 = state0,
+            state1 = state1,
+            weights = weights
+          ),
+          nonlin_param = nonlin_param
+        )
+
+    }
+
+
+    pl0 <-
+      ggplot2::ggplot(
+        data =
+          data.frame(
+            along = along,
+            ortho = ortho,
+            distance = distance^0.5,
+            what = "eta"
+          ),
+        mapping = ggplot2::aes(.data$along, .data$ortho, col = .data$what)
+      ) +
+      ggplot2::geom_path() +
+      ggplot2::geom_point(ggplot2::aes(size = .data$distance)) +
+      ggplot2::geom_point(
+        data = data.frame(
+          along = c(0, along_opt, delta_norm*0),
+          ortho = c(0, ortho_opt, 0),
+          what = c("eta0", "eta_opt", "eta1")
+        )
+      )
+    print(pl0)
+
 
     browser()
   }
