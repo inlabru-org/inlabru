@@ -2898,8 +2898,6 @@ bru_line_search <- function(model,
           what = c("eta0", "eta_opt", "eta1")
         )
       )
-    print(pl0)
-
 
     browser()
   }
