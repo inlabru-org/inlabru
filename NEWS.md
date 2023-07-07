@@ -3,7 +3,11 @@
 ## Feature updates
 
 * Add experimental support for `stars` via `eval_spatial()`.
-  (version `2.9.0.9007`)
+  (version `2.8.0.9007`)
+  
+* Now preserves the previous log output when using `bru_rerun()`,
+  and `bru_log_get()` is now a set of S3 methods, supporting extracting the
+  full inlabru log as well `bru`-object specific logs (version `2.8.0.9008`)
 
 ## Bug and dependency updates
 

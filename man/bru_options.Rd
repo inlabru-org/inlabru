@@ -76,18 +76,18 @@ specific calls to \code{\link[=bru]{bru()}} is recommended instead.
 }
 \section{Functions}{
 \itemize{
-\item \code{as.bru_options()}: coerces inputs to a \code{bru_options} object.
+\item \code{as.bru_options()}: Coerces inputs to a \code{bru_options} object.
 
-\item \code{bru_options_default()}: returns the default options.
+\item \code{bru_options_default()}: Returns the default options.
 
-\item \code{bru_options_check()}: checks for valid contents of a \code{bru_options}
+\item \code{bru_options_check()}: Checks for valid contents of a \code{bru_options}
 object, and produces warnings for invalid options.
 
-\item \code{bru_options_get()}: used to access global package options.
+\item \code{bru_options_get()}: Used to access global package options.
 
-\item \code{bru_options_set()}: used to set global package options.
+\item \code{bru_options_set()}: Used to set global package options.
 
-\item \code{bru_options_reset()}: clears the global option overrides.
+\item \code{bru_options_reset()}: Clears the global option overrides.
 
 }}
 \section{Valid options}{
@@ -142,7 +142,7 @@ multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 standard deviation is less than \code{rel_tol}. Default 0.1 (ten percent).}
 \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.}
-\item{lin_opt_method}{Which method to use for the line search optimisation step.
+\item{line_opt_method}{Which method to use for the line search optimisation step.
 Default "onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.
 The method "full" does line optimisation on the full nonlinear predictor;

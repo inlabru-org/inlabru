@@ -2908,16 +2908,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   inla.options <- bru_options_inla(options)
 
-  initial_log_length <- length(bru_log_get())
+  bru_log_bookmark("iinla")
   original_timings <- NULL
+  original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
-      log = if (initial_log_length <= 0) {
-        bru_log_get()
-      } else {
-        bru_log_get()[-seq_len(initial_log_length)]
-      },
+      log = c(original_log, bru_log_get(bookmark = "iinla")),
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
@@ -3029,6 +3026,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stop("Unknown previous result information class")
   }
   old.result <- result
+
+  # Preserve old log output
+  if (is.null(old.result[["bru_iinla"]][["log"]])) {
+    original_log <- character(0)
+  } else {
+    original_log <- old.result[["bru_iinla"]][["log"]]
+  }
 
   # Track variables
   track <- list()

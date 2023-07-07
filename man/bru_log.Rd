@@ -3,6 +3,9 @@
 \name{bru_log}
 \alias{bru_log}
 \alias{bru_log_reset}
+\alias{bru_log_bookmark}
+\alias{bru_log_bookmarks}
+\alias{bru_log_offset}
 \alias{bru_log_get}
 \alias{bru_log_get.default}
 \alias{bru_log_get.iinla}
@@ -11,15 +14,21 @@
 \alias{bru_log_message}
 \title{inlabru log message methods}
 \usage{
-bru_log_reset()
+bru_log_reset(bookmark = NULL, offset = NULL)
 
-bru_log_get(..., pretty = FALSE)
+bru_log_bookmark(bookmark = "", offset = NULL)
 
-\method{bru_log_get}{default}(..., pretty = FALSE)
+bru_log_bookmarks()
 
-\method{bru_log_get}{iinla}(x, ..., pretty = FALSE)
+bru_log_offset(bookmark = NULL, offset = NULL, log_length = NULL)
 
-\method{bru_log_get}{bru}(x, ..., pretty = FALSE)
+bru_log_get(..., offset = 0L)
+
+\method{bru_log_get}{default}(..., bookmark = NULL, offset = 0L)
+
+\method{bru_log_get}{iinla}(x, ..., offset = 0L)
+
+\method{bru_log_get}{bru}(x, ..., offset = 0L)
 
 \method{print}{bru_log}(x, ...)
 
@@ -34,13 +43,17 @@ bru_log_message(
 )
 }
 \arguments{
-\item{...}{Zero or more objects passed on to \code{\link[base:message]{base::.makeMessage()}}}
+\item{bookmark}{character; The label for a bookmark with a stored offset.}
 
-\item{pretty}{logical; If \code{TRUE}, return a single string with the log
-messages separated and terminated by line feeds, suitable for \code{cat(...)}.
-If \code{FALSE}, return the raw log as a vector of strings, suitable for
-\code{cat(..., sep = "\\n")}. For ordinary printing, the \code{print.bru_log} method
-handles this by itself. Default: \code{FALSE}}
+\item{offset}{integer; a position offset in the log, with \code{0L} pointing at
+the start of the log. If negative, denotes the point \code{abs(offset)} elements
+from tail of the log.}
+
+\item{log_length}{integer; the length of the log being operated on.
+If \code{NULL} (default) the global inlabru log length is used.}
+
+\item{...}{For \code{bru_log_message()}, zero or more objects passed on to
+\code{\link[base:message]{base::.makeMessage()}}}
 
 \item{x}{For \code{bru_log_get}, a \code{bru} or \code{iinla} object from \code{\link[=bru]{bru()}}.}
 
@@ -66,10 +79,12 @@ stored in the global log object. Can be controlled via the \code{bru_verbose_sto
 with \code{\link[=bru_options_set]{bru_options_set()}}.}
 }
 \value{
-\code{bru_log_get} A character vector of log messages. If \code{pretty} is \code{TRUE},
-the messages are collapsed into a single string with \verb{\\n} separating the messages.
-An additional class identifier \code{bru_log} is added, to allow a dedicated \code{print}
-method.
+\code{bru_log_bookmark} The offset of the added bookmark.
+
+\code{bru_log_get} A character vector of log messages, suitable for
+\code{cat(..., sep = "\\n")}. For ordinary printing, the \code{print.bru_log} method
+handles this by itself. An additional class identifier \code{bru_log} is added,
+to allow a dedicated \code{print} method to be found.
 
 \code{bru_log_message} returns \code{invisible()}
 }
@@ -78,11 +93,20 @@ Log message methods
 }
 \section{Functions}{
 \itemize{
-\item \code{bru_log_reset()}: clears the \code{inlabru} log contents.
+\item \code{bru_log_reset()}: Clears the \code{inlabru} log contents up to
+a given \code{offset} or \code{bookmark}. Default: clear the entire log
+
+\item \code{bru_log_bookmark()}: Set a log bookmark. If \code{offset} is \code{NULL} (the default),
+the bookmark will point to the current end of the log.
+
+\item \code{bru_log_bookmarks()}: Return the list of log bookmarks with associated log
+position offsets.
+
+\item \code{bru_log_offset()}: Utility function for computing log position offsets.
 
 \item \code{bru_log_get()}: Extract stored log messages
 
-\item \code{bru_log_message()}: adds a log message.
+\item \code{bru_log_message()}: Adds a log message.
 
 }}
 \examples{
