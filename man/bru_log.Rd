@@ -3,6 +3,7 @@
 \name{bru_log}
 \alias{bru_log}
 \alias{bru_log_reset}
+\alias{bru_logify}
 \alias{bru_log_bookmark}
 \alias{bru_log_bookmarks}
 \alias{bru_log_offset}
@@ -11,10 +12,14 @@
 \alias{bru_log_get.iinla}
 \alias{bru_log_get.bru}
 \alias{print.bru_log}
+\alias{[.bru_log}
+\alias{c.bru_log}
 \alias{bru_log_message}
 \title{inlabru log message methods}
 \usage{
 bru_log_reset(bookmark = NULL, offset = NULL)
+
+bru_logify(x = NULL, offset = 0L)
 
 bru_log_bookmark(bookmark = "", offset = NULL)
 
@@ -31,6 +36,10 @@ bru_log_get(..., offset = 0L)
 \method{bru_log_get}{bru}(x, ..., offset = 0L)
 
 \method{print}{bru_log}(x, ...)
+
+\method{[}{bru_log}(x, i)
+
+\method{c}{bru_log}(...)
 
 bru_log_message(
   ...,
@@ -49,13 +58,15 @@ bru_log_message(
 the start of the log. If negative, denotes the point \code{abs(offset)} elements
 from tail of the log.}
 
+\item{x}{For \code{bru_log_get()}, a \code{bru} or \code{iinla} object from \code{\link[=bru]{bru()}}.}
+
 \item{log_length}{integer; the length of the log being operated on.
 If \code{NULL} (default) the global inlabru log length is used.}
 
 \item{...}{For \code{bru_log_message()}, zero or more objects passed on to
 \code{\link[base:message]{base::.makeMessage()}}}
 
-\item{x}{For \code{bru_log_get}, a \code{bru} or \code{iinla} object from \code{\link[=bru]{bru()}}.}
+\item{i}{indices specifying elements to extract}
 
 \item{domain}{Domain for translations, passed on to \code{\link[base:message]{base::.makeMessage()}}}
 
@@ -95,6 +106,8 @@ Log message methods
 \itemize{
 \item \code{bru_log_reset()}: Clears the \code{inlabru} log contents up to
 a given \code{offset} or \code{bookmark}. Default: clear the entire log
+
+\item \code{bru_logify()}: Create or subset from a \code{bru_log} object.
 
 \item \code{bru_log_bookmark()}: Set a log bookmark. If \code{offset} is \code{NULL} (the default),
 the bookmark will point to the current end of the log.

@@ -58,7 +58,7 @@ bru_log_reset <- function(bookmark = NULL, offset = NULL) {
   envir <- bru_env_get()
   log_length <- length(envir[["log"]])
   if (offset >= log_length) {
-    envir[["log"]] <- character(0)
+    envir[["log"]] <- bru_logify()
     envir[["log_bookmarks"]] <- list()
     return(invisible(NULL))
   }
@@ -78,14 +78,19 @@ bru_log_reset <- function(bookmark = NULL, offset = NULL) {
 }
 
 
-
-bru_logify <- function(x, offset = 0L) {
-  log_length <- length(x)
-  offset <- bru_log_offset(offset = offset, log_length = log_length)
-  if (offset >= log_length) {
+#' @export
+#' @describeIn bru_log Create or subset from a `bru_log` object.
+bru_logify <- function(x = NULL, offset = 0L) {
+  if (is.null(x)) {
     x <- character(0)
-  } else if (offset > 0L) {
-    x <- x[-seq_len(offset)]
+  } else {
+    log_length <- length(x)
+    offset <- bru_log_offset(offset = offset, log_length = log_length)
+    if (offset >= log_length) {
+      x <- character(0)
+    } else if (offset > 0L) {
+      x <- x[-seq_len(offset)]
+    }
   }
   if (!inherits(x, "bru_log")) {
     class(x) <- c("bru_log", class(x))
@@ -171,7 +176,7 @@ bru_log_get.default <- function(..., bookmark = NULL, offset = 0L) {
 
 #' @rdname bru_log
 #' @export
-#' @param x For `bru_log_get`, a `bru` or `iinla` object from [bru()].
+#' @param x For `bru_log_get()`, a `bru` or `iinla` object from [bru()].
 bru_log_get.iinla <- function(x, ..., offset = 0L) {
   bru_logify(x[["log"]], offset = offset)
 }
@@ -186,6 +191,29 @@ bru_log_get.bru <- function(x, ..., offset = 0L) {
 #' @export
 print.bru_log <- function(x, ...) {
   cat(x, sep = "\n")
+}
+
+#' @export
+#' @param i indices specifying elements to extract
+#' @rdname bru_log
+`[.bru_log` <- function(x, i) {
+  cl <- class(x)
+  object <- NextMethod()
+  class(object) <- cl
+  object
+}
+
+#' @export
+#' @rdname bru_log
+`c.bru_log` <- function(...) {
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "character"),
+    TRUE
+  )))
+  object <- NextMethod()
+  class(object) <- c("bru_log", "character")
+  object
 }
 
 
