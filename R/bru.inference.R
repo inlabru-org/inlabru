@@ -2874,7 +2874,6 @@ bru_line_search <- function(model,
           ),
           nonlin_param = nonlin_param
         )
-
     }
 
 
@@ -2893,7 +2892,7 @@ bru_line_search <- function(model,
       ggplot2::geom_point(ggplot2::aes(size = .data$distance)) +
       ggplot2::geom_point(
         data = data.frame(
-          along = c(0, along_opt, delta_norm*0),
+          along = c(0, along_opt, delta_norm),
           ortho = c(0, ortho_opt, 0),
           what = c("eta0", "eta_opt", "eta1")
         )
