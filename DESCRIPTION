@@ -145,3 +145,5 @@ VignetteBuilder: knitr
 BuildVignettes: true
 LazyData: true
 LazyDataCompression: xz
+Remotes:
+    inlabru-org/fmesher
