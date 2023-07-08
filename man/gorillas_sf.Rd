@@ -97,7 +97,7 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$plotsample$nests)
 }
 \dontrun{
-  gorillas_sf$gcov <- gorillas_sf_gcov()
+gorillas_sf$gcov <- gorillas_sf_gcov()
 }
 }
 \references{

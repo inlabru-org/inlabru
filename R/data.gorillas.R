@@ -322,7 +322,7 @@ import.gorillas.sf <- function(overwrite = FALSE) {
 #' @export
 #' @examples
 #' \dontrun{
-#'   gorillas_sf$gcov <- gorillas_sf_gcov()
+#' gorillas_sf$gcov <- gorillas_sf_gcov()
 #' }
 gorillas_sf_gcov <- function() {
   terra::rast(system.file(inlabru::gorillas_sf$gcov_file, package = "inlabru"))
