@@ -18,7 +18,7 @@ specific calls to bru() is recommended instead."><!-- mathjax --><script src="ht
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -181,13 +181,13 @@ invisibly (as <code>bru_options_get(include_default = FALSE)</code>).</p>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>as.bru_options()</code>: coerces inputs to a <code>bru_options</code> object.</p></li>
-<li><p><code>bru_options_default()</code>: returns the default options.</p></li>
-<li><p><code>bru_options_check()</code>: checks for valid contents of a <code>bru_options</code>
+<ul><li><p><code>as.bru_options()</code>: Coerces inputs to a <code>bru_options</code> object.</p></li>
+<li><p><code>bru_options_default()</code>: Returns the default options.</p></li>
+<li><p><code>bru_options_check()</code>: Checks for valid contents of a <code>bru_options</code>
 object, and produces warnings for invalid options.</p></li>
-<li><p><code>bru_options_get()</code>: used to access global package options.</p></li>
-<li><p><code>bru_options_set()</code>: used to set global package options.</p></li>
-<li><p><code>bru_options_reset()</code>: clears the global option overrides.</p></li>
+<li><p><code>bru_options_get()</code>: Used to access global package options.</p></li>
+<li><p><code>bru_options_set()</code>: Used to set global package options.</p></li>
+<li><p><code>bru_options_reset()</code>: Clears the global option overrides.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="valid-options">Valid options<a class="anchor" aria-label="anchor" href="#valid-options"></a></h2>
@@ -274,7 +274,7 @@ standard deviation is less than <code>rel_tol</code>. Default 0.1 (ten percent).
 <dd><p>The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.</p></dd>
 
-<dt>lin_opt_method</dt>
+<dt>line_opt_method</dt>
 <dd><p>Which method to use for the line search optimisation step.
 Default "onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.

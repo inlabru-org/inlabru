@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-07-05</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-07-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp.Rmd" class="external-link"><code>vignettes/web/2d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp.Rmd</code></div>
@@ -271,10 +271,10 @@ integration <code>weight</code> values are contained in the
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean      sd   q0.025    q0.5   q0.975  median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 667.4362 28.6317 606.4939 668.681 725.3639 668.681         2.86317</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 666.2001 30.17785 614.4301 663.8311 723.4934 663.8311        3.017785</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.190175</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1.803892</span></span></code></pre></div>
 <p>Given some generous interval boundaries (500, 800) for lambda we can
 estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -290,11 +290,11 @@ estimate the posterior abundance distribution via</p>
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 599.1816 671.4006 740.6091</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 597.9371 663.6610 740.2730</span></span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 670.9877</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 665.1966</span></span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>

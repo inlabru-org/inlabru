@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,49 +86,75 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_log_reset</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_log_get</span><span class="op">(</span><span class="va">...</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">bru_log_get</span><span class="op">(</span><span class="va">...</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for iinla</span></span>
-<span><span class="fu">bru_log_get</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru</span></span>
-<span><span class="fu">bru_log_get</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, pretty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_log</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_log_message</span><span class="op">(</span></span>
-<span>  <span class="va">...</span>,</span>
-<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  appendLF <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  verbosity <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  allow_verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  verbose_store <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre><code>bru_log_reset(bookmark = NULL, offset = NULL)
+
+bru_logify(x = NULL, offset = 0L)
+
+bru_log_bookmark(bookmark = "", offset = NULL)
+
+bru_log_bookmarks()
+
+bru_log_offset(bookmark = NULL, offset = NULL, log_length = NULL)
+
+bru_log_get(..., offset = 0L)
+
+# S3 method for default
+bru_log_get(..., bookmark = NULL, offset = 0L)
+
+# S3 method for iinla
+bru_log_get(x, ..., offset = 0L)
+
+# S3 method for bru
+bru_log_get(x, ..., offset = 0L)
+
+# S3 method for bru_log
+print(x, ...)
+
+# S3 method for bru_log
+[(x, i)
+
+# S3 method for bru_log
+c(...)
+
+bru_log_message(
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1,
+  allow_verbose = TRUE,
+  verbose = NULL,
+  verbose_store = NULL
+)</code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>...</dt>
-<dd><p>Zero or more objects passed on to <code><a href="https://rdrr.io/r/base/message.html" class="external-link">base::.makeMessage()</a></code></p></dd>
+    <dl><dt>bookmark</dt>
+<dd><p>character; The label for a bookmark with a stored offset.</p></dd>
 
 
-<dt>pretty</dt>
-<dd><p>logical; If <code>TRUE</code>, return a single string with the log
-messages separated and terminated by line feeds, suitable for <code>cat(...)</code>.
-If <code>FALSE</code>, return the raw log as a vector of strings, suitable for
-<code>cat(..., sep = "\n")</code>. For ordinary printing, the <code>print.bru_log</code> method
-handles this by itself. Default: <code>FALSE</code></p></dd>
+<dt>offset</dt>
+<dd><p>integer; a position offset in the log, with <code>0L</code> pointing at
+the start of the log. If negative, denotes the point <code>abs(offset)</code> elements
+from tail of the log.</p></dd>
 
 
 <dt>x</dt>
-<dd><p>For <code>bru_log_get</code>, a <code>bru</code> or <code>iinla</code> object from <code><a href="bru.html">bru()</a></code>.</p></dd>
+<dd><p>For <code>bru_log_get()</code>, a <code>bru</code> or <code>iinla</code> object from <code><a href="bru.html">bru()</a></code>.</p></dd>
+
+
+<dt>log_length</dt>
+<dd><p>integer; the length of the log being operated on.
+If <code>NULL</code> (default) the global inlabru log length is used.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>For <code>bru_log_message()</code>, zero or more objects passed on to
+<code><a href="https://rdrr.io/r/base/message.html" class="external-link">base::.makeMessage()</a></code></p></dd>
+
+
+<dt>i</dt>
+<dd><p>indices specifying elements to extract</p></dd>
 
 
 <dt>domain</dt>
@@ -168,12 +194,13 @@ with <code><a href="bru_options.html">bru_options_set()</a></code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>bru_log_get</code> A character vector of log messages. If <code>pretty</code> is <code>TRUE</code>,
-the messages are collapsed into a single string with <code>\n</code> separating the messages.
-An additional class identifier <code>bru_log</code> is added, to allow a dedicated <code>print</code></p>
+<p><code>bru_log_bookmark</code> The offset of the added bookmark.</p>
 
 
-<p>method.</p>
+<p><code>bru_log_get</code> A character vector of log messages, suitable for
+<code>cat(..., sep = "\n")</code>. For ordinary printing, the <code>print.bru_log</code> method
+handles this by itself. An additional class identifier <code>bru_log</code> is added,
+to allow a dedicated <code>print</code> method to be found.</p>
 
 
 <p><code>bru_log_message</code> returns <code><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible()</a></code></p>
@@ -183,9 +210,16 @@ An additional class identifier <code>bru_log</code> is added, to allow a dedicat
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>bru_log_reset()</code>: clears the <code>inlabru</code> log contents.</p></li>
+<ul><li><p><code>bru_log_reset()</code>: Clears the <code>inlabru</code> log contents up to
+a given <code>offset</code> or <code>bookmark</code>. Default: clear the entire log</p></li>
+<li><p><code>bru_logify()</code>: Create or subset from a <code>bru_log</code> object.</p></li>
+<li><p><code>bru_log_bookmark()</code>: Set a log bookmark. If <code>offset</code> is <code>NULL</code> (the default),
+the bookmark will point to the current end of the log.</p></li>
+<li><p><code>bru_log_bookmarks()</code>: Return the list of log bookmarks with associated log
+position offsets.</p></li>
+<li><p><code>bru_log_offset()</code>: Utility function for computing log position offsets.</p></li>
 <li><p><code>bru_log_get()</code>: Extract stored log messages</p></li>
-<li><p><code>bru_log_message()</code>: adds a log message.</p></li>
+<li><p><code>bru_log_message()</code>: Adds a log message.</p></li>
 </ul></div>
 
     <div class="section level2">
