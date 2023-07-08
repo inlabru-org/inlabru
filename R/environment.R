@@ -59,7 +59,7 @@ bru_log_reset <- function(bookmark = NULL, offset = NULL) {
   log_length <- length(envir[["log"]])
   if (offset >= log_length) {
     envir[["log"]] <- bru_logify()
-    envir[["log_bookmarks"]] <- list()
+    envir[["log_bookmarks"]] <- integer(0L)
     return(invisible(NULL))
   }
   if (offset == 0L) {
@@ -67,11 +67,12 @@ bru_log_reset <- function(bookmark = NULL, offset = NULL) {
   }
   log_bookmarks <- envir[["log_bookmarks"]]
   envir[["log"]] <- envir[["log"]][-seq_len(offset)]
-  envir[["log_bookmarks"]] <- list()
+  envir[["log_bookmarks"]] <- integer(0L)
   for (book in seq_along(log_bookmarks)) {
     if (log_bookmarks[[book]] >= offset) {
-      bru_log_bookmark(names(log_bookmarks)[book],
-                       offset = log_bookmarks[[book]] - offset)
+      bru_log_bookmark(names(log_bookmarks[book]),
+        offset = log_bookmarks[[book]] - offset
+      )
     }
   }
   return(invisible(NULL))
@@ -80,20 +81,48 @@ bru_log_reset <- function(bookmark = NULL, offset = NULL) {
 
 #' @export
 #' @describeIn bru_log Create or subset from a `bru_log` object.
-bru_logify <- function(x = NULL, offset = 0L) {
-  if (is.null(x)) {
-    x <- character(0)
-  } else {
-    log_length <- length(x)
-    offset <- bru_log_offset(offset = offset, log_length = log_length)
-    if (offset >= log_length) {
-      x <- character(0)
-    } else if (offset > 0L) {
-      x <- x[-seq_len(offset)]
-    }
+bru_logify <- function(x = NULL, ...) {
+  UseMethod("bru_logify")
+}
+
+#' @export
+#' @describeIn bru_log Create an empty `bru_log` object.
+bru_logify.default <- function(x = NULL, ...) {
+  if (!is.null(x)) {
+    stop(paste0(
+      "No method avaiablable for converting class '",
+      paste0(class(x), collapse = ", "),
+      "' to 'bru_log'"
+    ))
   }
+  x <- character(0)
+  class(x) <- c("bru_log", "character")
+  x
+}
+
+#' @export
+#' @describeIn bru_log Convert a character vector into a `bru_log` object,
+#' and optionally extract a subset.
+bru_logify.character <- function(x, offset = 0L, ...) {
   if (!inherits(x, "bru_log")) {
     class(x) <- c("bru_log", class(x))
+  }
+  if (!identical(offset, 0L)) {
+    return(bru_logify(x, offset = offset, ...))
+  }
+  x
+}
+
+#' @export
+#' @describeIn bru_log Subset from a `bru_log` object.
+bru_logify.bru_log <- function(x, offset = 0L, ...) {
+  log_length <- length(x)
+  offset <- bru_log_offset(offset = offset, log_length = log_length)
+  if (offset >= log_length) {
+    return(bru_logify())
+  }
+  if (offset > 0L) {
+    x <- x[-seq_len(offset)]
   }
   x
 }
@@ -102,7 +131,7 @@ bru_logify <- function(x = NULL, offset = 0L) {
 #' @param offset integer; a position offset in the log, with `0L` pointing at
 #' the start of the log. If negative, denotes the point `abs(offset)` elements
 #' from tail of the log.
-#' @return `bru_log_bookmark` The offset of the added bookmark.
+#' @return `bru_log_bookmark` Return the offset of the added bookmark, invisibly.
 #' @export
 #' @describeIn bru_log Set a log bookmark. If `offset` is `NULL` (the default),
 #' the bookmark will point to the current end of the log.
@@ -114,12 +143,13 @@ bru_log_bookmark <- function(bookmark = "", offset = NULL) {
   envir <- bru_env_get()
   envir[["log_bookmarks"]] <- c(
     envir[["log_bookmarks"]],
-    {bm <- list(offset); names(bm) <- bookmark; bm}
+    structure(offset, names = bookmark)
   )
-  offset
+  invisible(offset)
 }
 #' @export
-#' @describeIn bru_log Return the list of log bookmarks with associated log
+#' @describeIn bru_log Return a integer vector with named elements being
+#' bookmarks into the global `inlabru` log with associated log
 #' position offsets.
 bru_log_bookmarks <- function() {
   bru_env_get()[["log_bookmarks"]]
@@ -187,15 +217,16 @@ bru_log_get.bru <- function(x, ..., offset = 0L) {
   bru_logify(x[["bru_iinla"]][["log"]], offset = offset)
 }
 
-#' @rdname bru_log
+#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`
 #' @export
 print.bru_log <- function(x, ...) {
   cat(x, sep = "\n")
+  invisible(x)
 }
 
 #' @export
 #' @param i indices specifying elements to extract
-#' @rdname bru_log
+#' @describeIn bru_log Extract elements of a `bru_log` object
 `[.bru_log` <- function(x, i) {
   cl <- class(x)
   object <- NextMethod()
@@ -204,7 +235,8 @@ print.bru_log <- function(x, ...) {
 }
 
 #' @export
-#' @rdname bru_log
+#' @describeIn bru_log Concatenate several `bru_log` or `character` objects
+#' into a `bru_log` object.
 `c.bru_log` <- function(...) {
   stopifnot(all(vapply(
     list(...),
@@ -241,14 +273,16 @@ print.bru_log <- function(x, ...) {
 #' if (interactive()) {
 #'   code_runner <- function() {
 #'     local_bru_options_set(
-#'       # Show messages up to and including level 3 (default 0)
-#'       bru_verbose = 3,
-#'       # Store messages to an including level 2 (default Inf, storing all)
-#'       bru_options_set(bru_verbose_store = 2)
+#'       # Show messages up to and including level 2 (default 0)
+#'       bru_verbose = 2,
+#'       # Store messages to an including level 3 (default Inf, storing all)
+#'       bru_verbose_store = 3
 #'     )
 #'
+#'     bru_log_bookmark("bookmark 1")
 #'     bru_log_message("Test message 1", verbosity = 1)
 #'     bru_log_message("Test message 2", verbosity = 2)
+#'     bru_log_bookmark("bookmark 2")
 #'     bru_log_message("Test message 3", verbosity = 3)
 #'     bru_log_message("Test message 4", verbosity = 4)
 #'
@@ -256,8 +290,10 @@ print.bru_log <- function(x, ...) {
 #'   }
 #'   message("Run code")
 #'   code_runner()
-#'   message("Check log")
-#'   print(bru_log_get())
+#'   message("Check log from bookmark 1")
+#'   print(bru_log_get(bookmark = "bookmark 1"))
+#'   message("Check log from bookmark 2")
+#'   print(bru_log_get(bookmark = "bookmark 2"))
 #' }
 #' @export
 
