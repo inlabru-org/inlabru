@@ -714,6 +714,7 @@ fm_crs_oblique <- function(x) {
 print.fm_crs <- function(x, ...) {
   print(x[["crs"]])
   cat(paste0("Oblique: c(", paste0(x[["oblique"]], collapse = ", "), ")\n"))
+  invisible(x)
 }
 
 
