@@ -88,7 +88,16 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre><code>bru_log_reset(bookmark = NULL, offset = NULL)
 
-bru_logify(x = NULL, offset = 0L)
+bru_logify(x = NULL, ...)
+
+# S3 method for default
+bru_logify(x = NULL, ...)
+
+# S3 method for character
+bru_logify(x, offset = 0L, ...)
+
+# S3 method for bru_log
+bru_logify(x, offset = 0L, ...)
 
 bru_log_bookmark(bookmark = "", offset = NULL)
 
@@ -143,14 +152,14 @@ from tail of the log.</p></dd>
 <dd><p>For <code>bru_log_get()</code>, a <code>bru</code> or <code>iinla</code> object from <code><a href="bru.html">bru()</a></code>.</p></dd>
 
 
-<dt>log_length</dt>
-<dd><p>integer; the length of the log being operated on.
-If <code>NULL</code> (default) the global inlabru log length is used.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>For <code>bru_log_message()</code>, zero or more objects passed on to
 <code><a href="https://rdrr.io/r/base/message.html" class="external-link">base::.makeMessage()</a></code></p></dd>
+
+
+<dt>log_length</dt>
+<dd><p>integer; the length of the log being operated on.
+If <code>NULL</code> (default) the global inlabru log length is used.</p></dd>
 
 
 <dt>i</dt>
@@ -194,7 +203,7 @@ with <code><a href="bru_options.html">bru_options_set()</a></code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>bru_log_bookmark</code> The offset of the added bookmark.</p>
+<p><code>bru_log_bookmark</code> Return the offset of the added bookmark, invisibly.</p>
 
 
 <p><code>bru_log_get</code> A character vector of log messages, suitable for
@@ -208,14 +217,27 @@ to allow a dedicated <code>print</code> method to be found.</p>
 
     </div>
     <div class="section level2">
+    <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
+    
+<ul><li><p><code>bru_logify(bru_log)</code>: Subset from a <code>bru_log</code> object.</p></li>
+<li><p><code>print(bru_log)</code>: Print a <code>bru_log</code> object with <code>cat(x, sep = "\n")</code></p></li>
+<li><p><code>[</code>: Extract elements of a <code>bru_log</code> object</p></li>
+<li><p><code>c(bru_log)</code>: Concatenate several <code>bru_log</code> or <code>character</code> objects
+into a <code>bru_log</code> object.</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
 <ul><li><p><code>bru_log_reset()</code>: Clears the <code>inlabru</code> log contents up to
 a given <code>offset</code> or <code>bookmark</code>. Default: clear the entire log</p></li>
 <li><p><code>bru_logify()</code>: Create or subset from a <code>bru_log</code> object.</p></li>
+<li><p><code>bru_logify(default)</code>: Create an empty <code>bru_log</code> object.</p></li>
+<li><p><code>bru_logify(character)</code>: Convert a character vector into a <code>bru_log</code> object,
+and optionally extract a subset.</p></li>
 <li><p><code>bru_log_bookmark()</code>: Set a log bookmark. If <code>offset</code> is <code>NULL</code> (the default),
 the bookmark will point to the current end of the log.</p></li>
-<li><p><code>bru_log_bookmarks()</code>: Return the list of log bookmarks with associated log
+<li><p><code>bru_log_bookmarks()</code>: Return a integer vector with named elements being
+bookmarks into the global <code>inlabru</code> log with associated log
 position offsets.</p></li>
 <li><p><code>bru_log_offset()</code>: Utility function for computing log position offsets.</p></li>
 <li><p><code>bru_log_get()</code>: Extract stored log messages</p></li>
@@ -232,14 +254,16 @@ position offsets.</p></li>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">code_runner</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="local_testthat.html">local_bru_options_set</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="co"># Show messages up to and including level 3 (default 0)</span></span></span>
-<span class="r-in"><span>      bru_verbose <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>      <span class="co"># Store messages to an including level 2 (default Inf, storing all)</span></span></span>
-<span class="r-in"><span>      <span class="fu"><a href="bru_options.html">bru_options_set</a></span><span class="op">(</span>bru_verbose_store <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="co"># Show messages up to and including level 2 (default 0)</span></span></span>
+<span class="r-in"><span>      bru_verbose <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>      <span class="co"># Store messages to an including level 3 (default Inf, storing all)</span></span></span>
+<span class="r-in"><span>      bru_verbose_store <span class="op">=</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="fu">bru_log_bookmark</span><span class="op">(</span><span class="st">"bookmark 1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">bru_log_message</span><span class="op">(</span><span class="st">"Test message 1"</span>, verbosity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">bru_log_message</span><span class="op">(</span><span class="st">"Test message 2"</span>, verbosity <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">bru_log_bookmark</span><span class="op">(</span><span class="st">"bookmark 2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">bru_log_message</span><span class="op">(</span><span class="st">"Test message 3"</span>, verbosity <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">bru_log_message</span><span class="op">(</span><span class="st">"Test message 4"</span>, verbosity <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -247,8 +271,10 @@ position offsets.</p></li>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Run code"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">code_runner</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Check log"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">bru_log_get</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Check log from bookmark 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">bru_log_get</span><span class="op">(</span>bookmark <span class="op">=</span> <span class="st">"bookmark 1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Check log from bookmark 2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">bru_log_get</span><span class="op">(</span>bookmark <span class="op">=</span> <span class="st">"bookmark 2"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
