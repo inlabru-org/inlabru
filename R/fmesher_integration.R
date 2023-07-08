@@ -1133,6 +1133,7 @@ fm_int_inla_mesh.sfc_MULTILINESTRING <- function(samplers,
 #'   integration points for the mesh
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
+#' @export
 fm_int_inla_mesh_core <- function(mesh, tri_subset = NULL, nsub = NULL) {
   # Construct a barycentric grid of subdivision triangle midpoints
   if (is.null(nsub)) {
