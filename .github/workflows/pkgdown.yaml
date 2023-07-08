@@ -44,7 +44,6 @@ jobs:
             local::.
             any::RColorBrewer
             any::ggplot2
-            any::maptools
             any::dplyr
             any::lwgeom
             any::tmaptools

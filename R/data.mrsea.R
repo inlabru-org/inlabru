@@ -3,8 +3,6 @@
 #' @docType data
 #' @description Data imported from package MRSea, see <https://www.creem.st-andrews.ac.uk/software/>
 #'
-#' @usage data(mrsea)
-#'
 #' @format A list of objects:
 #'  \describe{
 #'    \item{`points`:}{ A `SpatialPointsDataFrame` object containing the locations of
@@ -28,14 +26,13 @@
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(ggpolypath, quietly = TRUE)) {
-#'   data(mrsea)
 #'   ggplot() +
 #'     gg(mrsea$mesh) +
 #'     gg(mrsea$samplers) +
 #'     gg(mrsea$points) +
 #'     gg(mrsea$boundary)
 #' }
-NULL
+"mrsea"
 
 #' MRSea data import
 #'

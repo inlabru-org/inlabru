@@ -20,8 +20,7 @@
 #'
 #'
 #' @example inst/examples/data.toygroups.R
-
-NULL
+"toygroups"
 
 
 save.toygroups <- function() {

@@ -83,7 +83,7 @@ We start by plotting the distances and histogram of frequencies in distance inte
 W <- 8
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance),
-    breaks = seq(0, W, length = 9),
+    breaks = seq(0, W, length.out = 9),
     boundary = 0, fill = NA, color = "black"
   ) +
   geom_point(aes(x = distance), y = 0, pch = "|", cex = 4)
@@ -183,7 +183,7 @@ From version `2.8.0`, inlabru attmepts to automatically detect which components
 are used by the predictor expression, and the `include` argument can usually be left out.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
-distdf <- data.frame(distance = seq(0, 8, length = 100))
+distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, lsig))
 plot(dfun)
 ```
@@ -279,7 +279,7 @@ ggplot() +
   guides(fill = FALSE) +
   coord_equal()
 
-distdf <- data.frame(distance = seq(0, 8, length = 100))
+distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
@@ -324,7 +324,7 @@ Look at the goodness-of-fit of the two models in the distance dimension
 bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
-  breaks = seq(0, max(mexdolphin$points$distance), length = 9),
+  breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
   predictor = distance ~ hn(distance, lsig)
 )
 attributes(bc)$ggp
@@ -332,7 +332,7 @@ attributes(bc)$ggp
 bc1 <- bincount(
   result = fit1,
   observations = mexdolphin$points$distance,
-  breaks = seq(0, max(mexdolphin$points$distance), length = 9),
+  breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
   predictor = distance ~ hn(distance, lsig)
 )
 attributes(bc1)$ggp
@@ -415,7 +415,7 @@ Plot without the 95% credible intervals
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
-  geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +
+  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model))
 ```
@@ -423,7 +423,7 @@ ggplot(data.frame(mexdolphin$points)) +
 Plot with the 95% credible intervals (without taking the count rescaling into account)
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
-  geom_histogram(aes(x = distance), breaks = seq(0, 8, length = 9), alpha = 0.3) +
+  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
   geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
   geom_ribbon(

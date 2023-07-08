@@ -9,12 +9,15 @@ is.inside(mesh, loc, mesh.coords = NULL)
 \arguments{
 \item{mesh}{an inla.mesh object.}
 
-\item{loc}{Points in space stored either as data.frame, a two-column matrix of x and y coordinates or a SpatialPoints object.}
+\item{loc}{Points in space stored either as data.frame, a two-column matrix
+of x and y coordinates or a SpatialPoints object.}
 
-\item{mesh.coords}{Coordinate names of the mesh. Use only if loc is a data.frame with respective column names.}
+\item{mesh.coords}{Coordinate names of the mesh. Use only if loc is a
+data.frame with respective column names.}
 }
 \value{
-Single column matrix of Boolean values indicating if a point is inside the mesh.
+Single column matrix of Boolean values indicating if a point is
+inside the mesh.
 }
 \description{
 Query if a point is inside the mesh boundary

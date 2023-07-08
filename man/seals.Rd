@@ -37,3 +37,4 @@ ICES Journal of Marine Science, doi.10.1093/icesjms/fst155.
 Oigard, T. A. (2014) Current status of hooded seals in the Greenland Sea. Victims of climate change and predation?,
 Biological Conservation , 2014, 172, 29 - 36.
 }
+\keyword{datasets}

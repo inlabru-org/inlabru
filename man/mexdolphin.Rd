@@ -25,7 +25,7 @@ size information.}
 Library \code{dsm}.
 }
 \usage{
-data(mexdolphin)
+mexdolphin
 }
 \description{
 This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
@@ -78,3 +78,4 @@ NOAA Southeast Fisheries Science Center. 1996. Report of a Cetacean Survey of Oc
 Selected Continental Shelf Waters of the Northern Gulf of Mexico aboard NOAA Ship Oregon II
 (Cruise 220)
 }
+\keyword{datasets}

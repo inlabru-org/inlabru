@@ -35,7 +35,6 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
-bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -45,29 +44,28 @@ the `R` package `spatstat`, which contains the locations of 647 gorilla nests. W
 dataset like this:
 
 ```{r }
-data(gorillas, package = "inlabru")
+data(gorillas_sf, package = "inlabru")
 ```
 
 This dataset is a list containing a number of `R` objects, including the locations of the 
 nests, the boundary of the survey area and an `INLA` mesh - see `help(gorillas)` for 
 details. Extract the the objects we need from the list, into other objects, so that we 
-don't have to keep typing '`gorillas$`':
+don't have to keep typing '`gorillas_sf$`', and optionally load the covariates from disk:
 
 ```{r }
-nests <- gorillas$nests
-mesh <- gorillas$mesh
-boundary <- gorillas$boundary
+nests <- gorillas_sf$nests
+mesh <- gorillas_sf$mesh
+boundary <- gorillas_sf$boundary
+gcov <- gorillas_sf_gcov()
 ```
 
-Plot the points (the nests). (The `ggplot2` function `coord_fixed()` sets the aspect ratio, 
-which defaults to 1.)
+Plot the points (the nests).
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
   gg(mesh) +
-  gg(nests) +
-  gg(boundary) +
-  coord_fixed() +
+  geom_sf(data = boundary, alpha = 0.1, fill = "blue") +
+  geom_sf(data = nests) +
   ggtitle("Points")
 ```
 
@@ -79,18 +77,18 @@ Fit an LGCP model to the locations of the gorilla nests, predict on the survey r
 and produce a plot of the estimated density - which should look like the 
 plot shown below.
 
-Recall that the steps to specifying, fitting and predicting are:
+The steps to specifying, fitting and predicting are:
 
-1. Specify a model, comprising (for 2D models) `coordinates` on the left of `~` and 
+1. Specify a model, comprising (for 2D models) `geometry` on the left of `~` and 
 an SPDE `+ Intercept(1)` on the right. Please use the SPDE prior specification stated below.
 
-2. Call `lgcp( )`, passing it (with 2D models) the model components, the `SpatialPointsDataFrame` 
-containing the observed points and the `SpatialPolygonsDataFrame` defining the survey boundary
+2. Call `lgcp( )`, passing it (with 2D models) the model components, the `sf` 
+containing the observed points and the `sf` defining the survey boundary
 using the `samplers` argument.
 
 3. Call `predict( )`, passing it the fitted model from 2., locations at which to predict and
 an appropriate predictor specification. The locations at which to predict can be a 
-`SpatialPixelsDataFrame` covering the mesh, obtained by calling `fm_pixels(mesh, format = "sp")`.
+`sf` covering the mesh, obtained by calling `fm_pixels(mesh, format = "sf")`.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
@@ -100,11 +98,16 @@ matern <- inla.spde2.pcmatern(
   prior.range = c(5, 0.01)
 )
 
-cmp <- coordinates ~
-  mySmooth(coordinates, model = matern) +
+cmp <- geometry ~
+  mySmooth(geometry, model = matern) +
   Intercept(1)
 
-fit <- lgcp(cmp, nests, samplers = boundary, domain = list(coordinates = mesh))
+fit <- lgcp(
+  cmp,
+  data = nests,
+  samplers = boundary,
+  domain = list(geometry = mesh)
+)
 ```
 
 Predicting intensity
@@ -116,24 +119,28 @@ is in an object called `lambda`):
 ```{r results="hide",warning=FALSE,message=FALSE, fig.height=4,fig.width=9}
 pred <- predict(
   fit,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ data.frame(
     lambda = exp(mySmooth + Intercept),
     loglambda = mySmooth + Intercept
   )
 )
+pred$lambda <- terra::rast(
+  as(sf::as_Spatial(pred$lambda), "SpatialPixelsDataFrame"),
+)
+pred$loglambda <- terra::rast(
+  as(sf::as_Spatial(pred$loglambda), "SpatialPixelsDataFrame")
+)
 
 pl1 <- ggplot() +
-  gg(pred$lambda) +
-  gg(boundary) +
-  ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") +
-  coord_fixed()
+  gg(pred$lambda, aes(fill = mean)) +
+  geom_sf(data = boundary, alpha = 0.1) +
+  ggtitle("LGCP fit to Points", subtitle = "(Response Scale)")
 
 pl2 <- ggplot() +
-  gg(pred$loglambda) +
-  gg(boundary) +
-  ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") +
-  coord_fixed()
+  gg(pred$loglambda, aes(fill = mean)) +
+  geom_sf(data = boundary, alpha = 0.1) +
+  ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)")
 
 multiplot(pl1, pl2, cols = 2)
 ```
@@ -143,11 +150,8 @@ that the predicted intensity is in object `lambda`).
 
 ```{r warning=FALSE,message=FALSE,fig.width=9,fig.height=4}
 ggplot() +
-  gg(cbind(pred$lambda, data.frame(property = "q0.500")), aes(fill = median)) +
-  gg(cbind(pred$lambda, data.frame(property = "q0.025")), aes(fill = q0.025)) +
-  gg(cbind(pred$lambda, data.frame(property = "q0.975")), aes(fill = q0.975)) +
-  coord_equal() +
-  facet_wrap(~property)
+  gg(pred$lambda[[c("q0.025", "q0.5", "q0.975")]]) +
+  facet_wrap(~lyr)
 ```
 
 
@@ -195,7 +199,8 @@ Lambda
 Given some generous interval boundaries (500, 800) for lambda we can estimate the posterior abundance distribution via
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
 Nest <- predict(
-  fit, fm_int(mesh, boundary),
+  fit,
+  fm_int(mesh, boundary),
   ~ data.frame(
     N = 500:800,
     dpois(500:800,

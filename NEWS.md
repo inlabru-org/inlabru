@@ -1,14 +1,35 @@
 # inlabru (development version)
 
+## Feature updates
+
+* Add experimental support for `stars` via `eval_spatial()`.
+  (version `2.8.0.9007`)
+  
+* Now preserves the previous log output when using `bru_rerun()`,
+  and `bru_log_get()` is now a set of S3 methods, supporting extracting the
+  full inlabru log as well `bru`-object specific logs (version `2.8.0.9008`)
+
 ## Bug and dependency updates
 
 * Covariate object component inputs of type `SpatialPolygonsDataFrame`
   were not automatically passed on to `eval_spatial()`. The logic has now changed
   so that any object with a `eval_spatial()` method will trigger a call to
   `eval_spatial()`. See `?input_eval` for further information.
+  (version `2.8.0.9001`)
 
 * `fm_crs_is_null()`, `fm_transform()` now supports oblique `fm_crs` CRS objects,
   and `is.na()` methods for the `fm_crs` and `inla.CRS` classes have been added.
+  (version `2.8.0.9003`)
+  
+* Significant speed up `predict()` by using `quantile(..., names = FALSE)`.
+  (version `2.8.0.9004`)
+  
+* Improved `row_kron()` code, causing speedups of a factor 2-30 in randomised
+  test cases. (version `2.8.0.9005`)
+
+* Removed incorrect code for `sf` method for `eval_spatial()`, causing failure
+  when extracting from multiple layers in a single call.
+  (version `2.9.0.9007`)
 
 # inlabru 2.8.0
 

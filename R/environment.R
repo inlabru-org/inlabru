@@ -37,42 +37,220 @@ bru_env_get <- function() {
 # inlabru log methods ----
 
 #' @title inlabru log message methods
-#' @description Resets the inlabru log object
-#' @details `bru_log_reset()` clears the log contents.
+#' @description Log message methods
+#' @name bru_log
+#' @rdname bru_log
+NULL
+
+#' @describeIn bru_log Clears the `inlabru` log contents up to
+#' a given `offset` or `bookmark`. Default: clear the entire log
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'   # EXAMPLE1
+#'   bru_log_reset()
 #' }
 #' }
 #' @export
-#' @rdname bru_log
 
-bru_log_reset <- function() {
+bru_log_reset <- function(bookmark = NULL, offset = NULL) {
+  offset <- bru_log_offset(bookmark = bookmark, offset = offset)
+  # Clear log up to the given offset
   envir <- bru_env_get()
-  envir$log <- character(0)
-  invisible(NULL)
-}
-
-
-#' @param pretty logical; If `TRUE`, return a single string with the log
-#' messages separated and terminated by line feeds, suitable for `cat(...)`.
-#' If `FALSE`, return the raw log as a vector of strings, suitable for
-#' `cat(..., sep = "\n")`. Default: `FALSE`
-#' @return `bru_log_get` RETURN_VALUE
-#' @export
-#' @rdname bru_log
-
-bru_log_get <- function(pretty = FALSE) {
-  if (pretty) {
-    paste0(paste0(bru_env_get()[["log"]], collapse = "\n"), "\n")
-  } else {
-    bru_env_get()[["log"]]
+  log_length <- length(envir[["log"]])
+  if (offset >= log_length) {
+    envir[["log"]] <- bru_logify()
+    envir[["log_bookmarks"]] <- integer(0L)
+    return(invisible(NULL))
   }
+  if (offset == 0L) {
+    return(invisible(NULL))
+  }
+  log_bookmarks <- envir[["log_bookmarks"]]
+  envir[["log"]] <- envir[["log"]][-seq_len(offset)]
+  envir[["log_bookmarks"]] <- integer(0L)
+  for (book in seq_along(log_bookmarks)) {
+    if (log_bookmarks[[book]] >= offset) {
+      bru_log_bookmark(names(log_bookmarks[book]),
+        offset = log_bookmarks[[book]] - offset
+      )
+    }
+  }
+  return(invisible(NULL))
 }
 
 
-#' @param ... Zero or more objects passed on to [`base::.makeMessage()`]
+#' @export
+#' @describeIn bru_log Create or subset from a `bru_log` object.
+bru_logify <- function(x = NULL, ...) {
+  UseMethod("bru_logify")
+}
+
+#' @export
+#' @describeIn bru_log Create an empty `bru_log` object.
+bru_logify.default <- function(x = NULL, ...) {
+  if (!is.null(x)) {
+    stop(paste0(
+      "No method avaiablable for converting class '",
+      paste0(class(x), collapse = ", "),
+      "' to 'bru_log'"
+    ))
+  }
+  x <- character(0)
+  class(x) <- c("bru_log", "character")
+  x
+}
+
+#' @export
+#' @describeIn bru_log Convert a character vector into a `bru_log` object,
+#' and optionally extract a subset.
+bru_logify.character <- function(x, offset = 0L, ...) {
+  if (!inherits(x, "bru_log")) {
+    class(x) <- c("bru_log", class(x))
+  }
+  if (!identical(offset, 0L)) {
+    return(bru_logify(x, offset = offset, ...))
+  }
+  x
+}
+
+#' @export
+#' @describeIn bru_log Subset from a `bru_log` object.
+bru_logify.bru_log <- function(x, offset = 0L, ...) {
+  log_length <- length(x)
+  offset <- bru_log_offset(offset = offset, log_length = log_length)
+  if (offset >= log_length) {
+    return(bru_logify())
+  }
+  if (offset > 0L) {
+    x <- x[-seq_len(offset)]
+  }
+  x
+}
+
+#' @param bookmark character; The label for a bookmark with a stored offset.
+#' @param offset integer; a position offset in the log, with `0L` pointing at
+#' the start of the log. If negative, denotes the point `abs(offset)` elements
+#' from tail of the log.
+#' @return `bru_log_bookmark` Return the offset of the added bookmark, invisibly.
+#' @export
+#' @describeIn bru_log Set a log bookmark. If `offset` is `NULL` (the default),
+#' the bookmark will point to the current end of the log.
+bru_log_bookmark <- function(bookmark = "", offset = NULL) {
+  if (length(bookmark) == 0) {
+    stop("Bookmark labels must have at least one character.")
+  }
+  offset <- bru_log_offset(bookmark = NULL, offset = offset)
+  envir <- bru_env_get()
+  envir[["log_bookmarks"]] <- c(
+    envir[["log_bookmarks"]],
+    structure(offset, names = bookmark)
+  )
+  invisible(offset)
+}
+#' @export
+#' @describeIn bru_log Return a integer vector with named elements being
+#' bookmarks into the global `inlabru` log with associated log
+#' position offsets.
+bru_log_bookmarks <- function() {
+  bru_env_get()[["log_bookmarks"]]
+}
+#' @export
+#' @param log_length integer; the length of the log being operated on.
+#' If `NULL` (default) the global inlabru log length is used.
+#' @describeIn bru_log Utility function for computing log position offsets.
+bru_log_offset <- function(bookmark = NULL, offset = NULL, log_length = NULL) {
+  if (is.null(bookmark)) {
+    if (is.null(log_length)) {
+      log_length <- length(bru_env_get()[["log"]])
+    }
+    if (is.null(offset) || (offset > log_length)) {
+      return(log_length)
+    }
+    if (offset < 0L) {
+      offset <- max(0L, log_length + offset)
+    }
+    return(offset)
+  }
+  marks <- bru_log_bookmarks()
+  if (length(marks) == 0) {
+    warning(paste0("No log bookmarks found when looking for '", bookmark, "'"))
+    return(0L)
+  }
+  if (bookmark == "") {
+    return(marks[[length(marks)]])
+  }
+  found <- names(marks) %in% bookmark
+  if (!any(found)) {
+    warning(paste0("Log bookmark '", bookmark, "' not found"))
+    return(0L)
+  }
+  offset <- marks[found]
+  offset[[length(offset)]]
+}
+
+#' @return `bru_log_get` A character vector of log messages, suitable for
+#' `cat(..., sep = "\n")`. For ordinary printing, the `print.bru_log` method
+#' handles this by itself. An additional class identifier `bru_log` is added,
+#' to allow a dedicated `print` method to be found.
+#' @export
+#' @describeIn bru_log Extract stored log messages
+bru_log_get <- function(..., offset = 0L) {
+  UseMethod("bru_log_get")
+}
+#' @rdname bru_log
+#' @export
+bru_log_get.default <- function(..., bookmark = NULL, offset = 0L) {
+  offset <- bru_log_offset(bookmark = bookmark, offset = offset)
+  bru_logify(bru_env_get()[["log"]], offset = offset)
+}
+
+#' @rdname bru_log
+#' @export
+#' @param x For `bru_log_get()`, a `bru` or `iinla` object from [bru()].
+bru_log_get.iinla <- function(x, ..., offset = 0L) {
+  bru_logify(x[["log"]], offset = offset)
+}
+
+#' @rdname bru_log
+#' @export
+bru_log_get.bru <- function(x, ..., offset = 0L) {
+  bru_logify(x[["bru_iinla"]][["log"]], offset = offset)
+}
+
+#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`
+#' @export
+print.bru_log <- function(x, ...) {
+  cat(x, sep = "\n")
+  invisible(x)
+}
+
+#' @export
+#' @param i indices specifying elements to extract
+#' @describeIn bru_log Extract elements of a `bru_log` object
+`[.bru_log` <- function(x, i) {
+  cl <- class(x)
+  object <- NextMethod()
+  class(object) <- cl
+  object
+}
+
+#' @export
+#' @describeIn bru_log Concatenate several `bru_log` or `character` objects
+#' into a `bru_log` object.
+`c.bru_log` <- function(...) {
+  stopifnot(all(vapply(
+    list(...),
+    function(x) inherits(x, "character"),
+    TRUE
+  )))
+  object <- NextMethod()
+  class(object) <- c("bru_log", "character")
+  object
+}
+
+
+#' @param ... For `bru_log_message()`, zero or more objects passed on to
+#' [`base::.makeMessage()`]
 #' @param domain Domain for translations, passed on to [`base::.makeMessage()`]
 #' @param appendLF logical; whether to add a newline to the message. Only
 #'   used for verbose output.
@@ -89,17 +267,35 @@ bru_log_get <- function(pretty = FALSE) {
 #' stored in the global log object. Can be controlled via the `bru_verbose_store`
 #' with [bru_options_set()].
 #' @return
-#' * `bru_log_message` OUTPUT_DESCRIPTION
-#' @details
-#' * `bru_log_message` DETAILS
+#' `bru_log_message` returns `invisible()`
+#' @describeIn bru_log Adds a log message.
 #' @examples
-#' \dontrun{
 #' if (interactive()) {
-#'   # EXAMPLE1
-#' }
+#'   code_runner <- function() {
+#'     local_bru_options_set(
+#'       # Show messages up to and including level 2 (default 0)
+#'       bru_verbose = 2,
+#'       # Store messages to an including level 3 (default Inf, storing all)
+#'       bru_verbose_store = 3
+#'     )
+#'
+#'     bru_log_bookmark("bookmark 1")
+#'     bru_log_message("Test message 1", verbosity = 1)
+#'     bru_log_message("Test message 2", verbosity = 2)
+#'     bru_log_bookmark("bookmark 2")
+#'     bru_log_message("Test message 3", verbosity = 3)
+#'     bru_log_message("Test message 4", verbosity = 4)
+#'
+#'     invisible()
+#'   }
+#'   message("Run code")
+#'   code_runner()
+#'   message("Check log from bookmark 1")
+#'   print(bru_log_get(bookmark = "bookmark 1"))
+#'   message("Check log from bookmark 2")
+#'   print(bru_log_get(bookmark = "bookmark 2"))
 #' }
 #' @export
-#' @rdname bru_log
 
 bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
                             verbosity = 1,
@@ -117,8 +313,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
     (is.null(verbose_store) &&
       bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     envir <- bru_env_get()
-    envir$log <- c(
-      envir$log,
+    envir[["log"]] <- c(
+      envir[["log"]],
       .makeMessage(Sys.time(), ": ", ...,
         domain = domain,
         appendLF = FALSE
@@ -141,7 +337,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   specific calls to [bru()] is recommended instead.
 #' @param ... A collection of named options, optionally including one or more
 #' [`bru_options`] objects. Options specified later override the previous options.
-#' @return `bru_options()` returns an `bru_options` object.
+#' @return `bru_options()` returns a `bru_options` object.
 #' @section Valid options:
 #' For `bru_options` and `bru_options_set`, recognised options are:
 #' \describe{
@@ -193,7 +389,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' standard deviation is less than `rel_tol`. Default 0.1 (ten percent).}
 #' \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 #' full INLA step. Default is 2.}
-#' \item{lin_opt_method}{Which method to use for the line search optimisation step.
+#' \item{line_opt_method}{Which method to use for the line search optimisation step.
 #' Default "onestep", using a quadratic approximation based on the value and
 #' gradient at zero, and the value at the current best step length guess.
 #' The method "full" does line optimisation on the full nonlinear predictor;
@@ -263,7 +459,7 @@ bru_options <- function(...) {
 #' an error.
 #'
 #' @export
-#' @rdname bru_options
+#' @describeIn bru_options Coerces inputs to a `bru_options` object.
 
 as.bru_options <- function(x = NULL) {
   if (inherits(x, "bru_options")) {
@@ -277,16 +473,10 @@ as.bru_options <- function(x = NULL) {
   }
 }
 
+#' @describeIn bru_options Returns the default options.
 #' @return `bru_options_default()` returns an `bru_options` object containing
 #'   default options.
-#' @examples
-#' \dontrun{
-#' if (interactive()) {
-#'   # EXAMPLE1
-#' }
-#' }
 #' @export
-#' @rdname bru_options
 
 bru_options_default <- function() {
   bru_options(
@@ -302,7 +492,7 @@ bru_options_default <- function() {
       factor = (1 + sqrt(5)) / 2,
       rel_tol = 0.1,
       max_step = 2,
-      lin_opt_method = "onestep"
+      line_opt_method = "onestep"
     ),
     bru_compress_cp = TRUE,
     bru_debug = FALSE,
@@ -426,13 +616,12 @@ bru_options_inla <- function(options) {
 
 
 
-#' @details `bru_options_check` checks for valid contents of an `bru_options`
-#' object
+#' @describeIn bru_options Checks for valid contents of a `bru_options`
+#' object, and produces warnings for invalid options.
 #' @param options An `bru_options` object to be checked
 #' @param ignore_null Ignore missing or NULL options.
 #' @return `bru_options_check()` returns a `logical`; `TRUE` if the object
 #'   contains valid options for use by other functions
-#' @details `bru_options_check()` produces warnings for invalid options.
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -440,7 +629,6 @@ bru_options_inla <- function(options) {
 #' }
 #' }
 #' @export
-#' @rdname bru_options
 
 bru_options_check <- function(options, ignore_null = TRUE) {
   options <- as.bru_options(options)
@@ -487,13 +675,9 @@ bru_options_check <- function(options, ignore_null = TRUE) {
 #'   name strings.
 #'
 #' @examples
-#' \dontrun{
-#' if (interactive()) {
-#'   # EXAMPLE1
-#' }
-#' }
+#' bru_options_get("bru_verbose")
 #' @export
-#' @rdname bru_options
+#' @describeIn bru_options Used to access global package options.
 
 bru_options_get <- function(name = NULL, include_default = TRUE) {
   if (include_default) {
@@ -514,7 +698,7 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 }
 
 
-#' @details `bru_options_set()` is used to set global package options.
+#' @describeIn bru_options Used to set global package options.
 #' @return `bru_options_set()` returns a copy of the global override options,
 #' invisibly (as `bru_options_get(include_default = FALSE)`).
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
@@ -531,7 +715,6 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' }
 #' }
 #' @export
-#' @rdname bru_options
 
 bru_options_set <- function(..., .reset = FALSE) {
   envir <- bru_env_get()
@@ -543,9 +726,8 @@ bru_options_set <- function(..., .reset = FALSE) {
   invisible(bru_options_get(include_default = FALSE))
 }
 
-#' @details `bru_options_reset()` clears the global option overrides.
+#' @describeIn bru_options Clears the global option overrides.
 #' @export
-#' @rdname bru_options
 
 bru_options_reset <- function() {
   envir <- bru_env_get()
@@ -691,65 +873,6 @@ print.summary_bru_options <- function(x, ...) {
 
 
 
-
-# Old log methods ----
-
-#' @title inlabru log messages
-#'
-#' @description Retrieve, add, and/or print log messages
-#'
-#' @param txt character; log message.
-#' @param verbose logical; if `TRUE`, print the log message on screen with
-#' `message(txt)`. Default: `bru_options_get("bru_verbose")`
-#' @details The log message is stored if the log is active, see
-#' [bru_log_active()]
-#' @return `bru_log` invisibly returns the added log message.
-#' @export
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and Finn Lindgren
-#' \email{finn.lindgren@@gmail.com}
-
-bru_log <- function(txt, verbose = NULL) {
-  if (is.null(verbose)) {
-    verbose <- bru_options_get("bru_verbose")
-  }
-  bru_log_message(txt, verbose = verbose)
-}
-
-
-#' @param activation logical; whether to activate (`TRUE`) or deactivate
-#' (`FALSE`) the inlabru logging system. Default: NULL, to keep the current
-#' activation state
-#' @return `bru_log_active` returns the previous activation state
-#' @export
-#' @examples
-#' code_runner <- function() {
-#'   oa <- bru_log_active(TRUE)
-#'   on.exit(bru_log_active(oa))
-#'   bru_log("Test message")
-#' }
-#' bru_log_active()
-#' code_runner()
-#' cat(bru_log_get())
-#' bru_log_active()
-#' @rdname bru_log
-
-bru_log_active <- function(activation = NULL) {
-  current <- bru_options_get("bru_verbose_store")
-  if (!is.null(activation)) {
-    bru_options_set("bru_verbose_store" = activation)
-  }
-  current
-}
-
-
-# Old options methods ----
-
-
-
-
-
-
 # Utils ----
 
 
@@ -760,38 +883,24 @@ bru_log_active <- function(activation = NULL) {
 #' options instead instead.  In versions <= 2.1.15, this function set the INLA
 #' integration strategy to "eb" to speed up calculations. This is normally not
 #' needed since version 2.2.0, since the only the final iteration will use
-#' other than "eb".
+#' other than "eb".  Therefore, to recreate the main options set by `init.tutorial()`,
+#' the following is sufficient:
+#' ```
+#' bru_options_set(
+#'   bru_verbose = TRUE,
+#'   control.compute = list(dic = TRUE, waic = TRUE)
+#' )
+#' ```
 #'
-#' @aliases init.tutorial
 #' @export
 #'
-#' @return NULL
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#'
-#' @examples
-#' \dontrun{
-#' # Note: Only run this if you want to change the inlabru options for this session
-#'
-#' # Determine current bru defaults:
-#' bo <- bru_options_get()
-#'
-#' init.tutorial()
-#'
-#' # Check if it worked:
-#' bru_options_get("control.inla")
-#' }
-#'
 init.tutorial <- function() {
   lifecycle::deprecate_stop(
     "2.5.0",
-    I("init.tutorial()"),
+    "init.tutorial()",
     I(
       "bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))"
     )
-  )
-  message("Setting defaults for tutorial session.")
-  local_bru_options_set(
-    bru_verbose = TRUE,
-    control.compute = list(dic = TRUE, waic = TRUE)
   )
 }

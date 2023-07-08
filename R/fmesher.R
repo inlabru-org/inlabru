@@ -63,6 +63,8 @@ fmesher::fm_int
 #' @export
 fmesher::fm_int_inla_mesh
 #' @export
+fmesher::fm_int_inla_mesh_core
+#' @export
 fmesher::fm_int_multi_sampler
 #' @export
 fmesher::fm_length_unit

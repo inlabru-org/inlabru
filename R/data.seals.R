@@ -29,7 +29,7 @@
 #'     gg(seals$mesh) +
 #'     gg(seals$points)
 #' }
-NULL
+"seals"
 
 #' Seal pup edata import
 #'
@@ -46,7 +46,8 @@ NULL
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
-import.seals <- function(sealfile = "WestIce2012.csv", icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {
+import.seals <- function(sealfile = "WestIce2012.csv",
+                         icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {
   #' Load seal data
 
   seals <- read.csv(sealfile)

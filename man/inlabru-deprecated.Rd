@@ -67,7 +67,14 @@ Use \code{\link[=bru_options_set]{bru_options_set()}} to set specific
 options instead instead.  In versions <= 2.1.15, this function set the INLA
 integration strategy to "eb" to speed up calculations. This is normally not
 needed since version 2.2.0, since the only the final iteration will use
-other than "eb".
+other than "eb".  Therefore, to recreate the main options set by \code{init.tutorial()},
+the following is sufficient:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bru_options_set(
+  bru_verbose = TRUE,
+  control.compute = list(dic = TRUE, waic = TRUE)
+)
+}\if{html}{\out{</div>}}
 
 \item \code{predict(inla)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} since version \verb{2.1.0}.
 Prediction from fitted inla model. This method is not supported for plain
@@ -101,20 +108,6 @@ Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}}
 \item \code{eval_SpatialDF()}: Replaced by the generic \code{\link[=eval_spatial]{eval_spatial()}}
 
 }}
-\examples{
-\dontrun{
-# Note: Only run this if you want to change the inlabru options for this session
-
-# Determine current bru defaults:
-bo <- bru_options_get()
-
-init.tutorial()
-
-# Check if it worked:
-bru_options_get("control.inla")
-}
-
-}
 \seealso{
 \code{\link[=predict.bru]{predict.bru()}}
 

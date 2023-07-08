@@ -5,6 +5,16 @@ test_that("Component construction: linear model", {
 
   # Using label as input:
   cmp0 <- component_list(
+    list(component("x", x)),
+    lhoods = llik
+  )[["x"]]
+
+  expect_equal(cmp0$label, "x")
+  expect_equal(cmp0$main$model, "linear")
+  expect_equal(as.character(cmp0$main$input$input), "x")
+
+  # Using label as input:
+  cmp0 <- component_list(
     ~x,
     lhoods = llik
   )[["x"]]

@@ -22,7 +22,7 @@ survey region.}
 Library \code{MRSea}.
 }
 \usage{
-data(mrsea)
+mrsea
 }
 \description{
 Data imported from package MRSea, see \url{https://www.creem.st-andrews.ac.uk/software/}
@@ -31,7 +31,6 @@ Data imported from package MRSea, see \url{https://www.creem.st-andrews.ac.uk/so
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   require(ggpolypath, quietly = TRUE)) {
-  data(mrsea)
   ggplot() +
     gg(mrsea$mesh) +
     gg(mrsea$samplers) +
@@ -42,3 +41,4 @@ if (bru_safe_inla() &&
 \references{
 NONE YET
 }
+\keyword{datasets}

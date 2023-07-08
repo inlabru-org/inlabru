@@ -376,7 +376,8 @@ bru_used_upgrade <- function(lhoods, labels) {
 
 #' Update used_component information objects
 #'
-#' Merge available component labels information with used components information.
+#' Merge available component labels information with used components
+#' information.
 #'
 #' @param x Object to be updated
 #' @param labels character vector of component labels
@@ -429,10 +430,9 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 
 #' List components used in a model
 #'
-#' Create or extract information about which components are used by a model, or its
-#' individual observation models. If a non-NULL `labels` argument
-#' is supplied, also calls [bru_used_update()] on the `bru_used`
-#' objects.
+#' Create or extract information about which components are used by a model, or
+#' its individual observation models. If a non-NULL `labels` argument is
+#' supplied, also calls [bru_used_update()] on the `bru_used` objects.
 #'
 #' @param x An object that contains information about used components
 #' @param effect character; components used as effects. When `NULL`, auto-detect
@@ -521,8 +521,8 @@ replace_dollar <- function(expr) {
 #' @description
 #' Extracts the variable names from an R expression by pre- and post-processing
 #' around [all.vars()].
-#' First replaces `$` with `[[` indexing, so that internal column/variable names are ignored,
-#' then calls `all.vars()`.
+#' First replaces `$` with `[[` indexing, so that internal column/variable names
+#' are ignored, then calls `all.vars()`.
 #'
 #' @param x A `formula`, `expression`, or `character`
 #' @param functions logical; if TRUE, include function names
@@ -709,15 +709,15 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 #'
 #'   \itemize{
 #'     \item
-#'       Easy usage of spatial covariates and automatic construction
-#'       of inla projection matrices for (spatial) SPDE models. This feature is
-#'       accessible via the `components` parameter. Practical examples on how
-#'       to use spatial data by means of the components parameter can also be found
+#'       Easy usage of spatial covariates and automatic construction of inla
+#'       projection matrices for (spatial) SPDE models. This feature is
+#'       accessible via the `components` parameter. Practical examples on how to
+#'       use spatial data by means of the components parameter can also be found
 #'       by looking at the [lgcp] function's documentation.
 #'     \item
-#'       Constructing multiple likelihoods is straight forward. See [like] for more
-#'       information on how to provide additional likelihoods to `bru` using
-#'       the `...` parameter list.
+#'       Constructing multiple likelihoods is straight forward. See [like] for
+#'       more information on how to provide additional likelihoods to `bru`
+#'       using the `...` parameter list.
 #'     \item
 #'       Support for non-linear predictors. See example below.
 #'     \item
@@ -819,7 +819,8 @@ bru <- function(components = ~ Intercept(1),
     stop("No response likelihood models provided.")
   }
 
-  # Turn input into a list of components (from existing list, or a special formula)
+  # Turn input into a list of components (from existing list, or a special
+  # formula)
   components <- component_list(components, .envir = .envir)
 
   # Update include/exclude information to limit it to existing components
@@ -1164,19 +1165,19 @@ extended_bind_rows <- function(...) {
 #' evaluate the component effect that are different than those defined in the
 #' component definition itself (see [component_eval()]). Default `NULL`
 #' auto-detects use of `_latent` and `_eval` in the predictor expression.
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include`, `exclude`,
-#' and `include_latent`.
-#' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated. Use `include_latent` instead.
-#' @param allow_combine logical; If `TRUE`, the predictor expression may
-#' involve several rows of the input data to influence the same row.
-#' Default `FALSE`, but forced to `TRUE` if `response_data` is `NULL` or
-#' `data` is a `list`
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include`,
+#'   `exclude`, and `include_latent`.
+#' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated.
+#'   Use `include_latent` instead.
+#' @param allow_combine logical; If `TRUE`, the predictor expression may involve
+#'   several rows of the input data to influence the same row. Default `FALSE`,
+#'   but forced to `TRUE` if `response_data` is `NULL` or `data` is a `list`
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
-#' @param .envir The evaluation environment to use for special arguments
-#' (`E`, `Ntrials`, and `weights`) if not found in `response_data` or `data`. Defaults to
-#' the calling environment.
+#' @param .envir The evaluation environment to use for special arguments (`E`,
+#'   `Ntrials`, and `weights`) if not found in `response_data` or `data`.
+#'   Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #'
@@ -1342,14 +1343,14 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # TODO: check that the crs info is the same
 
     # For non-Spatial models:
-    # Use the response data list as the actual data object, since that's
-    # now the canonical place where the point information is given.  This also allows
+    # Use the response data list as the actual data object, since that's now the
+    # canonical place where the point information is given.  This also allows
     # response_data to be used when constructing the response list.
     # This makes it a strict requirement that the predictor can be evaluated as
     # a pure function of the domain data.  When implementing sf support, might
-    # be able to give explicit access to spatial coordinates, but otherwise
-    # the user can extract it from the geometry with st_coordinates(geometry)[,1]
-    # or similar.
+    # be able to give explicit access to spatial coordinates, but otherwise the
+    # user can extract it from the geometry with st_coordinates(geometry)[,1] or
+    # similar.
     # For Spatial models, keep the old behaviour for backwards compatibility for
     # now, but can likely realign that in the future after more testing.
     # Save general response data to add to response (precomputed covariates etc)
@@ -1669,36 +1670,37 @@ bru_like_expr <- function(lhood, components) {
 #' Log Gaussian Cox process (LGCP) inference using INLA
 #'
 #' This function performs inference on a LGCP observed via points residing
-#' possibly multiple dimensions. These dimensions are defined via the left
-#' hand side of the formula provided via the model parameter.
-#' The left hand side determines the intensity function that is assumed to
-#' drive the LGCP. This may include effects that lead to a thinning (filtering)
-#' of the point process. By default, the log intensity is assumed to be a linear
-#' combination of the effects defined by the formula's RHS. More sophisticated
-#' models, e.g. non-linear thinning, can be achieved by using the predictor
-#' argument. The latter requires multiple runs of INLA for improving the
-#' required approximation of the predictor. In many applications the LGCP is
-#' only observed through subsets of the dimensions the process is living in.
-#' For example, spatial point realizations may only be known in sub-areas of
-#' the modelled space. These observed subsets of the LGCP
-#' domain are called samplers and can be provided via the respective parameter.
-#' If samplers is NULL it is assumed that all of the LGCP's dimensions have
-#' been observed completely.
+#' possibly multiple dimensions. These dimensions are defined via the left hand
+#' side of the formula provided via the model parameter. The left hand side
+#' determines the intensity function that is assumed to drive the LGCP. This may
+#' include effects that lead to a thinning (filtering) of the point process. By
+#' default, the log intensity is assumed to be a linear combination of the
+#' effects defined by the formula's RHS. More sophisticated models, e.g.
+#' non-linear thinning, can be achieved by using the predictor argument. The
+#' latter requires multiple runs of INLA for improving the required
+#' approximation of the predictor. In many applications the LGCP is only
+#' observed through subsets of the dimensions the process is living in. For
+#' example, spatial point realizations may only be known in sub-areas of the
+#' modelled space. These observed subsets of the LGCP domain are called samplers
+#' and can be provided via the respective parameter. If samplers is NULL it is
+#' assumed that all of the LGCP's dimensions have been observed completely.
 #'
 #'
 #' @aliases lgcp
 #' @export
 #' @param components A formula describing the latent components
 #' @param data A data frame or `SpatialPoints(DataFrame)` object
-#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame` objects
+#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame`
+#'   objects
 #' @param domain Named list of domain definitions
 #' @param ips Integration points (overrides `samplers`)
-#' @param formula If NULL, the linear combination implied by the `components`
-#' is used as a predictor for the point location intensity. If a (possibly
-#' non-linear) expression is provided the respective Taylor approximation is
-#' used as a predictor. Multiple runs if INLA are then required for a better
-#' approximation of the posterior.
-#' @param E Single numeric used rescale all integration weights by a fixed factor
+#' @param formula If NULL, the linear combination implied by the `components` is
+#'   used as a predictor for the point location intensity. If a (possibly
+#'   non-linear) expression is provided the respective Taylor approximation is
+#'   used as a predictor. Multiple runs if INLA are then required for a better
+#'   approximation of the posterior.
+#' @param E Single numeric used rescale all integration weights by a fixed
+#'   factor
 #' @param \dots Further arguments passed on to [like()]
 #' @param options See [bru_options_set()]
 #' @return An [bru()] object
@@ -1834,8 +1836,8 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru()] or [lgcp()].
-#' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates needed for
-#' the prediction.
+#' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates
+#'   needed for the prediction.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
 #' hyperparameter states are returned as named list elements.
@@ -1860,27 +1862,27 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
-#' Default `NULL`
-#' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and the
-#' prediciton summary has the same number of rows as `newdata`, then the output is
-#' a `Spatial*DataFrame` object. Default `FALSE`.
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and
+#'   `exclude`. Default `NULL`
+#' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and
+#'   the prediciton summary has the same number of rows as `newdata`, then the
+#'   output is a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample()`
 #' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @details
-#' In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent`
-#' variable name can be used to directly access the latent state for a component,
-#' and the suffix function `_eval` can be used to evaluate a component at
-#' other input values than the expressions defined in the component definition
-#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' In addition to the component names (that give the effect of each component
+#' evaluated for the input data), the suffix `_latent` variable name can be used
+#' to directly access the latent state for a component, and the suffix function
+#' `_eval` can be used to evaluate a component at other input values than the
+#' expressions defined in the component definition itself, e.g.
+#' `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [component_eval()]).
-#' f
+#'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a `data.frame` or `Spatial*` object with predicted mean values and other
-#' summary statistics attached.
+#' @return a `data.frame` or `Spatial*` object with predicted mean values and
+#'   other summary statistics attached.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
@@ -1925,7 +1927,8 @@ predict.bru <- function(object,
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
 
-  vals <- generate.bru(object,
+  vals <- generate(
+    object,
     newdata = newdata,
     formula = formula,
     n.samples = n.samples,
@@ -2028,8 +2031,8 @@ predict.bru <- function(object,
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
-#' @param newdata A data.frame or SpatialPointsDataFrame of covariates needed for
-#' sampling.
+#' @param newdata A data.frame or SpatialPointsDataFrame of covariates needed
+#'   for sampling.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
 #' hyperparameter states are returned as named list elements.
@@ -2037,7 +2040,8 @@ predict.bru <- function(object,
 #' @param n.samples Integer setting the number of samples to draw in order to
 #' calculate the posterior statistics.
 #' The default, 100, is rather low but provides a quick approximate result.
-#' @param seed Random number generator seed passed on to `INLA::inla.posterior.sample`
+#' @param seed Random number generator seed passed on to
+#'   `INLA::inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
@@ -2048,17 +2052,18 @@ predict.bru <- function(object,
 #'   predictor expression. The exclusion list is applied to the list
 #'   as determined by the `include` parameter; Default: NULL (do not remove
 #'   any components from the inclusion list)
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and `exclude`.
+#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and
+#'   `exclude`.
 #' @param ... additional, unused arguments.
 #' @param data Deprecated. Use `newdata` instead.
 #' sampling.
 #' @details
-#' In addition to the component names (that give the effect
-#' of each component evaluated for the input data), the suffix `_latent`
-#' variable name can be used to directly access the latent state for a component,
-#' and the suffix function `_eval` can be used to evaluate a component at
-#' other input values than the expressions defined in the component definition
-#' itself, e.g. `field_eval(cbind(x, y))` for a component that was defined with
+#' In addition to the component names (that give the effect of each component
+#' evaluated for the input data), the suffix `_latent` variable name can be used
+#' to directly access the latent state for a component, and the suffix function
+#' `_eval` can be used to evaluate a component at other input values than the
+#' expressions defined in the component definition itself, e.g.
+#' `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [component_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
@@ -2167,11 +2172,13 @@ generate.bru <- function(object,
 # estimate the inital domain \code{x} if \code{x} is \code{NULL}
 # @param mcerr Monte Carlo error at which to stop the chain
 # @param n Inital number of samples. This will be doubled for each iteration.
-# @param discrete Set this to \code{TRUE} if the density is only defined for integer \code{x}
+# @param discrete Set this to \code{TRUE} if the density is only defined for
+#   integer \code{x}
 # @param verbose Be verbose?
 
 montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
-                                 mcerr = 0.01, n = 100, discrete = FALSE, verbose = FALSE) {
+                                 mcerr = 0.01, n = 100, discrete = FALSE,
+                                 verbose = FALSE) {
   .Deprecated()
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
@@ -2292,14 +2299,20 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
       smy <- data.frame(
         apply(data, MARGIN = 1, mean, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        as.matrix(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+        as.matrix(apply(data,
+          MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+          names = FALSE
+        ))
       )
       qs_names <- paste0("q", probs)
     } else {
       smy <- data.frame(
         apply(data, MARGIN = 1, mean, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        t(apply(data, MARGIN = 1, quantile, probs = probs, na.rm = TRUE))
+        t(apply(data,
+          MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+          names = FALSE
+        ))
       )
       qs_names <- paste0("q", probs)
     }
@@ -2440,25 +2453,6 @@ bru_line_search <- function(model,
                             comp_simple,
                             weights = 1,
                             options) {
-  if (length(options$bru_method$search) == 0) {
-    return(
-      list(
-        active = FALSE,
-        step_scaling = 1,
-        state = state
-      )
-    )
-  }
-
-  if (is.null(weights)) {
-    warning("NULL weights detected for line search. Using weights = 1 instead.",
-      immediate. = TRUE
-    )
-    weights <- 1
-  }
-
-  fact <- options$bru_method$factor
-
   # Metrics ----
   pred_scalprod <- function(delta1, delta2) {
     if (any(!is.finite(delta1)) || any(!is.finite(delta2))) {
@@ -2474,7 +2468,27 @@ bru_line_search <- function(model,
     pred_scalprod(delta, delta)^0.5
   }
 
+  # Is line search enabled? ----
+  if (length(options$bru_method$search) == 0) {
+    return(
+      list(
+        active = FALSE,
+        step_scaling = 1,
+        state = state
+      )
+    )
+  }
+
   # Initialise ----
+  if (is.null(weights)) {
+    warning("NULL weights detected for line search. Using weights = 1 instead.",
+      immediate. = TRUE
+    )
+    weights <- 1
+  }
+
+  fact <- options$bru_method$factor
+
   nonlin_param <- list(
     model = model,
     lhoods = lhoods,
@@ -2508,7 +2522,8 @@ bru_line_search <- function(model,
       idx = seq_along(lin_pred0),
       lin0 = lin_pred0,
       lin1 = lin_pred1,
-      nonlin1 = nonlin_pred
+      nonlin1 = nonlin_pred,
+      weights = weights
     )
   }
 
@@ -2758,60 +2773,130 @@ bru_line_search <- function(model,
     requireNamespace("ggplot2")
     requireNamespace("patchwork")
     pl1 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$lin0 - .data$lin1), col = "start", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlin1 - .data$lin1), col = "full", shape = "nonlin")) +
-      ggplot2::geom_point(ggplot2::aes(.data$lin1, (.data$nonlinopt - .data$lin1), col = "opt", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin0 - .data$lin1), col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin1 - .data$lin1), col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlin1 - .data$lin1), col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlinopt - .data$lin1), col = "opt")) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("eta - lin1")
     pl2 <- ggplot2::ggplot(df_debug) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
         (.data$lin0 - .data$lin1) * .data$weights^0.5,
-        col = "start",
-        shape = "linear"
+        col = "start"
       )) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
+        (.data$lin1 - .data$lin1) * .data$weights^0.5,
+        col = "inla"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$nonlin1 - .data$lin1) * .data$weights^0.5,
-        col = "full",
-        shape = "nonlin"
+        col = "full"
       )) +
       ggplot2::geom_point(ggplot2::aes(
-        .data$lin1,
+        .data$idx,
         (.data$nonlinopt - .data$lin1) * .data$weights^0.5,
-        col = "opt",
-        shape = "nonlin"
+        col = "opt"
       )) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("(eta - lin1) * sqrt(w)")
     pl3 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "full", shape = "linear")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full", shape = "nonlin")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt", shape = "nonlin")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt")) +
       ggplot2::geom_ribbon(
         ggplot2::aes(
-          .data$idx,
+          as.numeric(.data$idx),
           ymin = .data$lin1 - 2 * .data$weights^-0.5,
           ymax = .data$lin1 + 2 * .data$weights^-0.5
         ),
         alpha = 0.1
       ) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("eta")
     pl4 <- ggplot2::ggplot(data.frame(
       idx = seq_along(unlist(state0)),
       state0 = unlist(state0),
-      state1 = unlist(state1),
-      state = unlist(state)
+      state1 = unlist(state1)[names(unlist(state0))],
+      state = unlist(state)[names(unlist(state0))]
     )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state0, col = "start")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state1, col = "full")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, state, col = "opt")) +
-      ggplot2::scale_color_discrete(breaks = c("start", "full", "opt"))
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "full")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state, col = "opt")) +
+      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::ylab("state")
     print(((pl1 | pl2) / (pl3 | pl4)) +
       patchwork::plot_layout(guides = "collect") &
       ggplot2::theme(legend.position = "right"))
+
+    # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
+    # delta = lin1-lin0
+    delta <- lin_pred1 - lin_pred0
+    delta_norm <- pred_norm(delta)
+
+    # <eta-lin0, delta>/|delta|
+    along_opt <- pred_scalprod(nonlin_pred - lin_pred0, delta) / delta_norm
+    # |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>|
+    ortho_opt <- pred_norm(
+      nonlin_pred - lin_pred0 - delta * along_opt / delta_norm
+    )
+
+    step_scaling_range <- seq(0, step_scaling * fact, length.out = 20)
+    along <- ortho <- distance <- numeric(length(step_scaling_range))
+    for (iii in seq_along(step_scaling_range)) {
+      step_scaling_ <- step_scaling_range[iii]
+      state_ <- scale_state(state0, state1, step_scaling_)
+      nonlin_pred_ <- nonlin_predictor(
+        param = nonlin_param,
+        state = state_
+      )
+      # <eta-lin0, delta>/|delta|
+      along[iii] <- pred_scalprod(nonlin_pred_ - lin_pred0, delta) / delta_norm
+      # |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>|
+      ortho[iii] <- pred_norm(
+        nonlin_pred_ - lin_pred0 - delta * along[iii] / delta_norm
+      )
+      distance[iii] <-
+        line_search_optimisation_target_exact(
+          step_scaling_,
+          param = list(
+            lin = lin_pred1,
+            state0 = state0,
+            state1 = state1,
+            weights = weights
+          ),
+          nonlin_param = nonlin_param
+        )
+    }
+
+
+    pl0 <-
+      ggplot2::ggplot(
+        data =
+          data.frame(
+            along = along,
+            ortho = ortho,
+            distance = distance^0.5,
+            what = "eta"
+          ),
+        mapping = ggplot2::aes(.data$along, .data$ortho, col = .data$what)
+      ) +
+      ggplot2::geom_path() +
+      ggplot2::geom_point(ggplot2::aes(size = .data$distance)) +
+      ggplot2::geom_point(
+        data = data.frame(
+          along = c(0, along_opt, delta_norm),
+          ortho = c(0, ortho_opt, 0),
+          what = c("eta0", "eta_opt", "eta1")
+        )
+      )
 
     browser()
   }
@@ -2822,7 +2907,6 @@ bru_line_search <- function(model,
     state = state
   )
 }
-
 
 latent_names <- function(state) {
   nm <- lapply(
@@ -2895,16 +2979,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   inla.options <- bru_options_inla(options)
 
-  initial_log_length <- length(bru_log_get())
+  bru_log_bookmark("iinla")
   original_timings <- NULL
+  original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
-      log = if (initial_log_length <= 0) {
-        bru_log_get()
-      } else {
-        bru_log_get()[-seq_len(initial_log_length)]
-      },
+      log = c(original_log, bru_log_get(bookmark = "iinla")),
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
@@ -3016,6 +3097,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stop("Unknown previous result information class")
   }
   old.result <- result
+
+  # Preserve old log output
+  if (is.null(old.result[["bru_iinla"]][["log"]])) {
+    original_log <- character(0)
+  } else {
+    original_log <- old.result[["bru_iinla"]][["log"]]
+  }
 
   # Track variables
   track <- list()
@@ -3328,7 +3416,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         effect = label,
         index = 1,
         iteration = track_size + k,
-        mode = result[["mode"]][["log.posterior.mode"]],
+        mode = result[["misc"]][["configs"]][["max.log.posterior"]],
         sd = Inf
       )
     track[[k]] <- do.call(rbind, track_df)

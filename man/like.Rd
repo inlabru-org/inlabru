@@ -105,24 +105,24 @@ evaluate the component effect that are different than those defined in the
 component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{NULL}
 auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include}, \code{exclude},
-and \code{include_latent}.}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include},
+\code{exclude}, and \code{include_latent}.}
 
-\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated. Use \code{include_latent} instead.}
+\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated.
+Use \code{include_latent} instead.}
 
-\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
-involve several rows of the input data to influence the same row.
-Default \code{FALSE}, but forced to \code{TRUE} if \code{response_data} is \code{NULL} or
-\code{data} is a \code{list}}
+\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
+several rows of the input data to influence the same row. Default \code{FALSE},
+but forced to \code{TRUE} if \code{response_data} is \code{NULL} or \code{data} is a \code{list}}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
 
-\item{.envir}{The evaluation environment to use for special arguments
-(\code{E}, \code{Ntrials}, and \code{weights}) if not found in \code{response_data} or \code{data}. Defaults to
-the calling environment.}
+\item{.envir}{The evaluation environment to use for special arguments (\code{E},
+\code{Ntrials}, and \code{weights}) if not found in \code{response_data} or \code{data}.
+Defaults to the calling environment.}
 
 \item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
 
