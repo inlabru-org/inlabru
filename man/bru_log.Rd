@@ -2,12 +2,6 @@
 % Please edit documentation in R/environment.R
 \name{bru_log}
 \alias{bru_log}
-\alias{bru_log_reset}
-\alias{bru_log_new}
-\alias{bru_log_bookmark}
-\alias{bru_log_bookmarks}
-\alias{bru_log_offset}
-\alias{bru_log_index}
 \alias{bru_log.character}
 \alias{bru_log.bru_log}
 \alias{bru_log.iinla}
@@ -17,21 +11,8 @@
 \alias{[.bru_log}
 \alias{c.bru_log}
 \alias{length.bru_log}
-\alias{bru_log_message}
-\title{inlabru log message methods}
+\title{Access methods for \code{bru_log} objects}
 \usage{
-bru_log_reset(x = NULL, bookmark = NULL, offset = NULL)
-
-bru_log_new(x = NULL, bookmarks = NULL)
-
-bru_log_bookmark(bookmark = "", offset = NULL, x = NULL)
-
-bru_log_bookmarks(x = NULL)
-
-bru_log_offset(x = NULL, bookmark = NULL, offset = NULL)
-
-bru_log_index(x = NULL, i)
-
 bru_log(x = NULL)
 
 \method{bru_log}{character}(x)
@@ -40,7 +21,7 @@ bru_log(x = NULL)
 
 \method{bru_log}{iinla}(x)
 
-\method{bru_log}{bru}(x, ..., bookmark = NULL, offset = 0L)
+\method{bru_log}{bru}(x)
 
 \method{print}{bru_log}(x, ...)
 
@@ -51,67 +32,23 @@ bru_log(x = NULL)
 \method{c}{bru_log}(...)
 
 \method{length}{bru_log}(x)
-
-bru_log_message(
-  ...,
-  domain = NULL,
-  appendLF = TRUE,
-  verbosity = 1,
-  allow_verbose = TRUE,
-  verbose = NULL,
-  verbose_store = NULL,
-  x = NULL
-)
 }
 \arguments{
-\item{x}{A \code{bru_log} object, or in some cases, and object that can be
-converted/extracted to a \code{bru_log} object. \code{NULL} denotes the global
-\code{inlabru} log object.}
+\item{x}{An object that is, contains, or can be converted to,
+a \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
 
-\item{bookmark}{character; The label for a bookmark with a stored offset.}
-
-\item{offset}{integer; a position offset in the log, with \code{0L} pointing at
-the start of the log. If negative, denotes the point \code{abs(offset)} elements
-from tail of the log.}
+\item{...}{further arguments passed to or from other methods.}
 
 \item{i}{indices specifying elements to extract. If \code{character}, denotes
 the sequence between bookmark \code{i} and the next bookmark (or the end of the
 log if \code{i} is the last bookmark)}
-
-\item{...}{For \code{bru_log_message()}, zero or more objects passed on to
-\code{\link[base:message]{base::.makeMessage()}}}
-
-\item{domain}{Domain for translations, passed on to \code{\link[base:message]{base::.makeMessage()}}}
-
-\item{appendLF}{logical; whether to add a newline to the message. Only
-used for verbose output.}
-
-\item{verbosity}{numeric value describing the verbosity level of the message}
-
-\item{allow_verbose}{Whether to allow verbose output. Must be set to FALSE
-until the options object has been initialised.}
-
-\item{verbose}{logical, numeric, or \code{NULL}; local override for verbose
-output. If \code{NULL}, the global option \code{bru_verbose} or default value is used.
-If \code{FALSE}, no messages are printed. If \code{TRUE}, messages with \code{verbosity}
-\eqn{\le 1}{<=1}
-are printed. If numeric, messages with \code{verbosity} \eqn{\le}{<=} \code{verbose} are
-printed.}
-
-\item{verbose_store}{Same as \code{verbose}, but controlling what messages are
-stored in the global log object. Can be controlled via the \code{bru_verbose_store}
-with \code{\link[=bru_options_set]{bru_options_set()}}.}
 }
 \value{
-\code{bru_log_bookmark} Return the modified \code{bru_log} object if \code{x} is non-NULL.
-
 \code{bru_log} A \code{bru_log} object, containing a
-character vector of log messages, and potentially a vector of bookmarks..
-
-\code{bru_log_message} returns \code{invisible()}
+character vector of log messages, and potentially a vector of bookmarks.
 }
 \description{
-Log message methods
+Access method for \code{bru_log} objects
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -130,59 +67,15 @@ into a \code{bru_log} object.
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_log_reset()}: Clears the log contents up to
-a given \code{offset} or \code{bookmark}. Default: clear the entire log.
-When \code{x} is NULL, the global \code{inlabru} log is updated, and \code{invisible(NULL)}
-is returned. Otherwise the updated object is returned (invisibly).
-
-\item \code{bru_log_new()}: Create an empty \code{bru_log} object.
-
-\item \code{bru_log_bookmark()}: Set a log bookmark. If \code{offset} is \code{NULL} (the default),
-the bookmark will point to the current end of the log.
-
-\item \code{bru_log_bookmarks()}: Return a integer vector with named elements being
-bookmarks into the global \code{inlabru} log with associated log
-position offsets.
-
-\item \code{bru_log_offset()}: Utility function for computing log position offsets.
-
-\item \code{bru_log_index()}: Utility function for computing index vectors for \code{bru_log}
-objects.
-
 \item \code{bru_log()}: Extract stored log messages
 
-\item \code{bru_log_message()}: Adds a log message.
-
 }}
-\examples{
-\dontrun{
-if (interactive()) {
-  bru_log_reset()
+\seealso{
+Other \code{bru_log}: 
+\code{\link{bru_log_bookmark}()},
+\code{\link{bru_log_message}()},
+\code{\link{bru_log_new}()},
+\code{\link{bru_log_offset}()},
+\code{\link{bru_log_reset}()}
 }
-}
-if (interactive()) {
-  code_runner <- function() {
-    local_bru_options_set(
-      # Show messages up to and including level 2 (default 0)
-      bru_verbose = 2,
-      # Store messages to an including level 3 (default Inf, storing all)
-      bru_verbose_store = 3
-    )
-
-    bru_log_bookmark("bookmark 1")
-    bru_log_message("Test message 1", verbosity = 1)
-    bru_log_message("Test message 2", verbosity = 2)
-    bru_log_bookmark("bookmark 2")
-    bru_log_message("Test message 3", verbosity = 3)
-    bru_log_message("Test message 4", verbosity = 4)
-
-    invisible()
-  }
-  message("Run code")
-  code_runner()
-  message("Check log from bookmark 1")
-  print(bru_log()["bookmark 1"])
-  message("Check log from bookmark 2")
-  print(bru_log()["bookmark 2"])
-}
-}
+\concept{\code{bru_log}}

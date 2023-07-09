@@ -3099,11 +3099,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   old.result <- result
 
   # Preserve old log output
-  if (is.null(old.result[["bru_iinla"]][["log"]])) {
-    original_log <- bru_log(character(0))
-  } else {
-    original_log <- bru_log(old.result[["bru_iinla"]][["log"]])
-  }
+  original_log <- bru_log(
+    if (is.null(old.result)) {
+      character(0)
+    } else {
+      old.result
+    }
+  )
 
   # Track variables
   track <- list()

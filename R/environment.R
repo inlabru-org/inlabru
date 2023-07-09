@@ -36,19 +36,17 @@ bru_env_get <- function() {
 
 # inlabru log methods ----
 
-#' @title inlabru log message methods
-#' @description Log message methods
-#' @name bru_log
-#' @rdname bru_log
-NULL
-
-#' @describeIn bru_log Clears the log contents up to
+#' @title Clear log contents
+#' @description
+#' Clears the log contents up to
 #' a given `offset` or `bookmark`. Default: clear the entire log.
 #' When `x` is NULL, the global `inlabru` log is updated, and `invisible(NULL)`
 #' is returned. Otherwise the updated object is returned (invisibly).
 #' @param x A `bru_log` object, or in some cases, and object that can be
 #' converted/extracted to a `bru_log` object. `NULL` denotes the global
 #' `inlabru` log object.
+#' @inheritParams bru_log_offset
+#' @returns Returns (invisibly) the modified `bru_log` object, or `NULL` (when `x` is `NULL`)
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -56,6 +54,7 @@ NULL
 #' }
 #' }
 #' @export
+#' @family `bru_log`
 
 bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   offset <- bru_log_offset(x = x, bookmark = bookmark, offset = offset)
@@ -90,7 +89,16 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
 
 
 #' @export
-#' @describeIn bru_log Create an empty `bru_log` object.
+#' @title Create a `bru_log` object
+#' @description
+#' Create a `bru_log` object, by default empty.
+#' @param x An optional character vector of log messages
+#' @param bookmarks An optional `integer` vector of named bookmarks
+#' @family `bru_log`
+#' @examples
+#' x <- bru_log_new()
+#' x <- bru_log_message("Test message", x = x)
+#' print(x)
 bru_log_new <- function(x = NULL, bookmarks = NULL) {
   x <- list(
     log = if (is.null(x)) character(0) else as.character(x),
@@ -106,14 +114,22 @@ bru_log_new <- function(x = NULL, bookmarks = NULL) {
 }
 
 
+#' @title Methods for `bru_log` bookmarks
+#' @description
+#' Methods for `bru_log` bookmarks.
+#'
 #' @param bookmark character; The label for a bookmark with a stored offset.
 #' @param offset integer; a position offset in the log, with `0L` pointing at
 #' the start of the log. If negative, denotes the point `abs(offset)` elements
-#' from tail of the log.
-#' @return `bru_log_bookmark` Return the modified `bru_log` object if `x` is non-NULL.
+#' from tail of the log. When `bookmark` is non-NULL, the `offset` applies a
+#' shift (forwards or backwards) to the bookmark list.
+#' @param x A `bru_log` object. If `NULL`, the global `inlabru` log is used.
+#' @returns `bru_log_bookmark()`: Returns the modified `bru_log` object if `x` is non-NULL.
 #' @export
-#' @describeIn bru_log Set a log bookmark. If `offset` is `NULL` (the default),
+#' @describeIn bru_log_bookmark
+#' Set a log bookmark. If `offset` is `NULL` (the default),
 #' the bookmark will point to the current end of the log.
+#' @family `bru_log`
 bru_log_bookmark <- function(bookmark = "", offset = NULL, x = NULL) {
   if (nchar(bookmark) == 0) {
     stop("Bookmark labels must have at least one character.")
@@ -136,9 +152,10 @@ bru_log_bookmark <- function(bookmark = "", offset = NULL, x = NULL) {
 }
 
 #' @export
-#' @describeIn bru_log Return a integer vector with named elements being
+#' @describeIn bru_log_bookmark Return a integer vector with named elements being
 #' bookmarks into the global `inlabru` log with associated log
 #' position offsets.
+#' @returns `bru_log_bookmarks()`: Returns the bookmark vector associated with `x`
 bru_log_bookmarks <- function(x = NULL) {
   if (is.null(x)) {
     bru_env_get()[["log"]][["bookmarks"]]
@@ -147,8 +164,15 @@ bru_log_bookmarks <- function(x = NULL) {
   }
 }
 
+#' @title Position methods for `bru_log` objects
 #' @export
-#' @describeIn bru_log Utility function for computing log position offsets.
+#' @description
+#' Position methods for `bru_log` objects.
+#'
+#' @describeIn bru_log_offset
+#' Utility function for computing log position offsets.
+#' @family `bru_log`
+#' @inheritParams bru_log_bookmark
 bru_log_offset <- function(x = NULL,
                            bookmark = NULL,
                            offset = NULL) {
@@ -188,8 +212,11 @@ bru_log_offset <- function(x = NULL,
 }
 
 #' @export
-#' @describeIn bru_log Utility function for computing index vectors for `bru_log`
-#' objects.
+#' @describeIn bru_log_offset Utility function for computing index vectors
+#' for `bru_log` objects.
+#' @param i indices specifying elements to extract. If `character`, denotes
+#' the sequence between bookmark `i` and the next bookmark (or the end of the
+#' log if `i` is the last bookmark)
 bru_log_index <- function(x = NULL, i) {
   log_length <- NULL
   if (is.character(i)) {
@@ -212,10 +239,14 @@ bru_log_index <- function(x = NULL, i) {
 }
 
 
-
+#' @title Access methods for `bru_log` objects
+#' @description Access method for `bru_log` objects
+#' @param x An object that is, contains, or can be converted to,
+#' a `bru_log` object. If `NULL`, refers to the global `inlabru` log.
 #' @return `bru_log` A `bru_log` object, containing a
-#' character vector of log messages, and potentially a vector of bookmarks..
+#' character vector of log messages, and potentially a vector of bookmarks.
 #' @export
+#' @family `bru_log`
 #' @describeIn bru_log Extract stored log messages
 bru_log <- function(x = NULL) {
   if (is.null(x)) {
@@ -250,7 +281,7 @@ bru_log.iinla <- function(x) {
 
 #' @rdname bru_log
 #' @export
-bru_log.bru <- function(x, ..., bookmark = NULL, offset = 0L) {
+bru_log.bru <- function(x) {
   if (is.null(x[["bru_iinla"]][["log"]])) {
     return(bru_log_new(character(0)))
   }
@@ -258,6 +289,7 @@ bru_log.bru <- function(x, ..., bookmark = NULL, offset = 0L) {
 }
 
 #' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`
+#' @param ... further arguments passed to or from other methods.
 #' @export
 print.bru_log <- function(x, ...) {
   cat(x[["log"]], sep = "\n")
@@ -333,6 +365,8 @@ as.character.bru_log <- function(x, ...) {
 }
 
 
+#' @title Add a log message
+#' @description Adds a log message.
 #' @param ... For `bru_log_message()`, zero or more objects passed on to
 #' [`base::.makeMessage()`]
 #' @param domain Domain for translations, passed on to [`base::.makeMessage()`]
@@ -350,9 +384,11 @@ as.character.bru_log <- function(x, ...) {
 #' @param verbose_store Same as `verbose`, but controlling what messages are
 #' stored in the global log object. Can be controlled via the `bru_verbose_store`
 #' with [bru_options_set()].
+#' @param x A `bru_log` object. If `NULL`, refers to the global `inlabru` log.
 #' @return
-#' `bru_log_message` returns `invisible()`
-#' @describeIn bru_log Adds a log message.
+#' `bru_log_message` returns `invisible(x)`, where `x` is the updated `bru_log`
+#' object, or `NULL`.
+#' @family `bru_log`
 #' @examples
 #' if (interactive()) {
 #'   code_runner <- function() {
