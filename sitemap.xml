@@ -133,6 +133,21 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_log.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_bookmark.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_message.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_new.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_offset.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_reset.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_make_stack.html</loc>
   </url>
   <url>
@@ -425,9 +440,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/ipoints.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/is.inside.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/lgcp.html</loc>

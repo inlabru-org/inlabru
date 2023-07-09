@@ -147,6 +147,8 @@ future version.</p>
 <span><span class="co"># S3 method for bru_mapper_offset</span></span>
 <span><span class="fu"><a href="bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">is.inside</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">loc</span>, mesh.coords <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">vertices.inla.mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">eval_SpatialDF</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -192,12 +194,30 @@ through without transformation.</p></dd>
 <dt>CRSobj</dt>
 <dd><p>The target sp::CRS or inla.CRS object</p></dd>
 
+
+<dt>mesh</dt>
+<dd><p>an inla.mesh object.</p></dd>
+
+
+<dt>loc</dt>
+<dd><p>Points in space stored either as data.frame, a two-column matrix
+of x and y coordinates or a SpatialPoints object.</p></dd>
+
+
+<dt>mesh.coords</dt>
+<dd><p>Coordinate names of the mesh. Use only if loc is a
+data.frame with respective column names.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
 <p>A <code>CRS</code> object, or NULL if no valid CRS identified</p>
+
+
+<p><code>is.inside()</code>: Single column matrix of Boolean values indicating if a point is
+inside the mesh.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -265,6 +285,9 @@ instead.</p></li>
 <li><p><code>bru_mapper_offset()</code>: Creates a <code><a href="bru_mapper.html">bru_mapper_const()</a></code> mapper.</p></li>
 <li><p><code>ibm_n(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_values(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
+<li><p><code>is.inside()</code>: Find out which points are inside a mesh.
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_is_within.html">fm_is_within()</a></code>.
+Replace <code>is.inside(mesh, loc)</code> with <code>fm_is_within(loc, mesh)</code>.</p></li>
 <li><p><code>vertices.inla.mesh()</code>: Extract vertex locations from an <code>inla.mesh</code>.
 Converts the vertices of an <code>inla.mesh</code> object into a <code>SpatialPointsDataFrame</code>.
 Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code></p></li>
@@ -274,7 +297,8 @@ Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="fm_transform.html">fm_transform()</a></code></p>
 <p><code><a href="predict.bru.html">predict.bru()</a></code></p>
-<p><code><a href="generate.html">generate.bru()</a></code></p></div>
+<p><code><a href="generate.html">generate.bru()</a></code></p>
+<p><code><a href="fm_is_within.html">fm_is_within()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
