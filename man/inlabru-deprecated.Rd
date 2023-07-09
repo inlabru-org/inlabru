@@ -28,6 +28,7 @@
 \alias{bru_mapper_offset}
 \alias{ibm_n.bru_mapper_offset}
 \alias{ibm_values.bru_mapper_offset}
+\alias{is.inside}
 \alias{vertices.inla.mesh}
 \alias{eval_SpatialDF}
 \title{Deprecated functions in inlabru}
@@ -80,6 +81,8 @@ bru_mapper_offset(...)
 
 \method{ibm_values}{bru_mapper_offset}(...)
 
+is.inside(mesh, loc, mesh.coords = NULL)
+
 vertices.inla.mesh(...)
 
 eval_SpatialDF(...)
@@ -105,9 +108,20 @@ Setting to TRUE allows objects with no CRS information to be passed
 through without transformation.}
 
 \item{CRSobj}{The target sp::CRS or inla.CRS object}
+
+\item{mesh}{an inla.mesh object.}
+
+\item{loc}{Points in space stored either as data.frame, a two-column matrix
+of x and y coordinates or a SpatialPoints object.}
+
+\item{mesh.coords}{Coordinate names of the mesh. Use only if loc is a
+data.frame with respective column names.}
 }
 \value{
 A \code{CRS} object, or NULL if no valid CRS identified
+
+\code{is.inside()}: Single column matrix of Boolean values indicating if a point is
+inside the mesh.
 }
 \description{
 These functions still attempt to do their job, but will be removed in a
@@ -201,6 +215,10 @@ instead.
 
 \item \code{ibm_values(bru_mapper_offset)}: Replaced by \link{bru_mapper_const} methods
 
+\item \code{is.inside()}: Find out which points are inside a mesh.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[=fm_is_within]{fm_is_within()}}.
+Replace \code{is.inside(mesh, loc)} with \code{fm_is_within(loc, mesh)}.
+
 \item \code{vertices.inla.mesh()}: Extract vertex locations from an \code{inla.mesh}.
 Converts the vertices of an \code{inla.mesh} object into a \code{SpatialPointsDataFrame}.
 Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}}
@@ -222,6 +240,8 @@ if (interactive()) {
 \code{\link[=predict.bru]{predict.bru()}}
 
 \code{\link[=generate.bru]{generate.bru()}}
+
+\code{\link[=fm_is_within]{fm_is_within()}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

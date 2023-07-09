@@ -95,11 +95,9 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   #' Ice Covariate
 
-  stop("readRGDAL used by old internal method disable to allow removal of rgdal dependency.")
-  #  ice <- rgdal::readGDAL(icefile)
-  ice <- NULL
+  ice <- sf::read_sf(icefile)
   ice <- fm_transform(ice, fm_crs(target.p4s))
-  ii <- is.inside(mesh, coordinates(ice))
+  ii <- fm_is_within(ice, mesh)
   ice <- ice[as.vector(ii), ]
 
   # ggplot() +  gg(ice, mapping = aes(x, y, color = band1), size = 1) + gg(mesh) + coord_equal() + scale_color_gradientn(colours = topo.colors(100))
