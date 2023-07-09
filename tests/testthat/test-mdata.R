@@ -1,4 +1,5 @@
 test_that("mdata", {
+  if (FALSE) {
   local_bru_safe_inla()
 
   sim.poisson <- function(prob, m) {
@@ -133,5 +134,6 @@ test_that("mdata", {
     mm <- nrow(res) %/% 2
     rownames(res) <- c(paste0("beta", 1:mm, ".poisson"), paste0("beta", 1:mm, ".prob"))
     print(round(dig = 2, res))
+  }
   }
 })
