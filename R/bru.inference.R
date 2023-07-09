@@ -2660,11 +2660,34 @@ bru_line_search <- function(model,
       )
     step_scaling_opt_approx <- alpha$minimum
 
-    if (identical(options$bru_method$line_opt_method, "full")) {
-      alpha <-
+    state_opt <- scale_state(state0, state1, step_scaling_opt_approx)
+    nonlin_pred_opt <- nonlin_predictor(
+      param = nonlin_param,
+      state = state_opt
+    )
+    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+    delta_norm <- pred_norm(lin_pred0 - lin_pred1)
+    if (norm1_opt > delta_norm) {
+      bru_log_message(
+        paste0(
+          "iinla: norm1_opt > |delta|: ",
+          signif(norm1_opt, 4),
+          " > ",
+          signif(delta_norm, 4)
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+
+    if ((norm1_opt > delta_norm) ||
+        identical(options$bru_method$line_opt_method, "full")) {
+      alpha_ <-
         optimise(
           line_search_optimisation_target_exact,
-          step_scaling * c(1 / fact^2, fact),
+          step_scaling * c(0, fact),
           param = list(
             lin = lin_pred1,
             state0 = state0,
