@@ -3,52 +3,54 @@
 \name{bru_log}
 \alias{bru_log}
 \alias{bru_log_reset}
-\alias{bru_logify}
-\alias{bru_logify.default}
-\alias{bru_logify.character}
-\alias{bru_logify.bru_log}
+\alias{bru_log_new}
 \alias{bru_log_bookmark}
 \alias{bru_log_bookmarks}
 \alias{bru_log_offset}
-\alias{bru_log_get}
-\alias{bru_log_get.default}
-\alias{bru_log_get.iinla}
-\alias{bru_log_get.bru}
+\alias{bru_log_index}
+\alias{bru_log.character}
+\alias{bru_log.bru_log}
+\alias{bru_log.iinla}
+\alias{bru_log.bru}
 \alias{print.bru_log}
+\alias{as.character.bru_log}
 \alias{[.bru_log}
 \alias{c.bru_log}
+\alias{length.bru_log}
 \alias{bru_log_message}
 \title{inlabru log message methods}
 \usage{
-bru_log_reset(bookmark = NULL, offset = NULL)
+bru_log_reset(x = NULL, bookmark = NULL, offset = NULL)
 
-bru_logify(x = NULL, ...)
+bru_log_new(x = NULL, bookmarks = NULL)
 
-\method{bru_logify}{default}(x = NULL, ...)
+bru_log_bookmark(bookmark = "", offset = NULL, x = NULL)
 
-\method{bru_logify}{character}(x, offset = 0L, ...)
+bru_log_bookmarks(x = NULL)
 
-\method{bru_logify}{bru_log}(x, offset = 0L, ...)
+bru_log_offset(x = NULL, bookmark = NULL, offset = NULL)
 
-bru_log_bookmark(bookmark = "", offset = NULL)
+bru_log_index(x = NULL, i)
 
-bru_log_bookmarks()
+bru_log(x = NULL)
 
-bru_log_offset(bookmark = NULL, offset = NULL, log_length = NULL)
+\method{bru_log}{character}(x)
 
-bru_log_get(..., offset = 0L)
+\method{bru_log}{bru_log}(x)
 
-\method{bru_log_get}{default}(..., bookmark = NULL, offset = 0L)
+\method{bru_log}{iinla}(x)
 
-\method{bru_log_get}{iinla}(x, ..., offset = 0L)
-
-\method{bru_log_get}{bru}(x, ..., offset = 0L)
+\method{bru_log}{bru}(x, ..., bookmark = NULL, offset = 0L)
 
 \method{print}{bru_log}(x, ...)
+
+\method{as.character}{bru_log}(x, ...)
 
 \method{[}{bru_log}(x, i)
 
 \method{c}{bru_log}(...)
+
+\method{length}{bru_log}(x)
 
 bru_log_message(
   ...,
@@ -57,25 +59,27 @@ bru_log_message(
   verbosity = 1,
   allow_verbose = TRUE,
   verbose = NULL,
-  verbose_store = NULL
+  verbose_store = NULL,
+  x = NULL
 )
 }
 \arguments{
+\item{x}{A \code{bru_log} object, or in some cases, and object that can be
+converted/extracted to a \code{bru_log} object. \code{NULL} denotes the global
+\code{inlabru} log object.}
+
 \item{bookmark}{character; The label for a bookmark with a stored offset.}
 
 \item{offset}{integer; a position offset in the log, with \code{0L} pointing at
 the start of the log. If negative, denotes the point \code{abs(offset)} elements
 from tail of the log.}
 
-\item{x}{For \code{bru_log_get()}, a \code{bru} or \code{iinla} object from \code{\link[=bru]{bru()}}.}
+\item{i}{indices specifying elements to extract. If \code{character}, denotes
+the sequence between bookmark \code{i} and the next bookmark (or the end of the
+log if \code{i} is the last bookmark)}
 
 \item{...}{For \code{bru_log_message()}, zero or more objects passed on to
 \code{\link[base:message]{base::.makeMessage()}}}
-
-\item{log_length}{integer; the length of the log being operated on.
-If \code{NULL} (default) the global inlabru log length is used.}
-
-\item{i}{indices specifying elements to extract}
 
 \item{domain}{Domain for translations, passed on to \code{\link[base:message]{base::.makeMessage()}}}
 
@@ -99,12 +103,10 @@ stored in the global log object. Can be controlled via the \code{bru_verbose_sto
 with \code{\link[=bru_options_set]{bru_options_set()}}.}
 }
 \value{
-\code{bru_log_bookmark} Return the offset of the added bookmark, invisibly.
+\code{bru_log_bookmark} Return the modified \code{bru_log} object if \code{x} is non-NULL.
 
-\code{bru_log_get} A character vector of log messages, suitable for
-\code{cat(..., sep = "\\n")}. For ordinary printing, the \code{print.bru_log} method
-handles this by itself. An additional class identifier \code{bru_log} is added,
-to allow a dedicated \code{print} method to be found.
+\code{bru_log} A \code{bru_log} object, containing a
+character vector of log messages, and potentially a vector of bookmarks..
 
 \code{bru_log_message} returns \code{invisible()}
 }
@@ -113,27 +115,27 @@ Log message methods
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{bru_logify(bru_log)}: Subset from a \code{bru_log} object.
-
 \item \code{print(bru_log)}: Print a \code{bru_log} object with \code{cat(x, sep = "\\n")}
 
-\item \code{[}: Extract elements of a \code{bru_log} object
+\item \code{as.character(bru_log)}: Convert \code{bru_log} object to a plain \code{character} vector
+
+\item \code{[}: Extract a subset of a \code{bru_log} object
 
 \item \code{c(bru_log)}: Concatenate several \code{bru_log} or \code{character} objects
+into a \code{bru_log} object.
+
+\item \code{length(bru_log)}: Obtain the number of log entries
 into a \code{bru_log} object.
 
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_log_reset()}: Clears the \code{inlabru} log contents up to
-a given \code{offset} or \code{bookmark}. Default: clear the entire log
+\item \code{bru_log_reset()}: Clears the log contents up to
+a given \code{offset} or \code{bookmark}. Default: clear the entire log.
+When \code{x} is NULL, the global \code{inlabru} log is updated, and \code{invisible(NULL)}
+is returned. Otherwise the updated object is returned (invisibly).
 
-\item \code{bru_logify()}: Create or subset from a \code{bru_log} object.
-
-\item \code{bru_logify(default)}: Create an empty \code{bru_log} object.
-
-\item \code{bru_logify(character)}: Convert a character vector into a \code{bru_log} object,
-and optionally extract a subset.
+\item \code{bru_log_new()}: Create an empty \code{bru_log} object.
 
 \item \code{bru_log_bookmark()}: Set a log bookmark. If \code{offset} is \code{NULL} (the default),
 the bookmark will point to the current end of the log.
@@ -144,7 +146,10 @@ position offsets.
 
 \item \code{bru_log_offset()}: Utility function for computing log position offsets.
 
-\item \code{bru_log_get()}: Extract stored log messages
+\item \code{bru_log_index()}: Utility function for computing index vectors for \code{bru_log}
+objects.
+
+\item \code{bru_log()}: Extract stored log messages
 
 \item \code{bru_log_message()}: Adds a log message.
 
@@ -176,8 +181,8 @@ if (interactive()) {
   message("Run code")
   code_runner()
   message("Check log from bookmark 1")
-  print(bru_log_get(bookmark = "bookmark 1"))
+  print(bru_log()["bookmark 1"])
   message("Check log from bookmark 2")
-  print(bru_log_get(bookmark = "bookmark 2"))
+  print(bru_log()["bookmark 2"])
 }
 }

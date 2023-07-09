@@ -2985,7 +2985,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
-      log = c(original_log, bru_log_get(bookmark = "iinla")),
+      log = c(original_log, bru_log()["iinla"]),
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
@@ -3100,9 +3100,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   # Preserve old log output
   if (is.null(old.result[["bru_iinla"]][["log"]])) {
-    original_log <- character(0)
+    original_log <- bru_log(character(0))
   } else {
-    original_log <- old.result[["bru_iinla"]][["log"]]
+    original_log <- bru_log(old.result[["bru_iinla"]][["log"]])
   }
 
   # Track variables
