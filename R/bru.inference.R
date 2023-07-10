@@ -3777,9 +3777,6 @@ summary.bru <- function(object, verbose = FALSE, ...) {
     bru_info = summary(object[["bru_info"]], verbose = verbose, ...)
   )
 
-  result$WAIC <- object[["waic"]][["waic"]]
-  result$DIC <- object[["dic"]][["dic"]]
-
   if (inherits(object, "inla")) {
     result$inla <- NextMethod("summary", object)
     result[["inla"]][["call"]] <- NULL
@@ -3787,50 +3784,16 @@ summary.bru <- function(object, verbose = FALSE, ...) {
 
   class(result) <- c("summary_bru", "list")
   return(result)
-
-  marginal.summary <- function(m, name) {
-    df <- data.frame(
-      param = name,
-      mean = INLA::inla.emarginal(identity, m)
-    )
-    df$var <- INLA::inla.emarginal(function(x) {
-      (x - df$mean)^2
-    }, m)
-    df$sd <- sqrt(df$var)
-    df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
-    df
-  }
-
-  cat("\n")
-  for (nm in names(object$bru_info$model$effects)) {
-    eff <- object$bru_info$model$effects[[nm]]
-    if (identical(eff[["main"]][["type"]], "spde")) {
-      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
-      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
-      df <- rbind(
-        marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
-        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-      )
-      print(df)
-    }
-  }
-  message(
-    "The current summary.bru(...) method is outdated and will be replaced.\n",
-    "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative."
-  )
-  class(result) <- c("summary_bru", "list")
-  result
 }
 
 
 #' @export
-#' @param x An `summary_bru2` object
+#' @param x A `summary_bru` object
 #' @rdname summary.bru
 
 print.summary_bru <- function(x, ...) {
-  print(x$bru_info)
-  print(x$inla)
+  print(x$bru_info, ...)
+  print(x$inla, ...)
   invisible(x)
 }
 
