@@ -2548,9 +2548,10 @@ bru_line_search <- function(model,
   if (do_finite || do_contract) {
     nonfin <- any(!is.finite(nonlin_pred))
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     while ((do_finite && nonfin) ||
-      (do_contract && (norm0 > norm01 * fact))) {
+      (do_contract && ((norm0 > norm01 * fact) || (norm1 > norm01 * fact)))) {
       if (do_finite && nonfin) {
         finite_active <- finite_active - 1
       } else {
@@ -2564,12 +2565,18 @@ bru_line_search <- function(model,
       )
       nonfin <- any(!is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
         paste0(
           "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 3),
-          "%, Contract"
+          signif(100 * step_scaling, 4),
+          "%, Contract",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2608,7 +2615,12 @@ bru_line_search <- function(model,
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 3),
-          "%, Expand"
+          "%, Expand",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2628,13 +2640,19 @@ bru_line_search <- function(model,
         param = nonlin_param,
         state = state
       )
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 3),
-          "%, Overstep"
+          "%, Overstep",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2665,16 +2683,32 @@ bru_line_search <- function(model,
       param = nonlin_param,
       state = state_opt
     )
+    norm0_opt <- pred_norm(nonlin_pred_opt - lin_pred0)
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
-    delta_norm <- pred_norm(lin_pred0 - lin_pred1)
-    if (norm1_opt > delta_norm) {
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling_opt_approx, 4),
+        "%, Approx Optimisation",
+        " (",
+        "norm0 = ", signif(norm0_opt, 4),
+        ", norm1 = ", signif(norm1_opt, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 3
+    )
+
+    if (norm1_opt > norm01) {
       bru_log_message(
         paste0(
           "iinla: norm1_opt > |delta|: ",
           signif(norm1_opt, 4),
           " > ",
-          signif(delta_norm, 4)
+          signif(norm01, 4)
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2682,9 +2716,9 @@ bru_line_search <- function(model,
       )
     }
 
-    if ((norm1_opt > delta_norm) ||
+    if ((norm1_opt > norm01) ||
         identical(options$bru_method$line_opt_method, "full")) {
-      alpha_ <-
+      alpha <-
         optimise(
           line_search_optimisation_target_exact,
           step_scaling * c(0, fact),
@@ -2696,37 +2730,58 @@ bru_line_search <- function(model,
           ),
           nonlin_param = nonlin_param
         )
-    }
 
-    step_scaling_opt <- alpha$minimum
-    state_opt <- scale_state(state0, state1, step_scaling_opt)
-    nonlin_pred_opt <- nonlin_predictor(
-      param = nonlin_param,
-      state = state_opt
-    )
-    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+      step_scaling_opt <- alpha$minimum
+      state_opt <- scale_state(state0, state1, step_scaling_opt)
+      nonlin_pred_opt <- nonlin_predictor(
+        param = nonlin_param,
+        state = state_opt
+      )
+      norm0_opt <- pred_norm(nonlin_pred_opt - lin_pred0)
+      norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling_opt, 4),
+          "%, Optimisation",
+          " (",
+          "norm0 = ", signif(norm0_opt, 4),
+          ", norm1 = ", signif(norm1_opt, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (norm1_opt > norm01) {
+        bru_log_message(
+          paste0(
+            "iinla: norm1_opt > |delta|: ",
+            signif(norm1_opt, 4),
+            " > ",
+            signif(norm01, 4)
+          ),
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store,
+          verbosity = 3
+        )
+      }
+    } else {
+      step_scaling_opt <- step_scaling_opt_approx
+    }
 
     if (norm1_opt < norm1) {
       step_scaling <- step_scaling_opt
       state <- state_opt
       nonlin_pred <- nonlin_pred_opt
+      norm0 <- norm0_opt
       norm1 <- norm1_opt
-
+    } else {
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 4),
-          "%, Optimisation",
-          if (identical(options$bru_method$line_opt_method, "full")) {
-            paste0(
-              " (Approx = ",
-              signif(100 * step_scaling_opt_approx, 4),
-              "%)"
-            )
-          } else {
-            NULL
-          }
-        ),
+        paste0("iinla: Optimisation did not improve on previous solution."),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
@@ -2759,13 +2814,19 @@ bru_line_search <- function(model,
       param = nonlin_param,
       state = state
     )
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
       paste0(
         "iinla: Step rescaling: ",
         signif(100 * step_scaling, 3),
-        "%, Maximum step length"
+        "%, Maximum step length",
+        " (",
+        "norm0 = ", signif(norm0, 4),
+        ", norm1 = ", signif(norm1, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
       ),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store,
@@ -2782,7 +2843,12 @@ bru_line_search <- function(model,
       paste0(
         "iinla: Step rescaling: ",
         signif(100 * step_scaling, 3),
-        "%"
+        "%",
+        " (",
+        "norm0 = ", signif(norm0, 4),
+        ", norm1 = ", signif(norm1, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
       ),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store,
@@ -2855,14 +2921,15 @@ bru_line_search <- function(model,
       ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state, col = "opt")) +
       ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
       ggplot2::ylab("state")
-    print(((pl1 | pl2) / (pl3 | pl4)) +
+    pl1234 <-
+      ((pl1 | pl2) / (pl3 | pl4)) +
       patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "right"))
+      ggplot2::theme(legend.position = "right")
 
     # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
     # delta = lin1-lin0
     delta <- lin_pred1 - lin_pred0
-    delta_norm <- pred_norm(delta)
+    delta_norm <- norm01
 
     # <eta-lin0, delta>/|delta|
     along_opt <- pred_scalprod(nonlin_pred - lin_pred0, delta) / delta_norm
