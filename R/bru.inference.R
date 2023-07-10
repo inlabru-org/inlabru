@@ -2717,7 +2717,7 @@ bru_line_search <- function(model,
     }
 
     if ((norm1_opt > norm01) ||
-        identical(options$bru_method$line_opt_method, "full")) {
+      identical(options$bru_method$line_opt_method, "full")) {
       alpha <-
         optimise(
           line_search_optimisation_target_exact,
@@ -2923,8 +2923,8 @@ bru_line_search <- function(model,
       ggplot2::ylab("state")
     pl1234 <-
       ((pl1 | pl2) / (pl3 | pl4)) +
-      patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "right")
+        patchwork::plot_layout(guides = "collect") &
+        ggplot2::theme(legend.position = "right")
 
     # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
     # delta = lin1-lin0
