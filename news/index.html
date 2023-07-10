@@ -84,7 +84,10 @@
 <div class="section level3">
 <h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
 <ul><li><p>Add experimental support for <code>stars</code> via <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. (version <code>2.8.0.9007</code>)</p></li>
-<li><p>Now preserves the previous log output when using <code><a href="../reference/bru.html">bru_rerun()</a></code>, and <code>bru_log_get()</code> is now a set of S3 methods, supporting extracting the full inlabru log as well <code>bru</code>-object specific logs (version <code>2.8.0.9008</code>)</p></li>
+<li>
+<p>Now preserves the previous log output when using <code><a href="../reference/bru.html">bru_rerun()</a></code>, and <code><a href="../reference/bru_log.html">bru_log()</a></code> is now a set of S3 methods, supporting extracting the full inlabru log as well <code>bru</code>-object specific logs (version <code>2.8.0.9008</code>).</p>
+<p>Note: Up to version <code>2.8.0</code>, <code><a href="../reference/bru_log.html">bru_log()</a></code> was a deprecated alias for <code><a href="../reference/bru_log_message.html">bru_log_message()</a></code>. When running on <code>2.8.0</code> or earlier, use <code>bru_log_get()</code> to access the global log, and <code>cat(fit$bru_iinla$log, sep = "\n")</code> to print a stored estimation object log. After version <code>2.8.0</code>, use <code><a href="../reference/bru_log.html">bru_log()</a></code> to access the global log, and <code>bru_log(fit)</code> to access a stores estimation log.</p>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-and-dependency-updates-development-version">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-development-version"></a></h3>
