@@ -806,14 +806,7 @@ bru <- function(components = ~ Intercept(1),
     dot_is_lhood <- TRUE
     dot_is_lhood_list <- FALSE
   }
-  if (any(dot_is_lhood_list)) {
-    lhoods <- like_list(c(
-      lhoods[dot_is_lhood],
-      do.call(c, lhoods[dot_is_lhood_list])
-    ))
-  } else {
-    lhoods <- like_list(lhoods)
-  }
+  lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -1528,28 +1521,31 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 }
 
 
-#' @details
-#' * `like_list`: Combine a `bru_like` likelihoods
-#' into a `bru_like_list` object
+#' @describeIn like
+#' Combine `bru_like` likelihoods into a `bru_like_list` object
 #' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
 #' @export
-#' @rdname like
 like_list <- function(...) {
   UseMethod("like_list")
 }
 
-#' @details
-#' * `like_list.list`: Combine a list of `bru_like` likelihoods
+#' @describeIn like
+#' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @param object A list of `bru_like` objects
 #' @param envir An optional environment for the new `bru_like_list` object
 #' @export
-#' @rdname like
 like_list.list <- function(object, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
   if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
+    if (any(vapply(object, function(x) inherits(x, "bru_like_list"), TRUE))) {
+      stop(paste0(
+        "All list elements must be of class 'bru_like'.\n",
+           "To combine with 'bru_like_list' objects, use c(...)."
+        ))
+    }
     stop("All list elements must be of class 'bru_like'.")
   }
 
@@ -1558,14 +1554,51 @@ like_list.list <- function(object, envir = NULL, ...) {
   object
 }
 
-#' @details
-#' * `like_list.bru_like`: Combine several `bru_like` likelihoods
+#' @describeIn like
+#' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
-#' @rdname like
 like_list.bru_like <- function(..., envir = NULL) {
-  like_list(list(...), envir = envir)
+  do.call(c, list(..., envir = envir))
 }
+
+#' @describeIn like
+#' Combine several `bru_like` likelihoods and/or `bru_like_list`
+#' objects into a `bru_like_list` object
+#' @export
+c.bru_like <- function(..., envir = NULL) {
+  lst <- lapply(list(...), function(x) {
+    if (inherits(x, "bru_like")) {
+      list(x)
+    } else if (inherits(x, "bru_like_list")) {
+      x
+    } else {
+      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+    }
+  })
+  lst <- do.call(c, lst)
+  like_list(lst, envir = envir)
+}
+
+#' @describeIn like
+#' Combine several `bru_like` likelihoods and/or `bru_like_list`
+#' objects into a `bru_like_list` object
+#' @export
+c.bru_like_list <- function(..., envir = NULL) {
+  lst <- lapply(list(...), function(x) {
+    if (inherits(x, "bru_like")) {
+      list(x)
+    } else if (inherits(x, "bru_like_list")) {
+      x
+    } else {
+      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+    }
+  })
+  lst <- NextMethod("c", lst)
+  like_list(lst, envir = envir)
+}
+
+
 
 #' @export
 #' @param x `bru_like_list` object from which to extract element(s)
@@ -1578,6 +1611,7 @@ like_list.bru_like <- function(..., envir = NULL) {
   environment(object) <- env
   object
 }
+
 
 #' Utility functions for bru likelihood objects
 #' @param x Object of `bru_like` or `bru_like_list` type

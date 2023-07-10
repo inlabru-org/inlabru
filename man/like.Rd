@@ -5,6 +5,8 @@
 \alias{like_list}
 \alias{like_list.list}
 \alias{like_list.bru_like}
+\alias{c.bru_like}
+\alias{c.bru_like_list}
 \alias{[.bru_like_list}
 \title{Likelihood construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
@@ -36,6 +38,10 @@ like_list(...)
 \method{like_list}{list}(object, envir = NULL, ...)
 
 \method{like_list}{bru_like}(..., envir = NULL)
+
+\method{c}{bru_like}(..., envir = NULL)
+
+\method{c}{bru_like_list}(..., envir = NULL)
 
 \method{[}{bru_like_list}(x, i)
 }
@@ -140,22 +146,23 @@ A likelihood configuration which can be used to parameterise \code{\link[=bru]{b
 \description{
 Likelihood construction for usage with \code{\link[=bru]{bru()}}
 }
-\details{
+\section{Functions}{
 \itemize{
-\item \code{like_list}: Combine a \code{bru_like} likelihoods
-into a \code{bru_like_list} object
-}
+\item \code{like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
 
-\itemize{
-\item \code{like_list.list}: Combine a list of \code{bru_like} likelihoods
+\item \code{like_list(list)}: Combine a list of \code{bru_like} likelihoods
 into a \code{bru_like_list} object
-}
 
-\itemize{
-\item \code{like_list.bru_like}: Combine several \code{bru_like} likelihoods
+\item \code{like_list(bru_like)}: Combine several \code{bru_like} likelihoods
 into a \code{bru_like_list} object
-}
-}
+
+\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
+objects into a \code{bru_like_list} object
+
+\item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
+objects into a \code{bru_like_list} object
+
+}}
 \examples{
 \donttest{
 if (bru_safe_inla() &&
