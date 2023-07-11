@@ -117,6 +117,12 @@ like_list(object, envir = NULL, ...)
 # S3 method for bru_like
 like_list(..., envir = NULL)
 
+# S3 method for bru_like
+c(..., envir = NULL)
+
+# S3 method for bru_like_list
+c(..., envir = NULL)
+
 # S3 method for bru_like_list
 [(x, i)</code></pre></div>
     </div>
@@ -274,14 +280,17 @@ Defaults to the calling environment.</p></dd>
 <p>A likelihood configuration which can be used to parameterise <code><a href="bru.html">bru()</a></code>.</p>
     </div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
-<ul><li><p><code>like_list</code>: Combine a <code>bru_like</code> likelihoods
+<ul><li><p><code>like_list()</code>: Combine <code>bru_like</code> likelihoods into a <code>bru_like_list</code> object</p></li>
+<li><p><code>like_list(list)</code>: Combine a list of <code>bru_like</code> likelihoods
 into a <code>bru_like_list</code> object</p></li>
-</ul><ul><li><p><code>like_list.list</code>: Combine a list of <code>bru_like</code> likelihoods
+<li><p><code>like_list(bru_like)</code>: Combine several <code>bru_like</code> likelihoods
 into a <code>bru_like_list</code> object</p></li>
-</ul><ul><li><p><code>like_list.bru_like</code>: Combine several <code>bru_like</code> likelihoods
-into a <code>bru_like_list</code> object</p></li>
+<li><p><code>c(bru_like)</code>: Combine several <code>bru_like</code> likelihoods and/or <code>bru_like_list</code>
+objects into a <code>bru_like_list</code> object</p></li>
+<li><p><code>c(bru_like_list)</code>: Combine several <code>bru_like</code> likelihoods and/or <code>bru_like_list</code>
+objects into a <code>bru_like_list</code> object</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
