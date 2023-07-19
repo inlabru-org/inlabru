@@ -19,9 +19,9 @@ gorillas_sf = readRDS(here::here("sf", "Data", "gorillas_sf.rds"))
 
 # matrix version
 loc.bnd = matrix(c(0,0, 1,0, 1,1, 0,1), 4, 2, byrow=TRUE)
-segm.bnd = inla.mesh.segment(loc.bnd,
-                             idx = seq_len(nrow(loc.bnd)),
-                             is.bnd = TRUE)
+segm.bnd = fm_segm(loc.bnd,
+                   idx = seq_len(nrow(loc.bnd)),
+                   is.bnd = TRUE)
 
 # Note: this returns different indexing if idx is not set manually here.
 # Setting this to seq_len(nrow(loc.bnd)) makes the test work.
@@ -61,13 +61,13 @@ segm.bnd.sf.xym = fm_as_segm(loc.sf.xyz)
 
 pts1 <- rbind(c(0,3),c(0,4),c(1,5),c(2,5))
 pts2 <- rbind(c(1,1),c(0,0),c(0,-1),c(-2,-2))
-seg1 = INLA::inla.mesh.segment(loc = pts1,
-                               idx = seq_len(nrow(pts1)),
-                               is.bnd = FALSE)
+seg1 = fm_segm(loc = pts1,
+               idx = seq_len(nrow(pts1)),
+               is.bnd = FALSE)
 
-seg2 = INLA::inla.mesh.segment(loc = pts2,
-                               idx = seq_len(nrow(pts2)),
-                               is.bnd = FALSE)
+seg2 = fm_segm(loc = pts2,
+               idx = seq_len(nrow(pts2)),
+               is.bnd = FALSE)
 
 seg = fm_internal_sp2segment_join(list(seg1, seg2),
                                   grp = seq_len(length(seg)),
