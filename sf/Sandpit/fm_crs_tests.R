@@ -10,20 +10,20 @@ source(here::here("R", "fmesher_crs.R"))
 source(here::here("R", "sf_utils.R"))
 gorillas_sf = readRDS(here::here("sf", "Data", "gorillas_sf.rds"))
 
-#### testing for fm_as_inla_mesh_segment.sf ###
+#### testing for fm_as_segm.sf ###
 
 ## sfc_POINT ##
 
 # compare inla.mesh.segment with matrix input
-# to fm_as_inla_mesh_segment with sf point input
+# to fm_as_segm with sf point input
 
 # matrix version
 loc.bnd = matrix(c(0,0, 1,0, 1,1, 0,1), 4, 2, byrow=TRUE)
-segm.bnd = inla.mesh.segment(loc.bnd, 
-                             idx = seq_len(nrow(loc.bnd)),  
+segm.bnd = inla.mesh.segment(loc.bnd,
+                             idx = seq_len(nrow(loc.bnd)),
                              is.bnd = TRUE)
 
-# Note: this returns different indexing if idx is not set manually here. 
+# Note: this returns different indexing if idx is not set manually here.
 # Setting this to seq_len(nrow(loc.bnd)) makes the test work.
 
 # From inla.mesh.segment documentation:
@@ -31,7 +31,7 @@ segm.bnd = inla.mesh.segment(loc.bnd,
 #   the points in ‘loc’, as ‘c(1:nrow(loc),1L)’, otherwise
 #   ‘1:nrow(loc)’.
 #
-# However, fm_as_inla_mesh_segment.SpatialPoints uses seq_len(nrow(loc)) even if
+# However, fm_as_segm.SpatialPoints uses seq_len(nrow(loc)) even if
 # is.bnd == TRUE
 #
 # I am not sure if this is the desired behaviour.
@@ -40,7 +40,7 @@ segm.bnd = inla.mesh.segment(loc.bnd,
 loc.sf = st_as_sf(as.data.frame(loc.bnd),
                   coords = c(1,2))
 
-segm.bnd.sf = fm_as_inla_mesh_segment(loc.sf)
+segm.bnd.sf = fm_as_segm(loc.sf)
 
 identical(segm.bnd.sf, segm.bnd)
 str(segm.bnd)
@@ -55,7 +55,7 @@ class(loc.sf.xyz)
 class(st_geometry(loc.sf.xyz))
 class(st_geometry(loc.sf.xyz)[[1]])
 
-segm.bnd.sf.xym = fm_as_inla_mesh_segment(loc.sf.xyz)
+segm.bnd.sf.xym = fm_as_segm(loc.sf.xyz)
 
 ## scf_LINESTRING ##
 
@@ -77,7 +77,7 @@ line_str1 <- st_linestring(pts1)
 line_str2 <- st_linestring(pts2)
 line_sfc = st_as_sfc(list(line_str1, line_str2))
 line_sf = st_sf(geometry = line_sfc)
-seg_sf = fm_as_inla_mesh_segment(line_sf)
+seg_sf = fm_as_segm(line_sf)
 identical(seg_sf, seg)
 
 str(seg)

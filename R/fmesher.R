@@ -15,9 +15,23 @@ fmesher::fm_CRSargs
 #' @export
 fmesher::fm_CRSargs_as_list
 #' @export
-fmesher::fm_as_inla_mesh
+fmesher::fm_as_fm
 #' @export
-fmesher::fm_as_inla_mesh_segment
+fmesher::fm_as_mesh_2d
+#' @export
+fmesher::fm_as_mesh_1d
+#' @export
+fmesher::fm_as_lattice_2d
+#' @export
+fmesher::fm_as_segm
+#' @export
+fmesher::fm_mesh_2d
+#' @export
+fmesher::fm_mesh_1d
+#' @export
+fmesher::fm_lattice_2d
+#' @export
+fmesher::fm_segm
 #' @export
 fmesher::fm_as_sfc
 #' @export
