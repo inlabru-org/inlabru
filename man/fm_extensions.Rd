@@ -30,7 +30,7 @@ erosion by \code{concave}. This is equivalent to dilation by \code{convex} follo
 by closing (dilation + erosion) by \code{concave}.
 }
 \examples{
-if (fm_safe_inla()) {
+if (bru_safe_inla()) {
   inp <- sf::st_as_sf(as.data.frame(matrix(1:6, 3, 2)), coords = 1:2)
   out <- fm_extensions(inp, convex = c(0.75, 2))
   bnd <- lapply(out, fm_as_segm)
