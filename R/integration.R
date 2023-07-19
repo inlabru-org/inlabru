@@ -221,7 +221,7 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
     idx <- idx[ok, , drop = FALSE]
 
     # Split at mesh edges
-    line.spl <- split_lines(mesh, sp, ep, TRUE)
+    line.spl <- fm_split_lines(mesh, sp, ep)
     sp <- line.spl$sp
     ep <- line.spl$ep
     idx <- idx[line.spl$split.origin, ]
