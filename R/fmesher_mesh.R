@@ -1,3 +1,5 @@
+#' @include deprecated.R
+
 #' @title Generate lattice points covering a mesh
 #'
 #' @description Generate `terra`, `sf`, or `sp` lattice locations
@@ -388,3 +390,485 @@ fm_onto_mesh <- function(mesh, loc, crs = NULL) {
 
   loc
 }
+
+
+
+
+
+
+#' @title Compute an extension of a spatial object
+#'
+#' @description
+#' Constructs a potentially nonconvex extension of a spatial object by
+#' performing dilation by `convex + concave` followed by
+#' erosion by `concave`. This is equivalent to dilation by `convex` followed
+#' by closing (dilation + erosion) by `concave`.
+#'
+#' @param x A spatial object
+#' @param ... Arguments passed on to the sub-methods
+#' @param convex How much to extend
+#' @param concave The minimum allowed reentrant curvature. Default equal to `convex`
+#' @param preserveTopology logical; argument to `sf::st_simplify()`
+#' @param dTolerance If not null, the `dTolerance` argument to `sf::st_simplify()`
+#' @returns An extended object
+#' @references Gonzalez and Woods (1992), Digital Image Processing
+#' @export
+#' @examples
+#' inp <- sf::st_as_sf(as.data.frame(matrix(1:6, 3, 2)), coords = 1:2)
+#' out <- fm_nonconvex_hull(inp, convex = 1)
+#' plot(out)
+fm_nonconvex_hull <- function(x, ...) {
+  UseMethod("fm_nonconvex_hull")
+}
+
+#' @rdname fm_nonconvex_hull
+#' @export
+fm_nonconvex_hull.matrix <- function(x, ...) {
+  fm_nonconvex_hull.sfc(sf::st_multipoint(x), ...)
+}
+
+#' @rdname fm_nonconvex_hull
+#' @export
+fm_nonconvex_hull.sf <- function(x, ...) {
+  fm_nonconvex_hull.sfc(sf::st_geometry(x), ...)
+}
+
+#' @rdname fm_nonconvex_hull
+#' @export
+fm_nonconvex_hull.Spatial <- function(x, ...) {
+  fm_nonconvex_hull.sfc(sf::st_as_sfc(x), ...)
+}
+
+#' @rdname fm_nonconvex_hull
+#' @export
+fm_nonconvex_hull.sfg <- function(x, ...) {
+  fm_nonconvex_hull.sfc(sf::st_sfc(x), ...)
+}
+
+#' @rdname fm_nonconvex_hull
+#' @details Differs from `sf::st_buffer(x, convex)` followed by
+#' `sf::st_concave_hull()` (available from GEOS 3.11)
+#' in how the amount of allowed concavity is controlled.
+#' @export
+fm_nonconvex_hull.sfc <- function(x,
+                                  convex = -0.15,
+                                  concave = convex,
+                                  preserveTopology = TRUE,
+                                  dTolerance = NULL,
+                                  ...) {
+  if ((convex < 0) || (concave < 0)) {
+    approx_diameter <- fm_diameter(x)
+    if (convex < 0) {
+      convex <- approx_diameter * abs(convex)
+    }
+    if (concave < 0) {
+      concave <- approx_diameter * abs(concave)
+    }
+  }
+
+  nQuadSegs <- 64
+  y <- sf::st_buffer(x, dist = convex + concave, nQuadSegs = nQuadSegs)
+  y <- sf::st_union(y)
+  y <- sf::st_buffer(y, dist = -concave, nQuadSegs = nQuadSegs)
+  if (!is.null(dTolerance)) {
+    y <- sf::st_simplify(y,
+      preserveTopology = preserveTopology,
+      dTolerance = dTolerance
+    )
+  }
+  y <- sf::st_union(y)
+  y
+}
+
+#' @title Compute approximate spatial object diameter
+#' @param x A spatial object
+#' @param ... Currently unused
+#' @export
+fm_diameter <- function(x, ...) {
+  UseMethod("fm_diameter")
+}
+
+#' @rdname fm_diameter
+#' @export
+fm_diameter.sf <- function(x, ...) {
+  fm_diameter.sfc(sf::st_geometry(x))
+}
+
+#' @rdname fm_diameter
+#' @export
+fm_diameter.sfg <- function(x, ...) {
+  fm_diameter.sfc(sf::st_sfc(x))
+}
+
+#' @rdname fm_diameter
+#' @export
+fm_diameter.sfc <- function(x, ...) {
+  fm_diameter.matrix(sf::st_coordinates(x))
+}
+
+#' @rdname fm_diameter
+#' @export
+fm_diameter.matrix <- function(x, ...) {
+  if (ncol(x) == 1) {
+    lim <- range(x)
+    approx_diameter <- diff(lim)
+  } else if (ncol(x) == 2) {
+    lim <- rbind(range(x[, 1]), range(x[, 2]))
+    approx_diameter <- max(diff(lim[1, ]), diff(lim[2, ]))
+  } else if (ncol(x) >= 3) {
+    lim <- rbind(range(x[, 1]), range(x[, 2]), range(x[, 3]))
+    approx_diameter <- max(diff(lim[1, ]), diff(lim[2, ]), diff(lim[3, ]))
+  }
+  approx_diameter
+}
+
+
+#' @title Compute extensions of a spatial object
+#'
+#' @description
+#' Constructs a potentially nonconvex extension of a spatial object by
+#' performing dilation by `convex + concave` followed by
+#' erosion by `concave`. This is equivalent to dilation by `convex` followed
+#' by closing (dilation + erosion) by `concave`.
+#' @seealso [fm_nonconvex_hull()]
+#'
+#' @param x A spatial object
+#' @param convex numeric vector; How much to extend
+#' @param concave numeric vector; The minimum allowed reentrant curvature. Default equal to `convex`
+#' @param dTolerance If not null, the `dTolerance` argument to `sf::st_simplify()`,
+#' passed on to [fm_nonconvex_hull()].
+#' The default is `pmin(convex, concave) / 40`, chosen to
+#' give approximately 4 or more subsegments per circular quadrant.
+#' @param ... Optional further arguments to pass on to [fm_nonconvex_hull()].
+#' @returns A list of `sfg` objects.
+#' @export
+#' @examples
+#' if (fm_safe_inla()) {
+#'   inp <- sf::st_as_sf(as.data.frame(matrix(1:6, 3, 2)), coords = 1:2)
+#'   out <- fm_extensions(inp, convex = c(0.75, 2))
+#'   bnd <- lapply(out, fm_as_segm)
+#'   plot(INLA::inla.mesh.2d(boundary = bnd, max.edge = c(0.25, 1)), asp = 1)
+#' }
+#'
+fm_extensions <- function(x,
+                          convex = -0.15,
+                          concave = convex,
+                          dTolerance = NULL,
+                          ...) {
+  if (any(convex < 0) || any(concave < 0) || any(dTolerance < 0)) {
+    approx_diameter <- fm_diameter(x)
+  }
+  len <- max(length(convex), length(concave), length(dTolerance))
+  scale_fun <- function(val) {
+    if (any(val < 0)) {
+      val[val < 0] <- approx_diameter * abs(val[val < 0])
+    }
+    if (length(val) < len) {
+      val <- c(val, rep(val[length(val)], len - length(val)))
+    }
+    val
+  }
+  convex <- scale_fun(convex)
+  concave <- scale_fun(concave)
+  if (is.null(dTolerance)) {
+    dTolerance <- pmin(convex, concave) / 40
+  } else {
+    dTolerance <- scale_fun(dTolerance)
+  }
+
+  y <- lapply(
+    seq_along(convex),
+    function(k) {
+      fm_nonconvex_hull(
+        x,
+        convex = convex[k],
+        concave = concave[k],
+        dTolerance = dTolerance[k],
+        ...
+      )
+    }
+  )
+  y
+}
+
+
+
+# fm_segm ####
+
+#' @title Make a spatial segment object
+#' @describeIn fm_segm Create a new `fm_segm` object.
+#' @export
+#' @param ... Currently passed on to `inla.mesh.segment`
+#' @family object creation and conversion
+fm_segm <- function(...) {
+  UseMethod("fm_segm")
+}
+
+#' @rdname fm_segm
+#' @export
+fm_segm.default <- function(...) {
+  fm_as_segm(INLA::inla.mesh.segment(...))
+}
+
+#' @describeIn fm_segm Join multiple `fm_segm` objects into a single `fm_segm`
+#' object.
+#' @param grp.default When joining segments, use this group label for segments
+#' that have `grp == NULL`.
+#' @export
+fm_segm.fm_segm <- function(..., grp.default = 0) {
+  fm_as_segm(INLA::inla.mesh.segment(..., grp.default = grp.default))
+}
+#' @describeIn fm_segm Join multiple `inla.mesh.segment` objects into a single `fm_segm`
+#' object.
+#' @param grp.default When joining segments, use this group label for segments
+#' that have `grp == NULL`.
+#' @export
+#' @method fm_segm inla.mesh.segment
+fm_segm.inla.mesh.segment <- function(..., grp.default = 0) {
+  fm_as_segm(INLA::inla.mesh.segment(..., grp.default = grp.default))
+}
+
+
+#' @title Convert objects to `fm_segm`
+#' @describeIn fm_as_segm Convert an object to `fm_segm`.
+#' @param x Object to be converted.
+#' @param ... Arguments passed on to submethods
+#' @export
+#' @family object creation and conversion
+fm_as_segm <- function(x, ...) {
+  UseMethod("fm_as_segm")
+}
+#' @rdname fm_as_segm
+#' @export
+#' @method fm_as_segm inla.mesh.segment
+fm_as_segm.inla.mesh.segment <- function(x, ...) {
+  class(x) <- c("fm_segm", class(x))
+  x
+}
+
+
+
+
+# fm_mesh ####
+
+#' @title Convert objects to fmesher objects
+#' @description
+#' Used for conversion from general objects
+#' (usually `inla.mesh` and other INLA specific classes)
+#' to `fmesher` classes.
+#'
+#' @param x Object to be converted
+#' @param ... Arguments forwarded to submethods
+#' @rdname fm_as_fm
+#' @export
+#' @family object creation and conversion
+fm_as_fm <- function(x, ...) {
+  UseMethod("fm_as_fm")
+}
+#' @rdname fm_as_fm
+#' @export
+fm_as_fm.fm_mesh_1d <- function(x, ...) {
+  #  class(x) <- c("fm_mesh_1d", setdiff(class(x), "fm_mesh_1d"))
+  x
+}
+#' @rdname fm_as_fm
+#' @export
+fm_as_fm.fm_mesh_2d <- function(x, ...) {
+  #  class(x) <- c("fm_mesh_2d", setdiff(class(x), "fm_mesh_2d"))
+  x
+}
+#' @rdname fm_as_fm
+#' @export
+fm_as_fm.fm_segm <- function(x, ...) {
+  #  class(x) <- c("fm_segm", setdiff(class(x), "fm_segm"))
+  x
+}
+#' @rdname fm_as_fm
+#' @export
+fm_as_fm.fm_lattice_2d <- function(x, ...) {
+  #  class(x) <- c("fm_lattice_2d", setdiff(class(x), "fm_lattice_2d"))
+  x
+}
+#' @rdname fm_as_fm
+#' @export
+#' @method fm_as_fm inla.mesh.1d
+fm_as_fm.inla.mesh.1d <- function(x, ...) {
+  fm_as_mesh_1d(x, ...)
+}
+#' @rdname fm_as_fm
+#' @export
+#' @method fm_as_fm inla.mesh
+fm_as_fm.inla.mesh <- function(x, ...) {
+  fm_as_mesh_2d(x, ...)
+}
+
+#' @rdname fm_as_fm
+#' @export
+#' @method fm_as_fm inla.mesh.segment
+fm_as_fm.inla.mesh.segment <- function(x, ...) {
+  fm_as_segm(x, ...)
+}
+
+#' @rdname fm_as_fm
+#' @export
+#' @method fm_as_fm inla.mesh.lattice
+fm_as_fm.inla.mesh.lattice <- function(x, ...) {
+  fm_as_lattice_2d(x, ...)
+}
+
+# fm_mesh_1d ####
+
+#' @title Make a 1D mesh object
+#' @export
+#' @param ... Currently passed on to `inla.mesh.1d`
+#' @family object creation and conversion
+fm_mesh_1d <- function(...) {
+  UseMethod("fm_mesh_1d")
+}
+
+#' @rdname fm_mesh_1d
+#' @export
+fm_mesh_1d.default <- function(...) {
+  fm_as_mesh_1d(INLA::inla.mesh.1d(...))
+}
+
+#' @title Convert objects to `fm_segm`
+#' @describeIn fm_as_mesh_1d Convert an object to `fm_mesh_1d`.
+#' @param x Object to be converted.
+#' @param ... Arguments passed on to submethods
+#' @export
+#' @family object creation and conversion
+#' @export
+fm_as_mesh_1d <- function(...) {
+  UseMethod("fm_as_mesh_1d")
+}
+#' @rdname fm_as_mesh_1d
+#' @param x Object to be converted
+#' @export
+fm_as_mesh_1d.fm_mesh_1d <- function(x, ...) {
+  #  class(x) <- c("fm_mesh_1d", setdiff(class(x), "fm_mesh_1d"))
+  x
+}
+#' @rdname fm_as_mesh_1d
+#' @param x Object to be converted
+#' @export
+#' @method fm_as_mesh_1d inla.mesh.1d
+fm_as_mesh_1d.inla.mesh.1d <- function(x, ...) {
+  class(x) <- c("fm_mesh_1d", class(x))
+  x
+}
+
+
+# fm_mesh_2d ####
+
+#' @title Make a 2D mesh object
+#' @export
+#' @param ... Currently passed on to `inla.mesh.2d`
+#' @family object creation and conversion
+fm_mesh_2d <- function(...) {
+  UseMethod("fm_mesh_2d")
+}
+
+#' @rdname fm_mesh_2d
+#' @export
+fm_mesh_2d.default <- function(...) {
+  fm_as_mesh_2d(INLA::inla.mesh.2d(...))
+}
+
+#' @title Convert objects to `fm_mesh_2d`
+#' @describeIn fm_as_mesh_2d Convert an object to `fm_mesh_2d`.
+#' @param x Object to be converted.
+#' @param ... Arguments passed on to submethods
+#' @export
+#' @family object creation and conversion
+#' @export
+fm_as_mesh_2d <- function(...) {
+  UseMethod("fm_as_mesh_2d")
+}
+#' @rdname fm_as_mesh_2d
+#' @param x Object to be converted
+#' @export
+fm_as_mesh_2d.fm_mesh_2d <- function(x, ...) {
+#  class(x) <- c("fm_mesh_2d", setdiff(class(x), "fm_mesh_2d"))
+  x
+}
+#' @rdname fm_as_mesh_2d
+#' @export
+#' @method fm_as_mesh_2d inla.mesh
+fm_as_mesh_2d.inla.mesh <- function(x, ...) {
+  class(x) <- c("fm_mesh_2d", class(x))
+  x
+}
+
+
+
+
+# fm_lattice_2d ####
+
+#' @title Make a lattice object
+#' @export
+#' @param ... Currently passed on to `inla.mesh.lattice`
+#' @family object creation and conversion
+fm_lattice_2d <- function(...) {
+  UseMethod("fm_lattice_2d")
+}
+
+#' @rdname fm_lattice_2d
+#' @export
+fm_lattice_2d.default <- function(...) {
+  fm_as_lattice_2d(INLA::inla.mesh.lattice(...))
+}
+
+#' @title Convert objects to `fm_lattice_2d`
+#' @describeIn fm_as_lattice_2d Convert an object to `fm_lattice_2d`.
+#' @param x Object to be converted.
+#' @param ... Arguments passed on to submethods
+#' @export
+#' @family object creation and conversion
+#' @export
+fm_as_lattice_2d <- function(...) {
+  UseMethod("fm_as_lattice_2d")
+}
+#' @rdname fm_as_lattice_2d
+#' @param x Object to be converted
+#' @export
+fm_as_lattice_2d.fm_lattice_2d <- function(x, ...) {
+  #  class(x) <- c("fm_lattice_2d", setdiff(class(x), "fm_lattice_2d"))
+  x
+}
+#' @rdname fm_as_lattice_2d
+#' @param x Object to be converted
+#' @export
+#' @method fm_as_lattice_2d inla.mesh.lattice
+fm_as_lattice_2d.inla.mesh.lattice <- function(x, ...) {
+  class(x) <- c("fm_lattice_2d", class(x))
+  x
+}
+
+
+
+# Deprecated ####
+
+#' @describeIn inlabru-deprecated Conversion to inla.mesh.segment
+#' `r lifecycle::badge("deprecated")` in favour of [fm_as_segm()].
+#' @returns An `fm_segm` object
+#' @export
+fm_as_inla_mesh_segment <-
+  function(...) {
+    lifecycle::deprecate_soft("0.0.1",
+                              "fm_as_inla_mesh_segment()",
+                              "fm_as_segm()")
+    fm_as_segm(...)
+  }
+
+#' @describeIn inlabru-deprecated Conversion to inla.mesh.
+#' `r lifecycle::badge("deprecated")` in favour of [fm_as_mesh_2d()].
+#' @returns An `fm_mesh_2d` object
+#' @export
+fm_as_inla_mesh <- function(...) {
+  lifecycle::deprecate_soft("0.0.1",
+                            "fm_as_inla_mesh()",
+                            "fm_as_mesh_2d()")
+  fm_as_mesh_2d(...)
+}
+

@@ -79,7 +79,7 @@ defined on an \code{inla.mesh} or \code{inla.mesh.1d} object.
 \code{fm_evaluator} object. \code{fm_evaluate(mesh, field = field, ...)} is a
 shortcut to \code{fm_evaluate(fm_evaluator(mesh, ...), field = field)}.
 
-\item \code{fm_evaluator()}: Returns the and \code{fm_evaluator} list object with evaluation information.
+\item \code{fm_evaluator()}: Returns an \code{fm_evaluator} list object with evaluation information.
 The \code{proj} element contains a mapping matrix \code{A} and a logical vector \code{ok},
 that indicates which locations were mappable to the input mesh. For \code{inla.mesh}
 input, \code{proj} also contains a matrix \code{bary} and vector \code{t}, with the

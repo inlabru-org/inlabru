@@ -459,7 +459,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ))
 
     # This handles holes
-    poly_segm <- fm_as_inla_mesh_segment(samplers, join = FALSE)
+    poly_segm <- fm_as_segm(samplers, join = FALSE)
     poly_segm <- lapply(
       seq_along(poly_segm),
       function(k) {

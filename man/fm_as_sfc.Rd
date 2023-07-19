@@ -3,14 +3,20 @@
 \name{fm_as_sfc}
 \alias{fm_as_sfc}
 \alias{fm_as_sfc.inla.mesh}
+\alias{fm_as_sfc.fm_mesh_2d}
 \alias{fm_as_sfc.inla.mesh.segment}
+\alias{fm_as_sfc.fm_segm}
 \title{Conversion methods from mesh related objects to sfc}
 \usage{
 fm_as_sfc(x, ...)
 
 \method{fm_as_sfc}{inla.mesh}(x, ..., multi = FALSE)
 
+\method{fm_as_sfc}{fm_mesh_2d}(x, ..., multi = FALSE)
+
 \method{fm_as_sfc}{inla.mesh.segment}(x, ..., multi = FALSE)
+
+\method{fm_as_sfc}{fm_segm}(x, ..., multi = FALSE)
 }
 \arguments{
 \item{x}{An object to be coerced/transformed/converted into another class}
@@ -24,6 +30,10 @@ a set of \code{sfc_POLYGON}. Default \code{FALSE}}
 \itemize{
 \item \code{fm_as_sfc}: An \code{sfc_MULTIPOLYGON} or \code{sfc_POLYGON} object
 }
+
+\itemize{
+\item \code{fm_as_sfc}: An \code{sfc_MULTIPOLYGON} or \code{sfc_POLYGON} object
+}
 }
 \description{
 Conversion methods from mesh related objects to sfc
@@ -32,12 +42,24 @@ Conversion methods from mesh related objects to sfc
 \itemize{
 \item \code{fm_as_sfc(inla.mesh)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
+\item \code{fm_as_sfc(fm_mesh_2d)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 \item \code{fm_as_sfc(inla.mesh.segment)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+\item \code{fm_as_sfc(fm_segm)}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
 }}
 \seealso{
-Other fm_as: 
-\code{\link{fm_as_inla_mesh_segment}()},
-\code{\link{fm_as_inla_mesh}()}
+Other object creation and conversion: 
+\code{\link{fm_as_fm}()},
+\code{\link{fm_as_lattice_2d}()},
+\code{\link{fm_as_mesh_1d}()},
+\code{\link{fm_as_mesh_2d}()},
+\code{\link{fm_as_segm}()},
+\code{\link{fm_lattice_2d}()},
+\code{\link{fm_mesh_1d}()},
+\code{\link{fm_mesh_2d}()},
+\code{\link{fm_segm}()}
 }
 \concept{fm_as}
+\concept{object creation and conversion}

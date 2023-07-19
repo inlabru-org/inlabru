@@ -848,6 +848,7 @@ fm_crs.sfg <- function(x, ..., crsonly = FALSE) {
 
 #' @rdname fm_crs
 #' @export
+#' @method fm_crs inla.mesh
 fm_crs.inla.mesh <- function(x, ..., crsonly = FALSE) {
   fm_crs(x[["crs"]], ..., crsonly = crsonly)
 }

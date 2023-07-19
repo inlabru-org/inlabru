@@ -52,7 +52,7 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
 
   # matrix version
   loc.bnd <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), 4, 2, byrow = TRUE)
-  segm.bnd <- INLA::inla.mesh.segment(loc.bnd,
+  segm.bnd <- fm_segm(loc.bnd,
     is.bnd = TRUE,
     crs = fm_CRS()
   )
@@ -62,7 +62,7 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
     coords = c(1, 2)
   )
 
-  segm.bnd.sf <- fm_as_inla_mesh_segment(loc.sf, is.bnd = TRUE)
+  segm.bnd.sf <- fm_as_segm(loc.sf, is.bnd = TRUE)
 
   expect_identical(segm.bnd.sf, segm.bnd)
   #  str(segm.bnd)
@@ -78,7 +78,7 @@ test_that("Conversion from sfc_POINT to inla.mesh.segment", {
   class(sf::st_geometry(loc.sf.xyz))
   class(sf::st_geometry(loc.sf.xyz)[[1]])
 
-  expect_no_warning(fm_as_inla_mesh_segment(loc.sf.xyz))
+  expect_no_warning(fm_as_segm(loc.sf.xyz))
 })
 
 
@@ -89,14 +89,14 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
 
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5))
   pts2 <- rbind(c(1, 1), c(0, 0), c(0, -1), c(-2, -2))
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1,
     idx = seq_len(nrow(pts1)),
     is.bnd = FALSE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2,
     idx = seq_len(nrow(pts2)),
     is.bnd = FALSE,
@@ -113,7 +113,7 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
   line_sf <- sf::st_sf(geometry = line_sfc)
 
-  seg_from_sf <- fm_as_inla_mesh_segment(line_sf)
+  seg_from_sf <- fm_as_segm(line_sf)
   expect_identical(seg_from_sf, seg)
 
   seg_to_sf <- fm_as_sfc(seg)
@@ -130,30 +130,30 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
 test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   local_bru_safe_inla()
 
-  ## scf_POLYGON ##
+  ## sfc_POLYGON ##
 
   pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 10
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
-  seg0 <- INLA::inla.mesh.segment(
+  seg0 <- fm_segm(
     loc = pts0[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
-  seg0b <- INLA::inla.mesh.segment(
+  seg0b <- fm_segm(
     loc = pts0b[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
@@ -168,7 +168,7 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   line_str2 <- sf::st_polygon(list(pts0b))
   line_sfc <- sf::st_as_sfc(list(line_str1, line_str2))
   line_sf <- sf::st_sf(geometry = line_sfc)
-  seg_sf <- fm_as_inla_mesh_segment(line_sf)
+  seg_sf <- fm_as_segm(line_sf)
 
   expect_identical(seg_sf, seg)
 
@@ -181,30 +181,30 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
 test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
   local_bru_safe_inla()
 
-  ## scf_MULTIPOLYGON ##
+  ## sfc_MULTIPOLYGON ##
 
   pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 15
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
-  seg0 <- INLA::inla.mesh.segment(
+  seg0 <- fm_segm(
     loc = pts0[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
-  seg0b <- INLA::inla.mesh.segment(
+  seg0b <- fm_segm(
     loc = pts0b[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
@@ -230,7 +230,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
 
   line_sfc_c <- sf::st_combine(line_sfc)
   line_sfc_c <- c(line_sfc_c, line_sfc_c)
-  seg_sf_c <- fm_as_inla_mesh_segment(line_sfc_c)
+  seg_sf_c <- fm_as_segm(line_sfc_c)
 
   expect_identical(seg_sf_c, seg_2)
 
@@ -238,7 +238,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
   # and sf doesn't account for that, despite the sf standard being CCW ordering.
   # The conversion functions start by ensuring appropriate ordering.
   line_sfc_u <- sf::st_union(line_sfc)
-  seg_sf_u <- fm_as_inla_mesh_segment(line_sfc_u)
+  seg_sf_u <- fm_as_segm(line_sfc_u)
 
   minimal_shift <- function(a, b) {
     minimal_shift <- NA
@@ -270,30 +270,30 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
 test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
   local_bru_safe_inla()
 
-  ## scf_GEOMETRY ##
+  ## sfc_GEOMETRY ##
 
   pts0 <- rbind(c(-7, -7), c(7, -7), c(7, 7), c(-7, 7), c(-7, -7)) # covering (CCW)
   pts0b <- pts0 + 15
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3)) # hole (CW)
   pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2)) # hole (CW)
-  seg0 <- INLA::inla.mesh.segment(
+  seg0 <- fm_segm(
     loc = pts0[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
-  seg0b <- INLA::inla.mesh.segment(
+  seg0b <- fm_segm(
     loc = pts0b[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
@@ -315,7 +315,7 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
   line_sfc <- c(line_sfc1, line_sfc2)
 
   expect_s3_class(line_sfc, "sfc_GEOMETRY")
-  seg_sf <- fm_as_inla_mesh_segment(line_sfc)
+  seg_sf <- fm_as_segm(line_sfc)
 
   expect_identical(seg_sf, seg_1)
 })

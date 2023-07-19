@@ -20,13 +20,13 @@ test_that("Conversion from matrix to inla.mesh.segment", {
 
   # matrix version
   loc.bnd <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), 4, 2, byrow = TRUE)
-  segm.bnd <- INLA::inla.mesh.segment(
+  segm.bnd <- fm_segm(
     loc.bnd,
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  segm.bnd.sp <- fm_as_inla_mesh_segment(loc.bnd, is.bnd = TRUE, closed = TRUE)
+  segm.bnd.sp <- fm_as_segm(loc.bnd, is.bnd = TRUE, closed = TRUE)
 
   expect_identical(segm.bnd.sp, segm.bnd)
 })
@@ -39,14 +39,14 @@ test_that("Conversion from Lines to inla.mesh.segment", {
 
   pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5))
   pts2 <- rbind(c(1, 1), c(0, 0), c(0, -1), c(-2, -2))
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1,
     idx = seq_len(nrow(pts1)),
     is.bnd = FALSE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2,
     idx = seq_len(nrow(pts2)),
     is.bnd = FALSE,
@@ -58,7 +58,7 @@ test_that("Conversion from Lines to inla.mesh.segment", {
   )
   expect_identical(seg$grp, as.matrix(rep(1:2, each = 3)))
 
-  seg_sp <- fm_as_inla_mesh_segment(
+  seg_sp <- fm_as_segm(
     sp::Lines(list(sp::Line(pts1), sp::Line(pts2)), ID = "A"),
     grp = 1:2
   )
@@ -92,13 +92,13 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
   ## Polygon ##
   pts1 <- rbind(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)) # solid
   pts2 <- rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)) # hole
-  seg1 <- INLA::inla.mesh.segment(
+  seg1 <- fm_segm(
     loc = pts1[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
   )
 
-  seg2 <- INLA::inla.mesh.segment(
+  seg2 <- fm_segm(
     loc = pts2[1:4, , drop = FALSE],
     is.bnd = TRUE,
     crs = fm_CRS()
@@ -106,8 +106,8 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
 
   poly1 <- sp::Polygon(pts1[5:1, ], hole = FALSE)
   poly2 <- sp::Polygon(pts2[5:1, ], hole = TRUE)
-  seg1_sp <- fm_as_inla_mesh_segment(poly1)
-  seg2_sp <- fm_as_inla_mesh_segment(poly2)
+  seg1_sp <- fm_as_segm(poly1)
+  seg2_sp <- fm_as_segm(poly2)
 
   expect_identical(seg1_sp$loc[seg1_sp$idx[, 1], ], seg1$loc[seg1$idx[, 1], ])
   expect_identical(seg2_sp$loc[seg2_sp$idx[, 1], ], seg2$loc[seg2$idx[, 1], ])
@@ -132,13 +132,13 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
   if (FALSE) {
     pts1 <- rbind(c(0, 3), c(0, 4), c(1, 5), c(2, 5), c(0, 3))
     pts2 <- rbind(c(1, 2), c(0, 0), c(0, -1), c(-2, -2), c(1, 2))
-    seg1 <- INLA::inla.mesh.segment(
+    seg1 <- fm_segm(
       loc = pts1[1:4, , drop = FALSE],
       is.bnd = TRUE,
       crs = fm_CRS()
     )
 
-    seg2 <- INLA::inla.mesh.segment(
+    seg2 <- fm_segm(
       loc = pts2[1:4, , drop = FALSE],
       is.bnd = TRUE,
       crs = fm_CRS()
@@ -153,7 +153,7 @@ test_that("Conversion from Polygons to inla.mesh.segment", {
       sp::Polygon(pts1, hole = TRUE),
       sp::Polygon(pts2, hole = FALSE)
     ), ID = "A")
-    seg_sp <- fm_as_inla_mesh_segment(
+    seg_sp <- fm_as_segm(
       poly_sp,
       grp = 1:2
     )

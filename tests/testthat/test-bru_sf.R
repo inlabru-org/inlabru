@@ -28,7 +28,7 @@ test_that("sf gorillas lgcp vignette", {
   ## Build boundary information:
   ## inla.mesh.2d doesn't support sf yet.
   boundary <- list(
-    fm_as_inla_mesh_segment(gorillas_sf$boundary),
+    fm_as_segm(gorillas_sf$boundary),
     NULL
   )
 

@@ -124,7 +124,7 @@ fm_evaluate.fm_evaluator <-
 
 
 #' @describeIn fm_evaluate
-#' Returns the and `fm_evaluator` list object with evaluation information.
+#' Returns an `fm_evaluator` list object with evaluation information.
 #' The `proj` element contains a mapping matrix `A` and a logical vector `ok`,
 #' that indicates which locations were mappable to the input mesh. For `inla.mesh`
 #' input, `proj` also contains a matrix `bary` and vector `t`, with the
