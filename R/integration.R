@@ -606,7 +606,7 @@ integration_weight_aggregation <- function(mesh, integ) {
 
 #' Integration scheme for mesh triangle interiors
 #'
-#' `r lifecycle::badge("deprecated")` Use [fm_int_inla_mesh_core()] instead.
+#' `r lifecycle::badge("deprecated")` Use [fm_int_mesh_2d_core()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param tri_subset Optional triangle index vector for integration on a subset
@@ -623,10 +623,10 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "mesh_triangle_integration()",
-    "fm_int_inla_mesh_core()"
+    "fm_int_mesh_2d_core()"
   )
 
-  fm_int_inla_mesh_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
+  fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
 }
 
 
@@ -653,7 +653,7 @@ bru_int_polygon <- function(mesh,
   # Compute direct integration points
   # TODO: Allow blockwise construction to avoid
   # overly large temporary coordinate matrices (via tri_subset)
-  integ <- fm_int_inla_mesh_core(mesh, ...)
+  integ <- fm_int_mesh_2d_core(mesh, ...)
 
   # Keep points with positive weights (This should be all,
   # but if there's a degenerate triangle, this gets rid of it)
