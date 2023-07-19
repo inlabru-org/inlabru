@@ -49,10 +49,6 @@ fmesher::fm_evaluate
 #' @export
 fmesher::fm_evaluator
 #' @export
-fmesher::fm_evaluator_inla_mesh
-#' @export
-fmesher::fm_evaluator_inla_mesh_1d
-#' @export
 fmesher::fm_evaluator_lattice
 #' @export
 fmesher::fm_has_PROJ6
@@ -60,10 +56,6 @@ fmesher::fm_has_PROJ6
 fmesher::fm_identical_CRS
 #' @export
 fmesher::fm_int
-#' @export
-fmesher::fm_int_inla_mesh
-#' @export
-fmesher::fm_int_inla_mesh_core
 #' @export
 fmesher::fm_int_multi_sampler
 #' @export

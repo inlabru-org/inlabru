@@ -6,8 +6,15 @@
   (version `2.8.0.9007`)
   
 * Now preserves the previous log output when using `bru_rerun()`,
-  and `bru_log_get()` is now a set of S3 methods, supporting extracting the
-  full inlabru log as well `bru`-object specific logs (version `2.8.0.9008`)
+  and `bru_log()` is now a set of S3 methods, supporting extracting the
+  full inlabru log as well `bru`-object specific logs (version `2.8.0.9008`).
+  
+  Note: Up to version `2.8.0`, `bru_log()` was a deprecated alias for
+  `bru_log_message()`. When running on `2.8.0` or earlier, use `bru_log_get()`
+  to access the global log, and `cat(fit$bru_iinla$log, sep = "\n")` to print
+  a stored estimation object log.
+  After version `2.8.0`, use `bru_log()` to access the global log, and
+  `bru_log(fit)` to access a stores estimation log.
 
 ## Bug and dependency updates
 

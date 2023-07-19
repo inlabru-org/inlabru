@@ -806,14 +806,7 @@ bru <- function(components = ~ Intercept(1),
     dot_is_lhood <- TRUE
     dot_is_lhood_list <- FALSE
   }
-  if (any(dot_is_lhood_list)) {
-    lhoods <- like_list(c(
-      lhoods[dot_is_lhood],
-      do.call(c, lhoods[dot_is_lhood_list])
-    ))
-  } else {
-    lhoods <- like_list(lhoods)
-  }
+  lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
 
   if (length(lhoods) == 0) {
     stop("No response likelihood models provided.")
@@ -1528,28 +1521,31 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 }
 
 
-#' @details
-#' * `like_list`: Combine a `bru_like` likelihoods
-#' into a `bru_like_list` object
+#' @describeIn like
+#' Combine `bru_like` likelihoods into a `bru_like_list` object
 #' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
 #' @export
-#' @rdname like
 like_list <- function(...) {
   UseMethod("like_list")
 }
 
-#' @details
-#' * `like_list.list`: Combine a list of `bru_like` likelihoods
+#' @describeIn like
+#' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @param object A list of `bru_like` objects
 #' @param envir An optional environment for the new `bru_like_list` object
 #' @export
-#' @rdname like
 like_list.list <- function(object, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
   if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
+    if (any(vapply(object, function(x) inherits(x, "bru_like_list"), TRUE))) {
+      stop(paste0(
+        "All list elements must be of class 'bru_like'.\n",
+           "To combine with 'bru_like_list' objects, use c(...)."
+        ))
+    }
     stop("All list elements must be of class 'bru_like'.")
   }
 
@@ -1558,14 +1554,51 @@ like_list.list <- function(object, envir = NULL, ...) {
   object
 }
 
-#' @details
-#' * `like_list.bru_like`: Combine several `bru_like` likelihoods
+#' @describeIn like
+#' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
-#' @rdname like
 like_list.bru_like <- function(..., envir = NULL) {
-  like_list(list(...), envir = envir)
+  do.call(c, list(..., envir = envir))
 }
+
+#' @describeIn like
+#' Combine several `bru_like` likelihoods and/or `bru_like_list`
+#' objects into a `bru_like_list` object
+#' @export
+c.bru_like <- function(..., envir = NULL) {
+  lst <- lapply(list(...), function(x) {
+    if (inherits(x, "bru_like")) {
+      list(x)
+    } else if (inherits(x, "bru_like_list")) {
+      x
+    } else {
+      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+    }
+  })
+  lst <- do.call(c, lst)
+  like_list(lst, envir = envir)
+}
+
+#' @describeIn like
+#' Combine several `bru_like` likelihoods and/or `bru_like_list`
+#' objects into a `bru_like_list` object
+#' @export
+c.bru_like_list <- function(..., envir = NULL) {
+  lst <- lapply(list(...), function(x) {
+    if (inherits(x, "bru_like")) {
+      list(x)
+    } else if (inherits(x, "bru_like_list")) {
+      x
+    } else {
+      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+    }
+  })
+  lst <- NextMethod("c", lst)
+  like_list(lst, envir = envir)
+}
+
+
 
 #' @export
 #' @param x `bru_like_list` object from which to extract element(s)
@@ -1578,6 +1611,7 @@ like_list.bru_like <- function(..., envir = NULL) {
   environment(object) <- env
   object
 }
+
 
 #' Utility functions for bru likelihood objects
 #' @param x Object of `bru_like` or `bru_like_list` type
@@ -2548,9 +2582,10 @@ bru_line_search <- function(model,
   if (do_finite || do_contract) {
     nonfin <- any(!is.finite(nonlin_pred))
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
+    norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     while ((do_finite && nonfin) ||
-      (do_contract && (norm0 > norm01 * fact))) {
+      (do_contract && ((norm0 > norm01 * fact) || (norm1 > norm01 * fact)))) {
       if (do_finite && nonfin) {
         finite_active <- finite_active - 1
       } else {
@@ -2564,12 +2599,18 @@ bru_line_search <- function(model,
       )
       nonfin <- any(!is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
+      norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
         paste0(
           "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 3),
-          "%, Contract"
+          signif(100 * step_scaling, 4),
+          "%, Contract",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2608,7 +2649,12 @@ bru_line_search <- function(model,
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 3),
-          "%, Expand"
+          "%, Expand",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2628,13 +2674,19 @@ bru_line_search <- function(model,
         param = nonlin_param,
         state = state
       )
+      norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
         paste0(
           "iinla: Step rescaling: ",
           signif(100 * step_scaling, 3),
-          "%, Overstep"
+          "%, Overstep",
+          " (",
+          "norm0 = ", signif(norm0, 4),
+          ", norm1 = ", signif(norm1, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -2660,11 +2712,50 @@ bru_line_search <- function(model,
       )
     step_scaling_opt_approx <- alpha$minimum
 
-    if (identical(options$bru_method$line_opt_method, "full")) {
+    state_opt <- scale_state(state0, state1, step_scaling_opt_approx)
+    nonlin_pred_opt <- nonlin_predictor(
+      param = nonlin_param,
+      state = state_opt
+    )
+    norm0_opt <- pred_norm(nonlin_pred_opt - lin_pred0)
+    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+    bru_log_message(
+      paste0(
+        "iinla: Step rescaling: ",
+        signif(100 * step_scaling_opt_approx, 4),
+        "%, Approx Optimisation",
+        " (",
+        "norm0 = ", signif(norm0_opt, 4),
+        ", norm1 = ", signif(norm1_opt, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
+      ),
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 3
+    )
+
+    if (norm1_opt > norm01) {
+      bru_log_message(
+        paste0(
+          "iinla: norm1_opt > |delta|: ",
+          signif(norm1_opt, 4),
+          " > ",
+          signif(norm01, 4)
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+    }
+
+    if ((norm1_opt > norm01) ||
+      identical(options$bru_method$line_opt_method, "full")) {
       alpha <-
         optimise(
           line_search_optimisation_target_exact,
-          step_scaling * c(1 / fact^2, fact),
+          step_scaling * c(0, fact),
           param = list(
             lin = lin_pred1,
             state0 = state0,
@@ -2673,37 +2764,58 @@ bru_line_search <- function(model,
           ),
           nonlin_param = nonlin_param
         )
-    }
 
-    step_scaling_opt <- alpha$minimum
-    state_opt <- scale_state(state0, state1, step_scaling_opt)
-    nonlin_pred_opt <- nonlin_predictor(
-      param = nonlin_param,
-      state = state_opt
-    )
-    norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+      step_scaling_opt <- alpha$minimum
+      state_opt <- scale_state(state0, state1, step_scaling_opt)
+      nonlin_pred_opt <- nonlin_predictor(
+        param = nonlin_param,
+        state = state_opt
+      )
+      norm0_opt <- pred_norm(nonlin_pred_opt - lin_pred0)
+      norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
+
+      bru_log_message(
+        paste0(
+          "iinla: Step rescaling: ",
+          signif(100 * step_scaling_opt, 4),
+          "%, Optimisation",
+          " (",
+          "norm0 = ", signif(norm0_opt, 4),
+          ", norm1 = ", signif(norm1_opt, 4),
+          ", norm01 = ", signif(norm01, 4),
+          ")"
+        ),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 3
+      )
+
+      if (norm1_opt > norm01) {
+        bru_log_message(
+          paste0(
+            "iinla: norm1_opt > |delta|: ",
+            signif(norm1_opt, 4),
+            " > ",
+            signif(norm01, 4)
+          ),
+          verbose = options$bru_verbose,
+          verbose_store = options$bru_verbose_store,
+          verbosity = 3
+        )
+      }
+    } else {
+      step_scaling_opt <- step_scaling_opt_approx
+    }
 
     if (norm1_opt < norm1) {
       step_scaling <- step_scaling_opt
       state <- state_opt
       nonlin_pred <- nonlin_pred_opt
+      norm0 <- norm0_opt
       norm1 <- norm1_opt
-
+    } else {
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 4),
-          "%, Optimisation",
-          if (identical(options$bru_method$line_opt_method, "full")) {
-            paste0(
-              " (Approx = ",
-              signif(100 * step_scaling_opt_approx, 4),
-              "%)"
-            )
-          } else {
-            NULL
-          }
-        ),
+        paste0("iinla: Optimisation did not improve on previous solution."),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
         verbosity = 3
@@ -2736,13 +2848,19 @@ bru_line_search <- function(model,
       param = nonlin_param,
       state = state
     )
+    norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
       paste0(
         "iinla: Step rescaling: ",
         signif(100 * step_scaling, 3),
-        "%, Maximum step length"
+        "%, Maximum step length",
+        " (",
+        "norm0 = ", signif(norm0, 4),
+        ", norm1 = ", signif(norm1, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
       ),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store,
@@ -2759,7 +2877,12 @@ bru_line_search <- function(model,
       paste0(
         "iinla: Step rescaling: ",
         signif(100 * step_scaling, 3),
-        "%"
+        "%",
+        " (",
+        "norm0 = ", signif(norm0, 4),
+        ", norm1 = ", signif(norm1, 4),
+        ", norm01 = ", signif(norm01, 4),
+        ")"
       ),
       verbose = options$bru_verbose,
       verbose_store = options$bru_verbose_store,
@@ -2832,14 +2955,15 @@ bru_line_search <- function(model,
       ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state, col = "opt")) +
       ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
       ggplot2::ylab("state")
-    print(((pl1 | pl2) / (pl3 | pl4)) +
-      patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "right"))
+    pl1234 <-
+      ((pl1 | pl2) / (pl3 | pl4)) +
+        patchwork::plot_layout(guides = "collect") &
+        ggplot2::theme(legend.position = "right")
 
     # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
     # delta = lin1-lin0
     delta <- lin_pred1 - lin_pred0
-    delta_norm <- pred_norm(delta)
+    delta_norm <- norm01
 
     # <eta-lin0, delta>/|delta|
     along_opt <- pred_scalprod(nonlin_pred - lin_pred0, delta) / delta_norm
@@ -2985,7 +3109,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
     list(
-      log = c(original_log, bru_log_get(bookmark = "iinla")),
+      log = c(original_log, bru_log()["iinla"]),
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
@@ -3099,11 +3223,13 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   old.result <- result
 
   # Preserve old log output
-  if (is.null(old.result[["bru_iinla"]][["log"]])) {
-    original_log <- character(0)
-  } else {
-    original_log <- old.result[["bru_iinla"]][["log"]]
-  }
+  original_log <- bru_log(
+    if (is.null(old.result)) {
+      character(0)
+    } else {
+      old.result
+    }
+  )
 
   # Track variables
   track <- list()
@@ -3685,9 +3811,6 @@ summary.bru <- function(object, verbose = FALSE, ...) {
     bru_info = summary(object[["bru_info"]], verbose = verbose, ...)
   )
 
-  result$WAIC <- object[["waic"]][["waic"]]
-  result$DIC <- object[["dic"]][["dic"]]
-
   if (inherits(object, "inla")) {
     result$inla <- NextMethod("summary", object)
     result[["inla"]][["call"]] <- NULL
@@ -3695,50 +3818,16 @@ summary.bru <- function(object, verbose = FALSE, ...) {
 
   class(result) <- c("summary_bru", "list")
   return(result)
-
-  marginal.summary <- function(m, name) {
-    df <- data.frame(
-      param = name,
-      mean = INLA::inla.emarginal(identity, m)
-    )
-    df$var <- INLA::inla.emarginal(function(x) {
-      (x - df$mean)^2
-    }, m)
-    df$sd <- sqrt(df$var)
-    df[c("lq", "median", "uq")] <- INLA::inla.qmarginal(c(0.025, 0.5, 0.975), m)
-    df
-  }
-
-  cat("\n")
-  for (nm in names(object$bru_info$model$effects)) {
-    eff <- object$bru_info$model$effects[[nm]]
-    if (identical(eff[["main"]][["type"]], "spde")) {
-      hyp <- INLA::inla.spde.result(object, nm, eff$main$model)
-      cat(sprintf("\n--- Field '%s' transformed hyper parameters ---\n", nm))
-      df <- rbind(
-        marginal.summary(hyp$marginals.range.nominal$range.nominal.1, "range"),
-        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-        marginal.summary(hyp$marginals.variance.nominal$variance.nominal.1, "variance"),
-      )
-      print(df)
-    }
-  }
-  message(
-    "The current summary.bru(...) method is outdated and will be replaced.\n",
-    "Until then, you may prefer the output from INLA:::summary.inla(...) as an alternative."
-  )
-  class(result) <- c("summary_bru", "list")
-  result
 }
 
 
 #' @export
-#' @param x An `summary_bru2` object
+#' @param x A `summary_bru` object
 #' @rdname summary.bru
 
 print.summary_bru <- function(x, ...) {
-  print(x$bru_info)
-  print(x$inla)
+  print(x$bru_info, ...)
+  print(x$inla, ...)
   invisible(x)
 }
 
