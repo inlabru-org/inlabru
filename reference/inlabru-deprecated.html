@@ -78,7 +78,7 @@ future version."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Deprecated functions in inlabru</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 6 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 7 more</small>
       <div class="d-none name"><code>inlabru-deprecated.Rd</code></div>
     </div>
 
@@ -126,6 +126,10 @@ future version.</p>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
 <span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fm_as_inla_mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">fm_sp2segment</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -216,6 +220,12 @@ data.frame with respective column names.</p></dd>
 <p>A <code>CRS</code> object, or NULL if no valid CRS identified</p>
 
 
+<p>An <code>fm_segm</code> object</p>
+
+
+<p>An <code>fm_mesh_2d</code> object</p>
+
+
 <p><code>is.inside()</code>: Single column matrix of Boolean values indicating if a point is
 inside the mesh.</p>
     </div>
@@ -265,8 +275,12 @@ Handle transformation of various inla objects according to coordinate
 reference systems of <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> or <code><a href="https://rdrr.io/pkg/INLA/man/inla.CRS.html" class="external-link">INLA::inla.CRS</a></code> class.</p></li>
 <li><p><code>fm_spTransform(default)</code>: The default method handles low level transformation of raw
 coordinates.</p></li>
+<li><p><code>fm_as_inla_mesh_segment()</code>: Conversion to inla.mesh.segment
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_as_segm.html">fm_as_segm()</a></code>.</p></li>
+<li><p><code>fm_as_inla_mesh()</code>: Conversion to inla.mesh.
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_as_mesh_2d.html">fm_as_mesh_2d()</a></code>.</p></li>
 <li><p><code>fm_sp2segment()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of
-<code><a href="fm_as_inla_mesh_segment.html">fm_as_inla_mesh_segment()</a></code></p></li>
+<code><a href="fm_as_segm.html">fm_as_segm()</a></code></p></li>
 <li><p><code>predict(inla)</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> since version <code>2.1.0</code>.
 Prediction from fitted inla model. This method is not supported for plain
 inla objects. Please see <code><a href="predict.bru.html">predict.bru()</a></code> instead.

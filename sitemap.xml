@@ -262,10 +262,19 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_CRSargs.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_inla_mesh.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_fm.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_inla_mesh_segment.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_lattice_2d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_mesh_1d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_mesh_2d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_segm.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_as_sfc.html</loc>
@@ -286,7 +295,13 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_crs_wkt.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_diameter.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_evaluate.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_extensions.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_identical_CRS.html</loc>
@@ -307,7 +322,22 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_is_within.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_lattice_2d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_mesh_1d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_mesh_2d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_nonconvex_hull.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_pixels.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/fm_segm.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/fm_store_points.html</loc>

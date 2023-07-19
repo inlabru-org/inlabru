@@ -180,7 +180,7 @@ the domain.</p></dd>
 <ul><li><p><code>fm_evaluate()</code>: Returns the field function evaluated at the locations determined by an
 <code>fm_evaluator</code> object. <code>fm_evaluate(mesh, field = field, ...)</code> is a
 shortcut to <code>fm_evaluate(fm_evaluator(mesh, ...), field = field)</code>.</p></li>
-<li><p><code>fm_evaluator()</code>: Returns the and <code>fm_evaluator</code> list object with evaluation information.
+<li><p><code>fm_evaluator()</code>: Returns an <code>fm_evaluator</code> list object with evaluation information.
 The <code>proj</code> element contains a mapping matrix <code>A</code> and a logical vector <code>ok</code>,
 that indicates which locations were mappable to the input mesh. For <code>inla.mesh</code>
 input, <code>proj</code> also contains a matrix <code>bary</code> and vector <code>t</code>, with the
