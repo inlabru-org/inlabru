@@ -855,7 +855,7 @@ fm_as_lattice_2d.inla.mesh.lattice <- function(x, ...) {
 #' @export
 fm_as_inla_mesh_segment <-
   function(...) {
-    lifecycle::deprecate_soft("0.0.1",
+    lifecycle::deprecate_soft("2.8.0.9008",
                               "fm_as_inla_mesh_segment()",
                               "fm_as_segm()")
     fm_as_segm(...)
@@ -866,7 +866,7 @@ fm_as_inla_mesh_segment <-
 #' @returns An `fm_mesh_2d` object
 #' @export
 fm_as_inla_mesh <- function(...) {
-  lifecycle::deprecate_soft("0.0.1",
+  lifecycle::deprecate_soft("2.8.0.9008",
                             "fm_as_inla_mesh()",
                             "fm_as_mesh_2d()")
   fm_as_mesh_2d(...)
