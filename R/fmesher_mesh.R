@@ -871,4 +871,3 @@ fm_as_inla_mesh <- function(...) {
                             "fm_as_mesh_2d()")
   fm_as_mesh_2d(...)
 }
-
