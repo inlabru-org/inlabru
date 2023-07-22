@@ -719,7 +719,7 @@ gg.SpatRaster <- function(data, ...) {
 #' @name gg.inla.mesh
 #' @export
 
-#' @param data An `INLA::inla.mesh` object.
+#' @param data An `inla.mesh` object.
 #' @param color A vector of scalar values to fill the mesh with colors.
 #' The length of the vector mus correspond to the number of mesh vertices.
 #' The alternative name `colour` is also recognised.

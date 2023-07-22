@@ -138,7 +138,7 @@ test_that("bru: predict with _eval", {
     u = 1:5
   )
   u_mapper <- bru_mapper(
-    INLA::inla.mesh.1d(
+    fm_mesh_1d(
       seq(1, 5, length.out = 51)
     ),
     indexed = FALSE

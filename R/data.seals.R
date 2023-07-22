@@ -82,10 +82,10 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   #' Build a mesh. This mesh will be fine at the photo locations but coarse elsewhere
 
-  bnd <- INLA::inla.nonconvex.hull(coordinates(seals), resolution = 170, convex = 0.5)
-  bnd2 <- INLA::inla.nonconvex.hull(coordinates(seals), resolution = 100, convex = 0.7)
-  mesh <- INLA::inla.mesh.2d(boundary = list(bnd, bnd2), max.edge = c(0.2, 3))
-  mesh$crs <- fm_CRS(projargs = CRS(target.p4s))
+  bnd <- fm_extensions(coordinates(seals), convex = c(0.5, 0.7))
+  mesh <- fm_mesh_2d(boundary = bnd,
+                     max.edge = c(0.2, 3),
+                     crs = fm_CRS(projargs = CRS(target.p4s)))
   # ggplot() + gg(mesh) + gg(seals) + coord_equal()
   # mesh$n
 

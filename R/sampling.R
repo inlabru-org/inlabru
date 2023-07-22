@@ -61,7 +61,7 @@
 #' if (bru_safe_inla(quietly = TRUE) &&
 #'   bru_safe_sp()) {
 #'   vertices <- seq(0, 3, by = 0.1)
-#'   mesh <- INLA::inla.mesh.1d(vertices)
+#'   mesh <- fm_mesh_1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
 #'   pts <- sample.lgcp(mesh, loglambda)
 #'   pts$y <- 0
@@ -230,12 +230,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           area.mesh <- mesh
           area.R <- 1
         }
-        areas <- INLA::inla.fmesher.smorg(
-          area.mesh$loc,
-          area.mesh$graph$tv,
-          fem = 0,
-          output = "ta"
-        )$ta * area.R^2
+        areas <- fm_fem(area.mesh, order = 0)$ta * area.R^2
 
         loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)

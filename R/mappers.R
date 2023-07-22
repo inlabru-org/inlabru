@@ -2909,7 +2909,7 @@ ibm_jacobian.bru_mapper_mesh_B <- function(mapper, input, ...) {
 make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
   # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
   # only the computational neighbourhood structure:
-  fem <- INLA::inla.mesh.fem(mesh, order = 1)
+  fem <- fm_fem(mesh, order = 1)
   G <- (fem$g1 != 0) * 1.0
   G <- G - Matrix::Diagonal(nrow(G), diag(G))
 

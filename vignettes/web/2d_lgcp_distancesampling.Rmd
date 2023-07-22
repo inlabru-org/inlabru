@@ -137,7 +137,7 @@ fit <- lgcp(
   samplers = mexdolphin$samplers,
   domain = list(
     coordinates = mesh,
-    distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = form
 )
@@ -253,7 +253,7 @@ fit1 <- lgcp(
   samplers = mexdolphin$samplers,
   domain = list(
     coordinates = mesh,
-    distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = formula1
 )
@@ -348,7 +348,7 @@ cmp <- ~ lsig(1) + Intercept(1)
 dfit <- lgcp(
   components = cmp,
   mexdolphin$points,
-  domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula,
   options = list(bru_initial = list(lsig = 1, Intercept = 3))
 )
@@ -363,7 +363,7 @@ cmp <- ~ lsig(1) + Intercept(1)
 dfit1 <- lgcp(
   components = cmp,
   mexdolphin$points,
-  domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
 detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))

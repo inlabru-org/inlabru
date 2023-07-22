@@ -239,7 +239,7 @@ component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- component("myEffectOfX",
 #'     main = x,
-#'     model = INLA::inla.spde2.matern(INLA::inla.mesh.1d(1:10))
+#'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -1229,7 +1229,7 @@ make_submapper <- function(subcomp_n,
       if (allow_interpolation) {
         mapper <-
           bru_mapper(
-            INLA::inla.mesh.1d(values),
+            fm_mesh_1d(values),
             indexed = require_indexed
           )
       } else {

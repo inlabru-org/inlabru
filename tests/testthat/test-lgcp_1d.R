@@ -1,7 +1,7 @@
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
-  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free", degree = 2)
+  mesh1D <- fm_mesh_1d(x, boundary = "free", degree = 2)
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(150, 0.75),
@@ -83,7 +83,7 @@ test_data_discrete <- function() {
   xx <- ceiling(pts2$x)
   data <- data.frame(x = xx)
   x <- seq(1, 55, length = 55)
-  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  mesh1D <- fm_mesh_1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
     prior.range = c(0.01, 0.01),
     prior.sigma = c(1, 0.01),
@@ -168,7 +168,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
-  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
+  mesh1D <- fm_mesh_1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(1, 0.01),

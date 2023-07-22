@@ -260,7 +260,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- INLA::inla.mesh.1d(
+  mesh1 <- fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(

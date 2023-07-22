@@ -200,7 +200,7 @@ import.gorillas <- function() {
 
   # Build mesh
   bnd <- fm_as_segm(boundary)
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fm_mesh_2d(
     interior = bnd, max.edge = 222,
     crs = crs
   ) # With higher max.edge we run into various INLA errors/warnings

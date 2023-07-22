@@ -303,7 +303,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         stop("Interval description matrix must have 2 elements or be a 2-column matrix.")
       }
       if (is.null(domain)) {
-        domain <- INLA::inla.mesh.1d(sort(unique(as.vector(samplers))))
+        domain <- fm_mesh_1d(sort(unique(as.vector(samplers))))
       }
     }
     # Now samplers is a 2-column matrix, and domain is an `inla.mesh.1d` object.
@@ -371,7 +371,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     ips <- fm_vertices(domain, format = "sp")
-    ips$weight <- INLA::inla.mesh.fem(domain, order = 1)$va
+    ips$weight <- fm_fem(domain, order = 1)$va
 
     # backtransform
     if (!fm_crs_is_null(domain$crs)) {
@@ -474,7 +474,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     if (is.null(domain)) {
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
-      domain <- INLA::inla.mesh.2d(boundary = samplers, max.edge = max.edge)
+      domain <- fm_mesh_2d(boundary = list(samplers), max.edge = max.edge)
       domain$crs <- fm_CRS(samplers)
       domain_crs <- fm_CRS(domain$crs)
     } else {
@@ -591,7 +591,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' # ipoints needs INLA
 #' if (bru_safe_inla()) {
 #'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
+#'   ips1 <- fm_int(fm_mesh_1d(0:20),
 #'     rbind(c(0, 3), c(3, 8)),
 #'     name = "myDim"
 #'   )

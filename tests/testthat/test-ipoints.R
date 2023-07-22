@@ -14,7 +14,7 @@ test_that("1D integration points can be generated", {
 
 test_that("conversion of 1D mesh to integration points", {
   local_bru_safe_inla()
-  mesh <- INLA::inla.mesh.1d(seq(0, 10, by = 1))
+  mesh <- fm_mesh_1d(seq(0, 10, by = 1))
   ips <- ipoints(mesh, name = "time")
 
   expect_s3_class(ips, "data.frame")
@@ -88,7 +88,7 @@ test_that("Polygon integration with holes", {
   ))
 
   bndA <- INLA::inla.sp2segment(plyA)
-  m <- INLA::inla.mesh.2d(
+  m <- fm_mesh_2d(
     loc.domain = bndA$loc,
     max.edge = 1
   )
@@ -140,7 +140,7 @@ test_that("Polygon integration with holes", {
 test_that("Integration line splitting", {
   local_bru_safe_inla()
 
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fm_mesh_2d(
     loc.domain = cbind(0, 0),
     offset = 2,
     max.edge = 0.5

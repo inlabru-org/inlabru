@@ -595,7 +595,7 @@ evaluate_predictor <- function(model,
 #' @examples
 #' \dontrun{
 #' if (bru_safe_inla()) {
-#'   mesh <- INLA::inla.mesh.2d(
+#'   mesh <- fm_mesh_2d(
 #'     cbind(0, 0),
 #'     offset = 2, max.edge = 0.25
 #'   )

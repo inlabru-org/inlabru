@@ -268,7 +268,7 @@ classDiagram
     }
     class inla_mesh_1d{
         impute domain with inla.mesh.1d
-        (domain <- INLA::inla.mesh.1d(sort(unique(as.vector(samplers)))))
+        (domain <- fm_mesh_1d(sort(unique(as.vector(samplers)))))
     }
     class inla_mesh_segment{
         Convert sp curve objects to inla.mesh.segment objects
@@ -277,7 +277,7 @@ classDiagram
     class inla_mesh_2d{
         Create a triangle mesh based on initial point locations,
         specified or automatic boundaries, and mesh quality parameters.
-        (domain <- INLA::inla.mesh.2d(boundary = samplers,
+        (domain <- fm_mesh_2d(boundary = samplers,
         max.edge = max.edge))
     }
     class bru_int_polygon{

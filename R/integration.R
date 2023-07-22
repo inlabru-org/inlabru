@@ -332,7 +332,7 @@ join_segm <- function(...) {
   # Set locations
   loc <- new_loc[seq_len(prev_idx), , drop = FALSE]
 
-  INLA::inla.mesh.segment(
+  fm_segm(
     loc = loc,
     idx = idx,
     is.bnd = FALSE
@@ -353,7 +353,7 @@ intersection_mesh <- function(mesh, poly) {
     poly$loc <- cbind(poly$loc, 0)
   }
 
-  all_edges <- INLA::inla.mesh.segment(
+  all_edges <- fm_segm(
     loc = mesh$loc,
     idx = cbind(
       as.vector(t(mesh$graph$tv)),
@@ -367,14 +367,8 @@ intersection_mesh <- function(mesh, poly) {
     interior = c(list(all_edges))
   )
 
-  split <- INLA::inla.fmesher.smorg(mesh_cover$loc,
-    mesh_cover$graph$tv,
-    splitlines = list(
-      loc = poly$loc,
-      idx = poly$idx
-    )
-  )
-  split_segm <- INLA::inla.mesh.segment(
+  split <- fm_split_lines(mesh_cover, loc = poly$loc, idx = poly$idx)
+  split_segm <- fm_segm(
     loc = split$split.loc,
     idx = split$split.idx,
     is.bnd = FALSE
@@ -461,7 +455,7 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   }
 
   # Construct integration weights
-  weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
+  weight <- rep(fm_fem(mesh, order = 1)$ta / nB, each = nB)
 
   # Filter away points outside integration domain boundary:
   mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
@@ -498,7 +492,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
     gloc <- loc[group == g, , drop = FALSE]
 
     # Combine polygon with mesh boundary to get mesh covering the intersection.
-    bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
+    bnd <- fm_segm(loc = gloc, is.bnd = TRUE)
     integ <- make_stable_integration_points(mesh, bnd, ...)
 
     if (method %in% c("stable")) {
@@ -507,9 +501,7 @@ int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
     }
 
     # Keep points inside the mesh with positive weights
-    ok <-
-      fm_evaluator(mesh, integ$loc)$proj$ok &
-        (integ$weight > 0)
+    ok <- fm_is_within(integ$loc, mesh) & (integ$weight > 0)
 
     ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
     colnames(ips) <- c("x", "y")

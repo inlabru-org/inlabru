@@ -3888,10 +3888,11 @@ summary_bru <- function(object, ...) {
       signif(range(sm[, c(4, 6)])[1]), " : ",
       signif(range(sm[, c(4, 6)])[2]), "]"
     ))
-    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
+    if (inherits(object$model$effects[[nm]]$main$mapper,
+                 c("fm_mesh_2d", "inla.mesh"))) {
       cat(paste0(
         ", and area = ",
-        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
+        signif(sum(fm_fem(object$model$effects[[nm]]$main$mapper)$va))
       ))
     }
     cat("\n")

@@ -127,8 +127,8 @@ refine.inla.mesh <- function(mesh, refine = list(max.edge = 1)) {
 
   rmesh <- INLA::inla.mesh.create(
     loc = mesh$loc,
-    interior = INLA::inla.mesh.interior(mesh),
-    boundary = INLA::inla.mesh.boundary(mesh),
+    interior = fm_segm(mesh, boundary = FALSE),
+    boundary = fm_segm(mesh, boundary = TRUE),
     refine = refine
   )
   return(rmesh)
@@ -182,7 +182,7 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
     )
 
     segm2 <-
-      INLA::inla.mesh.segment(
+      fm_segm(
         loc = loc,
         idx = idx,
         grp = c(segm$grp, segm$grp),
@@ -193,8 +193,8 @@ tsplit.inla.mesh <- function(mesh, n = 1) {
     segm2
   }
 
-  interior2 <- split.edges(INLA::inla.mesh.interior(mesh)[[1]])
-  boundary2 <- split.edges(INLA::inla.mesh.boundary(mesh)[[1]])
+  interior2 <- split.edges(fm_segm(mesh, boundary = FALSE))
+  boundary2 <- split.edges(fm_segm(mesh, boundary = TRUE))
 
   mesh2 <- INLA::inla.mesh.create(
     loc = tri.loc,
