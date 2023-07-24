@@ -122,7 +122,7 @@
 #' @importFrom sp coordnames coordinates
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
-                    project = NULL) {
+                    project = deprecated()) {
   #  lifecycle::deprecate_soft("2.8.0",
   #                            "ipoints()",
   #                            "fm_int()",
@@ -160,7 +160,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     int.args[["nsub2"]] <- int.args[["nsub"]]
   }
 
-  if (!is.null(project)) {
+  if (lifecycle::is_present(project)) {
     lifecycle::deprecate_warn(
       "2.7.0",
       "ipoints(project)",
@@ -174,6 +174,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         "' instead."
       )
     )
+    project <- NULL
   }
 
   if (is.null(domain) &&

@@ -10,7 +10,7 @@ ipoints(
   name = NULL,
   group = NULL,
   int.args = NULL,
-  project = NULL
+  project = deprecated()
 )
 }
 \arguments{

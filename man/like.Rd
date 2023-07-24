@@ -26,7 +26,7 @@ like(
   exclude = NULL,
   include_latent = NULL,
   used = NULL,
-  allow_latent = NULL,
+  allow_latent = deprecated(),
   allow_combine = NULL,
   control.family = NULL,
   options = list(),

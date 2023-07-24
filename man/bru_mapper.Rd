@@ -24,7 +24,7 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
+bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
 
 \method{bru_mapper}{default}(...)
 

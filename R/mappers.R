@@ -493,8 +493,8 @@ print.summary_bru_mapper <- function(x, ...) {
 bru_mapper_define <- function(mapper,
                               new_class = NULL,
                               ...,
-                              methods = NULL) {
-  if (!is.null(methods)) {
+                              methods = deprecated()) {
+  if (lifecycle::is_present(methods)) {
     txt <-
       c(
         "In packages with Suggests: inlabru, add method information, e.g.:",

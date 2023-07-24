@@ -314,7 +314,7 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
 eval_SpatialDF <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "eval_spatial()")
+  lifecycle::deprecate_stop("2.6.0", "eval_spatialDF()", "eval_spatial()")
   eval_spatial(...)
 }
 

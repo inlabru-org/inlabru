@@ -17,7 +17,7 @@
   used = NULL,
   drop = FALSE,
   ...,
-  data = NULL
+  data = deprecated()
 )
 }
 \arguments{
