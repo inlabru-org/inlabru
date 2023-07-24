@@ -18,7 +18,7 @@ generate(object, ...)
   exclude = NULL,
   used = NULL,
   ...,
-  data = NULL
+  data = deprecated()
 )
 }
 \arguments{

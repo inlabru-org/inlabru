@@ -1184,7 +1184,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  exclude = NULL,
                  include_latent = NULL,
                  used = NULL,
-                 allow_latent = NULL,
+                 allow_latent = deprecated(),
                  allow_combine = NULL,
                  control.family = NULL,
                  options = list(),
@@ -1478,7 +1478,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       latent = include_latent
     )
   }
-  if (!is.null(allow_latent)) {
+  if (lifecycle::is_present(allow_latent)) {
     lifecycle::deprecate_soft(
       "2.8.0",
       "like(allow_latent = 'is deprecated')",
@@ -1931,9 +1931,9 @@ predict.bru <- function(object,
                         used = NULL,
                         drop = FALSE,
                         ...,
-                        data = NULL) {
+                        data = deprecated()) {
   object <- bru_check_object_bru(object)
-  if (!is.null(data)) {
+  if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
       lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
         details = c("`data` provided but not `newdata`. Setting `newdata <- data`.")
@@ -2118,9 +2118,9 @@ generate.bru <- function(object,
                          exclude = NULL,
                          used = NULL,
                          ...,
-                         data = NULL) {
+                         data = deprecated()) {
   object <- bru_check_object_bru(object)
-  if (!is.null(data)) {
+  if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
       lifecycle::deprecate_soft("2.8.0", "generate(data)", "generate(newdata)",
         details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`.")
