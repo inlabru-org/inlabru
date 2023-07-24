@@ -4,7 +4,8 @@ linters: linters_with_defaults(
     commented_code_linter = NULL, # 121
     object_usage_linter = NULL, # 54
     object_length_linter = NULL, # 28
-    cyclocomp_linter = NULL # 27
+    cyclocomp_linter = NULL, # 27
+    indentation_linter = NULL
   )
 exclusions: list(
     "data/gorillas.rda",
