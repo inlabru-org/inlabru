@@ -67,6 +67,8 @@ fmesher::fm_evaluator_lattice
 #' @export
 fmesher::fm_has_PROJ6
 #' @export
+fmesher::fm_crs_is_identical
+#' @export
 fmesher::fm_identical_CRS
 #' @export
 fmesher::fm_int

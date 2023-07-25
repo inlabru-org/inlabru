@@ -107,9 +107,10 @@ library(terra)
 library(tidyterra) # raster plotting
 library(tidyr)
 library(scales)
-library(inlabru)
-library(INLA)
 library(dplyr)
+library(INLA)
+library(inlabru)
+library(fmesher)
 # Note: the 'splancs' package also needs to be installed,
 # but doesn't need to be loaded
 
@@ -259,7 +260,7 @@ are created automatically, and the user does not need to deal with them directly
 This works by an automatic creation of a `bru_mapper` object that knows how
 to map between mesh nodes and spatial data locations.  Thus, the only two
 `R-INLA` functions needed in the user code of the SPDE modelling steps are
-`inla.mesh.2D()` and `inla.spde2.pcmatern()`, and the `inla.spde.make.index()`
+`fm_mesh_2d_inla()` and `inla.spde2.pcmatern()`, and the `inla.spde.make.index()`
 and `inla.spde.make.A()` functions are only called
 internally by the `inlabru` code itself, or rather `fm_evaluator()` is used instead.
 
@@ -276,11 +277,11 @@ outside the hull.
 
 ```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
 # make a hull and mesh for spatial model
-hull <- inla.nonconvex.hull(
+hull <- fm_nonconvex_hull(
   points = as.matrix(st_coordinates(count_dat)),
   convex = 200, concave = 350
 )
-mesh <- inla.mesh.2d(
+mesh <- fm_mesh_2d_inla(
   boundary = hull, max.edge = c(100, 600), # km inside and outside
   cutoff = 50, offset = c(100, 300)
 ) # cutoff is min edge

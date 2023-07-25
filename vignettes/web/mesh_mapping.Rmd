@@ -53,7 +53,7 @@ Then come back here to continue.
 
 The most basic `inla.spde.make.A` call is to map purely spatial points to a mesh:
 ```{r}
-mesh <- inla.mesh.2d(cbind(0, 0), offset = 2, max.edge = 10)
+mesh <- fm_mesh_2d_inla(cbind(0, 0), offset = 2, max.edge = 10)
 loc <- matrix(runif(10) * 2 - 1, 5, 2)
 ggplot() +
   gg(mesh) +
@@ -68,7 +68,7 @@ A.loc
 
 A basic conversion of this becomes
 ```{r}
-A.loc <- fm_evaluator(mesh, loc = loc)$proj$A
+A.loc <- fm_basis(mesh, loc = loc)
 A.loc
 ```
 but this is limited to just the basic case of evaluating on only a mesh.

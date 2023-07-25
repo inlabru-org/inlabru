@@ -1050,7 +1050,7 @@ extended_bind_rows <- function(...) {
     the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
     for (i in sf_data_idx_) {
       dt_crs <- fm_crs(dt[[i]][[nm]])
-      if (!fm_identical_CRS(dt_crs, the_crs)) {
+      if (!fm_crs_is_identical(dt_crs, the_crs)) {
         dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
       }
     }

@@ -53,7 +53,7 @@ First, we build a high resolution mesh for the true field, using low level INLA 
 
 ```{r }
 bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
-mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
+mesh_fine <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.2)
 ggplot() +
   gg(mesh_fine) +
   coord_equal()
@@ -129,7 +129,7 @@ Estimating the field
 Construct a mesh covering the data:
 
 ```{r }
-mesh <- inla.mesh.2d(boundary = bnd, max.edge = 0.5)
+mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.5)
 ggplot() +
   gg(mesh) +
   coord_equal()
