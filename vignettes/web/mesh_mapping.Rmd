@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 ```{r setup, eval = TRUE, echo=FALSE, include=FALSE}
 library(inlabru)
 library(INLA)
+library(fmesher)
 library(ggplot2)
 set.seed(12345L)
 ```

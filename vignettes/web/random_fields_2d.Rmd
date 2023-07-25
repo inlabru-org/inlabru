@@ -26,6 +26,7 @@ Setting things up
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
 library(inlabru)
+library(fmesher)
 library(mgcv)
 library(ggplot2)
 library(sp)

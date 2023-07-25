@@ -277,7 +277,7 @@ classDiagram
     class inla_mesh_2d{
         Create a triangle mesh based on initial point locations,
         specified or automatic boundaries, and mesh quality parameters.
-        (domain <- fm_mesh_2d(boundary = samplers,
+        (domain <- fm_mesh_2d_inla(boundary = samplers,
         max.edge = max.edge))
     }
     class bru_int_polygon{

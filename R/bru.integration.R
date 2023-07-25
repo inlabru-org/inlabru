@@ -475,7 +475,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     if (is.null(domain)) {
       warning("Computing integration points from polygon; specify a mesh for better numerical control.")
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
-      domain <- fm_mesh_2d(boundary = list(samplers), max.edge = max.edge)
+      domain <- fm_mesh_2d_inla(boundary = list(samplers), max.edge = max.edge)
       domain$crs <- fm_CRS(samplers)
       domain_crs <- fm_CRS(domain$crs)
     } else {

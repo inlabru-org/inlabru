@@ -99,8 +99,3 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
   )
   fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
 }
-
-
-
-
-

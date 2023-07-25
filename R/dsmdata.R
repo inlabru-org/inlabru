@@ -80,7 +80,7 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
   )
-  mesh <- fm_mesh_2d(
+  mesh <- fm_mesh_2d_inla(
     boundary = list(inner, outer),
     max.edge = c(
       min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 10,

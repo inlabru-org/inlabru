@@ -1273,7 +1273,7 @@ make_submapper <- function(subcomp_n,
 #' @examples
 #' if (bru_safe_inla(quietly = TRUE)) {
 #'   library(INLA)
-#'   mesh <- fm_rcdt_2d_inla(globe = 2)
+#'   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,
 #'     prior.range = c(1, 0.5),
 #'     prior.sigma = c(1, 0.5)

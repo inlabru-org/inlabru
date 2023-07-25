@@ -32,7 +32,7 @@ test_that("sf gorillas lgcp vignette", {
   )
 
   ## Build the mesh:
-  mesh_sf <- fm_mesh_2d(
+  mesh_sf <- fm_mesh_2d_inla(
     boundary = boundary,
     max.edge = c(0.54, 0.97),
     min.angle = c(30, 21),

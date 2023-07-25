@@ -61,7 +61,7 @@ import.shrimp <- function() {
   proj4string(gamba) <- CRS("+proj=longlat")
 
   # Make a mesh
-  mesh <- fm_mesh_2d(loc.domain = gamba, max.edge = 0.15, offset = 0.15,
+  mesh <- fm_mesh_2d_inla(loc.domain = gamba, max.edge = 0.15, offset = 0.15,
                      crs = CRS("+proj=longlat"))
 
   # Final shrimp object

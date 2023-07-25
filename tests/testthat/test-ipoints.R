@@ -88,7 +88,7 @@ test_that("Polygon integration with holes", {
   ))
 
   bndA <- INLA::inla.sp2segment(plyA)
-  m <- fm_mesh_2d(
+  m <- fm_mesh_2d_inla(
     loc.domain = bndA$loc,
     max.edge = 1
   )
@@ -140,7 +140,7 @@ test_that("Polygon integration with holes", {
 test_that("Integration line splitting", {
   local_bru_safe_inla()
 
-  mesh <- fm_mesh_2d(
+  mesh <- fm_mesh_2d_inla(
     loc.domain = cbind(0, 0),
     offset = 2,
     max.edge = 0.5
