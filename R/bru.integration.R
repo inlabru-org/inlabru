@@ -73,7 +73,8 @@
 #' \donttest{
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   bru_safe_sp() &&
+#'   require("fmesher")) {
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'
 #'   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -87,7 +88,7 @@
 #'
 #'
 #'   # Convert a 1D mesh into integration points
-#'   mesh <- inla.mesh.1d(seq(0, 10, by = 1))
+#'   mesh <- fm_mesh_1d(seq(0, 10, by = 1))
 #'   ips <- ipoints(mesh, name = "time")
 #'   plot(ips)
 #'
@@ -123,10 +124,10 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = deprecated()) {
-  #  lifecycle::deprecate_soft("2.8.0",
-  #                            "ipoints()",
-  #                            "fm_int()",
-  #                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+  lifecycle::deprecate_soft("2.8.0.9004",
+                            "ipoints()",
+                            "fm_int()",
+                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
 
   if (!is.null(group)) {
     if (is.null(name) && inherits(domain, "inla.mesh")) {

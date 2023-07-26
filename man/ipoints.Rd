@@ -91,7 +91,8 @@ points in the one-dimensional case.
 \donttest{
 if (require("INLA", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE) &&
-  bru_safe_sp()) {
+  bru_safe_sp() &&
+  require("fmesher")) {
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -105,7 +106,7 @@ if (require("INLA", quietly = TRUE) &&
 
 
   # Convert a 1D mesh into integration points
-  mesh <- inla.mesh.1d(seq(0, 10, by = 1))
+  mesh <- fm_mesh_1d(seq(0, 10, by = 1))
   ips <- ipoints(mesh, name = "time")
   plot(ips)
 

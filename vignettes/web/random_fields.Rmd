@@ -29,6 +29,7 @@ library(INLA)
 library(inlabru)
 library(mgcv)
 library(ggplot2)
+library(fmesher)
 ```
 
 Make a shortcut to a nicer colour scale:
@@ -132,7 +133,7 @@ mesh extend outside the data range.
 
 ```{r }
 x <- seq(-10, 65, by = 1) # this sets mesh points - try others if you like
-mesh1D <- inla.mesh.1d(x, boundary = "free")
+mesh1D <- fm_mesh_1d(x, boundary = "free")
 ```
 
 ... and see where the mesh points are:

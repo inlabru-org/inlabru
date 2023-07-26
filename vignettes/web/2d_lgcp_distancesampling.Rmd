@@ -33,6 +33,7 @@ Setting things up
 Load libraries
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(inlabru)
+library(fmesher)
 library(INLA)
 library(ggplot2)
 ```

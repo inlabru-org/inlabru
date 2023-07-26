@@ -27,7 +27,7 @@
 #' @importFrom rlang .data
 #' @examples
 #' \dontrun{
-#' if (require(ggplot2)) {
+#' if (require(ggplot2) && require(fmesher)) {
 #'   # Load a point pattern
 #'   data(Poisson2_1D)
 #'
@@ -46,7 +46,7 @@
 #'
 #'   # Fit an LGCP model
 #'   x <- seq(0, 55, length.out = 50)
-#'   mesh1D <- inla.mesh.1d(x, boundary = "free")
+#'   mesh1D <- fm_mesh_1d(x, boundary = "free")
 #'   mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
 #'   fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
 #'

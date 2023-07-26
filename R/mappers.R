@@ -708,13 +708,40 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 
 ## inla.mesh ####
 
-#' @param mesh An `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
+#' @param mesh An `fm_mesh_1d`, `fm_mesh_2d`, `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
+#' @export
+#' @describeIn bru_mapper Creates a mapper for 2D `fm_mesh_2d` objects
+bru_mapper.fm_mesh_2d <- function(mesh, ...) {
+  mapper <- list(mesh = mesh)
+  bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_2d")
+}
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_fm_mesh_2d <- function(mapper, ...) {
+  mapper[["mesh"]]$n
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_fm_mesh_2d <- function(mapper, ...) {
+  seq_len(mapper[["mesh"]]$n)
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_fm_mesh_2d <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  }
+  fm_basis(mapper[["mesh"]], input)
+}
+
 #' @export
 #' @describeIn bru_mapper Creates a mapper for 2D `inla.mesh` objects
 bru_mapper.inla.mesh <- function(mesh, ...) {
-  mapper <- list(mesh = mesh)
-  bru_mapper_define(mapper, new_class = "bru_mapper_inla_mesh_2d")
+  bru_mapper.fm_mesh_2d(fm_as_mesh_2d(mesh))
 }
+
+## The following methods are only used for old stored mapper objects
 
 #' @export
 #' @rdname bru_mapper_methods
@@ -732,7 +759,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_evaluator(mapper[["mesh"]], loc = input)$proj$A
+  fm_basis(mapper[["mesh"]], input)
 }
 
 
@@ -745,8 +772,8 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' and similar).
 #' Default: `NULL`, to force user specification of this parameter
 #' @export
-#' @describeIn bru_mapper Create mapper for an `inla.mesh.1d` object
-bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
+#' @describeIn bru_mapper Create mapper for an `fm_mesh_1d` object
+bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
     stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
   }
@@ -754,8 +781,47 @@ bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
     mesh = mesh,
     indexed = indexed
   )
-  bru_mapper_define(mapper, new_class = "bru_mapper_inla_mesh_1d")
+  bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_1d")
 }
+
+#' @export
+#' @rdname bru_mapper_methods
+ibm_n.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
+  mapper[["mesh"]]$m
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_values.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
+  if (mapper[["indexed"]]) {
+    seq_len(mapper[["mesh"]]$m)
+  } else {
+    mapper[["mesh"]]$loc
+  }
+}
+#' @export
+#' @rdname bru_mapper_methods
+ibm_jacobian.bru_mapper_fm_mesh_1d <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  }
+  ok <- !is.na(input)
+  if (all(ok)) {
+    A <- fm_basis(mapper[["mesh"]], input)
+  } else {
+    A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
+    A[ok, ] <- fm_basis(mapper[["mesh"]], input[ok])
+  }
+  A
+}
+
+#' @export
+#' @describeIn bru_mapper Create mapper for an `inla.mesh.1d` object; converts
+#' the mesh fo `fm_mesh_1d` first.
+bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
+  bru_mapper.fm_mesh_1d(fm_as_mesh_1d(mesh), indexed = indexed, ...)
+}
+
+## The following methods are only used for old stored mapper objects
 
 #' @export
 #' @rdname bru_mapper_methods
@@ -779,10 +845,10 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
   }
   ok <- !is.na(input)
   if (all(ok)) {
-    A <- fm_evaluator(mapper[["mesh"]], loc = input)$proj$A
+    A <- fm_basis(mapper[["mesh"]], input)
   } else {
     A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
-    A[ok, ] <- fm_evaluator(mapper[["mesh"]], loc = input[ok])$proj$A
+    A[ok, ] <- fm_basis(mapper[["mesh"]], input[ok])
   }
   A
 }

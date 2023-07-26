@@ -2,9 +2,15 @@
 % Please edit documentation in R/mappers.R
 \name{bru_mapper_methods}
 \alias{bru_mapper_methods}
+\alias{ibm_n.bru_mapper_fm_mesh_2d}
+\alias{ibm_values.bru_mapper_fm_mesh_2d}
+\alias{ibm_jacobian.bru_mapper_fm_mesh_2d}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_2d}
+\alias{ibm_n.bru_mapper_fm_mesh_1d}
+\alias{ibm_values.bru_mapper_fm_mesh_1d}
+\alias{ibm_jacobian.bru_mapper_fm_mesh_1d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_1d}
@@ -78,11 +84,23 @@
 \alias{ibm_jacobian.bru_mapper_mesh_B}
 \title{Methods for bru_mapper objects}
 \usage{
+\method{ibm_n}{bru_mapper_fm_mesh_2d}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_fm_mesh_2d}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_fm_mesh_2d}(mapper, input, ...)
+
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
 \method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
+
+\method{ibm_n}{bru_mapper_fm_mesh_1d}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_fm_mesh_1d}(mapper, ...)
+
+\method{ibm_jacobian}{bru_mapper_fm_mesh_1d}(mapper, input, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_1d}(mapper, ...)
 

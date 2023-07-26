@@ -480,11 +480,11 @@ test_that("Collect mapper, automatic construction", {
       n = 4,
       graph = Matrix::Diagonal(4) + 1
     )
-  # inla.mesh.1d mapper
+  # fm_mesh_1d mapper
 
   lik <- like(formula = y ~ ., data = data)
 
-  # This tests do not trigger INLA:inla.mesh.1d usage:
+  # These tests do not trigger INLA:inla.mesh.1d usage:
   cmp1 <- component_list(cmp1, lhoods = like_list(list(lik)))
   cmp2 <- component_list(cmp2, lhoods = like_list(list(lik)))
 

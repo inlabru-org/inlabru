@@ -244,7 +244,7 @@ classDiagram
         1D Check
         ((!is.null(samplers) && is.numeric(samplers)) ||
         (!is.null(domain) && (is.numeric(domain) || inherits(domain,
-        "inla.mesh.1d"))))
+        "fm_mesh_1d"))))
         }
     class nsub1{
         Number of integration points along a triangle edge for 1D
@@ -267,7 +267,7 @@ classDiagram
         (domain <- samplers; samplers <- NULL)
     }
     class inla_mesh_1d{
-        impute domain with inla.mesh.1d
+        impute domain with fm_mesh_1d
         (domain <- fm_mesh_1d(sort(unique(as.vector(samplers)))))
     }
     class inla_mesh_segment{
