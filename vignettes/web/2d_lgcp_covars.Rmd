@@ -555,7 +555,7 @@ Adapt the code used for the vegetation factor to do this.
 ```{r warning=FALSE,message=FALSE}
 LambdaE <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(Intercept + elev + mySmooth))
 )
 LambdaE

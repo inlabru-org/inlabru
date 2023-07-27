@@ -1701,37 +1701,6 @@ bm_aggregate_input <- function(input,
 
 
 
-bm_calc_weights <- function(block, log_weights, weights,
-                            n_out, n_state, rescale) {
-  if (rescale) {
-    # Compute blockwise normalised weights
-    if (!is.null(log_weights)) {
-      log_weights <- bm_calc_log_weights(
-        log_weights = log_weights,
-        block = block,
-        n_out = n_out,
-        n_state = n_state
-      )
-      weights <- exp(log_weights)
-    } else {
-      scale <- as.vector(
-        Matrix::sparseMatrix(
-          i = block,
-          j = rep(1L, n_state),
-          x = weights,
-          dims = c(n_out, 1)
-        )
-      )
-      weights <- weights / scale[block]
-    }
-  } else {
-    if (!is.null(log_weights)) {
-      weights <- exp(log_weights)
-    }
-  }
-  weights
-}
-
 
 #' @export
 #' @details
@@ -1750,21 +1719,12 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) 
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
-  weights <-
-    bm_calc_weights(
-      block = input[["block"]],
-      log_weights = input[["log_weights"]],
-      weights = input[["weights"]],
-      n_out = n_out,
-      n_state = n_state,
-      rescale = mapper[["rescale"]]
-    )
-
-  Matrix::sparseMatrix(
-    i = input[["block"]],
-    j = seq_len(n_state),
-    x = weights,
-    dims = c(n_out, n_state)
+  fm_block(
+    block = input[["block"]],
+    weights = input[["weights"]],
+    log_weights = input[["log_weights"]],
+    n_block = n_out,
+    rescale = mapper[["rescale"]]
   )
 }
 
@@ -1782,12 +1742,11 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
   n_out <- ibm_n_output(mapper, input = input)
 
   weights <-
-    bm_calc_weights(
+    fm_block_weights(
       block = input[["block"]],
-      log_weights = input[["log_weights"]],
       weights = input[["weights"]],
-      n_out = n_out,
-      n_state = n_state,
+      log_weights = input[["log_weights"]],
+      n_block = n_out,
       rescale = mapper[["rescale"]]
     )
 
@@ -1848,46 +1807,6 @@ bru_mapper_logsumexp <- function(rescale = FALSE,
 
 
 
-bm_calc_log_shift <- function(block, log_weights, n_out, n_state) {
-  block_k <- sort(unique(block))
-  shift <- numeric(n_out)
-  shift[block_k] <-
-    vapply(
-      block_k,
-      function(k) {
-        max(log_weights[block == k])
-      },
-      0.0
-    )
-  shift
-}
-
-bm_calc_log_weights <- function(block, log_weights, weights = NULL,
-                                n_out, n_state,
-                                rescale) {
-  if (is.null(log_weights)) {
-    log_weights <- log(weights)
-  }
-  if (rescale) {
-    shift <- bm_calc_log_shift(
-      block = block, log_weights = log_weights,
-      n_out = n_out, n_state = n_state
-    )
-    log_rescale <- as.vector(
-      Matrix::sparseMatrix(
-        i = block,
-        j = rep(1L, n_state),
-        x = exp(log_weights - shift[block]),
-        dims = c(n_out, 1)
-      )
-    )
-    log_rescale <- (log(log_rescale) + shift)[block]
-    log_weights <- log_weights - log_rescale
-  }
-  log_weights
-}
-
-
 
 #' @export
 #' @details
@@ -1905,21 +1824,20 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
-  log_weights <- bm_calc_log_weights(
-    log_weights = input[["log_weights"]],
+  log_weights <- fm_block_log_weights(
     block = input[["block"]],
-    n_out = n_out,
-    n_state = n_state,
+    log_weights = input[["log_weights"]],
+    weights = input[["weights"]],
+    n_block = n_out,
     rescale = mapper[["rescale"]]
   )
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- bm_calc_log_shift(
+  shift <- fm_block_log_shift(
     log_weights = w_state,
     block = input[["block"]],
-    n_out = n_out,
-    n_state = n_state
+    n_block = n_out
   )
 
   sum_values <-
@@ -1957,21 +1875,19 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
   n_state <- ibm_n(mapper, input = input, state = state)
   n_out <- ibm_n_output(mapper, input = input)
 
-  log_weights <- bm_calc_log_weights(
+  log_weights <- fm_block_log_weights(
     log_weights = input[["log_weights"]],
     block = input[["block"]],
-    n_out = n_out,
-    n_state = n_state,
+    n_block = n_out,
     rescale = mapper[["rescale"]]
   )
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- bm_calc_log_shift(
+  shift <- fm_block_log_shift(
     log_weights = w_state,
     block = input[["block"]],
-    n_out = n_out,
-    n_state = n_state
+    n_block = n_out
   )
 
   values <-

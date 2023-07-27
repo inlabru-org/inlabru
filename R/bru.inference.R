@@ -1295,11 +1295,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (is.null(ips)) {
-      #      ips <- ipmaker(
-      #        samplers = samplers,
-      #        domain = domain,
-      #        int.args = options[["bru_int_args"]]
-      #      )
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
@@ -1543,8 +1538,8 @@ like_list.list <- function(object, envir = NULL, ...) {
     if (any(vapply(object, function(x) inherits(x, "bru_like_list"), TRUE))) {
       stop(paste0(
         "All list elements must be of class 'bru_like'.\n",
-           "To combine with 'bru_like_list' objects, use c(...)."
-        ))
+        "To combine with 'bru_like_list' objects, use c(...)."
+      ))
     }
     stop("All list elements must be of class 'bru_like'.")
   }
@@ -3888,8 +3883,10 @@ summary_bru <- function(object, ...) {
       signif(range(sm[, c(4, 6)])[1]), " : ",
       signif(range(sm[, c(4, 6)])[2]), "]"
     ))
-    if (inherits(object$model$effects[[nm]]$main$mapper,
-                 c("fm_mesh_2d", "inla.mesh"))) {
+    if (inherits(
+      object$model$effects[[nm]]$main$mapper,
+      c("fm_mesh_2d", "inla.mesh")
+    )) {
       cat(paste0(
         ", and area = ",
         signif(sum(fm_fem(object$model$effects[[nm]]$main$mapper)$va))

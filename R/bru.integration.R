@@ -124,10 +124,14 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = deprecated()) {
-  lifecycle::deprecate_soft("2.8.0.9004",
-                            "ipoints()",
-                            "fm_int()",
-                            details = c("ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."))
+  lifecycle::deprecate_soft(
+    "2.8.0.9004",
+    "ipoints()",
+    "fm_int()",
+    details = c(
+      "ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."
+    )
+  )
 
   if (!is.null(group)) {
     if (is.null(name) && inherits(domain, "inla.mesh")) {
