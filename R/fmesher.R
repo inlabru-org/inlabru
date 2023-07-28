@@ -126,3 +126,7 @@ fmesher::fm_is_within
 fmesher::fm_as_inla_mesh
 #' @export
 fmesher::fm_as_inla_mesh_segment
+#' @export
+fmesher::st_signed_area
+#' @export
+fmesher::st_check_polygon

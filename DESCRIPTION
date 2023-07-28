@@ -55,7 +55,7 @@ Depends:
     stats
 Imports:
     dplyr,
-    fmesher (>= 0.0.9.9006),
+    fmesher (>= 0.0.9.9007),
     lifecycle,
     magrittr,
     MatrixModels,
@@ -134,7 +134,6 @@ Collate:
     'plotsample.R'
     'rgl.R'
     'sampling.R'
-    'sf_utils.R'
     'spatstat.R'
     'spde.R'
     'stack.R'
