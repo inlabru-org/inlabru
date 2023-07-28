@@ -55,7 +55,7 @@ Depends:
     stats
 Imports:
     dplyr,
-    fmesher (>= 0.0.9.9007),
+    fmesher (>= 0.0.9.9008),
     lifecycle,
     magrittr,
     MatrixModels,
