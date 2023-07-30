@@ -49,9 +49,9 @@ if (require("rgl", quietly = TRUE) &&
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
 
-  glplot(mexdolphin$mesh)
-  glplot(mexdolphin$samplers)
-  glplot(mexdolphin$points)
+  glplot(mexdolphin$mesh, alpha = 0.2)
+  glplot(mexdolphin$samplers, lwd = 5)
+  glplot(mexdolphin$points, size = 10)
 }
 }
 }
