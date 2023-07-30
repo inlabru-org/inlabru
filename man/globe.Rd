@@ -2,7 +2,7 @@
 % Please edit documentation in R/rgl.R
 \name{globe}
 \alias{globe}
-\title{Plot a globe using rgl}
+\title{Visualize a globe using RGL}
 \usage{
 globe(
   R = 1,
@@ -33,24 +33,18 @@ No value, used for plotting side effect.
 }
 \description{
 Creates a textured sphere and lon/lat coordinate annotations.
-}
-\details{
-This funciton requires the \code{rgl} and \code{sphereplot} packages.
+This function requires the \code{rgl} and \code{sphereplot} packages.
 }
 \examples{
 \dontrun{
-if (bru_safe_inla() &&
-  require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE) &&
-  bru_safe_sp()) {
+if (require("rgl", quietly = TRUE) &&
+    require("sphereplot", quietly = TRUE) &&
+    bru_safe_sp()) {
+  # Show the globe
+  globe()
 
   # Load pantropoical dolphin data
-
   data("mexdolphin", package = "inlabru")
-
-  # Show the globe
-
-  globe()
 
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
@@ -63,9 +57,6 @@ if (bru_safe_inla() &&
 }
 \seealso{
 Other inlabru RGL tools: 
-\code{\link{glplot.SpatialLines}()},
-\code{\link{glplot.SpatialPoints}()},
-\code{\link{glplot.inla.mesh}()},
 \code{\link{glplot}()}
 }
 \concept{inlabru RGL tools}

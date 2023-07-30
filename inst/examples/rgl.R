@@ -1,16 +1,12 @@
 \dontrun{
-if (bru_safe_inla() &&
-  require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE) &&
-  bru_safe_sp()) {
+if (require("rgl", quietly = TRUE) &&
+    require("sphereplot", quietly = TRUE) &&
+    bru_safe_sp()) {
+  # Show the globe
+  globe()
 
   # Load pantropoical dolphin data
-
   data("mexdolphin", package = "inlabru")
-
-  # Show the globe
-
-  globe()
 
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
