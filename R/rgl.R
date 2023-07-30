@@ -26,8 +26,8 @@ globe <- function(R = 1,
                   xlab = "", ylab = "", zlab = "") {
   # coordinates for texture
   n.smp <- 50
-  lat <- matrix(-asin(seq(-1, 1, len = n.smp)), n.smp, n.smp, byrow = TRUE)
-  long <- matrix(seq(-180, 180, len = n.smp) * pi / 180, n.smp, n.smp)
+  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)), n.smp, n.smp, byrow = TRUE)
+  long <- matrix(seq(-180, 180, length.out = n.smp) * pi / 180, n.smp, n.smp)
   x <- R * cos(lat) * cos(long)
   y <- R * cos(lat) * sin(long)
   z <- R * sin(lat)
