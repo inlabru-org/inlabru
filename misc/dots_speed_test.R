@@ -1,4 +1,3 @@
-
 a_old <- function(...) {
   A <- list(...)
   Anames <- names(A)
@@ -24,7 +23,9 @@ a_new2 <- function(...) {
 L <- as.list(seq_len(100))
 names(L) <- as.character(L)
 profvis::profvis({
-  bench::mark(old = do.call(a_old, L),
-              new = do.call(a_new, L),
-              new = do.call(a_new2, L))
+  bench::mark(
+    old = do.call(a_old, L),
+    new = do.call(a_new, L),
+    new = do.call(a_new2, L)
+  )
 })
