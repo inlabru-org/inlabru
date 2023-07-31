@@ -1,6 +1,8 @@
 #' @title Generate integration points
 #'
 #' @description
+#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_int()]
+#'
 #' This function generates points in one or two dimensions with a weight attached to each point.
 #' The weighted sum of a function evaluated at these points is the integral of that function approximated
 #' by linear basis functions. The parameter `samplers` describes the area(s) integrated over.
