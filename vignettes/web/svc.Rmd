@@ -278,12 +278,13 @@ outside the hull.
 ```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
 # make a hull and mesh for spatial model
 hull <- fm_nonconvex_hull(
-  points = as.matrix(st_coordinates(count_dat)),
+  count_dat,
   convex = 200, concave = 350
 )
 mesh <- fm_mesh_2d_inla(
   boundary = hull, max.edge = c(100, 600), # km inside and outside
-  cutoff = 50, offset = c(100, 300)
+  cutoff = 50, offset = c(100, 300),
+  crs = fm_crs(hull)
 ) # cutoff is min edge
 
 # plot it
@@ -485,6 +486,7 @@ grid to the modeling mesh.
 
 ```{r map_grid}
 # get easting and northing limits
+hull <- fm_as_segm(hull)
 xlim <- range(hull$loc[, 1])
 ylim <- range(hull$loc[, 2])
 grd_dims <- round(c(x = diff(range(xlim)), y = diff(range(ylim))) / 25)
