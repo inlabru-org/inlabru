@@ -1624,82 +1624,6 @@ ibm_values.bru_mapper_aggregate <- function(mapper, ...,
   }
 }
 
-bm_aggregate_input <- function(input,
-                               state = NULL,
-                               n_state = NULL,
-                               allow_log = TRUE,
-                               force_log = FALSE) {
-  if (is.null(input)) {
-    block <- NULL
-    weights <- NULL
-    log_weights <- NULL
-  } else {
-    block <- input[["block"]]
-    weights <- input[["weights"]]
-    if (allow_log) {
-      log_weights <- input[["log_weights"]]
-    } else {
-      log_weights <- NULL
-    }
-  }
-  if (is.null(state) && is.null(n_state)) {
-    n_state <- max(length(block), length(weights), length(log_weights))
-  } else if (!is.null(state)) {
-    n_state <- length(state)
-  }
-  if (is.null(block)) {
-    block <- rep(1L, n_state)
-  } else if (length(block) == 1) {
-    block <- rep(block, n_state)
-  }
-  if (allow_log && force_log) {
-    if (is.null(log_weights)) {
-      if (is.null(weights)) {
-        log_weights <- rep(0.0, n_state)
-      } else {
-        log_weights <- log(weights)
-        weights <- NULL
-      }
-    } else if (!is.null(weights)) {
-      warning("Both weights and log_weights supplied. Using log_weights.",
-        immediate. = TRUE
-      )
-      weights <- NULL
-    }
-    if (length(log_weights) == 1) {
-      log_weights <- rep(log_weights, n_state)
-    }
-  } else if (allow_log && !force_log) {
-    if (is.null(log_weights) && is.null(weights)) {
-      weights <- rep(1.0, n_state)
-    } else if (!is.null(weights)) {
-      # log_weights is non-NULL
-      if (!is.null(log_weights)) {
-        warning("Both weights and log_weights supplied. Using weights.",
-          immediate. = TRUE
-        )
-        log_weights <- NULL
-      }
-      if (length(weights) == 1) {
-        weights <- rep(weights, n_state)
-      }
-    } else {
-      # log_weights is non-NULL, weights is null
-      if (length(log_weights) == 1) {
-        log_weights <- rep(log_weights, n_state)
-      }
-    }
-  } else {
-    if (is.null(weights)) {
-      weights <- rep(1.0, n_state)
-    } else if (length(weights) == 1) {
-      weights <- rep(weights, n_state)
-    }
-  }
-  list(block = block, weights = weights, log_weights = log_weights)
-}
-
-
 
 
 #' @export
@@ -1711,19 +1635,11 @@ bm_aggregate_input <- function(input,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input,
-    state = state,
-    allow_log = TRUE,
-    force_log = FALSE
-  )
-  n_state <- ibm_n(mapper, input = input, state = state)
-  n_out <- ibm_n_output(mapper, input = input)
-
   fm_block(
     block = input[["block"]],
     weights = input[["weights"]],
     log_weights = input[["log_weights"]],
-    n_block = n_out,
+    n_block = mapper[["n_block"]],
     rescale = mapper[["rescale"]]
   )
 }
@@ -1733,31 +1649,16 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) 
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
-  input <- bm_aggregate_input(input,
-    state = state,
-    allow_log = TRUE,
-    force_log = FALSE
-  )
-  n_state <- ibm_n(mapper, input = input, state = state)
-  n_out <- ibm_n_output(mapper, input = input)
-
-  weights <-
-    fm_block_weights(
+  val <-
+    fm_block_eval(
       block = input[["block"]],
-      weights = input[["weights"]],
       log_weights = input[["log_weights"]],
-      n_block = n_out,
-      rescale = mapper[["rescale"]]
+      weights = input[["weights"]],
+      rescale = mapper[["rescale"]],
+      n_block = mapper[["n_block"]],
+      values = state
     )
-
-  values <-
-    Matrix::sparseMatrix(
-      i = input[["block"]],
-      j = rep(1L, n_state),
-      x = state * weights,
-      dims = c(n_out, 1)
-    )
-  as.vector(values)
+  val
 }
 
 
@@ -1817,12 +1718,17 @@ bru_mapper_logsumexp <- function(rescale = FALSE,
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) {
-  input <- bm_aggregate_input(input,
-    state = state,
-    allow_log = TRUE, force_log = TRUE
+  input <- fm_block_prep(
+    block = input[["block"]],
+    log_weights = input[["log_weights"]],
+    weights = input[["weights"]],
+    force_log = TRUE,
+    values = state,
+    n_block = mapper[["n_block"]]
   )
-  n_state <- ibm_n(mapper, input = input, state = state)
-  n_out <- ibm_n_output(mapper, input = input)
+
+  n_state <- length(input$block)
+  n_out <- input$n_block
 
   log_weights <- fm_block_log_weights(
     block = input[["block"]],
@@ -1868,40 +1774,17 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) 
 #' the log-sum-weight-exp value. If `FALSE`, the `sum-weight-exp` value is returned.
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
                                           log = TRUE, ..., sub_lin = NULL) {
-  input <- bm_aggregate_input(input,
-    state = state,
-    allow_log = TRUE, force_log = TRUE
-  )
-  n_state <- ibm_n(mapper, input = input, state = state)
-  n_out <- ibm_n_output(mapper, input = input)
-
-  log_weights <- fm_block_log_weights(
-    log_weights = input[["log_weights"]],
-    block = input[["block"]],
-    n_block = n_out,
-    rescale = mapper[["rescale"]]
-  )
-
-  # Compute shift for stable log-sum-exp
-  w_state <- state + log_weights
-  shift <- fm_block_log_shift(
-    log_weights = w_state,
-    block = input[["block"]],
-    n_block = n_out
-  )
-
-  values <-
-    Matrix::sparseMatrix(
-      i = input[["block"]],
-      j = rep(1L, n_state),
-      x = exp(w_state - shift[input[["block"]]]),
-      dims = c(n_out, 1)
+  val <-
+    fm_block_logsumexp_eval(
+      block = input[["block"]],
+      log_weights = input[["log_weights"]],
+      weights = input[["weights"]],
+      rescale = mapper[["rescale"]],
+      n_block = mapper[["n_block"]],
+      values = state,
+      log = log
     )
-  if (log) {
-    log(as.vector(values)) + shift
-  } else {
-    as.vector(values) * exp(shift)
-  }
+  val
 }
 
 
