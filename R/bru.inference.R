@@ -1543,8 +1543,8 @@ like_list.list <- function(object, envir = NULL, ...) {
     if (any(vapply(object, function(x) inherits(x, "bru_like_list"), TRUE))) {
       stop(paste0(
         "All list elements must be of class 'bru_like'.\n",
-           "To combine with 'bru_like_list' objects, use c(...)."
-        ))
+        "To combine with 'bru_like_list' objects, use c(...)."
+      ))
     }
     stop("All list elements must be of class 'bru_like'.")
   }

@@ -789,7 +789,7 @@ fm_as_mesh_2d <- function(...) {
 #' @param x Object to be converted
 #' @export
 fm_as_mesh_2d.fm_mesh_2d <- function(x, ...) {
-#  class(x) <- c("fm_mesh_2d", setdiff(class(x), "fm_mesh_2d"))
+  #  class(x) <- c("fm_mesh_2d", setdiff(class(x), "fm_mesh_2d"))
   x
 }
 #' @rdname fm_as_mesh_2d
@@ -855,9 +855,11 @@ fm_as_lattice_2d.inla.mesh.lattice <- function(x, ...) {
 #' @export
 fm_as_inla_mesh_segment <-
   function(...) {
-    lifecycle::deprecate_soft("2.8.0.9008",
-                              "fm_as_inla_mesh_segment()",
-                              "fm_as_segm()")
+    lifecycle::deprecate_soft(
+      "2.8.0.9008",
+      "fm_as_inla_mesh_segment()",
+      "fm_as_segm()"
+    )
     fm_as_segm(...)
   }
 
@@ -866,8 +868,10 @@ fm_as_inla_mesh_segment <-
 #' @returns An `fm_mesh_2d` object
 #' @export
 fm_as_inla_mesh <- function(...) {
-  lifecycle::deprecate_soft("2.8.0.9008",
-                            "fm_as_inla_mesh()",
-                            "fm_as_mesh_2d()")
+  lifecycle::deprecate_soft(
+    "2.8.0.9008",
+    "fm_as_inla_mesh()",
+    "fm_as_mesh_2d()"
+  )
   fm_as_mesh_2d(...)
 }
