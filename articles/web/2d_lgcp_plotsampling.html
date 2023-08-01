@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-07-29</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-08-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/web/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/web/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -182,7 +182,7 @@ the following SPDE setup:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matern</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh</span>,</span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
-<span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Fit an LGCP model with SPDE only to these data by using the
 <code>samplers=</code> argument of the function
@@ -251,14 +251,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
 <span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 652.9862 47.66756 574.1746 645.0972 756.4037 645.0972        4.766756</span></span>
-<span><span class="co">#&gt; 2 651.2032 36.79142 581.6384 651.6465 732.7460 651.6465        3.679142</span></span>
-<span><span class="co">#&gt; 3 673.6461 24.01182 625.5160 674.8028 721.0750 674.8028        2.401182</span></span>
+<span><span class="co">#&gt; 1 658.9690 46.84917 571.4421 657.8836 750.2763 657.8836        4.684917</span></span>
+<span><span class="co">#&gt; 2 644.5998 43.09022 571.8363 646.2869 729.5557 646.2869        4.309022</span></span>
+<span><span class="co">#&gt; 3 672.8118 24.36035 627.2410 674.4264 721.3459 674.4264        2.436035</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.493176</span></span>
-<span><span class="co">#&gt; 2      2.936534</span></span>
-<span><span class="co">#&gt; 3      1.847299</span></span>
+<span><span class="co">#&gt; 1      4.198184</span></span>
+<span><span class="co">#&gt; 2      3.102118</span></span>
+<span><span class="co">#&gt; 3      1.648276</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
