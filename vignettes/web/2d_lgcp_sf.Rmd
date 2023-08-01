@@ -95,7 +95,7 @@ an appropriate predictor specification. The locations at which to predict can be
 matern <- inla.spde2.pcmatern(
   mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(0.05, 0.01)
 )
 
 cmp <- geometry ~
