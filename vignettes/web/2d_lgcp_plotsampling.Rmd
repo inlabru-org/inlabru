@@ -101,12 +101,12 @@ setup:
 ```{r }
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(5, 0.01)
+  prior.range = c(0.05, 0.01)
 )
 ```
 
 
-Fit an LGCP model with SPDE only to these data by using the `samplers=` argument of 
+Fit an LGCP model with SPDE only to these data by using the `samplers=` argument of
 the function `lgcp( )`:
 
 
