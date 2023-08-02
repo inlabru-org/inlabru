@@ -488,7 +488,7 @@ grid to the modeling mesh.
 
 ```{r map_grid}
 # get easting and northing limits
-bbox <- fm_bounding_box(hull[[1]])
+bbox <- fm_bbox(hull[[1]])
 grd_dims <- round(c(x = diff(bbox$lim[[1]]), y = diff(bbox$lim[[2]])) / 25)
 
 # make mesh projector to get model summaries from the mesh to the mapping grid
