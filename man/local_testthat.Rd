@@ -15,7 +15,7 @@
 local_bru_testthat_assign(x, values, envir = parent.frame())
 
 local_bru_testthat_tolerances(
-  tolerances = c(1e-04, 0.01, 0.1),
+  tolerances = c(0.0001, 0.01, 0.1),
   envir = parent.frame()
 )
 

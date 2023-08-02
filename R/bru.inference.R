@@ -1124,7 +1124,7 @@ extended_bind_rows <- function(...) {
 #'  size/format for inputs and response variables, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param mesh An inla.mesh object. Obsolete.
+#' @param mesh Deprecated.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from `options$E`, normally `1`.
@@ -1178,7 +1178,7 @@ extended_bind_rows <- function(...) {
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
+                 mesh = deprecated(), E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL,
                  exclude = NULL,
@@ -1945,10 +1945,10 @@ predict.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, "inla.mesh")) {
+  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_soft(
       "2.8.0",
-      "predict(newdata = 'should not be an inla.mesh object')",
+      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
     newdata <- fm_vertices(newdata, format = "sp")
@@ -2132,10 +2132,10 @@ generate.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, "inla.mesh")) {
+  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_soft(
       "2.8.0",
-      "predict(newdata = 'should not be an inla.mesh object')",
+      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
     newdata <- fm_vertices(newdata, format = "sp")

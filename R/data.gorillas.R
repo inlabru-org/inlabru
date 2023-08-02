@@ -292,7 +292,7 @@ import.gorillas.sf <- function(overwrite = FALSE) {
 
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
-  gorillas_sf$mesh <- gorillas$mesh
+  gorillas_sf$mesh <- fmesher::fm_as_fm(gorillas$mesh)
   gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
   gcov <- terra::rast(gorillas$gcov[[1]])
   for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {

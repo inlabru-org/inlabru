@@ -15,7 +15,7 @@ like(
   family = "gaussian",
   data = NULL,
   response_data = NULL,
-  mesh = NULL,
+  mesh = deprecated(),
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -67,7 +67,7 @@ size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{mesh}{An inla.mesh object. Obsolete.}
+\item{mesh}{Deprecated.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
