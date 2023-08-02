@@ -94,7 +94,7 @@
 #'    the gorilla nests.}
 #'    \item{`boundary`:}{ An `sf` object defining the boundary
 #'    of the region that was searched for the nests.}
-#'    \item{`mesh`:}{ An `inla.mesh` object containing a mesh that can be used
+#'    \item{`mesh`:}{ An `fm_mesh_2d` object containing a mesh that can be used
 #'    with function `lgcp` to fit a LGCP to the nest data.}
 #'    \item{`gcov_file`:}{ The in-package filename of a `terra::SpatRaster` object,
 #'    with one layer for each of these spatial covariates:
