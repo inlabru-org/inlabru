@@ -13,6 +13,9 @@ name: test-coverage
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: test-coverage-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,6 +43,7 @@ jobs:
       - name: Test coverage
         run: |
           covr::codecov(
+            type = "all",
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
