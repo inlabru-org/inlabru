@@ -270,21 +270,22 @@ There are various things to consider when constructing a mesh
 (Lindgren and Rue 2015, Blangiardo and Cameletti 2015, Krainski 
 et al. 2018, Bakka et al. 2018). In constructing one, we balance a 
 trade-off between capturing fine-scaled features of the Gaussian 
-random field and computing times. Here, we create a non-convex 
-hull around the count sites, and then build a triangular mesh by 
-specifying minimum and maximum edge lengths within and slightly 
-outside the hull.
+random field and computing times. Here, we create two non-convex 
+hulls around the count sites, and then build a triangular mesh by 
+specifying minimum and maximum edge lengths within the inner hull,
+and within the slightly larger outer hull.
 
 ```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
-# make a hull and mesh for spatial model
-hull <- fm_nonconvex_hull(
+# make a two extension hulls and mesh for spatial model
+hull <- fm_extensions(
   count_dat,
-  convex = 200, concave = 350
+  convex = c(200, 500),
+  concave = c(350, 500)
 )
 mesh <- fm_mesh_2d_inla(
   boundary = hull, max.edge = c(100, 600), # km inside and outside
   cutoff = 50, offset = c(100, 300),
-  crs = fm_crs(hull)
+  crs = fm_crs(count_dat)
 ) # cutoff is min edge
 
 # plot it
@@ -416,25 +417,26 @@ specify an observation likelihood with the model formula for
 the negative binomial distribution for the counts, and define the
 estimation data.
 Then we ask
-`inla()` to compute WAIC and CPO to evaluate model fit, and to save
-the information necessary for posterior sampling (`config=TRUE`, but
-this will otherwise be set by default by `bru()`, as `inlabru::predict()`
+`inla()` to compute WAIC and CPO (temporarily disabled) to evaluate model fit
+(also, to save the information necessary for posterior sampling we need `config=TRUE`,
+but this is automatically set by `bru()`, as `inlabru::predict()`
 relies on it for posterior sampling and prediction). For
-computing speed, we choose to use the simplified laplace approximation strategy
+computing speed, we choose to use the simplified Laplace approximation strategy
 and Empirical Bayes estimation. The `inla()` run for this model takes
 about 1 minutes on a standard laptop computer. Another option is to
 use the Variational Bayes approximation as detailed in Van Niekerk and
 Rue (2021) and Van Niekerk et. al. (2022).
 
 ```{r run, eval=T, cache=TRUE}
-res <- bru(svc_components,
+res <- bru(
+  svc_components,
   like(
     formula = svc_formula,
     family = "nbinomial",
     data = count_dat
   ),
   options = list(
-    control.compute = list(waic = TRUE, cpo = TRUE),
+    control.compute = list(waic = TRUE, cpo = FALSE),
     control.inla = list(int.strategy = "eb"),
     verbose = FALSE
   )
@@ -486,15 +488,13 @@ grid to the modeling mesh.
 
 ```{r map_grid}
 # get easting and northing limits
-hull <- fm_as_segm(hull)
-xlim <- range(hull$loc[, 1])
-ylim <- range(hull$loc[, 2])
-grd_dims <- round(c(x = diff(range(xlim)), y = diff(range(ylim))) / 25)
+bbox <- fm_bounding_box(hull[[1]])
+grd_dims <- round(c(x = diff(bbox$lim[[1]]), y = diff(bbox$lim[[2]])) / 25)
 
 # make mesh projector to get model summaries from the mesh to the mapping grid
 mesh_proj <- fm_evaluator(
   mesh,
-  xlim = xlim, ylim = ylim, dims = grd_dims
+  xlim = bbox$lim[[1]], ylim = bbox$lim[[2]], dims = grd_dims
 )
 ```
 
