@@ -36,7 +36,7 @@ bru_safe_sp(force = TRUE)
 # Determine function location
 code_location <- "2d_lgcp_residuals_functions.R"
 if (!file.exists(code_location)) {
-  code_location <- file.path("vignettes", "web", code_location)
+  code_location <- file.path("vignettes", "articles", code_location)
 }
 ```
 
@@ -55,7 +55,7 @@ Point processes are useful for spatial data analysis and have wide applications
 in ecology, epidemiology, seismology, computational neuroscience, etc. 
 Residual analysis is an effective assessment method for spatial point processes, which commonly takes a frequentist approach.
 
-In this vignette, we will calculate residuals of some of the models from https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html
+In this vignette, we will calculate residuals of some of the models from https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html
 using a Bayesian approach to the residual methods in "Residual Analysis for 
 spatial point processes" (Baddeley et al). 
 
@@ -179,7 +179,7 @@ that they are easier to compute by hand in terms of estimates.
 
 # Computation of Residuals
 In this vignette, the residuals of some models from 
-https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html
 are computed using a Bayesian approach of the residuals described above. 
 This is done using the `inlabru` package. The models used are:
 
@@ -242,7 +242,7 @@ As <- prepare_residual_calculations(
 ## Assessing 4 models with residuals
 ### Vegetation Model
 This model is taken from 
-https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html .
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
 The model is defined such that the gorilla nests have vegetation type as a 
 fixed covariate.
 
@@ -286,7 +286,7 @@ data. This editing of the data frames is done by the function `edit_df`.
 
 ### Elevation model
 This model is also taken from 
-https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html .
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
 The model is defined such that the gorilla nests have elevation as a 
 continuous variable. 
 
@@ -343,7 +343,7 @@ knitr::kable(edit_df(
 
 ### Intercept Model
 This model is also taken from 
-https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html .
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
 The model is defined such that the gorilla nests have a constant effect. 
 
 The code chunk below shows how the model is defined by `lgcp()` and also 
@@ -388,7 +388,7 @@ knitr::kable(edit_df(
 
 ### Smooth Model
 This model is also taken from 
-https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html .
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
 The model is defined such that the gorilla nests depend on an SPDE type smooth function. 
 
 The code chunk below shows how the model is defined by `lgcp()` and also 

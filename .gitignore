@@ -9,3 +9,5 @@ Meta
 revdep
 inla.model
 inla.model-*
+/doc/
+/Meta/
