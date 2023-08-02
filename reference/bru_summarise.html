@@ -25,33 +25,33 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/web/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/web/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/web/publications.html">Publications</a>
+    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
+    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
+    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/web/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_sf.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/web/2d_lgcp_residuals.html">LGCPs - Residuals</a>
+    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_sf.html">LGCPs - An example in two dimensions (sf version)</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
+    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../articles/web/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
     <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/web/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
+    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
     <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/web/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/web/devel_flow.html">Code internal flow diagrams for model evaluation</a>
+    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="../articles/website_examples.html">Website articles</a>
   </div>
@@ -135,16 +135,16 @@ Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may 
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">bru_summarise</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">1000</span><span class="op">)</span>, max_moment <span class="op">=</span> <span class="fl">4</span>, probs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         mean        sd     skew ekurtosis mean.mc_std_err sd.mc_std_err</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1.0084659 1.0121818 1.832754  4.090672      0.03200800    0.03950322</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9960584 1.0396094 2.099336  6.304291      0.03287534    0.04737441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0116793 0.9885207 1.701947  3.530117      0.03125977    0.03676220</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.0311068 1.0202935 1.688766  3.461233      0.03226451    0.03770683</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.0037247 0.9733470 1.747010  3.753708      0.03077994    0.03692217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0001296 0.9847337 1.832220  4.105141      0.03114001    0.03847759</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9994612 1.0141666 2.248287  7.150356      0.03207076    0.04851162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.9903057 1.0107196 2.168886  7.287660      0.03196176    0.04870804</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.9652392 0.9512082 1.885587  4.661026      0.03007984    0.03882231</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.9578453 1.0042866 2.085464  5.737974      0.03175833    0.04417713</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9784544 1.0185163 2.299293  8.039460      0.03220831    0.05103128</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.0132962 1.0774910 2.456283  9.796356      0.03407326    0.05851867</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.9972935 1.0060787 1.992894  5.484476      0.03181500    0.04352519</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.0309050 1.0550268 1.895887  4.594587      0.03336288    0.04284432</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.9907641 0.9842202 2.029075  5.641034      0.03112378    0.04302246</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0250351 1.0451414 2.092236  6.385965      0.03305027    0.04786008</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9862291 1.0121549 2.166661  7.628371      0.03200715    0.04966364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  1.0244897 1.0248552 2.029215  5.918367      0.03240877    0.04560424</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.9940299 0.9591605 1.728840  3.832070      0.03033132    0.03663086</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.9761953 1.0278045 2.225175  7.002094      0.03250203    0.04876414</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

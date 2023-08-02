@@ -4,10 +4,43 @@
     <loc>https://inlabru-org.github.io/inlabru/404.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/1d_lgcp.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_distancesampling.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_multilikelihood.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_plotsampling.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_sf.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_spatiotemporal.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/Apptainer.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/bru_mapper.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/component.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/devel_flow.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/index.html</loc>
@@ -16,58 +49,25 @@
     <loc>https://inlabru-org.github.io/inlabru/articles/linearapprox.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/mesh_mapping.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/method.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/prediction_scores.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/1d_lgcp.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/articles/publications.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/articles/random_fields.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_covars.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/articles/random_fields_2d.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_distancesampling.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_multilikelihood.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_plotsampling.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_residuals.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_sf.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/2d_lgcp_spatiotemporal.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/Apptainer.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/devel_flow.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/mesh_mapping.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/publications.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/random_fields.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/random_fields_2d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/web/svc.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/articles/svc.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/website_examples.html</loc>
