@@ -385,13 +385,13 @@ svc_components <- ~ -1 +
 # formula, with "." meaning "add all the model components":
 svc_formula <- count ~ .
 ```
-Specifying the `sf` column `geometry` as input causes `inlabru` to textract the spatial coordinate information for the observation locations from. Alternatively, we could specify the function `st_coordinates` instead, but that would extract the raw coordinates, potentially losing important coordinate reference system information..  Alternatively, we can specify that CRS-free information explicitly as input, with `cbind(easting, northing)` or `st_coordinates(.data.)`.
+Specifying the `sf` column `geometry` as input causes `inlabru` to extract the spatial coordinate information for the observation locations from. Alternatively, we could specify the function `st_coordinates` instead, but that would extract the raw coordinates, potentially losing important coordinate reference system information.  Alternatively, we can specify that CRS-free information explicitly as input, with `cbind(easting, northing)` or `st_coordinates(.data.)`.
 
 Here, we define the response as `count`, remove the automatic global 
 intercept with a `-1`, and then specify the other terms in the model 
 with `label()` statements. The first `kappa()` statement defines $\kappa_s$, 
 the site effect, as a normally distributed and independent 
-(`model="iid"`), globally zero-centered (sum to zero `constr=TRUE`), deviation 
+(`model="iid"`), globally zero-centred (sum to zero `constr=TRUE`), deviation 
 from $\alpha_s$. The second `alpha()` statement defines $\alpha_s$ as a spatially varying 
 intercept with spatial structure described by the SPDE object called 
 'spde'. Remember that if one wants to constrain this kind of spatial 
