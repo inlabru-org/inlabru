@@ -45,7 +45,7 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019)
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
-Additional_repositories: https://inla.r-inla-download.org/R/testing
+Additional_repositories: https://inla.r-inla-download.org/R/testing, https://inlabru-org.r-universe.dev
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
