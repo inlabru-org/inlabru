@@ -1,7 +1,7 @@
 latent_spde1D_testdata <- function() {
   local_bru_safe_inla()
   data(Poisson2_1D, package = "inlabru", envir = environment())
-  x <- seq(0, 55, length = 50)
+  x <- seq(0, 55, length.out = 50)
   mesh1D <- fm_mesh_1d(x, boundary = "free")
 
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
