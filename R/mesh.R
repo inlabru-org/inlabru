@@ -62,7 +62,10 @@ vertices.inla.mesh <- function(...) {
 
 #' @title Generate `SpatialPixels` covering an `inla.mesh`
 #'
-#' @description Generate `SpatialPixels` covering an `inla.mesh`
+#' @description
+#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_pixels()]
+#'
+#' Generate `SpatialPixels` covering an `inla.mesh`.
 #'
 #' @export
 #' @seealso [fm_pixels()]

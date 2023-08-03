@@ -20,7 +20,9 @@ If \code{mask} is a \code{Spatial} object, only return pixels covered by this ob
 \code{SpatialPixelsDataFrame} covering the mesh
 }
 \description{
-Generate \code{SpatialPixels} covering an \code{inla.mesh}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_pixels]{fmesher::fm_pixels()}}
+
+Generate \code{SpatialPixels} covering an \code{inla.mesh}.
 }
 \examples{
 \donttest{

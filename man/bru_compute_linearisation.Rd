@@ -43,7 +43,7 @@ bru_compute_linearisation(...)
   input,
   state,
   comp_simple,
-  eps = 0.00001,
+  eps = 1e-05,
   ...
 )
 
