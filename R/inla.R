@@ -229,7 +229,8 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       seed = seed,
       intern = FALSE,
       num.threads = num.threads,
-      parallel.configs = FALSE
+      parallel.configs = FALSE,
+      add.names = FALSE
     )
   } else {
     samples <- INLA::inla.posterior.sample(
@@ -237,11 +238,13 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       result = result,
       seed = seed,
       intern = FALSE,
-      num.threads = num.threads
+      num.threads = num.threads,
+      add.names = FALSE
     )
   }
 
   ssmpl <- list()
+  .contents <- attr(samples, ".contents")
   for (i in seq_along(samples)) {
     smpl.latent <- samples[[i]]$latent
     smpl.hyperpar <- samples[[i]]$hyperpar
@@ -249,26 +252,8 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
 
     # Extract simulated predictor and fixed effects
     for (name in unique(c("Predictor", result$names.fixed))) {
-      vals[[name]] <- extract.entries(name, smpl.latent)
+      vals[[name]] <- extract.entries(name, smpl.latent, .contents = .contents)
     }
-
-    # For fixed effects that were modeled via factors we attach an extra vector holding the samples
-    fac.names <- names(result$model$effects)[
-      vapply(
-        result$model$effects,
-        function(e) {
-          identical(e$model, "factor")
-        },
-        TRUE
-      )
-    ]
-    for (name in fac.names) {
-      vals[[name]] <- smpl.latent[startsWith(rownames(smpl.latent), name), ]
-      names(vals[[name]]) <- lapply(names(vals[[name]]), function(nm) {
-        substring(nm, nchar(name) + 1)
-      })
-    }
-
 
     # Extract simulated latent variables.
     # If the model is "clinear", however, we might extract the realisations
@@ -277,16 +262,32 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
     # since the hyperpar name definition has changed
     if (length(result$summary.random) > 0) {
       for (k in seq_along(result$summary.random)) {
-        name <- unlist(names(result$summary.random[k]))
-        model <- result$model.random[k]
+        name <- names(result$summary.random)[k]
+        #        model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
-        vals[[name]] <- extract.entries(name, smpl.latent)
+        vals[[name]] <- extract.entries(name, smpl.latent, .contents = .contents)
         #        }
         #        else {
         #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
         #        }
       }
     }
+
+    # For effects that were modeled via factors we attach an extra vector holding the samples
+    fac.names <- names(result$bru_info$model$effects)[
+      vapply(
+        result$bru_info$model$effects,
+        function(e) {
+          identical(e$main$type, "factor")
+        },
+        TRUE
+      )
+    ]
+    for (name in fac.names) {
+      # TODO: figure out how to interact this with group and replicate info
+      names(vals[[name]]) <- result$bru_info$model$effects[[name]]$main$values
+    }
+
     if (length(smpl.hyperpar) > 0) {
       ## Sanitize the variable names; replace problems with "_".
       ## Needs to handle whatever INLA uses to describe the hyperparameters.
@@ -302,12 +303,22 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
   return(ssmpl)
 }
 
-extract.entries <- function(name, smpl) {
-  ename <- gsub("\\.", "\\\\.", name)
-  ename <- gsub("\\(", "\\\\(", ename)
-  ename <- gsub("\\)", "\\\\)", ename)
-  ptn <- paste("^", ename, "[\\:]*[\\.]*[0-9]*[\\.]*[0-9]*$", sep = "")
-  return(smpl[grep(ptn, rownames(smpl))])
+extract.entries <- function(name, smpl, .contents = NULL) {
+  if (is.null(.contents)) {
+    ename <- gsub("\\.", "\\\\.", name)
+    ename <- gsub("\\(", "\\\\(", ename)
+    ename <- gsub("\\)", "\\\\)", ename)
+    ptn <- paste("^", ename, "[\\:]*[\\.]*[0-9]*[\\.]*[0-9]*$", sep = "")
+    vals <- smpl[grep(ptn, rownames(smpl))]
+    return(vals)
+  }
+  idx <- match(name, .contents[["tag"]])
+  if (is.na(idx)) {
+    warning(paste0("Element '", name, "' not found in posterior sample."))
+    return(numeric(0L))
+  }
+  vals <- smpl[.contents[["start"]][idx] + seq_len(.contents[["length"]][idx]) - 1L]
+  return(vals)
 }
 
 # Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
