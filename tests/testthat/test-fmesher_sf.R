@@ -106,7 +106,7 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
     grp = seq_len(2)
   )
-  expect_identical(seg$grp, as.matrix(rep(1:2, each = 3)))
+  expect_identical(as.vector(seg$grp), rep(1:2, each = 3))
 
   line_str1 <- sf::st_linestring(pts1)
   line_str2 <- sf::st_linestring(pts2)
@@ -117,10 +117,21 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
   expect_identical(seg_from_sf, seg)
 
   seg_to_sf <- fm_as_sfc(seg)
-  expect_identical(seg_to_sf, sf::st_geometry(line_sf))
+  expect_identical(sf::st_zm(seg_to_sf), sf::st_geometry(line_sf))
+  expect_identical(
+    seg_to_sf,
+    sf::st_zm(sf::st_geometry(line_sf), drop = FALSE, what = "Z")
+  )
 
   seg_to_sf2 <- fm_as_sfc(seg, multi = TRUE)
-  expect_identical(seg_to_sf2, sf::st_union(sf::st_geometry(line_sf)))
+  expect_identical(
+    sf::st_zm(seg_to_sf2),
+    sf::st_union(sf::st_geometry(line_sf))
+  )
+  expect_identical(
+    seg_to_sf2,
+    sf::st_zm(sf::st_union(sf::st_geometry(line_sf)), drop = FALSE, what = "Z")
+  )
 
   #  str(seg)
   #  str(seg_sf)
@@ -162,7 +173,7 @@ test_that("Conversion from sfc_POLYGON to inla.mesh.segment", {
   seg <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b),
     grp = c(1, 1, 1, 2)
   )
-  expect_identical(seg$grp, as.matrix(rep(c(1L, 1L, 1L, 2L), each = 4)))
+  expect_identical(as.vector(seg$grp), rep(c(1L, 1L, 1L, 2L), each = 4))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
   line_str2 <- sf::st_polygon(list(pts0b))
@@ -213,7 +224,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
   seg_1 <- fm_internal_sp2segment_join(list(seg0, seg1, seg2, seg0b),
     grp = c(1, 1, 1, 1)
   )
-  expect_identical(seg_1$grp, as.matrix(rep(c(1L), each = 16)))
+  expect_identical(as.vector(seg_1$grp), rep(c(1L), each = 16))
   seg_2 <- fm_internal_sp2segment_join(
     list(
       seg0, seg1, seg2, seg0b,
@@ -221,7 +232,7 @@ test_that("Conversion from sfc_MULTIPOLYGON to inla.mesh.segment", {
     ),
     grp = c(1, 1, 1, 1, 2, 2, 2, 2)
   )
-  expect_identical(seg_2$grp, as.matrix(rep(c(1L, 2L), each = 16)))
+  expect_identical(as.vector(seg_2$grp), rep(c(1L, 2L), each = 16))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
   line_str2 <- sf::st_polygon(list(pts0b))
@@ -303,7 +314,7 @@ test_that("Conversion from sfc_GEOMETRY to inla.mesh.segment", {
     list(seg0, seg1, seg2, seg0b, seg0b),
     grp = c(1, 1, 1, 1, 2)
   )
-  expect_identical(seg_1$grp, as.matrix(rep(c(1L, 2L), times = c(16, 4))))
+  expect_identical(as.vector(seg_1$grp), rep(c(1L, 2L), times = c(16, 4)))
 
   line_str1 <- sf::st_polygon(list(pts0, pts1, pts2))
   line_str2 <- sf::st_polygon(list(pts0b))

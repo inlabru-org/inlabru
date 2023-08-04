@@ -56,7 +56,7 @@ test_that("Conversion from Lines to inla.mesh.segment", {
   seg <- fm_internal_sp2segment_join(list(seg1, seg2),
     grp = seq_len(2)
   )
-  expect_identical(seg$grp, as.matrix(rep(1:2, each = 3)))
+  expect_identical(as.vector(seg$grp), rep(1:2, each = 3))
 
   seg_sp <- fm_as_segm(
     sp::Lines(list(sp::Line(pts1), sp::Line(pts2)), ID = "A"),
