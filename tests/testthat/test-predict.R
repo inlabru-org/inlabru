@@ -64,7 +64,6 @@ test_that("bru: factor component", {
   expect_equal(nrow(xpost2), 4)
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
-
   xipost <- generate(fit,
     newdata = NULL,
     formula = ~ c(

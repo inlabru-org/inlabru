@@ -18,6 +18,9 @@
 
 ## Bug and dependency updates
 
+* Improved handling of posterior sample variable extraction. Now much faster
+  for large models. (version `2.8.0.9009`)
+
 * Covariate object component inputs of type `SpatialPolygonsDataFrame`
   were not automatically passed on to `eval_spatial()`. The logic has now changed
   so that any object with a `eval_spatial()` method will trigger a call to

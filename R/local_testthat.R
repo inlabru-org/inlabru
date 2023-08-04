@@ -182,10 +182,21 @@ local_bru_safe_inla <- function(multicore = FALSE,
         INLA::inla.setOption(fmesher.evolution.warn = old_fmesher_evolution_warn),
         envir
       )
-      INLA::inla.setOption(fmesher.evolution.warn = "soft")
-      withr::local_options(lifecycle_verbosity = "warning", .local_envir = envir)
+      INLA::inla.setOption(fmesher.evolution.warn = TRUE)
     }
+
+    if ("fmesher.evolution.verbosity" %in% names(INLA::inla.getOption())) {
+      # Save the fmesher.evolution.verbosity option so it can be restored
+      old_fmesher_evolution_verbosity <- INLA::inla.getOption("fmesher.evolution.verbosity")
+      withr::defer(
+        INLA::inla.setOption(fmesher.evolution.verbosity = old_fmesher_evolution_verbosity),
+        envir
+      )
+      INLA::inla.setOption(fmesher.evolution.verbosity = "soft")
+    }
+    # withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
   }
+
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)
   }
