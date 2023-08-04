@@ -174,6 +174,16 @@ local_bru_safe_inla <- function(multicore = FALSE,
       )
       INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
     }
+
+    if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
+      # Save the fmesher.evolution option so it can be restored
+      old_fmesher_evolution_warn <- INLA::inla.getOption("fmesher.evolution.warn")
+      withr::defer(
+        INLA::inla.setOption(fmesher.evolution.warn = old_fmesher_evolution_warn),
+        envir
+      )
+      INLA::inla.setOption(fmesher.evolution.warn = max(old_fmesher_evolution_warn, "stop"))
+    }
   }
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)
