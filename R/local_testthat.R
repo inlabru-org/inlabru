@@ -175,16 +175,6 @@ local_bru_safe_inla <- function(multicore = FALSE,
       INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
     }
 
-    if ("fmesher.evolution" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution option so it can be restored
-      old_fmesher_evolution <- INLA::inla.getOption("fmesher.evolution")
-      withr::defer(
-        INLA::inla.setOption(fmesher.evolution = old_fmesher_evolution),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
-    }
-
     if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
       # Save the fmesher.evolution.warn option so it can be restored
       old_fmesher_evolution_warn <- INLA::inla.getOption("fmesher.evolution.warn")
