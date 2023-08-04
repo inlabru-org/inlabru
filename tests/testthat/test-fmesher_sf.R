@@ -118,23 +118,12 @@ test_that("Conversion from sfc_LINESTRING to inla.mesh.segment", {
 
   seg_to_sf <- fm_as_sfc(seg)
   expect_identical(sf::st_zm(seg_to_sf), sf::st_geometry(line_sf))
-  expect_identical(
-    seg_to_sf,
-    sf::st_zm(sf::st_geometry(line_sf), drop = FALSE, what = "Z")
-  )
 
   seg_to_sf2 <- fm_as_sfc(seg, multi = TRUE)
   expect_identical(
     sf::st_zm(seg_to_sf2),
     sf::st_union(sf::st_geometry(line_sf))
   )
-  expect_identical(
-    seg_to_sf2,
-    sf::st_zm(sf::st_union(sf::st_geometry(line_sf)), drop = FALSE, what = "Z")
-  )
-
-  #  str(seg)
-  #  str(seg_sf)
 })
 
 

@@ -183,7 +183,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
         envir
       )
       INLA::inla.setOption(fmesher.evolution.warn = "none")
-      # withr::local_options(lifecycle_verbosity = "warning")
+      withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
     }
   }
   if (!multicore) {
