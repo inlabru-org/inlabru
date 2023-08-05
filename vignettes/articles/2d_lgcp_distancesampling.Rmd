@@ -113,7 +113,7 @@ We need to now separately define the components of the model
 (the SPDE, the Intercept and the detection function parameter `lsig`)
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-cmp <- ~ mySPDE(main = coordinates, model = matern) +
+cmp <- ~ mySPDE(main = geometry, model = matern) +
   lsig(1) + Intercept(1)
 ```
 
@@ -122,7 +122,7 @@ form the linear predictor (remembering that we need an offset due to the unknown
 direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-form <- coordinates + distance ~ mySPDE +
+form <- geometry + distance ~ mySPDE +
   log(hn(distance, lsig)) +
   Intercept + log(2)
 ```
@@ -134,10 +134,10 @@ and specify integration domains for the spatial and distance dimensions:
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 fit <- lgcp(
   components = cmp,
-  mexdolphin$points,
-  samplers = mexdolphin$samplers,
+  sf::st_as_sf(mexdolphin$points),
+  samplers = sf::st_as_sf(mexdolphin$samplers),
   domain = list(
-    coordinates = mesh,
+    geometry = mesh,
     distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = form
@@ -157,11 +157,18 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sp")
+pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sf")
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
-  gg(pr.int) +
+  geom_tile(
+    aes(
+      geometry = geometry,
+      fill = mean
+    ),
+    stat = "sf_coordinates",
+    data = pr.int
+  ) +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
@@ -195,7 +202,7 @@ The average detection probability within the maximum detection distance is estim
 We can look at the posterior for expected number of dolphins as usual:
 
 ```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly, format = "sf")
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 ```
@@ -244,16 +251,16 @@ hr <- function(distance, lsig) {
 Solution:
 
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula1 <- coordinates + distance ~ mySPDE +
+formula1 <- geometry + distance ~ mySPDE +
   log(hr(distance, lsig)) +
   Intercept + log(2)
 
 fit1 <- lgcp(
   components = cmp,
-  mexdolphin$points,
-  samplers = mexdolphin$samplers,
+  sf::st_as_sf(mexdolphin$points),
+  samplers = sf::st_as_sf(mexdolphin$samplers),
   domain = list(
-    coordinates = mesh,
+    geometry = mesh,
     distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = formula1
@@ -284,7 +291,7 @@ distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
 plot(dfun1)
 
-predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly, format = "sf")
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 
