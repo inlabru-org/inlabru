@@ -8,7 +8,7 @@
 \alias{c.bru_like}
 \alias{c.bru_like_list}
 \alias{[.bru_like_list}
-\title{Likelihood construction for usage with \code{\link[=bru]{bru()}}}
+\title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 like(
   formula = . ~ .,
@@ -144,7 +144,7 @@ Defaults to the calling environment.}
 A likelihood configuration which can be used to parameterise \code{\link[=bru]{bru()}}.
 }
 \description{
-Likelihood construction for usage with \code{\link[=bru]{bru()}}
+Observation model construction for usage with \code{\link[=bru]{bru()}}
 }
 \section{Functions}{
 \itemize{
@@ -230,4 +230,6 @@ if (bru_safe_inla() &&
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
+
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }

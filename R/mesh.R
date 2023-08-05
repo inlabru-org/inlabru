@@ -22,7 +22,7 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
   lifecycle::deprecate_soft(
     "2.8.0",
     "is.inside()",
-    "fm_is_within()",
+    "fmesher::fm_is_within()",
     details = "`is.inside(mesh, loc)` becomes `fm_is_within(loc, mesh)`"
   )
 
@@ -45,7 +45,7 @@ vertices.inla.mesh <- function(...) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "vertices.inla.mesh()",
-    "fm_vertices()",
+    "fmesher::fm_vertices()",
     details =
       c(
         "!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
@@ -97,7 +97,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
   lifecycle::deprecate_soft(
     "2.8.0",
     "pixels()",
-    "fm_pixels(format = 'sp')",
+    "fmesher::fm_pixels(format = 'sp')",
     details = "The fm_pixels() function can generate sf, terra, and sp output."
   )
   fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")

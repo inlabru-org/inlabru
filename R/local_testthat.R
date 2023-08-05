@@ -192,7 +192,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
         INLA::inla.setOption(fmesher.evolution.verbosity = old_fmesher_evolution_verbosity),
         envir
       )
-      INLA::inla.setOption(fmesher.evolution.verbosity = "soft")
+      INLA::inla.setOption(fmesher.evolution.verbosity = "stop")
     }
     # withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
   }

@@ -176,6 +176,6 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
 #' @param crs Coordinate reference system to change to
 #'
 stransform <- function(splist, crs) {
-  lifecycle::deprecate_stop("2.7.0", "stransform()", "fm_transform()")
+  lifecycle::deprecate_stop("2.7.0", "stransform()", "fmesher::fm_transform()")
   fm_transform(splist, crs = crs)
 }

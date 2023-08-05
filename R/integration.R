@@ -221,10 +221,15 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
     idx <- idx[ok, , drop = FALSE]
 
     # Split at mesh edges
-    line.spl <- fm_split_lines(mesh, sp, ep)
-    sp <- line.spl$sp
-    ep <- line.spl$ep
-    idx <- idx[line.spl$split.origin, ]
+    segm.to.split <- fm_segm(
+      rbind(sp, ep),
+      cbind(seq_len(nrow(sp)), seq_len(nrow(sp)) + nrow(sp))
+    )
+    line.spl <- fm_split_lines(mesh, segm.to.split)
+
+    sp <- line.spl$loc[line.spl$idx[, 1], , drop = FALSE]
+    ep <- line.spl$loc[line.spl$idx[, 2], , drop = FALSE]
+    idx <- idx[line.spl$origin, ]
   }
 
   # At this point, sp and ep are in the target_crs
@@ -470,7 +475,7 @@ integration_weight_aggregation <- function(mesh, integ) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "integration_weight_aggregation()",
-    "fm_vertex_projection()"
+    "fmesher::fm_vertex_projection()"
   )
 
   fm_vertex_projection(points = integ, mesh = mesh)
@@ -495,7 +500,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "mesh_triangle_integration()",
-    "fm_int_mesh_2d_core()"
+    "fmesher::fm_int_mesh_2d_core()"
   )
 
   fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)

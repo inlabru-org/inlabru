@@ -129,14 +129,14 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   lifecycle::deprecate_soft(
     "2.8.0.9004",
     "ipoints()",
-    "fm_int()",
+    "fmesher::fm_int()",
     details = c(
       "ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."
     )
   )
 
   if (!is.null(group)) {
-    if (is.null(name) && inherits(domain, "inla.mesh")) {
+    if (is.null(name) && inherits(domain, c("fm_mesh_2d", "inla.mesh"))) {
       if (inherits(samplers, "sf")) {
         name <- "geometry"
       } else {
@@ -185,7 +185,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
   }
 
   if (is.null(domain) &&
-    inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    inherits(samplers, c("fm_mesh_1d", "fm_mesh_2d", "inla.mesh.1d", "inla.mesh"))) {
     domain <- samplers
     samplers <- NULL
   }
@@ -210,7 +210,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
           )
         )
     ) ||
-      inherits(domain, "inla.mesh")
+      inherits(domain, c("fm_mesh_2d", "inla.mesh"))
   is_1d <- !is_2d &&
     (
       (!is.null(samplers) &&
@@ -221,7 +221,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
           (is.numeric(domain) ||
             is.character(domain) ||
             is.factor(domain)) ||
-          inherits(domain, "inla.mesh.1d")))
+          inherits(domain, c("fm_mesh_1d", "inla.mesh.1d"))))
     )
   if (!is_1d && !is_2d) {
     stop("Unable to determine integration domain definition")
@@ -242,11 +242,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
   # Do this check and transfer once more
   if (is.null(domain) &&
-    inherits(samplers, c("inla.mesh.1d", "inla.mesh"))) {
+    inherits(
+      samplers,
+      c("fm_mesh_1d", "fm_mesh_2d", "inla.mesh.1d", "inla.mesh")
+    )) {
     domain <- samplers
     samplers <- NULL
   }
-
 
   if (is_1d && is.null(name)) {
     name <- "x"
@@ -274,7 +276,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       weight = 1
     )
     colnames(ips) <- c(name, "weight")
-  } else if (is_1d && is.null(samplers) && inherits(domain, "inla.mesh.1d") &&
+  } else if (is_1d &&
+    is.null(samplers) &&
+    inherits(domain, c("fm_mesh_1d", "inla.mesh.1d")) &&
     identical(int.args[["method"]], "stable")) {
     if (isTRUE(domain$cyclic)) {
       loc_trap <- c(domain$loc, domain$interval[2])
@@ -295,7 +299,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     colnames(ips) <- c(name, "weight", ".block")
   } else if (is_1d) {
     domain_range <-
-      if (inherits(domain, "inla.mesh.1d")) {
+      if (inherits(domain, c("fm_mesh_1d", "inla.mesh.1d"))) {
         domain$interval
       } else {
         NULL
@@ -364,7 +368,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     ips <- do.call(rbind, ips)
-  } else if (inherits(domain, "inla.mesh") &&
+  } else if (inherits(domain, c("fm_mesh_2d", "inla.mesh")) &&
     is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {
     coord_names <- c("x", "y", "z")
@@ -667,7 +671,7 @@ ipmaker <- function(samplers, domain, dnames,
                     int.args = list(method = "stable", nsub = NULL)) {
   lifecycle::deprecate_soft("2.8.0",
     "ipmaker()",
-    "fm_int()",
+    "fmesher::fm_int()",
     details = c("ipmaker(samplers, domain, ...) has been replaced by more versatile fm_int(domain, samplers, ...) methods.")
   )
 

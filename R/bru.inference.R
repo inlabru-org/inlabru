@@ -1100,12 +1100,13 @@ extended_bind_rows <- function(...) {
 }
 
 
-#' Likelihood construction for usage with [bru()]
+#' Observation model construction for usage with [bru()]
 #'
 #' @aliases like
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 #' @param formula a `formula` where the right hand side is a general R
 #'   expression defines the predictor used in the model.
@@ -1515,6 +1516,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh
 }
 
+# Placeholder for future modularised version of like()
+## @describeIn like
+## Alias for `like()`, with `obs` standing for "observation model"
+## @export
+# bru_obs <- like
+
 
 #' @describeIn like
 #' Combine `bru_like` likelihoods into a `bru_like_list` object
@@ -1696,15 +1703,18 @@ bru_like_expr <- function(lhood, components) {
 
 
 
-#' Log Gaussian Cox process (LGCP) inference using INLA
+#' @title Log Gaussian Cox process (LGCP) inference using INLA
 #'
+#' @description
 #' This function performs inference on a LGCP observed via points residing
 #' possibly multiple dimensions. These dimensions are defined via the left hand
 #' side of the formula provided via the model parameter. The left hand side
 #' determines the intensity function that is assumed to drive the LGCP. This may
 #' include effects that lead to a thinning (filtering) of the point process. By
 #' default, the log intensity is assumed to be a linear combination of the
-#' effects defined by the formula's RHS. More sophisticated models, e.g.
+#' effects defined by the formula's RHS.
+#'
+#' More sophisticated models, e.g.
 #' non-linear thinning, can be achieved by using the predictor argument. The
 #' latter requires multiple runs of INLA for improving the required
 #' approximation of the predictor. In many applications the LGCP is only
@@ -1713,7 +1723,6 @@ bru_like_expr <- function(lhood, components) {
 #' modelled space. These observed subsets of the LGCP domain are called samplers
 #' and can be provided via the respective parameter. If samplers is NULL it is
 #' assumed that all of the LGCP's dimensions have been observed completely.
-#'
 #'
 #' @aliases lgcp
 #' @export
@@ -1790,7 +1799,8 @@ lgcp <- function(components,
                  formula = . ~ .,
                  E = NULL,
                  ...,
-                 options = list()) {
+                 options = list(),
+                 .envir = parent.frame()) {
   # If formula response missing, copy from components (for formula input)
   if (inherits(components, "formula")) {
     response <- extract_response(components)
@@ -1801,7 +1811,8 @@ lgcp <- function(components,
     formula = formula, data = data, samplers = samplers,
     E = E, ips = ips, domain = domain,
     ...,
-    options = options
+    options = options,
+    .envir = .envir
   )
   bru(components, lik, options = options)
 }
