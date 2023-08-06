@@ -6,7 +6,7 @@
 #' @param sp Start points of lines
 #' @param ep End points of lines
 #' @param filter.zero.length Filter out segments with zero length? (Bool)
-#' @param ... argments to int.quadrature
+#' @param ... arguments to int.quadrature
 #' @return List of start and end points resulting from splitting the given lines
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 #' @keywords internal

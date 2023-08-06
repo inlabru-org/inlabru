@@ -92,16 +92,6 @@ test_that("Polygon integration with holes", {
     loc.domain = bndA$loc,
     max.edge = 1
   )
-  ipA1 <- ipoints(plyA, m, int.args = list(
-    poly_method = "legacy",
-    method = "direct",
-    nsub2 = 1
-  ))
-  ipA2 <- ipoints(plyA, m, int.args = list(
-    poly_method = "legacy",
-    method = "stable",
-    nsub2 = 1
-  ))
   ipA3 <- ipoints(plyA, m, int.args = list(
     method = "direct",
     nsub2 = 1
@@ -110,8 +100,6 @@ test_that("Polygon integration with holes", {
     method = "stable",
     nsub2 = 1
   ))
-  ipA1$test <- "A1"
-  ipA2$test <- "A2"
   ipA3$test <- "A3"
   ipA4$test <- "A4"
 
@@ -122,15 +110,10 @@ test_that("Polygon integration with holes", {
     pl
 
     pl +
-      gg(ipA1, mapping = aes(col = weight, size = weight)) +
-      gg(ipA2, mapping = aes(col = weight, size = weight)) +
       gg(ipA3, mapping = aes(col = weight, size = weight)) +
       gg(ipA4, mapping = aes(col = weight, size = weight)) +
       ggplot2::facet_wrap(vars(test))
   }
-
-  expect_equal(sum(ipA1$weight), 8.779508, tolerance = midtol)
-  expect_equal(sum(ipA2$weight), 8.779508, tolerance = midtol)
 
   expect_equal(sum(ipA3$weight), 7.780959, tolerance = midtol)
   expect_equal(sum(ipA4$weight), 7.780959, tolerance = midtol)

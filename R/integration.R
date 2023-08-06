@@ -473,54 +473,6 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   )
 }
 
-# Integration points for polygons inside an inla.mesh
-#
-# This method doesn't handle polygons with holes. Use [bru_int_polygon()]
-# instead.
-#
-# @param mesh An inla.mesh object
-# @param loc Locations defining the polygons
-# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-# @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
-# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-# @keywords internal
-
-int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
-  if (is.null(group)) {
-    group <- rep(1, nrow(loc))
-  }
-  method <- match.arg(method, c("stable", "direct"))
-
-  ipsl <- list()
-  # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
-  for (g in unique(group)) {
-    gloc <- loc[group == g, , drop = FALSE]
-
-    # Combine polygon with mesh boundary to get mesh covering the intersection.
-    bnd <- INLA::inla.mesh.segment(loc = gloc, is.bnd = TRUE)
-    integ <- make_stable_integration_points(mesh, bnd, ...)
-
-    if (method %in% c("stable")) {
-      # Project integration points and weights to mesh nodes
-      integ <- fm_vertex_projection(integ, mesh)
-    }
-
-    # Keep points inside the mesh with positive weights
-    ok <-
-      fm_evaluator(mesh, integ$loc)$proj$ok &
-        (integ$weight > 0)
-
-    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
-    colnames(ips) <- c("x", "y")
-    ips$weight <- integ$weight[ok]
-
-    ips$.block <- rep(g, nrow(ips))
-    ipsl <- c(ipsl, list(ips))
-  }
-
-  do.call(rbind, ipsl)
-}
 
 
 
