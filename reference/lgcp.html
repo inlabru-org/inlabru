@@ -135,9 +135,9 @@ assumed that all of the LGCP's dimensions have been observed completely.</p>
 <span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ips <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">.</span> <span class="op">~</span> <span class="va">.</span>,</span>
-<span>  E <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  .envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -172,13 +172,10 @@ used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.</p></dd>
 
 
-<dt>E</dt>
-<dd><p>Single numeric used rescale all integration weights by a fixed
-factor</p></dd>
-
-
 <dt>...</dt>
-<dd><p>Further arguments passed on to <code><a href="like.html">like()</a></code></p></dd>
+<dd><p>Further arguments passed on to <code><a href="like.html">like()</a></code>. In particular,
+optional <code>E</code>, a single numeric used rescale all integration weights by a fixed
+factor.</p></dd>
 
 
 <dt>options</dt>
