@@ -48,7 +48,7 @@ data(mexdolphin, package = "inlabru")
 mesh <- mexdolphin$mesh
 ```
 
-Plot the data (the initial code below is just to get rid of tick marks)
+Plot the data (the initial code below is just to get rid of tick marks, if desired)
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
@@ -63,15 +63,12 @@ noxticks <- theme(
 )
 
 ggplot() +
-  gg(mexdolphin$ppoly) +
+  gg(sf::st_as_sf(mexdolphin$ppoly)) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  guides(fill = FALSE)
 ```
 
 Spatial model with a half-normal detection function
@@ -157,27 +154,17 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sf")
+pxl <- fm_pixels(mesh, nx = 200, ny = 100, mask = mexdolphin$ppoly, format = "sf")
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
-  geom_tile(
-    aes(
-      geometry = geometry,
-      fill = mean
-    ),
-    stat = "sf_coordinates",
-    data = pr.int
-  ) +
+  gg(pr.int, aes(fill = mean), geom = "tile") +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  guides(fill = FALSE)
 ```
 
 Predict the detection function and plot it, to generate a plot like the one below.
@@ -276,16 +263,13 @@ plot(spde.logvar)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
-  gg(pr.int1) +
+  gg(pr.int1, aes(fill = mean), geom = "tile") +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  guides(fill = FALSE)
 
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))

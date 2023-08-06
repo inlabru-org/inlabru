@@ -165,19 +165,19 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 
 #' Geom for data.frame
 #'
-#' This geom constructor will simply call [gg.prediction] for the data provided.
+#' This geom constructor will simply call [gg.bru_prediction()] for the data provided.
 #'
 #' Requires the `ggplot2` package.
 #'
 #' @name gg.data.frame
 #' @export
-#' @param ... Arguments passed on to [gg.prediction()].
+#' @param ... Arguments passed on to [gg.bru_prediction()].
 #' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon` value.
 #' @family geomes for inla and inlabru predictions
 #' @example inst/examples/gg.prediction.R
 
 gg.data.frame <- function(...) {
-  gg.prediction(...)
+  gg.bru_prediction(...)
 }
 
 
@@ -193,13 +193,12 @@ gg.data.frame <- function(...) {
 #' data frame (x-axis) using `geom_line`. In addition, a `geom_ribbon` is used to show
 #' the confidence interval.
 #'
-#' Note: `gg.prediction` also understands the format of INLA-style posterior summaries, e.g.
+#' Note: `gg.bru_prediction` also understands the format of INLA-style posterior summaries, e.g.
 #' `fit$summary.fixed` for an inla object `fit`
 #'
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.prediction
-#' @name gg.prediction
+#' @name gg.bru_prediction
 #' @export
 #' @importFrom utils modifyList
 #' @param data A prediction object, usually the result of a [predict.bru()] call.
@@ -215,7 +214,15 @@ gg.data.frame <- function(...) {
 #' @family geomes for inla and inlabru predictions
 #' @example inst/examples/gg.prediction.R
 
-gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar = FALSE, ...) {
+gg.bru_prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = NULL, bar = FALSE, ...) {
+  if (inherits(data, c("Spatial", "SpatRaster", "RasterLayer", "sf"))) {
+    return(NextMethod())
+  }
+
+  if (is.null(alpha)) {
+    alpha <- 0.3
+  }
+
   requireNamespace("ggplot2")
   # Convert from old and inla style names
   if (("median" %in% names(data)) &&
@@ -357,6 +364,12 @@ gg.prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = 0.3, bar 
   geom
 }
 
+#' @rdname gg.bru_prediction
+#' @export
+gg.prediction <- function(data, ...) {
+  gg.bru_prediction(data = data, ...)
+}
+
 #' Geom for SpatialPoints objects
 #'
 #' This function coerces the `SpatialPoints` into a `data.frame` and uses `geom_point`
@@ -399,6 +412,57 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   }
 
   ggplot2::geom_point(data = df, mapping = dmap, ...)
+}
+
+#' Geom helper for sf objects
+#'
+#' This function uses `geom_sf()`, unless overridden by the geom argument.
+#' Requires the `ggplot2` package.
+#'
+#' @name gg.sf
+#' @export
+#' @param data An `sf` object.
+#' @param mapping Default mapping is `ggplot2::aes(geometry = ...)`,
+#' where the geometry name is obtained from `attr(data, "sf_column")`.
+#' This is merged with the user supplied mapping.
+#' @param geom Either "sf" (default) or "tile". For "tile", uses
+#' `geom_tile(..., stat = "sf_coordinates")`. Intended for converting point data
+#' to grid tiles with the `fill` aesthetic.
+#' @param ... Arguments passed on to `geom_sf` or `geom_tile`.
+#' @return A ggplot return value
+#' @family geomes for spatial data
+
+gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
+  requireNamespace("ggplot2")
+
+  sf_column <- attr(data, "sf_column")
+
+  dmap <- ggplot2::aes(
+    geometry = .data[[sf_column]]
+  )
+
+  if (!is.null(mapping)) {
+    dmap <- modifyList(dmap, mapping)
+  }
+
+  geom <- match.arg(geom, c("sf", "tile"))
+
+  if (identical(geom, "sf")) {
+    result <- ggplot2::geom_sf(data = data, mapping = dmap, ...)
+  } else {
+    result <-
+      c(
+        ggplot2::geom_tile(
+          data = data,
+          mapping = dmap,
+          stat = "sf_coordinates",
+          ...
+        ),
+        ggplot2::coord_sf(default = TRUE, crs = fm_crs(data))
+      )
+  }
+
+  result
 }
 
 #' Geom for SpatialLines objects
@@ -961,14 +1025,24 @@ plot.bru <- function(x, ...) {
 #'
 #' Requires the `ggplot2` package.
 #'
-#' @export
-#' @method plot prediction
+#' @name plot.bru_prediction
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
-#' @param ... Arguments passed on to [gg.prediction].
+#' @param ... Arguments passed on to [gg.prediction()].
 #' @return an object of class `gg`
 #' @example inst/examples/gg.prediction.R
+#' @export
+#' @method plot bru_prediction
 
+plot.bru_prediction <- function(x, y = NULL, ...) {
+  requireNamespace("ggplot2")
+  ggplot2::ggplot() +
+    gg(x, ...)
+}
+
+#' @rdname plot.bru_prediction
+#' @export
+#' @method plot prediction
 plot.prediction <- function(x, y = NULL, ...) {
   requireNamespace("ggplot2")
   ggplot2::ggplot() +

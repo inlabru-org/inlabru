@@ -35,9 +35,9 @@ if (require("ggplot2", quietly = TRUE) &&
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
+\code{\link{gg.bru_prediction}()},
 \code{\link{gg.data.frame}()},
 \code{\link{gg.matrix}()},
-\code{\link{gg.prediction}()},
 \code{\link{gm}()}
 
 Other geomes for spatial data: 
@@ -48,6 +48,7 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixels}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
+\code{\link{gg.sf}()},
 \code{\link{gm}()}
 
 Other geomes for meshes: 

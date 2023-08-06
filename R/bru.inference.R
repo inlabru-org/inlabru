@@ -1923,8 +1923,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a `data.frame` or `Spatial*` object with predicted mean values and
-#'   other summary statistics attached.
+#' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values and
+#'   other summary statistics attached. Non-S4 object outputs have the class
+#'   "bru_prediction" added at the front of the class list.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
@@ -2055,7 +2056,9 @@ predict.bru <- function(object,
     }
   }
 
-  if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))
+  if (!isS4(smy)) {
+    class(smy) <- c("bru_prediction", class(smy))
+  }
   smy
 }
 

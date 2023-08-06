@@ -96,6 +96,7 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPixels}()},
 \code{\link{gg.SpatialPoints}()},
+\code{\link{gg.sf}()},
 \code{\link{gg}()},
 \code{\link{gm}()}
 }
