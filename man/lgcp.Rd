@@ -34,9 +34,9 @@ non-linear) expression is provided the respective Taylor approximation is
 used as a predictor. Multiple runs if INLA are then required for a better
 approximation of the posterior.}
 
-\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}.
-In particular, \code{E}, a single numeric used rescale all integration weights
-by a fixed factor.}
+\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular,
+optional \code{E}, a single numeric used rescale all integration weights by a fixed
+factor.}
 
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 }

@@ -1737,9 +1737,9 @@ bru_like_expr <- function(lhood, components) {
 #'   non-linear) expression is provided the respective Taylor approximation is
 #'   used as a predictor. Multiple runs if INLA are then required for a better
 #'   approximation of the posterior.
-#' @param \dots Further arguments passed on to [like()].
-#' In particular, `E`, a single numeric used rescale all integration weights
-#' by a fixed factor.
+#' @param \dots Further arguments passed on to [like()]. In particular,
+#' optional `E`, a single numeric used rescale all integration weights by a fixed
+#'   factor.
 #' @param options See [bru_options_set()]
 #' @return An [bru()] object
 #' @examples
@@ -1813,7 +1813,7 @@ lgcp <- function(components,
     options = options,
     .envir = .envir
   )
-  bru(components, lik, options = options)
+  bru(components, lik, options = options, .envir = .envir)
 }
 
 
