@@ -31,7 +31,7 @@ objects}
 \item{formula}{If NULL, the linear combination implied by the \code{components} is
 used as a predictor for the point location intensity. If a (possibly
 non-linear) expression is provided the respective Taylor approximation is
-used as a predictor. Multiple runs if INLA are then required for a better
+used as a predictor. Multiple runs of INLA are then required for a better
 approximation of the posterior.}
 
 \item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular,
@@ -39,6 +39,10 @@ optional \code{E}, a single numeric used rescale all integration weights by a fi
 factor.}
 
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
+
+\item{.envir}{The evaluation environment to use for special arguments
+(\code{E}, \code{Ntrials}, and \code{weights}) if not found in response_data or data.
+Defaults to the calling environment.}
 }
 \value{
 An \code{\link[=bru]{bru()}} object

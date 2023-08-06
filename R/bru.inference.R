@@ -1735,12 +1735,15 @@ bru_like_expr <- function(lhood, components) {
 #' @param formula If NULL, the linear combination implied by the `components` is
 #'   used as a predictor for the point location intensity. If a (possibly
 #'   non-linear) expression is provided the respective Taylor approximation is
-#'   used as a predictor. Multiple runs if INLA are then required for a better
+#'   used as a predictor. Multiple runs of INLA are then required for a better
 #'   approximation of the posterior.
 #' @param \dots Further arguments passed on to [like()]. In particular,
 #' optional `E`, a single numeric used rescale all integration weights by a fixed
 #'   factor.
 #' @param options See [bru_options_set()]
+#' @param .envir The evaluation environment to use for special arguments
+#' (`E`, `Ntrials`, and `weights`) if not found in response_data or data.
+#' Defaults to the calling environment.
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
