@@ -63,7 +63,7 @@
 #'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
 #'   Points per knot segment: `nsub1`
 #' * `poly_method`: if set to "legacy", selects an old polygon integration method
-#'   that doesn't handle holes. Only used for debugging purposes.
+#'   that doesn't handle holes. No longer supported, and will generate an error.
 #' @param project `r lifecycle::badge("deprecated")` Deprecated in favour of `int.args(method=...)`.
 #' If TRUE, aggregate the integration points to mesh vertices. Default:
 #' `project = (identical(int.args$method, "stable"))`
@@ -498,10 +498,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 
 
     if (identical(int.args[["poly_method"]], "legacy")) {
-      ips <- int.polygon(domain,
-        loc = polyloc[, 1:2], group = polyloc[, 3],
-        method = int.args$method, nsub = int.args$nsub2
-      )
+      stop("the legacy integration method method is no longer supported")
     } else {
       if (!is.null(int.args$use_new) && !int.args$use_new) {
         ips <- bru_int_polygon_old(

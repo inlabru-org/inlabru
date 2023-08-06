@@ -53,7 +53,7 @@ without aggregating onto mesh nodes)
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
 \item \code{poly_method}: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. Only used for debugging purposes.
+that doesn't handle holes. No longer supported, and will generate an error.
 }}
 
 \item{project}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of \code{int.args(method=...)}.

@@ -352,52 +352,6 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   )
 }
 
-# Integration points for polygons inside an inla.mesh
-#
-# This method doesn't handle polygons with holes. Use [bru_int_polygon()]
-# instead.
-#
-# @param mesh An inla.mesh object
-# @param loc Locations defining the polygons
-# @param group If loc defines multiple polygons then this is the ID of the group for each location in loc
-# @param method Which integration method to use ("stable", with aggregation to mesh vertices, or "direct")
-# @param ... Arguments passed to the low level integration method (`make_stable_integration_points`)
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-# @keywords internal
-
-int.polygon <- function(mesh, loc, group = NULL, method = NULL, ...) {
-  if (is.null(group)) {
-    group <- rep(1, nrow(loc))
-  }
-  method <- match.arg(method, c("stable", "direct"))
-
-  ipsl <- list()
-  # print(paste0("Number of polygons to integrate over: ", length(unique(group)) ))
-  for (g in unique(group)) {
-    gloc <- loc[group == g, , drop = FALSE]
-
-    # Combine polygon with mesh boundary to get mesh covering the intersection.
-    bnd <- fm_segm(loc = gloc, is.bnd = TRUE)
-    integ <- make_stable_integration_points(mesh, bnd, ...)
-
-    if (method %in% c("stable")) {
-      # Project integration points and weights to mesh nodes
-      integ <- fm_vertex_projection(integ, mesh)
-    }
-
-    # Keep points inside the mesh with positive weights
-    ok <- fm_is_within(integ$loc, mesh) & (integ$weight > 0)
-
-    ips <- data.frame(integ$loc[ok, 1:2, drop = FALSE])
-    colnames(ips) <- c("x", "y")
-    ips$weight <- integ$weight[ok]
-
-    ips$.block <- rep(g, nrow(ips))
-    ipsl <- c(ipsl, list(ips))
-  }
-
-  do.call(rbind, ipsl)
-}
 
 
 
@@ -614,3 +568,47 @@ bru_int_polygon <- function(mesh,
 
   do.call(rbind, ipsl)
 }
+
+
+
+
+
+
+
+# From plotsample test, comparing before and after code refactor to avoid
+# recreating the full integration scheme for every polygon
+#
+# print(bench::mark(
+#   A=bru_int_polygon_old(domain,
+#     polylist=poly_segm,method=int.args$method,
+#     nsub=int.args$nsub2),
+#   B=bru_int_polygon(
+#     domain,
+#     polylist = poly_segm,
+#     method = int.args$method,
+#     nsub = int.args$nsub2),
+#   check = FALSE))
+## A tibble: 2 × 13
+## expression      min median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time  gc
+## <bch:expr> <bch:tm> <bch:>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <lis> <lis>
+##  1 A            14.03s 14.03s    0.0713        NA     2.28     1    32     14.03s <NULL> <NULL> <ben… <tib…
+##  2 B             8.05s  8.05s    0.124         NA     2.61     1    21      8.05s <NULL> <NULL> <ben… <tib…
+
+# With a SPDF samplers object:
+#
+# bench::mark(
+#   ips_old = ipoints(
+#     samplers = gorillas$plotsample$plots,
+#     domain = gorillas$mesh,
+#     int.args = list(use_new = FALSE)
+#   ),
+#   ips_new = ipoints(
+#     samplers = gorillas$plotsample$plots,
+#     domain = gorillas$mesh,
+#     int.args = list(use_new = TRUE)
+#   ),
+#   check = FALSE)
+# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time    gc
+# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>  <list>
+#   1 ips_old      10.04s   10.04s    0.0996        NA    1.10      1    11     10.04s <NULL> <NULL> <bench… <tibbl…
+# 2 ips_new       2.91s    2.91s    0.343         NA    0.343     1     1      2.91s <NULL> <NULL> <bench… <tibbl…
