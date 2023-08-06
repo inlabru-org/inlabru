@@ -168,7 +168,7 @@ objects</p></dd>
 <dd><p>If NULL, the linear combination implied by the <code>components</code> is
 used as a predictor for the point location intensity. If a (possibly
 non-linear) expression is provided the respective Taylor approximation is
-used as a predictor. Multiple runs if INLA are then required for a better
+used as a predictor. Multiple runs of INLA are then required for a better
 approximation of the posterior.</p></dd>
 
 
@@ -180,6 +180,12 @@ factor.</p></dd>
 
 <dt>options</dt>
 <dd><p>See <code><a href="bru_options.html">bru_options_set()</a></code></p></dd>
+
+
+<dt>.envir</dt>
+<dd><p>The evaluation environment to use for special arguments
+(<code>E</code>, <code>Ntrials</code>, and <code>weights</code>) if not found in response_data or data.
+Defaults to the calling environment.</p></dd>
 
 </dl></div>
     <div class="section level2">
