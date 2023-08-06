@@ -15,7 +15,7 @@ split_lines(mesh, sp, ep, filter.zero.length = TRUE)
 
 \item{filter.zero.length}{Filter out segments with zero length? (Bool)}
 
-\item{...}{argments to int.quadrature}
+\item{...}{arguments to int.quadrature}
 }
 \value{
 List of start and end points resulting from splitting the given lines
