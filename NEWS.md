@@ -14,9 +14,9 @@
   to access the global log, and `cat(fit$bru_iinla$log, sep = "\n")` to print
   a stored estimation object log.
   After version `2.8.0`, use `bru_log()` to access the global log, and
-  `bru_log(fit)` to access a stores estimation log.
+  `bru_log(fit)` to access a stored estimation log.
 
-## Bug and dependency updates
+## Bug fixes and speed improvements
 
 * Improved handling of posterior sample variable extraction. Now much faster
   for large models. (version `2.8.0.9009`)
