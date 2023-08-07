@@ -34,7 +34,7 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     set.seed(1234L)
-    surface1 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sp")
+    surface1 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sp")
     density1 <- predict(fit,
       surface1,
       ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
@@ -45,7 +45,7 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     set.seed(1234L)
-    surface2 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sf")
+    surface2 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sf")
     density2 <- predict(fit,
       surface2,
       ~ exp(field_eval(geometry) + Intercept),

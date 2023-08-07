@@ -471,7 +471,11 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
           stat = "sf_coordinates",
           ...
         ),
-        ggplot2::coord_sf(default = TRUE, crs = fm_crs(data))
+        if (fmesher::fm_crs_is_null(fm_crs(data))) {
+          ggplot2::coord_sf(default = TRUE)
+        } else {
+          ggplot2::coord_sf(default = TRUE, crs = fm_crs(data))
+        }
       )
   }
 
@@ -842,7 +846,9 @@ gg.inla.mesh <- function(data,
   }
   if (!is.null(color)) {
     if (inherits(mask, "Spatial")) {
-      px <- fm_pixels(data, nx = nx, ny = ny, format = "sp")
+      # For backwards compatibility with old plotting code, use Spatial
+      # format, and mask only in the gg.Spatial* method.
+      px <- fm_pixels(data, dims = c(nx, ny), format = "sp")
       A <- fm_evaluator(data, px)$proj$A
       px$color <- as.vector(A %*% color)
       if (!is.null(alpha)) {
@@ -852,7 +858,7 @@ gg.inla.mesh <- function(data,
         gg <- gg(px, mask = mask)
       }
     } else {
-      px <- fm_pixels(data, nx = nx, ny = ny, mask = mask, format = "sf")
+      px <- fm_pixels(data, dims = c(nx, ny), mask = mask, format = "sf")
       proj <- fm_evaluator(data, px)
       px$color <- fm_evaluate(proj, field = color)
       if (!is.null(alpha)) {

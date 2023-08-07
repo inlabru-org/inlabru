@@ -270,7 +270,7 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- fm_pixels(gorillas$mesh,
-    mask = FALSE, nx = 220, ny = 180,
+    mask = FALSE, dims = c(220, 180),
     format = "sp"
   )
   pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))

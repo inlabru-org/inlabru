@@ -83,12 +83,26 @@ vertices.inla.mesh <- function(...) {
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data("mrsea", package = "inlabru")
-#'   pxl <- fm_pixels(mrsea$mesh,
-#'     nx = 50, ny = 50, mask = mrsea$boundary,
-#'     format = "sp"
+#'   pxl <- fm_pixels(
+#'     mrsea$mesh,
+#'     dims = c(50, 50),
+#'     mask = mrsea$boundary,
+#'     format = "sp",
+#'     minimal = TRUE
 #'   )
 #'   ggplot() +
-#'     gg(pxl, fill = "grey", alpha = 0.5) +
+#'     gg(pxl, fill = "blue", alpha = 0.75) +
+#'     gg(mrsea$mesh)
+#'
+#'   pxl <- fm_pixels(
+#'     mrsea$mesh,
+#'     dims = c(50, 50),
+#'     mask = mrsea$boundary,
+#'     format = "sf",
+#'     minimal = TRUE
+#'   )
+#'   ggplot() +
+#'     gg(pxl, geom = "tile", fill = "blue", alpha = 0.75) +
 #'     gg(mrsea$mesh)
 #' }
 #' }
@@ -98,7 +112,7 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
     "2.8.0",
     "pixels()",
     "fmesher::fm_pixels(format = 'sp')",
-    details = "The fm_pixels() function can generate sf, terra, and sp output."
+    details = "The `fm_pixels()` function can generate `sf`, `terra`, and `sp` output."
   )
-  fm_pixels(mesh, nx = nx, ny = ny, mask = mask, format = "sp")
+  fm_pixels(mesh, dims = c(nx, ny), mask = mask, format = "sp", minimal = FALSE)
 }

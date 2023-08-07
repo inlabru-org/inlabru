@@ -70,7 +70,7 @@ ggplot() +
 ```
 
 
-Fiting the model
+Fitting the model
 -----------------------------------
 
 Fit an LGCP model to the locations of the gorilla nests, predict on the survey region,
@@ -113,32 +113,26 @@ fit <- lgcp(
 Predicting intensity
 -----------------------------------
 
-You should get a plot like that below (the command below assumes that the prediction
-is in an object called `lambda`):
+You should get a plot like that below. The `gg` method for `sf` point data takes
+an optional argument `geom = "tile"` that converts the plot to the type used for lattice data.
 
 ```{r results="hide",warning=FALSE,message=FALSE, fig.height=4,fig.width=9}
 pred <- predict(
   fit,
-  fm_pixels(mesh, mask = boundary, format = "sf"),
+  fm_pixels(mesh, mask = boundary),
   ~ data.frame(
     lambda = exp(mySmooth + Intercept),
     loglambda = mySmooth + Intercept
   )
 )
-pred$lambda <- terra::rast(
-  as(sf::as_Spatial(pred$lambda), "SpatialPixelsDataFrame"),
-)
-pred$loglambda <- terra::rast(
-  as(sf::as_Spatial(pred$loglambda), "SpatialPixelsDataFrame")
-)
 
 pl1 <- ggplot() +
-  gg(pred$lambda, aes(fill = mean)) +
+  gg(pred$lambda, geom = "tile") +
   geom_sf(data = boundary, alpha = 0.1) +
   ggtitle("LGCP fit to Points", subtitle = "(Response Scale)")
 
 pl2 <- ggplot() +
-  gg(pred$loglambda, aes(fill = mean)) +
+  gg(pred$loglambda, geom = "tile") +
   geom_sf(data = boundary, alpha = 0.1) +
   ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)")
 
@@ -150,8 +144,15 @@ that the predicted intensity is in object `lambda`).
 
 ```{r warning=FALSE,message=FALSE,fig.width=9,fig.height=4}
 ggplot() +
-  gg(pred$lambda[[c("q0.025", "q0.5", "q0.975")]]) +
-  facet_wrap(~lyr)
+  gg(
+    tidyr::pivot_longer(pred$lambda,
+      c(q0.025, q0.5, q0.975),
+      names_to = "quantile", values_to = "value"
+    ),
+    aes(fill = value),
+    geom = "tile"
+  ) +
+  facet_wrap(~quantile)
 ```
 
 

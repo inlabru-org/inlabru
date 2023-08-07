@@ -67,8 +67,7 @@ ggplot() +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE)
+  theme(legend.text = element_text(size = 6))
 ```
 
 Spatial model with a half-normal detection function
@@ -153,18 +152,18 @@ plot(spde.logvar)
 
 Predict spatial intensity, and plot it:
 
-```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- fm_pixels(mesh, nx = 200, ny = 100, mask = mexdolphin$ppoly)
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+pxl <- fm_pixels(mesh, dims = c(200, 100), mask = mexdolphin$ppoly)
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
-
+```
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
 ggplot() +
-  gg(pr.int, aes(fill = mean), geom = "tile") +
+  gg(pr.int, geom = "tile") +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE)
+  theme(legend.text = element_text(size = 6))
 ```
 
 Predict the detection function and plot it, to generate a plot like the one below.
@@ -263,13 +262,12 @@ plot(spde.logvar)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
-  gg(pr.int1, aes(fill = mean), geom = "tile") +
+  gg(pr.int1, geom = "tile") +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE)
+  theme(legend.text = element_text(size = 6))
 
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
