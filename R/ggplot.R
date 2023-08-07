@@ -828,14 +828,35 @@ gg.inla.mesh <- function(data,
     color <- list(...)[["colour"]]
   }
   if (!is.null(color)) {
-    px <- fm_pixels(data, nx = nx, ny = ny, format = "sp")
-    A <- fm_evaluator(data, px)$proj$A
-    px$color <- as.vector(A %*% color)
-    if (!is.null(alpha)) {
-      px$alpha <- as.vector(A %*% alpha)
-      gg <- gg(px, mask = mask, alpha = "alpha")
+    if (inherits(mask, "Spatial")) {
+      px <- fm_pixels(data, nx = nx, ny = ny, format = "sp")
+      A <- fm_evaluator(data, px)$proj$A
+      px$color <- as.vector(A %*% color)
+      if (!is.null(alpha)) {
+        px$alpha <- as.vector(A %*% alpha)
+        gg <- gg(px, mask = mask, alpha = "alpha")
+      } else {
+        gg <- gg(px, mask = mask)
+      }
     } else {
-      gg <- gg(px, mask = mask)
+      px <- fm_pixels(data, nx = nx, ny = ny, mask = mask, format = "sf")
+      proj <- fm_evaluator(data, px)
+      px$color <- fm_evaluate(proj, field = color)
+      if (!is.null(alpha)) {
+        if (length(alpha) == 1) {
+          px$alpha <- alpha
+        } else {
+          px$alpha <- fm_evaluate(proj, field = alpha)
+        }
+        gg <- gg(px,
+                 ggplot2::aes(fill = .data[["color"]]),
+                 alpha = px[["alpha"]],
+                 geom = "tile")
+      } else {
+        gg <- gg(px,
+                 ggplot2::aes(fill = .data[["color"]]),
+                 geom = "tile")
+      }
     }
 
     return(gg)
