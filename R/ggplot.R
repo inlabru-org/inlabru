@@ -426,8 +426,9 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' where the geometry name is obtained from `attr(data, "sf_column")`.
 #' This is merged with the user supplied mapping.
 #' @param geom Either "sf" (default) or "tile". For "tile", uses
-#' `geom_tile(..., stat = "sf_coordinates")`. Intended for converting point data
-#' to grid tiles with the `fill` aesthetic.
+#' `geom_tile(..., stat = "sf_coordinates")`, intended for converting point data
+#' to grid tiles with the `fill` aesthetic, which is by default set to the first
+#' data column.
 #' @param ... Arguments passed on to `geom_sf` or `geom_tile`.
 #' @return A ggplot return value
 #' @family geomes for spatial data
@@ -436,20 +437,32 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
   requireNamespace("ggplot2")
 
   sf_column <- attr(data, "sf_column")
-
-  dmap <- ggplot2::aes(
-    geometry = .data[[sf_column]]
-  )
-
-  if (!is.null(mapping)) {
-    dmap <- modifyList(dmap, mapping)
-  }
-
   geom <- match.arg(geom, c("sf", "tile"))
 
   if (identical(geom, "sf")) {
+    dmap <- ggplot2::aes(
+      geometry = .data[[sf_column]]
+    )
+    if (!is.null(mapping)) {
+      dmap <- modifyList(dmap, mapping)
+    }
     result <- ggplot2::geom_sf(data = data, mapping = dmap, ...)
   } else {
+    data_column <- setdiff(names(data), sf_column)
+    if (length(data_column) > 0) {
+      data_column <- data_column[1]
+      dmap <- ggplot2::aes(
+        geometry = .data[[sf_column]],
+        fill = .data[[data_column]]
+      )
+    } else {
+      dmap <- ggplot2::aes(
+        geometry = .data[[sf_column]]
+      )
+    }
+    if (!is.null(mapping)) {
+      dmap <- modifyList(dmap, mapping)
+    }
     result <-
       c(
         ggplot2::geom_tile(

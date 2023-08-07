@@ -16,8 +16,9 @@ This is merged with the user supplied mapping.}
 \item{...}{Arguments passed on to \code{geom_sf} or \code{geom_tile}.}
 
 \item{geom}{Either "sf" (default) or "tile". For "tile", uses
-\code{geom_tile(..., stat = "sf_coordinates")}. Intended for converting point data
-to grid tiles with the \code{fill} aesthetic.}
+\code{geom_tile(..., stat = "sf_coordinates")}, intended for converting point data
+to grid tiles with the \code{fill} aesthetic, which is by default set to the first
+data column.}
 }
 \value{
 A ggplot return value
