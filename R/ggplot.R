@@ -862,13 +862,15 @@ gg.inla.mesh <- function(data,
           px$alpha <- fm_evaluate(proj, field = alpha)
         }
         gg <- gg(px,
-                 ggplot2::aes(fill = .data[["color"]]),
-                 alpha = px[["alpha"]],
-                 geom = "tile")
+          ggplot2::aes(fill = .data[["color"]]),
+          alpha = px[["alpha"]],
+          geom = "tile"
+        )
       } else {
         gg <- gg(px,
-                 ggplot2::aes(fill = .data[["color"]]),
-                 geom = "tile")
+          ggplot2::aes(fill = .data[["color"]]),
+          geom = "tile"
+        )
       }
     }
 

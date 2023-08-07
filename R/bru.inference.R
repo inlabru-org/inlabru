@@ -1587,9 +1587,11 @@ c.bru_like <- function(..., envir = NULL) {
 #' objects into a `bru_like_list` object
 #' @export
 c.bru_like_list <- function(..., envir = NULL) {
-  if (!all(vapply(list(...),
-                  function(xx) is.null(xx) || inherits(xx, "bru_like_list"),
-                  TRUE))) {
+  if (!all(vapply(
+    list(...),
+    function(xx) is.null(xx) || inherits(xx, "bru_like_list"),
+    TRUE
+  ))) {
     lst <- lapply(list(...), function(x) {
       if (inherits(x, "bru_like")) {
         structure(
