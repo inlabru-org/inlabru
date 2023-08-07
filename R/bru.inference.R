@@ -1587,17 +1587,25 @@ c.bru_like <- function(..., envir = NULL) {
 #' objects into a `bru_like_list` object
 #' @export
 c.bru_like_list <- function(..., envir = NULL) {
-  lst <- lapply(list(...), function(x) {
-    if (inherits(x, "bru_like")) {
-      list(x)
-    } else if (inherits(x, "bru_like_list")) {
-      x
-    } else {
-      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
-    }
-  })
-  lst <- NextMethod("c", lst)
-  like_list(lst, envir = envir)
+  if (!all(vapply(list(...),
+                  function(xx) is.null(xx) || inherits(xx, "bru_like_list"),
+                  TRUE))) {
+    lst <- lapply(list(...), function(x) {
+      if (inherits(x, "bru_like")) {
+        structure(
+          list(x),
+          class = "bru_like_list"
+        )
+      } else if (inherits(x, "bru_like_list")) {
+        x
+      } else {
+        stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+      }
+    })
+    return(do.call("c", lst))
+  }
+  object <- NextMethod()
+  like_list(object, envir = envir)
 }
 
 
