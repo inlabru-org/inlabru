@@ -49,13 +49,13 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing, https://inl
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
+    fmesher (>= 0.0.9.9017),
     methods,
     R (>= 3.6),
     sp (>= 1.4-5),
     stats
 Imports:
     dplyr,
-    fmesher (>= 0.0.9.9017),
     lifecycle,
     magrittr,
     MatrixModels,
