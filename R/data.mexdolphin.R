@@ -309,7 +309,7 @@ import.mexdolphin.sf <- function() {
   mexdolphin$samplers$mid.y <- mexdolphin$samplers$mid.y / 1000
   mexdolphin$samplers$Effort <- mexdolphin$samplers$Effort / 1000
   mexdolphin$mesh <- fm_transform(mexdolphin$mesh, crs = target_crs)
-
+  mexdolphin$mesh$loc <- fmesher::fm_unify_coords(mexdolphin$mesh$loc)
 
   # Remove all-NA columns such as "distance" from samplers, since they may
   # interfere with normal usage.
