@@ -94,7 +94,7 @@
 #'    the gorilla nests.}
 #'    \item{`boundary`:}{ An `sf` object defining the boundary
 #'    of the region that was searched for the nests.}
-#'    \item{`mesh`:}{ An `inla.mesh` object containing a mesh that can be used
+#'    \item{`mesh`:}{ An `fm_mesh_2d` object containing a mesh that can be used
 #'    with function `lgcp` to fit a LGCP to the nest data.}
 #'    \item{`gcov_file`:}{ The in-package filename of a `terra::SpatRaster` object,
 #'    with one layer for each of these spatial covariates:
@@ -200,7 +200,7 @@ import.gorillas <- function() {
 
   # Build mesh
   bnd <- fm_as_segm(boundary)
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fm_mesh_2d_inla(
     interior = bnd, max.edge = 222,
     crs = crs
   ) # With higher max.edge we run into various INLA errors/warnings
@@ -270,7 +270,7 @@ import.gorillas <- function() {
 
   # Extrapolate covariate
   pxl <- fm_pixels(gorillas$mesh,
-    mask = FALSE, nx = 220, ny = 180,
+    mask = FALSE, dims = c(220, 180),
     format = "sp"
   )
   pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
@@ -292,7 +292,7 @@ import.gorillas.sf <- function(overwrite = FALSE) {
 
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
-  gorillas_sf$mesh <- gorillas$mesh
+  gorillas_sf$mesh <- fmesher::fm_as_fm(gorillas$mesh)
   gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
   gcov <- terra::rast(gorillas$gcov[[1]])
   for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {

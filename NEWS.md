@@ -2,6 +2,13 @@
 
 ## Feature updates
 
+* Conversion of code to use `fmesher` for mesh and geometry handling;
+  the interface supports existing objects and methods.
+  See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
+  more information.
+
+* Added `gg.sf()` method.
+
 * Add experimental support for `stars` via `eval_spatial()`.
   (version `2.8.0.9007`)
   
@@ -9,12 +16,13 @@
   and `bru_log()` is now a set of S3 methods, supporting extracting the
   full inlabru log as well `bru`-object specific logs (version `2.8.0.9008`).
   
-  Note: Up to version `2.8.0`, `bru_log()` was a deprecated alias for
+  Note: From version `2.9.0`, use `bru_log()` to access the global log, and
+  `bru_log(fit)` to access a stored estimation log.
+  
+  Up to version `2.8.0`, `bru_log()` was a deprecated alias for
   `bru_log_message()`. When running on `2.8.0` or earlier, use `bru_log_get()`
   to access the global log, and `cat(fit$bru_iinla$log, sep = "\n")` to print
   a stored estimation object log.
-  After version `2.8.0`, use `bru_log()` to access the global log, and
-  `bru_log(fit)` to access a stored estimation log.
 
 ## Bug fixes and speed improvements
 

@@ -72,25 +72,15 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   ok <- rowSums(is.na(loc)) == 0
   loc <- loc[ok, , drop = FALSE]
-  inner <- INLA::inla.nonconvex.hull(
+  inner <- fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
-    resolution =
-      ceiling(c(
-        min(4, max(1, diff(range(loc[, 1])) / diff(range(loc[, 2])))),
-        min(4, max(1, diff(range(loc[, 2])) / diff(range(loc[, 1]))))
-      ) * 120)
   )
-  outer <- INLA::inla.nonconvex.hull(
+  outer <- fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
-    resolution =
-      ceiling(c(
-        min(4, max(1, diff(range(loc[, 1])) / diff(range(loc[, 2])))),
-        min(4, max(1, diff(range(loc[, 2])) / diff(range(loc[, 1]))))
-      ) * 120)
   )
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fm_mesh_2d_inla(
     boundary = list(inner, outer),
     max.edge = c(
       min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 10,

@@ -48,7 +48,7 @@
 
 import.shrimp <- function() {
   # Load the raw data
-  load(file = paste0(system.file("inst/extdata", package = "inlabru"), "/gamba.Rdata"))
+  load(file = file.path(system.file("inst/extdata", package = "inlabru"), "gamba.Rdata"))
 
   # Remove ambiguous coordinates
   gamba <- gamba[, c(1, 2, 3, 6, 7)]
@@ -61,7 +61,10 @@ import.shrimp <- function() {
   proj4string(gamba) <- CRS("+proj=longlat")
 
   # Make a mesh
-  mesh <- INLA::inla.mesh.2d(loc.domain = gamba, max.edge = 0.15, offse = 0.15)
+  mesh <- fm_mesh_2d_inla(
+    loc.domain = gamba, max.edge = 0.15, offset = 0.15,
+    crs = CRS("+proj=longlat")
+  )
 
   # Final shrimp object
   shrimp <- list(hauls = gamba, mesh = mesh)

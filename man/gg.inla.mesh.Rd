@@ -24,7 +24,7 @@
 )
 }
 \arguments{
-\item{data}{An \code{INLA::inla.mesh} object.}
+\item{data}{An \code{inla.mesh} object.}
 
 \item{color}{A vector of scalar values to fill the mesh with colors.
 The length of the vector mus correspond to the number of mesh vertices.

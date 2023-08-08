@@ -1050,7 +1050,7 @@ extended_bind_rows <- function(...) {
     the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
     for (i in sf_data_idx_) {
       dt_crs <- fm_crs(dt[[i]][[nm]])
-      if (!fm_identical_CRS(dt_crs, the_crs)) {
+      if (!fm_crs_is_identical(dt_crs, the_crs)) {
         dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
       }
     }
@@ -1100,12 +1100,13 @@ extended_bind_rows <- function(...) {
 }
 
 
-#' Likelihood construction for usage with [bru()]
+#' Observation model construction for usage with [bru()]
 #'
 #' @aliases like
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
 #' @param formula a `formula` where the right hand side is a general R
 #'   expression defines the predictor used in the model.
@@ -1124,7 +1125,7 @@ extended_bind_rows <- function(...) {
 #'  size/format for inputs and response variables, as a `data.frame` or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param mesh An inla.mesh object. Obsolete.
+#' @param mesh Deprecated.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
 #'   weights by E. Default taken from `options$E`, normally `1`.
@@ -1178,7 +1179,7 @@ extended_bind_rows <- function(...) {
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = NULL, E = NULL, Ntrials = NULL, weights = NULL,
+                 mesh = deprecated(), E = NULL, Ntrials = NULL, weights = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL,
                  exclude = NULL,
@@ -1295,11 +1296,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (is.null(ips)) {
-      #      ips <- ipmaker(
-      #        samplers = samplers,
-      #        domain = domain,
-      #        int.args = options[["bru_int_args"]]
-      #      )
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
@@ -1520,6 +1516,12 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   lh
 }
 
+# Placeholder for future modularised version of like()
+## @describeIn like
+## Alias for `like()`, with `obs` standing for "observation model"
+## @export
+# bru_obs <- like
+
 
 #' @describeIn like
 #' Combine `bru_like` likelihoods into a `bru_like_list` object
@@ -1585,17 +1587,27 @@ c.bru_like <- function(..., envir = NULL) {
 #' objects into a `bru_like_list` object
 #' @export
 c.bru_like_list <- function(..., envir = NULL) {
-  lst <- lapply(list(...), function(x) {
-    if (inherits(x, "bru_like")) {
-      list(x)
-    } else if (inherits(x, "bru_like_list")) {
-      x
-    } else {
-      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
-    }
-  })
-  lst <- NextMethod("c", lst)
-  like_list(lst, envir = envir)
+  if (!all(vapply(
+    list(...),
+    function(xx) is.null(xx) || inherits(xx, "bru_like_list"),
+    TRUE
+  ))) {
+    lst <- lapply(list(...), function(x) {
+      if (inherits(x, "bru_like")) {
+        structure(
+          list(x),
+          class = "bru_like_list"
+        )
+      } else if (inherits(x, "bru_like_list")) {
+        x
+      } else {
+        stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
+      }
+    })
+    return(do.call("c", lst))
+  }
+  object <- NextMethod()
+  like_list(object, envir = envir)
 }
 
 
@@ -1701,15 +1713,18 @@ bru_like_expr <- function(lhood, components) {
 
 
 
-#' Log Gaussian Cox process (LGCP) inference using INLA
+#' @title Log Gaussian Cox process (LGCP) inference using INLA
 #'
+#' @description
 #' This function performs inference on a LGCP observed via points residing
 #' possibly multiple dimensions. These dimensions are defined via the left hand
 #' side of the formula provided via the model parameter. The left hand side
 #' determines the intensity function that is assumed to drive the LGCP. This may
 #' include effects that lead to a thinning (filtering) of the point process. By
 #' default, the log intensity is assumed to be a linear combination of the
-#' effects defined by the formula's RHS. More sophisticated models, e.g.
+#' effects defined by the formula's RHS.
+#'
+#' More sophisticated models, e.g.
 #' non-linear thinning, can be achieved by using the predictor argument. The
 #' latter requires multiple runs of INLA for improving the required
 #' approximation of the predictor. In many applications the LGCP is only
@@ -1718,7 +1733,6 @@ bru_like_expr <- function(lhood, components) {
 #' modelled space. These observed subsets of the LGCP domain are called samplers
 #' and can be provided via the respective parameter. If samplers is NULL it is
 #' assumed that all of the LGCP's dimensions have been observed completely.
-#'
 #'
 #' @aliases lgcp
 #' @export
@@ -1745,48 +1759,46 @@ bru_like_expr <- function(lhood, components) {
 #' \donttest{
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   require(fmesher, quietly = TRUE)) {
 #'   # Load the Gorilla data
-#'   data(gorillas, package = "inlabru")
+#'   data <- gorillas_sf
 #'
 #'   # Plot the Gorilla nests, the mesh and the survey boundary
 #'   ggplot() +
-#'     gg(gorillas$mesh) +
-#'     gg(gorillas$nests) +
-#'     gg(gorillas$boundary) +
-#'     coord_fixed()
+#'     geom_fm(data = data$mesh) +
+#'     gg(data$boundary, fill = "blue", alpha = 0.2) +
+#'     gg(data$nests, col = "red", alpha = 0.2)
 #'
 #'   # Define SPDE prior
-#'   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+#'   matern <- INLA::inla.spde2.pcmatern(
+#'     data$mesh,
 #'     prior.sigma = c(0.1, 0.01),
 #'     prior.range = c(0.01, 0.01)
 #'   )
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
 #'   # effect and Intercept)
-#'   cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+#'   cmp <- geometry ~ field(geometry, model = matern) + Intercept(1)
 #'
 #'   # Fit the model (with int.strategy="eb" to make the example take less time)
-#'   fit <- lgcp(cmp, gorillas$nests,
-#'     samplers = gorillas$boundary,
-#'     domain = list(coordinates = gorillas$mesh),
+#'   fit <- lgcp(cmp, data$nests,
+#'     samplers = data$boundary,
+#'     domain = list(geometry = data$mesh),
 #'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
 #'
 #'   # Predict the spatial intensity surface
 #'   lambda <- predict(
 #'     fit,
-#'     fm_pixels(gorillas$mesh, format = "sp"),
-#'     ~ exp(mySmooth + Intercept)
+#'     fm_pixels(data$mesh, mask = data$boundary),
+#'     ~ exp(field + Intercept)
 #'   )
 #'
 #'   # Plot the intensity
 #'   ggplot() +
-#'     gg(lambda) +
-#'     gg(gorillas$mesh) +
-#'     gg(gorillas$nests) +
-#'     gg(gorillas$boundary) +
-#'     coord_fixed()
+#'     gg(lambda, geom = "tile") +
+#'     geom_fm(data = data$mesh, alpha = 0, linewidth = 0.05) +
+#'     gg(data$nests, col = "red", alpha = 0.2)
 #' }
 #' }
 #'
@@ -1919,8 +1931,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a `data.frame` or `Spatial*` object with predicted mean values and
-#'   other summary statistics attached.
+#' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values and
+#'   other summary statistics attached. Non-S4 object outputs have the class
+#'   "bru_prediction" added at the front of the class list.
 #' @example inst/examples/predict.bru.R
 
 predict.bru <- function(object,
@@ -1954,10 +1967,10 @@ predict.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, "inla.mesh")) {
+  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_soft(
       "2.8.0",
-      "predict(newdata = 'should not be an inla.mesh object')",
+      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
     newdata <- fm_vertices(newdata, format = "sp")
@@ -2051,7 +2064,9 @@ predict.bru <- function(object,
     }
   }
 
-  if (!inherits(smy, "Spatial")) class(smy) <- c("prediction", class(smy))
+  if (!isS4(smy)) {
+    class(smy) <- c("bru_prediction", class(smy))
+  }
   smy
 }
 
@@ -2141,10 +2156,10 @@ generate.bru <- function(object,
   # Convert data into list, data.frame or a Spatial object if not provided as such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, "inla.mesh")) {
+  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_soft(
       "2.8.0",
-      "predict(newdata = 'should not be an inla.mesh object')",
+      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
     newdata <- fm_vertices(newdata, format = "sp")
@@ -3892,10 +3907,13 @@ summary_bru <- function(object, ...) {
       signif(range(sm[, c(4, 6)])[1]), " : ",
       signif(range(sm[, c(4, 6)])[2]), "]"
     ))
-    if (inherits(object$model$effects[[nm]]$main$mapper, "inla.mesh")) {
+    if (inherits(
+      object$model$effects[[nm]]$main$mapper,
+      c("fm_mesh_2d", "inla.mesh")
+    )) {
       cat(paste0(
         ", and area = ",
-        signif(sum(INLA::inla.mesh.fem(object$model$effects[[nm]]$main$mapper)$va))
+        signif(sum(fm_fem(object$model$effects[[nm]]$main$mapper)$va))
       ))
     }
     cat("\n")

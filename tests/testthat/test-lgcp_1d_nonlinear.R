@@ -8,7 +8,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   }
   cmp <- ~ lsig(1) + Intercept(1)
   form <- distance ~ log(hr(distance, lsig)) + Intercept
-  ips <- fm_int(list(distance = INLA::inla.mesh.1d(seq(0, 8, by = 0.1))))
+  ips <- fm_int(list(distance = fm_mesh_1d(seq(0, 8, by = 0.1))))
 
   pts <-
     mexdolphin$points
@@ -34,7 +34,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -160,7 +160,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 #   }
 #   cmp <- ~ lsig(1) + Intercept(1)
 #   form <- distance ~ log(hr(distance, lsig)) + Intercept
-#   ips <- fm_int(INLA::inla.mesh.1d(seq(0, 8, by = 0.1)), name = "distance")
+#   ips <- fm_int(fm_mesh_1d(seq(0, 8, by = 0.1)), name = "distance")
 #   local_bru_options_set(bru_verbose = FALSE)
 #   bench::mark(
 #     pandemic = {
@@ -214,7 +214,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -232,7 +232,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form_list,
       family = "cp",
       data = pts,
-      domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,

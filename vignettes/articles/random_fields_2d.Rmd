@@ -26,6 +26,7 @@ Setting things up
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
 library(inlabru)
+library(fmesher)
 library(mgcv)
 library(ggplot2)
 library(sp)
@@ -53,7 +54,7 @@ First, we build a high resolution mesh for the true field, using low level INLA 
 
 ```{r }
 bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
-mesh_fine <- inla.mesh.2d(boundary = bnd, max.edge = 0.2)
+mesh_fine <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.2)
 ggplot() +
   gg(mesh_fine) +
   coord_equal()
@@ -74,7 +75,7 @@ the variance is twice the target variance. At corners the variance is 4 times as
 ```{r results="hide"}
 true_sd <- diag(inla.qinv(true_Q))^0.5
 ggplot() +
-  gg(mesh_fine, col = true_sd) +
+  gg(mesh_fine, color = true_sd) +
   coord_equal()
 ```
 
@@ -87,17 +88,15 @@ truth <- expand.grid(
   easting = seq(0, 10, length = 100),
   northing = seq(0, 10, length = 100)
 )
+truth <- sf::st_as_sf(truth, coords = c("easting", "northing"))
 truth$field <- fm_evaluate(
   mesh_fine,
-  loc = as.matrix(truth),
+  loc = truth,
   field = true_field
 )
-coordinates(truth) <- c("easting", "northing")
-truth <- as(truth, "SpatialPixelsDataFrame")
 
 pl_truth <- ggplot() +
-  gg(truth, mapping = aes(easting, northing, fill = field)) +
-  coord_equal() +
+  gg(truth, aes(fill = field), geom = "tile") +
   ggtitle("True field")
 pl_truth
 
@@ -110,15 +109,17 @@ Extract observations from some random locations:
 
 ```{r }
 n <- 200
-mydata <- data.frame(easting = runif(n, 0, 10), northing = runif(n, 0, 10))
+mydata <- sf::st_as_sf(
+  data.frame(easting = runif(n, 0, 10), northing = runif(n, 0, 10)),
+  coords = c("easting", "northing")
+)
 mydata$observed <-
   fm_evaluate(
     mesh_fine,
-    loc = as.matrix(mydata),
+    loc = mydata,
     field = true_field
   ) +
   rnorm(n, sd = 0.4)
-coordinates(mydata) <- c("easting", "northing")
 ggplot() +
   gg(mydata, aes(col = observed))
 ```
@@ -129,7 +130,7 @@ Estimating the field
 Construct a mesh covering the data:
 
 ```{r }
-mesh <- inla.mesh.2d(boundary = bnd, max.edge = 0.5)
+mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.5)
 ggplot() +
   gg(mesh) +
   coord_equal()
@@ -148,7 +149,7 @@ matern <-
 Specify the model components:
 
 ```{r }
-cmp <- observed ~ field(coordinates, model = matern) + Intercept(1)
+cmp <- observed ~ field(geometry, model = matern) + Intercept(1)
 ```
 
 Fit the model and inspect the results:
@@ -162,7 +163,7 @@ Predict the field on a lattice, and generate
 a single realisation from the posterior distribution:
 
 ```{r warning=FALSE,message=FALSE}
-pix <- fm_pixels(mesh, nx = 200, ny = 200, format = "sp")
+pix <- fm_pixels(mesh, dims = c(200, 200))
 pred <- predict(
   fit, pix,
   ~ field + Intercept
@@ -180,15 +181,13 @@ Compare the truth to the estimated field
 
 ```{r results="hide",warning=FALSE,message=FALSE, pfig.height=5,fig.width=12}
 pl_posterior_mean <- ggplot() +
-  gg(pred) +
-  gg(bnd) +
-  ggtitle("Posterior mean") +
-  coord_fixed()
+  gg(pred, geom = "tile") +
+  gg(bnd, alpha = 0) +
+  ggtitle("Posterior mean")
 pl_posterior_sample <- ggplot() +
-  gg(pred, aes(fill = sample)) +
-  gg(bnd) +
-  ggtitle("Posterior sample") +
-  coord_fixed()
+  gg(pred, aes(fill = sample), geom = "tile") +
+  gg(bnd, alpha = 0) +
+  ggtitle("Posterior sample")
 
 # Common colour scale for the truth and estimate:
 csc <- colsc(truth$field, pred$mean, pred$sample)
@@ -227,23 +226,20 @@ that the predicted intensity is in object `pred`).
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 csc <- colsc(
-  pred@data["median"],
-  pred@data["q0.025"],
-  pred@data["q0.975"]
+  pred[["median"]],
+  pred[["q0.025"]],
+  pred[["q0.975"]]
 ) ## Common colour scale from SpatialPixelsDataFrame
 
 gmedian <- ggplot() +
-  gg(pred["median"]) +
-  coord_equal() +
+  gg(pred["median"], geom = "tile") +
   csc
 glower95 <- ggplot() +
-  gg(pred["q0.025"]) +
-  coord_equal() +
+  gg(pred["q0.025"], geom = "tile") +
   csc +
   theme(legend.position = "none")
 gupper95 <- ggplot() +
-  gg(pred["q0.975"]) +
-  coord_equal() +
+  gg(pred["q0.975"], geom = "tile") +
   csc +
   theme(legend.position = "none")
 

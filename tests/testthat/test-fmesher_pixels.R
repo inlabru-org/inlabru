@@ -3,7 +3,7 @@ test_that("fm_pixels sp vs sf", {
   local_bru_safe_inla()
   skip_if_not_installed("sn")
 
-  mesh <- INLA::inla.mesh.2d(cbind(0, 0),
+  mesh <- fm_mesh_2d_inla(cbind(0, 0),
     offset = 10, max.edge = 1,
     crs = fm_CRS("longlat_globe")
   )
@@ -34,7 +34,7 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     set.seed(1234L)
-    surface1 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sp")
+    surface1 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sp")
     density1 <- predict(fit,
       surface1,
       ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
@@ -45,7 +45,7 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     set.seed(1234L)
-    surface2 <- fm_pixels(mesh, nx = 5, ny = 5, mask = TRUE, format = "sf")
+    surface2 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sf")
     density2 <- predict(fit,
       surface2,
       ~ exp(field_eval(geometry) + Intercept),

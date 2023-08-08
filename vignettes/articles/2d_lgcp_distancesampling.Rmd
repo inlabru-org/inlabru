@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 Introduction
 ----------------
 We're going to estimate distribution and abundance from a line transect survey of dolphins in the Gulf of Mexico. These data are 
-also available in the `R` package `dsm` (where they go under the name `mexdolphins`). In `inlabru` the data are called `mexdolphin`.
+also available in the `R` package `dsm` (where they go under the name `mexdolphins`). In `inlabru` the data are called `mexdolphin` for `sp` format, and `mexdolphin_sf` for `sf` format.
 
 Setting things up
 ----------------
@@ -33,6 +33,7 @@ Setting things up
 Load libraries
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(inlabru)
+library(fmesher)
 library(INLA)
 library(ggplot2)
 ```
@@ -40,14 +41,14 @@ library(ggplot2)
 Get the data
 -----------------------------------------------------------------
  
-We'll start by loading the data and extracting the mesh (for convenience).
+We'll start by loading the data, renaming it, and extracting the mesh (for convenience).
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-data(mexdolphin, package = "inlabru")
+mexdolphin <- mexdolphin_sf
 mesh <- mexdolphin$mesh
 ```
 
-Plot the data (the initial code below is just to get rid of tick marks)
+Plot the data (the initial code below is just to get rid of tick marks, if desired)
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
@@ -65,12 +66,8 @@ ggplot() +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  theme(legend.text = element_text(size = 6))
 ```
 
 Spatial model with a half-normal detection function
@@ -81,7 +78,7 @@ We start by plotting the distances and histogram of frequencies in distance inte
 
 ```{r fig.width=10, fig.heigth=4}
 W <- 8
-ggplot(data.frame(mexdolphin$points)) +
+ggplot(mexdolphin$points) +
   geom_histogram(aes(x = distance),
     breaks = seq(0, W, length.out = 9),
     boundary = 0, fill = NA, color = "black"
@@ -112,7 +109,7 @@ We need to now separately define the components of the model
 (the SPDE, the Intercept and the detection function parameter `lsig`)
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-cmp <- ~ mySPDE(main = coordinates, model = matern) +
+cmp <- ~ mySPDE(main = geometry, model = matern) +
   lsig(1) + Intercept(1)
 ```
 
@@ -121,7 +118,7 @@ form the linear predictor (remembering that we need an offset due to the unknown
 direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
-form <- coordinates + distance ~ mySPDE +
+form <- geometry + distance ~ mySPDE +
   log(hn(distance, lsig)) +
   Intercept + log(2)
 ```
@@ -136,8 +133,8 @@ fit <- lgcp(
   mexdolphin$points,
   samplers = mexdolphin$samplers,
   domain = list(
-    coordinates = mesh,
-    distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
+    geometry = mesh,
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = form
 )
@@ -155,21 +152,18 @@ plot(spde.logvar)
 
 Predict spatial intensity, and plot it:
 
-```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
-pxl <- fm_pixels(mesh, nx = 100, ny = 50, mask = mexdolphin$ppoly, format = "sp")
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+pxl <- fm_pixels(mesh, dims = c(200, 100), mask = mexdolphin$ppoly)
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
-
+```
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
 ggplot() +
-  gg(pr.int) +
-  gg(mexdolphin$ppoly) +
+  gg(pr.int, geom = "tile") +
+  gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  theme(legend.text = element_text(size = 6))
 ```
 
 Predict the detection function and plot it, to generate a plot like the one below.
@@ -243,7 +237,7 @@ hr <- function(distance, lsig) {
 Solution:
 
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula1 <- coordinates + distance ~ mySPDE +
+formula1 <- geometry + distance ~ mySPDE +
   log(hr(distance, lsig)) +
   Intercept + log(2)
 
@@ -252,8 +246,8 @@ fit1 <- lgcp(
   mexdolphin$points,
   samplers = mexdolphin$samplers,
   domain = list(
-    coordinates = mesh,
-    distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))
+    geometry = mesh,
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
   ),
   formula = formula1
 )
@@ -268,16 +262,12 @@ plot(spde.logvar)
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
-  gg(pr.int1) +
-  gg(mexdolphin$ppoly) +
+  gg(pr.int1, geom = "tile") +
+  gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  noyticks +
-  noxticks +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6)) +
-  guides(fill = FALSE) +
-  coord_equal()
+  theme(legend.text = element_text(size = 6))
 
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
@@ -348,7 +338,7 @@ cmp <- ~ lsig(1) + Intercept(1)
 dfit <- lgcp(
   components = cmp,
   mexdolphin$points,
-  domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula,
   options = list(bru_initial = list(lsig = 1, Intercept = 3))
 )
@@ -363,7 +353,7 @@ cmp <- ~ lsig(1) + Intercept(1)
 dfit1 <- lgcp(
   components = cmp,
   mexdolphin$points,
-  domain = list(distance = INLA::inla.mesh.1d(seq(0, 8, length.out = 30))),
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
 detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))

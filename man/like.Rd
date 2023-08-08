@@ -8,14 +8,14 @@
 \alias{c.bru_like}
 \alias{c.bru_like_list}
 \alias{[.bru_like_list}
-\title{Likelihood construction for usage with \code{\link[=bru]{bru()}}}
+\title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 like(
   formula = . ~ .,
   family = "gaussian",
   data = NULL,
   response_data = NULL,
-  mesh = NULL,
+  mesh = deprecated(),
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -67,7 +67,7 @@ size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{mesh}{An inla.mesh object. Obsolete.}
+\item{mesh}{Deprecated.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
@@ -144,7 +144,7 @@ Defaults to the calling environment.}
 A likelihood configuration which can be used to parameterise \code{\link[=bru]{bru()}}.
 }
 \description{
-Likelihood construction for usage with \code{\link[=bru]{bru()}}
+Observation model construction for usage with \code{\link[=bru]{bru()}}
 }
 \section{Functions}{
 \itemize{
@@ -230,4 +230,6 @@ if (bru_safe_inla() &&
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
+
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }

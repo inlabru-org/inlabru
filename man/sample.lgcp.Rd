@@ -75,7 +75,7 @@ or \code{R}, if specified. Output given in the same CRS as the mesh.
 if (bru_safe_inla(quietly = TRUE) &&
   bru_safe_sp()) {
   vertices <- seq(0, 3, by = 0.1)
-  mesh <- INLA::inla.mesh.1d(vertices)
+  mesh <- fm_mesh_1d(vertices)
   loglambda <- 5 - 0.5 * vertices
   pts <- sample.lgcp(mesh, loglambda)
   pts$y <- 0

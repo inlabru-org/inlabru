@@ -221,10 +221,15 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
     idx <- idx[ok, , drop = FALSE]
 
     # Split at mesh edges
-    line.spl <- split_lines(mesh, sp, ep, TRUE)
-    sp <- line.spl$sp
-    ep <- line.spl$ep
-    idx <- idx[line.spl$split.origin, ]
+    segm.to.split <- fm_segm(
+      rbind(sp, ep),
+      cbind(seq_len(nrow(sp)), seq_len(nrow(sp)) + nrow(sp))
+    )
+    line.spl <- fm_split_lines(mesh, segm.to.split)
+
+    sp <- line.spl$loc[line.spl$idx[, 1], , drop = FALSE]
+    ep <- line.spl$loc[line.spl$idx[, 2], , drop = FALSE]
+    idx <- idx[line.spl$origin, ]
   }
 
   # At this point, sp and ep are in the target_crs
@@ -289,132 +294,6 @@ int.slines <- function(data, mesh, .block = NULL, project = TRUE) {
 
 
 
-join_segm <- function(...) {
-  segm_list <- list(...)
-  loc <- matrix(0, 0, 3)
-  idx <- matrix(0, 0, 2)
-  for (k in seq_along(segm_list)) {
-    idx <- rbind(idx, segm_list[[k]]$idx + nrow(loc))
-    loc <- rbind(loc, segm_list[[k]]$loc)
-  }
-
-  # Collapse duplicate points
-  new_loc <- loc
-  new_idx <- seq_len(nrow(loc))
-  prev_idx <- 0
-  for (k in seq_len(nrow(loc))) {
-    if (any(is.na(new_loc[k, ]))) {
-      new_idx[k] <- NA
-    } else {
-      if (prev_idx == 0) {
-        prev_dist <- 1
-      } else {
-        prev_dist <- ((new_loc[seq_len(prev_idx), 1] - new_loc[k, 1])^2 +
-          (new_loc[seq_len(prev_idx), 2] - new_loc[k, 2])^2 +
-          (new_loc[seq_len(prev_idx), 3] - new_loc[k, 3])^2)^0.5
-      }
-      if (all(prev_dist > 0)) {
-        prev_idx <- prev_idx + 1
-        new_idx[k] <- prev_idx
-        new_loc[prev_idx, ] <- new_loc[k, ]
-      } else {
-        new_idx[k] <- which.min(prev_dist)
-      }
-    }
-  }
-  idx <- matrix(new_idx[idx], nrow(idx), 2)
-  # Remove NA and atomic lines
-  ok <-
-    !is.na(idx[, 1]) &
-      !is.na(idx[, 2]) &
-      idx[, 1] != idx[, 2]
-  idx <- idx[ok, , drop = FALSE]
-  # Set locations
-  loc <- new_loc[seq_len(prev_idx), , drop = FALSE]
-
-  INLA::inla.mesh.segment(
-    loc = loc,
-    idx = idx,
-    is.bnd = FALSE
-  )
-}
-
-
-
-#' Construct the intersection mesh of a mesh and a polygon
-#'
-#' @param mesh `inla.mesh` object to be intersected
-#' @param poly `inla.mesh.segment` object with a closed polygon
-#'   to intersect with the mesh
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @keywords internal
-intersection_mesh <- function(mesh, poly) {
-  if (ncol(poly$loc) < 3) {
-    poly$loc <- cbind(poly$loc, 0)
-  }
-
-  all_edges <- INLA::inla.mesh.segment(
-    loc = mesh$loc,
-    idx = cbind(
-      as.vector(t(mesh$graph$tv)),
-      as.vector(t(mesh$graph$tv[, c(2, 3, 1), drop = FALSE]))
-    ),
-    is.bnd = FALSE
-  )
-
-  mesh_cover <- INLA::inla.mesh.create(
-    loc = rbind(mesh$loc, poly$loc),
-    interior = c(list(all_edges))
-  )
-
-  split <- INLA::inla.fmesher.smorg(mesh_cover$loc,
-    mesh_cover$graph$tv,
-    splitlines = list(
-      loc = poly$loc,
-      idx = poly$idx
-    )
-  )
-  split_segm <- INLA::inla.mesh.segment(
-    loc = split$split.loc,
-    idx = split$split.idx,
-    is.bnd = FALSE
-  )
-
-  joint_segm <- join_segm(split_segm, all_edges)
-
-  mesh_joint_cover <- INLA::inla.mesh.create(
-    interior = list(joint_segm),
-    extend = TRUE
-  )
-
-  mesh_poly <- INLA::inla.mesh.create(boundary = poly)
-
-  loc_tri <-
-    (mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 1], , drop = FALSE] +
-      mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 2], , drop = FALSE] +
-      mesh_joint_cover$loc[mesh_joint_cover$graph$tv[, 3], , drop = FALSE]) / 3
-  ok_tri <-
-    fm_evaluator(mesh, loc = loc_tri)$proj$ok &
-      fm_evaluator(mesh_poly, loc = loc_tri)$proj$ok
-  if (any(ok_tri)) {
-    loc_subset <- unique(sort(as.vector(mesh_joint_cover$graph$tv[ok_tri, , drop = FALSE])))
-    new_idx <- integer(mesh$n)
-    new_idx[loc_subset] <- seq_along(loc_subset)
-    tv_subset <- matrix(new_idx[mesh_joint_cover$graph$tv[ok_tri, , drop = FALSE]],
-      ncol = 3
-    )
-    loc_subset <- mesh_joint_cover$loc[loc_subset, , drop = FALSE]
-    mesh_subset <- INLA::inla.mesh.create(
-      loc = loc_subset,
-      tv = tv_subset,
-      extend = FALSE
-    )
-  } else {
-    mesh_subset <- NULL
-  }
-
-  mesh_subset
-}
 
 
 
@@ -461,10 +340,10 @@ make_stable_integration_points <- function(mesh, bnd, nsub = NULL) {
   }
 
   # Construct integration weights
-  weight <- rep(INLA::inla.mesh.fem(mesh, order = 1)$ta / nB, each = nB)
+  weight <- rep(fm_fem(mesh, order = 1)$ta / nB, each = nB)
 
   # Filter away points outside integration domain boundary:
-  mesh_bnd <- INLA::inla.mesh.create(boundary = bnd)
+  mesh_bnd <- fm_rcdt_2d_inla(boundary = bnd)
   ok <- fm_evaluator(mesh_bnd, loc = loc)$proj$ok
 
   list(
@@ -550,7 +429,7 @@ integration_weight_aggregation <- function(mesh, integ) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "integration_weight_aggregation()",
-    "fm_vertex_projection()"
+    "fmesher::fm_vertex_projection()"
   )
 
   fm_vertex_projection(points = integ, mesh = mesh)
@@ -558,7 +437,7 @@ integration_weight_aggregation <- function(mesh, integ) {
 
 #' Integration scheme for mesh triangle interiors
 #'
-#' `r lifecycle::badge("deprecated")` Use [fm_int_inla_mesh_core()] instead.
+#' `r lifecycle::badge("deprecated")` Use [fm_int_mesh_2d_core()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param tri_subset Optional triangle index vector for integration on a subset
@@ -575,10 +454,10 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
   lifecycle::deprecate_warn(
     "2.8.0",
     "mesh_triangle_integration()",
-    "fm_int_inla_mesh_core()"
+    "fmesher::fm_int_mesh_2d_core()"
   )
 
-  fm_int_inla_mesh_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
+  fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
 }
 
 
@@ -605,7 +484,7 @@ bru_int_polygon <- function(mesh,
   # Compute direct integration points
   # TODO: Allow blockwise construction to avoid
   # overly large temporary coordinate matrices (via tri_subset)
-  integ <- fm_int_inla_mesh_core(mesh, ...)
+  integ <- fm_int_mesh_2d_core(mesh, ...)
 
   # Keep points with positive weights (This should be all,
   # but if there's a degenerate triangle, this gets rid of it)

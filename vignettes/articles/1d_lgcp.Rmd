@@ -40,6 +40,7 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
+library(fmesher)
 ```
 
 
@@ -69,7 +70,7 @@ Build a 1D mesh:
 
 ```{r }
 x <- seq(0, 55, length.out = 50)
-mesh1D <- inla.mesh.1d(x, boundary = "free")
+mesh1D <- fm_mesh_1d(x, boundary = "free")
 ```
 
 Make the latent components for a 1D SPDE model, using an integrate-to-zero constraint for

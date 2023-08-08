@@ -25,7 +25,7 @@ test_that("Component construction: default mesh/mapping construction, data is li
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- INLA::inla.mesh.1d(
+  mesh1 <- fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
@@ -104,7 +104,7 @@ test_that("Component construction: separate response_data input", {
   cmp2 <- add_mappers(cmp1, lhoods = list(lik2))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik2$data$x)
 
-  mesh1 <- INLA::inla.mesh.1d(lik1$data$x)
+  mesh1 <- fm_mesh_1d(lik1$data$x)
   expect_error(
     component_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1

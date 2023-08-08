@@ -65,6 +65,8 @@ A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} 
 2D integration points, including a \code{weight} column and \code{.block} column.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_int]{fmesher::fm_int()}}
+
 This function generates points in one or two dimensions with a weight attached to each point.
 The weighted sum of a function evaluated at these points is the integral of that function approximated
 by linear basis functions. The parameter \code{samplers} describes the area(s) integrated over.
@@ -91,7 +93,8 @@ points in the one-dimensional case.
 \donttest{
 if (require("INLA", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE) &&
-  bru_safe_sp()) {
+  bru_safe_sp() &&
+  require("fmesher")) {
   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 
   ips <- ipoints(c(0, 10), 50, name = "myDim")
@@ -105,7 +108,7 @@ if (require("INLA", quietly = TRUE) &&
 
 
   # Convert a 1D mesh into integration points
-  mesh <- inla.mesh.1d(seq(0, 10, by = 1))
+  mesh <- fm_mesh_1d(seq(0, 10, by = 1))
   ips <- ipoints(mesh, name = "time")
   plot(ips)
 

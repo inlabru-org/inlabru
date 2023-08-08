@@ -78,3 +78,102 @@ redirects:
   - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
   - ["articles/web/svc.html", "articles/svc.html"]
   - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
+
+reference:
+- title: "Model construction and estimation"
+  desc: "Functions for constructing models and performing estimation."
+  contents:
+  - matches("^inlabru-package$")
+  - matches("^bru$")
+  - matches("^bru_rerun$")
+  - matches("^bru_options$")
+  - starts_with("component")
+  - starts_with("like")
+  - starts_with("lgcp")
+- title: "Posterior evaluation"
+  desc: "Functions for evaluating posterior properties."
+  contents:
+  - starts_with("generate")
+  - starts_with("predict")
+  - starts_with("spde.posterior")
+  - starts_with("deltaIC")
+  - starts_with("devel.cvmeasure")
+- title: "Optimization log information"
+  desc: "Accessing the optimization text log, and plotting the optimization convergence."
+  contents:
+  - starts_with("bru_log")
+  - starts_with("bru_convergence_plot")
+- title: "Mapper methods"
+  desc: "Functions for `bru_mapper` handling."
+  contents:
+  - starts_with("bru_get_mapper")
+  - starts_with("bru_mapper")
+  - starts_with("ibm_")
+  - starts_with("bm_")
+  - starts_with("eval_spatial")
+  - starts_with("bru_forward_transformation")
+- title: "Miscellaneous"
+  desc: "Miscellaneous functions."
+  contents:
+  - starts_with("bru_fill_missing")
+  - starts_with("point2count")
+  - starts_with("sample.lgcp")
+- title: "Plot helpers"
+  desc: "Functions for helping build figures."
+  contents:
+  - starts_with("plot")
+  - starts_with("globe")
+  - starts_with("gg")
+  - starts_with("glplot")
+  - starts_with("gm")
+  - starts_with("gmap")
+  - starts_with("bincount")
+- title: "Printing methods"
+  desc: "Functions for printing."
+  contents:
+  - starts_with("print")
+  - starts_with("summary")
+- title: "Data objects"
+  desc: "Data objects"
+  contents:
+  - matches("Poisson1_")
+  - matches("Poisson2_")
+  - matches("Poisson3_")
+  - matches("gorillas")
+  - matches("gorillas_sf")
+  - matches("mexdolphin")
+  - matches("mrsea")
+  - matches("robins_subset")
+  - matches("seals")
+  - matches("shrimp")
+  - matches("toygroups")
+- title: "Internal helper functions"
+  desc: "Helper functions for more low level operations."
+  contents:
+  - starts_with("evaluate_")
+  - starts_with("expand_labels")
+  - starts_with("inla.stack.mjoin")
+  - starts_with("spatial.to.ppp")
+  - starts_with("bru_make_stack")
+  - starts_with("bru_summarise")
+  - starts_with("bru_standardise_names")
+  - starts_with("bru_safe_inla")
+  - starts_with("bru_safe_sp")
+  - starts_with("bru_call_options")
+  - starts_with("bru_compute_linearisation")
+- title: "Re-exported fmesher functions"
+  desc: "Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility."
+  contents:
+  - starts_with("fm_")
+- title: "Deprecated methods"
+  desc: "Deprecated methods"
+  contents:
+  - matches("ipoints")
+  - matches("pixels")
+  - matches("multiplot")
+  - matches("spoly")
+  - matches("sline")
+#- title: "Other functions"
+#  desc: "Other functions"
+#  contents:
+#  - matches("")

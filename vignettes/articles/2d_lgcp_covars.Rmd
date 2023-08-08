@@ -31,6 +31,7 @@ Set things up
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
 library(inlabru)
+library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
 bru_safe_sp(force = TRUE)
@@ -554,7 +555,7 @@ Adapt the code used for the vegetation factor to do this.
 ```{r warning=FALSE,message=FALSE}
 LambdaE <- predict(
   efit,
-  ipoints(boundary, mesh),
+  fm_int(mesh, boundary),
   ~ sum(weight * exp(Intercept + elev + mySmooth))
 )
 LambdaE
@@ -676,7 +677,7 @@ data(Poisson2_1D)
 ss <- seq(0, 55, length = 200)
 z <- cov2_1D(ss)
 x <- seq(1, 55, length = 100)
-mesh <- inla.mesh.1d(x, degree = 1)
+mesh <- fm_mesh_1d(x, degree = 1)
 
 comp <- x ~
   beta_z(cov2_1D(x), model = "linear") +

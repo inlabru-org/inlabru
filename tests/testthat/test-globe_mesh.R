@@ -10,7 +10,7 @@ test_that("2D modelling on the globe", {
     )
   )
 
-  mesh <- INLA::inla.mesh.create(globe = 2)
+  mesh <- fm_rcdt_2d_inla(globe = 2)
 
   data <- data.frame(
     Long = seq(-179, 179, length.out = 100),
@@ -68,7 +68,7 @@ test_that("2D LGCP modelling on the globe", {
     )
   )
 
-  mesh <- INLA::inla.mesh.create(globe = 2, crs = fm_CRS("sphere"))
+  mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_CRS("sphere"))
 
   data <- data.frame(
     Long = seq(-179, 179, length.out = 100),

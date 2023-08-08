@@ -106,7 +106,7 @@ matern <- inla.spde2.pcmatern(mesh,
 ```
 
 
-Fit an LGCP model with SPDE only to these data by using the `samplers=` argument of 
+Fit an LGCP model with SPDE only to these data by using the `samplers=` argument of
 the function `lgcp( )`:
 
 

@@ -74,15 +74,17 @@ for (ord in ords) {
     input <- seq(0, 1, length.out = N)
     timings[[ord]][[Ni]] <-
       cbind(
-      as.data.frame(
-        bench::mark(
-        "Matrix(0)" = ibm_jacobian.bru_mapper_harmonics.sparseMatrix(m, input = input),
-        "Matrix(1)" = ibm_jacobian.bru_mapper_harmonics.Matrix(m, input = input),
-        "matrix" = ibm_jacobian.bru_mapper_harmonics.matrix(m, input = input),
-        check = FALSE
-      ))[, c("expression", "itr/sec")],
-      ord = ord,
-      N = N)[, c("ord", "N", "expression", "itr/sec")]
+        as.data.frame(
+          bench::mark(
+            "Matrix(0)" = ibm_jacobian.bru_mapper_harmonics.sparseMatrix(m, input = input),
+            "Matrix(1)" = ibm_jacobian.bru_mapper_harmonics.Matrix(m, input = input),
+            "matrix" = ibm_jacobian.bru_mapper_harmonics.matrix(m, input = input),
+            check = FALSE
+          )
+        )[, c("expression", "itr/sec")],
+        ord = ord,
+        N = N
+      )[, c("ord", "N", "expression", "itr/sec")]
     timings[[ord]][[Ni]]["expression"] <-
       attr(timings[[ord]][[Ni]][["expression"]], "description")
   }
@@ -105,7 +107,7 @@ pv <- profvis::profvis({
 })
 
 library(ggplot2)
-ggplot(timings, aes(N, 1/`itr/sec`, col = expression, shape = order)) +
+ggplot(timings, aes(N, 1 / `itr/sec`, col = expression, shape = order)) +
   geom_point() +
   scale_x_log10() +
   scale_y_log10() +

@@ -239,7 +239,7 @@ component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- component("myEffectOfX",
 #'     main = x,
-#'     model = INLA::inla.spde2.matern(INLA::inla.mesh.1d(1:10))
+#'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -1229,7 +1229,7 @@ make_submapper <- function(subcomp_n,
       if (allow_interpolation) {
         mapper <-
           bru_mapper(
-            INLA::inla.mesh.1d(values),
+            fm_mesh_1d(values),
             indexed = require_indexed
           )
       } else {
@@ -1273,7 +1273,7 @@ make_submapper <- function(subcomp_n,
 #' @examples
 #' if (bru_safe_inla(quietly = TRUE)) {
 #'   library(INLA)
-#'   mesh <- inla.mesh.create(globe = 2)
+#'   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,
 #'     prior.range = c(1, 0.5),
 #'     prior.sigma = c(1, 0.5)
@@ -1293,9 +1293,9 @@ bru_get_mapper <- function(model, ...) {
 #' if no known mesh type is found in the model object.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  if (inherits(model$mesh, "inla.mesh")) {
+  if (inherits(model$mesh, c("fm_mesh_2d", "inla.mesh"))) {
     mapper <- bru_mapper(model$mesh)
-  } else if (inherits(model$mesh, "inla.mesh.1d")) {
+  } else if (inherits(model$mesh, c("fm_mesh_1d", "inla.mesh.1d"))) {
     mapper <- bru_mapper(model$mesh, indexed = TRUE)
   } else {
     mapper <- NULL
