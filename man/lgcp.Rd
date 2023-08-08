@@ -70,48 +70,46 @@ assumed that all of the LGCP's dimensions have been observed completely.
 \donttest{
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
-  bru_safe_sp()) {
+  require(fmesher, quietly = TRUE)) {
   # Load the Gorilla data
-  data(gorillas, package = "inlabru")
+  data <- gorillas_sf
 
   # Plot the Gorilla nests, the mesh and the survey boundary
   ggplot() +
-    gg(gorillas$mesh) +
-    gg(gorillas$nests) +
-    gg(gorillas$boundary) +
-    coord_fixed()
+    geom_fm(data = data$mesh) +
+    gg(data$boundary, fill = "blue", alpha = 0.2) +
+    gg(data$nests, col = "red", alpha = 0.2)
 
   # Define SPDE prior
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(
+    data$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(0.01, 0.01)
   )
 
   # Define domain of the LGCP as well as the model components (spatial SPDE
   # effect and Intercept)
-  cmp <- coordinates ~ mySmooth(coordinates, model = matern) + Intercept(1)
+  cmp <- geometry ~ field(geometry, model = matern) + Intercept(1)
 
   # Fit the model (with int.strategy="eb" to make the example take less time)
-  fit <- lgcp(cmp, gorillas$nests,
-    samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
+  fit <- lgcp(cmp, data$nests,
+    samplers = data$boundary,
+    domain = list(geometry = data$mesh),
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
   # Predict the spatial intensity surface
   lambda <- predict(
     fit,
-    fm_pixels(gorillas$mesh, format = "sp"),
-    ~ exp(mySmooth + Intercept)
+    fm_pixels(data$mesh, mask = data$boundary),
+    ~ exp(field + Intercept)
   )
 
   # Plot the intensity
   ggplot() +
-    gg(lambda) +
-    gg(gorillas$mesh) +
-    gg(gorillas$nests) +
-    gg(gorillas$boundary) +
-    coord_fixed()
+    gg(lambda, geom = "tile") +
+    geom_fm(data = data$mesh, alpha = 0, linewidth = 0.05) +
+    gg(data$nests, col = "red", alpha = 0.2)
 }
 }
 
