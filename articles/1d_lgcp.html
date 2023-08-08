@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-08-07</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/1d_lgcp.Rmd" class="external-link"><code>vignettes/articles/1d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>1d_lgcp.Rmd</code></div>
@@ -128,7 +128,8 @@ area.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">fmesher</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
@@ -152,7 +153,7 @@ area.</p>
 <p>Build a 1D mesh:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length.out <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
-<span><span class="va">mesh1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="va">x</span>, boundary <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mesh1D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_1d.html" class="external-link">fm_mesh_1d</a></span><span class="op">(</span><span class="va">x</span>, boundary <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span></code></pre></div>
 <p>Make the latent components for a 1D SPDE model, using an
 integrate-to-zero constraint for better identifiability:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -276,7 +277,7 @@ is done by adding up the intensity at locations <code>x</code> weighted
 by a particular weight. The locations <code>x</code> and their weights
 are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">mesh1D</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="va">mesh1D</span>, name <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ips</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          x    weight .block</span></span>
 <span><span class="co">#&gt; 1 0.000000 0.1870748      1</span></span>
@@ -290,7 +291,7 @@ are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 131.2152 11.87358 110.4998 129.2981 157.8327 129.2981        1.187358     0.8401679</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 131.9238 11.77781 105.9616 132.6529 151.9672 132.6529        1.177781     0.8429569</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -326,24 +327,24 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 250, rather than for the posterior mean <code>N</code> alone:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;      N        mean          sd       q0.025        q0.5     q0.975      median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.004504656 0.006795297 2.387686e-06 0.001755629 0.02239189 0.001755629    0.0006795297</span></span>
-<span><span class="co">#&gt; 52 101 0.005181877 0.007378871 3.560562e-06 0.002209540 0.02463474 0.002209540    0.0007378871</span></span>
-<span><span class="co">#&gt; 53 102 0.005922254 0.007960961 5.257760e-06 0.002753546 0.02683680 0.002753546    0.0007960961</span></span>
-<span><span class="co">#&gt; 54 103 0.006725175 0.008534909 7.688927e-06 0.003398177 0.02895214 0.003398177    0.0008534909</span></span>
-<span><span class="co">#&gt; 55 104 0.007588868 0.009093816 1.113665e-05 0.004153399 0.03093419 0.004153399    0.0009093816</span></span>
-<span><span class="co">#&gt; 56 105 0.008510316 0.009630659 1.597745e-05 0.005028119 0.03273747 0.005028119    0.0009630659</span></span>
+<span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 51 100 0.004416810 0.008186043 1.418616e-06 0.0006468420 0.03112525 0.0006468420    0.0008186043</span></span>
+<span><span class="co">#&gt; 52 101 0.004955676 0.008657054 2.139157e-06 0.0008422381 0.03283715 0.0008422381    0.0008657054</span></span>
+<span><span class="co">#&gt; 53 102 0.005534659 0.009117861 3.194076e-06 0.0010859121 0.03432251 0.0010859121    0.0009117861</span></span>
+<span><span class="co">#&gt; 54 103 0.006153502 0.009566013 4.722961e-06 0.0013864982 0.03466870 0.0013864982    0.0009566013</span></span>
+<span><span class="co">#&gt; 55 104 0.006811501 0.009998580 6.916572e-06 0.0017532736 0.03468143 0.0017532736    0.0009998580</span></span>
+<span><span class="co">#&gt; 56 105 0.007507474 0.010412025 1.003264e-05 0.0021959679 0.03477832 0.0021959679    0.0010412025</span></span>
 <span><span class="co">#&gt;    sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51  0.0009981704</span></span>
-<span><span class="co">#&gt; 52  0.0009896758</span></span>
-<span><span class="co">#&gt; 53  0.0009712488</span></span>
-<span><span class="co">#&gt; 54  0.0009440594</span></span>
-<span><span class="co">#&gt; 55  0.0009095229</span></span>
-<span><span class="co">#&gt; 56  0.0008691963</span></span></code></pre></div>
+<span><span class="co">#&gt; 51  0.0012297921</span></span>
+<span><span class="co">#&gt; 52  0.0011875508</span></span>
+<span><span class="co">#&gt; 53  0.0011383508</span></span>
+<span><span class="co">#&gt; 54  0.0010847802</span></span>
+<span><span class="co">#&gt; 55  0.0010293768</span></span>
+<span><span class="co">#&gt; 56  0.0009743748</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  99.88206 127.70230 160.49491</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  98.85544 130.16154 163.05923</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>

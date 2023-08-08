@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,8 +93,14 @@
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for fm_mesh_2d</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for fm_mesh_1d</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh.1d</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -160,7 +166,7 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 
 
 <dt>mesh</dt>
-<dd><p>An <code>inla.mesh.1d</code> or <code>inla.mesh.2d</code> object to use as a mapper</p></dd>
+<dd><p>An <code>fm_mesh_1d</code>, <code>fm_mesh_2d</code>, <code>inla.mesh.1d</code> or <code>inla.mesh.2d</code> object to use as a mapper</p></dd>
 
 
 <dt>indexed</dt>
@@ -274,8 +280,11 @@ Default <code>c(0, 1)</code>.</p></dd>
 arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
 instead, and supply at least a <code>new_class</code> class name.
 Use of the <code>bru_mapper.default</code> method will be deprecated from version 2.7.0.</p></li>
+<li><p><code>bru_mapper(fm_mesh_2d)</code>: Creates a mapper for 2D <code>fm_mesh_2d</code> objects</p></li>
 <li><p><code>bru_mapper(inla.mesh)</code>: Creates a mapper for 2D <code>inla.mesh</code> objects</p></li>
-<li><p><code>bru_mapper(inla.mesh.1d)</code>: Create mapper for an <code>inla.mesh.1d</code> object</p></li>
+<li><p><code>bru_mapper(fm_mesh_1d)</code>: Create mapper for an <code>fm_mesh_1d</code> object</p></li>
+<li><p><code>bru_mapper(inla.mesh.1d)</code>: Create mapper for an <code>inla.mesh.1d</code> object; converts
+the mesh fo <code>fm_mesh_1d</code> first.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>

@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -364,10 +364,11 @@ Current predefined object mappers are defined for objects of these
 classes:</p>
 <ul>
 <li>
-<code>inla.mesh</code>; Use <code>bru_mapper(object)</code>
+<code>fm_mesh_2d</code> and <code>inla.mesh</code>; Use
+<code>bru_mapper(object)</code>
 </li>
 <li>
-<code>inla.mesh.1d</code>; Use
+<code>fm_mesh_1d</code> and <code>inla.mesh.1d</code>; Use
 <code>bru_mapper(object, indexed)</code>
 </li>
 </ul>
@@ -526,13 +527,15 @@ Custom mappers should normally not need to specialise this method.</p>
 (e.g. <code>"iid"</code>, <code>"bym2"</code>, <code>"rw2"</code> etc),
 inlabru will construct default mappers, that in most cases replicate the
 default <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> behaviour.</p>
-<p>For the <code>inla.mesh</code> and <code>inla.mesh.1d</code> classes,
-default mappers can be constructed by the pre-defined
-<code>bru_mapper</code> S3 methods. For 2d meshes
-(<code>inla.mesh</code>),</p>
+<p>For the <code>fm_mesh_1d</code>, <code>fm_mesh_2d</code>,
+<code>inla.mesh</code> and <code>inla.mesh.1d</code> classes, default
+mappers can be constructed by the pre-defined <code>bru_mapper</code> S3
+methods. For 2d meshes (<code>fm_mesh_2d</code>,
+<code>inla.mesh</code>),</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
-<p>For 1d meshes (<code>inla.mesh.1d</code>),</p>
+<p>For 1d meshes (<code>fm_mesh_1d</code>,
+<code>inla.mesh.1d</code>),</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models</span></span>
 <span><span class="co"># with degree=1 meshes)</span></span>

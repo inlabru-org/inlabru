@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,7 +105,7 @@
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-08-07</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
@@ -190,9 +190,10 @@ loading some packages, and setting some options.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dieghernan.github.io/tidyterra/" class="external-link">tidyterra</a></span><span class="op">)</span> <span class="co"># raster plotting</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">fmesher</a></span><span class="op">)</span></span>
 <span><span class="co"># Note: the 'splancs' package also needs to be installed,</span></span>
 <span><span class="co"># but doesn't need to be loaded</span></span>
 <span></span>
@@ -330,11 +331,11 @@ directly. This works by an automatic creation of a
 <code>bru_mapper</code> object that knows how to map between mesh nodes
 and spatial data locations. Thus, the only two <code>R-INLA</code>
 functions needed in the user code of the SPDE modelling steps are
-<code>inla.mesh.2D()</code> and <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern()</a></code>, and
-the <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.index.html" class="external-link">inla.spde.make.index()</a></code> and
+<code><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link">fm_mesh_2d_inla()</a></code> and <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern()</a></code>,
+and the <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.index.html" class="external-link">inla.spde.make.index()</a></code> and
 <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A()</a></code> functions are only called internally by
 the <code>inlabru</code> code itself, or rather
-<code><a href="../reference/fm_evaluate.html">fm_evaluator()</a></code> is used instead.</p>
+<code><a href="https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html" class="external-link">fm_evaluator()</a></code> is used instead.</p>
 </div>
 <div class="section level2">
 <h2 id="modeling-mesh">Modeling mesh<a class="anchor" aria-label="anchor" href="#modeling-mesh"></a>
@@ -343,18 +344,21 @@ the <code>inlabru</code> code itself, or rather
 (Lindgren and Rue 2015, Blangiardo and Cameletti 2015, Krainski et
 al. 2018, Bakka et al. 2018). In constructing one, we balance a
 trade-off between capturing fine-scaled features of the Gaussian random
-field and computing times. Here, we create a non-convex hull around the
-count sites, and then build a triangular mesh by specifying minimum and
-maximum edge lengths within and slightly outside the hull.</p>
+field and computing times. Here, we create two non-convex hulls around
+the count sites, and then build a triangular mesh by specifying minimum
+and maximum edge lengths within the inner hull, and within the slightly
+larger outer hull.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># make a hull and mesh for spatial model</span></span>
-<span><span class="va">hull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.nonconvex.hull.html" class="external-link">inla.nonconvex.hull</a></span><span class="op">(</span></span>
-<span>  points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">count_dat</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  convex <span class="op">=</span> <span class="fl">200</span>, concave <span class="op">=</span> <span class="fl">350</span></span>
+<code class="sourceCode R"><span><span class="co"># make a two extension hulls and mesh for spatial model</span></span>
+<span><span class="va">hull</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_nonconvex_hull.html" class="external-link">fm_extensions</a></span><span class="op">(</span></span>
+<span>  <span class="va">count_dat</span>,</span>
+<span>  convex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">500</span><span class="op">)</span>,</span>
+<span>  concave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">500</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html" class="external-link">inla.mesh.2d</a></span><span class="op">(</span></span>
+<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link">fm_mesh_2d_inla</a></span><span class="op">(</span></span>
 <span>  boundary <span class="op">=</span> <span class="va">hull</span>, max.edge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">600</span><span class="op">)</span>, <span class="co"># km inside and outside</span></span>
-<span>  cutoff <span class="op">=</span> <span class="fl">50</span>, offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">300</span><span class="op">)</span></span>
+<span>  cutoff <span class="op">=</span> <span class="fl">50</span>, offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">300</span><span class="op">)</span>,</span>
+<span>  crs <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs.html" class="external-link">fm_crs</a></span><span class="op">(</span><span class="va">count_dat</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="co"># cutoff is min edge</span></span>
 <span></span>
 <span><span class="co"># plot it</span></span>
@@ -491,25 +495,26 @@ speed and better numerics. In the call to <code><a href="../reference/bru.html">
 the model components, and specify an observation likelihood with the
 model formula for the negative binomial distribution for the counts, and
 define the estimation data. Then we ask <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> to compute
-WAIC and CPO to evaluate model fit, and to save the information
-necessary for posterior sampling (<code>config=TRUE</code>, but this
-will otherwise be set by default by <code><a href="../reference/bru.html">bru()</a></code>, as
-<code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">inlabru::predict()</a></code> relies on it for posterior sampling and
-prediction). For computing speed, we choose to use the simplified
-laplace approximation strategy and Empirical Bayes estimation. The
-<code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> run for this model takes about 1 minutes on a
-standard laptop computer. Another option is to use the Variational Bayes
-approximation as detailed in Van Niekerk and Rue (2021) and Van Niekerk
-et. al. (2022).</p>
+WAIC and CPO (temporarily disabled) to evaluate model fit (also, to save
+the information necessary for posterior sampling we need
+<code>config=TRUE</code>, but this is automatically set by
+<code><a href="../reference/bru.html">bru()</a></code>, as <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">inlabru::predict()</a></code> relies on it for
+posterior sampling and prediction). For computing speed, we choose to
+use the simplified Laplace approximation strategy and Empirical Bayes
+estimation. The <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> run for this model takes about 1
+minutes on a standard laptop computer. Another option is to use the
+Variational Bayes approximation as detailed in Van Niekerk and Rue
+(2021) and Van Niekerk et. al. (2022).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">svc_components</span>,</span>
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
+<span>  <span class="va">svc_components</span>,</span>
 <span>  <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
 <span>    formula <span class="op">=</span> <span class="va">svc_formula</span>,</span>
 <span>    family <span class="op">=</span> <span class="st">"nbinomial"</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">count_dat</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>waic <span class="op">=</span> <span class="cn">TRUE</span>, cpo <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>waic <span class="op">=</span> <span class="cn">TRUE</span>, cpo <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
@@ -526,13 +531,13 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.20996730    0.41534009</span></span>
-<span><span class="co">#&gt; Range for alpha     1045.03510163  345.45581333</span></span>
-<span><span class="co">#&gt; Stdev for alpha        2.05397705    0.45833532</span></span>
-<span><span class="co">#&gt; Range for eps       5505.91861164 3769.91067425</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.44230896    0.19436686</span></span>
-<span><span class="co">#&gt; Range for tau        816.55586394  311.12062641</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06516436    0.01445585</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.31831767    0.45355187</span></span>
+<span><span class="co">#&gt; Range for alpha      927.19477418  294.00343163</span></span>
+<span><span class="co">#&gt; Stdev for alpha        1.99499847    0.41516080</span></span>
+<span><span class="co">#&gt; Range for eps       5680.30110008 3672.62771338</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.45108850    0.26969132</span></span>
+<span><span class="co">#&gt; Range for tau        698.42033384  245.31177306</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06264081    0.01197311</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
@@ -540,7 +545,7 @@ of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.03818  1.10719  3.41680  7.13654  9.06888 54.01239</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.04796  1.04269  3.20812  6.75592  8.27565 52.08891</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -549,7 +554,7 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.7055  0.8765  0.9875  0.9755  1.0496  1.2874</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.7673  0.8884  0.9820  0.9710  1.0460  1.1733</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -557,7 +562,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -13.153  -5.333  -1.686  -1.108   2.979  11.460</span></span></code></pre></div>
+<span><span class="co">#&gt; -13.059  -5.073  -1.797  -1.157   2.543  11.226</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
@@ -568,14 +573,13 @@ of these parameter estimates. We start by creating a 25-km mapping grid,
 and then projecting this mapping grid to the modeling mesh.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get easting and northing limits</span></span>
-<span><span class="va">xlim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">hull</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">ylim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">hull</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">grd_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">xlim</span><span class="op">)</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">ylim</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span></span>
+<span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_bbox.html" class="external-link">fm_bbox</a></span><span class="op">(</span><span class="va">hull</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">grd_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># make mesh projector to get model summaries from the mesh to the mapping grid</span></span>
-<span><span class="va">mesh_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fm_evaluate.html">fm_evaluator</a></span><span class="op">(</span></span>
+<span><span class="va">mesh_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html" class="external-link">fm_evaluator</a></span><span class="op">(</span></span>
 <span>  <span class="va">mesh</span>,</span>
-<span>  xlim <span class="op">=</span> <span class="va">xlim</span>, ylim <span class="op">=</span> <span class="va">ylim</span>, dims <span class="op">=</span> <span class="va">grd_dims</span></span>
+<span>  xlim <span class="op">=</span> <span class="va">bbox</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, ylim <span class="op">=</span> <span class="va">bbox</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, dims <span class="op">=</span> <span class="va">grd_dims</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Then we populate the mapping grids with parameter estimates
 (posterior median and range95), turn them into a raster stack, and mask
@@ -606,7 +610,7 @@ the raster stack to the study area.</p>
 <span><span class="co"># loop to get estimates on a mapping grid</span></span>
 <span><span class="va">pred_grids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="va">alph</span>, epsilon <span class="op">=</span> <span class="va">epsi</span>, tau <span class="op">=</span> <span class="va">taus</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/fm_evaluate.html">fm_evaluate</a></span><span class="op">(</span><span class="va">mesh_proj</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/coerce.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html" class="external-link">fm_evaluate</a></span><span class="op">(</span><span class="va">mesh_proj</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># make a terra raster stack with the posterior median and range95</span></span>

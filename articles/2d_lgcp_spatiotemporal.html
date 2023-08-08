@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">Fabian E. Bachl
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-08-07</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_spatiotemporal.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_spatiotemporal.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_spatiotemporal.Rmd</code></div>
@@ -158,11 +158,11 @@ the numerical integration scheme for the LGCP likelihood. We can also
 call the internal functions directly to see what the integration scheme
 will look like. Because our model will take time (season) into account
 we have to construct the integration points for the LGCP accordingly.
-Using the <code><a href="../reference/fm_int.html">fm_int()</a></code> we can specify the product domain space.
+Using the <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code> we can specify the product domain space.
 Note that omitting this step would simply aggregate all sampling regions
 over time.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fm_int.html">fm_int</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span></span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>, season <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">samplers</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -208,8 +208,8 @@ distinct points in time.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Predict and plot the intensity for all seasons:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ppxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span>
-<span><span class="va">ppxl_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fm_cprod.html">fm_cprod</a></span><span class="op">(</span><span class="va">ppxl</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ppxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mrsea</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">mrsea</span><span class="op">$</span><span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span>
+<span><span class="va">ppxl_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_cprod.html" class="external-link">fm_cprod</a></span><span class="op">(</span><span class="va">ppxl</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>

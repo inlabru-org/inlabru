@@ -18,7 +18,7 @@ posterior of the estimated random effects."><!-- mathjax --><script src="https:/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -195,8 +195,9 @@ output is a <code>Spatial*DataFrame</code> object. Default <code>FALSE</code>.</
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>a <code>data.frame</code> or <code>Spatial*</code> object with predicted mean values and
-other summary statistics attached.</p>
+<p>a <code>data.frame</code>, <code>sf</code>, or <code>Spatial*</code> object with predicted mean values and
+other summary statistics attached. Non-S4 object outputs have the class
+"bru_prediction" added at the front of the class list.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -279,7 +280,7 @@ generate new realisations for indices greater than <code>n</code>.</p>
 <span class="r-in"><span>  <span class="co"># objects as well as Spatial objects. For instance, we might want to predict</span></span></span>
 <span class="r-in"><span>  <span class="co"># 'mySmooth' at the locations of the mesh vertices. Using</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_vertices.html">fm_vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertices.html" class="external-link">fm_vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># we obtain these vertices as a SpatialPointsDataFrame</span></span></span>
 <span class="r-in"><span></span></span>
@@ -313,7 +314,7 @@ generate new realisations for indices greater than <code>n</code>.</p>
 <span class="r-in"><span>  <span class="co"># Alternatively, we can predict the spatial field at a grid of locations, e.g. a</span></span></span>
 <span class="r-in"><span>  <span class="co"># SpatialPixels object covering the mesh</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_pixels.html">fm_pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">mySmooth2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">pxl</span>, <span class="op">~</span><span class="va">mySmooth</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># This will give us a SpatialPixelDataFrame with the columns we are looking for</span></span></span>

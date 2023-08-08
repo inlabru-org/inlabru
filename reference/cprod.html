@@ -18,7 +18,7 @@ Legacy wrapper for fm_cprod()"><!-- mathjax --><script src="https://cdnjs.cloudf
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@ Legacy wrapper for fm_cprod()"><!-- mathjax --><script src="https://cdnjs.cloudf
 dimensions and multiplies their weights accordingly.
 If the object defining points in a particular dimension has no
 weights attached to it all weights are assumed to be 1.</p>
-<p>Legacy wrapper for <code><a href="fm_cprod.html">fm_cprod()</a></code></p>
+<p>Legacy wrapper for <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_cprod.html" class="external-link">fm_cprod()</a></code></p>
     </div>
 
     <div class="section level2">
@@ -105,7 +105,7 @@ weights attached to it all weights are assumed to be 1.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
 <dd><p><code>data.frame</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> objects, each one
-usually obtained by a call to an <code><a href="fm_int.html">fm_int()</a></code> method.</p></dd>
+usually obtained by a call to an <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code> method.</p></dd>
 
 
 <dt>na.rm</dt>
@@ -117,7 +117,7 @@ If <code>NULL</code> (default), act as <code>TRUE</code>, but warn if any elemen
 <dt>.blockwise</dt>
 <dd><p>logical; if <code>FALSE</code>, computes full tensor product integration.
 If <code>TRUE</code>, computes within-block tensor product integration (used internally
-by <code><a href="fm_int.html">fm_int()</a></code>).
+by <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code>).
 Default <code>FALSE</code></p></dd>
 
 </dl></div>
@@ -130,7 +130,7 @@ integration points and their weights</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="fm_cprod.html">fm_cprod()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="https://inlabru-org.github.io/fmesher/reference/fm_cprod.html" class="external-link">fm_cprod()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -139,11 +139,11 @@ integration points and their weights</p>
 <span class="r-in"><span><span class="co"># ipoints needs INLA</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># Create integration points in dimension 'myDim' and 'myDiscreteDim'</span></span></span>
-<span class="r-in"><span>  <span class="va">ips1</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_int.html">fm_int</a></span><span class="op">(</span><span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.1d.html" class="external-link">inla.mesh.1d</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">ips1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_1d.html" class="external-link">fm_mesh_1d</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"myDim"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">ips2</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_int.html">fm_int</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"myDiscreteDim"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ips2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"myDiscreteDim"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate the cross product</span></span></span>
 <span class="r-in"><span>  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu">cprod</span><span class="op">(</span><span class="va">ips1</span>, <span class="va">ips2</span><span class="op">)</span></span></span>

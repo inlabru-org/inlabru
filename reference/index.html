@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,9 +79,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="model-construction-and-estimation">Model construction and estimation<a class="anchor" aria-label="anchor" href="#model-construction-and-estimation"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Functions for constructing models and performing estimation.</p>
 
       
     </div><div id="" class="section level2">
@@ -91,29 +91,9 @@
 
       <dl><dt>
           
-          <code><a href="Poisson1_1D.html">Poisson1_1D</a></code> 
+          <code><a href="inlabru-package.html">inlabru-package</a></code> <code><a href="inlabru-package.html">_PACKAGE</a></code> <code><a href="inlabru-package.html">inlabru</a></code> 
         </dt>
-        <dd>1-Dimensional Homogeneous Poisson example.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="Poisson2_1D.html">Poisson2_1D</a></code> 
-        </dt>
-        <dd>1-Dimensional NonHomogeneous Poisson example.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="Poisson3_1D.html">Poisson3_1D</a></code> 
-        </dt>
-        <dd>1-Dimensional NonHomogeneous Poisson example.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bincount.html">bincount()</a></code> 
-        </dt>
-        <dd>1D LGCP bin count simulation and comparison with data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bm_list.html">c(<i>&lt;bru_mapper&gt;</i>)</a></code> <code><a href="bm_list.html">c(<i>&lt;bm_list&gt;</i>)</a></code> <code><a href="bm_list.html">`[`(<i>&lt;bm_list&gt;</i>)</a></code> 
-        </dt>
-        <dd>Methods for mapper lists</dd>
+        <dd>inlabru</dd>
       </dl><dl><dt>
           
           <code><a href="bru.html">bru()</a></code> <code><a href="bru.html">bru_rerun()</a></code> 
@@ -121,35 +101,82 @@
         <dd>Convenient model fitting using (iterated) INLA</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_call_options.html">bru_call_options()</a></code> 
+          <code><a href="bru_options.html">bru_options()</a></code> <code><a href="bru_options.html">as.bru_options()</a></code> <code><a href="bru_options.html">bru_options_default()</a></code> <code><a href="bru_options.html">bru_options_check()</a></code> <code><a href="bru_options.html">bru_options_get()</a></code> <code><a href="bru_options.html">bru_options_set()</a></code> <code><a href="bru_options.html">bru_options_reset()</a></code> 
         </dt>
-        <dd>Additional bru options</dd>
+        <dd>Create or update an options objects</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_compute_linearisation.html">bru_compute_linearisation()</a></code> 
+          <code><a href="component.html">component()</a></code> 
         </dt>
-        <dd>Compute inlabru model linearisation information</dd>
+        <dd>Latent model component construction</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_convergence_plot.html">bru_convergence_plot()</a></code> 
+          <code><a href="component_eval.html">component_eval()</a></code> 
         </dt>
-        <dd>Plot inlabru convergence diagnostics</dd>
+        <dd>Evaluate component values in predictor expressions</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_fill_missing.html">bru_fill_missing()</a></code> 
+          <code><a href="component_list.html">component_list()</a></code> <code><a href="component_list.html">c(<i>&lt;component_list&gt;</i>)</a></code> <code><a href="component_list.html">c(<i>&lt;component&gt;</i>)</a></code> <code><a href="component_list.html">`[`(<i>&lt;component_list&gt;</i>)</a></code> 
         </dt>
-        <dd>Fill in missing values in Spatial grids</dd>
+        <dd>Methods for inlabru component lists</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_get_mapper.html">bru_get_mapper()</a></code> <code><a href="bru_get_mapper.html">bru_get_mapper_safely()</a></code> 
+          <code><a href="like.html">like()</a></code> <code><a href="like.html">like_list()</a></code> <code><a href="like.html">c(<i>&lt;bru_like&gt;</i>)</a></code> <code><a href="like.html">c(<i>&lt;bru_like_list&gt;</i>)</a></code> <code><a href="like.html">`[`(<i>&lt;bru_like_list&gt;</i>)</a></code> 
         </dt>
-        <dd>Extract mapper information from INLA model component objects</dd>
+        <dd>Observation model construction for usage with <code><a href="../reference/bru.html">bru()</a></code></dd>
       </dl><dl><dt>
           
-          <code><a href="bru_info.html">summary(<i>&lt;bru_info&gt;</i>)</a></code> <code><a href="bru_info.html">print(<i>&lt;summary_bru_info&gt;</i>)</a></code> <code><a href="bru_info.html">bru_info()</a></code> 
+          <code><a href="lgcp.html">lgcp()</a></code> 
         </dt>
-        <dd>Methods for bru_info objects</dd>
+        <dd>Log Gaussian Cox process (LGCP) inference using INLA</dd>
+      </dl></div><div class="section level2">
+      <h2 id="posterior-evaluation">Posterior evaluation<a class="anchor" aria-label="anchor" href="#posterior-evaluation"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for evaluating posterior properties.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="generate.html">generate()</a></code> 
+        </dt>
+        <dd>Generate samples from fitted bru models</dd>
       </dl><dl><dt>
+          
+          <code><a href="predict.bru.html">predict(<i>&lt;bru&gt;</i>)</a></code> 
+        </dt>
+        <dd>Prediction from fitted bru model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="spde.posterior.html">spde.posterior()</a></code> 
+        </dt>
+        <dd>Posteriors of SPDE hyper parameters and Matern correlation or covariance function.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="deltaIC.html">deltaIC()</a></code> 
+        </dt>
+        <dd>Summarise DIC and WAIC from <code>lgcp</code> objects.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="devel.cvmeasure.html">devel.cvmeasure()</a></code> 
+        </dt>
+        <dd>Variance and correlations measures for prediction components</dd>
+      </dl></div><div class="section level2">
+      <h2 id="optimization-log-information">Optimization log information<a class="anchor" aria-label="anchor" href="#optimization-log-information"></a></h2>
+      
+      <p class="section-desc"></p><p>Accessing the optimization text log, and plotting the optimization convergence.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="bru_log.html">bru_log()</a></code> <code><a href="bru_log.html">print(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">as.character(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">`[`(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">c(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">length(<i>&lt;bru_log&gt;</i>)</a></code> 
         </dt>
@@ -181,9 +208,25 @@
         <dd>Clear log contents</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_make_stack.html">bru_make_stack()</a></code> 
+          <code><a href="bru_convergence_plot.html">bru_convergence_plot()</a></code> 
         </dt>
-        <dd>Build an inla data stack from linearisation information</dd>
+        <dd>Plot inlabru convergence diagnostics</dd>
+      </dl></div><div class="section level2">
+      <h2 id="mapper-methods">Mapper methods<a class="anchor" aria-label="anchor" href="#mapper-methods"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for <code>bru_mapper</code> handling.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="bru_get_mapper.html">bru_get_mapper()</a></code> <code><a href="bru_get_mapper.html">bru_get_mapper_safely()</a></code> 
+        </dt>
+        <dd>Extract mapper information from INLA model component objects</dd>
       </dl><dl><dt>
           
           <code><a href="bru_mapper.html">bru_mapper()</a></code> <code><a href="bru_mapper.html">bru_mapper_define()</a></code> <code><a href="bru_mapper.html">bru_mapper_index()</a></code> <code><a href="bru_mapper.html">bru_mapper_taylor()</a></code> <code><a href="bru_mapper.html">bru_mapper_linear()</a></code> <code><a href="bru_mapper.html">bru_mapper_matrix()</a></code> <code><a href="bru_mapper.html">bru_mapper_factor()</a></code> <code><a href="bru_mapper.html">bru_mapper_const()</a></code> <code><a href="bru_mapper.html">bru_mapper_scale()</a></code> <code><a href="bru_mapper.html">bru_mapper_aggregate()</a></code> <code><a href="bru_mapper.html">bru_mapper_logsumexp()</a></code> <code><a href="bru_mapper.html">bru_mapper_pipe()</a></code> <code><a href="bru_mapper.html">bru_mapper_multi()</a></code> <code><a href="bru_mapper.html">bru_mapper_collect()</a></code> <code><a href="bru_mapper.html">bru_mapper_harmonics()</a></code> <code><a href="bru_mapper.html">bru_mapper_mesh_B()</a></code> 
@@ -196,74 +239,14 @@
         <dd>Generic methods for bru_mapper objects</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_index&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_index&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_is_linear(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_names(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`ibm_names&lt;-`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_is_linear(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_names(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`ibm_names&lt;-`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_harmonics&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_harmonics&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> 
+          <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_fm_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_fm_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_fm_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_inla_mesh_2d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_fm_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_fm_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_fm_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_inla_mesh_1d&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_index&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_index&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_taylor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_linear&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_matrix&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_factor&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_const&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_scale&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_aggregate&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_logsumexp&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_is_linear(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_names(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`ibm_names&lt;-`(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n_output(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_is_linear(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_eval(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_linear(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_invalid_output(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`[`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_names(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">`ibm_names&lt;-`(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_harmonics&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_harmonics&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_n(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_values(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> <code><a href="bru_mapper_methods.html">ibm_jacobian(<i>&lt;bru_mapper_mesh_B&gt;</i>)</a></code> 
         </dt>
         <dd>Methods for bru_mapper objects</dd>
       </dl><dl><dt>
           
-          <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">print(<i>&lt;summary_bru_mapper&gt;</i>)</a></code> 
+          <code><a href="bm_list.html">c(<i>&lt;bru_mapper&gt;</i>)</a></code> <code><a href="bm_list.html">c(<i>&lt;bm_list&gt;</i>)</a></code> <code><a href="bm_list.html">`[`(<i>&lt;bm_list&gt;</i>)</a></code> 
         </dt>
-        <dd>mapper object summaries</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_options.html">bru_options()</a></code> <code><a href="bru_options.html">as.bru_options()</a></code> <code><a href="bru_options.html">bru_options_default()</a></code> <code><a href="bru_options.html">bru_options_check()</a></code> <code><a href="bru_options.html">bru_options_get()</a></code> <code><a href="bru_options.html">bru_options_set()</a></code> <code><a href="bru_options.html">bru_options_reset()</a></code> 
-        </dt>
-        <dd>Create or update an options objects</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_safe_inla.html">bru_safe_inla()</a></code> 
-        </dt>
-        <dd>Load INLA safely for examples and tests</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_safe_sp.html">bru_safe_sp()</a></code> 
-        </dt>
-        <dd>Check for potential <code>sp</code> version compatibility issues</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_standardise_names.html">bru_standardise_names()</a></code> 
-        </dt>
-        <dd>Standardise inla hyperparameter names</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_summarise.html">bru_summarise()</a></code> 
-        </dt>
-        <dd>Summarise and annotate data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="bru_transformation.html">bru_forward_transformation()</a></code> <code><a href="bru_transformation.html">bru_inverse_transformation()</a></code> 
-        </dt>
-        <dd>Transformation tools</dd>
-      </dl><dl><dt>
-          
-          <code><a href="call-stack.html">fm_caller_name()</a></code> <code><a href="call-stack.html">fm_call_stack()</a></code> <code><a href="call-stack.html">fm_try_callstack()</a></code> 
-        </dt>
-        <dd>Call stack utility functions</dd>
-      </dl><dl><dt>
-          
-          <code><a href="component.html">component()</a></code> 
-        </dt>
-        <dd>Latent model component construction</dd>
-      </dl><dl><dt>
-          
-          <code><a href="component_eval.html">component_eval()</a></code> 
-        </dt>
-        <dd>Evaluate component values in predictor expressions</dd>
-      </dl><dl><dt>
-          
-          <code><a href="component_list.html">component_list()</a></code> <code><a href="component_list.html">c(<i>&lt;component_list&gt;</i>)</a></code> <code><a href="component_list.html">c(<i>&lt;component&gt;</i>)</a></code> <code><a href="component_list.html">`[`(<i>&lt;component_list&gt;</i>)</a></code> 
-        </dt>
-        <dd>Methods for inlabru component lists</dd>
-      </dl><dl><dt>
-          
-          <code><a href="deltaIC.html">deltaIC()</a></code> 
-        </dt>
-        <dd>Summarise DIC and WAIC from <code>lgcp</code> objects.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="devel.cvmeasure.html">devel.cvmeasure()</a></code> 
-        </dt>
-        <dd>Variance and correlations measures for prediction components</dd>
+        <dd>Methods for mapper lists</dd>
       </dl><dl><dt>
           
           <code><a href="eval_spatial.html">eval_spatial()</a></code> 
@@ -271,149 +254,66 @@
         <dd>Evaluate spatial covariates</dd>
       </dl><dl><dt>
           
-          <code><a href="evaluate_comp_lin.html">evaluate_comp_lin()</a></code> 
+          <code><a href="bru_transformation.html">bru_forward_transformation()</a></code> <code><a href="bru_transformation.html">bru_inverse_transformation()</a></code> 
         </dt>
-        <dd>Compute all component linearisations</dd>
+        <dd>Transformation tools</dd>
+      </dl></div><div class="section level2">
+      <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
+      
+      <p class="section-desc"></p><p>Miscellaneous functions.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="bru_fill_missing.html">bru_fill_missing()</a></code> 
+        </dt>
+        <dd>Fill in missing values in Spatial grids</dd>
       </dl><dl><dt>
           
-          <code><a href="evaluate_index.html">evaluate_index()</a></code> 
+          <code><a href="point2count.html">point2count()</a></code> 
         </dt>
-        <dd>Compute all index values</dd>
+        <dd>Convert a plot sample of points into one of counts.</dd>
       </dl><dl><dt>
           
-          <code><a href="evaluate_inputs.html">evaluate_inputs()</a></code> 
+          <code><a href="sample.lgcp.html">sample.lgcp()</a></code> 
         </dt>
-        <dd>Compute all component inputs</dd>
+        <dd>Sample from an inhomogeneous Poisson process</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plot-helpers">Plot helpers<a class="anchor" aria-label="anchor" href="#plot-helpers"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for helping build figures.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plot.bru.html">plot(<i>&lt;bru&gt;</i>)</a></code> 
+        </dt>
+        <dd>Plot method for posterior marginals estimated by bru</dd>
       </dl><dl><dt>
           
-          <code><a href="expand_labels.html">expand_labels()</a></code> 
+          <code><a href="plot.bru_prediction.html">plot(<i>&lt;bru_prediction&gt;</i>)</a></code> <code><a href="plot.bru_prediction.html">plot(<i>&lt;prediction&gt;</i>)</a></code> 
         </dt>
-        <dd>Expand labels</dd>
+        <dd>Plot prediction using ggplot2</dd>
       </dl><dl><dt>
           
-          <code><a href="fm_CRS_sp.html">fm_CRS()</a></code> 
+          <code><a href="plotsample.html">plotsample()</a></code> 
         </dt>
-        <dd>Create a coordinate reference system object</dd>
+        <dd>Create a plot sample.</dd>
       </dl><dl><dt>
           
-          <code><a href="fm_as_fm.html">fm_as_fm()</a></code> 
+          <code><a href="globe.html">globe()</a></code> 
         </dt>
-        <dd>Convert objects to fmesher objects</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_as_lattice_2d.html">fm_as_lattice_2d()</a></code> 
-        </dt>
-        <dd>Convert objects to <code>fm_lattice_2d</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_as_mesh_1d.html">fm_as_mesh_1d()</a></code> 
-        </dt>
-        <dd>Convert objects to <code>fm_segm</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_as_mesh_2d.html">fm_as_mesh_2d()</a></code> 
-        </dt>
-        <dd>Convert objects to <code>fm_mesh_2d</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_as_segm.html">fm_as_segm()</a></code> 
-        </dt>
-        <dd>Convert objects to <code>fm_segm</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_as_sfc.html">fm_as_sfc()</a></code> 
-        </dt>
-        <dd>Conversion methods from mesh related objects to sfc</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_centroids.html">fm_centroids()</a></code> 
-        </dt>
-        <dd>Extract triangle centroids from an <code>inla.mesh</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_contains.html">fm_contains()</a></code> 
-        </dt>
-        <dd>Check which mesh triangles are inside a polygon</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_crs.html">is.na(<i>&lt;fm_crs&gt;</i>)</a></code> <code><a href="fm_crs.html">is.na(<i>&lt;inla.CRS&gt;</i>)</a></code> <code><a href="fm_crs.html">fm_crs_is_null()</a></code> <code><a href="fm_crs.html">fm_crs()</a></code> <code><a href="fm_crs.html">fm_crs_oblique()</a></code> <code><a href="fm_crs.html">`fm_crs_oblique&lt;-`()</a></code> <code><a href="fm_crs.html">print(<i>&lt;fm_crs&gt;</i>)</a></code> <code><a href="fm_crs.html">st_crs(<i>&lt;fm_crs&gt;</i>)</a></code> <code><a href="fm_crs.html">`$`(<i>&lt;fm_crs&gt;</i>)</a></code> <code><a href="fm_crs.html">fm_wkt_predef()</a></code> 
-        </dt>
-        <dd>Obtain coordinate reference system object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_crs_wkt.html">fm_wkt_is_geocent()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_is_geocent()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_get_ellipsoid_radius()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_get_ellipsoid_radius()</a></code> <code><a href="fm_crs_wkt.html">fm_ellipsoid_radius()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_set_ellipsoid_radius()</a></code> <code><a href="fm_crs_wkt.html">`fm_ellipsoid_radius&lt;-`()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_set_ellipsoid_radius()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_unit_params()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_get_lengthunit()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_set_lengthunit()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_get_lengthunit()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_set_lengthunit()</a></code> <code><a href="fm_crs_wkt.html">fm_length_unit()</a></code> <code><a href="fm_crs_wkt.html">`fm_length_unit&lt;-`()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt()</a></code> <code><a href="fm_crs_wkt.html">fm_proj4string()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_get_wkt()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_tree_projection_type()</a></code> <code><a href="fm_crs_wkt.html">fm_wkt_projection_type()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_projection_type()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_bounds()</a></code> <code><a href="fm_crs_wkt.html">fm_crs_detect_manifold()</a></code> 
-        </dt>
-        <dd>Handling CRS/WKT</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_diameter.html">fm_diameter()</a></code> 
-        </dt>
-        <dd>Compute approximate spatial object diameter</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_evaluate.html">fm_evaluate()</a></code> <code><a href="fm_evaluate.html">fm_evaluator()</a></code> <code><a href="fm_evaluate.html">fm_evaluator_inla_mesh()</a></code> <code><a href="fm_evaluate.html">fm_evaluator_inla_mesh_1d()</a></code> <code><a href="fm_evaluate.html">fm_evaluator_lattice()</a></code> 
-        </dt>
-        <dd>Methods for projecting to/from an inla.mesh</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_extensions.html">fm_extensions()</a></code> 
-        </dt>
-        <dd>Compute extensions of a spatial object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_int.html">fm_int()</a></code> 
-        </dt>
-        <dd>Multi-domain integration</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_is_within.html">fm_is_within()</a></code> 
-        </dt>
-        <dd>Query if points are inside a mesh</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_lattice_2d.html">fm_lattice_2d()</a></code> 
-        </dt>
-        <dd>Make a lattice object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_mesh_1d.html">fm_mesh_1d()</a></code> 
-        </dt>
-        <dd>Make a 1D mesh object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_mesh_2d.html">fm_mesh_2d()</a></code> 
-        </dt>
-        <dd>Make a 2D mesh object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_nonconvex_hull.html">fm_nonconvex_hull()</a></code> 
-        </dt>
-        <dd>Compute an extension of a spatial object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_pixels.html">fm_pixels()</a></code> 
-        </dt>
-        <dd>Generate lattice points covering a mesh</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_segm.html">fm_segm()</a></code> 
-        </dt>
-        <dd>Make a spatial segment object</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_transform.html">fm_transform()</a></code> 
-        </dt>
-        <dd>Object coordinate transformation</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fm_vertices.html">fm_vertices()</a></code> 
-        </dt>
-        <dd>Extract vertex locations from an <code>inla.mesh</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="generate.html">generate()</a></code> 
-        </dt>
-        <dd>Generate samples from fitted bru models</dd>
+        <dd>Visualize a globe using RGL</dd>
       </dl><dl><dt>
           
           <code><a href="gg.RasterLayer.html">gg(<i>&lt;RasterLayer&gt;</i>)</a></code> 
@@ -461,6 +361,11 @@
         <dd>Geom for SpatialPolygons objects</dd>
       </dl><dl><dt>
           
+          <code><a href="gg.bru_prediction.html">gg(<i>&lt;bru_prediction&gt;</i>)</a></code> <code><a href="gg.bru_prediction.html">gg(<i>&lt;prediction&gt;</i>)</a></code> 
+        </dt>
+        <dd>Geom for predictions</dd>
+      </dl><dl><dt>
+          
           <code><a href="gg.data.frame.html">gg(<i>&lt;data.frame&gt;</i>)</a></code> 
         </dt>
         <dd>Geom for data.frame</dd>
@@ -481,34 +386,14 @@
         <dd>Geom for matrix</dd>
       </dl><dl><dt>
           
-          <code><a href="gg.prediction.html">gg(<i>&lt;prediction&gt;</i>)</a></code> 
+          <code><a href="gg.sf.html">gg(<i>&lt;sf&gt;</i>)</a></code> 
         </dt>
-        <dd>Geom for predictions</dd>
-      </dl><dl><dt>
-          
-          <code><a href="globe.html">globe()</a></code> 
-        </dt>
-        <dd>Plot a globe using rgl</dd>
+        <dd>Geom helper for sf objects</dd>
       </dl><dl><dt>
           
           <code><a href="glplot.html">glplot()</a></code> 
         </dt>
-        <dd>Render Spatial* and inla.mesh objects using RGL</dd>
-      </dl><dl><dt>
-          
-          <code><a href="glplot.SpatialLines.html">glplot(<i>&lt;SpatialLines&gt;</i>)</a></code> 
-        </dt>
-        <dd>Visualize SpatialLines using RGL</dd>
-      </dl><dl><dt>
-          
-          <code><a href="glplot.SpatialPoints.html">glplot(<i>&lt;SpatialPoints&gt;</i>)</a></code> 
-        </dt>
-        <dd>Visualize SpatialPoints using RGL</dd>
-      </dl><dl><dt>
-          
-          <code><a href="glplot.inla.mesh.html">glplot(<i>&lt;inla.mesh&gt;</i>)</a></code> 
-        </dt>
-        <dd>Visualize SpatialPoints using RGL</dd>
+        <dd>Render objects using RGL</dd>
       </dl><dl><dt>
           
           <code><a href="gm.html">gm()</a></code> 
@@ -521,6 +406,73 @@
         <dd>Plot a map using extent of a spatial object</dd>
       </dl><dl><dt>
           
+          <code><a href="bincount.html">bincount()</a></code> 
+        </dt>
+        <dd>1D LGCP bin count simulation and comparison with data</dd>
+      </dl></div><div class="section level2">
+      <h2 id="printing-methods">Printing methods<a class="anchor" aria-label="anchor" href="#printing-methods"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for printing.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="bru_info.html">summary(<i>&lt;bru_info&gt;</i>)</a></code> <code><a href="bru_info.html">print(<i>&lt;summary_bru_info&gt;</i>)</a></code> <code><a href="bru_info.html">bru_info()</a></code> 
+        </dt>
+        <dd>Methods for bru_info objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_log.html">bru_log()</a></code> <code><a href="bru_log.html">print(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">as.character(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">`[`(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">c(<i>&lt;bru_log&gt;</i>)</a></code> <code><a href="bru_log.html">length(<i>&lt;bru_log&gt;</i>)</a></code> 
+        </dt>
+        <dd>Access methods for <code>bru_log</code> objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_multi&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_pipe&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">summary(<i>&lt;bru_mapper_collect&gt;</i>)</a></code> <code><a href="bru_mapper_summary.html">print(<i>&lt;summary_bru_mapper&gt;</i>)</a></code> 
+        </dt>
+        <dd>mapper object summaries</dd>
+      </dl><dl><dt>
+          
+          <code><a href="summary.bru.html">summary(<i>&lt;bru&gt;</i>)</a></code> <code><a href="summary.bru.html">print(<i>&lt;summary_bru&gt;</i>)</a></code> 
+        </dt>
+        <dd>Summary for an inlabru fit</dd>
+      </dl><dl><dt>
+          
+          <code><a href="summary.bru_options.html">summary(<i>&lt;bru_options&gt;</i>)</a></code> <code><a href="summary.bru_options.html">print(<i>&lt;summary_bru_options&gt;</i>)</a></code> 
+        </dt>
+        <dd>Print inlabru options</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-objects">Data objects<a class="anchor" aria-label="anchor" href="#data-objects"></a></h2>
+      
+      <p class="section-desc"></p><p>Data objects</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="Poisson1_1D.html">Poisson1_1D</a></code> 
+        </dt>
+        <dd>1-Dimensional Homogeneous Poisson example.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Poisson2_1D.html">Poisson2_1D</a></code> 
+        </dt>
+        <dd>1-Dimensional NonHomogeneous Poisson example.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Poisson3_1D.html">Poisson3_1D</a></code> 
+        </dt>
+        <dd>1-Dimensional NonHomogeneous Poisson example.</dd>
+      </dl><dl><dt>
+          
           <code><a href="gorillas.html">gorillas</a></code> <code><a href="gorillas.html">gorillas</a></code> 
         </dt>
         <dd>Gorilla nesting sites</dd>
@@ -531,32 +483,12 @@
         <dd>Gorilla nesting sites in sf format</dd>
       </dl><dl><dt>
           
-          <code><a href="inla.stack.mjoin.html">inla.stack.mjoin()</a></code> 
-        </dt>
-        <dd>Join stacks intended to be run with different likelihoods</dd>
-      </dl><dl><dt>
-          
-          <code><a href="inlabru-package.html">inlabru-package</a></code> <code><a href="inlabru-package.html">_PACKAGE</a></code> <code><a href="inlabru-package.html">inlabru</a></code> 
-        </dt>
-        <dd>inlabru</dd>
-      </dl><dl><dt>
-          
-          <code><a href="ipoints.html">ipoints()</a></code> 
-        </dt>
-        <dd>Generate integration points</dd>
-      </dl><dl><dt>
-          
-          <code><a href="lgcp.html">lgcp()</a></code> 
-        </dt>
-        <dd>Log Gaussian Cox process (LGCP) inference using INLA</dd>
-      </dl><dl><dt>
-          
-          <code><a href="like.html">like()</a></code> <code><a href="like.html">like_list()</a></code> <code><a href="like.html">c(<i>&lt;bru_like&gt;</i>)</a></code> <code><a href="like.html">c(<i>&lt;bru_like_list&gt;</i>)</a></code> <code><a href="like.html">`[`(<i>&lt;bru_like_list&gt;</i>)</a></code> 
-        </dt>
-        <dd>Likelihood construction for usage with <code><a href="../reference/bru.html">bru()</a></code></dd>
-      </dl><dl><dt>
-          
           <code><a href="mexdolphin.html">mexdolphin</a></code> 
+        </dt>
+        <dd>Pan-tropical spotted dolphins in the Gulf of Mexico</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mexdolphin_sf.html">mexdolphin_sf</a></code> 
         </dt>
         <dd>Pan-tropical spotted dolphins in the Gulf of Mexico</dd>
       </dl><dl><dt>
@@ -566,54 +498,9 @@
         <dd>Marine renewables strategic environmental assessment</dd>
       </dl><dl><dt>
           
-          <code><a href="multiplot.html">multiplot()</a></code> 
-        </dt>
-        <dd>Multiple ggplots on a page.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="pixels.html">pixels()</a></code> 
-        </dt>
-        <dd>Generate <code>SpatialPixels</code> covering an <code>inla.mesh</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot.bru.html">plot(<i>&lt;bru&gt;</i>)</a></code> 
-        </dt>
-        <dd>Plot method for posterior marginals estimated by bru</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot.prediction.html">plot(<i>&lt;prediction&gt;</i>)</a></code> 
-        </dt>
-        <dd>Plot prediction using ggplot2</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plotsample.html">plotsample()</a></code> 
-        </dt>
-        <dd>Create a plot sample.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="point2count.html">point2count()</a></code> 
-        </dt>
-        <dd>Convert a plot sample of points into one of counts.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="predict.bru.html">predict(<i>&lt;bru&gt;</i>)</a></code> 
-        </dt>
-        <dd>Prediction from fitted bru model</dd>
-      </dl><dl><dt>
-          
           <code><a href="robins_subset.html">robins_subset</a></code> 
         </dt>
         <dd>robins_subset</dd>
-      </dl><dl><dt>
-          
-          <code><a href="row_kron.html">row_kron()</a></code> 
-        </dt>
-        <dd>Row-wise Kronecker products</dd>
-      </dl><dl><dt>
-          
-          <code><a href="sample.lgcp.html">sample.lgcp()</a></code> 
-        </dt>
-        <dd>Sample from an inhomogeneous Poisson process</dd>
       </dl><dl><dt>
           
           <code><a href="seals.html">seals</a></code> 
@@ -626,9 +513,45 @@
         <dd>Blue and red shrimp in the Western Mediterranean Sea</dd>
       </dl><dl><dt>
           
-          <code><a href="sline.html">sline()</a></code> 
+          <code><a href="toygroups.html">toygroups</a></code> 
         </dt>
-        <dd>Convert data frame to SpatialLinesDataFrame</dd>
+        <dd>Simulated 1D animal group locations and group sizes</dd>
+      </dl></div><div class="section level2">
+      <h2 id="internal-helper-functions">Internal helper functions<a class="anchor" aria-label="anchor" href="#internal-helper-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Helper functions for more low level operations.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="evaluate_comp_lin.html">evaluate_comp_lin()</a></code> 
+        </dt>
+        <dd>Compute all component linearisations</dd>
+      </dl><dl><dt>
+          
+          <code><a href="evaluate_index.html">evaluate_index()</a></code> 
+        </dt>
+        <dd>Compute all index values</dd>
+      </dl><dl><dt>
+          
+          <code><a href="evaluate_inputs.html">evaluate_inputs()</a></code> 
+        </dt>
+        <dd>Compute all component inputs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="expand_labels.html">expand_labels()</a></code> 
+        </dt>
+        <dd>Expand labels</dd>
+      </dl><dl><dt>
+          
+          <code><a href="inla.stack.mjoin.html">inla.stack.mjoin()</a></code> 
+        </dt>
+        <dd>Join stacks intended to be run with different likelihoods</dd>
       </dl><dl><dt>
           
           <code><a href="spatial.to.ppp.html">spatial.to.ppp()</a></code> 
@@ -636,9 +559,77 @@
         <dd>Convert SpatialPoints and boundary polygon to spatstat ppp object</dd>
       </dl><dl><dt>
           
-          <code><a href="spde.posterior.html">spde.posterior()</a></code> 
+          <code><a href="bru_make_stack.html">bru_make_stack()</a></code> 
         </dt>
-        <dd>Posteriors of SPDE hyper parameters and Matern correlation or covariance function.</dd>
+        <dd>Build an inla data stack from linearisation information</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_summarise.html">bru_summarise()</a></code> 
+        </dt>
+        <dd>Summarise and annotate data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_standardise_names.html">bru_standardise_names()</a></code> 
+        </dt>
+        <dd>Standardise inla hyperparameter names</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_safe_inla.html">bru_safe_inla()</a></code> 
+        </dt>
+        <dd>Load INLA safely for examples and tests</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_safe_sp.html">bru_safe_sp()</a></code> 
+        </dt>
+        <dd>Check for potential <code>sp</code> version compatibility issues</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_call_options.html">bru_call_options()</a></code> 
+        </dt>
+        <dd>Additional bru options</dd>
+      </dl><dl><dt>
+          
+          <code><a href="bru_compute_linearisation.html">bru_compute_linearisation()</a></code> 
+        </dt>
+        <dd>Compute inlabru model linearisation information</dd>
+      </dl></div><div class="section level2">
+      <h2 id="re-exported-fmesher-functions">Re-exported fmesher functions<a class="anchor" aria-label="anchor" href="#re-exported-fmesher-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      
+    </div><div class="section level2">
+      <h2 id="deprecated-methods">Deprecated methods<a class="anchor" aria-label="anchor" href="#deprecated-methods"></a></h2>
+      
+      <p class="section-desc"></p><p>Deprecated methods</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="ipoints.html">ipoints()</a></code> 
+        </dt>
+        <dd>Generate integration points</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pixels.html">pixels()</a></code> 
+        </dt>
+        <dd>Generate <code>SpatialPixels</code> covering an <code>inla.mesh</code></dd>
+      </dl><dl><dt>
+          
+          <code><a href="multiplot.html">multiplot()</a></code> 
+        </dt>
+        <dd>Multiple ggplots on a page.</dd>
       </dl><dl><dt>
           
           <code><a href="spoly.html">spoly()</a></code> 
@@ -646,41 +637,12 @@
         <dd>Convert a data.frame of boundary points into a SpatialPolgonsDataFrame</dd>
       </dl><dl><dt>
           
-          <code><a href="st_check_dim.html">st_check_dim()</a></code> 
+          <code><a href="sline.html">sline()</a></code> 
         </dt>
-        <dd>Check for "XYZ", "XYM" and "XYZM" sfg classes</dd>
-      </dl><dl><dt>
-          
-          <code><a href="st_check_polygon.html">st_check_polygon()</a></code> 
-        </dt>
-        <dd>Check sfg polygon satisfies standards for POLYGON simple features</dd>
-      </dl><dl><dt>
-          
-          <code><a href="st_signed_area.html">st_signed_area()</a></code> 
-        </dt>
-        <dd>Calculate signed area for polygon</dd>
-      </dl><dl><dt>
-          
-          <code><a href="summary.bru.html">summary(<i>&lt;bru&gt;</i>)</a></code> <code><a href="summary.bru.html">print(<i>&lt;summary_bru&gt;</i>)</a></code> 
-        </dt>
-        <dd>Summary for an inlabru fit</dd>
-      </dl><dl><dt>
-          
-          <code><a href="summary.bru_options.html">summary(<i>&lt;bru_options&gt;</i>)</a></code> <code><a href="summary.bru_options.html">print(<i>&lt;summary_bru_options&gt;</i>)</a></code> 
-        </dt>
-        <dd>Print inlabru options</dd>
-      </dl><dl><dt>
-          
-          <code><a href="toygroups.html">toygroups</a></code> 
-        </dt>
-        <dd>Simulated 1D animal group locations and group sizes</dd>
-      </dl><dl><dt>
-          
-          <code><a href="wkt_tree.html">fm_wkt_as_wkt_tree()</a></code> <code><a href="wkt_tree.html">fm_wkt_tree_as_wkt()</a></code> <code><a href="wkt_tree.html">fm_wkt_tree_get_item()</a></code> <code><a href="wkt_tree.html">fm_wkt_tree_set_item()</a></code> 
-        </dt>
-        <dd>Internal WKT handling</dd>
+        <dd>Convert data frame to SpatialLinesDataFrame</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

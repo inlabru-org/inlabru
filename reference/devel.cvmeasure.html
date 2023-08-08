@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -160,7 +160,7 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Predict SPDE and vegetation at the mesh vertex locations</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="fm_vertices.html">fm_vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">vrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertices.html" class="external-link">fm_vertices</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">fit</span>,</span></span>
 <span class="r-in"><span>    <span class="va">vrt</span>,</span></span>
@@ -249,7 +249,7 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-in"><span>  <span class="co"># Variance and correlation integrated over space</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">vm.int</span> <span class="op">&lt;-</span> <span class="fu">devel.cvmeasure</span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">joint</span>, <span class="va">pred</span><span class="op">$</span><span class="va">field</span>, <span class="va">pred</span><span class="op">$</span><span class="va">veg</span>,</span></span>
-<span class="r-in"><span>    samplers <span class="op">=</span> <span class="fu"><a href="fm_int.html">fm_int</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    samplers <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    mesh <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">vm.int</span></span></span>
@@ -257,8 +257,8 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-plt img"><img src="devel.cvmeasure-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="devel.cvmeasure-2.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="devel.cvmeasure-3.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    var.joint         var1       var2          cor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.02133968 0.0001032363 0.02125803 -0.007285056</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    var.joint         var1       var2         cor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01784248 0.0001033332 0.01773032 0.003257412</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

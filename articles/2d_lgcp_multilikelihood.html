@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,7 +104,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-08-07</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -242,8 +242,8 @@ improves the accuracy of the posterior distribution estimation.</p>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.8.0.9009</span></span>
-<span><span class="co">#&gt; INLA version: 23.06.29</span></span>
+<span><span class="co">#&gt; inlabru version: 2.8.0.9010</span></span>
+<span><span class="co">#&gt; INLA version: 23.08.08</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Difference: main = spde(coordinates), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -256,10 +256,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.56, Running = 115, Post = 0.111, Total = 117 </span></span>
+<span><span class="co">#&gt;     Pre = 1.12, Running = 104, Post = 0.112, Total = 105 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.359 1.378     -3.061   -0.359      2.343 -0.359   0</span></span>
+<span><span class="co">#&gt;             mean   sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
+<span><span class="co">#&gt; Intercept -0.348 1.35     -2.993   -0.348      2.297 -0.348   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -267,27 +267,27 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;    Difference SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.73 0.348      2.046    2.713      3.439 2.766</span></span>
-<span><span class="co">#&gt; Stdev for Common     1.94 0.195      1.553    1.937      2.331 1.969</span></span>
-<span><span class="co">#&gt; Range for Difference 1.25 0.868      0.209    0.972      3.572 0.610</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.16 0.103      0.031    0.128      0.432 0.087</span></span>
+<span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for Common     2.957 0.721      1.826    2.860      4.640 2.667</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.059 0.423      1.371    2.010      3.026 1.909</span></span>
+<span><span class="co">#&gt; Range for Difference 2.111 2.953      0.185    1.236      9.518 0.473</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.174 0.059      0.087    0.164      0.316 0.146</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.79</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.56</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -773.45</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.71</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2711.20</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 646.02</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2672.16</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 626.50</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1203.48 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.99 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.8.0.9009</span></span>
-<span><span class="co">#&gt; INLA version: 23.06.29</span></span>
+<span><span class="co">#&gt; inlabru version: 2.8.0.9010</span></span>
+<span><span class="co">#&gt; INLA version: 23.08.08</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; Common: main = spde(coordinates), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Difference: main = spde(coordinates), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -300,10 +300,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.03, Running = 20.3, Post = 0.0946, Total = 21.4 </span></span>
+<span><span class="co">#&gt;     Pre = 0.945, Running = 51.6, Post = 0.0872, Total = 52.6 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.358 1.383     -3.069   -0.358      2.353 -0.358   0</span></span>
+<span><span class="co">#&gt; Intercept -0.354 1.369     -3.037   -0.354      2.329 -0.354   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -311,20 +311,20 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;    Difference SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.90 0.669      1.799    2.830      4.419 2.694</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.03 0.378      1.382    1.994      2.864 1.931</span></span>
-<span><span class="co">#&gt; Range for Difference 1.50 0.998      0.363    1.254      4.103 0.860</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.18 0.089      0.062    0.163      0.403 0.131</span></span>
+<span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for Common     2.934 0.596      1.961    2.867      4.294 2.726</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.047 0.335      1.482    2.015      2.796 1.945</span></span>
+<span><span class="co">#&gt; Range for Difference 1.684 1.311      0.374    1.323      5.151 0.848</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.168 0.112      0.033    0.142      0.453 0.089</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.10</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.03</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -773.96</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.29</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2711.68</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 646.25</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2712.48</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 646.70</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.30 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.16 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

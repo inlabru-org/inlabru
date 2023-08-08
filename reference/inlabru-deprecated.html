@@ -12,7 +12,7 @@ future version."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ future version."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Deprecated functions in inlabru</h1>
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 7 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/bru.spatial.R" class="external-link"><code>R/bru.spatial.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a>, <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/R/environment.R" class="external-link"><code>R/environment.R</code></a>, and 4 more</small>
       <div class="d-none name"><code>inlabru-deprecated.Rd</code></div>
     </div>
 
@@ -92,46 +92,6 @@ future version.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">stransform</span><span class="op">(</span><span class="va">splist</span>, <span class="va">crs</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">init.tutorial</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_has_PROJ6</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_not_for_PROJ6</span><span class="op">(</span>fun <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_not_for_PROJ4</span><span class="op">(</span>fun <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_fallback_PROJ6</span><span class="op">(</span>fun <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_requires_PROJ6</span><span class="op">(</span>fun <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_as_sp_crs</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_sp_get_crs</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, crs0 <span class="op">=</span> <span class="cn">NULL</span>, crs1 <span class="op">=</span> <span class="cn">NULL</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for SpatialPoints</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for SpatialPointsDataFrame</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for inla.mesh.lattice</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for inla.mesh.segment</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for inla.mesh</span></span>
-<span><span class="fu">fm_spTransform</span><span class="op">(</span><span class="va">x</span>, <span class="va">CRSobj</span>, passthrough <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_as_inla_mesh_segment</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_as_inla_mesh</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">fm_sp2segment</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -168,35 +128,8 @@ future version.</p>
 <dd><p>Coordinate reference system to change to</p></dd>
 
 
-<dt>fun</dt>
-<dd><p>The name of the function that requires PROJ6. Default: NULL,
-which uses the name of the calling function.</p></dd>
-
-
-<dt>x</dt>
-<dd><p>The object that should be transformed from it's current CRS to a new CRS</p></dd>
-
-
 <dt>...</dt>
-<dd><p>Potential additional arguments</p></dd>
-
-
-<dt>crs0</dt>
-<dd><p>The source sp::CRS or inla.CRS object</p></dd>
-
-
-<dt>crs1</dt>
-<dd><p>The target sp::CRS or inla.CRS object</p></dd>
-
-
-<dt>passthrough</dt>
-<dd><p>Default is FALSE.
-Setting to TRUE allows objects with no CRS information to be passed
-through without transformation.</p></dd>
-
-
-<dt>CRSobj</dt>
-<dd><p>The target sp::CRS or inla.CRS object</p></dd>
+<dd><p>Usually passed on to other methods</p></dd>
 
 
 <dt>mesh</dt>
@@ -217,24 +150,8 @@ data.frame with respective column names.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A <code>CRS</code> object, or NULL if no valid CRS identified</p>
-
-
-<p>An <code>fm_segm</code> object</p>
-
-
-<p>An <code>fm_mesh_2d</code> object</p>
-
-
 <p><code>is.inside()</code>: Single column matrix of Boolean values indicating if a point is
 inside the mesh.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function is a convenience method to workaround PROJ4/PROJ6
-differences, and the lack of a crs extraction method for Spatial objects.
-For newer code, use <code><a href="fm_crs.html">fm_crs()</a></code> instead, that returns <code>crs</code> objects,
-and use <a href="fm_crs.html">fm_CRS()</a> to extract/construct/convert to old style <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> objects.</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
@@ -257,30 +174,6 @@ the following is sufficient:</p>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">bru_verbose =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">control.compute =</span> <span class="fu">list</span>(<span class="at">dic =</span> <span class="cn">TRUE</span>, <span class="at">waic =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre><p></p></div></li>
-<li><p><code>fm_has_PROJ6()</code>: Detect whether PROJ6 is available</p></li>
-<li><p><code>fm_not_for_PROJ6()</code>: <code>fm_not_for_PROJ6</code> is called to warn about using old PROJ4
-features even though PROJ6 is available</p></li>
-<li><p><code>fm_not_for_PROJ4()</code>: <code>fm_not_for_PROJ4</code> is called to give an error when
-calling methods that are only available for PROJ6</p></li>
-<li><p><code>fm_fallback_PROJ6()</code>: Called to warn about falling back
-to using old PROJ4 methods when a PROJ6 method hasn't been implemented</p></li>
-<li><p><code>fm_requires_PROJ6()</code>: Called to give an error when PROJ6
-is required but not available</p></li>
-<li><p><code>fm_as_sp_crs()</code>: Wrapper for <code><a href="fm_CRS_sp.html">fm_CRS()</a></code>
-<code><a href="https://rdrr.io/pkg/sp/man/Spatial-class.html" class="external-link">sp::Spatial</a></code> and <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> objects.</p></li>
-<li><p><code>fm_sp_get_crs()</code>: Wrapper for CRS(projargs) (PROJ4) and CRS(wkt) for
-<code><a href="https://rdrr.io/pkg/sp/man/Spatial-class.html" class="external-link">sp::Spatial</a></code> objects.</p></li>
-<li><p><code>fm_spTransform()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> (See <code><a href="fm_transform.html">fm_transform()</a></code> instead)
-Handle transformation of various inla objects according to coordinate
-reference systems of <code><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">sp::CRS</a></code> or <code><a href="https://rdrr.io/pkg/INLA/man/inla.CRS.html" class="external-link">INLA::inla.CRS</a></code> class.</p></li>
-<li><p><code>fm_spTransform(default)</code>: The default method handles low level transformation of raw
-coordinates.</p></li>
-<li><p><code>fm_as_inla_mesh_segment()</code>: Conversion to inla.mesh.segment
-<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_as_segm.html">fm_as_segm()</a></code>.</p></li>
-<li><p><code>fm_as_inla_mesh()</code>: Conversion to inla.mesh.
-<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_as_mesh_2d.html">fm_as_mesh_2d()</a></code>.</p></li>
-<li><p><code>fm_sp2segment()</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of
-<code><a href="fm_as_segm.html">fm_as_segm()</a></code></p></li>
 <li><p><code>predict(inla)</code>: <a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> since version <code>2.1.0</code>.
 Prediction from fitted inla model. This method is not supported for plain
 inla objects. Please see <code><a href="predict.bru.html">predict.bru()</a></code> instead.
@@ -300,19 +193,18 @@ instead.</p></li>
 <li><p><code>ibm_n(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>ibm_values(bru_mapper_offset)</code>: Replaced by <a href="bru_mapper.html">bru_mapper_const</a> methods</p></li>
 <li><p><code>is.inside()</code>: Find out which points are inside a mesh.
-<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="fm_is_within.html">fm_is_within()</a></code>.
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_is_within.html" class="external-link">fm_is_within()</a></code>.
 Replace <code>is.inside(mesh, loc)</code> with <code>fm_is_within(loc, mesh)</code>.</p></li>
 <li><p><code>vertices.inla.mesh()</code>: Extract vertex locations from an <code>inla.mesh</code>.
 Converts the vertices of an <code>inla.mesh</code> object into a <code>SpatialPointsDataFrame</code>.
-Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code></p></li>
+Deprecated in favour of <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertices.html" class="external-link">fm_vertices()</a></code></p></li>
 <li><p><code>eval_SpatialDF()</code>: Replaced by the generic <code><a href="eval_spatial.html">eval_spatial()</a></code></p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="fm_transform.html">fm_transform()</a></code></p>
-<p><code><a href="predict.bru.html">predict.bru()</a></code></p>
+    <div class="dont-index"><p><code><a href="predict.bru.html">predict.bru()</a></code></p>
 <p><code><a href="generate.html">generate.bru()</a></code></p>
-<p><code><a href="fm_is_within.html">fm_is_within()</a></code></p></div>
+<p><code><a href="https://inlabru-org.github.io/fmesher/reference/fm_is_within.html" class="external-link">fm_is_within()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -320,16 +212,6 @@ Deprecated in favour of <code><a href="fm_vertices.html">fm_vertices()</a></code
 <p>Fabian E. Bachl <a href="mailto:bachlfab@gmail.com">bachlfab@gmail.com</a></p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>, proj4string <span class="op">=</span> <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="fm_CRS_sp.html">fm_CRS</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
