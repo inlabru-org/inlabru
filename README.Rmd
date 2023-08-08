@@ -83,30 +83,28 @@ suppressPackageStartupMessages(library(sp))
 ```
 ```{r example}
 # Load libraries
-library(inlabru)
 library(INLA)
+library(inlabru)
+library(fmesher)
 library(ggplot2)
-bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
-
-# Load the data
-data(gorillas, package = "inlabru")
 
 # Construct latent model components
-matern <- inla.spde2.pcmatern(gorillas$mesh,
+matern <- inla.spde2.pcmatern(
+  gorillas_sf$mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.01, 0.01)
 )
-cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
+cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
-  components = cmp,
+  cmp,
   like(
-    formula = coordinates ~ .,
+    formula = geometry ~ .,
     family = "cp",
-    data = gorillas$nests,
-    samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh)
+    data = gorillas_sf$nests,
+    samplers = gorillas_sf$boundary,
+    domain = list(geometry = gorillas_sf$mesh)
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
@@ -114,14 +112,14 @@ fit <- bru(
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
+  fm_pixels(gorillas_sf$mesh, mask = gorillas_sf$boundary),
   ~ exp(mySmooth + Intercept)
 )
 
 # Plot the result
 ggplot() +
-  gg(lambda) +
-  gg(gorillas$nests, color = "red", size = 0.2) +
-  coord_equal() +
+  geom_fm(data = gorillas_sf$mesh) +
+  gg(lambda, geom = "tile") +
+  gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
   ggtitle("Nest intensity per km squared")
 ```

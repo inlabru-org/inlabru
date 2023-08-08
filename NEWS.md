@@ -3,9 +3,11 @@
 ## Feature updates
 
 * Conversion of code to use `fmesher` for mesh and geometry handling;
-  the interface supports exisiting objects and methods.
+  the interface supports existing objects and methods.
   See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
   more information.
+
+* Added `gg.sf()` method.
 
 * Add experimental support for `stars` via `eval_spatial()`.
   (version `2.8.0.9007`)
