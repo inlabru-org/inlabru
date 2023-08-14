@@ -21,15 +21,15 @@ sfill <- function(data, where = NULL) {
     vals <- vals[!is.na(vals)]
 
     data.ow <- spatstat.geom::owin(
-      range(coordinates(dpoints)[, 1]),
-      range(coordinates(dpoints)[, 2])
+      range(sp::coordinates(dpoints)[, 1]),
+      range(sp::coordinates(dpoints)[, 2])
     )
-    data.ppp <- spatstat.geom::as.ppp(coordinates(dpoints), data.ow)
+    data.ppp <- spatstat.geom::as.ppp(sp::coordinates(dpoints), data.ow)
     where.ow <- spatstat.geom::owin(
-      range(coordinates(where)[, 1]),
-      range(coordinates(where)[, 2])
+      range(sp::coordinates(where)[, 1]),
+      range(sp::coordinates(where)[, 2])
     )
-    where.ppp <- spatstat.geom::as.ppp(coordinates(where), where.ow)
+    where.ppp <- spatstat.geom::as.ppp(sp::coordinates(where), where.ow)
 
     nn <- spatstat.geom::nncross(where.ppp, data.ppp)[, "which"]
     vallist[[k]] <- vals[nn]

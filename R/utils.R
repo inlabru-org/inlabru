@@ -126,7 +126,8 @@ check_package_version_and_load <-
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_sp()) {
+#' if (bru_safe_sp() &&
+#'   require("sp")) {
 #'   # Run sp dependent calculations
 #' }
 #' }

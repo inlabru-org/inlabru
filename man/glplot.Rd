@@ -47,10 +47,12 @@ inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
 
 }}
 \examples{
-\dontrun{
-if (require("rgl", quietly = TRUE) &&
+\donttest{
+if (interactive() &&
+    require("rgl", quietly = TRUE) &&
     require("sphereplot", quietly = TRUE) &&
-    bru_safe_sp()) {
+    bru_safe_sp() &&
+    require("sp")) {
   # Show the globe
   globe()
 

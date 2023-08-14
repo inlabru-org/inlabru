@@ -389,7 +389,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     if (!fm_crs_is_null(domain$crs)) {
       ips <- fm_transform(ips, crs = crs)
     }
-    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+    sp::coordnames(ips) <- coord_names[seq_len(NCOL(sp::coordinates(ips)))]
   } else if (inherits(samplers, "SpatialPointsDataFrame")) {
     if (!("weight" %in% names(samplers))) {
       warning("The integration points provided have no weight column. Setting weights to 1.")
@@ -429,7 +429,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     #    } else if (!is.null(name)) {
     #      coord_names[seq_along(name)] <- name
     #    }
-    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+    sp::coordnames(ips) <- coord_names[seq_len(NCOL(sp::coordinates(ips)))]
   } else if (is_2d &&
     (inherits(samplers, c(
       "SpatialPolygons",
@@ -463,8 +463,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       seq_len(length(samplers)),
       function(k) {
         cbind(
-          x = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 1]),
-          y = rev(coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 2]),
+          x = rev(sp::coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 1]),
+          y = rev(sp::coordinates(samplers@polygons[[k]]@Polygons[[1]])[, 2]),
           group = k
         )
       }
@@ -552,7 +552,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     #    } else if (!is.null(name)) {
     #      coord_names[seq_along(name)] <- name
     #    }
-    coordnames(ips) <- coord_names[seq_len(NCOL(coordinates(ips)))]
+    sp::coordnames(ips) <- coord_names[seq_len(NCOL(sp::coordinates(ips)))]
   } else {
     stop("No integration handling code reached; please notify the package developer.")
   }

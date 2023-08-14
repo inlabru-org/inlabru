@@ -59,7 +59,8 @@
 #' \donttest{
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   bru_safe_sp() &&
+#'   require("sp")) {
 #'   vertices <- seq(0, 3, by = 0.1)
 #'   mesh <- fm_mesh_1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
@@ -74,7 +75,8 @@
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   bru_safe_sp() &&
+#'   require("sp")) {
 #'   data("gorillas", package = "inlabru")
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
