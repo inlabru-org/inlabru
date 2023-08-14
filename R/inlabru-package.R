@@ -20,7 +20,8 @@
 #' For point process inference [lgcp()] can be used as a shortcut to `bru(..., like(model="cp", ...))`.
 #'
 #' The package comes with multiple real world data sets, namely [gorillas],
-#' [mexdolphin], [seals]. Plotting these data sets is straight forward using inlabru's extensions
+#' [mexdolphin], [gorillas_sf], [mexdolphin_sf], [seals_sp]. Plotting these data
+#'  sets is straight forward using inlabru's extensions
 #' to `ggplot2`, e.g. the [gg()] function. For educational purposes some simulated data sets are available
 #' as well, e.g. [Poisson1_1D], [Poisson2_1D], [Poisson2_1D] and [toygroups].
 #'

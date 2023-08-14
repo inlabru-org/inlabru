@@ -3,12 +3,12 @@
 #' @docType data
 #' @description This is a single transect of an aereal photo seal pup survey in the Greenland Sea
 #'
-#' @usage data(seals)
+#' @usage data(seals_sp)
 #'
 #' @format The data contain these objects:
 #'  \describe{
 #'    \item{`points`:}{ A `SpatialPointsDataFrame` Center locations of the photos}
-#'    \item{`mesh`:}{ An `inla.mesh` enclosing the plane's transect}
+#'    \item{`mesh`:}{ An `fm_mesh_2d` enclosing the plane's transect}
 #'    \item{`ice.data`:}{ An `SpatialPointsDataFrame` with MODIS ice concentration estimates}
 #'    \item{`ice.cv`:}{ An `covdata` object with interpolated ice coverage data}
 #'  }
@@ -24,12 +24,11 @@
 #'
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
-#'   data(seals, package = "inlabru")
 #'   ggplot() +
-#'     gg(seals$mesh) +
-#'     gg(seals$points)
+#'     geom_fm(data = seals_sp$mesh) +
+#'     gg(seals_sp$points)
 #' }
-"seals"
+"seals_sp"
 
 #' Seal pup edata import
 #'
@@ -42,7 +41,7 @@
 #' @importFrom utils read.csv
 #' @param sealfile Character pointing to the file containing the seal counts and photo locations
 #' @param icefile Character pointing to the .tif file containing the ice sheet covariate
-#' @return The [seals] data set
+#' @return The [seals_sp] data set
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
@@ -133,8 +132,17 @@ import.seals <- function(sealfile = "WestIce2012.csv",
   seals <- list(mesh = mesh, points = seals, ice.data = ice, ice.cv = icecv)
 }
 
-save.seals <- function(...) {
-  # save.seals("/home/fbachl/devel/r/seals/WestIce2012.csv", "/home/fbachl/devel/r/seals/reflectance_0.0025deg_grid_modis_20120328_1310.tif")
-  seals <- import.seals(...)
-  save("seals", file = paste0(system.file("data", package = "inlabru"), "/seals.RData"))
-}
+#save.seals <- function(...) {
+#  # save.seals("/home/fbachl/devel/r/seals/WestIce2012.csv",
+#  # "/home/fbachl/devel/r/seals/reflectance_0.0025deg_grid_modis_20120328_1310.tif")
+#  seals <- import.seals(...)
+#  save("seals", file = paste0(system.file("data", package = "inlabru"), "/seals.RData"))
+#}
+
+# seals_sp <- import.seals(...)
+#
+# seals_sp$mesh <- fm_as_fm(seals_sp$mesh)
+# seals_sp$ice.cv$mesh <- fm_as_fm(seals_sp$ice.cv$mesh)
+# sp::proj4string(seals_sp$points) <- fm_CRS(seals_sp$mesh)
+# sp::proj4string(seals_sp$ice.data) <- fm_CRS(seals_sp$mesh)
+# use_data(seals_sp, compress = "xz")

@@ -15,7 +15,7 @@ import.seals(
 \item{icefile}{Character pointing to the .tif file containing the ice sheet covariate}
 }
 \value{
-The \link{seals} data set
+The \link{seals_sp} data set
 }
 \description{
 Generate \code{Spatial} objects from raw seal pup survey data (not inlcuded in
