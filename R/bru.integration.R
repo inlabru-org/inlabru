@@ -76,6 +76,7 @@
 #' if (require("INLA", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
 #'   bru_safe_sp() &&
+#'   require("sp") &&
 #'   require("fmesher")) {
 #'   # Create 50 integration points covering the dimension 'myDim' between 0 and 10.
 #'

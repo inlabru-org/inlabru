@@ -1960,16 +1960,30 @@ input_eval.bru_input <- function(input, data, env = NULL,
       }
 
       val <- 1
-      warning(
-        paste0(
-          "The input evaluation '",
-          deparse(input$input),
-          "' for '", input$label,
-          "' failed. Perhaps the data object doesn't contain the needed variables?",
-          " Falling back to '1'."
-        ),
-        immediate. = TRUE
-      )
+      input_string <- deparse(input$input)
+      if (identical(input_string, "coordinates")) {
+        warning(
+          paste0(
+            "The input evaluation '",
+            input_string,
+            "' for '", input$label,
+            "' failed. Perhaps you need to load the 'sp' package with 'library(sp)'?",
+            " Falling back to '1'."
+          ),
+          immediate. = TRUE
+        )
+      } else {
+        warning(
+          paste0(
+            "The input evaluation '",
+            input_string,
+            "' for '", input$label,
+            "' failed. Perhaps the data object doesn't contain the needed variables?",
+            " Falling back to '1'."
+          ),
+          immediate. = TRUE
+        )
+      }
       return(val)
     }
     return(val)

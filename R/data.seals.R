@@ -132,12 +132,12 @@ import.seals <- function(sealfile = "WestIce2012.csv",
   seals <- list(mesh = mesh, points = seals, ice.data = ice, ice.cv = icecv)
 }
 
-#save.seals <- function(...) {
+# save.seals <- function(...) {
 #  # save.seals("/home/fbachl/devel/r/seals/WestIce2012.csv",
 #  # "/home/fbachl/devel/r/seals/reflectance_0.0025deg_grid_modis_20120328_1310.tif")
 #  seals <- import.seals(...)
 #  save("seals", file = paste0(system.file("data", package = "inlabru"), "/seals.RData"))
-#}
+# }
 
 # seals_sp <- import.seals(...)
 #
