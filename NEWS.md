@@ -11,6 +11,13 @@
 
 * Add experimental support for `stars` via `eval_spatial()`.
   (version `2.8.0.9007`)
+
+* Move the `sp` package from 'Depends' to 'Imports'.  This means that user code
+  should either use `sp::` or `library("sp")` to access `sp` methods.
+  The `bru_safe_sp()` helper function can be used to check for a safe
+  `sp` package configuration during the transition from `rgdal` to `sf`, and
+  is only needed if you may run on systems with `sp` installations older than
+  "2.0-0" or with `sp::get_evolution_status() < 2`. (version `2.8.2011`)
   
 * Now preserves the previous log output when using `bru_rerun()`,
   and `bru_log()` is now a set of S3 methods, supporting extracting the
@@ -25,9 +32,6 @@
   a stored estimation object log.
 
 ## Bug fixes and speed improvements
-
-* Improved handling of posterior sample variable extraction. Now much faster
-  for large models. (version `2.8.0.9009`)
 
 * Covariate object component inputs of type `SpatialPolygonsDataFrame`
   were not automatically passed on to `eval_spatial()`. The logic has now changed
@@ -48,6 +52,9 @@
 * Removed incorrect code for `sf` method for `eval_spatial()`, causing failure
   when extracting from multiple layers in a single call.
   (version `2.9.0.9007`)
+
+* Improved handling of posterior sample variable extraction in `generate()`
+  and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
 
 # inlabru 2.8.0
 
