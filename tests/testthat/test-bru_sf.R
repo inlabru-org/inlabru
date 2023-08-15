@@ -55,7 +55,7 @@ test_that("sf gorillas lgcp vignette", {
 
   matern <- INLA::inla.spde2.pcmatern(mesh_sf,
     prior.sigma = c(0.1, 0.01),
-    prior.range = c(5, 0.01)
+    prior.range = c(0.1, 0.01)
   )
 
   cmp <- geometry ~ mySmooth(geometry, model = matern) +

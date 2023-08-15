@@ -171,7 +171,7 @@ the vegetation covariate, using an SPDE:
 ```{r results='hide',warning=FALSE,message=FALSE}
 pcmatern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(1, 0.01)
+  prior.range = c(0.1, 0.01)
 )
 
 comp2 <- coordinates ~
@@ -429,7 +429,7 @@ We create our model to pass to lgcp thus:
 ```{r results="hide",warning=FALSE,message=FALSE}
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
-  prior.range = c(1, 0.01)
+  prior.range = c(0.1, 0.01)
 )
 
 ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +

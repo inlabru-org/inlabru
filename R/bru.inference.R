@@ -1773,7 +1773,7 @@ bru_like_expr <- function(lhood, components) {
 #'   matern <- INLA::inla.spde2.pcmatern(
 #'     data$mesh,
 #'     prior.sigma = c(0.1, 0.01),
-#'     prior.range = c(0.01, 0.01)
+#'     prior.range = c(0.1, 0.01)
 #'   )
 #'
 #'   # Define domain of the LGCP as well as the model components (spatial SPDE
