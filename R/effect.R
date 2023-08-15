@@ -1968,10 +1968,18 @@ input_eval.bru_input <- function(input, data, env = NULL,
             input_string,
             "' for '", input$label,
             "' failed. Perhaps you need to load the 'sp' package with 'library(sp)'?",
-            " Falling back to '1'."
+            " Attempting 'sp::coordinates'."
           ),
           immediate. = TRUE
         )
+        input$input <- expression(sp::coordinates)
+        return(input_eval(
+          input,
+          data = data,
+          env = env,
+          null.on.fail = null.on.fail,
+          ...
+        ))
       } else {
         warning(
           paste0(

@@ -52,7 +52,6 @@ Depends:
     fmesher (>= 0.0.9.9022),
     methods,
     R (>= 3.6),
-    sp (>= 1.4-5),
     stats
 Imports:
     dplyr,
@@ -63,6 +62,7 @@ Imports:
     plyr,
     rlang,
     sf,
+    sp (>= 1.4-5),
     terra,
     tibble,
     utils,
