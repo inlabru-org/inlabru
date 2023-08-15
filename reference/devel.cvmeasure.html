@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9011</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,7 +129,8 @@ Point process models for spatio-temporal distance sampling data from a large-sca
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
 <span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="bru_safe_sp.html">bru_safe_sp</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="bru_safe_sp.html">bru_safe_sp</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/edzer/sp/" class="external-link">"sp"</a></span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Load Gorilla data</span></span></span>
 <span class="r-in"><span></span></span>
@@ -257,8 +258,8 @@ Point process models for spatio-temporal distance sampling data from a large-sca
 <span class="r-plt img"><img src="devel.cvmeasure-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="devel.cvmeasure-2.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="devel.cvmeasure-3.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    var.joint         var1      var2           cor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01852149 0.0001044315 0.0184175 -0.0001611083</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    var.joint         var1       var2          cor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01823301 0.0001037029 0.01813839 -0.003310495</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
