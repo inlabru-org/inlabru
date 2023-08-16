@@ -67,7 +67,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   df <- SpatialPointsDataFrame(
     coords = rbind(domain$loc[, 1:2], coordinates(observations)),
     data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
-    proj4string = domain$crs
+    proj4string = fm_CRS(domain)
   )
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals

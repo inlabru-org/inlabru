@@ -378,8 +378,8 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     }
 
     # transform to equal area projection
-    if (!fm_crs_is_null(domain$crs)) {
-      crs <- domain$crs
+    if (!fm_crs_is_null(fm_crs(domain))) {
+      crs <- fm_crs(domain)
       samplers <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
     }
 
@@ -387,7 +387,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     ips$weight <- fm_fem(domain, order = 1)$va
 
     # backtransform
-    if (!fm_crs_is_null(domain$crs)) {
+    if (!fm_crs_is_null(fm_crs(domain))) {
       ips <- fm_transform(ips, crs = crs)
     }
     sp::coordnames(ips) <- coord_names[seq_len(NCOL(sp::coordinates(ips)))]
@@ -455,7 +455,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     samplers_crs <- fm_CRS(samplers)
 
     # Convert samplers and domain to equal area CRS
-    if (!fm_crs_is_null(domain$crs)) {
+    if (!fm_crs_is_null(fm_crs(domain))) {
       samplers <- fm_transform(samplers, crs = fm_crs("+proj=cea +units=km"))
     }
 
@@ -489,10 +489,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
       max.edge <- max(diff(range(polyloc[, 1])), diff(range(polyloc[, 2]))) / 20
       domain <- fm_mesh_2d_inla(boundary = list(samplers), max.edge = max.edge)
       domain$crs <- fm_CRS(samplers)
-      domain_crs <- fm_CRS(domain$crs)
+      domain_crs <- fm_CRS(domain)
     } else {
-      domain_crs <- fm_CRS(domain$crs)
-      if (!fm_crs_is_null(domain$crs)) {
+      domain_crs <- fm_CRS(domain)
+      if (!fm_crs_is_null(fm_crs(domain))) {
         domain <- fm_transform(domain, crs = fm_crs("+proj=cea +units=km"))
       }
     }

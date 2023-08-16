@@ -188,7 +188,7 @@ import.mexdolphin <- function() {
   mexdolphin$mesh$loc <- mexdolphin$mesh$loc / 1000
 
   # Set mesh crs
-  mexdolphin$mesh$crs <- target_crs
+  mexdolphin$mesh$crs <- fm_crs(target_crs)
 
   coordnames(mexdolphin$samplers) <- coordnames(mexdolphin$points)
 

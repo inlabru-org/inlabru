@@ -163,7 +163,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- fm_crs(mesh$crs)
+    input.crs <- fm_crs(mesh)
     use.crs <- !is.na(input.crs) && !ignore.CRS
     is.geocent <- (mesh$manifold == "S2")
 

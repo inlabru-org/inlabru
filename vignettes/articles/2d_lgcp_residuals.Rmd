@@ -36,7 +36,7 @@ bru_safe_sp(force = TRUE)
 # Determine function location
 code_location <- "2d_lgcp_residuals_functions.R"
 if (!file.exists(code_location)) {
-  code_location <- file.path("vignettes", "articles", code_location)
+  code_location <- system.file(file.path("misc", code_location), package = "inlabru")
 }
 ```
 
@@ -47,7 +47,10 @@ source(code_location)
 ```
 ```{r , eval=FALSE, echo=TRUE}
 # Load function definitions
-source("2d_lgcp_residuals_functions.R")
+source(system.file(
+  file.path("misc", "2d_lgcp_residuals_functions.R"),
+  package = "inlabru"
+))
 ```
 
 # Introduction

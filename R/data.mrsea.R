@@ -114,7 +114,7 @@ import.mrsea <- function() {
 
   # Mesh
   mesh <- dset$mesh
-  mesh$crs <- crs
+  mesh$crs <- fm_crs(crs)
 
 
   # Boundary

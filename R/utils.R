@@ -713,10 +713,12 @@ resave_package_data <- function() {
     do_compress(env, smallest_compress, the_path)
 
     new_info <- rbind(new_info, file.info(the_path))
-}
-  df <- data.frame(path = rownames(old_info),
-             size_old = old_info$size,
-             size_new = new_info$size)
+  }
+  df <- data.frame(
+    path = rownames(old_info),
+    size_old = old_info$size,
+    size_new = new_info$size
+  )
   df$"new/old" <- round(df$size_new / df$size_old * 1000) / 10
   df
 }
