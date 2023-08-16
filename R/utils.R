@@ -657,27 +657,18 @@ resave_package_data <- function() {
     "gorillas_sf", "mexdolphin_sf",
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-    "seals_sp", "shrimp", "toygroups"
+    "seals_sp", "shrimp", "toygroups",
+    "robins_subset"
   )
-  for (name in name_list) {
-    message(paste0("Data: ", name))
-    env <- new.env()
-    data(list = name, package = "inlabru", envir = env)
+  compress_values <- c("gzip", "bzip2", "xz")
 
-    # Find paths
-    new_path <- file.path("data", paste0(name, ".rda"))
-    old_path <- file.path("data", paste0(name, ".RData"))
-    if (!file.exists(old_path)) {
-      old_path <- new_path
-    }
-
-    old_info <- file.info(old_path)
+  do_compress <- function(env, compress, the_path) {
     if (length(names(env)) == 1) {
       eval(
         parse(text = paste0(
           "usethis::use_data(",
           paste0(names(env), collapse = ", "),
-          ", compress = 'xz', overwrite = TRUE)"
+          ", compress = '", compress, "', overwrite = TRUE)"
         )),
         envir = env
       )
@@ -687,15 +678,47 @@ resave_package_data <- function() {
           "save(",
           paste0(names(env), collapse = ", "),
           ", file = '",
-          new_path,
-          "', compress = 'xz')"
+          the_path,
+          "', compress = '", compress, "')"
         )),
         envir = env
       )
     }
-    new_info <- file.info(new_path)
-    browser()
   }
+
+  new_info <- NULL
+  old_info <- NULL
+  for (name in name_list) {
+    message(paste0("Data: ", name))
+    env <- new.env()
+    data(list = name, package = "inlabru", envir = env)
+
+    # Find paths
+    the_path <- file.path("data", paste0(name, ".rda"))
+
+    old_info <- rbind(old_info, file.info(the_path))
+
+    smallest_size <- Inf
+    smallest_compress <- NULL
+    for (compress in compress_values) {
+      do_compress(env, compress, the_path)
+      new_info_ <- file.info(the_path)
+
+      if (new_info_$size < smallest_size) {
+        smallest_size <- new_info_$size
+        smallest_compress <- compress
+      }
+    }
+
+    do_compress(env, smallest_compress, the_path)
+
+    new_info <- rbind(new_info, file.info(the_path))
+}
+  df <- data.frame(path = rownames(old_info),
+             size_old = old_info$size,
+             size_new = new_info$size)
+  df$"new/old" <- round(df$size_new / df$size_old * 1000) / 10
+  df
 }
 
 
