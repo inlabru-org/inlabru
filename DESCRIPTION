@@ -117,8 +117,6 @@ Collate:
     'deltaIC.R'
     'deprecated.R'
     'dsdata.R'
-    'dsmdata.R'
-    'dsmdata.tools.R'
     'effect.R'
     'environment.R'
     'fmesher.R'

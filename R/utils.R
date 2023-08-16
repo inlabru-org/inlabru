@@ -691,7 +691,7 @@ resave_package_data <- function() {
   for (name in name_list) {
     message(paste0("Data: ", name))
     env <- new.env()
-    data(list = name, package = "inlabru", envir = env)
+    utils::data(list = name, package = "inlabru", envir = env)
 
     # Find paths
     the_path <- file.path("data", paste0(name, ".rda"))
