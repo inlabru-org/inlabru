@@ -319,56 +319,13 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
         domain <- fm_mesh_1d(sort(unique(as.vector(samplers))))
       }
     }
-    # Now samplers is a 2-column matrix, and domain is an `inla.mesh.1d` object.
+    domain <- fm_as_mesh_1d(domain)
+    # Now samplers is a 2-column matrix, and domain is an `fm_mesh_1d` object.
 
-    ips <- list()
-
-    # Integrate over each samplers subinterval, with nsub integration points
-    # per domain knot interval
-    if (domain$degree >= 2) {
-      warning("Integration points projected onto knots may lead to instability for degree >= 2 basis functions.")
-    }
-    nsub <- int.args[["nsub1"]]
-    u <- rep(
-      (seq_len(nsub) - 0.5) / nsub,
-      domain$n - 1
-    )
-    int_loc <-
-      domain$loc[rep(seq_len(domain$n - 1), each = nsub)] * (1 - u) +
-      domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] * u
-    int_w <-
-      (domain$loc[rep(seq_len(domain$n - 1) + 1, each = nsub)] -
-        domain$loc[rep(seq_len(domain$n - 1), each = nsub)]) /
-        nsub
-
-    for (j in seq_len(nrow(samplers))) {
-      subsamplers <- samplers[j, ]
-
-      if (identical(int.args[["method"]], "stable")) {
-        A_ <- fm_evaluator(domain, int_loc)$proj$A
-        w <- as.vector((int_w *
-          (int_loc >= min(subsamplers)) *
-          (int_loc <= max(subsamplers))) %*% A_)
-        ips[[j]] <- data.frame(
-          loc = domain$loc[w > 0],
-          weight = w[w > 0],
-          .block = j
-        )
-      } else {
-        inside <-
-          (int_loc >= min(subsamplers)) &
-            (int_loc <= max(subsamplers))
-
-        ips[[j]] <- data.frame(
-          loc = int_loc[inside],
-          weight = int_w[inside],
-          .block = j
-        )
-      }
-      colnames(ips[[j]]) <- c(name, "weight", ".block")
-    }
-
-    ips <- do.call(rbind, ips)
+    ips <- fmesher::fm_int(domain = domain,
+                           samplers = samplers,
+                           name = name,
+                           int.args = int.args)
   } else if (inherits(domain, c("fm_mesh_2d", "inla.mesh")) &&
     is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {
