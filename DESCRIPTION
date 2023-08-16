@@ -116,7 +116,6 @@ Collate:
     'data.toygroups.R'
     'deltaIC.R'
     'deprecated.R'
-    'dsdata.R'
     'effect.R'
     'environment.R'
     'fmesher.R'
