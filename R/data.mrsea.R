@@ -33,4 +33,3 @@
 #'     gg(mrsea$boundary)
 #' }
 "mrsea"
-

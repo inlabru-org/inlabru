@@ -29,4 +29,3 @@
 #'     gg(seals_sp$points)
 #' }
 "seals_sp"
-
