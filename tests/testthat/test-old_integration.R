@@ -49,8 +49,6 @@ test_that("Continuous integration", {
 
 
 
-# From old ipoints tests
-
 test_that("conversion of SpatialPolygon to integration points when domain is defined via a mesh", {
   skip_if_not(bru_safe_sp())
   withr::local_options(lifecycle_verbosity = "quiet")
@@ -167,4 +165,39 @@ test_that("Polygon integration with holes", {
   expect_equal(sum(ipA4$weight), 8.004, tolerance = midtol)
   expect_equal(sum(ipA5$weight), 8.004, tolerance = midtol)
   expect_equal(sum(ipA6$weight), 8.004, tolerance = midtol)
+})
+
+
+
+test_that("SpatialLines integration", {
+  skip_if_not(bru_safe_sp())
+  withr::local_options(lifecycle_verbosity = "quiet")
+
+  bnd <- fm_segm(cbind(c(0, 1, 1, 0), c(0, 0, 1, 1)), is.bnd = TRUE)
+  mesh <- fm_mesh_2d(boundary = bnd)
+
+  theline <-
+    sf::as_Spatial(sf::st_zm(fm_as_sfc(fm_segm(rbind(
+      c(0.8, 0.2), c(0.2, 0.8)
+    ), is.bnd = FALSE))))
+
+  ips <- ipoints(domain = mesh, samplers = theline)
+  ips_fmesher <- fm_int(domain = mesh, samplers = theline)
+
+  expect_equal(as.data.frame(ips), as.data.frame(ips_fmesher))
+
+  theline <- SpatialLinesDataFrame(
+    theline,
+    data = data.frame(theblock = 4),
+    match.ID = FALSE
+  )
+
+  ips <- ipoints(domain = mesh, samplers = theline, group = "theblock")
+  ips_fmesher <- fm_int(domain = list(coordinates = mesh,
+                                      theblock = sort(unique(theline[["theblock"]]))),
+                        samplers = theline)
+
+  expect_equal(as.data.frame(ips), as.data.frame(ips_fmesher))
+
+
 })
