@@ -16,8 +16,6 @@ initial states (missing elements are set to zero), to be used as starting
 point, or \code{NULL}. If non-null, overrides \code{options$bru_initial}}
 
 \item{options}{A \code{bru_options} object.}
-
-\item{data}{A data.frame}
 }
 \value{
 An \code{iinla} object that inherits from \code{INLA::inla}, with an

@@ -1692,7 +1692,7 @@ print.summary_component_list <- function(x, ...) {
 #' @keywords internal
 #' @param component A component.
 #' @param input Component inputs, from `input_eval()`
-#' @param linearisation evaluation state
+#' @param state linearisation evaluation state
 #' @param ... Optional parameters passed on to `ibm_eval`
 #' and `ibm_jacobian.
 #' @return A `bru_mapper_taylor` or `comp_simple_list` object.

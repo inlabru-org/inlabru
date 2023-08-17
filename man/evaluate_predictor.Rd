@@ -37,9 +37,7 @@ the "matrix" format is used, otherwise "list".
 expression for a state.
 \item \code{"list"} A list where each column contains the evaluated predictor
 expression for a state.
-}}
-
-\item{inla_f}{logical
+}
 
 Default: "auto"}
 }

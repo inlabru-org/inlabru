@@ -3095,7 +3095,6 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #'
 #' @aliases iinla
 #' @export
-#' @param data A data.frame
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]
 #' @param initial A previous `bru` result or a list of named latent variable
