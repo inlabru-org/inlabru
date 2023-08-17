@@ -151,6 +151,10 @@ expression for a state.</p></li>
 </ul></dd>
 
 
+<dt>used</dt>
+<dd><p>A <code><a href="bru_used.html">bru_used()</a></code> object, or NULL (default)</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments passed on to <code>inla.posterior.sample</code></p></dd>
 
@@ -185,19 +189,6 @@ When seed != 0, overridden to "1:1"</p></dd>
 <dd><p>logical; If <code>TRUE</code>, return hyperparameter properties
 on the internal scale. Currently ignored when <code>property="sample"</code>.
 Default is <code>FALSE</code>.</p></dd>
-
-
-<dt>include</dt>
-<dd><p>Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded)</p></dd>
-
-
-<dt>exclude</dt>
-<dd><p>Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the <code>include</code> parameter; Default: NULL (do not remove
-any components from the inclusion list)</p></dd>
 
 </dl></div>
     <div class="section level2">
