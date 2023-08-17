@@ -54,7 +54,7 @@ bru_env_get <- function() {
 #' }
 #' }
 #' @export
-#' @family `bru_log`
+#' @family inlabru log methods
 
 bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   offset <- bru_log_offset(x = x, bookmark = bookmark, offset = offset)
@@ -94,7 +94,7 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
 #' Create a `bru_log` object, by default empty.
 #' @param x An optional character vector of log messages
 #' @param bookmarks An optional `integer` vector of named bookmarks
-#' @family `bru_log`
+#' @family inlabru log methods
 #' @examples
 #' x <- bru_log_new()
 #' x <- bru_log_message("Test message", x = x)
@@ -129,7 +129,7 @@ bru_log_new <- function(x = NULL, bookmarks = NULL) {
 #' @describeIn bru_log_bookmark
 #' Set a log bookmark. If `offset` is `NULL` (the default),
 #' the bookmark will point to the current end of the log.
-#' @family `bru_log`
+#' @family inlabru log methods
 bru_log_bookmark <- function(bookmark = "", offset = NULL, x = NULL) {
   if (nchar(bookmark) == 0) {
     stop("Bookmark labels must have at least one character.")
@@ -171,7 +171,7 @@ bru_log_bookmarks <- function(x = NULL) {
 #'
 #' @describeIn bru_log_offset
 #' Utility function for computing log position offsets.
-#' @family `bru_log`
+#' @family inlabru log methods
 #' @inheritParams bru_log_bookmark
 bru_log_offset <- function(x = NULL,
                            bookmark = NULL,
@@ -251,7 +251,7 @@ bru_log_index <- function(x = NULL, i) {
 #' @return `bru_log` A `bru_log` object, containing a
 #' character vector of log messages, and potentially a vector of bookmarks.
 #' @export
-#' @family `bru_log`
+#' @family inlabru log methods
 #' @describeIn bru_log Extract stored log messages
 bru_log <- function(x = NULL) {
   if (is.null(x)) {
@@ -393,7 +393,7 @@ as.character.bru_log <- function(x, ...) {
 #' @return
 #' `bru_log_message` returns `invisible(x)`, where `x` is the updated `bru_log`
 #' object, or `NULL`.
-#' @family `bru_log`
+#' @family inlabru log methods
 #' @examples
 #' if (interactive()) {
 #'   code_runner <- function() {

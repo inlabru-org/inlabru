@@ -20,11 +20,11 @@ x <- bru_log_message("Test message", x = x)
 print(x)
 }
 \seealso{
-Other \code{bru_log}: 
+Other inlabru log methods: 
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_message}()},
 \code{\link{bru_log_offset}()},
 \code{\link{bru_log_reset}()},
 \code{\link{bru_log}()}
 }
-\concept{\code{bru_log}}
+\concept{inlabru log methods}

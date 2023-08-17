@@ -62,7 +62,7 @@ predict.inla <- function(object, ...) {
 #' Sampling based on inla posteriors.
 #' This method is not supported for plain inla objects.
 #' Please see [generate.bru()] instead.
-#' See [#78](https://github.com/fbachl/inlabru/issues/78) for more information
+#' See [#78](https://github.com/inlabru-org/inlabru/issues/78) for more information
 #' related to `INLA::inla.rerun()`; use [bru_rerun()] instead.
 #'
 #' @seealso [generate.bru()]

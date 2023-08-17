@@ -101,7 +101,7 @@ information related to \code{INLA::inla.rerun()}; use \code{\link[=bru_rerun]{br
 Sampling based on inla posteriors.
 This method is not supported for plain inla objects.
 Please see \code{\link[=generate.bru]{generate.bru()}} instead.
-See \href{https://github.com/fbachl/inlabru/issues/78}{#78} for more information
+See \href{https://github.com/inlabru-org/inlabru/issues/78}{#78} for more information
 related to \code{INLA::inla.rerun()}; use \code{\link[=bru_rerun]{bru_rerun()}} instead.
 
 \item \code{ibm_amatrix()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}

@@ -76,11 +76,11 @@ into a \code{bru_log} object.
 
 }}
 \seealso{
-Other \code{bru_log}: 
+Other inlabru log methods: 
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_message}()},
 \code{\link{bru_log_new}()},
 \code{\link{bru_log_offset}()},
 \code{\link{bru_log_reset}()}
 }
-\concept{\code{bru_log}}
+\concept{inlabru log methods}
