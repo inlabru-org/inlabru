@@ -35,6 +35,19 @@ bru_safe_inla <- function(multicore = NULL,
     return(FALSE)
   }
 
+  inla.call <- tryCatch(
+    INLA::inla.getOption("inla.call"),
+    error = function(e) {
+      e
+    }
+  )
+  if (inherits(inla.call, "simpleError")) {
+    if (!quietly) {
+      message("inla.getOption('inla.call') failed. INLA not installed correctly.")
+    }
+    return(FALSE)
+  }
+
   if (is.null(multicore)) {
     multicore <-
       !identical(Sys.getenv("TESTTHAT"), "true") ||

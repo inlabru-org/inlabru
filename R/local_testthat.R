@@ -142,6 +142,16 @@ local_bru_safe_inla <- function(multicore = FALSE,
                                 quietly = TRUE,
                                 envir = parent.frame()) {
   if (requireNamespace("INLA", quietly = TRUE)) {
+    inla.call <- tryCatch(
+      INLA::inla.getOption("inla.call"),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(inla.call, "simpleError")) {
+      return(testthat::skip("inla.getOption('inla.call') failed, skip INLA tests."))
+    }
+
     # Save the num.threads option so it can be restored
     old_threads <- tryCatch(
       INLA::inla.getOption("num.threads"),
