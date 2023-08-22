@@ -173,7 +173,7 @@ test_that("SpatialLines integration", {
   skip_if_not(bru_safe_sp())
   withr::local_options(lifecycle_verbosity = "quiet")
 
-  bnd <- fm_segm(cbind(c(0, 1, 1, 0), c(0, 0, 1, 1)), is.bnd = TRUE)
+  bnd <- fm_segm(cbind(c(0, 1, 0.9, 0), c(0, 0, 1, 1)), is.bnd = TRUE)
   mesh <- fm_mesh_2d(boundary = bnd)
 
   theline <-
