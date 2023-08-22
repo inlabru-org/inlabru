@@ -174,7 +174,7 @@ test_that("SpatialLines integration", {
   withr::local_options(lifecycle_verbosity = "quiet")
 
   bnd <- fm_segm(cbind(c(0, 1, 0.9, 0), c(0, 0, 1, 1)), is.bnd = TRUE)
-  mesh <- fm_mesh_2d(boundary = bnd)
+  mesh <- fm_mesh_2d_inla(boundary = bnd)
 
   theline <-
     sf::as_Spatial(sf::st_zm(fm_as_sfc(fm_segm(rbind(
