@@ -95,12 +95,13 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-and-speed-improvements-development-version">Bug fixes and speed improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-speed-improvements-development-version"></a></h3>
-<ul><li><p>Covariate object component inputs of type <code>SpatialPolygonsDataFrame</code> were not automatically passed on to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. The logic has now changed so that any object with a <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> method will trigger a call to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. See <code><a href="../reference/input_eval.html">?input_eval</a></code> for further information. (version <code>2.8.0.9001</code>)</p></li>
-<li><p><code><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs_is_null.html" class="external-link">fm_crs_is_null()</a></code>, <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_transform.html" class="external-link">fm_transform()</a></code> now supports oblique <code>fm_crs</code> CRS objects, and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> methods for the <code>fm_crs</code> and <code>inla.CRS</code> classes have been added. (version <code>2.8.0.9003</code>)</p></li>
-<li><p>Significant speed up <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> by using <code>quantile(..., names = FALSE)</code>. (version <code>2.8.0.9004</code>)</p></li>
-<li><p>Improved <code><a href="../reference/row_kron.html">row_kron()</a></code> code, causing speedups of a factor 2-30 in randomised test cases. (version <code>2.8.0.9005</code>)</p></li>
-<li><p>Removed incorrect code for <code>sf</code> method for <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, causing failure when extracting from multiple layers in a single call. (version <code>2.9.0.9007</code>)</p></li>
-<li><p>Improved handling of posterior sample variable extraction in <code><a href="../reference/generate.html">generate()</a></code> and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>. Now much faster for large models. (version <code>2.8.0.9009</code>)</p></li>
+<ul><li>Covariate object component inputs of type <code>SpatialPolygonsDataFrame</code> were not automatically passed on to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. The logic has now changed so that any object with a <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> method will trigger a call to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. See <code><a href="../reference/input_eval.html">?input_eval</a></code> for further information. (version <code>2.8.0.9001</code>)</li>
+<li>
+<code><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs_is_null.html" class="external-link">fm_crs_is_null()</a></code>, <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_transform.html" class="external-link">fm_transform()</a></code> now supports oblique <code>fm_crs</code> CRS objects, and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> methods for the <code>fm_crs</code> and <code>inla.CRS</code> classes have been added. (version <code>2.8.0.9003</code>)</li>
+<li>Significant speed up <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> by using <code>quantile(..., names = FALSE)</code>. (version <code>2.8.0.9004</code>)</li>
+<li>Improved <code><a href="../reference/row_kron.html">row_kron()</a></code> code, causing speedups of a factor 2-30 in randomised test cases. (version <code>2.8.0.9005</code>)</li>
+<li>Removed incorrect code for <code>sf</code> method for <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, causing failure when extracting from multiple layers in a single call. (version <code>2.9.0.9007</code>)</li>
+<li>Improved handling of posterior sample variable extraction in <code><a href="../reference/generate.html">generate()</a></code> and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>. Now much faster for large models. (version <code>2.8.0.9009</code>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -126,22 +127,24 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-and-dependency-updates-2-8-0">Bug and dependency updates<a class="anchor" aria-label="anchor" href="#bug-and-dependency-updates-2-8-0"></a></h3>
-<ul><li><p>Remove <code>rgdal</code> and <code>maptools</code> dependencies <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
-<li><p>Add <code><a href="../reference/bru_safe_sp.html">bru_safe_sp()</a></code> to check if <code>sp</code> can be used safely (checks <code>rgdal</code> availability and <code>sp</code> evolution status, optionally forcing use of <code>sf</code>) <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
-<li><p>Remove PROJ4 support <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></p></li>
-<li><p>Change <code>rgl.*</code> functions to <code>*3d</code>. Thanks to Duncan Murdoch <a href="https://github.com/inlabru-org/inlabru/issues/181" class="external-link">#181</a></p></li>
-<li><p>Speed up <code>ibm_jacobian.bru_mapper_harmonics</code> for large models</p></li>
-<li><p>Add workarounds for inconsistent polygon orientation resulting from <code>sf::st_*</code> calls that don’t account for the <code>geos</code> canonical representation being CW, whereas the canonical Simple Features representation being CCW. See <a href="https://github.com/r-spatial/sf/issues/2096" class="external-link uri">https://github.com/r-spatial/sf/issues/2096</a></p></li>
+<ul><li>Remove <code>rgdal</code> and <code>maptools</code> dependencies <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></li>
+<li>Add <code><a href="../reference/bru_safe_sp.html">bru_safe_sp()</a></code> to check if <code>sp</code> can be used safely (checks <code>rgdal</code> availability and <code>sp</code> evolution status, optionally forcing use of <code>sf</code>) <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></li>
+<li>Remove PROJ4 support <a href="https://github.com/inlabru-org/inlabru/issues/178" class="external-link">#178</a></li>
+<li>Change <code>rgl.*</code> functions to <code>*3d</code>. Thanks to Duncan Murdoch <a href="https://github.com/inlabru-org/inlabru/issues/181" class="external-link">#181</a></li>
+<li>Speed up <code>ibm_jacobian.bru_mapper_harmonics</code> for large models</li>
+<li>Add workarounds for inconsistent polygon orientation resulting from <code>sf::st_*</code> calls that don’t account for the <code>geos</code> canonical representation being CW, whereas the canonical Simple Features representation being CCW. See <a href="https://github.com/r-spatial/sf/issues/2096" class="external-link uri">https://github.com/r-spatial/sf/issues/2096</a>
+</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.7.0" id="inlabru-270">inlabru 2.7.0<a class="anchor" aria-label="anchor" href="#inlabru-270"></a></h2><p class="text-muted">CRAN release: 2022-12-02</p>
 <div class="section level3">
 <h3 id="feature-overview-2-7-0">Feature overview<a class="anchor" aria-label="anchor" href="#feature-overview-2-7-0"></a></h3>
-<ul><li><p>Added support for <code>sf</code> and <code>terra</code> inputs to most methods</p></li>
-<li><p>Expanded geometry and mesh handling methods</p></li>
-<li><p>Expanded <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> system</p></li>
-<li><p>Added convergence diagnostics plot with <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code></p></li>
+<ul><li>Added support for <code>sf</code> and <code>terra</code> inputs to most methods</li>
+<li>Expanded geometry and mesh handling methods</li>
+<li>Expanded <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> system</li>
+<li>Added convergence diagnostics plot with <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="feature-details-2-7-0">Feature details<a class="anchor" aria-label="anchor" href="#feature-details-2-7-0"></a></h3>
@@ -153,21 +156,20 @@
 <li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
 <li>
 <p>Further <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> method updates;</p>
-<ul><li><p>Deprecated <code><a href="../reference/inlabru-deprecated.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</p></li>
-<li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</p></li>
-<li><p>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</p></li>
-<li><p><code>summary</code> methods for <code>bru_mapper</code> objects (<code><a href="../reference/bru_mapper_summary.html">summary.bru_mapper()</a></code>)</p></li>
-<li><p>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</p></li>
+<ul><li>Deprecated <code><a href="../reference/inlabru-deprecated.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
+<li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</li>
+<li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</li>
+<li>
+<code>summary</code> methods for <code>bru_mapper</code> objects (<code><a href="../reference/bru_mapper_summary.html">summary.bru_mapper()</a></code>)</li>
+<li>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</li>
 </ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-7-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-7-0"></a></h3>
-<ul><li><p>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></p></li>
-<li><p>Fixed issue with plain mapper evaluation in the <code><a href="../reference/bru_mapper_generics.html">ibm_eval.default()</a></code> and <code><a href="../reference/bru_mapper_methods.html">ibm_eval.bru_mapper_collect()</a></code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code><a href="../reference/bru_mapper.html">bru_mapper_multi()</a></code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</p></li>
-<li>
-<p>Fix for <code>eval_spatial.SpatRaster</code>; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></p>
-<ul><li>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></li>
-</ul></li>
+<ul><li>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></li>
+<li>Fixed issue with plain mapper evaluation in the <code><a href="../reference/bru_mapper_generics.html">ibm_eval.default()</a></code> and <code><a href="../reference/bru_mapper_methods.html">ibm_eval.bru_mapper_collect()</a></code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code><a href="../reference/bru_mapper.html">bru_mapper_multi()</a></code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</li>
+<li>Fix for <code>eval_spatial.SpatRaster</code>; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></li>
+<li>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -182,116 +184,127 @@
 <li><p>New vignettes on the <code>bru_mapper</code> system, <code>component</code> definitions, and <code>prediction_scores</code></p></li>
 <li>
 <p>General overhaul of the <code>bru_mapper</code> and linearised predictor system, to prepare for new features.</p>
-<ul><li><p>Add <code>ibm_eval</code> generic for evaluating mappers for given states.</p></li>
-<li><p>Add <code>bru_mapper_taylor</code>, used as an internal mapper for linearised mappers. This and <code>ibm_eval</code> is aimed at future support for nonlinear mappers. Associated new generic methods: <code>ibm_{is_linear,jacobian,linear}</code>.</p></li>
-<li><p>New mapper implementations should use <code>ibm_jacobian</code> instead of <code>ibm_amatrix</code>. This allows defining a linearised mapper via <code>ibm_eval(input, state0) + ibm_jacobian(input, state0) %*% (state - state0)</code>.</p></li>
-<li><p>New mapper class <code>bru_mapper_const</code>, which replaces <code>bru_mapper_offset</code>. <code>bru_mapper_offset</code> is now deprecated and will produce warnings.</p></li>
+<ul><li>Add <code>ibm_eval</code> generic for evaluating mappers for given states.</li>
+<li>Add <code>bru_mapper_taylor</code>, used as an internal mapper for linearised mappers. This and <code>ibm_eval</code> is aimed at future support for nonlinear mappers. Associated new generic methods: <code>ibm_{is_linear,jacobian,linear}</code>.</li>
+<li>New mapper implementations should use <code>ibm_jacobian</code> instead of <code>ibm_amatrix</code>. This allows defining a linearised mapper via <code>ibm_eval(input, state0) + ibm_jacobian(input, state0) %*% (state - state0)</code>.</li>
+<li>New mapper class <code>bru_mapper_const</code>, which replaces <code>bru_mapper_offset</code>. <code>bru_mapper_offset</code> is now deprecated and will produce warnings.</li>
 </ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-6-0"></a></h3>
-<ul><li><p>Enable both datum/ensemble container for ellipsoid information, to support <code>epsg:4326</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/154" class="external-link">#154</a></p></li>
-<li><p>Make duplicated component names an error instead of a warning. Relates to <a href="https://github.com/inlabru-org/inlabru/issues/155" class="external-link">#155</a></p></li>
-<li><p>Fix <code>Tsparse</code> assumptions in <code>row_kron</code> to prepare for Matrix <code>1.5-2</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/162" class="external-link">#162</a></p></li>
+<ul><li>Enable both datum/ensemble container for ellipsoid information, to support <code>epsg:4326</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/154" class="external-link">#154</a></li>
+<li>Make duplicated component names an error instead of a warning. Relates to <a href="https://github.com/inlabru-org/inlabru/issues/155" class="external-link">#155</a></li>
+<li>Fix <code>Tsparse</code> assumptions in <code>row_kron</code> to prepare for Matrix <code>1.5-2</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/162" class="external-link">#162</a></li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.3" id="inlabru-253">inlabru 2.5.3<a class="anchor" aria-label="anchor" href="#inlabru-253"></a></h2><p class="text-muted">CRAN release: 2022-09-05</p>
 <div class="section level3">
 <h3 id="features-2-5-3">Features<a class="anchor" aria-label="anchor" href="#features-2-5-3"></a></h3>
-<ul><li><p>Add <code>bru_mapper_harmonics</code> mapper for <code>cos</code> and <code>sin</code> basis sets.</p></li>
-<li><p>Allow <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> input data to be be a list.</p></li>
-<li><p>Allow arbitrary quantile summaries in <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
-<li><p>Remove <code>cv</code>, <code>var</code>, <code>smin</code>, <code>smax</code> summaries from <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
-<li><p>Add <code>mean.mc_std_err</code> and <code>sd.mc_std_err</code> output to <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code></p></li>
-<li><p>Add <code>robins_subset</code> data set and associated variable coefficient web vignette</p></li>
+<ul><li>Add <code>bru_mapper_harmonics</code> mapper for <code>cos</code> and <code>sin</code> basis sets.</li>
+<li>Allow <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> input data to be be a list.</li>
+<li>Allow arbitrary quantile summaries in <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>
+</li>
+<li>Remove <code>cv</code>, <code>var</code>, <code>smin</code>, <code>smax</code> summaries from <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>
+</li>
+<li>Add <code>mean.mc_std_err</code> and <code>sd.mc_std_err</code> output to <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>
+</li>
+<li>Add <code>robins_subset</code> data set and associated variable coefficient web vignette</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-5-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-5-3"></a></h3>
-<ul><li><p>Propagate multi-likelihood A-matrix information instead of recomputing. Fixes iteration issue for bym2 and other <code>bru_mapper_collect</code> models.</p></li>
-<li><p>Turn on predictor summaries during iterations to allow <code>inla.mode="classic"</code> to use proper line search.</p></li>
-<li><p>Avoid deprecated Matrix (&gt;=1.4-2) class coercion methods</p></li>
-<li><p>Work around for lack of full Matrix and ModelMatrix support for the <code>unique</code> method. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/145" class="external-link">#145</a></p></li>
+<ul><li>Propagate multi-likelihood A-matrix information instead of recomputing. Fixes iteration issue for bym2 and other <code>bru_mapper_collect</code> models.</li>
+<li>Turn on predictor summaries during iterations to allow <code>inla.mode="classic"</code> to use proper line search.</li>
+<li>Avoid deprecated Matrix (&gt;=1.4-2) class coercion methods</li>
+<li>Work around for lack of full Matrix and ModelMatrix support for the <code>unique</code> method. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/145" class="external-link">#145</a></li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.2" id="inlabru-252">inlabru 2.5.2<a class="anchor" aria-label="anchor" href="#inlabru-252"></a></h2><p class="text-muted">CRAN release: 2022-03-30</p>
-<ul><li><p>More robust package checks</p></li>
-<li><p>More robust namespace and INLA availability checks</p></li>
-<li><p>Add package vignette with links to the website examples</p></li>
+<ul><li>More robust package checks</li>
+<li>More robust namespace and INLA availability checks</li>
+<li>Add package vignette with links to the website examples</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.1" id="inlabru-251">inlabru 2.5.1<a class="anchor" aria-label="anchor" href="#inlabru-251"></a></h2>
-<ul><li><p>Revert to R language features compatible with R 4.0.5</p></li>
-<li><p>Use <code>strategy="gaussian"</code> during iterations.</p></li>
+<ul><li>Revert to R language features compatible with R 4.0.5</li>
+<li>Use <code>strategy="gaussian"</code> during iterations.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.5.0" id="inlabru-250">inlabru 2.5.0<a class="anchor" aria-label="anchor" href="#inlabru-250"></a></h2><p class="text-muted">CRAN release: 2022-03-21</p>
 <div class="section level3">
 <h3 id="features-2-5-0">Features<a class="anchor" aria-label="anchor" href="#features-2-5-0"></a></h3>
-<ul><li><p>Add <code><a href="../reference/bru.html">bru()</a></code> timing information in <code>$bru_timings</code> and <code>$bru_iinla$timings</code></p></li>
-<li><p>Add <code>SpatialPolygonsDataFrame</code> support to <code><a href="../reference/gg.html">gg()</a></code> methods</p></li>
-<li><p>Allow accessing <code>E</code> and <code>Ntrials</code> from <code>response_data</code> and <code>data</code> (further special arguments remain to be added)</p></li>
-<li><p><code>deltaIC</code> improvements</p></li>
-<li><p>New transformation helper tools <code>bru_{forward/inverse}_transformation()</code></p></li>
-<li><p>Experimental support for matrix and formula component inputs. E.g. with <code>~ name(~ -1 + a + b + a:b, model = "fixed")</code>, covariate fixed effect interaction specifications can be made. For formula input, <code><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">MatrixModels::model.Matrix()</a></code> is called to construct matrix input that is then used as the A-matrix for fixed effects, one per column, added up to form the combined effect.</p></li>
-<li><p>Documentation and examples improvements</p></li>
+<ul><li>Add <code><a href="../reference/bru.html">bru()</a></code> timing information in <code>$bru_timings</code> and <code>$bru_iinla$timings</code>
+</li>
+<li>Add <code>SpatialPolygonsDataFrame</code> support to <code><a href="../reference/gg.html">gg()</a></code> methods</li>
+<li>Allow accessing <code>E</code> and <code>Ntrials</code> from <code>response_data</code> and <code>data</code> (further special arguments remain to be added)</li>
+<li>
+<code>deltaIC</code> improvements</li>
+<li>New transformation helper tools <code>bru_{forward/inverse}_transformation()</code>
+</li>
+<li>Experimental support for matrix and formula component inputs. E.g. with <code>~ name(~ -1 + a + b + a:b, model = "fixed")</code>, covariate fixed effect interaction specifications can be made. For formula input, <code><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">MatrixModels::model.Matrix()</a></code> is called to construct matrix input that is then used as the A-matrix for fixed effects, one per column, added up to form the combined effect.</li>
+<li>Documentation and examples improvements</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-5-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-5-0"></a></h3>
-<ul><li><p>Fix A-matrix construction for <code><a href="../reference/evaluate_model.html">evaluate_model()</a></code> for cases where the <code>inla_f</code> argument matters</p></li>
-<li><p>More efficient and robust mesh integration code</p></li>
-<li><p>Cleanup of environment handling for component lists</p></li>
+<ul><li>Fix A-matrix construction for <code><a href="../reference/evaluate_model.html">evaluate_model()</a></code> for cases where the <code>inla_f</code> argument matters</li>
+<li>More efficient and robust mesh integration code</li>
+<li>Cleanup of environment handling for component lists</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.4.0" id="inlabru-240">inlabru 2.4.0<a class="anchor" aria-label="anchor" href="#inlabru-240"></a></h2><p class="text-muted">CRAN release: 2021-12-19</p>
 <div class="section level3">
 <h3 id="features-2-4-0">Features<a class="anchor" aria-label="anchor" href="#features-2-4-0"></a></h3>
-<ul><li><p>Allow predictors to have different size than the input data. The <code>data</code> argument is now allowed to be a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>, and the new argument <code>response_data</code> allows separate specification of component inputs and response variables.</p></li>
-<li><p>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</p></li>
-<li><p>Add <code>control.family</code> as a direct argument to <code><a href="../reference/like.html">like()</a></code>. Gives a warning if a <code>control.family</code> argument is supplied to the the <code>options</code> argument of <code><a href="../reference/bru.html">bru()</a></code>, but at least one likelihood has <code>control.family</code> information. (Issue <a href="https://github.com/inlabru-org/inlabru/issues/109" class="external-link">#109</a>)</p></li>
+<ul><li>Allow predictors to have different size than the input data. The <code>data</code> argument is now allowed to be a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>, and the new argument <code>response_data</code> allows separate specification of component inputs and response variables.</li>
+<li>Add <code>bru_mapper_collect</code> class for handling sequential collections of mappers, including collections where all but the first mapper is hidden from the <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> arguments <code>n</code> and <code>values</code>, as needed to support e.g. “bym2” models.</li>
+<li>Add <code>control.family</code> as a direct argument to <code><a href="../reference/like.html">like()</a></code>. Gives a warning if a <code>control.family</code> argument is supplied to the the <code>options</code> argument of <code><a href="../reference/bru.html">bru()</a></code>, but at least one likelihood has <code>control.family</code> information. (Issue <a href="https://github.com/inlabru-org/inlabru/issues/109" class="external-link">#109</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bugfixes-2-4-0">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-2-4-0"></a></h3>
-<ul><li><p>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code></p></li>
-<li><p>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href="https://github.com/inlabru-org/inlabru/issues/123" class="external-link">#123</a>)</p></li>
-<li><p>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</p></li>
+<ul><li>Fix support for <code>SpatialPointsDataFrame</code> and <code>SpatialGridDataFrame</code> input to <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code>
+</li>
+<li>Force explicit <code>model = "offset"</code> components instead of special options, to avoid interfering with the linearisation system (Issue <a href="https://github.com/inlabru-org/inlabru/issues/123" class="external-link">#123</a>)</li>
+<li>Make the iterations more robust by resetting the internal INLA predictor states to initial value zero at each step</li>
 </ul></div>
 <div class="section level3">
 <h3 id="miscellaneous-2-4-0">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous-2-4-0"></a></h3>
-<ul><li><p>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</p></li>
-<li><p>Add option <code>bru_method$max_step</code> to control the largest allowed line search scaling factor. See <code><a href="../reference/bru_options.html">?bru_options</a></code></p></li>
-<li><p>New default option <code>bru_compress_cp</code> set to <code>TRUE</code> to compress the predictor expression for <code>family="cp"</code> to use a single element for the linear predictor sum.</p></li>
+<ul><li>Rename the option <code>bru_method$stop_at_max_rel_deviation</code> to <code>bru_method$rel_tol</code>. Automatic conversion to the new name, but a warning is given.</li>
+<li>Add option <code>bru_method$max_step</code> to control the largest allowed line search scaling factor. See <code><a href="../reference/bru_options.html">?bru_options</a></code>
+</li>
+<li>New default option <code>bru_compress_cp</code> set to <code>TRUE</code> to compress the predictor expression for <code>family="cp"</code> to use a single element for the linear predictor sum.</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.1" id="inlabru-231">inlabru 2.3.1<a class="anchor" aria-label="anchor" href="#inlabru-231"></a></h2><p class="text-muted">CRAN release: 2021-03-22</p>
-<ul><li><p>Documentation and dependency updates for CRAN compatibility</p></li>
-<li><p>See NEWS for version 2.3.0 for the major updates since version 2.1.13</p></li>
+<ul><li>Documentation and dependency updates for CRAN compatibility</li>
+<li>See NEWS for version 2.3.0 for the major updates since version 2.1.13</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.0" id="inlabru-230">inlabru 2.3.0<a class="anchor" aria-label="anchor" href="#inlabru-230"></a></h2><p class="text-muted">CRAN release: 2021-03-16</p>
 <div class="section level3">
 <h3 id="breaking-changes-since-version-2-3-0">Breaking changes since version 2.1.13<a class="anchor" aria-label="anchor" href="#breaking-changes-since-version-2-3-0"></a></h3>
-<ul><li><p>The model component argument <code>map</code> has been deprecated. Use <code>main</code> to specify the main component input, <code>~ elev(main = elevation, model = "rw2")</code>. Unlike the old <code>map</code> argument, <code>main</code> is the first one, so the shorter version <code>~ elev(elevation, model = "rw2")</code> also works.</p></li>
-<li><p>Intercept-like components should now have explicit inputs, e.g. <code>~ Intercept(1)</code> to avoid accidental confusion with other variables.</p></li>
-<li><p>The argument list for <code><a href="../reference/bru.html">bru()</a></code> has been simplified, so that all arguments except <code>components</code> and <code>options</code> must either be outputs from calls to <code><a href="../reference/like.html">like()</a></code>, or arguments that can be sent to a single <code><a href="../reference/like.html">like()</a></code> call.</p></li>
-<li><p>The option setting system has been replaced with a more coherent system; see <code>?bru_options()</code> for details.</p></li>
-<li><p>The <code>samplers</code> and <code>domain</code> system for <code>lgcp</code> models is now stricter, and requires explicit <code>domain</code> definitions for all the point process dimensions. Alternatively, user-defined integration schemes can be supplied via the <code>ips</code> argument.</p></li>
+<ul><li>The model component argument <code>map</code> has been deprecated. Use <code>main</code> to specify the main component input, <code>~ elev(main = elevation, model = "rw2")</code>. Unlike the old <code>map</code> argument, <code>main</code> is the first one, so the shorter version <code>~ elev(elevation, model = "rw2")</code> also works.</li>
+<li>Intercept-like components should now have explicit inputs, e.g. <code>~ Intercept(1)</code> to avoid accidental confusion with other variables.</li>
+<li>The argument list for <code><a href="../reference/bru.html">bru()</a></code> has been simplified, so that all arguments except <code>components</code> and <code>options</code> must either be outputs from calls to <code><a href="../reference/like.html">like()</a></code>, or arguments that can be sent to a single <code><a href="../reference/like.html">like()</a></code> call.</li>
+<li>The option setting system has been replaced with a more coherent system; see <code>?bru_options()</code> for details.</li>
+<li>The <code>samplers</code> and <code>domain</code> system for <code>lgcp</code> models is now stricter, and requires explicit <code>domain</code> definitions for all the point process dimensions. Alternatively, user-defined integration schemes can be supplied via the <code>ips</code> argument.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-since-version-2-3-0">New features since version 2.1.13<a class="anchor" aria-label="anchor" href="#new-features-since-version-2-3-0"></a></h3>
-<ul><li><p>The model component input arguments <code>main</code>, <code>group</code>, <code>replicate</code>, and <code>weights</code> can now take general R expressions using the data inputs. Special cases are detected: <code>SpatialPixels/GridDataFrame</code> objects are evaluated at spatial locations if the input data is a <code>SpatialPointsDataFrame</code> object. Functions are evaluated on the data object, e.g. <code>field(coordinates, model = spde)</code></p></li>
-<li><p>The component arguments <code>mapper</code>, <code>group_mapper</code>, and <code>replicate_mapper</code> can be used for precise control of the mapping between inputs and latent variables. See <code><a href="../reference/bru_mapper.html">?bru_mapper</a></code> for more details. Mapper information is automatically extracted from <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">INLA::inla.spde2.pcmatern()</a></code> model objects.</p></li>
-<li><p>The R-INLA <code>weights</code> and <code>copy</code> features are now supported.</p></li>
-<li><p>The predictor expressions can access the data object directly via <code>.data.</code></p></li>
-<li><p>If data from several rows can affect the same output row, the <code>allow_combine = TRUE</code> argument must be supplied to <code><a href="../reference/like.html">like()</a></code></p></li>
-<li><p>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</p></li>
-<li><p>Predictor expressions can access the latent state of a model component directly, by adding the suffix <code>_latent</code> to the component name, e.g. <code>name_latent</code>. For <code><a href="../reference/like.html">like()</a></code>, this requires <code>allow_latent = TRUE</code> to activate the needed linearisation code for this.</p></li>
-<li><p>Predictor expressions can evaluate component effects for arbitrary inputs by adding the suffix <code>_eval</code> to access special evaluator functions, e.g. <code>name_eval(1:10)</code>. This is useful for evaluating the 1D effect of spatial covariates. See the NEWS item for version 2.2.8 for further details.</p></li>
-<li><p>The internal system for predictor linearisation and iterated INLA inference has been rewritten to be faster and more robust</p></li>
-<li><p>See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new features and bug fixes</p></li>
+<ul><li>The model component input arguments <code>main</code>, <code>group</code>, <code>replicate</code>, and <code>weights</code> can now take general R expressions using the data inputs. Special cases are detected: <code>SpatialPixels/GridDataFrame</code> objects are evaluated at spatial locations if the input data is a <code>SpatialPointsDataFrame</code> object. Functions are evaluated on the data object, e.g. <code>field(coordinates, model = spde)</code>
+</li>
+<li>The component arguments <code>mapper</code>, <code>group_mapper</code>, and <code>replicate_mapper</code> can be used for precise control of the mapping between inputs and latent variables. See <code><a href="../reference/bru_mapper.html">?bru_mapper</a></code> for more details. Mapper information is automatically extracted from <code><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">INLA::inla.spde2.pcmatern()</a></code> model objects.</li>
+<li>The R-INLA <code>weights</code> and <code>copy</code> features are now supported.</li>
+<li>The predictor expressions can access the data object directly via <code>.data.</code>
+</li>
+<li>If data from several rows can affect the same output row, the <code>allow_combine = TRUE</code> argument must be supplied to <code><a href="../reference/like.html">like()</a></code>
+</li>
+<li>The <code>include</code> and <code>exclude</code> arguments to <code><a href="../reference/like.html">like()</a></code>, <code><a href="../reference/generate.html">generate()</a></code>, and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> can be used to specify which components are used for a given likelihood model or predictor expression. This can be used to prevent evaluation of components that are invalid for a likelihood or predictor.</li>
+<li>Predictor expressions can access the latent state of a model component directly, by adding the suffix <code>_latent</code> to the component name, e.g. <code>name_latent</code>. For <code><a href="../reference/like.html">like()</a></code>, this requires <code>allow_latent = TRUE</code> to activate the needed linearisation code for this.</li>
+<li>Predictor expressions can evaluate component effects for arbitrary inputs by adding the suffix <code>_eval</code> to access special evaluator functions, e.g. <code>name_eval(1:10)</code>. This is useful for evaluating the 1D effect of spatial covariates. See the NEWS item for version 2.2.8 for further details.</li>
+<li>The internal system for predictor linearisation and iterated INLA inference has been rewritten to be faster and more robust</li>
+<li>See the NEWS entries for versions 2.1.14 to 2.2.8 for further details on new features and bug fixes</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -304,19 +317,20 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.7" id="inlabru-227">inlabru 2.2.7<a class="anchor" aria-label="anchor" href="#inlabru-227"></a></h2>
-<ul><li><p>Add support for <code>ngroup</code> and <code>nrep</code> in component definitions</p></li>
-<li><p>Updated <code>mexdolphin</code> and <code>mrsea</code> data sets, with consistent km units and improved mesh designs</p></li>
+<ul><li>Add support for <code>ngroup</code> and <code>nrep</code> in component definitions</li>
+<li>Updated <code>mexdolphin</code> and <code>mrsea</code> data sets, with consistent km units and improved mesh designs</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.6" id="inlabru-226">inlabru 2.2.6<a class="anchor" aria-label="anchor" href="#inlabru-226"></a></h2>
-<ul><li><p>Add <code>predict(..., include)</code> discussion to distance sampling vignette, for handling non-spatial prediction in spatial models.</p></li>
-<li><p>Fix bugs in <code>gg.SpatialLines</code></p></li>
+<ul><li>Add <code>predict(..., include)</code> discussion to distance sampling vignette, for handling non-spatial prediction in spatial models.</li>
+<li>Fix bugs in <code>gg.SpatialLines</code>
+</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.5" id="inlabru-225">inlabru 2.2.5<a class="anchor" aria-label="anchor" href="#inlabru-225"></a></h2>
-<ul><li><p>Vignette corrections</p></li>
-<li><p>Documentation improvements</p></li>
-<li><p>Fix minor bug in <code>Spatial*</code> object handling and plotting</p></li>
+<ul><li>Vignette corrections</li>
+<li>Documentation improvements</li>
+<li>Fix minor bug in <code>Spatial*</code> object handling and plotting</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.4" id="inlabru-224">inlabru 2.2.4<a class="anchor" aria-label="anchor" href="#inlabru-224"></a></h2>
@@ -324,9 +338,10 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.2" id="inlabru-222">inlabru 2.2.2<a class="anchor" aria-label="anchor" href="#inlabru-222"></a></h2>
-<ul><li><p>Fixed issue with <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code></p></li>
-<li><p>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</p></li>
-<li><p>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</p></li>
+<ul><li>Fixed issue with <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code>
+</li>
+<li>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</li>
+<li>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.1" id="inlabru-221">inlabru 2.2.1<a class="anchor" aria-label="anchor" href="#inlabru-221"></a></h2>
@@ -334,27 +349,30 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.0" id="inlabru-220">inlabru 2.2.0<a class="anchor" aria-label="anchor" href="#inlabru-220"></a></h2>
-<ul><li><p>Support for the INLA “copy” feature, <code>comp2(input, copy = "comp1")</code></p></li>
-<li><p>Allow component weights to be an unnamed parameter, <code>comp(input, weights, ...)</code></p></li>
-<li><p>Direct access to the data objects in component inputs and predictor expressions, as <code>.data.</code>, allowing e.g. <code>covar(fun(.data.), ...)</code> for a complex covariate extractor method <code>fun()</code></p></li>
-<li><p>Partial support for spherical manifold meshes</p></li>
-<li><p>Uses INLA integration strategy “eb” for initial nonlinear iterations, and a specified integration strategy only for the final iteration, so that the computations are faster, and uses the conditional latent mode as linearisation point.</p></li>
+<ul><li>Support for the INLA “copy” feature, <code>comp2(input, copy = "comp1")</code>
+</li>
+<li>Allow component weights to be an unnamed parameter, <code>comp(input, weights, ...)</code>
+</li>
+<li>Direct access to the data objects in component inputs and predictor expressions, as <code>.data.</code>, allowing e.g. <code>covar(fun(.data.), ...)</code> for a complex covariate extractor method <code>fun()</code>
+</li>
+<li>Partial support for spherical manifold meshes</li>
+<li>Uses INLA integration strategy “eb” for initial nonlinear iterations, and a specified integration strategy only for the final iteration, so that the computations are faster, and uses the conditional latent mode as linearisation point.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.15" id="inlabru-2115">inlabru 2.1.15<a class="anchor" aria-label="anchor" href="#inlabru-2115"></a></h2>
-<ul><li><p>New options system</p></li>
-<li><p>New faster linearisation method</p></li>
-<li><p>New line search method to make the nonlinear inla iterations robust</p></li>
-<li><p>Method for updating old stored estimation objects</p></li>
-<li><p>System for supplying mappings between latent models and evaluated effects via <code>bru_mapper</code> objects</p></li>
-<li><p>Improved factor support; Either as “contrast with the 1st level”, via the special <code>"factor_contrast"</code> model, or all levels with model <code>"factor_full"</code>. Further options planned (e.g. a simpler options to fix the precision parameter). The estimated coefficients appear as random effects in the <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> output.</p></li>
-<li><p>Interface restructuring to support new features while keeping most backwards compatibility. Change <code>map=</code> to <code>main=</code> or unnamed first argument; Since <code>main</code> is the first parameter, it doesn’t need to be a named argument.</p></li>
-<li><p>Keep components with zero derivative in the linearisation</p></li>
-<li><p>PROJ6 support</p></li>
-<li><p>Add random seed option for posterior sampling</p></li>
-<li><p>Add package unit testing</p></li>
-<li><p>New backend code to make extended feature support easier</p></li>
-<li><p>New <code>int.args</code> option to control spatial integration resolution, thanks to Martin Jullum (<code>martinju</code>)</p></li>
+<ul><li>New options system</li>
+<li>New faster linearisation method</li>
+<li>New line search method to make the nonlinear inla iterations robust</li>
+<li>Method for updating old stored estimation objects</li>
+<li>System for supplying mappings between latent models and evaluated effects via <code>bru_mapper</code> objects</li>
+<li>Improved factor support; Either as “contrast with the 1st level”, via the special <code>"factor_contrast"</code> model, or all levels with model <code>"factor_full"</code>. Further options planned (e.g. a simpler options to fix the precision parameter). The estimated coefficients appear as random effects in the <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> output.</li>
+<li>Interface restructuring to support new features while keeping most backwards compatibility. Change <code>map=</code> to <code>main=</code> or unnamed first argument; Since <code>main</code> is the first parameter, it doesn’t need to be a named argument.</li>
+<li>Keep components with zero derivative in the linearisation</li>
+<li>PROJ6 support</li>
+<li>Add random seed option for posterior sampling</li>
+<li>Add package unit testing</li>
+<li>New backend code to make extended feature support easier</li>
+<li>New <code>int.args</code> option to control spatial integration resolution, thanks to Martin Jullum (<code>martinju</code>)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.13" id="inlabru-2113">inlabru 2.1.13<a class="anchor" aria-label="anchor" href="#inlabru-2113"></a></h2><p class="text-muted">CRAN release: 2020-02-16</p>
@@ -379,17 +397,17 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.8" id="inlabru-218">inlabru 2.1.8<a class="anchor" aria-label="anchor" href="#inlabru-218"></a></h2>
-<ul><li><p>Update default options</p></li>
-<li><p>Prevent <code>int.polygon</code> from integrating outside the mesh domain, and generally more robust integration scheme construction.</p></li>
-<li><p>Fix <code><a href="../reference/bru.html">bru()</a></code> to <code><a href="../reference/like.html">like()</a></code> parameter logic. (Thanks to Peter Vesk for bug example)</p></li>
+<ul><li>Update default options</li>
+<li>Prevent <code>int.polygon</code> from integrating outside the mesh domain, and generally more robust integration scheme construction.</li>
+<li>Fix <code><a href="../reference/bru.html">bru()</a></code> to <code><a href="../reference/like.html">like()</a></code> parameter logic. (Thanks to Peter Vesk for bug example)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.7" id="inlabru-217">inlabru 2.1.7<a class="anchor" aria-label="anchor" href="#inlabru-217"></a></h2>
-<ul><li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
-<li><p>Added <code>inla</code> methods for <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</p></li>
-<li><p>Added protection for examples requiring optional packages</p></li>
-<li><p>Fix <code>sample.lgcp</code> output formatting, extended CRS support, and more efficient sampling algorithm</p></li>
-<li><p>Avoid dense matrices for effect mapping</p></li>
+<ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
+<li>Added <code>inla</code> methods for <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> and <code><a href="../reference/generate.html">generate()</a></code> that convert <code>inla</code> output into <code>bru</code> objects before calling the <code>bru</code> prediction and posterior sample generator.</li>
+<li>Added protection for examples requiring optional packages</li>
+<li>Fix <code>sample.lgcp</code> output formatting, extended CRS support, and more efficient sampling algorithm</li>
+<li>Avoid dense matrices for effect mapping</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.4" id="inlabru-214">inlabru 2.1.4<a class="anchor" aria-label="anchor" href="#inlabru-214"></a></h2>
@@ -398,8 +416,9 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.3" id="inlabru-213">inlabru 2.1.3<a class="anchor" aria-label="anchor" href="#inlabru-213"></a></h2><p class="text-muted">CRAN release: 2018-02-11</p>
-<ul><li><p>Added matrix geom <code><a href="../reference/gg.matrix.html">gg.matrix()</a></code></p></li>
-<li><p>Fixed CRAN test issues</p></li>
+<ul><li>Added matrix geom <code><a href="../reference/gg.matrix.html">gg.matrix()</a></code>
+</li>
+<li>Fixed CRAN test issues</li>
 </ul></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
