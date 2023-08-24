@@ -49,7 +49,7 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.1.1.9004),
+    fmesher (>= 0.1.2),
     methods,
     R (>= 3.6),
     stats
