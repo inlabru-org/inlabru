@@ -1,28 +1,20 @@
 ## Submission notes
 
-* Minor release 2.8.0, including new features, bug fixes, and
-  fixes for package dependencies (improved handling of sp/rgdal/etc)
-* CRAN checks for old version, 2.7.0:
+* Minor release 2.9.0, including new features, speed improvements, bug fixes,
+  and package dependency updates (Moved 'sp' from Depends to Imports to prepare
+  for future move to Suggests, and added dependency on the new 'fmesher' package)
+* CRAN checks for old version, 2.8.0:
   NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.8.0 (with latest INLA, 23.06.15):
+  NOTE: Documented arguments not in \usage in documentation object
+* Checks for new version, 2.9.0 (with latest INLA, 23.08.18):
   - Spurious error message about potentially invalid doi, see below
-
-## Test environments
-
-* ubuntu 22.04 (local, with INLA), R 4.3.1, 4.2.3, R devel
-* macOS-latest (on github, with INLA), R 4.3.1
-* windows-latest (on github, with INLA), R 4.3.1
-* win-builder; R devel, 4.3.1, 4.2.3
-* R-hub;
-    Windows Server R-devel
-    Fedora Linux R-devel
-    Ubuntu Linux 20.04 R-release
-* For the github platforms, separate tests were also
-  done without installing packages in Suggests.
 
 ## R CMD check results
 
 Comments:
+
+* All "Documented arguments not in \usage in documentation object" cases have
+  been corrected
 
 * The non-CRAN Suggested package INLA has been extensively tested with inlabru
   locally and in github actions for both Linux, Windows, and macOS.
