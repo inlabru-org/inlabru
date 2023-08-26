@@ -322,10 +322,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     domain <- fm_as_mesh_1d(domain)
     # Now samplers is a 2-column matrix, and domain is an `fm_mesh_1d` object.
 
-    ips <- fmesher::fm_int(domain = domain,
-                           samplers = samplers,
-                           name = name,
-                           int.args = int.args)
+    ips <- fmesher::fm_int(
+      domain = domain,
+      samplers = samplers,
+      name = name,
+      int.args = int.args
+    )
   } else if (inherits(domain, c("fm_mesh_2d", "inla.mesh")) &&
     is.null(samplers) &&
     identical(int.args[["method"]], "stable")) {

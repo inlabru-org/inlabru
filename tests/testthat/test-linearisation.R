@@ -3,7 +3,7 @@ test_that("Linearisation", {
   local_bru_safe_inla()
 
   set.seed(12345L)
-  data <- data.frame(x = seq_len(100) / 10 )
+  data <- data.frame(x = seq_len(100) / 10)
   data <- within(data, {
     y <- exp(x / 5) - 4 + rnorm(length(x), sd = 0.1)
     z <- rpois(length(x), exp(x / 5) + 4)
@@ -93,9 +93,9 @@ test_that("Linearisation", {
         components = cmp,
         lhoods,
         options = list(
-#          bru_initial = list(
-#            x = 1 / 5, Int_y = -4, Int_z = log(4)
-#          ),
+          #          bru_initial = list(
+          #            x = 1 / 5, Int_y = -4, Int_z = log(4)
+          #          ),
           control.inla = list(int.strategy = "eb"),
           bru_verbose = FALSE,
           bru_method = list(

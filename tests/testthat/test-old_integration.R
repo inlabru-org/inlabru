@@ -193,11 +193,13 @@ test_that("SpatialLines integration", {
   )
 
   ips <- ipoints(domain = mesh, samplers = theline, group = "theblock")
-  ips_fmesher <- fm_int(domain = list(coordinates = mesh,
-                                      theblock = sort(unique(theline[["theblock"]]))),
-                        samplers = theline)
+  ips_fmesher <- fm_int(
+    domain = list(
+      coordinates = mesh,
+      theblock = sort(unique(theline[["theblock"]]))
+    ),
+    samplers = theline
+  )
 
   expect_equal(as.data.frame(ips), as.data.frame(ips_fmesher))
-
-
 })
