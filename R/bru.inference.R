@@ -1504,7 +1504,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response = response,
     inla.family = inla.family,
     domain = domain,
-    drange = NULL,
     used = used,
     allow_combine = allow_combine,
     control.family = control.family
