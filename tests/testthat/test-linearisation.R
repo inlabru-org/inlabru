@@ -3,10 +3,10 @@ test_that("Linearisation", {
   local_bru_safe_inla()
 
   set.seed(12345L)
-  data <- data.frame(x = seq_len(100) / 10)
+  data <- data.frame(x = seq_len(10) / 1)
   data <- within(data, {
-    y <- exp(x / 5) - 4 + rnorm(length(x), sd = 0.1)
-    z <- rpois(length(x), exp(x / 5) + 4)
+    y <- exp(x / 5) - 2 + rnorm(length(x), sd = 0.1)
+    z <- rpois(length(x), (exp(x / 5) + exp(2)))
   })
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
