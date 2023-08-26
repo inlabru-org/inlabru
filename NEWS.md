@@ -46,6 +46,8 @@
   (version `2.9.0.9007`)
 * Improved handling of posterior sample variable extraction in `generate()`
   and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
+* Fixed linearisation issue when using only the `*_latent` form of a component.
+  (version 2.8.0.9015)
 
 # inlabru 2.8.0
 

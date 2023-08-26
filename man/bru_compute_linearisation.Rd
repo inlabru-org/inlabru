@@ -20,6 +20,7 @@ bru_compute_linearisation(...)
   comp_simple,
   effects,
   pred0,
+  used,
   allow_latent,
   allow_combine,
   eps,
@@ -79,6 +80,8 @@ expression
 }}
 
 \item{pred0}{Precomputed predictor for the given state}
+
+\item{used}{A \code{\link[=bru_used]{bru_used()}} object for the predictor expression}
 
 \item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
 directly available to the predictor expression, with a \verb{_latent} suffix.}

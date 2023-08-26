@@ -25,6 +25,7 @@ bru_compute_linearisation <- function(...) {
 #' Precomputed effect list for all components involved in the likelihood
 #' expression
 #' @param pred0 Precomputed predictor for the given state
+#' @param used A [bru_used()] object for the predictor expression
 #' @param allow_latent logical. If `TRUE`, the latent state of each component is
 #' directly available to the predictor expression, with a `_latent` suffix.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
@@ -40,6 +41,7 @@ bru_compute_linearisation.component <- function(cmp,
                                                 comp_simple,
                                                 effects,
                                                 pred0,
+                                                used,
                                                 allow_latent,
                                                 allow_combine,
                                                 eps,
@@ -119,12 +121,14 @@ bru_compute_linearisation.component <- function(cmp,
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
 
-      if (is.null(A)) {
-        effects_eps <- NULL
+      if (symmetric_diffs) {
+        effects_eps <- list(effects, effects)
       } else {
+        effects_eps <- effects
+      }
+      if (!is.null(A)) {
         if (assume_rowwise) {
           if (symmetric_diffs) {
-            effects_eps <- list(list(), list())
             for (label_loop in names(effects)) {
               if (NROW(effects[[label_loop]]) == 1) {
                 effects_eps[[1]][[label_loop]] <-
@@ -139,7 +143,6 @@ bru_compute_linearisation.component <- function(cmp,
             effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
             effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
           } else {
-            effects_eps <- list()
             for (label_loop in names(effects)) {
               if (NROW(effects[[label_loop]]) == 1) {
                 effects_eps[[label_loop]] <-
@@ -175,14 +178,13 @@ bru_compute_linearisation.component <- function(cmp,
             data
           },
         effects =
-          if (is.null(effects_eps)) {
-            NULL
-          } else if (symmetric_diffs) {
+          if (symmetric_diffs) {
             effects_eps
           } else {
             list(effects_eps)
           },
         predictor = lhood_expr,
+        used = used,
         format = "matrix"
       )
       # Store sparse triplet information
@@ -251,6 +253,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
     data = data,
     effects = list(effects),
     predictor = lhood_expr,
+    used = used,
     format = "matrix"
   )
   if (lhood[["linear"]]) {
@@ -304,6 +307,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             comp_simple = comp_simple[[label]],
             effects = effects,
             pred0 = pred0,
+            used = used,
             allow_latent = label %in% used[["latent"]],
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
