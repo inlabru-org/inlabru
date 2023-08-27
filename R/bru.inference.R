@@ -1628,6 +1628,7 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' @param x Object of `bru_like` or `bru_like_list` type
 #' @export
 #' @keywords internal
+#' @returns * `bru_like_inla_family()` returns a string or vector of strings
 #' @rdname bru_like_methods
 bru_like_inla_family <- function(x, ...) {
   UseMethod("bru_like_inla_family")
@@ -1643,9 +1644,11 @@ bru_like_inla_family.bru_like_list <- function(x, ...) {
   vapply(x, bru_like_inla_family, "")
 }
 
-#' @param control.family INLA `control.family` overrides
+#' @param control.family list of INLA `control.family` options to override
 #' @export
 #' @keywords internal
+#' @returns * `bru_like_control_family()` returns a list with `INLA::control.family` options,
+#' or a list of such lists, with one element per observation model
 #' @rdname bru_like_methods
 bru_like_control_family <- function(x, control.family = NULL, ...) {
   UseMethod("bru_like_control_family")

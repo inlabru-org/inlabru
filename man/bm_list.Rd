@@ -20,6 +20,9 @@
 
 \item{i}{indices specifying elements to extract}
 }
+\value{
+A \code{bm_list} object
+}
 \description{
 \code{bru_mapper} lists can be combined into \code{bm_list} lists.
 }

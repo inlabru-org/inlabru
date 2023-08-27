@@ -16,6 +16,8 @@ NULL
 #' default constructor [bru_mapper_define()] that can be used to define
 #' new mappers in user code.
 #'
+#' @returns
+#' * `bru_mapper()` returns a `bru_mapper` object
 #' @examples
 #' mapper <- bru_mapper_index(5)
 #' ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
@@ -230,6 +232,7 @@ NULL
 #' @export
 #' @describeIn bm_list The `...` arguments should be `bru_mapper`
 #' objects.
+#' @returns A `bm_list` object
 #' @examples
 #' m <- c(A = bru_mapper_const(), B = bru_mapper_scale())
 #' str(m)

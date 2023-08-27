@@ -182,6 +182,7 @@ integration_weight_aggregation <- function(mesh, integ) {
   fm_vertex_projection(points = integ, mesh = mesh)
 }
 
+#' @describeIn inlabru-deprecated
 #' Integration scheme for mesh triangle interiors
 #'
 #' `r lifecycle::badge("deprecated")` Use [fm_int_mesh_2d_core()] instead.
@@ -193,8 +194,8 @@ integration_weight_aggregation <- function(mesh, integ) {
 #'    `(nsub + 1)^2` proto-integration points used to compute
 #'   the vertex weights
 #'   (default `NULL=9`, giving 100 integration points for each triangle)
-#' @return `list` with elements `loc` and `weight` with
-#'   integration points for the mesh
+#' @return * `mesh_triangle_integration` returns a `list` with elements `loc`
+#' and `weight` with integration points for the mesh
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
@@ -204,7 +205,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     "fmesher::fm_int_mesh_2d_core()"
   )
 
-  fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
+  fmesher::fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
 }
 
 

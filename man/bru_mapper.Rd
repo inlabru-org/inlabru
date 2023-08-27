@@ -162,6 +162,11 @@ Default \code{c(0, 1)}.}
 
 \item{B}{a square or tall basis conversion matrix}
 }
+\value{
+\itemize{
+\item \code{bru_mapper()} returns a \code{bru_mapper} object
+}
+}
 \description{
 Constructors for \code{bru_mapper} objects
 }

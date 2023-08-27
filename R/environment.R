@@ -715,6 +715,7 @@ bru_options_deprecated <- function(args) {
 #'
 #' @aliases bru_call_options
 #' @export
+#' @returns A `bru_options` object
 #'
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'

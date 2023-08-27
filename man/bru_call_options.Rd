@@ -9,6 +9,9 @@ bru_call_options(...)
 \arguments{
 \item{\dots}{Options passed on to \code{\link[=as.bru_options]{as.bru_options()}}}
 }
+\value{
+A \code{bru_options} object
+}
 \description{
 Construct a \code{bru_options} object including the default and global options,
 and converting deprecated option names.
