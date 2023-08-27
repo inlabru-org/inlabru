@@ -33,54 +33,9 @@ bru_standardise_names <- function(x) {
 
 
 
-#' @describeIn inlabru-deprecated
-#' `r lifecycle::badge("deprecated")` since version `2.1.0`.
-#' Prediction from fitted inla model. This method is not supported for plain
-#' inla objects. Please see [predict.bru()] instead.
-#' See [#78](https://github.com/inlabru-org/inlabru/issues/78) for more
-#' information related to `INLA::inla.rerun()`; use [bru_rerun()] instead.
-#'
-#' @seealso [predict.bru()]
-#' @export
-#' @keywords internal
-predict.inla <- function(object, ...) {
-  lifecycle::deprecate_stop(
-    when = "2.1.0",
-    what = "predict.inla()",
-    with = "predict.bru()",
-    details = c(
-      "The `predict()` method is not supported for plain inla objects.",
-      "Also see https://github.com/inlabru-org/inlabru/issues/78 ; use `bru_rerun()` instead of `inla.rerun()`"
-    )
-  )
-}
 
 
 
-#' @describeIn inlabru-deprecated
-#' `r lifecycle::badge("deprecated")` since version `2.1.0`.
-#' Sampling based on inla posteriors.
-#' This method is not supported for plain inla objects.
-#' Please see [generate.bru()] instead.
-#' See [#78](https://github.com/inlabru-org/inlabru/issues/78) for more information
-#' related to `INLA::inla.rerun()`; use [bru_rerun()] instead.
-#'
-#' @seealso [generate.bru()]
-#'
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @export
-#' @keywords internal
-generate.inla <- function(...) {
-  lifecycle::deprecate_stop(
-    when = "2.1.0",
-    what = "generate.inla()",
-    with = "generate.bru()",
-    details = c(
-      "The `generate()` method is not supported for plain inla objects.",
-      "Also see https://github.com/inlabru-org/inlabru/issues/78 ; use `bru_rerun()` instead of `inla.rerun()`"
-    )
-  )
-}
 
 
 

@@ -185,7 +185,7 @@ part of the latent state is only a part of the internal state, such as for
 `"bym"` models.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_offset(list(name1 = ..., name2 = ..., ...),
+mapper <- bru_mapper_collect(list(name1 = ..., name2 = ..., ...),
   hidden = FALSE
 )
 ibm_eval(mapper,

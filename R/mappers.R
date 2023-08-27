@@ -100,18 +100,6 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
 
-#' @describeIn inlabru-deprecated
-#' `r lifecycle::badge("deprecated")`
-#' Deprecated since 2.7.0. Use [ibm_jacobian()]
-#' instead.
-#' @export
-ibm_amatrix <- function(...) {
-  lifecycle::deprecate_stop(
-    "2.7.0",
-    "ibm_amatrix()",
-    "ibm_jacobian()"
-  )
-}
 
 #' @describeIn bru_mapper_generics
 #' Implementations must return `TRUE` or `FALSE`.
@@ -211,15 +199,6 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 }
 
 
-#' @describeIn inlabru-deprecated Use case changed to [ibm_invalid_output()]
-#' @export
-ibm_valid_input <- function(...) {
-  lifecycle::deprecate_stop(
-    "2.7.0",
-    "ibm_valid_input()"
-  )
-  UseMethod("ibm_valid_input")
-}
 
 
 #' Methods for mapper lists
@@ -1338,21 +1317,9 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
 #' @describeIn inlabru-deprecated Creates a [bru_mapper_const()] mapper.
 bru_mapper_offset <- function(...) {
   lifecycle::deprecate_warn("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
-  bru_mapper_define(bru_mapper_const(), new_class = "bru_mapper_offset")
+  bru_mapper_const()
 }
 
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
-ibm_n.bru_mapper_offset <- function(...) {
-  lifecycle::deprecate_warn("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
-  NextMethod()
-}
-#' @export
-#' @describeIn inlabru-deprecated Replaced by [bru_mapper_const] methods
-ibm_values.bru_mapper_offset <- function(...) {
-  lifecycle::deprecate_warn("2.6.0", "bru_mapper_offset()", "bru_mapper_const()")
-  NextMethod()
-}
 
 
 

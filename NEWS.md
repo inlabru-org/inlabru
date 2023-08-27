@@ -47,7 +47,17 @@
 * Improved handling of posterior sample variable extraction in `generate()`
   and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
 * Fixed linearisation issue when using only the `*_latent` form of a component.
-  (version 2.8.0.9015)
+  (version `2.8.0.9015`)
+
+## Deprecation of old functions
+
+* `eval_SpatialDF` removed, deprecated since `2.8.0`. See `eval_spatial` instead.
+* `stransform`, `ibm_amatrix`, `ibm_valid_input` removed, deprecated since `2.7.0`.
+  See `fm_transform` and `ibm_jacobian` instead.
+* `bru_mapper_offset`, deprecated since `2.6.0` now returns a pure `bru_mapper_const`
+  object, and all `bru_mapper_offset` `ibm_*` methods have been removed.
+* `init.tutorial` removed, deprecated since `2.5.0`
+* `generate.inla` and `predict.inla` removed, deprecated since `2.1.0`
 
 # inlabru 2.8.0
 

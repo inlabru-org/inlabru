@@ -1018,30 +1018,3 @@ print.summary_bru_options <- function(x, ...) {
 
 
 
-#' @describeIn inlabru-deprecated Global setting for tutorial sessions.
-#'
-#' Use [bru_options_set()] to set specific
-#' options instead instead.  In versions <= 2.1.15, this function set the INLA
-#' integration strategy to "eb" to speed up calculations. This is normally not
-#' needed since version 2.2.0, since the only the final iteration will use
-#' other than "eb".  Therefore, to recreate the main options set by `init.tutorial()`,
-#' the following is sufficient:
-#' ```
-#' bru_options_set(
-#'   bru_verbose = TRUE,
-#'   control.compute = list(dic = TRUE, waic = TRUE)
-#' )
-#' ```
-#'
-#' @export
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-init.tutorial <- function() {
-  lifecycle::deprecate_stop(
-    "2.5.0",
-    "init.tutorial()",
-    I(
-      "bru_options_set(bru_verbose = TRUE, control.compute = list(dic = TRUE, waic = TRUE))"
-    )
-  )
-}
