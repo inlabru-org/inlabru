@@ -102,7 +102,22 @@
 <li>Improved <code><a href="../reference/row_kron.html">row_kron()</a></code> code, causing speedups of a factor 2-30 in randomised test cases. (version <code>2.8.0.9005</code>)</li>
 <li>Removed incorrect code for <code>sf</code> method for <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>, causing failure when extracting from multiple layers in a single call. (version <code>2.9.0.9007</code>)</li>
 <li>Improved handling of posterior sample variable extraction in <code><a href="../reference/generate.html">generate()</a></code> and <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>. Now much faster for large models. (version <code>2.8.0.9009</code>)</li>
-<li>Fixed linearisation issue when using only the <code>*_latent</code> form of a component. (version 2.8.0.9015)</li>
+<li>Fixed linearisation issue when using only the <code>*_latent</code> form of a component. (version <code>2.8.0.9015</code>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecation-of-old-functions-development-version">Deprecation of old functions<a class="anchor" aria-label="anchor" href="#deprecation-of-old-functions-development-version"></a></h3>
+<ul><li>
+<code>eval_SpatialDF</code> removed, deprecated since <code>2.8.0</code>. See <code>eval_spatial</code> instead.</li>
+<li>
+<code>stransform</code>, <code>ibm_amatrix</code>, <code>ibm_valid_input</code> removed, deprecated since <code>2.7.0</code>. See <code>fm_transform</code> and <code>ibm_jacobian</code> instead.</li>
+<li>
+<code>bru_mapper_offset</code>, deprecated since <code>2.6.0</code> now returns a pure <code>bru_mapper_const</code> object, and all <code>bru_mapper_offset</code> <code>ibm_*</code> methods have been removed.</li>
+<li>
+<code>init.tutorial</code> removed, deprecated since <code>2.5.0</code>
+</li>
+<li>
+<code>generate.inla</code> and <code>predict.inla</code> removed, deprecated since <code>2.1.0</code>
+</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -157,7 +172,7 @@
 <li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
 <li>
 <p>Further <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> method updates;</p>
-<ul><li>Deprecated <code><a href="../reference/inlabru-deprecated.html">ibm_amatrix()</a></code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
+<ul><li>Deprecated <code>ibm_amatrix()</code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
 <li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</li>
 <li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</li>
 <li>
