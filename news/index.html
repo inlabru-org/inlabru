@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.8.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,10 +80,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.9.0" id="inlabru-290">inlabru 2.9.0<a class="anchor" aria-label="anchor" href="#inlabru-290"></a></h2>
 <div class="section level3">
-<h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
+<h3 id="feature-updates-2-9-0">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-2-9-0"></a></h3>
 <ul><li><p>Conversion of code to use <code>fmesher</code> for mesh and geometry handling; the interface supports existing objects and methods. See <a href="https://inlabru-org.github.io/fmesher/articles/inla_conversion.html" class="external-link uri">https://inlabru-org.github.io/fmesher/articles/inla_conversion.html</a> for more information.</p></li>
+<li><p>General speed improvements, see below for details.</p></li>
 <li><p>Added <code><a href="../reference/gg.sf.html">gg.sf()</a></code> method.</p></li>
 <li><p>Add experimental support for <code>stars</code> via <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. (version <code>2.8.0.9007</code>)</p></li>
 <li><p>Move the <code>sp</code> package from ‘Depends’ to ‘Imports’. This means that user code should either use <code>sp::</code> or <code><a href="https://github.com/edzer/sp/" class="external-link">library("sp")</a></code> to access <code>sp</code> methods. The <code><a href="../reference/bru_safe_sp.html">bru_safe_sp()</a></code> helper function can be used to check for a safe <code>sp</code> package configuration during the transition from <code>rgdal</code> to <code>sf</code>, and is only needed if you may run on systems with <code>sp</code> installations older than “2.0-0” or with <code>sp::get_evolution_status() &lt; 2</code>. (version <code>2.8.2011</code>)</p></li>
@@ -94,7 +95,7 @@
 </li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-and-speed-improvements-development-version">Bug fixes and speed improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-speed-improvements-development-version"></a></h3>
+<h3 id="bug-fixes-and-speed-improvements-2-9-0">Bug fixes and speed improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-speed-improvements-2-9-0"></a></h3>
 <ul><li>Covariate object component inputs of type <code>SpatialPolygonsDataFrame</code> were not automatically passed on to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. The logic has now changed so that any object with a <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> method will trigger a call to <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>. See <code><a href="../reference/input_eval.html">?input_eval</a></code> for further information. (version <code>2.8.0.9001</code>)</li>
 <li>
 <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs_is_null.html" class="external-link">fm_crs_is_null()</a></code>, <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_transform.html" class="external-link">fm_transform()</a></code> now supports oblique <code>fm_crs</code> CRS objects, and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> methods for the <code>fm_crs</code> and <code>inla.CRS</code> classes have been added. (version <code>2.8.0.9003</code>)</li>
@@ -106,7 +107,7 @@
 <li>Workaround for equivalent but textually different CRS/WKT information in <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code>. (version <code>2.9.0.9016</code>, fixes <a href="https://github.com/inlabru-org/inlabru/issues/200" class="external-link">#200</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="deprecation-of-old-functions-development-version">Deprecation of old functions<a class="anchor" aria-label="anchor" href="#deprecation-of-old-functions-development-version"></a></h3>
+<h3 id="deprecation-of-old-functions-2-9-0">Deprecation of old functions<a class="anchor" aria-label="anchor" href="#deprecation-of-old-functions-2-9-0"></a></h3>
 <ul><li>
 <code>eval_SpatialDF</code> removed, deprecated since <code>2.8.0</code>. See <code>eval_spatial</code> instead.</li>
 <li>
