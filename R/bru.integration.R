@@ -571,7 +571,7 @@ cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
   lifecycle::deprecate_soft(
     "2.8.0",
     "cprod()",
-    "fmesher:fm_cprod()"
+    "fmesher::fm_cprod()"
   )
   fm_cprod(..., na.rm = na.rm, .blockwise = .blockwise)
 }

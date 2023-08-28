@@ -6,6 +6,7 @@
   the interface supports existing objects and methods.
   See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
   more information.
+* General speed improvements, see below for details.
 * Added `gg.sf()` method.
 * Add experimental support for `stars` via `eval_spatial()`.
   (version `2.8.0.9007`)

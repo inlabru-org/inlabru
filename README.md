@@ -91,16 +91,12 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> This is INLA_99.99.9999 built 2023-08-07 00:03:43 UTC.
+#> This is INLA_23.08.26 built 2023-08-26 14:18:34 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 library(inlabru)
+#> Loading required package: fmesher
 library(fmesher)
 library(ggplot2)
-#> 
-#> Attaching package: 'ggplot2'
-#> The following object is masked from 'package:inlabru':
-#> 
-#>     seals
 
 # Construct latent model components
 matern <- inla.spde2.pcmatern(
