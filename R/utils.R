@@ -731,7 +731,7 @@ resave_package_data <- function() {
 #' @title Row-wise Kronecker products
 #'
 #' @description
-#' `r lifecycle::badge("deprecated") in favour of [fmesher::fm_row_kron()].
+#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_row_kron()].
 #'
 #' Takes two Matrices and computes the row-wise Kronecker product.  Optionally
 #' applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker

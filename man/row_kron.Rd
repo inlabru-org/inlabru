@@ -25,7 +25,7 @@ resulting matrix.}
 A \code{Matrix::sparseMatrix} object.
 }
 \description{
-`r lifecycle::badge("deprecated") in favour of \code{\link[fmesher:fm_row_kron]{fmesher::fm_row_kron()}}.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_row_kron]{fmesher::fm_row_kron()}}.
 
 Takes two Matrices and computes the row-wise Kronecker product.  Optionally
 applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker
