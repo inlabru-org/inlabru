@@ -49,7 +49,7 @@
 * Fixed linearisation issue when using only the `*_latent` form of a component.
   (version `2.8.0.9015`)
 * Workaround for equivalent but textually different CRS/WKT information in
-  `bru_fill_missing()`. (version `2.9.0.9016`)
+  `bru_fill_missing()`. (version `2.9.0.9016`, fixes #200)
 
 ## Deprecation of old functions
 
