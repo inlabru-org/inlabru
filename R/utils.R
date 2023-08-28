@@ -35,6 +35,19 @@ bru_safe_inla <- function(multicore = NULL,
     return(FALSE)
   }
 
+  inla.call <- tryCatch(
+    INLA::inla.getOption("inla.call"),
+    error = function(e) {
+      e
+    }
+  )
+  if (inherits(inla.call, "simpleError")) {
+    if (!quietly) {
+      message("inla.getOption('inla.call') failed. INLA not installed correctly.")
+    }
+    return(FALSE)
+  }
+
   if (is.null(multicore)) {
     multicore <-
       !identical(Sys.getenv("TESTTHAT"), "true") ||
@@ -126,7 +139,8 @@ check_package_version_and_load <-
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_sp()) {
+#' if (bru_safe_sp() &&
+#'   require("sp")) {
 #'   # Run sp dependent calculations
 #' }
 #' }
@@ -312,11 +326,6 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
   UseMethod("eval_spatial")
 }
 
-#' @describeIn inlabru-deprecated Replaced by the generic [eval_spatial()]
-eval_SpatialDF <- function(...) {
-  lifecycle::deprecate_stop("2.6.0", "eval_spatial()")
-  eval_spatial(...)
-}
 
 #' @export
 #' @describeIn eval_spatial Compatibility wrapper for `eval_spatial.sf`
@@ -427,10 +436,6 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
     val <- numeric(NROW(where))
     idx <- sf::st_intersects(where, data, sparse = TRUE)
     for (l in unique(layer)) {
-      val[layer == l] <- sp::over(
-        where[layer == l, , drop = FALSE],
-        data
-      )[, l, drop = TRUE]
       val[layer == l] <- vapply(
         idx[layer == l],
         function(i) {
@@ -482,6 +487,35 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   } else {
     val <- val[["value"]]
   }
+  val
+}
+
+
+#' @export
+#' @rdname eval_spatial
+eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
+  layer <- extract_layer(where, layer, selector)
+  check_layer(data, where, layer)
+  if (!inherits(where, c("sf", "sfc"))) {
+    where <- sf::st_as_sf(where)
+  }
+  val <- stars::st_extract(
+    data,
+    sf::st_geometry(where)
+  )
+  val <- sf::st_as_sf(val)
+
+  unique_layer <- unique(layer)
+  if (length(unique_layer) == 1) {
+    val <- val[, unique_layer, drop = TRUE]
+  } else {
+    val_ <- numeric(NROW(where))
+    for (l in unique(layer)) {
+      val_[layer == l] <- val[layer == l, l, drop = TRUE]
+    }
+    val <- val_
+  }
+
   val
 }
 
@@ -561,12 +595,6 @@ bru_fill_missing <- function(data, where, values,
     stop("NAs detected in the 'layer' information.")
   }
 
-  data_crs <- fm_crs(data)
-  where_crs <- fm_crs(where)
-  if (!fm_identical_CRS(data_crs, where_crs)) {
-    warning("'data' and 'where' for spatial infilling have different CRS")
-  }
-
   layers <- unique(layer)
   if (length(layers) > 1) {
     for (l in layers) {
@@ -585,6 +613,7 @@ bru_fill_missing <- function(data, where, values,
   # Only one layer from here on.
   layer <- layers
 
+  data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
     data_values <- terra::values(data[[layer]], dataframe = TRUE)[[layer]]
     data_coord <- as.data.frame(terra::crds(data))
@@ -597,13 +626,14 @@ bru_fill_missing <- function(data, where, values,
     data_coord <- data
   }
 
+  where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
+
   notok <- is.na(values)
   ok <- which(!notok)
   notok <- which(notok)
   data_notok <- is.na(data_values)
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
-
 
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
@@ -627,29 +657,22 @@ bru_fill_missing <- function(data, where, values,
 # Resave data
 resave_package_data <- function() {
   name_list <- c(
-    "gorillas", "mexdolphin", "mrsea",
+    "gorillas", "mexdolphin",
+    "gorillas_sf", "mexdolphin_sf",
+    "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-    "seals", "shrimp", "toygroups"
+    "seals_sp", "shrimp", "toygroups",
+    "robins_subset"
   )
-  for (name in name_list) {
-    message(paste0("Data: ", name))
-    env <- new.env()
-    data(list = name, package = "inlabru", envir = env)
+  compress_values <- c("gzip", "bzip2", "xz")
 
-    # Find paths
-    new_path <- file.path("data", paste0(name, ".rda"))
-    old_path <- file.path("data", paste0(name, ".RData"))
-    if (!file.exists(old_path)) {
-      old_path <- new_path
-    }
-
-    old_info <- file.info(old_path)
+  do_compress <- function(env, compress, the_path) {
     if (length(names(env)) == 1) {
       eval(
         parse(text = paste0(
           "usethis::use_data(",
           paste0(names(env), collapse = ", "),
-          ", compress = 'xz', overwrite = TRUE)"
+          ", compress = '", compress, "', overwrite = TRUE)"
         )),
         envir = env
       )
@@ -659,19 +682,56 @@ resave_package_data <- function() {
           "save(",
           paste0(names(env), collapse = ", "),
           ", file = '",
-          new_path,
-          "', compress = 'xz')"
+          the_path,
+          "', compress = '", compress, "')"
         )),
         envir = env
       )
     }
-    new_info <- file.info(new_path)
-    browser()
   }
+
+  new_info <- NULL
+  old_info <- NULL
+  for (name in name_list) {
+    message(paste0("Data: ", name))
+    env <- new.env()
+    utils::data(list = name, package = "inlabru", envir = env)
+
+    # Find paths
+    the_path <- file.path("data", paste0(name, ".rda"))
+
+    old_info <- rbind(old_info, file.info(the_path))
+
+    smallest_size <- Inf
+    smallest_compress <- NULL
+    for (compress in compress_values) {
+      do_compress(env, compress, the_path)
+      new_info_ <- file.info(the_path)
+
+      if (new_info_$size < smallest_size) {
+        smallest_size <- new_info_$size
+        smallest_compress <- compress
+      }
+    }
+
+    do_compress(env, smallest_compress, the_path)
+
+    new_info <- rbind(new_info, file.info(the_path))
+  }
+  df <- data.frame(
+    path = rownames(old_info),
+    size_old = old_info$size,
+    size_new = new_info$size
+  )
+  df$"new/old" <- round(df$size_new / df$size_old * 1000) / 10
+  df
 }
 
 
-#' Row-wise Kronecker products
+#' @title Row-wise Kronecker products
+#'
+#' @description
+#' `r lifecycle::badge("deprecated") in favour of [fmesher::fm_row_kron()].
 #'
 #' Takes two Matrices and computes the row-wise Kronecker product.  Optionally
 #' applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker
@@ -689,98 +749,7 @@ resave_package_data <- function() {
 #' @return A `Matrix::sparseMatrix` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
+#' @keywords internal
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
-  if (!inherits(M1, "Matrix")) {
-    M1 <- as(M1, "Matrix")
-  }
-  if (!inherits(M2, "Matrix")) {
-    M2 <- as(M2, "Matrix")
-  }
-  n1 <- nrow(M1)
-  n2 <- nrow(M2)
-  if ((n1 == 1) && (n2 > 1)) {
-    M1 <- Matrix::kronecker(rep(1, n2), M1)
-    n <- n2
-  } else if ((n1 > 1) && (n2 == 1)) {
-    M2 <- Matrix::kronecker(rep(1, n1), M2)
-    n <- n1
-  } else if (n1 != n2) {
-    stop(paste0("Size mismatch for row.kron, (n1, n2) = (", n1, ", ", n2, ")"))
-  } else {
-    n <- n1
-  }
-  if (is.null(repl)) {
-    repl <- rep(1L, n)
-  }
-  if (is.null(n.repl)) {
-    n.repl <- max(repl)
-  }
-  if (is.null(weights)) {
-    weights <- rep(1, n)
-  } else if (length(weights) == 1L) {
-    weights <- rep(weights[1], n)
-  }
-
-  ## OK: Checked robustness for all-zero rows 2022-10-20, matrix 1.5-2
-  ## TODO: Maybe move big sparseMatrix call outside the loop.
-  ## TODO: Automatically choose M1 or M2 for looping.
-
-  M1 <- as(as(as(as(M1, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
-  M2 <- as(as(as(as(M2, "dMatrix"), "generalMatrix"), "CsparseMatrix"), "TsparseMatrix")
-  n1 <- (as.vector(Matrix::sparseMatrix(
-    i = 1L + M1@i, j = rep(1L, length(M1@i)),
-    x = 1L, dims = c(n, 1)
-  )))
-  n2 <- (as.vector(Matrix::sparseMatrix(
-    i = 1L + M2@i, j = rep(1L, length(M2@i)),
-    x = 1L, dims = c(n, 1)
-  )))
-
-  M <- (Matrix::sparseMatrix(
-    i = integer(0), j = integer(0), x = numeric(0),
-    dims = c(n, ncol(M2) * ncol(M1) * n.repl)
-  ))
-  n1 <- n1[1L + M1@i]
-  for (k in unique(n1)) {
-    sub <- which(n1 == k)
-    n.sub <- length(sub)
-
-    i.sub <- 1L + M1@i[sub]
-    j.sub <- 1L + M1@j[sub]
-    o1 <- order(i.sub, j.sub)
-    jj <- rep(seq_len(k), times = n.sub / k)
-    i.sub <- i.sub[o1]
-    j.sub <- (Matrix::sparseMatrix(
-      i = i.sub,
-      j = jj,
-      x = j.sub[o1],
-      dims = c(n, k)
-    ))
-    x.sub <- (Matrix::sparseMatrix(
-      i = i.sub,
-      j = jj,
-      x = weights[i.sub] * M1@x[sub][o1],
-      dims = c(n, k)
-    ))
-    sub2 <- which(is.element(1L + M2@i, i.sub))
-
-    if (length(sub2) > 0) {
-      i <- 1L + M2@i[sub2]
-      ii <- rep(i, times = k)
-      repl.i <- repl[ii]
-
-      M <- (M +
-        Matrix::sparseMatrix(
-          i = ii,
-          j = (1L + rep(M2@j[sub2], times = k) +
-            ncol(M2) * (as.vector(j.sub[i, ]) - 1L) +
-            ncol(M2) * ncol(M1) * (repl.i - 1L)),
-          x = (rep(M2@x[sub2], times = k) *
-            as.vector(x.sub[i, ])),
-          dims = c(n, ncol(M2) * ncol(M1) * n.repl)
-        ))
-    }
-  }
-
-  return(M)
+  fm_row_kron(M1 = M1, M2 = M2, repl = repl, n.repl = n.repl, weights = weights)
 }

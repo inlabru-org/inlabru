@@ -20,7 +20,8 @@ input_eval(...)
 
 \item{component}{A component.}
 
-\item{data}{A \code{data.frame} or \verb{Spatial*} object of covariates and/or point locations.
+\item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
+covariates and/or point locations.
 If \code{NULL}, return the component's map.}
 }
 \value{
@@ -30,6 +31,25 @@ An list of mapper input values, formatted for the full component mapper
 \description{
 Obtain component inputs
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{input_eval(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},
+\code{group}, \code{replicate}, or \code{weight}), and process the results:
+\enumerate{
+\item If \code{eval()} failed, return NULL or map everything to 1
+(see the \code{null.on.fail} argument). This should normally not
+happen, unless the component use logic is incorrect,
+(e.g. via \code{include}/\code{exclude})
+leading to missing columns for a certain likelihood in a
+multi-\code{like()} model.
+\item If we obtain a function, apply the function to the data object
+\item If we obtain an object supported by \code{\link[=eval_spatial]{eval_spatial()}}, extract the values
+of that data frame at the point locations
+\item Else we obtain a vector and return as-is. This happens when input
+references a column of the data points, or some other complete expression
+}
+
+}}
 \section{Simple covariates and the map parameter}{
 
 
@@ -73,15 +93,22 @@ needed output. For example,
 
 
 When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-surface temperature or elevation. Although it is straight forward to add this data to the input
+surface temperature or elevation. Although it is straightforward to add this data to the input
 data frame or write a covariate function like in the previous section there is an even more
 convenient way in inlabru. Spatial covariates are often stored as \code{SpatialPixelsDataFrame},
 \code{SpatialPixelsDataFrame} or \code{RasterLayer} objects. These can be provided directly via
-the input expressions if the \code{\link[=like]{like()}} data is a \code{SpatialPointsDataFrame} object.
-inlabru will automatically
+the input expressions if they are supported by \code{\link[=eval_spatial]{eval_spatial()}}, and
+the \code{\link[=like]{like()}} data is an \code{sf} or \code{SpatialPointsDataFrame} object.
+\code{inlabru} will then automatically
 evaluate and/or interpolate the covariate at your data locations when using code like
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(mySpatialPixels, model = "linear")
+}\if{html}{\out{</div>}}
+
+For more precise control, use the the \code{layer} and \code{selector} arguments (see \code{\link[=component]{component()}}),
+or call \code{eval_spatial()} directly, e.g.:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.), model = "linear")
 }\if{html}{\out{</div>}}
 }
 
@@ -96,10 +123,26 @@ can be set to \code{coordinates}, which is the \code{sp} package function that e
 coordinates from the \code{SpatialPointsDataFrame} that was provided as input to \code{\link[=like]{like()}}. The code for
 this would look as follows:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ field(coordinates, model = inla.spde2.matern(...))
 }\if{html}{\out{</div>}}
+
+Since \code{coordinates} is a function from the \code{sp} package, this results in
+evaluation of \code{sp::coordinates(.data.)}, which loses any CRS information
+from the data object.
+
+For \code{sf} data with a geometry column (by default named \code{geometry}), use
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ field(geometry, model = inla.spde2.matern(...))
+}\if{html}{\out{</div>}}
+
+Since the CRS information is part of the geometry column of the \code{sf} object,
+this retains CRS information, so this is more robust, and allows the model
+to be built on a different CRS than the observation data.
 }
 
+\seealso{
+\code{\link[=component]{component()}}
+}
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren \email{finn.lindgren@gmail.com}
 }

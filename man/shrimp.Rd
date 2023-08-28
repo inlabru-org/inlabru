@@ -41,3 +41,4 @@ if (require(ggplot2, quietly = TRUE)) {
 Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa,
 D. Accounting for preferential sampling in species distribution models. Ecology and Evolution,  In Press.
 }
+\keyword{datasets}

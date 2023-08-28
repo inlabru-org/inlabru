@@ -7,8 +7,6 @@
 #'   along with time, location, and effort information, from Audubon Christimas Bird
 #'   Counts (CBC) conducted in six US states between 1987 and 2016.
 #'
-#' @usage data(robins_subset)
-#'
 #' @format The data are a data.frame with variables
 #'  \describe{
 #'    \item{`circle`:}{
@@ -61,4 +59,4 @@
 #'     geom_point(aes(lon, lat, colour = count + 1)) +
 #'     scale_colour_gradient(low = "blue", high = "red", trans = "log")
 #' }
-NULL
+"robins_subset"

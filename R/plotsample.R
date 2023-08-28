@@ -59,6 +59,7 @@ makepoly <- function(start, width, height) {
 #' \donttest{
 #' # Some features require the raster package
 #' if (bru_safe_sp() &&
+#'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")
@@ -129,6 +130,7 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' \donttest{
 #' # Some features require the raster package
 #' if (bru_safe_sp() &&
+#'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   data(gorillas, package = "inlabru")

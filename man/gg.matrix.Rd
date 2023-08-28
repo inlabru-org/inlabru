@@ -31,8 +31,8 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
+\code{\link{gg.bru_prediction}()},
 \code{\link{gg.data.frame}()},
-\code{\link{gg.prediction}()},
 \code{\link{gg}()},
 \code{\link{gm}()}
 }

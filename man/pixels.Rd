@@ -20,18 +20,34 @@ If \code{mask} is a \code{Spatial} object, only return pixels covered by this ob
 \code{SpatialPixelsDataFrame} covering the mesh
 }
 \description{
-Generate \code{SpatialPixels} covering an \code{inla.mesh}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_pixels]{fmesher::fm_pixels()}}
+
+Generate \code{SpatialPixels} covering an \code{inla.mesh}.
 }
 \examples{
 \donttest{
 if (require(ggplot2, quietly = TRUE)) {
   data("mrsea", package = "inlabru")
-  pxl <- fm_pixels(mrsea$mesh,
-    nx = 50, ny = 50, mask = mrsea$boundary,
-    format = "sp"
+  pxl <- fm_pixels(
+    mrsea$mesh,
+    dims = c(50, 50),
+    mask = mrsea$boundary,
+    format = "sp",
+    minimal = TRUE
   )
   ggplot() +
-    gg(pxl, fill = "grey", alpha = 0.5) +
+    gg(pxl, fill = "blue", alpha = 0.75) +
+    gg(mrsea$mesh)
+
+  pxl <- fm_pixels(
+    mrsea$mesh,
+    dims = c(50, 50),
+    mask = mrsea$boundary,
+    format = "sf",
+    minimal = TRUE
+  )
+  ggplot() +
+    gg(pxl, geom = "tile", fill = "blue", alpha = 0.75) +
     gg(mrsea$mesh)
 }
 }

@@ -21,15 +21,15 @@ sfill <- function(data, where = NULL) {
     vals <- vals[!is.na(vals)]
 
     data.ow <- spatstat.geom::owin(
-      range(coordinates(dpoints)[, 1]),
-      range(coordinates(dpoints)[, 2])
+      range(sp::coordinates(dpoints)[, 1]),
+      range(sp::coordinates(dpoints)[, 2])
     )
-    data.ppp <- spatstat.geom::as.ppp(coordinates(dpoints), data.ow)
+    data.ppp <- spatstat.geom::as.ppp(sp::coordinates(dpoints), data.ow)
     where.ow <- spatstat.geom::owin(
-      range(coordinates(where)[, 1]),
-      range(coordinates(where)[, 2])
+      range(sp::coordinates(where)[, 1]),
+      range(sp::coordinates(where)[, 2])
     )
-    where.ppp <- spatstat.geom::as.ppp(coordinates(where), where.ow)
+    where.ppp <- spatstat.geom::as.ppp(sp::coordinates(where), where.ow)
 
     nn <- spatstat.geom::nncross(where.ppp, data.ppp)[, "which"]
     vallist[[k]] <- vals[nn]
@@ -158,24 +158,4 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
   # If requested, change CRS
   if (!is.null(to.crs)) spoly <- fm_transform(spoly, to.crs)
   spoly
-}
-
-
-#' @describeIn inlabru-deprecated Coordinate transformation for spatial objects
-#'
-#' This is a wrapper for the [spTransform][sp::spTransform] function provided by the `sp` package.
-#' Given a spatial object (or a list thereof) it will transform the coordinate system according
-#' to the parameter `crs`. In addition to the usual spatial objects this function is
-#' also capable of transforming `INLA::inla.mesh` objects that are equipped with a coordinate
-#' system. Returns a list of Spatial* objects.
-#'
-#' `r lifecycle::badge("deprecated")` Deprecated in favour of the `fm_transform` methods.
-#'
-#' @export
-#' @param splist list of Spatial* objects
-#' @param crs Coordinate reference system to change to
-#'
-stransform <- function(splist, crs) {
-  lifecycle::deprecate_stop("2.7.0", "stransform()", "fm_transform()")
-  fm_transform(splist, crs = crs)
 }

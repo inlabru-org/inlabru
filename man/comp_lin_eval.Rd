@@ -20,7 +20,7 @@ and `ibm_jacobian.}
 
 \item{input}{Component inputs, from \code{input_eval()}}
 
-\item{linearisation}{evaluation state}
+\item{state}{linearisation evaluation state}
 }
 \value{
 A \code{bru_mapper_taylor} or \code{comp_simple_list} object.

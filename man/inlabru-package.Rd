@@ -26,7 +26,8 @@ a \code{predict()} method, documented in \code{\link[=predict.bru]{predict.bru()
 For point process inference \code{\link[=lgcp]{lgcp()}} can be used as a shortcut to \code{bru(..., like(model="cp", ...))}.
 
 The package comes with multiple real world data sets, namely \link{gorillas},
-\link{mexdolphin}, \link{seals}. Plotting these data sets is straight forward using inlabru's extensions
+\link{mexdolphin}, \link{gorillas_sf}, \link{mexdolphin_sf}, \link{seals_sp}. Plotting these data
+sets is straight forward using inlabru's extensions
 to \code{ggplot2}, e.g. the \code{\link[=gg]{gg()}} function. For educational purposes some simulated data sets are available
 as well, e.g. \link{Poisson1_1D}, \link{Poisson2_1D}, \link{Poisson2_1D} and \link{toygroups}.
 }

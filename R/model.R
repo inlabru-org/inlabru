@@ -140,13 +140,7 @@ print.summary_bru_model <- function(x, ...) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
-#' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded)
-#' @param exclude Character vector of component labels that are not used by the
-#'   predictor expression. The exclusion list is applied to the list
-#'   as determined by the `include` parameter; Default: NULL (do not remove
-#'   any components from the inclusion list)
+#' @param used A [bru_used()] object, or NULL (default)
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #' @details * `evaluate_model` is a wrapper to evaluate model state, A-matrices,
 #' effects, and predictor, all in one call.
@@ -372,7 +366,6 @@ evaluate_effect_multi_state.component_list <- function(components, input, state,
 #' expression for a state.
 #' * `"list"` A list where each column contains the evaluated predictor
 #' expression for a state.
-#' @param inla_f logical
 #'
 #' Default: "auto"
 #' @details For each component, e.g. "name", the state values are available as
@@ -595,7 +588,7 @@ evaluate_predictor <- function(model,
 #' @examples
 #' \dontrun{
 #' if (bru_safe_inla()) {
-#'   mesh <- INLA::inla.mesh.2d(
+#'   mesh <- fmesher::fm_mesh_2d_inla(
 #'     cbind(0, 0),
 #'     offset = 2, max.edge = 0.25
 #'   )

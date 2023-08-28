@@ -5,15 +5,17 @@
 \alias{like_list}
 \alias{like_list.list}
 \alias{like_list.bru_like}
+\alias{c.bru_like}
+\alias{c.bru_like_list}
 \alias{[.bru_like_list}
-\title{Likelihood construction for usage with \code{\link[=bru]{bru()}}}
+\title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 like(
   formula = . ~ .,
   family = "gaussian",
   data = NULL,
   response_data = NULL,
-  mesh = NULL,
+  mesh = deprecated(),
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -24,7 +26,7 @@ like(
   exclude = NULL,
   include_latent = NULL,
   used = NULL,
-  allow_latent = NULL,
+  allow_latent = deprecated(),
   allow_combine = NULL,
   control.family = NULL,
   options = list(),
@@ -36,6 +38,10 @@ like_list(...)
 \method{like_list}{list}(object, envir = NULL, ...)
 
 \method{like_list}{bru_like}(..., envir = NULL)
+
+\method{c}{bru_like}(..., envir = NULL)
+
+\method{c}{bru_like_list}(..., envir = NULL)
 
 \method{[}{bru_like_list}(x, i)
 }
@@ -61,7 +67,7 @@ size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{mesh}{An inla.mesh object. Obsolete.}
+\item{mesh}{Deprecated.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
@@ -105,24 +111,24 @@ evaluate the component effect that are different than those defined in the
 component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{NULL}
 auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include}, \code{exclude},
-and \code{include_latent}.}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include},
+\code{exclude}, and \code{include_latent}.}
 
-\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated. Use \code{include_latent} instead.}
+\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated.
+Use \code{include_latent} instead.}
 
-\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
-involve several rows of the input data to influence the same row.
-Default \code{FALSE}, but forced to \code{TRUE} if \code{response_data} is \code{NULL} or
-\code{data} is a \code{list}}
+\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
+several rows of the input data to influence the same row. Default \code{FALSE},
+but forced to \code{TRUE} if \code{response_data} is \code{NULL} or \code{data} is a \code{list}}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
 
-\item{.envir}{The evaluation environment to use for special arguments
-(\code{E}, \code{Ntrials}, and \code{weights}) if not found in \code{response_data} or \code{data}. Defaults to
-the calling environment.}
+\item{.envir}{The evaluation environment to use for special arguments (\code{E},
+\code{Ntrials}, and \code{weights}) if not found in \code{response_data} or \code{data}.
+Defaults to the calling environment.}
 
 \item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
 
@@ -138,24 +144,25 @@ the calling environment.}
 A likelihood configuration which can be used to parameterise \code{\link[=bru]{bru()}}.
 }
 \description{
-Likelihood construction for usage with \code{\link[=bru]{bru()}}
+Observation model construction for usage with \code{\link[=bru]{bru()}}
 }
-\details{
+\section{Functions}{
 \itemize{
-\item \code{like_list}: Combine a \code{bru_like} likelihoods
-into a \code{bru_like_list} object
-}
+\item \code{like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
 
-\itemize{
-\item \code{like_list.list}: Combine a list of \code{bru_like} likelihoods
+\item \code{like_list(list)}: Combine a list of \code{bru_like} likelihoods
 into a \code{bru_like_list} object
-}
 
-\itemize{
-\item \code{like_list.bru_like}: Combine several \code{bru_like} likelihoods
+\item \code{like_list(bru_like)}: Combine several \code{bru_like} likelihoods
 into a \code{bru_like_list} object
-}
-}
+
+\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
+objects into a \code{bru_like_list} object
+
+\item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
+objects into a \code{bru_like_list} object
+
+}}
 \examples{
 \donttest{
 if (bru_safe_inla() &&
@@ -223,4 +230,6 @@ if (bru_safe_inla() &&
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
+
+Finn Lindgren \email{finn.lindgren@gmail.com}
 }

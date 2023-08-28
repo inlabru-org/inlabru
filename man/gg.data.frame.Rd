@@ -7,13 +7,13 @@
 \method{gg}{data.frame}(...)
 }
 \arguments{
-\item{...}{Arguments passed on to \code{\link[=gg.prediction]{gg.prediction()}}.}
+\item{...}{Arguments passed on to \code{\link[=gg.bru_prediction]{gg.bru_prediction()}}.}
 }
 \value{
 Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon} value.
 }
 \description{
-This geom constructor will simply call \link{gg.prediction} for the data provided.
+This geom constructor will simply call \code{\link[=gg.bru_prediction]{gg.bru_prediction()}} for the data provided.
 }
 \details{
 Requires the \code{ggplot2} package.
@@ -101,8 +101,8 @@ if (bru_safe_inla() &&
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
+\code{\link{gg.bru_prediction}()},
 \code{\link{gg.matrix}()},
-\code{\link{gg.prediction}()},
 \code{\link{gg}()},
 \code{\link{gm}()}
 }

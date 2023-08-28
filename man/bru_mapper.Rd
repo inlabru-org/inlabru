@@ -4,7 +4,9 @@
 \alias{bru_mapper}
 \alias{bru_mapper_define}
 \alias{bru_mapper.default}
+\alias{bru_mapper.fm_mesh_2d}
 \alias{bru_mapper.inla.mesh}
+\alias{bru_mapper.fm_mesh_1d}
 \alias{bru_mapper.inla.mesh.1d}
 \alias{bru_mapper_index}
 \alias{bru_mapper_taylor}
@@ -24,11 +26,15 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, ..., methods = NULL)
+bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
 
 \method{bru_mapper}{default}(...)
 
+\method{bru_mapper}{fm_mesh_2d}(mesh, ...)
+
 \method{bru_mapper}{inla.mesh}(mesh, ...)
+
+\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL, ...)
 
 \method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
 
@@ -82,7 +88,7 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 
 \item{methods}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated.}
 
-\item{mesh}{An \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
+\item{mesh}{An \code{fm_mesh_1d}, \code{fm_mesh_2d}, \code{inla.mesh.1d} or \code{inla.mesh.2d} object to use as a mapper}
 
 \item{indexed}{logical; if \code{TRUE}, the \code{ibm_values()} method
 will return an integer vector instead of the factor levels.
@@ -156,6 +162,11 @@ Default \code{c(0, 1)}.}
 
 \item{B}{a square or tall basis conversion matrix}
 }
+\value{
+\itemize{
+\item \code{bru_mapper()} returns a \code{bru_mapper} object
+}
+}
 \description{
 Constructors for \code{bru_mapper} objects
 }
@@ -166,9 +177,14 @@ arguments along. Mapper implementations should call \code{\link[=bru_mapper_defi
 instead, and supply at least a \code{new_class} class name.
 Use of the \code{bru_mapper.default} method will be deprecated from version 2.7.0.
 
+\item \code{bru_mapper(fm_mesh_2d)}: Creates a mapper for 2D \code{fm_mesh_2d} objects
+
 \item \code{bru_mapper(inla.mesh)}: Creates a mapper for 2D \code{inla.mesh} objects
 
-\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object
+\item \code{bru_mapper(fm_mesh_1d)}: Create mapper for an \code{fm_mesh_1d} object
+
+\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object; converts
+the mesh fo \code{fm_mesh_1d} first.
 
 }}
 \section{Functions}{

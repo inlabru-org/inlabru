@@ -51,7 +51,7 @@ if (require("ggplot2", quietly = TRUE)) {
     ) +
     xlab(expression(bold(s))) +
     ylab("count")
-  ss <- seq(0, 55, length = 200)
+  ss <- seq(0, 55, length.out = 200)
   lambda <- lambda2_1D(ss)
   p2 <- ggplot() +
     geom_line(

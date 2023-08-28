@@ -44,6 +44,7 @@ Creates a plot sample on a regular grid with a random start location.
 \donttest{
 # Some features require the raster package
 if (bru_safe_sp() &&
+  require("sp") &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   data(gorillas, package = "inlabru")

@@ -45,7 +45,9 @@ plot and the area of each plot.}
 Library \code{spatstat.data}.
 }
 \usage{
-data(gorillas)
+gorillas
+# To avoid the name clash with spatstat.data::gorillas, use
+data(gorillas, package = "inlabru")
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
@@ -54,6 +56,7 @@ as point process data for use with \code{inlabru}.
 \examples{
 if (bru_safe_inla() &&
   bru_safe_sp() &&
+  require("sp") &&
   require(ggplot2, quietly = TRUE) &&
   require(ggpolypath, quietly = TRUE)) {
   data(gorillas, package = "inlabru") # get the data
@@ -82,3 +85,4 @@ Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial behaviour
 in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk Assessment
 26 (6), 793-811.
 }
+\keyword{datasets}

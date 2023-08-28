@@ -1,11 +1,9 @@
-#' Plot a globe using rgl
+#' Visualize a globe using RGL
 #'
+#' @description
 #' Creates a textured sphere and lon/lat coordinate annotations.
+#' This function requires the `rgl` and `sphereplot` packages.
 #'
-#' This funciton requires the `rgl` and `sphereplot` packages.
-#'
-#' @aliases globe
-#' @name globe
 #' @export
 #' @param R Radius of the globe
 #' @param R.grid Radius of the annotation sphere.
@@ -28,8 +26,8 @@ globe <- function(R = 1,
                   xlab = "", ylab = "", zlab = "") {
   # coordinates for texture
   n.smp <- 50
-  lat <- matrix(-asin(seq(-1, 1, len = n.smp)), n.smp, n.smp, byrow = TRUE)
-  long <- matrix(seq(-180, 180, len = n.smp) * pi / 180, n.smp, n.smp)
+  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)), n.smp, n.smp, byrow = TRUE)
+  long <- matrix(seq(-180, 180, length.out = n.smp) * pi / 180, n.smp, n.smp)
   x <- R * cos(lat) * cos(long)
   y <- R * cos(lat) * sin(long)
   z <- R * sin(lat)
@@ -48,12 +46,12 @@ globe <- function(R = 1,
   sphereplot::rgl.sphgrid(longtype = "D", add = TRUE, radius = R.grid)
 }
 
-#' Render Spatial* and inla.mesh objects using RGL
+#' Render objects using RGL
 #'
-#' glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data
-#' and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
+#' `glplot()` is a generic function for renders various kinds of spatial objects, i.e. `Spatial*` data
+#' and `fm_mesh_2d` objects. The function invokes particular methods which depend on the class of
+#' the first argument.
 #'
-#' @aliases glplot
 #' @name glplot
 #' @export
 #' @param object an object used to select a method.
@@ -67,22 +65,15 @@ glplot <- function(object, ...) {
   UseMethod("glplot")
 }
 
-#' Visualize SpatialPoints using RGL
-#'
-#' This function will calculate the cartesian coordinates of the points provided
+#' @describeIn glplot This function will calculate the cartesian coordinates of the points provided
 #' and use points3d() in order to render them.
 #'
 #' @export
-#' @name glplot.SpatialPoints
 #'
-#' @param object a SpatialPoints or SpatialPointsDataFrame object.
 #' @param add If TRUE, add the points to an existing plot. If FALSE, create new plot.
 #' @param color vector of R color characters. See material3d() for details.
-#' @param ... Parameters passed on to points3d()
 #'
 #' @family inlabru RGL tools
-#'
-#' @example inst/examples/rgl.R
 
 
 glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
@@ -100,22 +91,12 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
   rgl::points3d(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
 
-#' Visualize SpatialLines using RGL
-#'
-#' This function will calculate a cartesian representation of the lines provided
+#' @describeIn glplot This function will calculate a cartesian representation of the lines provided
 #' and use lines3d() in order to render them.
 #'
-#'
 #' @export
-#' @name glplot.SpatialLines
-#'
-#' @param object a SpatialLines or SpatialLinesDataFrame object.
-#' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
-#' @param ... Parameters passed on to lines3d().
 #'
 #' @family inlabru RGL tools
-#'
-#' @example inst/examples/rgl.R
 
 glplot.SpatialLines <- function(object, add = TRUE, ...) {
   qq <- coordinates(object)
@@ -144,39 +125,31 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 }
 
 
-#' Visualize SpatialPoints using RGL
-#'
-#' This function transforms the mesh to 3D cartesian coordinates and uses
+#' @describeIn glplot This function transforms the mesh to 3D cartesian coordinates and uses
 #' inla.plot.mesh() with `rgl=TRUE` to plot the result.
 #'
 #' @export
-#' @name glplot.inla.mesh
 #'
-#' @param object an inla.mesh object.
-#' @param add If TRUE, add the lines to an existing plot. If FALSE, create new plot.
 #' @param col Color specification. A single named color, a vector of scalar values, or a matrix of RGB values.
-#' @param ... Parameters passed on to plot.inla.mesh()
+#' @param ... Parameters passed on to plot_rgl.fm_mesh_2d()
 #'
 #' @family inlabru RGL tools
-#'
-#' @example inst/examples/rgl.R
 
-glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
+glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
   if (object$manifold == "S2") {
     # mesh$loc = mesh$loc
   } else {
-    ll <- data.frame(object$loc)
-    colnames(ll) <- c("x", "y", "z")
-    coordinates(ll) <- c("x", "y", "z")
-    proj4string(ll) <- object$crs
-    ll <- fm_transform(ll, crs = fm_crs("sphere"))
-    object$loc <- coordinates(ll)
-    object$crs <- fm_CRS(fm_crs("sphere"))
+    object <- fm_transform(object, crs = fm_crs("sphere"), passthrough = TRUE)
   }
 
   if (is.null(col)) {
-    plot(object, rgl = TRUE, add = add, ...)
+    fmesher::plot_rgl(object, add = add, ...)
   } else {
-    plot(object, rgl = TRUE, add = add, col = col, ...)
+    fmesher::plot_rgl(object, add = add, col = col, ...)
   }
+}
+#' @rdname glplot
+#' @export
+glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
+  glplot(fm_as_fm(object), add = add, col = col, ...)
 }

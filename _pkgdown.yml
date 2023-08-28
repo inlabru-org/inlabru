@@ -10,41 +10,43 @@ navbar:
       menu:
       - text: Basic examples
       - text: Random field models in 1D
-        href: articles/web/random_fields.html
+        href: articles/random_fields.html
       - text: Spatial random field models in 2D
-        href: articles/web/random_fields_2d.html
+        href: articles/random_fields_2d.html
       - text: Publications
-        href: articles/web/publications.html
+        href: articles/publications.html
       - text: ---
       - text: Point process examples
       - text: LGCPs - An example in one dimension
-        href: articles/web/1d_lgcp.html
-      - text: LGCPs - An example in two dimensions
-        href: articles/web/2d_lgcp.html
+        href: articles/1d_lgcp.html
+      - text: LGCPs - An example in two dimensions (sp version)
+        href: articles/2d_lgcp.html
+      - text: LGCPs - An example in two dimensions (sf version)
+        href: articles/2d_lgcp_sf.html
       - text: LGCPs - Spatial covariates
-        href: articles/web/2d_lgcp_covars.html
+        href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
-        href: articles/web/2d_lgcp_distancesampling.html
+        href: articles/2d_lgcp_distancesampling.html
       - text: LGCPs - Plot sampling
-        href: articles/web/2d_lgcp_plotsampling.html
+        href: articles/2d_lgcp_plotsampling.html
       - text: LGCPs - Multiple likelihoods
-        href: articles/web/2d_lgcp_multilikelihood.html
+        href: articles/2d_lgcp_multilikelihood.html
       - text: LGCPs - An example in space and time
-        href: articles/web/2d_lgcp_spatiotemporal.html
+        href: articles/2d_lgcp_spatiotemporal.html
       - text: LGCPs - Residuals
-        href: articles/web/2d_lgcp_residuals.html
+        href: articles/2d_lgcp_residuals.html
       - text: ---
       - text: Concepts
       - text: Defining a model component
         href: articles/component.html
       - text: Spatially varying coefficient models
-        href: articles/web/svc.html
+        href: articles/svc.html
       - text: Computing posterior prediction scores
         href: articles/prediction_scores.html
       - text: ---
       - text: Theory and technical documentation
       - text: Installation of INLA and inlabru with Apptainer on HPC
-        href: articles/web/Apptainer.html
+        href: articles/Apptainer.html
       - text: The iterative linearised inlabru method
         href: articles/method.html
       - text: A nonlinear model approximation example
@@ -52,6 +54,126 @@ navbar:
       - text: Customised model component with the bru_mapper system
         href: articles/bru_mapper.html
       - text: Converting inla.spde.make.A calls to the bru_mapper system
-        href: articles/web/mesh_mapping.html
+        href: articles/mesh_mapping.html
       - text: Code internal flow diagrams for model evaluation
-        href: articles/web/devel_flow.html
+        href: articles/devel_flow.html
+      - text: ---
+      - text: Website articles
+        href: articles/website_examples.html
+
+redirects:
+  - ["articles/web/Apptainer.html", "articles/Apptainer.html"]
+  - ["articles/web/publications.html", "articles/publications.html"]
+  - ["articles/web/2d_lgcp_multilikelihood.html", "articles/2d_lgcp_multilikelihood.html"]
+  - ["articles/web/2d_lgcp_spatiotemporal.html", "articles/2d_lgcp_spatiotemporal.html"]
+  - ["articles/web/2d_lgcp.html", "articles/2d_lgcp.html"]
+  - ["articles/web/2d_lgcp_sf.html", "articles/2d_lgcp_sf.html"]
+  - ["articles/web/1d_lgcp.html", "articles/1d_lgcp_.html"]
+  - ["articles/web/2d_lgcp_plotsampling.html", "articles/2d_lgcp_plotsampling.html"]
+  - ["articles/web/2d_lgcp_distancesampling.html", "articles/2d_lgcp_distancesampling.html"]
+  - ["articles/web/2d_lgcp_covars.html", "articles/2d_lgcp_covars.html"]
+  - ["articles/web/2d_lgcp_residuals.html", "articles/2d_lgcp_residuals.html"]
+  - ["articles/web/random_fields.html", "articles/random_fields.html"]
+  - ["articles/web/mesh_mapping.html", "articles/mesh_mapping.html"]
+  - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
+  - ["articles/web/svc.html", "articles/svc.html"]
+  - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
+
+reference:
+- title: "Model construction and estimation"
+  desc: "Functions for constructing models and performing estimation."
+  contents:
+  - matches("^inlabru-package$")
+  - matches("^bru$")
+  - matches("^bru_rerun$")
+  - matches("^bru_options$")
+  - starts_with("component")
+  - starts_with("like")
+  - starts_with("lgcp")
+- title: "Posterior evaluation"
+  desc: "Functions for evaluating posterior properties."
+  contents:
+  - starts_with("generate")
+  - starts_with("predict")
+  - starts_with("spde.posterior")
+  - starts_with("deltaIC")
+  - starts_with("devel.cvmeasure")
+- title: "Optimization log information"
+  desc: "Accessing the optimization text log, and plotting the optimization convergence."
+  contents:
+  - starts_with("bru_log")
+  - starts_with("bru_convergence_plot")
+- title: "Mapper methods"
+  desc: "Functions for `bru_mapper` handling."
+  contents:
+  - starts_with("bru_get_mapper")
+  - starts_with("bru_mapper")
+  - starts_with("ibm_")
+  - starts_with("bm_")
+  - starts_with("eval_spatial")
+  - starts_with("bru_forward_transformation")
+- title: "Miscellaneous"
+  desc: "Miscellaneous functions."
+  contents:
+  - starts_with("bru_fill_missing")
+  - starts_with("point2count")
+  - starts_with("sample.lgcp")
+- title: "Plot helpers"
+  desc: "Functions for helping build figures."
+  contents:
+  - starts_with("plot")
+  - starts_with("globe")
+  - starts_with("gg")
+  - starts_with("glplot")
+  - starts_with("gm")
+  - starts_with("gmap")
+  - starts_with("bincount")
+- title: "Printing methods"
+  desc: "Functions for printing."
+  contents:
+  - starts_with("print")
+  - starts_with("summary")
+- title: "Data objects"
+  desc: "Data objects"
+  contents:
+  - matches("Poisson1_")
+  - matches("Poisson2_")
+  - matches("Poisson3_")
+  - matches("gorillas")
+  - matches("gorillas_sf")
+  - matches("mexdolphin")
+  - matches("mrsea")
+  - matches("robins_subset")
+  - matches("seals")
+  - matches("shrimp")
+  - matches("toygroups")
+- title: "Internal helper functions"
+  desc: "Helper functions for more low level operations."
+  contents:
+  - starts_with("evaluate_")
+  - starts_with("expand_labels")
+  - starts_with("inla.stack.mjoin")
+  - starts_with("spatial.to.ppp")
+  - starts_with("bru_make_stack")
+  - starts_with("bru_summarise")
+  - starts_with("bru_standardise_names")
+  - starts_with("bru_safe_inla")
+  - starts_with("bru_safe_sp")
+  - starts_with("bru_call_options")
+  - starts_with("bru_compute_linearisation")
+- title: "Re-exported fmesher functions"
+  desc: "Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility."
+  contents:
+  - starts_with("fm_")
+- title: "Deprecated methods"
+  desc: "Deprecated methods"
+  contents:
+  - matches("ipoints")
+  - matches("pixels")
+  - matches("multiplot")
+  - matches("spoly")
+  - matches("sline")
+#- title: "Other functions"
+#  desc: "Other functions"
+#  contents:
+#  - matches("")

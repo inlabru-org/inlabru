@@ -64,7 +64,6 @@ test_that("bru: factor component", {
   expect_equal(nrow(xpost2), 4)
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
-
   xipost <- generate(fit,
     newdata = NULL,
     formula = ~ c(
@@ -138,7 +137,7 @@ test_that("bru: predict with _eval", {
     u = 1:5
   )
   u_mapper <- bru_mapper(
-    INLA::inla.mesh.1d(
+    fm_mesh_1d(
       seq(1, 5, length.out = 51)
     ),
     indexed = FALSE

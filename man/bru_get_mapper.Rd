@@ -57,7 +57,7 @@ inherits from the \code{bru_mapper} class, and gives an error if it does not.
 \examples{
 if (bru_safe_inla(quietly = TRUE)) {
   library(INLA)
-  mesh <- inla.mesh.create(globe = 2)
+  mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
   spde <- inla.spde2.pcmatern(mesh,
     prior.range = c(1, 0.5),
     prior.sigma = c(1, 0.5)

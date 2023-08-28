@@ -11,7 +11,7 @@ test_that("Georeferenced data with sp", {
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
   coordinates(mydata) <- c("Easting", "Northing")
 
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fm_mesh_2d_inla(
     loc = mydata,
     offset = 5,
     max.edge = 4,

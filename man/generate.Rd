@@ -18,7 +18,7 @@ generate(object, ...)
   exclude = NULL,
   used = NULL,
   ...,
-  data = NULL
+  data = deprecated()
 )
 }
 \arguments{
@@ -26,8 +26,8 @@ generate(object, ...)
 
 \item{...}{additional, unused arguments.}
 
-\item{newdata}{A data.frame or SpatialPointsDataFrame of covariates needed for
-sampling.}
+\item{newdata}{A data.frame or SpatialPointsDataFrame of covariates needed
+for sampling.}
 
 \item{formula}{A formula where the right hand side defines an R expression
 to evaluate for each generated sample. If \code{NULL}, the latent and
@@ -38,7 +38,8 @@ See Details for more information.}
 calculate the posterior statistics.
 The default, 100, is rather low but provides a quick approximate result.}
 
-\item{seed}{Random number generator seed passed on to \code{INLA::inla.posterior.sample}}
+\item{seed}{Random number generator seed passed on to
+\code{INLA::inla.posterior.sample}}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
@@ -53,7 +54,8 @@ predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and \code{exclude}.}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and
+\code{exclude}.}
 
 \item{data}{Deprecated. Use \code{newdata} instead.
 sampling.}
@@ -76,12 +78,12 @@ that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
 }
 \details{
-In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix \verb{_latent}
-variable name can be used to directly access the latent state for a component,
-and the suffix function \verb{_eval} can be used to evaluate a component at
-other input values than the expressions defined in the component definition
-itself, e.g. \code{field_eval(cbind(x, y))} for a component that was defined with
+In addition to the component names (that give the effect of each component
+evaluated for the input data), the suffix \verb{_latent} variable name can be used
+to directly access the latent state for a component, and the suffix function
+\verb{_eval} can be used to evaluate a component at other input values than the
+expressions defined in the component definition itself, e.g.
+\code{field_eval(cbind(x, y))} for a component that was defined with
 \code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
 
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to

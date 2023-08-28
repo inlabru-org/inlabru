@@ -26,30 +26,26 @@ test_that("sf gorillas lgcp vignette", {
   gorillas_sf$boundary <- b2
 
   ## Build boundary information:
-  ## inla.mesh.2d doesn't support sf yet.
   boundary <- list(
-    fm_as_inla_mesh_segment(gorillas_sf$boundary),
+    gorillas_sf$boundary,
     NULL
   )
 
   ## Build the mesh:
-  ## Suppress PROJ support warnings, until the inla.mesh functions are updated
-  suppressWarnings(
-    mesh_sf <- INLA::inla.mesh.2d(
-      boundary = boundary,
-      max.edge = c(0.54, 0.97),
-      min.angle = c(30, 21),
-      ## Safeguard against large meshes.
-      max.n = c(48000, 16000),
-      ## Don't build a huge mesh!
-      max.n.strict = c(128000, 128000),
-      ## Filter away adjacent points.
-      cutoff = 0.01,
-      ## Offset for extra boundaries, if needed.
-      offset = c(0.73, 1.55),
-      ## Build mesh in this crs:
-      crs = fm_CRS(gorillas$nests)
-    )
+  mesh_sf <- fm_mesh_2d_inla(
+    boundary = boundary,
+    max.edge = c(0.54, 0.97),
+    min.angle = c(30, 21),
+    ## Safeguard against large meshes.
+    max.n = c(48000, 16000),
+    ## Don't build a huge mesh!
+    max.n.strict = c(128000, 128000),
+    ## Filter away adjacent points.
+    cutoff = 0.01,
+    ## Offset for extra boundaries, if needed.
+    offset = c(0.73, 1.55),
+    ## Build mesh in this crs:
+    crs = fm_CRS(gorillas$nests)
   )
 
   # library(ggplot2)
@@ -59,7 +55,7 @@ test_that("sf gorillas lgcp vignette", {
 
   matern <- INLA::inla.spde2.pcmatern(mesh_sf,
     prior.sigma = c(0.1, 0.01),
-    prior.range = c(5, 0.01)
+    prior.range = c(0.1, 0.01)
   )
 
   cmp <- geometry ~ mySmooth(geometry, model = matern) +

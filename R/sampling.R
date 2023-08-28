@@ -59,9 +59,10 @@
 #' \donttest{
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   bru_safe_sp() &&
+#'   require("sp")) {
 #'   vertices <- seq(0, 3, by = 0.1)
-#'   mesh <- INLA::inla.mesh.1d(vertices)
+#'   mesh <- fm_mesh_1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
 #'   pts <- sample.lgcp(mesh, loglambda)
 #'   pts$y <- 0
@@ -74,7 +75,8 @@
 #' # The INLA package is required
 #' if (bru_safe_inla(quietly = TRUE) &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   bru_safe_sp()) {
+#'   bru_safe_sp() &&
+#'   require("sp")) {
 #'   data("gorillas", package = "inlabru")
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
@@ -89,7 +91,8 @@
 sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
                         ignore.CRS = FALSE) {
   stopifnot(bru_safe_inla())
-  if (inherits(mesh, "inla.mesh.1d")) {
+  mesh <- fm_as_fm(mesh)
+  if (inherits(mesh, "fm_mesh_1d")) {
     xmin <- mesh$interval[1]
     xmax <- mesh$interval[2]
     area <- xmax - xmin
@@ -139,7 +142,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       }
     }
     ret <- do.call(rbind, multi.sample)
-  } else if (inherits(mesh, "inla.mesh")) {
+  } else if (inherits(mesh, "fm_mesh_2d")) {
     multi.samples <- is.matrix(loglambda)
     if (multi.samples) {
       result <- list()
@@ -160,7 +163,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- fm_crs(mesh$crs)
+    input.crs <- fm_crs(mesh)
     use.crs <- !is.na(input.crs) && !ignore.CRS
     is.geocent <- (mesh$manifold == "S2")
 
@@ -230,12 +233,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           area.mesh <- mesh
           area.R <- 1
         }
-        areas <- INLA::inla.fmesher.smorg(
-          area.mesh$loc,
-          area.mesh$graph$tv,
-          fem = 0,
-          output = "ta"
-        )$ta * area.R^2
+        areas <- fm_fem(area.mesh, order = 0)$ta * area.R^2
 
         loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)
@@ -453,7 +451,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     # Only retain points within the samplers
     if (!is.null(samplers) && (length(ret) > 0)) {
-      if (inherits(samplers, "inla.mesh")) {
+      if (inherits(samplers, "fm_mesh_2d")) {
         proj <- fm_evaluator(samplers, points)
         ret <- ret[proj$proj$ok]
       } else if (inherits(samplers, "Spatial")) {
@@ -466,7 +464,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     }
   } else {
     stop(paste0(
-      "The `mesh` must inherit from `inla.mesh.1d` or `inla.mesh`.\n  class = c('",
+      "The `mesh` must be convertible by `fm_as_fm()` to `fm_mesh_1d` or `fm_mesh_2d`.\n",
+      "  class = c('",
       paste0(class(mesh), collapse = "', '"),
       "')"
     ))

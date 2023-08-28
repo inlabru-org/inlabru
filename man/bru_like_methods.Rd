@@ -24,7 +24,17 @@ bru_like_control_family(x, control.family = NULL, ...)
 \arguments{
 \item{x}{Object of \code{bru_like} or \code{bru_like_list} type}
 
-\item{control.family}{INLA \code{control.family} overrides}
+\item{control.family}{list of INLA \code{control.family} options to override}
+}
+\value{
+\itemize{
+\item \code{bru_like_inla_family()} returns a string or vector of strings
+}
+
+\itemize{
+\item \code{bru_like_control_family()} returns a list with \code{INLA::control.family} options,
+or a list of such lists, with one element per observation model
+}
 }
 \description{
 Utility functions for bru likelihood objects

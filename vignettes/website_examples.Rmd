@@ -23,8 +23,8 @@ These potentially long running examples/tutorials are available on
 (https://inlabru-org.github.io/inlabru/)
 
 ```{r, echo=FALSE,results="asis"}
-files <- list.files("web", "\\.Rmd$")
-for (file in file.path("web", files)) {
+files <- list.files("articles", "\\.Rmd$")
+for (file in file.path("articles", files)) {
   lines <- readLines(file, n = 10)
   title_idx <- grep("^title: ", lines)
   if (length(title_idx) > 0) {
@@ -34,7 +34,7 @@ for (file in file.path("web", files)) {
     cat("* [",
       title,
       "](https://inlabru-org.github.io/inlabru/articles/",
-      sub("\\.Rmd", ".html", file),
+      sub("\\.Rmd", ".html", basename(file)),
       ")\n",
       sep = ""
     )

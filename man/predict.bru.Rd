@@ -17,14 +17,14 @@
   used = NULL,
   drop = FALSE,
   ...,
-  data = NULL
+  data = deprecated()
 )
 }
 \arguments{
 \item{object}{An object obtained by calling \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}.}
 
-\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates needed for
-the prediction.}
+\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
+needed for the prediction.}
 
 \item{formula}{A formula where the right hand side defines an R expression
 to evaluate for each generated sample. If \code{NULL}, the latent and
@@ -57,20 +57,21 @@ predictor expression. The exclusion list is applied to the list
 as determined by the \code{include} parameter; Default: NULL (do not remove
 any components from the inclusion list)}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and \code{exclude}.
-Default \code{NULL}}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and
+\code{exclude}. Default \code{NULL}}
 
-\item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and the
-prediciton summary has the same number of rows as \code{newdata}, then the output is
-a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
+\item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and
+the prediciton summary has the same number of rows as \code{newdata}, then the
+output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 
-\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
+\item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 
-\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated. Use \code{newdata} instead.}
+\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 }
 \value{
-a \code{data.frame} or \verb{Spatial*} object with predicted mean values and other
-summary statistics attached.
+a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values and
+other summary statistics attached. Non-S4 object outputs have the class
+"bru_prediction" added at the front of the class list.
 }
 \description{
 Takes a fitted \code{bru} object produced by the function \code{\link[=bru]{bru()}} and produces
@@ -89,14 +90,14 @@ value drawn in course of estimating the statistics.
 Internally, this method calls \code{\link[=generate.bru]{generate.bru()}} in order to draw samples from
 the model.
 
-In addition to the component names (that give the effect
-of each component evaluated for the input data), the suffix \verb{_latent}
-variable name can be used to directly access the latent state for a component,
-and the suffix function \verb{_eval} can be used to evaluate a component at
-other input values than the expressions defined in the component definition
-itself, e.g. \code{field_eval(cbind(x, y))} for a component that was defined with
+In addition to the component names (that give the effect of each component
+evaluated for the input data), the suffix \verb{_latent} variable name can be used
+to directly access the latent state for a component, and the suffix function
+\verb{_eval} can be used to evaluate a component at other input values than the
+expressions defined in the component definition itself, e.g.
+\code{field_eval(cbind(x, y))} for a component that was defined with
 \code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
-f
+
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
@@ -104,6 +105,7 @@ generate new realisations for indices greater than \code{n}.
 \donttest{
 if (bru_safe_inla(multicore = FALSE) &&
     bru_safe_sp() &&
+    require("sp") &&
     require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE)) {
 

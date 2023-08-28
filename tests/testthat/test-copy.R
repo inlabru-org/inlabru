@@ -14,7 +14,7 @@ test_that("bru: inla copy feature", {
     +1 +
       myLin1(x,
         model = "rw1",
-        mapper = bru_mapper(INLA::inla.mesh.1d(seq(-1, 1, length.out = 100)),
+        mapper = bru_mapper(fm_mesh_1d(seq(-1, 1, length.out = 100)),
           indexed = FALSE
         )
       ) +

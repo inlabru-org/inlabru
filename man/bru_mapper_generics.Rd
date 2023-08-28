@@ -5,7 +5,6 @@
 \alias{ibm_n}
 \alias{ibm_n_output}
 \alias{ibm_values}
-\alias{ibm_amatrix}
 \alias{ibm_is_linear}
 \alias{ibm_jacobian}
 \alias{ibm_linear}
@@ -17,7 +16,6 @@
 \alias{ibm_n.default}
 \alias{ibm_n_output.default}
 \alias{ibm_values.default}
-\alias{ibm_amatrix.default}
 \alias{ibm_is_linear.default}
 \alias{ibm_jacobian.default}
 \alias{ibm_linear.default}
@@ -32,8 +30,6 @@ ibm_n(mapper, inla_f = FALSE, ...)
 ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_values(mapper, inla_f = FALSE, ...)
-
-ibm_amatrix(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_is_linear(mapper, ...)
 
@@ -56,8 +52,6 @@ ibm_invalid_output(mapper, input, state, ...)
 \method{ibm_n_output}{default}(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
-
-\method{ibm_amatrix}{default}(mapper, ...)
 
 \method{ibm_is_linear}{default}(mapper, ...)
 
@@ -117,13 +111,6 @@ would be interpretable by an \code{INLA::f(..., values = ...)} specification.
 The exception is the method for \code{bru_mapper_multi}, that returns a
 multi-column data frame.
 
-\item \code{ibm_amatrix()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-Deprecated since 2.7.0. Use \code{\link[=ibm_jacobian]{ibm_jacobian()}}
-instead.
-Implementations must return a (sparse) matrix of size \code{ibm_n_output(...)}
-by \code{ibm_n(...)}. The \code{inla_f=TRUE} argument should only affect
-the allowed type of input format.
-
 \item \code{ibm_is_linear()}: Implementations must return \code{TRUE} or \code{FALSE}.
 If \code{TRUE} (returned by the default method unless the mapper
 contains an \code{is_linear} variable), users of the mapper
@@ -176,18 +163,10 @@ first checks for a 'n_inla' element.
 'values' from the mapper object, and \code{seq_len(ibm_n(mapper))} if
 it doesn't exist.
 
-\item \code{ibm_amatrix(default)}: Gives an error message.
-Mapper classes must implement their own \code{ibm_jacobian} or
-\code{ibm_amatrix} methods. New implementations should use
-a \code{ibm_jacobian} method. \code{ibm_amatrix} may become deprecated
-in a future version.
-
 \item \code{ibm_is_linear(default)}: Returns logical
 \code{is_linear} from the mapper object if it exists, and otherwise \code{TRUE}.
 
-\item \code{ibm_jacobian(default)}: Calls \code{ibm_amatrix}, which
-by default gives an error.
-Mapper classes should implement their own \code{ibm_jacobian} method.
+\item \code{ibm_jacobian(default)}: Mapper classes must implement their own \code{ibm_jacobian} method.
 
 \item \code{ibm_linear(default)}: Calls \code{ibm_eval()} and \code{ibm_jacobian()}
 and returns a \code{bru_mapper_taylor} object.

@@ -29,7 +29,8 @@ checks and optionally sets the \code{sp} evolution status flag if \code{rgdal} i
 }
 \examples{
 \dontrun{
-if (bru_safe_sp()) {
+if (bru_safe_sp() &&
+  require("sp")) {
   # Run sp dependent calculations
 }
 }

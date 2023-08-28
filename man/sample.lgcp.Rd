@@ -73,9 +73,10 @@ or \code{R}, if specified. Output given in the same CRS as the mesh.
 \donttest{
 # The INLA package is required
 if (bru_safe_inla(quietly = TRUE) &&
-  bru_safe_sp()) {
+  bru_safe_sp() &&
+  require("sp")) {
   vertices <- seq(0, 3, by = 0.1)
-  mesh <- INLA::inla.mesh.1d(vertices)
+  mesh <- fm_mesh_1d(vertices)
   loglambda <- 5 - 0.5 * vertices
   pts <- sample.lgcp(mesh, loglambda)
   pts$y <- 0
@@ -88,7 +89,8 @@ if (bru_safe_inla(quietly = TRUE) &&
 # The INLA package is required
 if (bru_safe_inla(quietly = TRUE) &&
   require(ggplot2, quietly = TRUE) &&
-  bru_safe_sp()) {
+  bru_safe_sp() &&
+  require("sp")) {
   data("gorillas", package = "inlabru")
   pts <- sample.lgcp(gorillas$mesh,
     loglambda = 1.5,

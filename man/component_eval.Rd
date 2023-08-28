@@ -37,7 +37,7 @@ the effect of a component called "name".
 \examples{
 \dontrun{
 if (bru_safe_inla()) {
-  mesh <- INLA::inla.mesh.2d(
+  mesh <- fmesher::fm_mesh_2d_inla(
     cbind(0, 0),
     offset = 2, max.edge = 0.25
   )

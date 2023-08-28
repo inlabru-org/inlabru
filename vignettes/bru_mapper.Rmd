@@ -185,7 +185,7 @@ part of the latent state is only a part of the internal state, such as for
 `"bym"` models.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_offset(list(name1 = ..., name2 = ..., ...),
+mapper <- bru_mapper_collect(list(name1 = ..., name2 = ..., ...),
   hidden = FALSE
 )
 ibm_eval(mapper,
@@ -257,8 +257,8 @@ For object with predefined mapper conversion methods, use `bru_mapper(object)`
 to obtain a suitable mapper object.
 Current predefined object mappers are defined for objects of these classes:
 
-* `inla.mesh`; Use `bru_mapper(object)`
-* `inla.mesh.1d`; Use `bru_mapper(object, indexed)`
+* `fm_mesh_2d` and `inla.mesh`; Use `bru_mapper(object)`
+* `fm_mesh_1d` and `inla.mesh.1d`; Use `bru_mapper(object, indexed)`
 
 More details are given below.
 
@@ -356,12 +356,12 @@ For component models referenced by a character label (e.g. `"iid"`, `"bym2"`, `"
 inlabru will construct default mappers, that in most cases replicate the default `INLA::f()`
 behaviour.
 
-For the `inla.mesh` and `inla.mesh.1d` classes, default mappers can be constructed by
-the pre-defined `bru_mapper` S3 methods. For 2d meshes (`inla.mesh`),
+For the `fm_mesh_1d`, `fm_mesh_2d`, `inla.mesh` and `inla.mesh.1d` classes, default mappers can be constructed by
+the pre-defined `bru_mapper` S3 methods. For 2d meshes (`fm_mesh_2d`, `inla.mesh`),
 ```{r, eval=FALSE}
 bru_mapper(mesh)
 ```
-For 1d meshes (`inla.mesh.1d`),
+For 1d meshes (`fm_mesh_1d`, `inla.mesh.1d`),
 ```{r, eval=FALSE}
 # If ibm_values() should return mesh$loc (e.g. for "rw2" models
 # with degree=1 meshes)

@@ -2,48 +2,83 @@
 % Please edit documentation in R/rgl.R
 \name{glplot}
 \alias{glplot}
-\title{Render Spatial* and inla.mesh objects using RGL}
+\alias{glplot.SpatialPoints}
+\alias{glplot.SpatialLines}
+\alias{glplot.fm_mesh_2d}
+\alias{glplot.inla.mesh}
+\title{Render objects using RGL}
 \usage{
 glplot(object, ...)
+
+\method{glplot}{SpatialPoints}(object, add = TRUE, color = "red", ...)
+
+\method{glplot}{SpatialLines}(object, add = TRUE, ...)
+
+\method{glplot}{fm_mesh_2d}(object, add = TRUE, col = NULL, ...)
+
+\method{glplot}{inla.mesh}(object, add = TRUE, col = NULL, ...)
 }
 \arguments{
 \item{object}{an object used to select a method.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{...}{Parameters passed on to plot_rgl.fm_mesh_2d()}
+
+\item{add}{If TRUE, add the points to an existing plot. If FALSE, create new plot.}
+
+\item{color}{vector of R color characters. See material3d() for details.}
+
+\item{col}{Color specification. A single named color, a vector of scalar values, or a matrix of RGB values.}
 }
 \description{
-glplot is a generic function for renders various kinds of spatial objects, i.e. Spatial* data
-and inla.mesh objects. The function invokes particular methods which depend on the class of the first argument.
+\code{glplot()} is a generic function for renders various kinds of spatial objects, i.e. \verb{Spatial*} data
+and \code{fm_mesh_2d} objects. The function invokes particular methods which depend on the class of
+the first argument.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{glplot(SpatialPoints)}: This function will calculate the cartesian coordinates of the points provided
+and use points3d() in order to render them.
+
+\item \code{glplot(SpatialLines)}: This function will calculate a cartesian representation of the lines provided
+and use lines3d() in order to render them.
+
+\item \code{glplot(fm_mesh_2d)}: This function transforms the mesh to 3D cartesian coordinates and uses
+inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
+
+}}
 \examples{
-\dontrun{
-if (bru_safe_inla() &&
-  require("rgl", quietly = TRUE) &&
-  require("sphereplot", quietly = TRUE) &&
-  bru_safe_sp()) {
+\donttest{
+if (interactive() &&
+    require("rgl", quietly = TRUE) &&
+    require("sphereplot", quietly = TRUE) &&
+    bru_safe_sp() &&
+    require("sp")) {
+  # Show the globe
+  globe()
 
   # Load pantropoical dolphin data
-
   data("mexdolphin", package = "inlabru")
-
-  # Show the globe
-
-  globe()
 
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
 
-  glplot(mexdolphin$mesh)
-  glplot(mexdolphin$samplers)
-  glplot(mexdolphin$points)
+  glplot(mexdolphin$mesh, alpha = 0.2)
+  glplot(mexdolphin$samplers, lwd = 5)
+  glplot(mexdolphin$points, size = 10)
 }
 }
 }
 \seealso{
 Other inlabru RGL tools: 
-\code{\link{globe}()},
-\code{\link{glplot.SpatialLines}()},
-\code{\link{glplot.SpatialPoints}()},
-\code{\link{glplot.inla.mesh}()}
+\code{\link{globe}()}
+
+Other inlabru RGL tools: 
+\code{\link{globe}()}
+
+Other inlabru RGL tools: 
+\code{\link{globe}()}
+
+Other inlabru RGL tools: 
+\code{\link{globe}()}
 }
 \concept{inlabru RGL tools}

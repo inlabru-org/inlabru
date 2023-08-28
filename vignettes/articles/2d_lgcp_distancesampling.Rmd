@@ -1,0 +1,423 @@
+---
+title: "LGCPs - Distance sampling"
+author: "David Borchers and Finn Lindgren"
+date: "Generated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LGCPs - Distance sampling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+
+
+Introduction
+----------------
+We're going to estimate distribution and abundance from a line transect survey of dolphins in the Gulf of Mexico. These data are 
+also available in the `R` package `dsm` (where they go under the name `mexdolphins`). In `inlabru` the data are called `mexdolphin` for `sp` format, and `mexdolphin_sf` for `sf` format.
+
+Setting things up
+----------------
+
+Load libraries
+```{r results="hide",warning=FALSE,message=FALSE}
+library(inlabru)
+library(fmesher)
+library(INLA)
+library(ggplot2)
+```
+
+Get the data
+-----------------------------------------------------------------
+ 
+We'll start by loading the data, renaming it, and extracting the mesh (for convenience).
+
+```{r results="hide",warning=FALSE,message=FALSE}
+mexdolphin <- mexdolphin_sf
+mesh <- mexdolphin$mesh
+```
+
+Plot the data (the initial code below is just to get rid of tick marks, if desired)
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+noyticks <- theme(
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank()
+)
+
+noxticks <- theme(
+  axis.text.x = element_blank(),
+  axis.ticks = element_blank()
+)
+
+ggplot() +
+  gg(mexdolphin$ppoly) +
+  gg(mexdolphin$samplers, color = "grey") +
+  gg(mexdolphin$points, size = 0.2, alpha = 1) +
+  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.text = element_text(size = 6))
+```
+
+Spatial model with a half-normal detection function
+-----------------------------------------------------------------
+The `samplers` in this dataset are lines, not polygons, so we need to tell `inlabru` about the
+strip half-width, `W`, which in the case of these data is 8.
+We start by plotting the distances and histogram of frequencies in distance intervals:
+
+```{r fig.width=10, fig.heigth=4}
+W <- 8
+ggplot(mexdolphin$points) +
+  geom_histogram(aes(x = distance),
+    breaks = seq(0, W, length.out = 9),
+    boundary = 0, fill = NA, color = "black"
+  ) +
+  geom_point(aes(x = distance), y = 0, pch = "|", cex = 4)
+```
+
+We need to define a half-normal detection probability function. This must take distance as its first
+argument and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
+
+```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
+hn <- function(distance, lsig) {
+  exp(-0.5 * (distance / exp(lsig))^2)
+}
+```
+
+Specify and fit an SPDE model to these data using a half-normal detection function form.
+We need to define a (Matern) covariance function for the SPDE
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+matern <- inla.spde2.pcmatern(mexdolphin$mesh,
+  prior.sigma = c(2, 0.01),
+  prior.range = c(50, 0.01)
+)
+```
+
+We need to now separately define the components of the model 
+(the SPDE, the Intercept and the detection function parameter `lsig`)
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+cmp <- ~ mySPDE(main = geometry, model = matern) +
+  lsig(1) + Intercept(1)
+```
+
+... and the formula, which describes how these components are combined to 
+form the linear predictor (remembering that we need an offset due to the unknown
+direction of the detections!):
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+form <- geometry + distance ~ mySPDE +
+  log(hn(distance, lsig)) +
+  Intercept + log(2)
+```
+
+Then fit the model, passing both the components and the formula 
+(previously the formula was constructed invisibly by `inlabru`),
+and specify integration domains for the spatial and distance dimensions:
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+fit <- lgcp(
+  components = cmp,
+  mexdolphin$points,
+  samplers = mexdolphin$samplers,
+  domain = list(
+    geometry = mesh,
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
+  ),
+  formula = form
+)
+```
+
+Look at the SPDE parameter posteriors
+ 
+
+```{r }
+spde.range <- spde.posterior(fit, "mySPDE", what = "range")
+plot(spde.range)
+spde.logvar <- spde.posterior(fit, "mySPDE", what = "log.variance")
+plot(spde.logvar)
+```
+
+Predict spatial intensity, and plot it:
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
+pxl <- fm_pixels(mesh, dims = c(200, 100), mask = mexdolphin$ppoly)
+pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
+```
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, fig.width=10, fig.heigth=4}
+ggplot() +
+  gg(pr.int, geom = "tile") +
+  gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
+  gg(mexdolphin$samplers, color = "grey") +
+  gg(mexdolphin$points, size = 0.2, alpha = 1) +
+  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.text = element_text(size = 6))
+```
+
+Predict the detection function and plot it, to generate a plot like the one below.
+Here, we should make sure that it doesn't try to evaluate the effects of
+components that can't be evaluated using the given input data. Here, we're only
+providing distances and no spatial coordinates, so we cannot evaluate the
+spatial random field in this `predict()` call. We can specify this by providing
+a vector of component names to include in the prediction calculations, here only
+"lsig", with `include = "lsig"`. See `?predict.bru` for more information.
+From version `2.8.0`, inlabru attmepts to automatically detect which components
+are used by the predictor expression, and the `include` argument can usually be left out.
+
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
+distdf <- data.frame(distance = seq(0, 8, length.out = 100))
+dfun <- predict(fit, distdf, ~ hn(distance, lsig))
+plot(dfun)
+```
+The average detection probability within the maximum detection distance is estimated to be
+`r mean(dfun$mean)`.
+
+
+We can look at the posterior for expected number of dolphins as usual:
+
+```{r warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
+Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
+Lambda
+```
+
+and including the randomness about the expected number. In this case, it turns
+out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte Carlo
+error in the posterior, and this takes a little while to compute:
+
+```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
+Ns <- seq(50, 450, by = 1)
+Nest <- predict(fit, predpts,
+  ~ data.frame(
+    N = Ns,
+    density = dpois(Ns,
+      lambda = sum(weight * exp(mySPDE + Intercept))
+    )
+  ),
+  n.samples = 2000
+)
+
+Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
+ggplot(data = Nest) +
+  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
+```
+
+Hazard-rate Detection Function
+-----------------------------------------------------------------
+Try doing this all again, but use this hazard-rate detection function model:
+
+```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
+hr <- function(distance, lsig) {
+  1 - exp(-(distance / exp(lsig))^-1)
+}
+```
+
+Solution:
+
+```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+formula1 <- geometry + distance ~ mySPDE +
+  log(hr(distance, lsig)) +
+  Intercept + log(2)
+
+fit1 <- lgcp(
+  components = cmp,
+  mexdolphin$points,
+  samplers = mexdolphin$samplers,
+  domain = list(
+    geometry = mesh,
+    distance = fm_mesh_1d(seq(0, 8, length.out = 30))
+  ),
+  formula = formula1
+)
+```
+Plots:
+```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
+plot(spde.range)
+spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
+plot(spde.logvar)
+
+pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
+
+ggplot() +
+  gg(pr.int1, geom = "tile") +
+  gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
+  gg(mexdolphin$samplers, color = "grey") +
+  gg(mexdolphin$points, size = 0.2, alpha = 1) +
+  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.text = element_text(size = 6))
+
+distdf <- data.frame(distance = seq(0, 8, length.out = 100))
+dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
+plot(dfun1)
+
+predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
+Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
+Lambda1
+
+Ns <- seq(50, 650, by = 1)
+Nest1 <- predict(
+  fit1,
+  predpts,
+  ~ data.frame(
+    N = Ns,
+    density = dpois(Ns,
+      lambda = sum(weight * exp(mySPDE + Intercept))
+    )
+  ),
+  n.samples = 2000
+)
+
+Nest1$plugin_estimate <- dpois(Nest1$N, lambda = Lambda1$mean)
+ggplot(data = Nest1) +
+  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_ribbon(
+    aes(
+      x = N,
+      ymin = mean - 2 * mean.mc_std_err,
+      ymax = mean + 2 * mean.mc_std_err,
+      colour = NULL, fill = "Posterior"
+    ),
+    alpha = 0.2
+  ) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
+```
+
+Comparing the models
+-----------------------
+
+
+Look at the goodness-of-fit of the two models in the distance dimension
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+bc <- bincount(
+  result = fit,
+  observations = mexdolphin$points$distance,
+  breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
+  predictor = distance ~ hn(distance, lsig)
+)
+attributes(bc)$ggp
+
+bc1 <- bincount(
+  result = fit1,
+  observations = mexdolphin$points$distance,
+  breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
+  predictor = distance ~ hn(distance, lsig)
+)
+attributes(bc1)$ggp
+```
+
+Fit Models only to the distance sampling data
+-----------------------------------------------------------------
+Half-normal first
+
+```{r,results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+formula <- distance ~ log(hn(distance, lsig)) + Intercept
+cmp <- ~ lsig(1) + Intercept(1)
+dfit <- lgcp(
+  components = cmp,
+  mexdolphin$points,
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
+  formula = formula,
+  options = list(bru_initial = list(lsig = 1, Intercept = 3))
+)
+detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
+```
+
+Half-normal next
+
+```{r,results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+formula1 <- distance ~ log(hr(distance, lsig)) + Intercept
+cmp <- ~ lsig(1) + Intercept(1)
+dfit1 <- lgcp(
+  components = cmp,
+  mexdolphin$points,
+  domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
+  formula = formula1
+)
+detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))
+```
+
+
+Plot both lines on histogram of observations
+First scale lines to have same area as that of histogram
+Half-normal:
+
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+hnline <- data.frame(distance = detfun$distance, p = detfun$mean, lower = detfun$q0.025, upper = detfun$q0.975)
+wts <- diff(hnline$distance)
+wts[1] <- wts[1] / 2
+wts <- c(wts, wts[1])
+hnarea <- sum(wts * hnline$p)
+n <- length(mexdolphin$points$distance)
+scale <- n / hnarea
+hnline$En <- hnline$p * scale
+hnline$En.lower <- hnline$lower * scale
+hnline$En.upper <- hnline$upper * scale
+```
+
+Hazard-rate:
+
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+hrline <- data.frame(distance = detfun1$distance, p = detfun1$mean, lower = detfun1$q0.025, upper = detfun1$q0.975)
+wts <- diff(hrline$distance)
+wts[1] <- wts[1] / 2
+wts <- c(wts, wts[1])
+hrarea <- sum(wts * hrline$p)
+n <- length(mexdolphin$points$distance)
+scale <- n / hrarea
+hrline$En <- hrline$p * scale
+hrline$En.lower <- hrline$lower * scale
+hrline$En.upper <- hrline$upper * scale
+```
+
+Combine lines in a single object for plotting
+
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+dlines <- rbind(
+  cbind(hnline, model = "Half-normal"),
+  cbind(hrline, model = "Hazard-rate")
+)
+```
+
+Plot without the 95% credible intervals
+
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+ggplot(data.frame(mexdolphin$points)) +
+  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
+  geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
+  geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model))
+```
+
+Plot with the 95% credible intervals (without taking the count rescaling into account)
+```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+ggplot(data.frame(mexdolphin$points)) +
+  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
+  geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
+  geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
+  geom_ribbon(
+    data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
+    alpha = 0.2, lty = 2
+  )
+```

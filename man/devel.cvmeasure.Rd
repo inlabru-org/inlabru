@@ -27,7 +27,8 @@ Calculates local and integrated variance and correlation measures as introduced 
 \donttest{
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE) &&
-    bru_safe_sp()) {
+    bru_safe_sp() &&
+    require("sp")) {
 
   # Load Gorilla data
 

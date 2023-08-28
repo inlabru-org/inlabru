@@ -25,3 +25,6 @@
 ^sf$
 ^misc$
 ^inla.model
+^man/chk$
+^man/chk_all$
+^man/chk_found$

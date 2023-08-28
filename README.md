@@ -89,64 +89,48 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
 # Load libraries
-library(inlabru)
 library(INLA)
 #> Loading required package: Matrix
-#> This is INLA_23.06.15 built 2023-06-15 06:01:53 UTC.
+#> This is INLA_23.08.26 built 2023-08-26 14:18:34 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
+library(inlabru)
+#> Loading required package: fmesher
+library(fmesher)
 library(ggplot2)
-bru_safe_sp(force = TRUE) # Ensures sp works without rgdal installed
-
-# Load the data
-data(gorillas, package = "inlabru")
 
 # Construct latent model components
-matern <- inla.spde2.pcmatern(gorillas$mesh,
+matern <- inla.spde2.pcmatern(
+  gorillas_sf$mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.01, 0.01)
 )
-cmp <- ~ mySmooth(coordinates, model = matern) + Intercept(1)
+cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
-  components = cmp,
+  cmp,
   like(
-    formula = coordinates ~ .,
+    formula = geometry ~ .,
     family = "cp",
-    data = gorillas$nests,
-    samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh)
+    data = gorillas_sf$nests,
+    samplers = gorillas_sf$boundary,
+    domain = list(geometry = gorillas_sf$mesh)
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
-#> Please note that rgdal will be retired during October 2023,
-#> plan transition to sf/stars/terra functions using GDAL and PROJ
-#> at your earliest convenience.
-#> See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution
-#> rgdal: version: 1.6-7, (SVN revision 1203)
-#> Geospatial Data Abstraction Library extensions to R successfully loaded
-#> Loaded GDAL runtime: GDAL 3.4.1, released 2021/12/27
-#> Path to GDAL shared files: /usr/share/gdal
-#> GDAL binary built with GEOS: TRUE 
-#> Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]
-#> Path to PROJ shared files: /home/flindgre/.local/share/proj:/usr/share/proj
-#> PROJ CDN enabled: FALSE
-#> Linking to sp version:1.6-1
-#> To mute warnings of possible GDAL/OSR exportToProj4() degradation,
-#> use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.
 
 # Predict Gorilla nest intensity
 lambda <- predict(
   fit,
-  fm_pixels(gorillas$mesh, mask = gorillas$boundary, format = "sp"),
+  fm_pixels(gorillas_sf$mesh, mask = gorillas_sf$boundary),
   ~ exp(mySmooth + Intercept)
 )
 
 # Plot the result
 ggplot() +
-  gg(lambda) +
-  gg(gorillas$nests, color = "red", size = 0.2) +
-  coord_equal() +
+  geom_fm(data = gorillas_sf$mesh) +
+  gg(lambda, geom = "tile") +
+  gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
   ggtitle("Nest intensity per km squared")
 ```
 

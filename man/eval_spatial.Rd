@@ -7,6 +7,7 @@
 \alias{eval_spatial.SpatialGridDataFrame}
 \alias{eval_spatial.sf}
 \alias{eval_spatial.SpatRaster}
+\alias{eval_spatial.stars}
 \title{Evaluate spatial covariates}
 \usage{
 eval_spatial(data, where, layer = NULL, selector = NULL)
@@ -20,6 +21,8 @@ eval_spatial(data, where, layer = NULL, selector = NULL)
 \method{eval_spatial}{sf}(data, where, layer = NULL, selector = NULL)
 
 \method{eval_spatial}{SpatRaster}(data, where, layer = NULL, selector = NULL)
+
+\method{eval_spatial}{stars}(data, where, layer = NULL, selector = NULL)
 }
 \arguments{
 \item{data}{Spatial data}

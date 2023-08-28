@@ -2,21 +2,21 @@ test_that("Linearisation", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  data <- data.frame(x = 1:10)
+  set.seed(12345L)
+  data <- data.frame(x = seq_len(10) / 1)
   data <- within(data, {
-    y <- exp(x / 5) - 4 + rnorm(length(x), sd = 0.1)
-    z <- rpois(length(x), exp(x / 5) + 4)
+    y <- exp(x / 5) - 2 + rnorm(length(x), sd = 0.1)
+    z <- rpois(length(x), (exp(x / 5) + exp(2)))
   })
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
-  # NOTE: Need explicit include specification to allow mapper construction for Int_y
   lhoods <-
     like_list(
       like(
         formula = y ~ exp(x) + Int_y_latent, data = data
       ),
       like(
-        formula = z ~ exp(x) + Int_z, data = data, family = "poisson"
+        formula = z ~ log(exp(x) + exp(Int_z_latent)), data = data, family = "poisson"
       )
     )
   lhoods <- bru_used_update(lhoods, names(component_list(cmp)))
@@ -26,12 +26,12 @@ test_that("Linearisation", {
   expect_equal(used[["latent"]], "Int_y")
 
   used <- bru_used(lhoods[[2]])
-  expect_equal(used[["effect"]], c("x", "Int_z"))
-  expect_equal(used[["latent"]], character(0))
+  expect_equal(used[["effect"]], "x")
+  expect_equal(used[["latent"]], "Int_z")
 
   used <- bru_used(lhoods)
-  expect_equal(used[["effect"]], c("x", "Int_z"))
-  expect_equal(used[["latent"]], "Int_y")
+  expect_equal(used[["effect"]], "x")
+  expect_equal(used[["latent"]], c("Int_y", "Int_z"))
 
   model <- bru_model(component_list(cmp, lhoods), lhoods)
 
@@ -49,7 +49,7 @@ test_that("Linearisation", {
     model,
     lhoods = lhoods,
     input = inp,
-    state = list(x = 1 / 5, Int_y = -4, Int_z = 4),
+    state = list(x = 1 / 5, Int_y = -4, Int_z = log(4)),
     comp_simple = comp_lin
   )
 
@@ -93,6 +93,9 @@ test_that("Linearisation", {
         components = cmp,
         lhoods,
         options = list(
+          #          bru_initial = list(
+          #            x = 1 / 5, Int_y = -4, Int_z = log(4)
+          #          ),
           control.inla = list(int.strategy = "eb"),
           bru_verbose = FALSE,
           bru_method = list(

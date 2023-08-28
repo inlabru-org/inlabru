@@ -36,7 +36,7 @@ Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
 # ipoints needs INLA
 if (bru_safe_inla()) {
   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-  ips1 <- fm_int(INLA::inla.mesh.1d(0:20),
+  ips1 <- fm_int(fm_mesh_1d(0:20),
     rbind(c(0, 3), c(3, 8)),
     name = "myDim"
   )

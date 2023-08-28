@@ -184,7 +184,7 @@ spde.posterior <- function(result, name, what = "range") {
 
   if (what == "matern.correlation" || what == "matern.covariance") {
     xmax <- exp(spderesult$summary.log.range.nominal[["0.975quant"]]) * 1.2
-    x <- seq(0, xmax, length = 200)
+    x <- seq(0, xmax, length.out = 200)
     log.range <- list(
       mean = spderesult$summary.log.range.nominal[["mean"]],
       sd = spderesult$summary.log.range.nominal[["sd"]]

@@ -39,9 +39,9 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   # Fit an LGCP model with  and SPDE component
 
-  x <- seq(0, 55, length = 20)
-  mesh1D <- INLA::inla.mesh.1d(x, boundary = "free")
-  mdl <- x ~ spde1D(x, model = INLA::inla.spde2.matern(mesh1D)) + Intercept
+  x <- seq(0, 55, length.out = 20)
+  mesh1D <- fm_mesh_1d(x, boundary = "free")
+  mdl <- x ~ spde1D(x, model = INLA::inla.spde2.matern(mesh1D)) + Intercept(1)
   fit <- lgcp(mdl, data = pts2, domain = list(x = mesh1D))
 
   # Calculate and plot the posterior range

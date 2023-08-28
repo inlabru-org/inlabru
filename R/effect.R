@@ -239,7 +239,7 @@ component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- component("myEffectOfX",
 #'     main = x,
-#'     model = INLA::inla.spde2.matern(INLA::inla.mesh.1d(1:10))
+#'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -1229,7 +1229,7 @@ make_submapper <- function(subcomp_n,
       if (allow_interpolation) {
         mapper <-
           bru_mapper(
-            INLA::inla.mesh.1d(values),
+            fm_mesh_1d(values),
             indexed = require_indexed
           )
       } else {
@@ -1273,7 +1273,7 @@ make_submapper <- function(subcomp_n,
 #' @examples
 #' if (bru_safe_inla(quietly = TRUE)) {
 #'   library(INLA)
-#'   mesh <- inla.mesh.create(globe = 2)
+#'   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,
 #'     prior.range = c(1, 0.5),
 #'     prior.sigma = c(1, 0.5)
@@ -1293,9 +1293,9 @@ bru_get_mapper <- function(model, ...) {
 #' if no known mesh type is found in the model object.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  if (inherits(model$mesh, "inla.mesh")) {
+  if (inherits(model$mesh, c("fm_mesh_2d", "inla.mesh"))) {
     mapper <- bru_mapper(model$mesh)
-  } else if (inherits(model$mesh, "inla.mesh.1d")) {
+  } else if (inherits(model$mesh, c("fm_mesh_1d", "inla.mesh.1d"))) {
     mapper <- bru_mapper(model$mesh, indexed = TRUE)
   } else {
     mapper <- NULL
@@ -1692,7 +1692,7 @@ print.summary_component_list <- function(x, ...) {
 #' @keywords internal
 #' @param component A component.
 #' @param input Component inputs, from `input_eval()`
-#' @param linearisation evaluation state
+#' @param state linearisation evaluation state
 #' @param ... Optional parameters passed on to `ibm_eval`
 #' and `ibm_jacobian.
 #' @return A `bru_mapper_taylor` or `comp_simple_list` object.
@@ -1771,15 +1771,21 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' @section Spatial Covariates:
 #'
 #' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-#' surface temperature or elevation. Although it is straight forward to add this data to the input
+#' surface temperature or elevation. Although it is straightforward to add this data to the input
 #' data frame or write a covariate function like in the previous section there is an even more
 #' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
 #' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the input expressions if the [like()] data is a `SpatialPointsDataFrame` object.
-#' inlabru will automatically
+#' the input expressions if they are supported by [eval_spatial()], and
+#' the [like()] data is an `sf` or `SpatialPointsDataFrame` object.
+#' `inlabru` will then automatically
 #' evaluate and/or interpolate the covariate at your data locations when using code like
 #' ```
 #' components = y ~ psi(mySpatialPixels, model = "linear")
+#' ```
+#' For more precise control, use the the `layer` and `selector` arguments (see [component()]),
+#' or call `eval_spatial()` directly, e.g.:
+#' ```
+#' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.), model = "linear")
 #' ```
 #'
 #' @section Coordinates:
@@ -1792,13 +1798,26 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
 #' this would look as follows:
 #' ```
-#' components = y ~ mySPDE(main = coordinates, model = inla.spde2.matern(...))
+#' components = y ~ field(coordinates, model = inla.spde2.matern(...))
 #' ```
+#' Since `coordinates` is a function from the `sp` package, this results in
+#' evaluation of `sp::coordinates(.data.)`, which loses any CRS information
+#' from the data object.
+#'
+#' For `sf` data with a geometry column (by default named `geometry`), use
+#' ```
+#' components = y ~ field(geometry, model = inla.spde2.matern(...))
+#' ```
+#' Since the CRS information is part of the geometry column of the `sf` object,
+#' this retains CRS information, so this is more robust, and allows the model
+#' to be built on a different CRS than the observation data.
+#'
 #'
 #' @export
 #' @keywords internal
 #' @param component A component.
-#' @param data A `data.frame` or `Spatial*` object of covariates and/or point locations.
+#' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
+#' covariates and/or point locations.
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component mapper
@@ -1880,9 +1899,22 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 }
 
 
+#' @describeIn input_eval Attempts to evaluate a component input (e.g. `main`,
+#' `group`, `replicate`, or `weight`), and process the results:
+#' 1. If `eval()` failed, return NULL or map everything to 1
+#'    (see the `null.on.fail` argument). This should normally not
+#'    happen, unless the component use logic is incorrect,
+#'    (e.g. via `include`/`exclude`)
+#'    leading to missing columns for a certain likelihood in a
+#'    multi-`like()` model.
+#' 2. If we obtain a function, apply the function to the data object
+#' 3. If we obtain an object supported by [eval_spatial()], extract the values
+#'    of that data frame at the point locations
+#' 4. Else we obtain a vector and return as-is. This happens when input
+#'    references a column of the data points, or some other complete expression
+#'
+#' @seealso [component()]
 #' @export
-#' @rdname input_eval
-
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
   # Evaluate the map with the data in an environment
@@ -1912,16 +1944,6 @@ input_eval.bru_input <- function(input, data, env = NULL,
     }
   )
 
-  # 0) Eval failed. map everything to 1. This happens for automatically
-  #    added Intercept, and for some components that cannot be evaluated
-  #    based on the data, e.g. missing columns for a certain likelihood in a
-  #    multilikelihood model.
-  # 1) If we obtain a function, apply the function to the data
-  # 2) If we obtain a SpatialGridDataFrame extract the values of that data
-  #    frame at the point locations using the over() function
-  # 3) Else we obtain a vector and return as-is. This happens when input
-  #    references a column of the data points, or some other complete expression
-
   # ## Need to handle varying input lengths.
   # ## auto-expansion of scalars needs to happen elsewhere, where it's needed,
   # ## e.g. when using component A-matrices to construct a default linear model
@@ -1938,16 +1960,38 @@ input_eval.bru_input <- function(input, data, env = NULL,
       }
 
       val <- 1
-      warning(
-        paste0(
-          "The input evaluation '",
-          deparse(input$input),
-          "' for '", input$label,
-          "' failed. Perhaps the data object doesn't contain the needed variables?",
-          " Falling back to '1'."
-        ),
-        immediate. = TRUE
-      )
+      input_string <- deparse(input$input)
+      if (identical(input_string, "coordinates")) {
+        warning(
+          paste0(
+            "The input evaluation '",
+            input_string,
+            "' for '", input$label,
+            "' failed. Perhaps you need to load the 'sp' package with 'library(sp)'?",
+            " Attempting 'sp::coordinates'."
+          ),
+          immediate. = TRUE
+        )
+        input$input <- expression(sp::coordinates)
+        return(input_eval(
+          input,
+          data = data,
+          env = env,
+          null.on.fail = null.on.fail,
+          ...
+        ))
+      } else {
+        warning(
+          paste0(
+            "The input evaluation '",
+            input_string,
+            "' for '", input$label,
+            "' failed. Perhaps the data object doesn't contain the needed variables?",
+            " Falling back to '1'."
+          ),
+          immediate. = TRUE
+        )
+      }
       return(val)
     }
     return(val)
@@ -2008,11 +2052,10 @@ input_eval.bru_input <- function(input, data, env = NULL,
     val <- as(val, "Matrix")
   } else if (inherits(
     e_input,
-    c(
-      "SpatialGridDataFrame",
-      "SpatialPixelsDataFrame",
-      "SpatRaster",
-      "sf"
+    gsub(
+      pattern = "^eval_spatial\\.([^*]*)\\*?",
+      replacement = "\\1",
+      x = format(utils::.S3methods("eval_spatial"))
     )
   )) {
     input_layer <-

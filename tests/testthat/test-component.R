@@ -5,6 +5,16 @@ test_that("Component construction: linear model", {
 
   # Using label as input:
   cmp0 <- component_list(
+    list(component("x", x)),
+    lhoods = llik
+  )[["x"]]
+
+  expect_equal(cmp0$label, "x")
+  expect_equal(cmp0$main$model, "linear")
+  expect_equal(as.character(cmp0$main$input$input), "x")
+
+  # Using label as input:
+  cmp0 <- component_list(
     ~x,
     lhoods = llik
   )[["x"]]
@@ -250,7 +260,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- INLA::inla.mesh.1d(
+  mesh1 <- fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(

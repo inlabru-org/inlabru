@@ -45,7 +45,7 @@ together with the global override options. Default: \code{TRUE}}
 options list should be emptied before setting the new option(s).}
 }
 \value{
-\code{bru_options()} returns an \code{bru_options} object.
+\code{bru_options()} returns a \code{bru_options} object.
 
 For \code{as.bru_options()}, \code{NULL} or no input returns an empty
 \code{bru_options} object, a \code{list} is converted via \code{bru_options(...)},
@@ -74,16 +74,22 @@ The \verb{_get}, \verb{_set}, and \verb{_reset} functions operate on a global
 package options override object. In many cases, setting options in
 specific calls to \code{\link[=bru]{bru()}} is recommended instead.
 }
-\details{
-\code{bru_options_check} checks for valid contents of an \code{bru_options}
-object
+\section{Functions}{
+\itemize{
+\item \code{as.bru_options()}: Coerces inputs to a \code{bru_options} object.
 
-\code{bru_options_check()} produces warnings for invalid options.
+\item \code{bru_options_default()}: Returns the default options.
 
-\code{bru_options_set()} is used to set global package options.
+\item \code{bru_options_check()}: Checks for valid contents of a \code{bru_options}
+object, and produces warnings for invalid options.
 
-\code{bru_options_reset()} clears the global option overrides.
-}
+\item \code{bru_options_get()}: Used to access global package options.
+
+\item \code{bru_options_set()}: Used to set global package options.
+
+\item \code{bru_options_reset()}: Clears the global option overrides.
+
+}}
 \section{Valid options}{
 
 For \code{bru_options} and \code{bru_options_set}, recognised options are:
@@ -136,7 +142,7 @@ multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
 standard deviation is less than \code{rel_tol}. Default 0.1 (ten percent).}
 \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.}
-\item{lin_opt_method}{Which method to use for the line search optimisation step.
+\item{line_opt_method}{Which method to use for the line search optimisation step.
 Default "onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.
 The method "full" does line optimisation on the full nonlinear predictor;
@@ -177,19 +183,10 @@ if (interactive()) {
 }
 \dontrun{
 if (interactive()) {
-  # EXAMPLE1
-}
-}
-\dontrun{
-if (interactive()) {
   bru_options_check(bru_options(bru_max_iter = "text"))
 }
 }
-\dontrun{
-if (interactive()) {
-  # EXAMPLE1
-}
-}
+bru_options_get("bru_verbose")
 \dontrun{
 if (interactive()) {
   bru_options_set(

@@ -1,0 +1,880 @@
+---
+title: "Residual Analysis of spatial point process models using Bayesian methods"
+author: "Niharika Reddy Peddinenikalva"
+date: "`r Sys.Date()`"
+output: html_document
+header-includes: 
+  - \newcommand{\R}{\mathbb{R}}
+  - \newcommand{\C}{\mathbb{C}}
+  - \newcommand{\Z}{\mathbb{Z}}
+  - \newcommand{\E}{\mathbb{E}}
+  - \newcommand{\probP}{\text{I\kern-0.15em P}}
+  - \newcommand{\abs}[1]{\lvert #1 \rvert}
+  - \newcommand{\vb}[1]{\mathbf{#1}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  cache = TRUE,
+  dev = "png",
+  dev.args = list(type = "cairo-png")
+)
+library("INLA")
+library("inlabru")
+library("RColorBrewer")
+library("ggplot2")
+library("dplyr")
+library("lwgeom")
+library("patchwork")
+library("terra")
+library("data.table")
+bru_safe_sp(force = TRUE)
+```
+
+```{r, eval=TRUE, echo=FALSE}
+# Determine function location
+code_location <- "2d_lgcp_residuals_functions.R"
+if (!file.exists(code_location)) {
+  code_location <- system.file(file.path("misc", code_location), package = "inlabru")
+}
+```
+
+```{r load-functions, file=code_location, eval=TRUE, echo=FALSE}
+# Do not change this code chunk
+# Load function definitions
+source(code_location)
+```
+```{r , eval=FALSE, echo=TRUE}
+# Load function definitions
+source(system.file(
+  file.path("misc", "2d_lgcp_residuals_functions.R"),
+  package = "inlabru"
+))
+```
+
+# Introduction
+Point processes are useful for spatial data analysis and have wide applications 
+in ecology, epidemiology, seismology, computational neuroscience, etc. 
+Residual analysis is an effective assessment method for spatial point processes, which commonly takes a frequentist approach.
+
+In this vignette, we will calculate residuals of some of the models from https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html
+using a Bayesian approach to the residual methods in "Residual Analysis for 
+spatial point processes" (Baddeley et al). 
+
+# Theory of Residuals for Spatial point process models
+
+Consider a spatial point pattern $\mathbf{x} = \{x_1, \dots, x_n \}$ of $n$ 
+points in a bounded region $W$ of $\R^2$. For a model of a spatial point 
+process $\vb{X}$ with probability density $f_{\theta}$ and parameter $\theta$, 
+the innovation process of the model is defined by
+\begin{equation}\label{eq:innovations}
+    I_{\theta}(B) = n(\vb{X} \cap B) - \int_B \lambda_{\theta} (u) \, du
+\end{equation}
+Here, $\int_B \lambda_{\theta}(u) \, du$ is the expected number of points of the
+fitted model in the bounded subset of $B$. 
+Innovations satisfy $\E_{\theta} \left[ I_{\theta}(B)\right] = 0$ .
+
+Given data $\vb{x}$ of the model and that the parameter estimate is 
+$\hat{\theta}$, the raw residuals are given by 
+\begin{equation}\label{eq:raw residuals}
+    R_{\hat{\theta}}(B) = n(\vb{x} \cap B) - \int_B \hat{\lambda}(u) \,du
+\end{equation}
+
+Increments of the innovation process $I$ and raw residuals of the Poisson 
+processes $R$ are analogous to errors and raw residuals of linear models 
+respectively. 
+
+## Types of Residuals
+
+We can scale the raw residual by scaling the increments of $R_{\hat{\theta}}$. \\
+The $h$-weighted innovations are given by
+\begin{equation}\label{eq:h innovations}
+    I(B, h, \lambda) = \sum_{x_i \in \vb{X} \cap B} h(x_i) - 
+    \int_B h(u) \lambda(u) \,du
+\end{equation}
+This leads to the $h$-weighted residuals
+\begin{equation}
+\label{eq:h residuals}
+    R(B, \hat{h}, \hat{\theta}) = I(B, \hat{h}, \hat{\lambda}) = 
+    \sum_{x_i \in \vb{x} \cap B} h(x_i) - \int_B \hat{h}(u) \hat{\lambda}(u)\,du
+\end{equation}
+Since the innovation has mean 0, a true model would yield 
+\[
+\E \left[R(B, \hat{h}, \hat{\theta})\right] \approx 0.
+\]
+Changing the choice of the weight function $h$, yields  different types of 
+residuals. 
+
+### Scaling Residuals
+By taking $h(u) = \vb{1} \{ u \in B\}$, we get the raw residuals:
+\begin{aligned}
+    R(B, \hat{h}, \hat{\theta}) & = I(B, \hat{h}, \hat{\lambda}) = 
+    \sum_{x_i \in \vb{x} \cap B}h(x_i) - \int_B \hat{h}(u)\hat{\lambda}(u)\,du\\
+    & = n(\vb{x} \cap B) - \int_B \hat{\lambda}(u) \,du
+\end{aligned}
+
+### Inverse Residuals
+By taking $h(u) = \frac{1}{\lambda (u)}$, we may encounter the case where 
+$\lambda(u) = 0$. The GNZ-formula
+\begin{equation}
+\E \left[ \sum_{x_i \in \vb{X}} h(x_i)\right] = 
+\E \left[ \int_W h(u) \lambda(u) \,du \right],
+\end{equation}
+would still hold for the first terms of the $h$-weighted residuals to exist. If
+we define $h(u) \lambda(u) = 0$ for all $u$ such that $\lambda(u) = 0$, then the second term of $h$-weighted residuals will also exist and the inverse residual 
+is given by
+\begin{aligned}
+    R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) & = 
+    \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
+    \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
+    & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
+    \int_B \vb{1} \{ x_i \in \vb{x} \} \,du 
+\end{aligned}
+    
+### Pearson Residuals
+By using $h(u) = \frac{1}{\sqrt{\lambda(u)}}$, the Pearson residual is given by
+\begin{aligned}
+    R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right) 
+    & = \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
+    \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
+    & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
+    \int_B \sqrt{\hat{\lambda}(u)} \,du 
+\end{aligned}
+Here, zero values of $\hat{\lambda}(u)$ do not cause any issues with calculating residuals as we set $\hat{h}(u) \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)}$ for 
+all $u$.
+
+So the three types of residuals are:
+\begin{eqnarray}
+\text{Scaled:} \qquad & R(B, \hat{h}, \hat{\theta}) & = n(\vb{x} \cap B) - 
+\int_B \hat{\lambda}(u) \,du \\
+\text{Inverse:} \qquad & R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) 
+& = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
+\int_B \vb{1} \{ x_i \in \vb{x} \} \,du \\
+\text{Pearson:} \qquad &  R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta} \right) & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - 
+\int_B \sqrt{\hat{\lambda}(u)} \,du 
+\end{eqnarray}
+
+Note that $\hat{\lambda}(u)$ and $\hat{h}(u)$ are estimates of $\lambda (u)$ and
+$h(u)$ respectively
+
+## Motivation for choice of residuals
+The scaling residuals are nothing but the raw residuals and hence depict the 
+residual data as is. However, the Pearson residuals use a weighted function 
+$h(u) = \frac{1}{\lambda(u)}$ so this helps to obtain normalised residuals since
+the denominator accounts for variance of the residuals and hence makes it 
+reliable for any sample size. 
+
+The use of the inverse residual in this project is less clear. However, we do 
+know that it is easier to compute this residual since we have the GNZ formula to
+estimate the value of $h(u) = \frac{1}{\lambda(u)} for any value $\lambda(u)$. 
+
+For notation's sake in this discussion, let $h_{s}(u), h_{i}(u), h_p(u)$ 
+indicate the weight function for scaling, inverse and Pearson residuals 
+respectively. 
+Then, $h_s(u) = \vb{1}\{u \in B\}, h_i(u) = \frac{1}{\lambda(u)}, h_p(u) = \frac{1}{\sqrt{\lambda(u)}}$. 
+We can also see that $h_s(u) = \left(h_i(u)\right)^0$  and $h_p(u) = 
+\left(h_i(u)\right)^{1/2}$, so the values of the Pearson residuals would lie 
+somewhere between the other two residuals. 
+So, in our case, the inverse residuals would not be very useful, but we do find 
+that they are easier to compute by hand in terms of estimates.
+
+
+# Computation of Residuals
+In this vignette, the residuals of some models from 
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html
+are computed using a Bayesian approach of the residuals described above. 
+This is done using the `inlabru` package. The models used are:
+
+* Model 1 (Vegetation Model): 
+    The model is defined such that the gorilla nests have vegetation type as a 
+    fixed covariate.
+    
+* Model 2 (Elevation Model): 
+    The model is defined such that the gorilla nests have elevation as a 
+    continuous variable. 
+    
+* Model 3 (Intercept Model): 
+    The model is defined such that the gorilla nests have a constant effect. 
+    
+* Model 4 (SPDE Smooth type model): 
+    The model is defined such that the gorilla nests depend on an SPDE type 
+    smooth function. 
+    
+
+The functions used to calculate the residuals of these models are given in the 
+Code appendix at the end of this vignette.
+
+
+## Loading gorillas data
+This vignette uses the `gorillas` dataset from the "inlabru" package in R for 
+modelling spatial Poisson processes. 
+Here, the ``inlabru" package uses Latent Gaussian Cox Processes to model the 
+data using different model definitions.
+
+```{r load-data, echo=TRUE}
+# Load data
+data(gorillas, package = "inlabru")
+nests <- gorillas$nests
+mesh <- gorillas$mesh
+boundary <- gorillas$boundary
+gcov <- gorillas$gcov
+```
+
+Initially, the set $B$ is defines as $B=W$, where $W$ is the object `boundary`. 
+The function `prepare_residual_calculations()` is defined to compute a data 
+frame of observations $x_i$ and sample points $u \in W$ to compute the residual,
+a matrix `A_sum` that helps to calculate the summation term of the residual and 
+a matrix `A_integrate` that helps to calculate the integral term of the residual.
+
+The function `residual_df` is defined to compute all three types of residuals
+for a given model and choice of $B$ given a set of observations.
+
+```{r preparatory-function, echo=TRUE}
+# Define the subset B
+B <- boundary
+
+# Store the required matrices and data frames for residual computation
+As <- prepare_residual_calculations(
+  samplers = B, domain = mesh,
+  observations = nests
+)
+```
+
+
+## Assessing 4 models with residuals
+### Vegetation Model
+This model is taken from 
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
+The model is defined such that the gorilla nests have vegetation type as a 
+fixed covariate.
+
+The code chunk below shows how the model is defined by `lgcp()` and also 
+displays the model in the form of a plot.
+The residuals of the model are also computed where $B = W$.
+
+```{r veg-mod, echo=TRUE}
+# Define the vegetation model
+comp1 <- coordinates ~
+  vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
+
+fit1 <- lgcp(comp1, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
+
+# Display the model
+int1 <- predict(fit1,
+  newdata = fm_pixels(mesh, mask = boundary, format = "sp"),
+  ~ exp(vegetation + Intercept)
+)
+ggplot() +
+  gg(int1) +
+  gg(boundary, alpha = 0, lwd = 2) +
+  gg(nests, color = "DarkGreen") +
+  coord_equal()
+
+# Calculate the residuals for the vegetation model
+veg_res <- residual_df(
+  fit1, As$df, expression(exp(vegetation + Intercept)),
+  As$A_sum, As$A_integrate
+)
+knitr::kable(edit_df(veg_res, c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
+```
+
+Note: The data frame produced by `residual_df()` originally contains the columns
+`Type`, `mean.mc_std_err`, `sd.mc_std_err` and `median` which have been removed
+in all the tables in the vignette to highlight only essential and non-recurring 
+data. This editing of the data frames is done by the function `edit_df`.
+
+### Elevation model
+This model is also taken from 
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
+The model is defined such that the gorilla nests have elevation as a 
+continuous variable. 
+
+```{r elevation-model-setup, echo=FALSE}
+# Setting up the elevation model
+elev <- gcov$elevation
+elev$elevation <- elev$elevation - mean(elev$elevation, na.rm = TRUE)
+matern <- inla.spde2.pcmatern(mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.05, 0.01)
+)
+```
+
+The code chunk below shows how the model is defined by `lgcp()` and also 
+displays the model in the form of a plot. 
+
+```{r elev-mod, echo=TRUE}
+# Define the Elevation model
+comp2 <- coordinates ~ elev(elev, model = "linear") +
+  mySmooth(coordinates, model = matern) + Intercept(1)
+
+fit2 <- lgcp(comp2, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
+
+# Display the model
+int2 <- predict(
+  fit2,
+  fm_pixels(mesh, mask = boundary, format = "sp"),
+  ~ exp(elev + mySmooth + Intercept)
+)
+ggplot() +
+  gg(int2) +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+") +
+  coord_equal()
+```
+
+The residuals of the model when $B = W$ are given below:
+
+```{r elev-res, echo=FALSE}
+# Calculate the residuals for the model
+elev_res <- residual_df(
+  model = fit2, df = As$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  elev_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
+```
+
+### Intercept Model
+This model is also taken from 
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
+The model is defined such that the gorilla nests have a constant effect. 
+
+The code chunk below shows how the model is defined by `lgcp()` and also 
+displays the model in the form of a plot. The residuals of the model are also 
+computed where $B = W$.
+
+```{r int-mod, echo=TRUE}
+# Define the Intercept model
+comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
+fit3 <- lgcp(comp3, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
+
+# Display the model
+int3 <- predict(
+  fit3,
+  fm_pixels(mesh, mask = boundary, format = "sp"),
+  ~ exp(Intercept)
+)
+ggplot() +
+  gg(int3) +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+") +
+  coord_equal()
+```
+
+The residuals of the model when $B = W$ are given below:
+
+```{r int-res, echo=FALSE}
+# Calculate the residuals for the model
+int_res <- residual_df(
+  model = fit3, df = As$df,
+  expr = expression(exp(Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  int_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
+```
+
+### Smooth Model
+This model is also taken from 
+https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
+The model is defined such that the gorilla nests depend on an SPDE type smooth function. 
+
+The code chunk below shows how the model is defined by `lgcp()` and also 
+displays the model in the form of a plot. The residuals of the model are also 
+computed where $B = W$.
+
+```{r smooth-mod, echo=TRUE}
+# Define the Smooth model
+comp4 <- coordinates ~ mySmooth(coordinates, model = matern) +
+  Intercept(1)
+fit4 <- lgcp(comp4, nests,
+  samplers = boundary,
+  domain = list(coordinates = mesh)
+)
+
+# Display the model
+int4 <- predict(
+  fit4,
+  fm_pixels(mesh, mask = boundary, format = "sp"),
+  ~ exp(mySmooth + Intercept)
+)
+ggplot() +
+  gg(int4) +
+  gg(boundary) +
+  gg(nests, shape = "+") +
+  coord_equal()
+```
+
+The residuals of the model when $B = W$ are given below:
+
+```{r smooth-res, echo=FALSE}
+# Calculate the residuals for the model
+smooth_res <- residual_df(
+  model = fit4, df = As$df,
+  expr = expression(exp(mySmooth + Intercept)),
+  A_sum = As$A_sum, A_integrate = As$A_integrate
+)
+knitr::kable(edit_df(
+  smooth_res,
+  c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
+))
+```
+### Comparing models
+Firstly, from the plots of the four models, we see that there are visual 
+similarities in what the Elevation and smooth models appear to be. So, we would expect that these two models show similar trends in residuals. 
+
+
+## Redefining the set B
+
+Consider defining a new type of set $B$ which consists of two subpolygons within
+the boundary. This is done by the `partition()` function which divides a polygon
+into grids based on number of rows and columns or by a desired resolution. 
+The code chunk below demonstrates a use of the function for dividing the polygon
+and calculating the residuals for this choice of $B$.
+
+```{r partitioning-B-two, echo=TRUE}
+# Create a grid for B partitioned into two
+B1 <- partition(samplers = boundary, nrows = 1, ncols = 2)
+plot(B1, main = "Two partitions of B")
+
+As1 <- prepare_residual_calculations(
+  samplers = B1, domain = mesh,
+  observations = nests
+)
+# Residuals for the vegetation model
+veg_res2 <- residual_df(
+  fit1, As1$df, expression(exp(vegetation + Intercept)),
+  As1$A_sum, As1$A_integrate
+)
+knitr::kable(edit_df(veg_res2, c(
+  "Type", "mean.mc_std_err",
+  "sd.mc_std_err", "median"
+)))
+```
+Here, it can be seen that there are two lines of residual data for each type of 
+residual. This signifies that the `residual_df` function has calculated 
+residuals for each partition. To compare these residuals effectively, a 
+function `residual_plot()` is defined that plots the residuals for each 
+corresponding polygon of `B`. This is discussed later in the vignette.
+
+Another type of partitioning is considered with three sections of the region and 
+its residuals are as displayed below:
+```{r partitioning-B-three, echo=FALSE}
+# Create a grid for B partitioned into three
+B2 <- partition(samplers = boundary, nrows = 3, ncols = 1)
+plot(B2, main = "Three partitions of B")
+
+As2 <- prepare_residual_calculations(
+  samplers = B2, domain = mesh,
+  observations = nests
+)
+# Residuals for the vegetation model
+veg_res3 <- residual_df(
+  fit1, As2$df, expression(exp(vegetation + Intercept)),
+  As2$A_sum, As2$A_integrate
+)
+knitr::kable(edit_df(veg_res3, c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")))
+```
+
+
+
+## Residuals of models at different resolutions
+Consider two more resolutions of $B$, given in the plots below.  Here we use the
+`resolution` argument instead of `nrow` and `ncol`. Due to the way `terra::rast()`
+interprets the arguments, using `resolution` doesn't guarantee complete coverage of the
+`samplers` polygon.
+```{r more-resolutions, echo=FALSE}
+# Create two more partitions of B using two resolutions
+B3 <- partition(samplers = boundary, resolution = c(0.5, 0.5))
+plot(B3, main = "B3")
+
+# Calculate preparatory data for residuals at this resolution
+As3 <- prepare_residual_calculations(
+  samplers = B3, domain = mesh,
+  observations = nests
+)
+
+
+B4 <- partition(samplers = boundary, resolution = c(2, 2))
+plot(B4, main = "B4")
+
+# Calculate preparatory data for residuals at this resolution
+As4 <- prepare_residual_calculations(
+  samplers = B4, domain = mesh,
+  observations = nests
+)
+```
+
+
+Using these two new choices of $B$, the residuals are calculated for all four 
+models at both resolutions using `residual_df()`.
+```{r calc-res-all-models-two-resolutions, echo=FALSE}
+# Vegetation model
+Residual_fit1_B3 <- residual_df(
+  model = fit1, df = As3$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
+
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+
+# Elevation model
+Residual_fit2_B3 <- residual_df(
+  model = fit2, df = As3$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As3$A_sum, A_integrate = As3$A_integrate
+)
+
+Residual_fit2_B4 <- residual_df(
+  model = fit2, df = As4$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As4$A_sum, A_integrate = As4$A_integrate
+)
+
+
+# Intercept model
+Residual_fit3_B3 <- residual_df(
+  model = fit3, df = As3$df,
+  expr = expression(exp(Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
+
+Residual_fit3_B4 <- residual_df(
+  model = fit3, df = As4$df,
+  expr = expression(exp(Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+
+# Smooth + Intercept
+Residual_fit4_B3 <- residual_df(
+  model = fit4, df = As3$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
+
+Residual_fit4_B4 <- residual_df(
+  model = fit4, df = As4$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+```
+
+The functions `set_csc()` and `residual_plot()` are defined to plot the three 
+types of residuals for the model for each partition in $B$. The code chunk below
+demonstrates how this plotting is done for the vegetation model at resolution 
+$B = B_3$. Here, it is useful for each type of residual to have the same colour
+scale at both resolutions.
+
+```{r store-res-plot-1, echo = FALSE}
+# Colour scales for each model to cover both resolutions
+fit1_csc <- set_csc(rbind(Residual_fit1_B3, Residual_fit1_B4), rep("RdBu", 3))
+fit2_csc <- set_csc(rbind(Residual_fit2_B3, Residual_fit2_B4), rep("RdBu", 3))
+fit3_csc <- set_csc(rbind(Residual_fit3_B3, Residual_fit3_B4), rep("RdBu", 3))
+fit4_csc <- set_csc(rbind(Residual_fit4_B3, Residual_fit4_B4), rep("RdBu", 3))
+
+# Plots for all 4 models with resolution B3
+plotB3_fit1 <- residual_plot(B3, Residual_fit1_B3, fit1_csc, "Vegetation Model")
+plotB3_fit2 <- residual_plot(B3, Residual_fit2_B3, fit2_csc, "Elevation Model")
+plotB3_fit3 <- residual_plot(B3, Residual_fit3_B3, fit3_csc, "Intercept Model")
+plotB3_fit4 <- residual_plot(B3, Residual_fit4_B3, fit4_csc, "Smooth Model")
+
+# Plots for all 4 models with resolution B4
+plotB4_fit1 <- residual_plot(B4, Residual_fit1_B4, fit1_csc, "Vegetation Model")
+plotB4_fit2 <- residual_plot(B4, Residual_fit2_B4, fit2_csc, "Elevation Model")
+plotB4_fit3 <- residual_plot(B4, Residual_fit3_B4, fit3_csc, "Intercept Model")
+plotB4_fit4 <- residual_plot(B4, Residual_fit4_B4, fit4_csc, "Smooth Model")
+```
+
+```{r display-veg-plot-code, eval=FALSE,echo=TRUE, fig.height=2.5,fig.width=4.5}
+# Residuals of Vegetation model
+Residual_fit1_B3 <- residual_df(
+  model = fit1, df = As3$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As3$A_sum,
+  A_integrate = As3$A_integrate
+)
+
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+# Colour scales for each model to cover both resolutions
+fit1_csc <- set_csc(rbind(Residual_fit1_B3, Residual_fit1_B4), rep("RdBu", 3))
+
+# Store plots
+plotB3_fit1 <- residual_plot(B3, Residual_fit1_B3, fit1_csc, "Vegetation Model")
+plotB4_fit1 <- residual_plot(B4, Residual_fit1_B4, fit1_csc, "Vegetation Model")
+
+# comparing the vegetation model
+((plotB3_fit1$Scaling | plotB3_fit1$Inverse | plotB3_fit1$Pearson) /
+  (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
+  plot_annotation(title = "Vegetation Model") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+### Comparing different types of residuals for each model
+Now, the plots below help to compare the residuals for each model at two 
+resolutions of $B$ for each type of residual.
+
+```{r plot-all-1, echo=FALSE, fig.width=9, , fig.height=7}
+# comparing the vegetation model
+((plotB3_fit1$Scaling | plotB3_fit1$Inverse | plotB3_fit1$Pearson) /
+  (plotB4_fit1$Scaling | plotB4_fit1$Inverse | plotB4_fit1$Pearson)) +
+  plot_annotation(title = "Vegetation Model") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# comparing the elevation model
+((plotB3_fit2$Scaling | plotB3_fit2$Inverse | plotB3_fit2$Pearson) /
+  (plotB4_fit2$Scaling | plotB4_fit2$Inverse | plotB4_fit2$Pearson)) +
+  plot_annotation(title = "Elevation Model") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# comparing the intercept model
+((plotB3_fit3$Scaling | plotB3_fit3$Inverse | plotB3_fit3$Pearson) /
+  (plotB4_fit3$Scaling | plotB4_fit3$Inverse | plotB4_fit3$Pearson)) +
+  plot_annotation("Intercept model") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# comparing the smooth+intercept model
+((plotB3_fit4$Scaling | plotB3_fit4$Inverse | plotB3_fit4$Pearson) /
+  (plotB4_fit4$Scaling | plotB4_fit4$Inverse | plotB4_fit4$Pearson)) +
+  plot_annotation("Smooth model") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+#### Discussion
+In this section, we discuss some of the findings from the output in the code. 
+A relevant point that would be used repeatedly in this discussion is that since 
+the colour scales for the residuals are chosen so that negative and positive 
+values are in hues of red and blue respectively, negative and positive residuals 
+imply an overestimation and underestimation of gorilla nests by the model 
+respectively. Thus, red regions in a plot would imply overestimation of gorilla 
+nests by the model in that region and blue regions in a plot would imply 
+underestimation of gorilla nests by the model in that region.
+
+A common observation for all models is that the scaling residuals seem to have 
+the highest range among the residuals since they are direct interpretations of 
+residuals for all models.
+Also, the Pearson residuals seem to take values between the scaling and inverse 
+residuals for both resolutions of all four models.
+However, for almost all types of residuals for each model, the positive and 
+negative residual values are not very extreme for the $B_3$ resolution but these 
+corresponding residual values are more extreme at the $B_4$ resolution for each 
+type of residual. This could be because of the bias in the ``experimental" mode 
+of \texttt{INLA} which is explored at other points in this project.
+
+For the vegetation and intercept model, the regions which have negative and 
+positive residuals remain the same for all residuals at different levels for 
+each type of residual. Also, it seems that the north and north-west region of 
+both models are underestimated by the model while the remaining regions are 
+overestimated by the model at different levels.
+
+For the elevation model, each type of residual has slight variations in negative
+and positive residuals for corresponding regions in a fixed resolution. 
+This means that different residuals suggest that a particular polygon in 
+overestimated and underestimated by the model. However, this happens only at a 
+few points and is not containing extremes of the residuals in the same regions. 
+The Pearson residuals are supposedly the most reliable in this case as they are 
+normalised residuals. 
+All three types of residuals contain larger proportions of negative residuals 
+which suggest that the model overestimates the gorilla population the region (at 
+different amounts in different regions).
+
+### Comparing different models for each type of residual
+Another way to compare residuals, is to consider each type of residual 
+separately and plot the residuals for all four models at each resolution. This 
+helps to compare the models for a given type of residual and choice of $B$. 
+Here, it is useful to have the same colour scale for all the 4 models.
+
+```{r store-res-plot-2, echo=FALSE}
+# Data frame of all models together for B3 and B4
+B3res <- rbind(
+  Residual_fit1_B3, Residual_fit2_B3,
+  Residual_fit3_B3, Residual_fit4_B3
+)
+B4res <- rbind(
+  Residual_fit1_B4, Residual_fit2_B4,
+  Residual_fit3_B4, Residual_fit4_B4
+)
+
+# Colour scale for each resolution to cover all 4 models
+B3csc <- set_csc(B3res, rep("RdBu", 3))
+B4csc <- set_csc(B4res, rep("RdBu", 3))
+
+# Plots for all 4 models with resolution B3
+plotB3_veg <- residual_plot(B3, Residual_fit1_B3, B3csc, "Vegetation Model")
+plotB3_elev <- residual_plot(B3, Residual_fit2_B3, B3csc, "Elevation Model")
+plotB3_int <- residual_plot(B3, Residual_fit3_B3, B3csc, "Intercept Model")
+plotB3_smooth <- residual_plot(B3, Residual_fit4_B3, B3csc, "Smooth Model")
+
+# Plots for all 4 models with resolution B4
+plotB4_veg <- residual_plot(B4, Residual_fit1_B4, B4csc, "Vegetation Model")
+plotB4_elev <- residual_plot(B4, Residual_fit2_B4, B4csc, "Elevation Model")
+plotB4_int <- residual_plot(B4, Residual_fit3_B4, B4csc, "Intercept Model")
+plotB4_smooth <- residual_plot(B4, Residual_fit4_B4, B4csc, "Smooth Model")
+```
+
+
+The code chunk below demonstrates the code for plotting the "Pearson" residuals 
+when $B = B_4$.
+
+```{r disply-pearson-plot-code, eval = FALSE, echo = TRUE}
+# Calculate the residuals for all models at B4
+Residual_fit1_B4 <- residual_df(
+  model = fit1, df = As4$df,
+  expr = expression(exp(vegetation + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+Residual_fit2_B4 <- residual_df(
+  model = fit2, df = As4$df,
+  expr = expression(exp(elev + mySmooth + Intercept)),
+  A_sum = As4$A_sum, A_integrate = As4$A_integrate
+)
+
+Residual_fit3_B4 <- residual_df(
+  model = fit3, df = As4$df,
+  expr = expression(exp(Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+Residual_fit4_B4 <- residual_df(
+  model = fit4, df = As4$df,
+  expr = expression(exp(mySmooth + Intercept)), A_sum = As4$A_sum,
+  A_integrate = As4$A_integrate
+)
+
+# Set the colour scale
+B4res <- rbind(
+  Residual_fit1_B4, Residual_fit2_B4,
+  Residual_fit3_B4, Residual_fit4_B4
+)
+B4csc <- set_csc(B4res, rep("RdBu", 3))
+
+# Plots for residuals of all 4 models with resolution B4
+plotB4_veg <- residual_plot(B4, Residual_fit1_B4, B4csc, "Vegetation Model")
+plotB4_elev <- residual_plot(B4, Residual_fit2_B4, B4csc, "Elevation Model")
+plotB4_int <- residual_plot(B4, Residual_fit3_B4, B4csc, "Intercept Model")
+plotB4_smooth <- residual_plot(B4, Residual_fit4_B4, B4csc, "Smooth Model")
+
+# Comparing all models for B4 Pearson residuals
+((plotB4_veg$Pearson | plotB4_elev$Pearson) /
+  (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
+  plot_annotation("B4 Pearson Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+Now, the plots below help to compare all 4 models at a particular choice of $B$
+and for a chosen residual type.
+
+```{r plot-all-2, fig.height=7, fig.width=7, echo=FALSE}
+# Comparing all models for B3 Scaling residuals
+((plotB3_veg$Scaling | plotB3_elev$Scaling) /
+  (plotB3_int$Scaling | plotB3_smooth$Scaling)) +
+  plot_annotation("B3 Scaling Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# Comparing all models for B3 Inverse residuals
+((plotB3_veg$Inverse | plotB3_elev$Inverse) /
+  (plotB3_int$Inverse | plotB3_smooth$Inverse)) +
+  plot_annotation("B3 Inverse Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# Comparing all models for B3 Pearson residuals
+((plotB3_veg$Pearson | plotB3_elev$Pearson) /
+  (plotB3_int$Pearson | plotB3_smooth$Pearson)) +
+  plot_annotation("B3 Pearson Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+# Comparing all models for B4 Scaling Residuals
+((plotB4_veg$Scaling | plotB4_elev$Scaling) /
+  (plotB4_int$Scaling | plotB4_smooth$Scaling)) +
+  plot_annotation("B4 Scaling Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+
+# Comparing all models for B4 Inverse residuals
+((plotB4_veg$Inverse | plotB4_elev$Inverse) /
+  (plotB4_int$Inverse | plotB4_smooth$Inverse)) +
+  plot_annotation("B4 Inverse Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+
+
+# Comparing all models for B4 Pearson residuals
+((plotB4_veg$Pearson | plotB4_elev$Pearson) /
+  (plotB4_int$Pearson | plotB4_smooth$Pearson)) +
+  plot_annotation("B4 Pearson Residuals") +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+#### Discussion
+Firstly, a common feature in each of the three figures is that the residual 
+plots for the vegetation and intercept models are relatively similar and those of the elevation and smooth models are relatively similar as well for both resolutions 
+for any type of residual. 
+Also, for a fixed type of residual and a chosen model, the $B_3$ residuals are 
+less extreme compared to the $B_4$ residuals, plausibly owing to the bias in the 
+``experimental" mode in \texttt{INLA}. 
+Another feature in all three types of residuals is that the elevation and 
+intercept model have less extreme residual values compared to the vegetation and 
+intercept models for a given type of residual. This could suggest that the 
+former two are better models for gorilla nesting in the given region. 
+The residual values have a wider range when $B=B_4$ than when $B = B_3$. 
+
+For the scaling residuals and the Pearson residuals, the elevation and smooth 
+models have less extreme values of residuals relative the vegetation and 
+intercept models. This suggests that the elevation and smooth models are more 
+suited to estimating the gorilla nesting locations in $W$. Also, there is a 
+significant underestimation in the north-west areas by the vegetation and 
+intercept models while the same areas are not underestimated by the other two 
+models. However, as explored in \cref{sec:comparing_inla_modes}, these residuals
+are calculated in the ``experimental" mode of \texttt{INLA} which produces some
+overestimates in these two models, so this must be kept in mind while reaching 
+to conclusions about a suitable model for nesting locations.
+
+For the inverse residuals, the same observations hold, except the residuals for 
+the elevation and smooth models have residuals that are not significantly less
+extreme relative to the vegetation and intercept models as seen in the case of 
+the Pearson and scaling residuals for both resolutions $B_3$ and $B_4$.
+
+
+# Code appendix
+
+## Function definitions
+
+```{r file=code_location, eval=FALSE, echo=TRUE}
+# Do not change this code chunk
+```
