@@ -1475,7 +1475,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     )
   }
   if (lifecycle::is_present(allow_latent)) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "2.8.0",
       "like(allow_latent = 'is deprecated')",
       "like(include_latent)",
@@ -1954,7 +1954,7 @@ predict.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_soft("2.8.0", "predict(data)", "predict(newdata)",
+      lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
         details = c("`data` provided but not `newdata`. Setting `newdata <- data`.")
       )
       newdata <- data
@@ -1970,7 +1970,7 @@ predict.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "2.8.0",
       "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
@@ -2143,7 +2143,7 @@ generate.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_soft("2.8.0", "generate(data)", "generate(newdata)",
+      lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
         details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`.")
       )
       newdata <- data
@@ -2159,7 +2159,7 @@ generate.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "2.8.0",
       "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"

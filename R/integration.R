@@ -205,7 +205,7 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     "fmesher::fm_int_mesh_2d_core()"
   )
 
-  fmesher::fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = NULL)
+  fmesher::fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = nsub)
 }
 
 

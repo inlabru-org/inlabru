@@ -127,12 +127,12 @@
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = deprecated()) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.8.0.9004",
     "ipoints()",
     "fmesher::fm_int()",
     details = c(
-      "ipoints(samplers, domain) has been replaced by more versatile fm_int(domain, samplers, ...) methods."
+      "`ipoints(samplers, domain)` has been replaced by more versatile `fm_int(domain, samplers, ...)` methods."
     )
   )
 
@@ -568,6 +568,10 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' }
 #'
 cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
-  # lifecycle::deprecate_soft("2.8.0")
+  lifecycle::deprecate_soft(
+    "2.8.0",
+    "cprod()",
+    "fmesher:fm_cprod()"
+  )
   fm_cprod(..., na.rm = na.rm, .blockwise = .blockwise)
 }

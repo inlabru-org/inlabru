@@ -19,7 +19,7 @@
 #'   inside the mesh.
 #'
 is.inside <- function(mesh, loc, mesh.coords = NULL) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.8.0",
     "is.inside()",
     "fmesher::fm_is_within()",
@@ -108,7 +108,7 @@ vertices.inla.mesh <- function(...) {
 #' }
 #'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.8.0",
     "pixels()",
     "fmesher::fm_pixels(format = 'sp')",
