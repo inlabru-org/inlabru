@@ -12,7 +12,7 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,10 +133,10 @@ and inverse calculations use lower tails only, potentially losing accuracy in th
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">bru_forward_transformation</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">u</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">bru_inverse_transformation</span><span class="op">(</span><span class="va">pexp</span>, <span class="va">y</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">v</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]     [,2]     [,3]     [,4]      [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> u 1.236497 1.810714 2.331435 1.542745 0.2886574</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> y 1.112178 1.674883 2.309370 1.394795 0.4754129</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> v 1.236497 1.810714 2.331435 1.542745 0.2886574</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]        [,2]     [,3]      [,4]        [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> u -1.09228242 -1.13148782 2.146689 0.5014597 -1.62303860</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> y  0.07387572  0.06901355 2.070434 0.5887891  0.02685367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> v -1.09228242 -1.13148782 2.146689 0.5014597 -1.62303860</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
