@@ -595,12 +595,6 @@ bru_fill_missing <- function(data, where, values,
     stop("NAs detected in the 'layer' information.")
   }
 
-  data_crs <- fm_crs(data)
-  where_crs <- fm_crs(where)
-  if (!fm_crs_is_identical(data_crs, where_crs)) {
-    warning("'data' and 'where' for spatial infilling have different CRS")
-  }
-
   layers <- unique(layer)
   if (length(layers) > 1) {
     for (l in layers) {
@@ -619,6 +613,7 @@ bru_fill_missing <- function(data, where, values,
   # Only one layer from here on.
   layer <- layers
 
+  data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
     data_values <- terra::values(data[[layer]], dataframe = TRUE)[[layer]]
     data_coord <- as.data.frame(terra::crds(data))
@@ -630,6 +625,8 @@ bru_fill_missing <- function(data, where, values,
     data_values <- data[[layer]]
     data_coord <- data
   }
+
+  where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
 
   notok <- is.na(values)
   ok <- which(!notok)
