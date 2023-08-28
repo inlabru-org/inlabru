@@ -1015,6 +1015,3 @@ print.summary_bru_options <- function(x, ...) {
 
 
 # Utils ----
-
-
-

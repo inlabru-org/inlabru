@@ -159,5 +159,3 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NUL
   if (!is.null(to.crs)) spoly <- fm_transform(spoly, to.crs)
   spoly
 }
-
-

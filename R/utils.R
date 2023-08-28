@@ -635,7 +635,6 @@ bru_fill_missing <- function(data, where, values,
   data_ok <- which(!data_notok)
   data_notok <- which(data_notok)
 
-
   for (batch in seq_len(ceiling(length(notok) / batch_size))) {
     subset <- notok[seq((batch - 1) * batch_size,
       min(length(notok), batch * batch_size),
