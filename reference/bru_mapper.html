@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,13 +94,13 @@
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for fm_mesh_2d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for fm_mesh_1d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh.1d</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -111,39 +111,39 @@
 <span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  jacobian <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  state0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span>,</span>
 <span>  values_mapper <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_const</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_const</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_scale</span><span class="op">(</span>mapper <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_scale</span><span class="op">(</span>mapper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_aggregate</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_aggregate</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_harmonics</span><span class="op">(</span></span>
 <span>  order <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  scaling <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  intercept <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_mesh_B</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">B</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_mapper_mesh_B</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">B</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -234,6 +234,10 @@ the same as dividing by the number of entries in each block.</p></li>
 <dt>n_block</dt>
 <dd><p>Predetermined number of output blocks. If <code>NULL</code>, overrides
 the maximum block index in the inputs.</p></dd>
+
+
+<dt>qfun</dt>
+<dd><p>A quantile function, supporting</p></dd>
 
 
 <dt>mappers</dt>
@@ -339,6 +343,13 @@ for  \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]\)
 and \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]\)
 calculations.  Relies on the input handling methods for <code>bru_mapper_aggregate</code>,
 but also allows the weights to be supplied on a logarithmic scale as <code>log_weights</code>.
+To avoid numerical overflow, it uses the common method of internally
+shifting the state blockwise with
+<code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
+and shifting the result back afterwards.</p></li>
+<li><p><code>bru_mapper_marginal()</code>: Constructs a mapper
+that transforms the marginal distribution <code>state</code> from \(\textrm{N}(0,1)\)
+to the distribution of a given quantile function.
 To avoid numerical overflow, it uses the common method of internally
 shifting the state blockwise with
 <code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,

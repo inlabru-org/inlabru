@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,9 +81,13 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>The <code>is_linear</code> flag wasn’t correctly set for <code>bru_mapper_logsumexp</code> mappers. Since previous versions did not accept non-linear component mappers, this is unlikely to have affected any user code. (Fixed in version <code>2.9.0.9001</code>)</li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.9.0" id="inlabru-290">inlabru 2.9.0<a class="anchor" aria-label="anchor" href="#inlabru-290"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.9.0" id="inlabru-290">inlabru 2.9.0<a class="anchor" aria-label="anchor" href="#inlabru-290"></a></h2><p class="text-muted">CRAN release: 2023-08-28</p>
 <div class="section level3">
 <h3 id="feature-updates-2-9-0">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-2-9-0"></a></h3>
 <ul><li><p>Conversion of code to use <code>fmesher</code> for mesh and geometry handling; the interface supports existing objects and methods. See <a href="https://inlabru-org.github.io/fmesher/articles/inla_conversion.html" class="external-link uri">https://inlabru-org.github.io/fmesher/articles/inla_conversion.html</a> for more information.</p></li>
