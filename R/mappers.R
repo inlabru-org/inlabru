@@ -4,7 +4,8 @@
 #' @name bru_mapper
 NULL
 
-#' @param \dots Arguments passed on to other methods
+#' @param \dots Arguments passed on to sub-methods, or used for special purposes,
+#' see details for each function below.
 #' @export
 #' @seealso [bru_mapper_generics] for generic methods,
 #' [bru_mapper_methods] for specific method implementations, and
@@ -446,7 +447,6 @@ print.summary_bru_mapper <- function(x, ...) {
 #' @param mapper For `bru_mapper_define`, a prototype mapper object, see Details.
 #' For `bru_mapper_scale`, a mapper to be scaled.
 #' @param new_class If non-`NULL`, this is added at the front of the class definition
-#' @param \dots Deprecated, alternative way to supply optional method definitions.
 #' @param methods `r lifecycle::badge("deprecated")` Deprecated.
 #'
 #' @describeIn bru_mapper Adds the `new_class` and "bru_mapper" class

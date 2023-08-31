@@ -80,7 +80,8 @@ bru_mapper_harmonics(
 bru_mapper_mesh_B(mesh, B)
 }
 \arguments{
-\item{\dots}{Deprecated, alternative way to supply optional method definitions.}
+\item{\dots}{Arguments passed on to sub-methods, or used for special purposes,
+see details for each function below.}
 
 \item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see Details.
 For \code{bru_mapper_scale}, a mapper to be scaled.}
