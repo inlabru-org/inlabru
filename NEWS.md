@@ -5,6 +5,7 @@
 * The `is_linear` flag wasn't correctly set for `bru_mapper_logsumexp` mappers.
   Since previous versions did not accept non-linear component mappers, this
   is unlikely to have affected any user code. (Fixed in version `2.9.0.9001`)
+* Improved error message for missing LGCP domain specification. (version `2.9.0.9002`)
 
 # inlabru 2.9.0
 

@@ -1298,6 +1298,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (is.null(ips)) {
+      if (is.null(domain)) {
+        stop("The family='cp' model requires a 'domain' specification compatible with 'fmesher::fm_int()'")
+      }
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
