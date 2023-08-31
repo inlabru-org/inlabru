@@ -128,7 +128,7 @@
 <span></span>
 <span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
 <span></span>
@@ -149,7 +149,8 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
-<dd><p>Deprecated, alternative way to supply optional method definitions.</p></dd>
+<dd><p>Arguments passed on to sub-methods, or used for special purposes,
+see details for each function below.</p></dd>
 
 
 <dt>mapper</dt>
@@ -246,10 +247,6 @@ like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">s
 like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.</p></dd>
 
 
-<dt>param</dt>
-<dd><p>Distribution parameter arguments for <code>qfun</code> and <code>pfun</code></p></dd>
-
-
 <dt>mappers</dt>
 <dd><p>A list of <code>bru_mapper</code> objects</p></dd>
 
@@ -285,6 +282,10 @@ Default <code>c(0, 1)</code>.</p></dd>
 
 <dt>B</dt>
 <dd><p>a square or tall basis conversion matrix</p></dd>
+
+
+<dt>param</dt>
+<dd><p>Distribution parameter arguments for <code>qfun</code> and <code>pfun</code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -359,11 +360,9 @@ shifting the state blockwise with
 and shifting the result back afterwards.</p></li>
 <li><p><code>bru_mapper_marginal()</code>: Constructs a mapper
 that transforms the marginal distribution <code>state</code> from \(\textrm{N}(0,1)\)
-to the distribution of a given quantile function.
-To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise with
-<code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
-and shifting the result back afterwards.</p></li>
+to the distribution of a given quantile function. The <code>...</code> arguments are used
+as parameter arguments to <code>qfun</code> and <code>pfun</code>.
+be</p></li>
 <li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where <code>mappers</code> is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next
 mapper.

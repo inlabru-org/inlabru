@@ -237,7 +237,7 @@ with other mappers, as steps in a sequence of transformations, or as
 individual transformation mappers.</p>
 <ul>
 <li><code><a href="../reference/bru_mapper.html">bru_mapper_scale()</a></code></li>
-<li><code>bru_mapper_marginal(qfun, pfun, param)</code></li>
+<li><code>bru_mapper_marginal(qfun, pfun, ...)</code></li>
 <li><code>bru_mapper_aggregate(rescale)</code></li>
 <li><code>bru_mapper_logsumexp(rescale)</code></li>
 </ul>
@@ -264,14 +264,14 @@ distribution defined by a quantile function. This can be used to define
 components with latent marginal <code>N(0,1)</code> distribution but
 non-Gaussian effect.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_mapper</span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, param <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
-<span>  input <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># If a list is given, it overrides the 'param' specification</span></span>
+<span>  input <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># If a list is given, it overrides the parameter specification</span></span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Example:</span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_mapper</span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_mrginal</span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="aggregate">aggregate<a class="anchor" aria-label="anchor" href="#aggregate"></a>
