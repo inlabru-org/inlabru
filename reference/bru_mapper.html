@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,13 +94,13 @@
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for fm_mesh_2d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for fm_mesh_1d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for inla.mesh.1d</span></span>
 <span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -237,7 +237,17 @@ the maximum block index in the inputs.</p></dd>
 
 
 <dt>qfun</dt>
-<dd><p>A quantile function, supporting</p></dd>
+<dd><p>A quantile function, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::qnorm()</a></code>.</p></dd>
+
+
+<dt>pfun</dt>
+<dd><p>A CDF, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.</p></dd>
+
+
+<dt>param</dt>
+<dd><p>Distribution parameter arguments for <code>qfun</code> and <code>pfun</code></p></dd>
 
 
 <dt>mappers</dt>

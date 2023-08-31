@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -249,13 +249,13 @@ ibm_n_output(mapper, input, state = NULL, ..., n_state = NULL)
 ibm_values(mapper, ..., state = NULL, n_state = NULL)
 
 # S3 method for bru_mapper_marginal
-ibm_jacobian(mapper, input, state = NULL, inverse = FALSE, ...)
+ibm_jacobian(mapper, input, state = NULL, ..., inverse = FALSE)
 
 # S3 method for bru_mapper_marginal
 ibm_linear(mapper, input, state, ...)
 
 # S3 method for bru_mapper_marginal
-ibm_eval(mapper, input, state = NULL, inverse = FALSE, ...)
+ibm_eval(mapper, input, state = NULL, ..., inverse = FALSE)
 
 # S3 method for bru_mapper_pipe
 ibm_n(mapper, ..., state = NULL)
