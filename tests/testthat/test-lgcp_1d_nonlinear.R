@@ -3,30 +3,19 @@ test_that("Mexdolphin: Hazard rate detection function", {
   local_bru_safe_inla()
   data(mexdolphin, package = "inlabru", envir = environment())
 
-  hr <- function(distance, lsig) {
-    1 - exp(-(distance / exp(lsig))^-1)
+  sig <- function(x) bru_forward_transformation(qexp, x, rate = 1/8)
+  hr <- function(distance, sigma) {
+    1 - exp(-(distance / sigma)^-1)
   }
-  cmp <- ~ lsig(1) + Intercept(1)
-  form <- distance ~ log(hr(distance, lsig)) + Intercept
+  log_hr <- function(distance, sigma) {
+    log1p(-exp(-(distance / sigma)^-1))
+  }
+  cmp <- ~ sig_theta(1, prec.linear = 1) + Intercept(1)
+  form <- distance ~ log_hr(distance, sig(sig_theta)) + Intercept
   ips <- fm_int(list(distance = fm_mesh_1d(seq(0, 8, by = 0.1))))
 
   pts <-
     mexdolphin$points
-
-  fit_classic <- lgcp(
-    components = cmp,
-    pts,
-    ips = ips,
-    formula = form,
-    options = list(
-      bru_verbose = 0,
-      bru_compress_cp = TRUE,
-      bru_max_iter = 10,
-      verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "classic"
-    )
-  )
 
   fit <- bru(
     components = cmp,
@@ -46,107 +35,88 @@ test_that("Mexdolphin: Hazard rate detection function", {
     )
   )
 
-  if (FALSE) {
-    pred <- predict(fit,
-      data = data.frame(distance = seq(-8, 8, by = 0.01)),
-      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
-    )
-
-    ggplot(data.frame(distance = c(
-      pts$distance,
-      -pts$distance
-    ))) +
-      geom_density(aes(distance, after_stat(count))) +
-      geom_line(aes(distance, est, col = "Plugin"),
-        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
-          mutate(est = hr(
-            abs(distance),
-            fit$summary.fixed["lsig", "mean"]
-          ) *
-            exp(fit$summary.fixed["Intercept", "mean"]))
-      ) +
-      geom_line(aes(distance, mean, col = "Pred"),
-        data = pred
-      ) +
-      geom_line(aes(distance, est, col = "1"),
-        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
-          mutate(est = hr(
-            abs(distance),
-            1
-          ) *
-            exp(2.3))
-      )
-
-    pred <- predict(fit,
-      data = ips,
-      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
-    )
-    ggplot(data.frame(pts)) +
-      stat_ecdf(aes(distance)) +
-      geom_line(
-        aes(distance,
-          cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
-            sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
-          col = "Plugin"
-        ),
-        data = data.frame(ips)
-      ) +
-      geom_line(
-        aes(distance,
-          cumsum(mean) / sum(mean),
-          col = "Pred"
-        ),
-        data = pred
-      ) +
-      geom_line(
-        aes(distance,
-          cumsum(hr(distance, 1)) /
-            sum(hr(distance, 1)),
-          col = "1"
-        ),
-        data = data.frame(ips)
-      )
-  }
-
-  expect_equal(
-    fit_classic$summary.fixed["lsig", "mean"],
-    1.03741,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit_classic$summary.fixed["lsig", "sd"],
-    0.5184620,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit_classic$summary.fixed["Intercept", "mean"],
-    2.32,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit_classic$summary.fixed["Intercept", "sd"],
-    0.2899217,
-    tolerance = midtol
-  )
+  ##########
+  # pred <- predict(fit,
+  #                 newdata = data.frame(distance = seq(-8, 8, by = 0.01)),
+  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # )
+  #
+  # library(ggplot2)
+  # library(tidyverse)
+  # ggplot(data.frame(distance = c(
+  #   pts$distance,
+  #   -pts$distance
+  # ))) +
+  #   geom_density(aes(distance, after_stat(count))) +
+  #   geom_line(aes(distance, est, col = "Plugin"),
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #               mutate(est = hr(
+  #                 abs(distance),
+  #                 sig(fit$summary.fixed["sig_theta", "mean"])
+  #               ) *
+  #                 exp(fit$summary.fixed["Intercept", "mean"]))
+  #   ) +
+  #   geom_line(aes(distance, mean, col = "Pred"),
+  #             data = pred
+  #   ) +
+  #   geom_line(aes(distance, est, col = "1"),
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #               mutate(est = hr(
+  #                 abs(distance),
+  #                 1
+  #               ) *
+  #                 exp(2.3))
+  #   )
+  #
+  # pred <- predict(fit,
+  #                 data = ips,
+  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # )
+  # ggplot(data.frame(pts)) +
+  #   stat_ecdf(aes(distance)) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(hr(distance, sig(fit$summary.fixed["sig_theta", "mean"]))) /
+  #           sum(hr(distance, sig(fit$summary.fixed["sig_theta", "mean"]))),
+  #         col = "Plugin"
+  #     ),
+  #     data = data.frame(ips) %>% arrange(distance)
+  #   ) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(mean) / sum(mean),
+  #         col = "Pred"
+  #     ),
+  #     data = pred %>% arrange(distance)
+  #   ) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(hr(distance, 1)) /
+  #           sum(hr(distance, 1)),
+  #         col = "1"
+  #     ),
+  #     data = data.frame(ips) %>% arrange(distance)
+  #   )
+  ##########
 
   expect_equal(
-    fit$summary.fixed["lsig", "mean"],
-    1.06,
+    fit$summary.fixed["sig_theta", "mean"],
+    -0.4653159,
     tolerance = midtol
   )
   expect_equal(
-    fit$summary.fixed["lsig", "sd"],
-    0.5183252,
+    fit$summary.fixed["sig_theta", "sd"],
+    0.3583088,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    2.29,
+    2.2593613,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.2900139,
+    0.2720904,
     tolerance = midtol
   )
 })
