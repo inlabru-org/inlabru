@@ -513,7 +513,9 @@ replace_dollar <- function(expr) {
     expr[[3]] <- replace_dollar(expr[[3]])
   } else {
     for (i in seq_along(expr)[-1]) {
-      expr[[i]] <- replace_dollar(expr[[i]])
+      if (!is.null(expr[[i]])) {
+        expr[[i]] <- replace_dollar(expr[[i]])
+      }
     }
   }
   expr

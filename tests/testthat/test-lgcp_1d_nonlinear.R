@@ -12,7 +12,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   }
   cmp <- ~ sig_theta(1, prec.linear = 1) + Intercept(1)
   form <- distance ~ log_hr(distance, sig(sig_theta)) + Intercept
-  ips <- fm_int(list(distance = fm_mesh_1d(seq(0, 8, by = 0.1))))
+  form_list <- list(distance = distance) ~ log(hr(distance, sig(sig_theta))) + Intercept
 
   pts <-
     mexdolphin$points
@@ -30,9 +30,69 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
+      bru_initial = list(Intercept = 0, sig_theta = -1),
       inla.mode = "compact"
     )
+  )
+
+  expect_equal(
+    fit$summary.fixed["sig_theta", "mean"],
+    -0.4653159,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["sig_theta", "sd"],
+    0.3583088,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    2.2593613,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "sd"],
+    0.2720904,
+    tolerance = midtol
+  )
+
+  fit_list <- bru(
+    components = cmp,
+    like(
+      formula = form_list,
+      family = "cp",
+      data = pts,
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+    ),
+    options = list(
+      bru_verbose = 0,
+      bru_compress_cp = TRUE,
+      bru_max_iter = 10,
+      verbose = FALSE,
+      bru_initial = list(Intercept = 0, sig_theta = -1),
+      inla.mode = "compact"
+    )
+  )
+
+  expect_equal(
+    fit_list$summary.fixed["sig_theta", "mean"],
+    -0.4653159,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["sig_theta", "sd"],
+    0.3583088,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["Intercept", "mean"],
+    2.2593613,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["Intercept", "sd"],
+    0.2720904,
+    tolerance = midtol
   )
 
   ##########
@@ -99,84 +159,25 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #   )
   ##########
 
-  expect_equal(
-    fit$summary.fixed["sig_theta", "mean"],
-    -0.4653159,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit$summary.fixed["sig_theta", "sd"],
-    0.3583088,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit$summary.fixed["Intercept", "mean"],
-    2.2593613,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit$summary.fixed["Intercept", "sd"],
-    0.2720904,
-    tolerance = midtol
-  )
 })
 
 
-# timings <- function() {
-#   data(mexdolphin, package = "inlabru", envir = environment())
-#
-#   hr <- function(distance, lsig) {
-#     1 - exp(-(distance / (exp(lsig)))^-1)
-#   }
-#   cmp <- ~ lsig(1) + Intercept(1)
-#   form <- distance ~ log(hr(distance, lsig)) + Intercept
-#   ips <- fm_int(fm_mesh_1d(seq(0, 8, by = 0.1)), name = "distance")
-#   local_bru_options_set(bru_verbose = FALSE)
-#   bench::mark(
-#     pandemic = {
-#       local_bru_options_set(bru_method = list(taylor = "pandemic"))
-#       fit <- lgcp(
-#         components = cmp,
-#         mexdolphin$points,
-#         ips = ips,
-#         formula = form,
-#         options = list(control.inla = list(int.strategy = "auto"))
-#       )
-#     },
-#     check = FALSE,
-#     min_iterations = 2
-#   )
-# }
-#
-# timings()
-# # A tibble: 2 x 13
-# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time         gc
-# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>       <list>
-#   1 legacy        1.36s    1.39s     0.722        NA     2.17     2     6      2.77s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
-#   2 pandemic      1.36s    1.37s     0.732        NA     2.19     2     6      2.73s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
-#
-# Unit: seconds
-# expr      min       lq     mean   median       uq      max neval cld
-# legacy 1.447667 1.474479 1.507082 1.496711 1.520239 1.899379   100   b
-# pandemic 1.252985 1.271926 1.291995 1.288727 1.307383 1.402191   100  a
-
-
-
-
-test_that("Mexdolphin: Hazard rate detection function", {
+test_that("Marginal parameter transformation", {
   skip_on_cran()
   local_bru_safe_inla()
-  data(mexdolphin, package = "inlabru", envir = environment())
+  data(mexdolphin_sf, package = "inlabru", envir = environment())
 
-  hr <- function(distance, lsig) {
-    1 - exp(-(distance / exp(lsig))^-1)
+  sig <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
+  hr <- function(distance, sigma) {
+    1 - exp(-(distance / sigma)^-1)
   }
-  cmp <- ~ lsig(1) + Intercept(1)
-  form <- distance ~ log(hr(distance, lsig)) + Intercept
-  form_list <- list(distance = distance) ~ log(hr(distance, lsig)) + Intercept
+  log_hr <- function(distance, sigma) {
+    log1p(-exp(-(distance / sigma)^-1))
+  }
+  cmp <- ~ sigma(1, prec.linear = 1) + Intercept(1)
+  form <- distance ~ log_hr(distance, sigma = ibm_eval(sig, NULL, sigma)) + Intercept
 
-  pts <-
-    mexdolphin$points
+  pts <- mexdolphin_sf$points
 
   fit <- bru(
     components = cmp,
@@ -191,36 +192,30 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
+      bru_initial = list(Intercept = 0, sigma = ibm_eval(sig, NULL, 1, inverse = TRUE)),
       inla.mode = "compact"
     )
   )
 
-  fit_list <- bru(
-    components = cmp,
-    like(
-      formula = form_list,
-      family = "cp",
-      data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
-    ),
-    options = list(
-      bru_verbose = 0,
-      bru_compress_cp = TRUE,
-      bru_max_iter = 10,
-      verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "compact"
-    )
+  expect_equal(
+    fit$summary.fixed["sigma", "mean"],
+    -0.4653159,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["sigma", "sd"],
+    0.3583088,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    2.2593613,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "sd"],
+    0.2720904,
+    tolerance = midtol
   )
 
-  expect_equal(fit$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
-  expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "mean"], 2.29, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
-
-  expect_equal(fit_list$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["Intercept", "mean"], 2.29, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
 })
