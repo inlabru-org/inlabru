@@ -1778,11 +1778,9 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 #' @describeIn bru_mapper
 #' Constructs a mapper
 #' that transforms the marginal distribution `state` from \eqn{\textrm{N}(0,1)}{N(0, 1)}
-#' to the distribution of a given quantile function.
-#' To avoid numerical overflow, it uses the common method of internally
-#' shifting the state blockwise with
-#' `(state-log_weights)[block] - max((state-log_weights)[block])`,
-#' and shifting the result back afterwards.
+#' to the distribution of a given quantile function. The `...` arguments are used
+#' as parameter arguments to `qfun` and `pfun`.
+#' be
 #' @param qfun A quantile function, supporting `lower.tail` and `log.p` arguments,
 #' like [stats::qnorm()].
 #' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
@@ -1790,12 +1788,12 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 #' @param param Distribution parameter arguments for `qfun` and `pfun`
 bru_mapper_marginal <- function(qfun,
                                 pfun,
-                                param = list()) {
+                                ...) {
   bru_mapper_define(
     list(
       qfun = qfun,
       pfun = pfun,
-      param = param,
+      param = list(...),
       is_linear = FALSE
     ),
     new_class = c("bru_mapper_marginal")

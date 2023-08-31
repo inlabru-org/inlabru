@@ -62,7 +62,7 @@ bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
 
 bru_mapper_logsumexp(rescale = FALSE, n_block = NULL)
 
-bru_mapper_marginal(qfun, pfun, param = list())
+bru_mapper_marginal(qfun, pfun, ...)
 
 bru_mapper_pipe(mappers)
 
@@ -146,8 +146,6 @@ like \code{\link[stats:Normal]{stats::qnorm()}}.}
 \item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
 like \code{\link[stats:Normal]{stats::pnorm()}}.}
 
-\item{param}{Distribution parameter arguments for \code{qfun} and \code{pfun}}
-
 \item{mappers}{A list of \code{bru_mapper} objects}
 
 \item{hidden}{\code{logical}, set to \code{TRUE} to flag that the mapper is to be used
@@ -170,6 +168,8 @@ basis function is a constant. (Default \code{TRUE})}
 Default \code{c(0, 1)}.}
 
 \item{B}{a square or tall basis conversion matrix}
+
+\item{param}{Distribution parameter arguments for \code{qfun} and \code{pfun}}
 }
 \value{
 \itemize{
@@ -267,11 +267,9 @@ and shifting the result back afterwards.
 
 \item \code{bru_mapper_marginal()}: Constructs a mapper
 that transforms the marginal distribution \code{state} from \eqn{\textrm{N}(0,1)}{N(0, 1)}
-to the distribution of a given quantile function.
-To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise with
-\code{(state-log_weights)[block] - max((state-log_weights)[block])},
-and shifting the result back afterwards.
+to the distribution of a given quantile function. The \code{...} arguments are used
+as parameter arguments to \code{qfun} and \code{pfun}.
+be
 
 \item \code{bru_mapper_pipe()}: Create a pipe mapper, where \code{mappers} is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next
