@@ -190,11 +190,11 @@
 
 \method{ibm_values}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
 
-\method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, inverse = FALSE, ...)
+\method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
 
 \method{ibm_linear}{bru_mapper_marginal}(mapper, input, state, ...)
 
-\method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, inverse = FALSE, ...)
+\method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
 
 \method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
 

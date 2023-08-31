@@ -31,11 +31,11 @@ bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
 
 \method{bru_mapper}{default}(...)
 
-\method{bru_mapper}{fm_mesh_2d}(mesh)
+\method{bru_mapper}{fm_mesh_2d}(mesh, ...)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
-\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL)
+\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL, ...)
 
 \method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
 
@@ -140,7 +140,13 @@ the same as dividing by the number of entries in each block.
 \item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
 the maximum block index in the inputs.}
 
-\item{qfun}{A quantile function, supporting}
+\item{qfun}{A quantile function, supporting \code{lower.tail} and \code{log.p} arguments,
+like \code{\link[stats:Normal]{stats::qnorm()}}.}
+
+\item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
+like \code{\link[stats:Normal]{stats::pnorm()}}.}
+
+\item{param}{Distribution parameter arguments for \code{qfun} and \code{pfun}}
 
 \item{mappers}{A list of \code{bru_mapper} objects}
 

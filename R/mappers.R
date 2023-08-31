@@ -693,7 +693,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' @param mesh An `fm_mesh_1d`, `fm_mesh_2d`, `inla.mesh.1d` or `inla.mesh.2d` object to use as a mapper
 #' @export
 #' @describeIn bru_mapper Creates a mapper for 2D `fm_mesh_2d` objects
-bru_mapper.fm_mesh_2d <- function(mesh) {
+bru_mapper.fm_mesh_2d <- function(mesh, ...) {
   mapper <- list(mesh = mesh)
   bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_2d")
 }
@@ -755,7 +755,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' Default: `NULL`, to force user specification of this parameter
 #' @export
 #' @describeIn bru_mapper Create mapper for an `fm_mesh_1d` object
-bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL) {
+bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
     stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
   }
@@ -1783,7 +1783,11 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 #' shifting the state blockwise with
 #' `(state-log_weights)[block] - max((state-log_weights)[block])`,
 #' and shifting the result back afterwards.
-#' @param qfun A quantile function, supporting
+#' @param qfun A quantile function, supporting `lower.tail` and `log.p` arguments,
+#' like [stats::qnorm()].
+#' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
+#' like [stats::pnorm()].
+#' @param param Distribution parameter arguments for `qfun` and `pfun`
 bru_mapper_marginal <- function(qfun,
                                 pfun,
                                 param = list()) {
@@ -1855,8 +1859,8 @@ ibm_values.bru_mapper_marginal <- function(mapper, ...,
 #' as a parameter list for `qfun`, overriding that of the mapper itself.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
-                                             inverse = FALSE,
-                                             ...) {
+                                             ...,
+                                             inverse = FALSE) {
   stopifnot(!is.null(state))
   if (!is.null(input)) {
     mapper$param <- input
@@ -1905,7 +1909,8 @@ ibm_linear.bru_mapper_marginal <- function(mapper, input, state, ...) {
 #' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically stable way.
 #' If `TRUE`, evaluates the inverse `qnorm(pfun(x, param))` instead.
 ibm_eval.bru_mapper_marginal <- function(mapper, input, state = NULL,
-                                         inverse = FALSE, ...) {
+                                         ...,
+                                         inverse = FALSE) {
   stopifnot(!is.null(state))
   if (!is.null(input)) {
     mapper$param <- input
