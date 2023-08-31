@@ -851,8 +851,8 @@ bru <- function(components = ~ Intercept(1),
   result$bru_timings <-
     rbind(
       data.frame(
-        Task = c("Preparation"),
-        Iteration = rep(NA_integer_, 1),
+        Task = c("Preprocess"),
+        Iteration = 0L,
         Time = c(timing_setup - timing_start)
       ),
       result[["bru_iinla"]][["timings"]]
@@ -892,10 +892,12 @@ bru_rerun <- function(result, options = list()) {
   )
 
   timing_end <- Sys.time()
+  new_timings <- result[["bru_iinla"]][["timings"]]$Iteration >
+    max(original_timings$Iteration)
   result$bru_timings <-
     rbind(
-      original_timings[1, , drop = FALSE],
-      result[["bru_iinla"]][["timings"]]
+      original_timings,
+      result[["bru_iinla"]][["timings"]][new_timings, , drop = FALSE]
     )
 
   # Add bru information to the result
@@ -3117,9 +3119,17 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 
 
 iinla <- function(model, lhoods, initial = NULL, options) {
-  timing_start <- Sys.time()
-  timing_setup <- Sys.time()
-  timing_iterations <- Sys.time()
+  add_timing <- function(timings, task, iteration = NA_integer_) {
+    return(rbind(
+      timings,
+      data.frame(
+        Task = task,
+        Iteration = iteration,
+        AbsoluteTime = Sys.time()
+      )
+    ))
+  }
+  timings <- add_timing(NULL, "Start")
 
   inla.options <- bru_options_inla(options)
 
@@ -3156,19 +3166,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         rbind(
           original_timings,
           data.frame(
-            Task = c(
-              "Setup",
-              rep("Iteration", length(timing_iterations) - 1)
-            ),
-            Iteration = c(
-              NA_integer_,
-              iteration_offset +
-                seq_len(length(timing_iterations) - 1)
-            ),
-            Time = c(
-              timing_setup - timing_start,
-              diff(timing_iterations)
-            )
+            Task = timings$Task[-1],
+            Iteration = timings$Iteration[-1] + iteration_offset,
+            Time = diff(timings$AbsoluteTime)
           )
         )
       },
@@ -3346,9 +3346,6 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     previous_x <- 0 # TODO: construct from the initial linearisation state instead
   }
 
-  timing_setup <- Sys.time()
-  timing_iterations <- Sys.time()
-
   track_df <- NULL
   do_final_integration <- (options$bru_max_iter == 1)
   do_final_theta_no_restart <- FALSE
@@ -3485,6 +3482,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         )
     }
 
+    timings <- add_timing(timings, "Preprocess", k)
+
     result <- fm_try_callstack(
       do.call(
         INLA::inla,
@@ -3492,6 +3491,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         envir = environment(model$effects)
       )
     )
+
+    timings <- add_timing(timings, "Run inla()", k)
 
     if (inherits(result, "try-error")) {
       bru_log_message(
@@ -3598,7 +3599,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             options = options
           )
           state <- line_search[["state"]]
+          timings <- add_timing(timings, "Line search", k)
         }
+
         bru_log_message(
           "iinla: Evaluate component linearisations",
           verbose = options$bru_verbose,
@@ -3623,6 +3626,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           state = state,
           comp_simple = comp_simple
         )
+
         stk <- bru_make_stack(lhoods, lin, idx)
 
         stk.data <- INLA::inla.stack.data(stk)
@@ -3669,9 +3673,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       track[[k]][["new_linearisation"]][track[[k]][["effect"]] == label] <-
         unlist(states[[length(states)]][[label]])
     }
-    k <- k + 1
 
-    timing_iterations <- c(timing_iterations, Sys.time())
+    k <- k + 1
   }
 
   result[["bru_iinla"]] <- collect_misc_info()
