@@ -154,7 +154,8 @@ method, called inside <code><a href="bru.html">bru()</a></code>.</p>
 <span>  replicate_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  replicate_selector <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrep <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  A.msk <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  marginal <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  A.msk <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  .envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  envir_extra <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -249,9 +250,13 @@ passed directly on to <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class=
 replication model. Same syntax as for <code>main</code></p></dd>
 
 
+<dt>marginal</dt>
+<dd><p>May specify a <code><a href="bru_mapper.html">bru_mapper_marginal()</a></code> mapper,
+that is applied before scaling by <code>weights</code>.</p></dd>
+
+
 <dt>A.msk</dt>
-<dd><p>TODO: check/fix/deprecate this parameter.
-Likely doesn't work at the moment, and I've found no examples that use it.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> and has no effect.</p></dd>
 
 
 <dt>.envir</dt>
