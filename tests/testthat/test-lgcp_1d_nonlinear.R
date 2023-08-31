@@ -175,7 +175,7 @@ test_that("Marginal parameter transformation", {
     log1p(-exp(-(distance / sigma)^-1))
   }
   cmp <- ~ sigma(1, prec.linear = 1) + Intercept(1)
-  form <- distance ~ log_hr(distance, sigma = ibm_eval(sig, NULL, sigma)) + Intercept
+  form <- distance ~ log_hr(distance, sigma = ibm_eval(sig, state = sigma)) + Intercept
 
   pts <- mexdolphin_sf$points
 
@@ -192,7 +192,7 @@ test_that("Marginal parameter transformation", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, sigma = ibm_eval(sig, NULL, 1, inverse = TRUE)),
+      bru_initial = list(Intercept = 0, sigma = ibm_eval(sig, state = 1, inverse = TRUE)),
       inla.mode = "compact"
     )
   )

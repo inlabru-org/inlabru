@@ -1860,7 +1860,7 @@ ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
                                              ...,
                                              inverse = FALSE) {
   stopifnot(!is.null(state))
-  if (!is.null(input)) {
+  if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
   eps <- 1e-6
@@ -1910,7 +1910,7 @@ ibm_eval.bru_mapper_marginal <- function(mapper, input, state = NULL,
                                          ...,
                                          inverse = FALSE) {
   stopifnot(!is.null(state))
-  if (!is.null(input)) {
+  if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
   if (!inverse) {
