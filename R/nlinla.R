@@ -48,15 +48,6 @@ bru_compute_linearisation.component <- function(cmp,
                                                 ...) {
   label <- cmp[["label"]]
 
-  if (!is.null(comp_simple) &&
-    !inherits(comp_simple, "bru_mapper_taylor")) {
-    warning(paste0(
-      "Non-linear component mappers not fully supported!",
-      "\nClass for '", label, "': '",
-      paste0(class(comp_simple), collapse = "', '"),
-      "'"
-    ), immediate. = TRUE)
-  }
   if (is.null(comp_simple)) {
     A <- NULL
     assume_rowwise <- FALSE

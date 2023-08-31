@@ -119,7 +119,8 @@ Use \code{include_latent} instead.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
 several rows of the input data to influence the same row. Default \code{FALSE},
-but forced to \code{TRUE} if \code{response_data} is \code{NULL} or \code{data} is a \code{list}}
+but forced to \code{TRUE} if \code{response_data} is non-\code{NULL}, \code{data} is a \code{list},
+or the likelihood construction requires it.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 

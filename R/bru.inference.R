@@ -1172,7 +1172,8 @@ extended_bind_rows <- function(...) {
 #'   Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve
 #'   several rows of the input data to influence the same row. Default `FALSE`,
-#'   but forced to `TRUE` if `response_data` is `NULL` or `data` is a `list`
+#'   but forced to `TRUE` if `response_data` is non-`NULL`, `data` is a `list`,
+#'   or the likelihood construction requires it.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]

@@ -1,5 +1,12 @@
 # inlabru (development version)
 
+## Feature updates
+
+* Add new `ibm_simplify()` generic to handle mapper simplification more generally;
+  needed to properly support non-linear component mappers. (version `2.9.0.9004`)
+* Add new `bru_mapper_marginal()` mapper class that can be used as part of component
+  mapper pipelines. (version `2.9.0.9004`)
+
 ## Bug fixes
 
 * The `is_linear` flag wasn't correctly set for `bru_mapper_logsumexp` mappers.

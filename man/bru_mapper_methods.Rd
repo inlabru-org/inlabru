@@ -320,7 +320,8 @@ see the \code{ibm_eval()} details for \code{marginal} mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
-\item{pre_A}{Internal; precomputed Jacobian matrix}
+\item{pre_A}{Internal; precomputed Jacobian matrix. Can be supplied to
+to \code{ibm_eval()} methods that make use of them if needed.}
 
 \item{x}{object from which to extract element(s)}
 

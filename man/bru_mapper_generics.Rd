@@ -8,6 +8,7 @@
 \alias{ibm_is_linear}
 \alias{ibm_jacobian}
 \alias{ibm_linear}
+\alias{ibm_simplify}
 \alias{ibm_eval}
 \alias{ibm_names}
 \alias{ibm_names<-}
@@ -19,6 +20,7 @@
 \alias{ibm_is_linear.default}
 \alias{ibm_jacobian.default}
 \alias{ibm_linear.default}
+\alias{ibm_simplify.default}
 \alias{ibm_eval.default}
 \alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
@@ -36,6 +38,8 @@ ibm_is_linear(mapper, ...)
 ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_linear(mapper, input, state = NULL, ...)
+
+ibm_simplify(mapper, input, state = NULL, ...)
 
 ibm_eval(mapper, input, state = NULL, ...)
 
@@ -58,6 +62,8 @@ ibm_invalid_output(mapper, input, state, ...)
 \method{ibm_jacobian}{default}(mapper, input, state, ...)
 
 \method{ibm_linear}{default}(mapper, input, state, ...)
+
+\method{ibm_simplify}{default}(mapper, input, state, ...)
 
 \method{ibm_eval}{default}(mapper, input, state = NULL, ...)
 
@@ -130,6 +136,10 @@ The linearised mapper output is defined as
 The default method calls \code{ibm_eval()} and \code{ibm_jacobian()} to generate
 the needed information.
 
+\item \code{ibm_simplify()}: Implementations must return a \link{bru_mapper} object.
+The default method returns \code{ibm_linear(...)} for linear mappers, and the
+original \code{mapper} for non-linear mappers.
+
 \item \code{ibm_eval()}: Implementations must return a vector of length \code{ibm_n_output(...)}.
 The \code{input} contents must
 be in a format accepted by \code{ibm_jacobian(...)}
@@ -173,6 +183,9 @@ and returns a \code{bru_mapper_taylor} object.
 The \code{state0} information in the affine mapper indicates for which state
 the \code{offset} was evaluated; The affine mapper output is defined as
 \code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}
+
+\item \code{ibm_simplify(default)}: Calls \code{ibm_linear()} for linear mappers, and returns the original mapper
+for non-linear mappers.
 
 \item \code{ibm_eval(default)}: Verifies that the mapper is linear
 with \code{ibm_is_linear()}, and then computes a linear mapping

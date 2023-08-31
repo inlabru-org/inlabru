@@ -138,6 +138,15 @@ ibm_linear <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_linear")
 }
 
+#' @describeIn bru_mapper_generics
+#' Implementations must return a [bru_mapper] object.
+#' The default method returns `ibm_linear(...)` for linear mappers, and the
+#' original `mapper` for non-linear mappers.
+#' @export
+ibm_simplify <- function(mapper, input, state = NULL, ...) {
+  UseMethod("ibm_simplify")
+}
+
 #' @param state A vector of latent state values for the mapping,
 #' of length `ibm_n(mapper, inla_f = FALSE)`
 #' @describeIn bru_mapper_generics
@@ -617,6 +626,22 @@ ibm_linear.default <- function(mapper, input, state, ...) {
     values_mapper = mapper
   )
 }
+
+#' @describeIn bru_mapper_generics
+#' Calls `ibm_linear()` for linear mappers, and returns the original mapper
+#' for non-linear mappers.
+#' @export
+ibm_simplify.default <- function(mapper, input, state, ...) {
+  if (ibm_is_linear(mapper)) {
+    if (is.null(state)) {
+      state <- rep(0, ibm_n(mapper))
+    }
+    return(ibm_linear(mapper, input = input, state = state, ...))
+  }
+  return(mapper)
+}
+
+
 
 #' @describeIn bru_mapper_generics
 #' Verifies that the mapper is linear
@@ -2024,7 +2049,8 @@ ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
       mapper[["mappers"]][[k]],
       input = input[[k]],
       state = state_k,
-      ...
+      ...,
+      pre_A = A_k # The mapper might take advantage of the precomputed Jacobian
     )
     if (k == first) {
       A <- A_k
@@ -2237,7 +2263,8 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
 
 
 
-#' @param pre_A Internal; precomputed Jacobian matrix
+#' @param pre_A Internal; precomputed Jacobian matrix. Can be supplied to
+#' to `ibm_eval()` methods that make use of them if needed.
 #' @export
 #' @rdname bru_mapper_methods
 ibm_linear.bru_mapper_multi <- function(mapper, input, state,

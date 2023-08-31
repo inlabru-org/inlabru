@@ -688,37 +688,18 @@ evaluate_comp_simple <- function(...) {
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
                                                 inla_f = FALSE, ...) {
-  are_linear <- vapply(
+  mappers <- lapply(
     components,
-    function(x) ibm_is_linear(x[["mapper"]]),
-    TRUE
-  )
-  the_linear <- names(components)[are_linear]
-  the_nonlinear <- names(components)[!are_linear]
-
-  if (any(are_linear)) {
-    mappers <- comp_lin_eval(
-      components[the_linear],
-      input = input[the_linear],
-      state = NULL,
-      inla_f = inla_f
-    )
-  } else {
-    mappers <- list()
-  }
-
-  if (any(!are_linear)) {
-    mappers <- c(
-      mappers,
-      lapply(
-        components[the_nonlinear],
-        function(x) x[["mapper"]]
+    function(x) {
+      label <- x[["label"]]
+      ibm_simplify(
+        x[["mapper"]],
+        input[[label]],
+        state = NULL,
+        inla_f = inla_f
       )
-    )
-  }
-
-  # Reorder
-  mappers <- mappers[names(components)]
+    }
+  )
 
   class(mappers) <- c("comp_simple_list", class(mappers))
   mappers
