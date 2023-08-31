@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,6 +110,8 @@ available (see Details). Otherwise the
 <span></span>
 <span><span class="fu">ibm_linear</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">ibm_simplify</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">ibm_eval</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">ibm_names</span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
@@ -137,6 +139,9 @@ available (see Details). Otherwise the
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_linear</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">ibm_simplify</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_eval</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -215,6 +220,9 @@ The linearised mapper output is defined as
 <code>effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)</code>.
 The default method calls <code>ibm_eval()</code> and <code>ibm_jacobian()</code> to generate
 the needed information.</p></li>
+<li><p><code>ibm_simplify()</code>: Implementations must return a <a href="bru_mapper.html">bru_mapper</a> object.
+The default method returns <code>ibm_linear(...)</code> for linear mappers, and the
+original <code>mapper</code> for non-linear mappers.</p></li>
 <li><p><code>ibm_eval()</code>: Implementations must return a vector of length <code>ibm_n_output(...)</code>.
 The <code>input</code> contents must
 be in a format accepted by <code>ibm_jacobian(...)</code>
@@ -248,6 +256,8 @@ and returns a <code>bru_mapper_taylor</code> object.
 The <code>state0</code> information in the affine mapper indicates for which state
 the <code>offset</code> was evaluated; The affine mapper output is defined as
 <code>effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)</code></p></li>
+<li><p><code>ibm_simplify(default)</code>: Calls <code>ibm_linear()</code> for linear mappers, and returns the original mapper
+for non-linear mappers.</p></li>
 <li><p><code>ibm_eval(default)</code>: Verifies that the mapper is linear
 with <code>ibm_is_linear()</code>, and then computes a linear mapping
 as <code>ibm_jacobian(...) %*% state</code>.  When <code>state</code> is <code>NULL</code>,

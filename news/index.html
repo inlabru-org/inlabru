@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<div class="section level3">
+<h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
+<ul><li>Add new <code><a href="../reference/bru_mapper_generics.html">ibm_simplify()</a></code> generic to handle mapper simplification more generally; needed to properly support non-linear component mappers. (version <code>2.9.0.9004</code>)</li>
+<li>Add new <code><a href="../reference/bru_mapper.html">bru_mapper_marginal()</a></code> mapper class that can be used as part of component mapper pipelines. (version <code>2.9.0.9004</code>)</li>
+</ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>The <code>is_linear</code> flag wasn’t correctly set for <code>bru_mapper_logsumexp</code> mappers. Since previous versions did not accept non-linear component mappers, this is unlikely to have affected any user code. (Fixed in version <code>2.9.0.9001</code>)</li>
