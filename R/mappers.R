@@ -1785,7 +1785,6 @@ ibm_linear.bru_mapper_logsumexp <- function(mapper, input, state, ...) {
 #' like [stats::qnorm()].
 #' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
 #' like [stats::pnorm()].
-#' @param param Distribution parameter arguments for `qfun` and `pfun`
 bru_mapper_marginal <- function(qfun,
                                 pfun,
                                 ...) {
@@ -1989,8 +1988,18 @@ ibm_n.bru_mapper_pipe <- function(mapper, ..., state = NULL) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
-  final <- length(mapper[["mappers"]])
-  ibm_n_output(mapper[["mappers"]][[final]], input[[final]], state = state, ..., )
+  final <- names(mapper[["mappers"]])[length(mapper[["mappers"]])]
+  if (missing(input) || is.null(input)) {
+    inp <- NULL
+  } else if (is.null(names(input))) {
+    names(input) <- names(mapper[["mappers"]])[seq_along(input)]
+    inp <- input[[final]]
+  } else {
+    inp <- input[[final]]
+  }
+  ibm_n_output(mapper[["mappers"]][[length(mapper[["mappers"]])]],
+               inp,
+               state = state,...)
 }
 
 #' @export
@@ -2016,7 +2025,8 @@ ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
       input = input[[k]],
       state = state_k, ...
     )
-    state_k <- ibm_eval(mapper[["mappers"]][[k]],
+    state_k <- ibm_eval(
+      mapper[["mappers"]][[k]],
       input = input[[k]],
       state = state_k,
       ...
@@ -2047,10 +2057,16 @@ ibm_linear.bru_mapper_pipe <- function(mapper, input, state, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+  if (!is.null(input)) {
+    if (is.null(names(input))) {
+      names(input) <- names(mapper[["mappers"]])[seq_along(input)]
+    }
+  }
   state_k <- state
-  for (k in seq_along(mapper[["mappers"]])) {
+  for (k in names(mapper[["mappers"]])) {
     # TODO: Introduce an "eval and Jacobian" method...
-    state_k <- ibm_eval(mapper[["mappers"]][[k]],
+    state_k <- ibm_eval(
+      mapper[["mappers"]][[k]],
       input = input[[k]],
       state = state_k,
       ...

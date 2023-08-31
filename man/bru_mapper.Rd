@@ -169,8 +169,6 @@ basis function is a constant. (Default \code{TRUE})}
 Default \code{c(0, 1)}.}
 
 \item{B}{a square or tall basis conversion matrix}
-
-\item{param}{Distribution parameter arguments for \code{qfun} and \code{pfun}}
 }
 \value{
 \itemize{

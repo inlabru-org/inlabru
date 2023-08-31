@@ -212,8 +212,9 @@ component <- function(...) {
 #' @param replicate,replicate_mapper,replicate_layer,replicate_selector,nrep
 #' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
-#' @param A.msk TODO: check/fix/deprecate this parameter.
-#' Likely doesn't work at the moment, and I've found no examples that use it.
+#' @param marginal May specify a `bru_mapper_marginal()` mapper,
+#' that is applied before scaling by `weights`.
+#' @param A.msk `r lifecycle::badge("deprecated")` and has no effect.
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
@@ -279,7 +280,9 @@ component.character <- function(object,
                                 replicate_layer = NULL,
                                 replicate_selector = NULL,
                                 nrep = NULL,
-                                A.msk = NULL,
+                                # Marginal transformation
+                                marginal = NULL,
+                                A.msk = deprecated(),
                                 .envir = parent.frame(),
                                 envir_extra = NULL) {
   # INLA models:
@@ -407,7 +410,7 @@ component.character <- function(object,
         )
       },
     copy = copy,
-    A.msk = A.msk,
+    marginal = marginal,
     env = .envir,
     env_extra = envir_extra
   )
@@ -494,7 +497,8 @@ component.character <- function(object,
       "main_selector",
       "group_selector",
       "replicate_selector",
-      "weights_selector"
+      "weights_selector",
+      "marginal"
     ))]
 
     # Replace arguments that will be evaluated by a mapper
@@ -803,17 +807,32 @@ add_mappers.component <- function(component, lhoods, ...) {
     require_indexed = TRUE
   )
   # Add scalable multi-mapper
-  component[["mapper"]] <-
-    bru_mapper_pipe(
-      list(
-        mapper = bru_mapper_multi(list(
-          main = component$main$mapper,
-          group = component$group$mapper,
-          replicate = component$replicate$mapper
-        )),
-        scale = bru_mapper_scale()
+  if (is.null(component[["marginal"]])) {
+    component[["mapper"]] <-
+      bru_mapper_pipe(
+        list(
+          mapper = bru_mapper_multi(list(
+            main = component$main$mapper,
+            group = component$group$mapper,
+            replicate = component$replicate$mapper
+          )),
+          scale = bru_mapper_scale()
+        )
       )
-    )
+  } else {
+    component[["mapper"]] <-
+      bru_mapper_pipe(
+        list(
+          mapper = bru_mapper_multi(list(
+            main = component$main$mapper,
+            group = component$group$mapper,
+            replicate = component$replicate$mapper
+          )),
+          marginal = component[["marginal"]],
+          scale = bru_mapper_scale()
+        )
+      )
+  }
 
   fcall <- component$fcall
 

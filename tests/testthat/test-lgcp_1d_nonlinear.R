@@ -158,7 +158,6 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #     data = data.frame(ips) %>% arrange(distance)
   #   )
   ##########
-
 })
 
 
@@ -167,35 +166,46 @@ test_that("Marginal parameter transformation", {
   local_bru_safe_inla()
   data(mexdolphin_sf, package = "inlabru", envir = environment())
 
-  sig <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
   hr <- function(distance, sigma) {
     1 - exp(-(distance / sigma)^-1)
   }
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- ~ sigma(1, prec.linear = 1) + Intercept(1)
-  form <- distance ~ log_hr(distance, sigma = ibm_eval(sig, state = sigma)) + Intercept
+  cmp <- component_list(~
+    sigma(
+      1,
+      prec.linear = 1,
+      marginal = bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
+    ) + Intercept(1))
+  form <- distance ~ log_hr(distance, sigma = sigma) + Intercept
 
   pts <- mexdolphin_sf$points
 
-  fit <- bru(
-    components = cmp,
-    like(
-      formula = form,
-      family = "cp",
-      data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
-    ),
-    options = list(
-      bru_verbose = 0,
-      bru_compress_cp = TRUE,
-      bru_max_iter = 10,
-      verbose = FALSE,
-      bru_initial = list(Intercept = 0, sigma = ibm_eval(sig, state = 1, inverse = TRUE)),
-      inla.mode = "compact"
+  suppressWarnings({
+    expect_warning(
+      {
+        fit <- bru(
+          components = cmp,
+          like(
+            formula = form,
+            family = "cp",
+            data = pts,
+            domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+          ),
+          options = list(
+            bru_verbose = 0,
+            bru_compress_cp = TRUE,
+            bru_max_iter = 10,
+            verbose = FALSE,
+            bru_initial = list(Intercept = 0, sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)),
+            inla.mode = "compact"
+          )
+        )
+      },
+      "Non-linear mappers are experimental!|Non-linear component mappers not fully supported!",
     )
-  )
+  })
 
   expect_equal(
     fit$summary.fixed["sigma", "mean"],
@@ -217,5 +227,4 @@ test_that("Marginal parameter transformation", {
     0.2720904,
     tolerance = midtol
   )
-
 })
