@@ -49,6 +49,12 @@
 \alias{ibm_jacobian.bru_mapper_logsumexp}
 \alias{ibm_eval.bru_mapper_logsumexp}
 \alias{ibm_linear.bru_mapper_logsumexp}
+\alias{ibm_n.bru_mapper_marginal}
+\alias{ibm_n_output.bru_mapper_marginal}
+\alias{ibm_values.bru_mapper_marginal}
+\alias{ibm_jacobian.bru_mapper_marginal}
+\alias{ibm_linear.bru_mapper_marginal}
+\alias{ibm_eval.bru_mapper_marginal}
 \alias{ibm_n.bru_mapper_pipe}
 \alias{ibm_n_output.bru_mapper_pipe}
 \alias{ibm_values.bru_mapper_pipe}
@@ -178,6 +184,18 @@
 
 \method{ibm_linear}{bru_mapper_logsumexp}(mapper, input, state, ...)
 
+\method{ibm_n}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
+
+\method{ibm_n_output}{bru_mapper_marginal}(mapper, input, state = NULL, ..., n_state = NULL)
+
+\method{ibm_values}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
+
+\method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, inverse = FALSE, ...)
+
+\method{ibm_linear}{bru_mapper_marginal}(mapper, input, state, ...)
+
+\method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, inverse = FALSE, ...)
+
 \method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
 
 \method{ibm_n_output}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
@@ -297,6 +315,9 @@ that have state dependent output size.}
 \item{log}{logical; control \code{log} output. Default \code{TRUE}, see the \code{ibm_eval()} details
 for \code{logsumexp} mappers.}
 
+\item{inverse}{logical; control \code{bru_mapper_marginal} evaluation. Default \code{FALSE},
+see the \code{ibm_eval()} details for \code{marginal} mappers.}
+
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
 \item{pre_A}{Internal; precomputed Jacobian matrix}
@@ -369,6 +390,9 @@ equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
 
+For \code{bru_mapper_marginal}, non-NULL \code{input} values are intepreted
+as a parameter list for \code{qfun}, overriding that of the mapper itself.
+
 \itemize{
 \item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with
 named entries, or a list with unnamed but ordered elements.
@@ -415,6 +439,10 @@ with unnamed but ordered columns.
 \itemize{
 \item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
 the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
+
+\item \code{ibm_eval(bru_mapper_marginal)}: When \code{inverse} is \code{FALSE} (default), \code{ibm_eval()}
+for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically stable way.
+If \code{TRUE}, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
 
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 

@@ -17,6 +17,7 @@
 \alias{bru_mapper_scale}
 \alias{bru_mapper_aggregate}
 \alias{bru_mapper_logsumexp}
+\alias{bru_mapper_marginal}
 \alias{bru_mapper_pipe}
 \alias{bru_mapper_multi}
 \alias{bru_mapper_collect}
@@ -30,11 +31,11 @@ bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
 
 \method{bru_mapper}{default}(...)
 
-\method{bru_mapper}{fm_mesh_2d}(mesh, ...)
+\method{bru_mapper}{fm_mesh_2d}(mesh)
 
 \method{bru_mapper}{inla.mesh}(mesh, ...)
 
-\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL, ...)
+\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL)
 
 \method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
 
@@ -44,39 +45,39 @@ bru_mapper_taylor(
   offset = NULL,
   jacobian = NULL,
   state0 = NULL,
-  ...,
   values_mapper = NULL
 )
 
-bru_mapper_linear(...)
+bru_mapper_linear()
 
-bru_mapper_matrix(labels, ...)
+bru_mapper_matrix(labels)
 
-bru_mapper_factor(values, factor_mapping, indexed = FALSE, ...)
+bru_mapper_factor(values, factor_mapping, indexed = FALSE)
 
-bru_mapper_const(...)
+bru_mapper_const()
 
-bru_mapper_scale(mapper = NULL, ...)
+bru_mapper_scale(mapper = NULL)
 
-bru_mapper_aggregate(rescale = FALSE, n_block = NULL, ...)
+bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
 
-bru_mapper_logsumexp(rescale = FALSE, n_block = NULL, ...)
+bru_mapper_logsumexp(rescale = FALSE, n_block = NULL)
 
-bru_mapper_pipe(mappers, ...)
+bru_mapper_marginal(qfun, pfun, param = list())
 
-bru_mapper_multi(mappers, ...)
+bru_mapper_pipe(mappers)
 
-bru_mapper_collect(mappers, hidden = FALSE, ...)
+bru_mapper_multi(mappers)
+
+bru_mapper_collect(mappers, hidden = FALSE)
 
 bru_mapper_harmonics(
   order = 1,
   scaling = 1,
   intercept = TRUE,
-  interval = c(0, 1),
-  ...
+  interval = c(0, 1)
 )
 
-bru_mapper_mesh_B(mesh, B, ...)
+bru_mapper_mesh_B(mesh, B)
 }
 \arguments{
 \item{\dots}{Deprecated, alternative way to supply optional method definitions.}
@@ -138,6 +139,8 @@ the same as dividing by the number of entries in each block.
 
 \item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
 the maximum block index in the inputs.}
+
+\item{qfun}{A quantile function, supporting}
 
 \item{mappers}{A list of \code{bru_mapper} objects}
 
@@ -251,6 +254,14 @@ for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
 and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(blocksum(w*exp(state)/blocksum(w)))}
 calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
 but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
+To avoid numerical overflow, it uses the common method of internally
+shifting the state blockwise with
+\code{(state-log_weights)[block] - max((state-log_weights)[block])},
+and shifting the result back afterwards.
+
+\item \code{bru_mapper_marginal()}: Constructs a mapper
+that transforms the marginal distribution \code{state} from \eqn{\textrm{N}(0,1)}{N(0, 1)}
+to the distribution of a given quantile function.
 To avoid numerical overflow, it uses the common method of internally
 shifting the state blockwise with
 \code{(state-log_weights)[block] - max((state-log_weights)[block])},

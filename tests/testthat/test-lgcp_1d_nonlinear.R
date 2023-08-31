@@ -3,7 +3,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   local_bru_safe_inla()
   data(mexdolphin, package = "inlabru", envir = environment())
 
-  sig <- function(x) bru_forward_transformation(qexp, x, rate = 1/8)
+  sig <- function(x) bru_forward_transformation(qexp, x, rate = 1 / 8)
   hr <- function(distance, sigma) {
     1 - exp(-(distance / sigma)^-1)
   }
