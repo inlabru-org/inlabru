@@ -182,30 +182,23 @@ test_that("Marginal parameter transformation", {
 
   pts <- mexdolphin_sf$points
 
-  suppressWarnings({
-    expect_warning(
-      {
-        fit <- bru(
-          components = cmp,
-          like(
-            formula = form,
-            family = "cp",
-            data = pts,
-            domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
-          ),
-          options = list(
-            bru_verbose = 0,
-            bru_compress_cp = TRUE,
-            bru_max_iter = 10,
-            verbose = FALSE,
-            bru_initial = list(Intercept = 0, sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)),
-            inla.mode = "compact"
-          )
-        )
-      },
-      "Non-linear mappers are experimental!|Non-linear component mappers not fully supported!",
+  fit <- bru(
+    components = cmp,
+    like(
+      formula = form,
+      family = "cp",
+      data = pts,
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+    ),
+    options = list(
+      bru_verbose = 0,
+      bru_compress_cp = TRUE,
+      bru_max_iter = 10,
+      verbose = FALSE,
+      bru_initial = list(Intercept = 0, sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)),
+      inla.mode = "compact"
     )
-  })
+  )
 
   expect_equal(
     fit$summary.fixed["sigma", "mean"],

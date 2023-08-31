@@ -708,7 +708,6 @@ evaluate_comp_simple.component_list <- function(components, input,
   }
 
   if (any(!are_linear)) {
-    warning("Non-linear mappers are experimental!", immediate. = TRUE)
     mappers <- c(
       mappers,
       lapply(
