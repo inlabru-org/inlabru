@@ -99,6 +99,9 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{value}{a character vector of the same length as the number
 of sub-mappers in the mapper}
+
+\item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
+supplied by internal methods that already have the Jacobian.}
 }
 \description{
 A \code{bru_mapper} sub-class implementation must provide an

@@ -108,9 +108,7 @@ a non-null Jacobian.}
 
 \item{jacobian}{For \code{bru_mapper_taylor()}, the Jacobian matrix,
 evaluated at \code{state0}, or, a named list of such matrices.
-May be \code{NULL} or an empty list, for a constant mapping.
-For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
-supplied by internal methods that already have the Jacobian.}
+May be \code{NULL} or an empty list, for a constant mapping.}
 
 \item{state0}{For \code{bru_mapper_taylor}, the state the linearisation
 was evaluated at, or a list of length matching the \code{jacobian} list.

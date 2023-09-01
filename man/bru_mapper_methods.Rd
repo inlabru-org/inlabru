@@ -319,6 +319,9 @@ see the \code{ibm_eval()} details for \code{marginal} mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
+\item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
+supplied by internal methods that already have the Jacobian.}
+
 \item{pre_A}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{jacobian}.}
 
 \item{x}{object from which to extract element(s)}

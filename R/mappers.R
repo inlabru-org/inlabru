@@ -674,6 +674,9 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
 #' with `ibm_is_linear()`, and then computes a linear mapping
 #' as `ibm_jacobian(...) %*% state`.  When `state` is `NULL`,
 #' a zero vector of length `ibm_n_output(...)` is returned.
+#' @param jacobian
+#' For `ibm_eval()` methods, an optional pre-computed Jacobian, typically
+#' supplied by internal methods that already have the Jacobian.
 #' @export
 ibm_eval.default <- function(mapper, input, state = NULL, ..., jacobian = NULL) {
   if (!ibm_is_linear(mapper)) {
@@ -702,8 +705,13 @@ ibm_eval.default <- function(mapper, input, state = NULL, ..., jacobian = NULL) 
 #' @export
 ibm_eval2.default <- function(mapper, input, state, ...) {
   jacobian <- ibm_jacobian(mapper, input, state, ...)
-  offset <- ibm_eval(mapper, input, state, ...,
-                     jacobian = jacobian)
+  offset <- ibm_eval(
+    mapper,
+    input,
+    state,
+    ...,
+    jacobian = jacobian
+  )
   list(offset = offset, jacobian = jacobian)
 }
 
@@ -949,8 +957,6 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 #' @param jacobian For `bru_mapper_taylor()`, the Jacobian matrix,
 #' evaluated at `state0`, or, a named list of such matrices.
 #' May be `NULL` or an empty list, for a constant mapping.
-#' For `ibm_eval()` methods, an optional pre-computed Jacobian, typically
-#' supplied by internal methods that already have the Jacobian.
 #' @param state0 For `bru_mapper_taylor`, the state the linearisation
 #' was evaluated at, or a list of length matching the `jacobian` list.
 #' `NULL` is interpreted as 0.
@@ -2293,6 +2299,9 @@ ibm_linear.bru_mapper_multi <- function(mapper, input, state,
 }
 
 
+#' @param jacobian
+#' For `ibm_eval()` methods, an optional pre-computed Jacobian, typically
+#' supplied by internal methods that already have the Jacobian.
 #' @param pre_A `r lifecycle::badge("deprecated")` in favour of `jacobian`.
 #' @export
 #' @rdname bru_mapper_methods
