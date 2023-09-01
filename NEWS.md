@@ -6,6 +6,8 @@
   needed to properly support non-linear component mappers. (version `2.9.0.9004`)
 * Add new `bru_mapper_marginal()` mapper class that can be used as part of component
   mapper pipelines. (version `2.9.0.9004`)
+* Add new `ibm_eval2()` generic that computes both evaluation and Jacobian,
+  avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
 
 ## Bug fixes
 

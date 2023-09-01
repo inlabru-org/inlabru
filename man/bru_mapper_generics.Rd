@@ -10,6 +10,7 @@
 \alias{ibm_linear}
 \alias{ibm_simplify}
 \alias{ibm_eval}
+\alias{ibm_eval2}
 \alias{ibm_names}
 \alias{ibm_names<-}
 \alias{ibm_inla_subset}
@@ -22,6 +23,7 @@
 \alias{ibm_linear.default}
 \alias{ibm_simplify.default}
 \alias{ibm_eval.default}
+\alias{ibm_eval2.default}
 \alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
 \alias{ibm_invalid_output.default}
@@ -42,6 +44,8 @@ ibm_linear(mapper, input, state = NULL, ...)
 ibm_simplify(mapper, input = NULL, state = NULL, ...)
 
 ibm_eval(mapper, input, state = NULL, ...)
+
+ibm_eval2(mapper, input, state = NULL, ...)
 
 ibm_names(mapper)
 
@@ -65,7 +69,9 @@ ibm_invalid_output(mapper, input, state, ...)
 
 \method{ibm_simplify}{default}(mapper, input = NULL, state = NULL, ...)
 
-\method{ibm_eval}{default}(mapper, input, state = NULL, ...)
+\method{ibm_eval}{default}(mapper, input, state = NULL, ..., jacobian = NULL)
+
+\method{ibm_eval2}{default}(mapper, input, state, ...)
 
 \method{ibm_names}{default}(mapper, ...)
 
@@ -145,6 +151,11 @@ The \code{input} contents must
 be in a format accepted by \code{ibm_jacobian(...)}
 for the mapper.
 
+\item \code{ibm_eval2()}: Implementations must return a list with elements \code{offset} and \code{jacobian}.
+The \code{input} contents must
+be in a format accepted by \code{ibm_jacobian(...)}
+for the mapper.
+
 \item \code{ibm_names()}: Implementations must return a character vector of sub-mapper names, or \code{NULL}.
 Intended for providing information about multi-mappers and mapper collections.
 
@@ -191,6 +202,12 @@ for non-linear mappers.
 with \code{ibm_is_linear()}, and then computes a linear mapping
 as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
 a zero vector of length \code{ibm_n_output(...)} is returned.
+
+\item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and \code{ibm_eval(..., jacobian = jacobian)}
+and returns a list with elements \code{offset} and \code{jacobian}, as needed
+by \code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
+their own \code{ibm_eval2} method if join construction of evaluation and Jacobian
+is more efficient than separate construction.
 
 \item \code{ibm_names(default)}: Returns \code{NULL}
 

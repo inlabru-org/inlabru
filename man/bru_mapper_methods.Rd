@@ -38,29 +38,25 @@
 \alias{ibm_n_output.bru_mapper_scale}
 \alias{ibm_values.bru_mapper_scale}
 \alias{ibm_jacobian.bru_mapper_scale}
-\alias{ibm_linear.bru_mapper_scale}
 \alias{ibm_eval.bru_mapper_scale}
 \alias{ibm_n.bru_mapper_aggregate}
 \alias{ibm_n_output.bru_mapper_aggregate}
 \alias{ibm_values.bru_mapper_aggregate}
 \alias{ibm_jacobian.bru_mapper_aggregate}
 \alias{ibm_eval.bru_mapper_aggregate}
-\alias{ibm_linear.bru_mapper_aggregate}
 \alias{ibm_jacobian.bru_mapper_logsumexp}
 \alias{ibm_eval.bru_mapper_logsumexp}
-\alias{ibm_linear.bru_mapper_logsumexp}
 \alias{ibm_n.bru_mapper_marginal}
 \alias{ibm_n_output.bru_mapper_marginal}
 \alias{ibm_values.bru_mapper_marginal}
 \alias{ibm_jacobian.bru_mapper_marginal}
-\alias{ibm_linear.bru_mapper_marginal}
 \alias{ibm_eval.bru_mapper_marginal}
 \alias{ibm_n.bru_mapper_pipe}
 \alias{ibm_n_output.bru_mapper_pipe}
 \alias{ibm_values.bru_mapper_pipe}
 \alias{ibm_jacobian.bru_mapper_pipe}
-\alias{ibm_linear.bru_mapper_pipe}
 \alias{ibm_eval.bru_mapper_pipe}
+\alias{ibm_eval2.bru_mapper_pipe}
 \alias{ibm_simplify.bru_mapper_pipe}
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_n_output.bru_mapper_multi}
@@ -163,8 +159,6 @@
 
 \method{ibm_jacobian}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
-\method{ibm_linear}{bru_mapper_scale}(mapper, input, state, ...)
-
 \method{ibm_eval}{bru_mapper_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 \method{ibm_n}{bru_mapper_aggregate}(mapper, ..., input = NULL, state = NULL, n_state = NULL)
@@ -177,13 +171,9 @@
 
 \method{ibm_eval}{bru_mapper_aggregate}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
-\method{ibm_linear}{bru_mapper_aggregate}(mapper, input, state, ...)
-
 \method{ibm_jacobian}{bru_mapper_logsumexp}(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_mapper_logsumexp}(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
-
-\method{ibm_linear}{bru_mapper_logsumexp}(mapper, input, state, ...)
 
 \method{ibm_n}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
 
@@ -192,8 +182,6 @@
 \method{ibm_values}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
 
 \method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
-
-\method{ibm_linear}{bru_mapper_marginal}(mapper, input, state, ...)
 
 \method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
 
@@ -205,9 +193,9 @@
 
 \method{ibm_jacobian}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
 
-\method{ibm_linear}{bru_mapper_pipe}(mapper, input, state, ...)
-
 \method{ibm_eval}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval2}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bru_mapper_pipe}(mapper, input = NULL, state = NULL, ..., n_state = NULL)
 
@@ -231,7 +219,15 @@
 
 \method{ibm_linear}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, ...)
 
-\method{ibm_eval}{bru_mapper_multi}(mapper, input, state = NULL, inla_f = FALSE, ..., pre_A = NULL)
+\method{ibm_eval}{bru_mapper_multi}(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  jacobian = NULL,
+  pre_A = deprecated()
+)
 
 \method{ibm_invalid_output}{bru_mapper_multi}(mapper, input, state, inla_f = FALSE, multi = FALSE, ...)
 
@@ -323,8 +319,7 @@ see the \code{ibm_eval()} details for \code{marginal} mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
-\item{pre_A}{Internal; precomputed Jacobian matrix. Can be supplied to
-to \code{ibm_eval()} methods that make use of them if needed.}
+\item{pre_A}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{jacobian}.}
 
 \item{x}{object from which to extract element(s)}
 
