@@ -449,6 +449,21 @@ print.summary_bru_mapper <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
+#' @method print bru_mapper
+#' @rdname bru_mapper_summary
+print.bru_mapper <- function(x, ...,
+                             prefix = "",
+                             initial = prefix,
+                             depth = 1) {
+  print(summary(x,
+    prefix = "",
+    initial = prefix,
+    depth = 1
+  ), ...)
+  invisible(x)
+}
+
 
 # MAPPERS ----
 ## Constructor ----
@@ -2230,6 +2245,7 @@ ibm_n.bru_mapper_multi <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n_output.bru_mapper_multi <- function(mapper, input, ...) {
+  input <- bru_mapper_multi_prepare_input(mapper, input)
   # Assume that the first mapper fully handles the output size
   if (is.matrix(input)) {
     ibm_n_output(mapper[["mapper"]][[1]], input[, 1, drop = TRUE], ...)
@@ -2289,6 +2305,9 @@ bru_mapper_multi_prepare_input <- function(mapper, input) {
     if (is.data.frame(input)) {
       names(input) <- names(mapper[["mappers"]])[seq_len(ncol(input))]
     } else {
+      if (is.null(input)) {
+        input <- rep(list(NULL), length(mapper[["mappers"]]))
+      }
       # input should now be a list
       names(input) <- names(mapper[["mappers"]])[seq_along(input)]
     }

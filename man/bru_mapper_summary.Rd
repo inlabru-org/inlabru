@@ -6,6 +6,7 @@
 \alias{summary.bru_mapper_pipe}
 \alias{summary.bru_mapper_collect}
 \alias{print.summary_bru_mapper}
+\alias{print.bru_mapper}
 \title{mapper object summaries}
 \usage{
 \method{summary}{bru_mapper}(object, ..., prefix = "", initial = prefix, depth = 1)
@@ -17,6 +18,8 @@
 \method{summary}{bru_mapper_collect}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{print}{summary_bru_mapper}(x, ...)
+
+\method{print}{bru_mapper}(x, ..., prefix = "", initial = prefix, depth = 1)
 }
 \arguments{
 \item{object}{\code{bru_mapper} object to summarise}
