@@ -153,10 +153,7 @@ available (see Details). Otherwise the
 <span><span class="fu">ibm_inla_subset</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">ibm_invalid_output</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bru_mapper_pipe</span></span>
-<span><span class="fu">ibm_simplify</span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="cn">NULL</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, n_state <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ibm_invalid_output</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -271,11 +268,6 @@ the <code>ibm_values</code> output to construct the inla subset indexing, passin
 extra arguments such as <code>multi</code> on to the methods (this means it supports
 both regular vector values and <code>multi=1</code> data.frame values).</p></li>
 <li><p><code>ibm_invalid_output(default)</code>: Returns an all-<code>FALSE</code> logical vector.</p></li>
-<li><p><code>ibm_simplify(bru_mapper_pipe)</code>: Constructs a simplified <code>pipe</code> mapper. For fully linear pipes, calls <code>ibm_linear()</code>.
-For partially non-linear pipes, replaces each sequence of linear mappers with a single
-<code><a href="bru_mapper.html">bru_mapper_taylor()</a></code> mapper, while keeping the full list of original mapper
-names, allowing the original <code>input</code> structure to be used also with the simplified
-mappers, since the <code>taylor</code> mappers are not dependent on inputs.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
