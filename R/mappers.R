@@ -2140,7 +2140,7 @@ ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
 
 
 
-#' @describeIn bru_mapper_generics
+#' @describeIn bru_mapper_methods
 #' Constructs a simplified `pipe` mapper. For fully linear pipes, calls [ibm_linear()].
 #' For partially non-linear pipes, replaces each sequence of linear mappers with a single
 #' [bru_mapper_taylor()] mapper, while keeping the full list of original mapper

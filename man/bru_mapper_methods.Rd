@@ -61,6 +61,7 @@
 \alias{ibm_jacobian.bru_mapper_pipe}
 \alias{ibm_linear.bru_mapper_pipe}
 \alias{ibm_eval.bru_mapper_pipe}
+\alias{ibm_simplify.bru_mapper_pipe}
 \alias{ibm_n.bru_mapper_multi}
 \alias{ibm_n_output.bru_mapper_multi}
 \alias{ibm_values.bru_mapper_multi}
@@ -207,6 +208,8 @@
 \method{ibm_linear}{bru_mapper_pipe}(mapper, input, state, ...)
 
 \method{ibm_eval}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+
+\method{ibm_simplify}{bru_mapper_pipe}(mapper, input = NULL, state = NULL, ..., n_state = NULL)
 
 \method{ibm_n}{bru_mapper_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
@@ -444,6 +447,12 @@ the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value i
 \item \code{ibm_eval(bru_mapper_marginal)}: When \code{inverse} is \code{FALSE} (default), \code{ibm_eval()}
 for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically stable way.
 If \code{TRUE}, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
+
+\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls \code{\link[=ibm_linear]{ibm_linear()}}.
+For partially non-linear pipes, replaces each sequence of linear mappers with a single
+\code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of original mapper
+names, allowing the original \code{input} structure to be used also with the simplified
+mappers, since the \code{taylor} mappers are not dependent on inputs.
 
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 
