@@ -1983,11 +1983,12 @@ bru_mapper_pipe <- function(mappers) {
   n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
   n <- ibm_n(mappers[[1]])
   is_linear <- all(is_linear_multi)
-  if (is.null(names(mappers))) {
-    names(mappers) <- as.character(seq_along(mappers))
+  the_names <- names(mappers)
+  if (is.null(the_names)) {
+    the_names <- as.character(seq_along(mappers))
+    names(mappers) <- the_names
   } else if ("" %in% names(mappers)) {
-    warning("Either all or none of the pipe sub-mappers should be named.", immediate. = TRUE)
-    names(mappers) <- as.character(seq_along(mappers))
+    stop("Either all or none of the pipe sub-mappers should be named.")
   }
   bru_mapper_define(
     list(
@@ -1995,7 +1996,8 @@ bru_mapper_pipe <- function(mappers) {
       is_linear_multi,
       is_linear = is_linear,
       n_multi = n_multi,
-      n = n
+      n = n,
+      names = the_names
     ),
     new_class = "bru_mapper_pipe"
   )
@@ -2013,9 +2015,12 @@ ibm_n.bru_mapper_pipe <- function(mapper, ..., state = NULL) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
-  final <- names(mapper[["mappers"]])[length(mapper[["mappers"]])]
+  if (is.null(mapper[["names"]])) {
+    mapper[["names"]] <- names(mapper[["mappers"]])
+  }
+  final <- mapper[["names"]][length(mapper[["names"]])]
   if (!is.null(input) && is.null(names(input))) {
-    names(input) <- names(mapper[["mappers"]])[seq_along(input)]
+    names(input) <- mapper[["names"]][seq_along(input)]
   }
   ibm_n_output(
     mapper[["mappers"]][[length(mapper[["mappers"]])]],
@@ -2033,9 +2038,12 @@ ibm_values.bru_mapper_pipe <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+  if (is.null(mapper[["names"]])) {
+    mapper[["names"]] <- names(mapper[["mappers"]])
+  }
   state_k <- state
   if (!is.null(input) && is.null(names(input))) {
-    names(input) <- names(mapper[["mappers"]])[seq_along(input)]
+    names(input) <- mapper[["names"]][seq_along(input)]
   }
   first <- names(mapper[["mappers"]])[1]
   for (k in names(mapper[["mappers"]])) {
@@ -2078,10 +2086,11 @@ ibm_linear.bru_mapper_pipe <- function(mapper, input, state, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
-  if (!is.null(input)) {
-    if (is.null(names(input))) {
-      names(input) <- names(mapper[["mappers"]])[seq_along(input)]
-    }
+  if (is.null(mapper[["names"]])) {
+    mapper[["names"]] <- names(mapper[["mappers"]])
+  }
+  if (!is.null(input) && is.null(names(input))) {
+    names(input) <- mapper[["names"]][seq_along(input)]
   }
   state_k <- state
   for (k in names(mapper[["mappers"]])) {
