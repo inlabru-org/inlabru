@@ -143,7 +143,7 @@ ibm_linear <- function(mapper, input, state = NULL, ...) {
 #' The default method returns `ibm_linear(...)` for linear mappers, and the
 #' original `mapper` for non-linear mappers.
 #' @export
-ibm_simplify <- function(mapper, input, state = NULL, ...) {
+ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
   UseMethod("ibm_simplify")
 }
 
@@ -631,10 +631,10 @@ ibm_linear.default <- function(mapper, input, state, ...) {
 #' Calls `ibm_linear()` for linear mappers, and returns the original mapper
 #' for non-linear mappers.
 #' @export
-ibm_simplify.default <- function(mapper, input, state, ...) {
+ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
   if (ibm_is_linear(mapper)) {
     if (is.null(state)) {
-      state <- rep(0, ibm_n(mapper))
+      state <- rep(0, ibm_n(mapper, input = input, state = NULL, ...))
     }
     return(ibm_linear(mapper, input = input, state = state, ...))
   }
@@ -2005,28 +2005,46 @@ bru_mapper_pipe <- function(mappers) {
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n.bru_mapper_pipe <- function(mapper, ..., state = NULL) {
+ibm_n.bru_mapper_pipe <- function(mapper, ..., input = NULL, state = NULL) {
   if (is.null(mapper[["mappers"]][[1]]) && is.null(state)) {
     return(NA_integer_)
   }
-  ibm_n(mapper[["mappers"]][[1]], ..., state = state)
+  if (is.null(mapper[["names"]])) {
+    mapper[["names"]] <- names(mapper[["mappers"]])
+  }
+  if (!is.null(input) && is.null(names(input))) {
+    names(input) <- mapper[["names"]][seq_along(input)]
+  }
+  ibm_n(mapper[["mappers"]][[1]], ...,
+    input = input[[names(mapper[["mappers"]])[1]]],
+    state = state
+  )
 }
 
 #' @export
 #' @rdname bru_mapper_methods
-ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
+ibm_n_output.bru_mapper_pipe <- function(mapper, input, state = NULL, ..., n_state = NULL) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
   }
-  final <- mapper[["names"]][length(mapper[["names"]])]
   if (!is.null(input) && is.null(names(input))) {
     names(input) <- mapper[["names"]][seq_along(input)]
   }
-  ibm_n_output(
-    mapper[["mappers"]][[length(mapper[["mappers"]])]],
-    input[[final]],
-    state = state, ...
+  n <- ibm_n(
+    mapper[["mappers"]][[1]],
+    input = input[[names(mapper[["mappers"]])[1]]],
+    state = state,
+    ...,
+    n_state = n_state
   )
+  for (k in names(mapper[["mappers"]])) {
+    n <- ibm_n_output(
+      mapper[["mappers"]][[k]],
+      input = input[[k]],
+      ..., n_state = n
+    )
+  }
+  return(n)
 }
 
 #' @export
@@ -2041,10 +2059,10 @@ ibm_jacobian.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
   }
-  state_k <- state
   if (!is.null(input) && is.null(names(input))) {
     names(input) <- mapper[["names"]][seq_along(input)]
   }
+  state_k <- state
   first <- names(mapper[["mappers"]])[1]
   for (k in names(mapper[["mappers"]])) {
     # TODO: Introduce an "eval and Jacobian" method to avoid
@@ -2104,6 +2122,61 @@ ibm_eval.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
   }
   state_k
 }
+
+
+
+#' @describeIn bru_mapper_generics
+#' Constructs a simplified `pipe` mapper. For fully linear pipes, calls [ibm_linear()].
+#' For partially non-linear pipes, replaces each sequence of linear mappers with a single
+#' [bru_mapper_taylor()] mapper, while keeping the full list of original mapper
+#' names, allowing the original `input` structure to be used also with the simplified
+#' mappers, since the `taylor` mappers are not dependent on inputs.
+#' @export
+ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
+                                         ..., n_state = NULL) {
+  if (is.null(mapper[["names"]])) {
+    mapper[["names"]] <- names(mapper[["mappers"]])
+  }
+  if (!is.null(input) && is.null(names(input))) {
+    names(input) <- mapper[["names"]][seq_along(input)]
+  }
+  if (ibm_is_linear(mapper)) {
+    if (is.null(state)) {
+      state <- rep(0, ibm_n(mapper[["mappers"]][[1]],
+        ...,
+        input = input[[names(mapper[["mappers"]])[1]]]
+      ))
+    }
+    return(ibm_linear(mapper, input = input, state = state, ..., n_state = n_state))
+  }
+
+  # Basic version, that just replaces each individual mapper with a simplification.
+  n <- ibm_n(
+    mapper[["mappers"]][[1]],
+    input = input[[names(mapper[["mappers"]])[1]]],
+    state = state,
+    ...,
+    n_state = n_state
+  )
+  for (k in names(mapper[["mappers"]])) {
+    if (ibm_is_linear(mapper[["mappers"]][[k]])) {
+      mapper[["mappers"]][[k]] <- ibm_simplify(
+        mapper[["mappers"]][[k]],
+        input = input[[k]],
+        n_state = n
+      )
+    }
+    n <- ibm_n_output(
+      mapper[["mappers"]][[k]],
+      input = input[[k]],
+      ...,
+      n_state = n
+    )
+  }
+
+  return(mapper)
+}
+
 
 
 

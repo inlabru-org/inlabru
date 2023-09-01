@@ -25,6 +25,7 @@
 \alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
 \alias{ibm_invalid_output.default}
+\alias{ibm_simplify.bru_mapper_pipe}
 \title{Generic methods for bru_mapper objects}
 \usage{
 ibm_n(mapper, inla_f = FALSE, ...)
@@ -39,7 +40,7 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_linear(mapper, input, state = NULL, ...)
 
-ibm_simplify(mapper, input, state = NULL, ...)
+ibm_simplify(mapper, input = NULL, state = NULL, ...)
 
 ibm_eval(mapper, input, state = NULL, ...)
 
@@ -63,7 +64,7 @@ ibm_invalid_output(mapper, input, state, ...)
 
 \method{ibm_linear}{default}(mapper, input, state, ...)
 
-\method{ibm_simplify}{default}(mapper, input, state, ...)
+\method{ibm_simplify}{default}(mapper, input = NULL, state = NULL, ...)
 
 \method{ibm_eval}{default}(mapper, input, state = NULL, ...)
 
@@ -72,6 +73,8 @@ ibm_invalid_output(mapper, input, state, ...)
 \method{ibm_inla_subset}{default}(mapper, ...)
 
 \method{ibm_invalid_output}{default}(mapper, input, state, ...)
+
+\method{ibm_simplify}{bru_mapper_pipe}(mapper, input = NULL, state = NULL, ..., n_state = NULL)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -200,6 +203,12 @@ extra arguments such as \code{multi} on to the methods (this means it supports
 both regular vector values and \code{multi=1} data.frame values).
 
 \item \code{ibm_invalid_output(default)}: Returns an all-\code{FALSE} logical vector.
+
+\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls \code{\link[=ibm_linear]{ibm_linear()}}.
+For partially non-linear pipes, replaces each sequence of linear mappers with a single
+\code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of original mapper
+names, allowing the original \code{input} structure to be used also with the simplified
+mappers, since the \code{taylor} mappers are not dependent on inputs.
 
 }}
 \examples{

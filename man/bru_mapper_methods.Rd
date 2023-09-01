@@ -196,9 +196,9 @@
 
 \method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
 
-\method{ibm_n}{bru_mapper_pipe}(mapper, ..., state = NULL)
+\method{ibm_n}{bru_mapper_pipe}(mapper, ..., input = NULL, state = NULL)
 
-\method{ibm_n_output}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
+\method{ibm_n_output}{bru_mapper_pipe}(mapper, input, state = NULL, ..., n_state = NULL)
 
 \method{ibm_values}{bru_mapper_pipe}(mapper, ...)
 
