@@ -169,7 +169,7 @@ ibm_eval(mapper,
 )
 
 # Example:
-mapper <- bru_mapper_mrginal(qfun = qexp, pfun = pexp, rate = 1 / 8)
+mapper <- bru_mapper_marginal(qfun = qexp, pfun = pexp, rate = 1 / 8)
 ```
 
 #### aggregate
