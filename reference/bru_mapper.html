@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,9 +191,11 @@ a non-null Jacobian.</p></dd>
 
 
 <dt>jacobian</dt>
-<dd><p>For <code>bru_mapper_taylor</code>, the Jacobian matrix,
+<dd><p>For <code>bru_mapper_taylor()</code>, the Jacobian matrix,
 evaluated at <code>state0</code>, or, a named list of such matrices.
-May be <code>NULL</code> or an empty list, for a constant mapping.</p></dd>
+May be <code>NULL</code> or an empty list, for a constant mapping.
+For <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> methods, an optional pre-computed Jacobian, typically
+supplied by internal methods that already have the Jacobian.</p></dd>
 
 
 <dt>state0</dt>

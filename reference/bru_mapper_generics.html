@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,6 +114,8 @@ available (see Details). Otherwise the
 <span></span>
 <span><span class="fu">ibm_eval</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">ibm_eval2</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">ibm_names</span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">ibm_names</span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
@@ -144,7 +146,10 @@ available (see Details). Otherwise the
 <span><span class="fu">ibm_simplify</span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="cn">NULL</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">ibm_eval</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">ibm_eval</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, jacobian <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">ibm_eval2</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">ibm_names</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -227,6 +232,10 @@ original <code>mapper</code> for non-linear mappers.</p></li>
 The <code>input</code> contents must
 be in a format accepted by <code>ibm_jacobian(...)</code>
 for the mapper.</p></li>
+<li><p><code>ibm_eval2()</code>: Implementations must return a list with elements <code>offset</code> and <code>jacobian</code>.
+The <code>input</code> contents must
+be in a format accepted by <code>ibm_jacobian(...)</code>
+for the mapper.</p></li>
 <li><p><code>ibm_names()</code>: Implementations must return a character vector of sub-mapper names, or <code>NULL</code>.
 Intended for providing information about multi-mappers and mapper collections.</p></li>
 <li><p><code>ibm_names(mapper) &lt;- value</code>: Set mapper names.</p></li>
@@ -262,6 +271,11 @@ for non-linear mappers.</p></li>
 with <code>ibm_is_linear()</code>, and then computes a linear mapping
 as <code>ibm_jacobian(...) %*% state</code>.  When <code>state</code> is <code>NULL</code>,
 a zero vector of length <code>ibm_n_output(...)</code> is returned.</p></li>
+<li><p><code>ibm_eval2(default)</code>: Calls <code>jacobian &lt;- ibm_jacobian(...)</code> and <code>ibm_eval(..., jacobian = jacobian)</code>
+and returns a list with elements <code>offset</code> and <code>jacobian</code>, as needed
+by <code>ibm_linear.default()</code> and similar methods. Mapper classes can implement
+their own <code>ibm_eval2</code> method if join construction of evaluation and Jacobian
+is more efficient than separate construction.</p></li>
 <li><p><code>ibm_names(default)</code>: Returns <code>NULL</code></p></li>
 <li><p><code>ibm_inla_subset(default)</code>: Uses
 the <code>ibm_values</code> output to construct the inla subset indexing, passing

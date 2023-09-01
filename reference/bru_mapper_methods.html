@@ -18,7 +18,7 @@ ibm_n() and ibm_values() methods also need to be provided."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -207,9 +207,6 @@ ibm_values(mapper, ..., state = NULL, n_state = NULL)
 ibm_jacobian(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_scale
-ibm_linear(mapper, input, state, ...)
-
-# S3 method for bru_mapper_scale
 ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
 
 # S3 method for bru_mapper_aggregate
@@ -227,17 +224,11 @@ ibm_jacobian(mapper, input, state = NULL, ...)
 # S3 method for bru_mapper_aggregate
 ibm_eval(mapper, input, state = NULL, ..., sub_lin = NULL)
 
-# S3 method for bru_mapper_aggregate
-ibm_linear(mapper, input, state, ...)
-
 # S3 method for bru_mapper_logsumexp
 ibm_jacobian(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_logsumexp
 ibm_eval(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
-
-# S3 method for bru_mapper_logsumexp
-ibm_linear(mapper, input, state, ...)
 
 # S3 method for bru_mapper_marginal
 ibm_n(mapper, ..., state = NULL, n_state = NULL)
@@ -250,9 +241,6 @@ ibm_values(mapper, ..., state = NULL, n_state = NULL)
 
 # S3 method for bru_mapper_marginal
 ibm_jacobian(mapper, input, state = NULL, ..., inverse = FALSE)
-
-# S3 method for bru_mapper_marginal
-ibm_linear(mapper, input, state, ...)
 
 # S3 method for bru_mapper_marginal
 ibm_eval(mapper, input, state = NULL, ..., inverse = FALSE)
@@ -270,10 +258,10 @@ ibm_values(mapper, ...)
 ibm_jacobian(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_pipe
-ibm_linear(mapper, input, state, ...)
+ibm_eval(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_pipe
-ibm_eval(mapper, input, state = NULL, ...)
+ibm_eval2(mapper, input, state = NULL, ...)
 
 # S3 method for bru_mapper_pipe
 ibm_simplify(mapper, input = NULL, state = NULL, ..., n_state = NULL)
@@ -305,7 +293,15 @@ ibm_jacobian(
 ibm_linear(mapper, input, state, inla_f = FALSE, ...)
 
 # S3 method for bru_mapper_multi
-ibm_eval(mapper, input, state = NULL, inla_f = FALSE, ..., pre_A = NULL)
+ibm_eval(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  jacobian = NULL,
+  pre_A = deprecated()
+)
 
 # S3 method for bru_mapper_multi
 ibm_invalid_output(mapper, input, state, inla_f = FALSE, multi = FALSE, ...)
@@ -442,8 +438,7 @@ see the <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> details f
 
 
 <dt>pre_A</dt>
-<dd><p>Internal; precomputed Jacobian matrix. Can be supplied to
-to <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> methods that make use of them if needed.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> in favour of <code>jacobian</code>.</p></dd>
 
 
 <dt>x</dt>
