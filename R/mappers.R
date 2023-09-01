@@ -697,11 +697,12 @@ ibm_eval.default <- function(mapper, input, state = NULL, ..., jacobian = NULL) 
 
 
 #' @describeIn bru_mapper_generics
-#' Calls `jacobian <- ibm_jacobian(...)` and `ibm_eval(..., jacobian = jacobian)`
+#' Calls `jacobian <- ibm_jacobian(...)` and
+#' `offset <- ibm_eval(..., jacobian = jacobian)`
 #' and returns a list with elements `offset` and `jacobian`, as needed
 #' by [ibm_linear.default()] and similar methods. Mapper classes can implement
-#' their own `ibm_eval2` method if join construction of evaluation and Jacobian
-#' is more efficient than separate construction.
+#' their own `ibm_eval2` method if joint construction of evaluation and Jacobian
+#' is more efficient than separate or sequential construction.
 #' @export
 ibm_eval2.default <- function(mapper, input, state, ...) {
   jacobian <- ibm_jacobian(mapper, input, state, ...)

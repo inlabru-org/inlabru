@@ -206,11 +206,12 @@ with \code{ibm_is_linear()}, and then computes a linear mapping
 as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
 a zero vector of length \code{ibm_n_output(...)} is returned.
 
-\item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and \code{ibm_eval(..., jacobian = jacobian)}
+\item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and
+\code{offset <- ibm_eval(..., jacobian = jacobian)}
 and returns a list with elements \code{offset} and \code{jacobian}, as needed
 by \code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
-their own \code{ibm_eval2} method if join construction of evaluation and Jacobian
-is more efficient than separate construction.
+their own \code{ibm_eval2} method if joint construction of evaluation and Jacobian
+is more efficient than separate or sequential construction.
 
 \item \code{ibm_names(default)}: Returns \code{NULL}
 
