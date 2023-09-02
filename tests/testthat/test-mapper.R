@@ -525,14 +525,14 @@ test_that("Collect mapper, automatic construction", {
 
 
 test_that("Marginal mapper", {
-  m1 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1/8)
+  m1 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
   state0 <- -5:5
   val1 <- ibm_eval(m1, state = state0)
 
   state1 <- ibm_eval(m1, state = val1, reverse = TRUE)
   expect_equal(state1, state0)
 
-  m2 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1/8, inverse = TRUE)
+  m2 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8, inverse = TRUE)
   state2 <- ibm_eval(m2, state = val1)
   expect_equal(state2, state0)
 
