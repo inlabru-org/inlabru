@@ -181,9 +181,9 @@
 
 \method{ibm_values}{bru_mapper_marginal}(mapper, ..., state = NULL, n_state = NULL)
 
-\method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
+\method{ibm_jacobian}{bru_mapper_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
-\method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., inverse = FALSE)
+\method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
 \method{ibm_n}{bru_mapper_pipe}(mapper, ..., input = NULL, state = NULL)
 
@@ -314,8 +314,9 @@ that have state dependent output size.}
 \item{log}{logical; control \code{log} output. Default \code{TRUE}, see the \code{ibm_eval()} details
 for \code{logsumexp} mappers.}
 
-\item{inverse}{logical; control \code{bru_mapper_marginal} evaluation. Default \code{FALSE},
-see the \code{ibm_eval()} details for \code{marginal} mappers.}
+\item{reverse}{logical; control \code{bru_mapper_marginal} evaluation. Default \code{FALSE}.
+When \code{TRUE}, reverses the direction of the mapping, see details for \code{marginal}
+mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
@@ -392,7 +393,7 @@ equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
 
-For \code{bru_mapper_marginal}, non-NULL \code{input} values are intepreted
+For \code{bru_mapper_marginal}, non-NULL \code{input} values are interpreted
 as a parameter list for \code{qfun}, overriding that of the mapper itself.
 
 \itemize{
@@ -442,9 +443,10 @@ with unnamed but ordered columns.
 \item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
 the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
 
-\item \code{ibm_eval(bru_mapper_marginal)}: When \code{inverse} is \code{FALSE} (default), \code{ibm_eval()}
-for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically stable way.
-If \code{TRUE}, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
+\item \code{ibm_eval(bru_mapper_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
+\code{FALSE}, \code{ibm_eval()}
+for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically
+stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
 
 \item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls \code{\link[=ibm_linear]{ibm_linear()}}.
 For partially non-linear pipes, replaces each sequence of linear mappers with a single

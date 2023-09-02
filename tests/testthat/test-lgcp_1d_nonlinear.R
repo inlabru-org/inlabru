@@ -176,7 +176,12 @@ test_that("Marginal parameter transformation", {
     sigma(
       1,
       prec.linear = 1,
-      marginal = bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
+      marginal = bru_mapper_marginal(
+        qfun = qexp,
+        pfun = pexp,
+        dfun = dexp,
+        rate = 1 / 8
+      )
     ) + Intercept(1))
   form <- distance ~ log_hr(distance, sigma = sigma) + Intercept
 

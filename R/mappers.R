@@ -1750,42 +1750,49 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 
 ## _marginal ####
 
+#' @param inverse logical; When `FALSE` (default), defines a mapping from
+#' standard Gaussian to a specified distribution.  When `TRUE`, defines
+#' the inverse mapping, from the specified distribution to a standard Gaussian.
+
 #' @export
 #' @describeIn bru_mapper
-#' Constructs a mapper
-#' that transforms the marginal distribution `state` from \eqn{\textrm{N}(0,1)}{N(0, 1)}
-#' to the distribution of a given quantile function. The `...` arguments are used
-#' as parameter arguments to `qfun` and `pfun`.
-#' be
+#' Constructs a mapper that transforms the marginal distribution `state` from
+#' \eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
+#' quantile function. The `...` arguments are used as parameter arguments to
+#' `qfun`, `pfun`, and `dfun`.
 #' @param qfun A quantile function, supporting `lower.tail` and `log.p` arguments,
 #' like [stats::qnorm()].
 #' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
-#' like [stats::pnorm()].
+#' like [stats::pnorm()].  Only used if used with
+#' `xor(mapper[["inverse"]], reverse)` being `TRUE` in a method call.
+#' @param dfun A pdf, supporting `log` argument,
+#' like [stats::dnorm()]. If `NULL`, uses finite differences on `pfun`
+#' instead.
+#' @param inverse logical; If `FALSE` (default), [bru_mapper_marginal()]
+#' defines a mapping from standard Normal to a specified distribution.
+#' If `TRUE`, it defines a mapping from the specified distribution to a standard
+#' Normal.
+#' @examples
+#' m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1/8)
+#' (val <- ibm_eval(m, state = -5:5))
+#' ibm_eval(m, state = val, reverse = TRUE)
 bru_mapper_marginal <- function(qfun,
                                 pfun,
-                                ...) {
+                                dfun,
+                                ...,
+                                inverse = FALSE) {
   bru_mapper_define(
     list(
       qfun = qfun,
       pfun = pfun,
+      dfun = dfun,
+      inverse = inverse,
       param = list(...),
       is_linear = FALSE
     ),
     new_class = c("bru_mapper_marginal")
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #' @export
@@ -1827,34 +1834,62 @@ ibm_values.bru_mapper_marginal <- function(mapper, ...,
 }
 
 #' @export
-#' @param sub_lin Internal, optional pre-computed sub-mapper information
-#' @details For `bru_mapper_marginal`, non-NULL `input` values are intepreted
+#' @param reverse logical; control `bru_mapper_marginal` evaluation. Default `FALSE`.
+#' When `TRUE`, reverses the direction of the mapping, see details for `marginal`
+#' mappers.
+#' @details For `bru_mapper_marginal`, non-NULL `input` values are interpreted
 #' as a parameter list for `qfun`, overriding that of the mapper itself.
 #' @rdname bru_mapper_methods
 ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
                                              ...,
-                                             inverse = FALSE) {
+                                             reverse = FALSE) {
   stopifnot(!is.null(state))
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
-  eps <- 1e-6
-  der <-
-    (
-      ibm_eval(
+  if (!is.null(mapper[["dfun"]])) {
+    if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
+      mapper[["inverse"]] <- FALSE
+      val <- ibm_eval(
         mapper,
         input = NULL,
-        state = state + eps,
-        inverse = inverse
-      ) -
+        state = state,
+        reverse = FALSE
+      )
+      log_dens <-
+        do.call(mapper[["dfun"]], c(list(val, log = TRUE), mapper$param))
+      der <- exp(dnorm(state, log = TRUE) - log_dens)
+    } else {
+      mapper[["inverse"]] <- FALSE
+      log_dens <-
+        do.call(mapper[["dfun"]], c(list(state, log = TRUE), mapper$param))
+      val <- ibm_eval(
+        mapper,
+        input = NULL,
+        state = state,
+        reverse = TRUE
+      )
+      der <- exp(log_dens - dnorm(val, log = TRUE))
+    }
+  } else {
+    eps <- 1e-4 * (1 + abs(state))
+    der <-
+      (
         ibm_eval(
           mapper,
           input = NULL,
-          state = state - eps,
-          inverse = inverse
-        )
-    ) /
-      (2 * eps)
+          state = state + eps,
+          reverse = reverse
+        ) -
+          ibm_eval(
+            mapper,
+            input = NULL,
+            state = state - eps,
+            reverse = reverse
+          )
+      ) /
+        (2 * eps)
+  }
   return(Matrix::Diagonal(n = length(state), der))
 }
 
@@ -1863,19 +1898,18 @@ ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
 
 
 #' @export
-#' @param inverse logical; control `bru_mapper_marginal` evaluation. Default `FALSE`,
-#' see the `ibm_eval()` details for `marginal` mappers.
-#' @describeIn bru_mapper_methods When `inverse` is `FALSE` (default), `ibm_eval()`
-#' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically stable way.
-#' If `TRUE`, evaluates the inverse `qnorm(pfun(x, param))` instead.
+#' @describeIn bru_mapper_methods When `xor(mapper[["inverse"]], reverse)` is
+#' `FALSE`, `ibm_eval()`
+#' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically
+#' stable way. Otherwise, evaluates the inverse `qnorm(pfun(x, param))` instead.
 ibm_eval.bru_mapper_marginal <- function(mapper, input, state = NULL,
                                          ...,
-                                         inverse = FALSE) {
+                                         reverse = FALSE) {
   stopifnot(!is.null(state))
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
-  if (!inverse) {
+  if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
     val <- do.call(
       bru_forward_transformation,
       c(

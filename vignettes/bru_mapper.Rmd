@@ -162,14 +162,17 @@ This can be used to define components with latent marginal `N(0,1)` distribution
 effect.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_marginal(qfun = ..., pfun = ..., ...)
+mapper <- bru_mapper_marginal(qfun = ..., pfun = ..., dfun = ..., ...)
 ibm_eval(mapper,
   input = NULL, # If a list is given, it overrides the parameter specification
   state = ...
 )
 
 # Example:
-mapper <- bru_mapper_marginal(qfun = qexp, pfun = pexp, rate = 1 / 8)
+mapper <- bru_mapper_marginal(
+  qfun = qexp, pfun = pexp, dfun = dexp,
+  rate = 1 / 8
+)
 ```
 
 #### aggregate

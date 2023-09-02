@@ -62,7 +62,7 @@ bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
 
 bru_mapper_logsumexp(rescale = FALSE, n_block = NULL)
 
-bru_mapper_marginal(qfun, pfun, ...)
+bru_mapper_marginal(qfun, pfun, dfun, ..., inverse = FALSE)
 
 bru_mapper_pipe(mappers)
 
@@ -145,7 +145,17 @@ the maximum block index in the inputs.}
 like \code{\link[stats:Normal]{stats::qnorm()}}.}
 
 \item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
-like \code{\link[stats:Normal]{stats::pnorm()}}.}
+like \code{\link[stats:Normal]{stats::pnorm()}}.  Only used if used with
+\code{xor(mapper[["inverse"]], reverse)} being \code{TRUE} in a method call.}
+
+\item{dfun}{A pdf, supporting \code{log} argument,
+like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL}, uses finite differences on \code{pfun}
+instead.}
+
+\item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bru_mapper_marginal]{bru_mapper_marginal()}}
+defines a mapping from standard Normal to a specified distribution.
+If \code{TRUE}, it defines a mapping from the specified distribution to a standard
+Normal.}
 
 \item{mappers}{A list of \code{bru_mapper} objects}
 
@@ -264,11 +274,10 @@ shifting the state blockwise with
 \code{(state-log_weights)[block] - max((state-log_weights)[block])},
 and shifting the result back afterwards.
 
-\item \code{bru_mapper_marginal()}: Constructs a mapper
-that transforms the marginal distribution \code{state} from \eqn{\textrm{N}(0,1)}{N(0, 1)}
-to the distribution of a given quantile function. The \code{...} arguments are used
-as parameter arguments to \code{qfun} and \code{pfun}.
-be
+\item \code{bru_mapper_marginal()}: Constructs a mapper that transforms the marginal distribution \code{state} from
+\eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
+quantile function. The \code{...} arguments are used as parameter arguments to
+\code{qfun}, \code{pfun}, and \code{dfun}.
 
 \item \code{bru_mapper_pipe()}: Create a pipe mapper, where \code{mappers} is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next
@@ -314,6 +323,9 @@ The period for the first order harmonics is shifted and scaled to match
 \examples{
 mapper <- bru_mapper_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
+m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1/8)
+(val <- ibm_eval(m, state = -5:5))
+ibm_eval(m, state = val, reverse = TRUE)
 }
 \seealso{
 \link{bru_mapper_generics} for generic methods,
