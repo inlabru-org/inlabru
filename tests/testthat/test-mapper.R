@@ -539,3 +539,34 @@ test_that("Marginal mapper", {
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
 })
+
+
+test_that("Mapper lists", {
+  m1 <- bru_mapper_index(4L)
+  m2 <- bru_mapper_index(3L)
+
+  expect_s3_class(c(m1), "bm_list")
+  expect_s3_class(c(m1, m2), "bm_list")
+  expect_s3_class(c(c(m1, m2), c(m2, m1)), "bm_list")
+})
+
+test_that("Mesh 1d mapper", {
+  m <- bru_mapper(fmesher::fm_mesh_1d(1:5, boundary = "f"), indexed = TRUE)
+
+  loc <- seq(-2, 7, by = 0.5)
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, length(loc))
+  expect_equal(val, loc)
+})
+
+test_that("Mesh 2d mapper", {
+  m <- bru_mapper(fmesher::fmexample$mesh)
+
+  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = FALSE)
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, 25)
+
+  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
+  val = ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, 9)
+})
