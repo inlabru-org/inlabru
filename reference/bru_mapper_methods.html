@@ -240,10 +240,10 @@ ibm_n_output(mapper, input, state = NULL, ..., n_state = NULL)
 ibm_values(mapper, ..., state = NULL, n_state = NULL)
 
 # S3 method for bru_mapper_marginal
-ibm_jacobian(mapper, input, state = NULL, ..., inverse = FALSE)
+ibm_jacobian(mapper, input, state = NULL, ..., reverse = FALSE)
 
 # S3 method for bru_mapper_marginal
-ibm_eval(mapper, input, state = NULL, ..., inverse = FALSE)
+ibm_eval(mapper, input, state = NULL, ..., reverse = FALSE)
 
 # S3 method for bru_mapper_pipe
 ibm_n(mapper, ..., input = NULL, state = NULL)
@@ -428,9 +428,10 @@ that have state dependent output size.</p></dd>
 for <code>logsumexp</code> mappers.</p></dd>
 
 
-<dt>inverse</dt>
-<dd><p>logical; control <code>bru_mapper_marginal</code> evaluation. Default <code>FALSE</code>,
-see the <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> details for <code>marginal</code> mappers.</p></dd>
+<dt>reverse</dt>
+<dd><p>logical; control <code>bru_mapper_marginal</code> evaluation. Default <code>FALSE</code>.
+When <code>TRUE</code>, reverses the direction of the mapping, see details for <code>marginal</code>
+mappers.</p></dd>
 
 
 <dt>sub_A</dt>
@@ -502,7 +503,7 @@ and <code>weights</code>. <code>block</code>
 should be a vector of the same length as the <code>state</code>, or <code>NULL</code>, with <code>NULL</code>
 equivalent to all-1.
 If <code>weights</code> is <code>NULL</code>, it's interpreted as all-1.</p></li>
-</ul><p>For <code>bru_mapper_marginal</code>, non-NULL <code>input</code> values are intepreted
+</ul><p>For <code>bru_mapper_marginal</code>, non-NULL <code>input</code> values are interpreted
 as a parameter list for <code>qfun</code>, overriding that of the mapper itself.</p>
 <ul><li><p><code>ibm_jacobian</code> for <code>bru_mapper_multi</code> accepts a list with
 named entries, or a list with unnamed but ordered elements.
@@ -540,9 +541,10 @@ with unnamed but ordered columns.</p></li>
     
 <ul><li><p><code>ibm_eval(bru_mapper_logsumexp)</code>: When <code>log</code> is <code>TRUE</code> (default), <code><a href="bru_mapper_generics.html">ibm_eval()</a></code> for <code>logsumexp</code> returns
 the log-sum-weight-exp value. If <code>FALSE</code>, the <code>sum-weight-exp</code> value is returned.</p></li>
-<li><p><code>ibm_eval(bru_mapper_marginal)</code>: When <code>inverse</code> is <code>FALSE</code> (default), <code><a href="bru_mapper_generics.html">ibm_eval()</a></code>
-for <code>marginal</code> returns <code>qfun(pnorm(x), param)</code>, evaluated in a numerically stable way.
-If <code>TRUE</code>, evaluates the inverse <code>qnorm(pfun(x, param))</code> instead.</p></li>
+<li><p><code>ibm_eval(bru_mapper_marginal)</code>: When <code>xor(mapper[["inverse"]], reverse)</code> is
+<code>FALSE</code>, <code><a href="bru_mapper_generics.html">ibm_eval()</a></code>
+for <code>marginal</code> returns <code>qfun(pnorm(x), param)</code>, evaluated in a numerically
+stable way. Otherwise, evaluates the inverse <code>qnorm(pfun(x, param))</code> instead.</p></li>
 <li><p><code>ibm_simplify(bru_mapper_pipe)</code>: Constructs a simplified <code>pipe</code> mapper. For fully linear pipes, calls <code><a href="bru_mapper_generics.html">ibm_linear()</a></code>.
 For partially non-linear pipes, replaces each sequence of linear mappers with a single
 <code><a href="bru_mapper.html">bru_mapper_taylor()</a></code> mapper, while keeping the full list of original mapper

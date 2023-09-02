@@ -128,7 +128,7 @@
 <span></span>
 <span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, <span class="va">dfun</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
 <span></span>
@@ -244,7 +244,21 @@ like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">s
 
 <dt>pfun</dt>
 <dd><p>A CDF, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.</p></dd>
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.  Only used if used with
+<code>xor(mapper[["inverse"]], reverse)</code> being <code>TRUE</code> in a method call.</p></dd>
+
+
+<dt>dfun</dt>
+<dd><p>A pdf, supporting <code>log</code> argument,
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::dnorm()</a></code>. If <code>NULL</code>, uses finite differences on <code>pfun</code>
+instead.</p></dd>
+
+
+<dt>inverse</dt>
+<dd><p>logical; If <code>FALSE</code> (default), <code>bru_mapper_marginal()</code>
+defines a mapping from standard Normal to a specified distribution.
+If <code>TRUE</code>, it defines a mapping from the specified distribution to a standard
+Normal.</p></dd>
 
 
 <dt>mappers</dt>
@@ -354,11 +368,10 @@ To avoid numerical overflow, it uses the common method of internally
 shifting the state blockwise with
 <code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
 and shifting the result back afterwards.</p></li>
-<li><p><code>bru_mapper_marginal()</code>: Constructs a mapper
-that transforms the marginal distribution <code>state</code> from \(\textrm{N}(0,1)\)
-to the distribution of a given quantile function. The <code>...</code> arguments are used
-as parameter arguments to <code>qfun</code> and <code>pfun</code>.
-be</p></li>
+<li><p><code>bru_mapper_marginal()</code>: Constructs a mapper that transforms the marginal distribution <code>state</code> from
+\(\textrm{N}(0,1)\) to the distribution of a given (continuous)
+quantile function. The <code>...</code> arguments are used as parameter arguments to
+<code>qfun</code>, <code>pfun</code>, and <code>dfun</code>.</p></li>
 <li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where <code>mappers</code> is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next
 mapper.
@@ -407,6 +420,13 @@ class objects.</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] . . . 1 .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] . . . . 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] . 1 . . .</span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">pexp</span>, <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="op">-</span><span class="fl">5</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 2.293213e-06 2.533739e-04 1.080648e-02 1.841033e-01 1.382030e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 5.545177e+00 1.472817e+01 3.026547e+01 5.286181e+01 8.288081e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 1.205200e+02</span>
+<span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="va">val</span>, reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -5 -4 -3 -2 -1  0  1  2  3  4  5</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
