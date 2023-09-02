@@ -567,6 +567,6 @@ test_that("Mesh 2d mapper", {
   expect_length(val, 25)
 
   loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
-  val = ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 9)
 })
