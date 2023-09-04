@@ -779,12 +779,12 @@ bru_mapper.fm_mesh_2d <- function(mesh, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_fm_mesh_2d <- function(mapper, ...) {
-  mapper[["mesh"]]$n
+  fmesher::fm_dof(mapper[["mesh"]])
 }
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_fm_mesh_2d <- function(mapper, ...) {
-  seq_len(mapper[["mesh"]]$n)
+  seq_len(fmesher::fm_dof(mapper[["mesh"]]))
 }
 #' @export
 #' @rdname bru_mapper_methods
@@ -847,13 +847,13 @@ bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
 #' @export
 #' @rdname bru_mapper_methods
 ibm_n.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
-  mapper[["mesh"]]$m
+  fmesher::fm_dof(mapper[["mesh"]])
 }
 #' @export
 #' @rdname bru_mapper_methods
 ibm_values.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
   if (mapper[["indexed"]]) {
-    seq_len(mapper[["mesh"]]$m)
+    seq_len(fmesher::fm_dof(mapper[["mesh"]]))
   } else {
     mapper[["mesh"]]$loc
   }
