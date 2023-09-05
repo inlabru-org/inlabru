@@ -62,7 +62,7 @@ bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
 
 bru_mapper_logsumexp(rescale = FALSE, n_block = NULL)
 
-bru_mapper_marginal(qfun, pfun, dfun, ..., inverse = FALSE)
+bru_mapper_marginal(qfun, pfun = NULL, dfun = NULL, ..., inverse = FALSE)
 
 bru_mapper_pipe(mappers)
 
@@ -145,12 +145,13 @@ the maximum block index in the inputs.}
 like \code{\link[stats:Normal]{stats::qnorm()}}.}
 
 \item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
-like \code{\link[stats:Normal]{stats::pnorm()}}.  Only used if used with
-\code{xor(mapper[["inverse"]], reverse)} being \code{TRUE} in a method call.}
+like \code{\link[stats:Normal]{stats::pnorm()}}.  Only needed and used when
+\code{xor(mapper[["inverse"]], reverse)} is \code{TRUE} in a method call.
+Default \code{NULL}}
 
 \item{dfun}{A pdf, supporting \code{log} argument,
-like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL}, uses finite differences on \code{qfun} or \code{pfun}
-instead.}
+like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
+differences on \code{qfun} or \code{pfun} instead.}
 
 \item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bru_mapper_marginal]{bru_mapper_marginal()}}
 defines a mapping from standard Normal to a specified distribution.

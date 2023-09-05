@@ -1763,11 +1763,12 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 #' @param qfun A quantile function, supporting `lower.tail` and `log.p` arguments,
 #' like [stats::qnorm()].
 #' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
-#' like [stats::pnorm()].  Only used if used with
-#' `xor(mapper[["inverse"]], reverse)` being `TRUE` in a method call.
+#' like [stats::pnorm()].  Only needed and used when
+#' `xor(mapper[["inverse"]], reverse)` is `TRUE` in a method call.
+#' Default `NULL`
 #' @param dfun A pdf, supporting `log` argument,
-#' like [stats::dnorm()]. If `NULL`, uses finite differences on `qfun` or `pfun`
-#' instead.
+#' like [stats::dnorm()]. If `NULL` (default), uses finite
+#' differences on `qfun` or `pfun` instead.
 #' @param inverse logical; If `FALSE` (default), [bru_mapper_marginal()]
 #' defines a mapping from standard Normal to a specified distribution.
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
@@ -1777,8 +1778,8 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 #' (val <- ibm_eval(m, state = -5:5))
 #' ibm_eval(m, state = val, reverse = TRUE)
 bru_mapper_marginal <- function(qfun,
-                                pfun,
-                                dfun,
+                                pfun = NULL,
+                                dfun = NULL,
                                 ...,
                                 inverse = FALSE) {
   bru_mapper_define(
