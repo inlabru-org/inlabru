@@ -149,7 +149,7 @@ like \code{\link[stats:Normal]{stats::pnorm()}}.  Only used if used with
 \code{xor(mapper[["inverse"]], reverse)} being \code{TRUE} in a method call.}
 
 \item{dfun}{A pdf, supporting \code{log} argument,
-like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL}, uses finite differences on \code{pfun}
+like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL}, uses finite differences on \code{qfun} or \code{pfun}
 instead.}
 
 \item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bru_mapper_marginal]{bru_mapper_marginal()}}
