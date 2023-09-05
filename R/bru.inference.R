@@ -1307,6 +1307,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       if (is.null(domain)) {
         stop("The family='cp' model requires a 'domain' specification compatible with 'fmesher::fm_int()'")
       }
+      if (!setequal(names(response), names(domain))) {
+        stop(paste0(
+          "Mismatch between names of observed dimensions and the given domain names:\n",
+          "    names(response) = (", paste0(names(response), collapse = ", "), ")\n",
+          "    names(domain)   = (", paste0(names(domain), collapse = ", "), ")"
+          ))
+      }
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
