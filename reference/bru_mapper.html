@@ -128,7 +128,7 @@
 <span></span>
 <span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, <span class="va">pfun</span>, <span class="va">dfun</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, pfun <span class="op">=</span> <span class="cn">NULL</span>, dfun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
 <span></span>
@@ -244,14 +244,15 @@ like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">s
 
 <dt>pfun</dt>
 <dd><p>A CDF, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.  Only used if used with
-<code>xor(mapper[["inverse"]], reverse)</code> being <code>TRUE</code> in a method call.</p></dd>
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.  Only needed and used when
+<code>xor(mapper[["inverse"]], reverse)</code> is <code>TRUE</code> in a method call.
+Default <code>NULL</code></p></dd>
 
 
 <dt>dfun</dt>
 <dd><p>A pdf, supporting <code>log</code> argument,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::dnorm()</a></code>. If <code>NULL</code>, uses finite differences on <code>qfun</code> or <code>pfun</code>
-instead.</p></dd>
+like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::dnorm()</a></code>. If <code>NULL</code> (default), uses finite
+differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
 
 
 <dt>inverse</dt>

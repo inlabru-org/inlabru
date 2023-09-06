@@ -264,17 +264,15 @@ distribution defined by a quantile function. This can be used to define
 components with latent marginal <code>N(0,1)</code> distribution but
 non-Gaussian effect.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, dfun <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, dfun <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># If a list is given, it overrides the parameter specification</span></span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Example:</span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span></span>
-<span>  qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, dfun <span class="op">=</span> <span class="va">dexp</span>,</span>
-<span>  rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Examples:</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, dfun <span class="op">=</span> <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="aggregate">aggregate<a class="anchor" aria-label="anchor" href="#aggregate"></a>
