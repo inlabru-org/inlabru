@@ -1312,7 +1312,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           "Mismatch between names of observed dimensions and the given domain names:\n",
           "    names(response) = (", paste0(names(response), collapse = ", "), ")\n",
           "    names(domain)   = (", paste0(names(domain), collapse = ", "), ")"
-          ))
+        ))
       }
       ips <- fm_int(
         domain = domain,

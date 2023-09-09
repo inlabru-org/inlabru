@@ -1769,17 +1769,21 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 #' @param dfun A pdf, supporting `log` argument,
 #' like [stats::dnorm()]. If `NULL` (default), uses finite
 #' differences on `qfun` or `pfun` instead.
+#' @param dqfun A function evaluating the derivative of `qfun`.
+#' If `NULL` (default), uses `1 / dfun(...)` or finite
+#' differences on `qfun` or `pfun` instead.
 #' @param inverse logical; If `FALSE` (default), [bru_mapper_marginal()]
 #' defines a mapping from standard Normal to a specified distribution.
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
 #' Normal.
 #' @examples
-#' m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+#' m <- bru_mapper_marginal(qexp, rate = 1 / 8)
 #' (val <- ibm_eval(m, state = -5:5))
 #' ibm_eval(m, state = val, reverse = TRUE)
 bru_mapper_marginal <- function(qfun,
                                 pfun = NULL,
                                 dfun = NULL,
+                                dqfun = NULL,
                                 ...,
                                 inverse = FALSE) {
   bru_mapper_define(
@@ -1787,6 +1791,7 @@ bru_mapper_marginal <- function(qfun,
       qfun = qfun,
       pfun = pfun,
       dfun = dfun,
+      dqfun = dqfun,
       inverse = inverse,
       param = list(...),
       is_linear = FALSE
@@ -1848,8 +1853,12 @@ ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
-  if (!is.null(mapper[["dfun"]])) {
-    if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
+  if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
+    if (!is.null(mapper[["dqfun"]])) {
+      val <- pnorm(state)
+      dq <- do.call(mapper[["dqfun"]], c(list(val), mapper$param))
+      der <- dnorm(state) * dq
+    } else if (!is.null(mapper[["dfun"]])) {
       mapper[["inverse"]] <- FALSE
       val <- ibm_eval(
         mapper,
@@ -1861,18 +1870,29 @@ ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
         do.call(mapper[["dfun"]], c(list(val, log = TRUE), mapper$param))
       der <- exp(dnorm(state, log = TRUE) - log_dens)
     } else {
-      mapper[["inverse"]] <- FALSE
+      der <- NULL
+    }
+  } else if (!is.null(mapper[["dqfun"]]) ||
+    !is.null(mapper[["dfun"]])) {
+    mapper[["inverse"]] <- FALSE
+    val <- ibm_eval(
+      mapper,
+      input = NULL,
+      state = state,
+      reverse = TRUE
+    )
+    if (!is.null(mapper[["dqfun"]])) {
+      dq <- do.call(mapper[["dqfun"]], c(list(val), mapper$param))
+      der <- 1 / (dq * dnorm(val))
+    } else { # if (!is.null(mapper[["dfun"]])) {
       log_dens <-
         do.call(mapper[["dfun"]], c(list(state, log = TRUE), mapper$param))
-      val <- ibm_eval(
-        mapper,
-        input = NULL,
-        state = state,
-        reverse = TRUE
-      )
       der <- exp(log_dens - dnorm(val, log = TRUE))
     }
   } else {
+    der <- NULL
+  }
+  if (is.null(der)) {
     eps <- 1e-4 * (1 + abs(state))
     der <-
       (

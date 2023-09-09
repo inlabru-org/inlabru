@@ -62,7 +62,14 @@ bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
 
 bru_mapper_logsumexp(rescale = FALSE, n_block = NULL)
 
-bru_mapper_marginal(qfun, pfun = NULL, dfun = NULL, ..., inverse = FALSE)
+bru_mapper_marginal(
+  qfun,
+  pfun = NULL,
+  dfun = NULL,
+  dqfun = NULL,
+  ...,
+  inverse = FALSE
+)
 
 bru_mapper_pipe(mappers)
 
@@ -151,6 +158,10 @@ Default \code{NULL}}
 
 \item{dfun}{A pdf, supporting \code{log} argument,
 like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
+differences on \code{qfun} or \code{pfun} instead.}
+
+\item{dqfun}{A function evaluating the derivative of \code{qfun}.
+If \code{NULL} (default), uses \code{1 / dfun(...)} or finite
 differences on \code{qfun} or \code{pfun} instead.}
 
 \item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bru_mapper_marginal]{bru_mapper_marginal()}}
@@ -324,7 +335,7 @@ The period for the first order harmonics is shifted and scaled to match
 \examples{
 mapper <- bru_mapper_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
-m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+m <- bru_mapper_marginal(qexp, rate = 1 / 8)
 (val <- ibm_eval(m, state = -5:5))
 ibm_eval(m, state = val, reverse = TRUE)
 }
