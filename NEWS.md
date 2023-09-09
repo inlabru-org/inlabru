@@ -8,6 +8,8 @@
   mapper pipelines. (version `2.9.0.9004`)
 * Add new `ibm_eval2()` generic that computes both evaluation and Jacobian,
   avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
+* Add new `bru_timings_plot()` function that plots the time used for each nonlinear iteration
+(version `2.9.0.2007`)
 
 ## Bug fixes
 
