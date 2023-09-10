@@ -289,7 +289,7 @@ and shifting the result back afterwards.
 \item \code{bru_mapper_marginal()}: Constructs a mapper that transforms the marginal distribution \code{state} from
 \eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
 quantile function. The \code{...} arguments are used as parameter arguments to
-\code{qfun}, \code{pfun}, and \code{dfun}.
+\code{qfun}, \code{pfun}, \code{dfun}, and \code{dqfun}.
 
 \item \code{bru_mapper_pipe()}: Create a pipe mapper, where \code{mappers} is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next

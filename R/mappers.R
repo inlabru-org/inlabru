@@ -1759,7 +1759,7 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 #' Constructs a mapper that transforms the marginal distribution `state` from
 #' \eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
 #' quantile function. The `...` arguments are used as parameter arguments to
-#' `qfun`, `pfun`, and `dfun`.
+#' `qfun`, `pfun`, `dfun`, and `dqfun`.
 #' @param qfun A quantile function, supporting `lower.tail` and `log.p` arguments,
 #' like [stats::qnorm()].
 #' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
