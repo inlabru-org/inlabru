@@ -4,7 +4,7 @@
 \alias{bru_timings_plot}
 \title{Plot inlabru iteration timings}
 \usage{
-bru_timings_plot(fit)
+bru_timings_plot(x)
 }
 \arguments{
 \item{x}{a \link{bru} object, typically a result from \code{\link[=bru]{bru()}} for a nonlinear

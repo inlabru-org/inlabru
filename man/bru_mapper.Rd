@@ -335,7 +335,7 @@ The period for the first order harmonics is shifted and scaled to match
 \examples{
 mapper <- bru_mapper_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
-m <- bru_mapper_marginal(qexp, rate = 1 / 8)
+m <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
 (val <- ibm_eval(m, state = -5:5))
 ibm_eval(m, state = val, reverse = TRUE)
 }

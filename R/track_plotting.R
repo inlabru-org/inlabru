@@ -363,7 +363,7 @@ make_track_plots <- function(fit) {
 #' fit <- bru(...)
 #' bru_timings_plot(fit)
 #' }
-bru_timings_plot <- function(fit) {
+bru_timings_plot <- function(x) {
   needed <- c("ggplot2")
   are_installed <-
     vapply(
@@ -383,7 +383,7 @@ bru_timings_plot <- function(fit) {
     )
   }
 
-  ggplot2::ggplot(fit[["bru_timings"]]) +
+  ggplot2::ggplot(x[["bru_timings"]]) +
     ggplot2::geom_point(ggplot2::aes(
       .data$Iteration,
       .data$Time,

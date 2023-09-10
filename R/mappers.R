@@ -1777,7 +1777,7 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
 #' Normal.
 #' @examples
-#' m <- bru_mapper_marginal(qexp, rate = 1 / 8)
+#' m <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
 #' (val <- ibm_eval(m, state = -5:5))
 #' ibm_eval(m, state = val, reverse = TRUE)
 bru_mapper_marginal <- function(qfun,
