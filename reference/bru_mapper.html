@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9008</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +128,14 @@
 <span></span>
 <span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qfun</span>, pfun <span class="op">=</span> <span class="cn">NULL</span>, dfun <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span></span>
+<span>  <span class="va">qfun</span>,</span>
+<span>  pfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dqfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  inverse <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
 <span></span>
@@ -252,6 +259,12 @@ Default <code>NULL</code></p></dd>
 <dt>dfun</dt>
 <dd><p>A pdf, supporting <code>log</code> argument,
 like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::dnorm()</a></code>. If <code>NULL</code> (default), uses finite
+differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
+
+
+<dt>dqfun</dt>
+<dd><p>A function evaluating the derivative of <code>qfun</code>.
+If <code>NULL</code> (default), uses <code>1 / dfun(...)</code> or finite
 differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
 
 
@@ -421,7 +434,7 @@ class objects.</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] . . . 1 .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] . . . . 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] . 1 . . .</span>
-<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">pexp</span>, <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">pexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="op">-</span><span class="fl">5</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 2.293213e-06 2.533739e-04 1.080648e-02 1.841033e-01 1.382030e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 5.545177e+00 1.472817e+01 3.026547e+01 5.286181e+01 8.288081e+01</span>
