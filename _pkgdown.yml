@@ -103,6 +103,7 @@ reference:
   contents:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
+  - starts_with("bru_timings_plot")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
   contents:
