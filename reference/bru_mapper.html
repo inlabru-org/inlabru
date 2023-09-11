@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9009</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -263,8 +263,8 @@ differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
 
 
 <dt>dqfun</dt>
-<dd><p>A function evaluating the derivative of <code>qfun</code>.
-If <code>NULL</code> (default), uses <code>1 / dfun(...)</code> or finite
+<dd><p>A function evaluating the reciprocal of the derivative of <code>qfun</code>.
+If <code>NULL</code> (default), uses <code>dfun(qfun(...),...)</code> or finite
 differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
 
 
