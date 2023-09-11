@@ -75,13 +75,13 @@
   test cases. (version `2.8.0.9005`)
 * Removed incorrect code for `sf` method for `eval_spatial()`, causing failure
   when extracting from multiple layers in a single call.
-  (version `2.9.0.9007`)
+  (version `2.8.0.9007`)
 * Improved handling of posterior sample variable extraction in `generate()`
   and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
 * Fixed linearisation issue when using only the `*_latent` form of a component.
   (version `2.8.0.9015`)
 * Workaround for equivalent but textually different CRS/WKT information in
-  `bru_fill_missing()`. (version `2.9.0.9016`, fixes #200)
+  `bru_fill_missing()`. (version `2.8.0.9016`, fixes #200)
 
 ## Deprecation of old functions
 
