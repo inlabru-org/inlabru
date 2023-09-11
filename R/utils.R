@@ -533,7 +533,8 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
 #' extract data, see [component()] for details.
-#' @param batch_size Size of nearest-neighbour calculation blocks, to limit the
+#' @param batch_size `r lifecycle::badge("deprecated")` due to improved algorithm.
+#' Size of nearest-neighbour calculation blocks, to limit the
 #' memory and computational complexity.
 #' @return An infilled vector of values
 #' @export
@@ -563,7 +564,7 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' }
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
-                             batch_size = 50) {
+                             batch_size = deprecated()) {
   stopifnot(inherits(
     data,
     c(
@@ -615,8 +616,10 @@ bru_fill_missing <- function(data, where, values,
 
   data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
-    data_values <- terra::values(data[[layer]], dataframe = TRUE)[[layer]]
-    data_coord <- as.data.frame(terra::crds(data))
+    data_values <- terra::values(data[[layer]],
+                                 dataframe = TRUE,
+                                 na.rm = TRUE)[[layer]]
+    data_coord <- as.data.frame(terra::crds(data[[layer]], na.rm = TRUE))
     data_coord <- sf::st_as_sf(data_coord,
       coords = seq_len(ncol(data_coord)),
       crs = data_crs
@@ -628,27 +631,15 @@ bru_fill_missing <- function(data, where, values,
 
   where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
 
-  notok <- is.na(values)
-  ok <- which(!notok)
-  notok <- which(notok)
-  data_notok <- is.na(data_values)
-  data_ok <- which(!data_notok)
-  data_notok <- which(data_notok)
+  values_notok <- is.na(values)
 
-  for (batch in seq_len(ceiling(length(notok) / batch_size))) {
-    subset <- notok[seq((batch - 1) * batch_size,
-      min(length(notok), batch * batch_size),
-      by = 1
-    )]
-    dst <- sf::st_distance(
-      data_coord[data_ok, , drop = FALSE],
-      where[subset, , drop = FALSE],
-      by_element = FALSE
-    )
+  nn <- sf::st_nearest_feature(
+    where[values_notok, , drop = FALSE],
+    data_coord
+  )
 
-    nn <- apply(dst, MARGIN = 2, function(col) which.min(col)[[1]])
-    values[subset] <- data_values[data_ok[nn]]
-  }
+  values[values_notok] <- data_values[nn]
+
   values
 }
 

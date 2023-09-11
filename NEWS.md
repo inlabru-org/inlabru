@@ -19,6 +19,15 @@
 * Improved error messages for missing or incomplete LGCP domain specification.
   (version `2.9.0.9002` and `2.9.0.9006`)
 * Allow `NULL` in automatic component usage detection. (version `2.9.0.9003`)
+* Corrected the crs information for `gorillas$plotsample$counts` and
+  `gorillas_sf$plotsample$counts` from `+units=m` to `+units=km`. (version `2.9.0.9010`)
+  The geometry information in `counts` is unlikely to have been used in examples
+  or analysis code, as the problem would have been immediately obvious;
+  plotting or other geometric operations that use the crs information would
+  heve been completely wrong, and is only detected now that more code uses the
+  crs information at all. Thanks to Dmytro Perepolkin for reporting in issue #205
+* Fix problem in `bru_fill_missing()` for cases where the input data object also
+  has missing values. (version `2.9.0.9011`)
 
 # inlabru 2.9.0
 

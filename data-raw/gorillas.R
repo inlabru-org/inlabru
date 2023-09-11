@@ -6,17 +6,17 @@
 #' @return gorilla data
 
 import.gorillas <- function() {
-  stopifnot(check_spatstat("spatstat.data"))
+  stopifnot(inlabru:::check_spatstat("spatstat.data"))
   gorillas <- spatstat.data::gorillas
   gorillas.extra <- spatstat.data::gorillas.extra
 
   # Create SpatialPoints representing nest locations
   requireNamespace("spatstat.geom")
   nests <- as.data.frame(gorillas)
-  coordinates(nests) <- c("x", "y")
+  sp::coordinates(nests) <- c("x", "y")
   crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84") # from the Gorillas help file
   crs_km <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84 +units=km")
-  proj4string(nests) <- crs
+  sp::proj4string(nests) <- crs
 
   # Turn the observation window into spatial polygon
   boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
@@ -34,8 +34,8 @@ import.gorillas <- function() {
   gcov <- list()
   for (nm in names(gorillas.extra)) {
     gcov[[nm]] <- as(gorillas.extra[[nm]], "SpatialGridDataFrame")
-    proj4string(gcov[[nm]]) <- proj4string(nests)
-    coordnames(gcov[[nm]]) <- c("x", "y")
+    sp::proj4string(gcov[[nm]]) <- sp::proj4string(nests)
+    sp::coordnames(gcov[[nm]]) <- c("x", "y")
     names(gcov[[nm]]) <- nm
     if (is.character(gcov[[nm]][[nm]])) {
       gcov[[nm]][[nm]] <- as.factor(gcov[[nm]][[nm]])
@@ -71,8 +71,8 @@ import.gorillas <- function() {
     x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4
   )
   counts <- point2count(plotpts$plots, plotpts$dets)
-  x <- coordinates(counts)[, 1]
-  y <- coordinates(counts)[, 2]
+  x <- sp::coordinates(counts)[, 1]
+  y <- sp::coordinates(counts)[, 2]
   count <- counts@data$n
 
   # Make gam data frame
@@ -90,39 +90,38 @@ import.gorillas <- function() {
   gorillas$plotsample <- sample_9x9_60pc
 
   # Make the count data frame spatial
-  coordinates(gorillas$plotsample$counts) <- c("x", "y")
-  proj4string(gorillas$plotsample$counts) <- crs
+  sp::coordinates(gorillas$plotsample$counts) <- c("x", "y")
+  sp::proj4string(gorillas$plotsample$counts) <- crs_km
 
   # Extrapolate covariate
-  pxl <- fm_pixels(gorillas$mesh,
+  pxl_ <- fm_pixels(gorillas$mesh,
     mask = FALSE, dims = c(220, 180),
     format = "sp"
   )
-  pxl <- fm_transform(pxl, fm_crs(gorillas$gcov[[1]]))
+  pxl_ <- fm_transform(pxl_, fm_crs(gorillas$gcov[[1]]))
   for (k in names(gorillas$gcov)) {
+    pxl <- pxl_
     NA_value <- gorillas$gcov[[k]][[1]][1]
-    is.na(NA_value) <- NA
+    is.na(NA_value) <- TRUE
     pxl[[k]] <- NA_value
     pxl[[k]] <- bru_fill_missing(gorillas$gcov[[k]], pxl, values = pxl[[k]])
+    gorillas$gcov[[k]] <- pxl
   }
-  gorillas$gcov <- pxl
 
   return(gorillas)
 }
 
 
 #' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
-import.gorillas.sf <- function(overwrite = FALSE) {
-  gorillas <- inlabru::gorillas
+import.gorillas.sf <- function(gorillas = NULL, overwrite = FALSE) {
+  if (is.null(gorillas)) {
+    gorillas <- inlabru::gorillas
+  }
 
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
   gorillas_sf$mesh <- fmesher::fm_as_fm(gorillas$mesh)
   gorillas_sf$boundary <- sf::st_as_sf(gorillas$boundary)
-  gcov <- terra::rast(gorillas$gcov[[1]])
-  for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {
-    terra::add(gcov) <- terra::rast(gorillas$gcov[[k]])
-  }
   gorillas_sf$plotsample <- lapply(gorillas$plotsample, sf::st_as_sf)
 
   gorillas_sf$gcov_file <- "extdata/gorillas_cov.tif"
@@ -131,6 +130,11 @@ import.gorillas.sf <- function(overwrite = FALSE) {
     if (file.exists(filename)) {
       message(paste0("Overwriting existing ", filename))
     }
+    gcov <- terra::rast(gorillas$gcov[[1]])
+    for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {
+      terra::add(gcov) <- terra::rast(gorillas$gcov[[k]])
+    }
+
     terra::writeRaster(
       gcov,
       filename = filename,
@@ -144,6 +148,6 @@ import.gorillas.sf <- function(overwrite = FALSE) {
 
 
 # gorillas <- import.gorillas()
-# use_data(gorillas)
-# gorillas_sf <- import.gorillas.sf()
+# usethis::use_data(gorillas, overwrite=TRUE)
+# gorillas_sf <- import.gorillas.sf(gorillas)
 # usethis::use_data(gorillas_sf, overwrite = TRUE)
