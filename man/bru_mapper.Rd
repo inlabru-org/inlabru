@@ -160,8 +160,8 @@ Default \code{NULL}}
 like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
 differences on \code{qfun} or \code{pfun} instead.}
 
-\item{dqfun}{A function evaluating the derivative of \code{qfun}.
-If \code{NULL} (default), uses \code{1 / dfun(...)} or finite
+\item{dqfun}{A function evaluating the reciprocal of the derivative of \code{qfun}.
+If \code{NULL} (default), uses \code{dfun(qfun(...),...)} or finite
 differences on \code{qfun} or \code{pfun} instead.}
 
 \item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bru_mapper_marginal]{bru_mapper_marginal()}}
