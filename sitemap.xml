@@ -154,13 +154,61 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_aggregate.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_collect.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_const.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_factor.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_1d.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_2d.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_methods.html</loc>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_harmonics.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_index.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_linear.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_logsumexp.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_marginal.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_matrix.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_mesh_B.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_multi.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_scale.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_summary.html</loc>
+  </url>
+  <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_taylor.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_model.html</loc>

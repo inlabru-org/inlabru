@@ -140,7 +140,7 @@ four parts:</p>
 <p>Regular users normally at most need some of the methods from
 <code><a href="../reference/bru_mapper.html">?bru_mapper</a></code> and sometimes
 <code><a href="../reference/bru_mapper_generics.html">?bru_mapper_generics</a></code>. The methods in
-<code><a href="../reference/bru_mapper_methods.html">?bru_mapper_methods</a></code> provides more details and allows the
+<code>?bru_mapper_methods</code> provides more details and allows the
 user to query mappers and to use them outside the context of inlabru
 model definitions. The <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code> and
 <code><a href="../reference/bru_get_mapper.html">bru_get_mapper()</a></code> methods are needed for those implementing
@@ -163,11 +163,11 @@ definition.</p>
 vectors as state.</p>
 <p>Constructors:</p>
 <ul>
-<li><code><a href="../reference/bru_mapper.html">bru_mapper_const()</a></code></li>
-<li><code><a href="../reference/bru_mapper.html">bru_mapper_linear()</a></code></li>
+<li><code><a href="../reference/bru_mapper_const.html">bru_mapper_const()</a></code></li>
+<li><code><a href="../reference/bru_mapper_linear.html">bru_mapper_linear()</a></code></li>
 <li><code>bru_mapper_index(n)</code></li>
 <li><code>bru_mapper_factor(values, factor_mapping)</code></li>
-<li><code><a href="../reference/bru_mapper.html">bru_mapper_matrix()</a></code></li>
+<li><code><a href="../reference/bru_mapper_matrix.html">bru_mapper_matrix()</a></code></li>
 <li><code>bru_mapper_harmonics(order, scaling, intercept, interval)</code></li>
 </ul>
 <div class="section level4">
@@ -236,7 +236,7 @@ state vector has length <span class="math inline">\(2p\)</span>.</p>
 with other mappers, as steps in a sequence of transformations, or as
 individual transformation mappers.</p>
 <ul>
-<li><code><a href="../reference/bru_mapper.html">bru_mapper_scale()</a></code></li>
+<li><code><a href="../reference/bru_mapper_scale.html">bru_mapper_scale()</a></code></li>
 <li><code>bru_mapper_marginal(qfun, pfun, ...)</code></li>
 <li><code>bru_mapper_aggregate(rescale)</code></li>
 <li><code>bru_mapper_logsumexp(rescale)</code></li>
@@ -249,7 +249,7 @@ vector with the <code>state</code> vector. This is used for INLA models
 to implement the <code>weights</code> component scaling, as the final
 stage of a <code>pipe</code> mapper, see below.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_scale</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_scale.html">bru_mapper_scale</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="va">...</span>,</span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
@@ -264,15 +264,15 @@ distribution defined by a quantile function. This can be used to define
 components with latent marginal <code>N(0,1)</code> distribution but
 non-Gaussian effect.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, dfun <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_marginal.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">...</span>, pfun <span class="op">=</span> <span class="va">...</span>, dfun <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span>, inverse <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="cn">NULL</span>, <span class="co"># If a list is given, it overrides the parameter specification</span></span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Examples:</span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, dfun <span class="op">=</span> <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_marginal.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_marginal.html">bru_mapper_marginal</a></span><span class="op">(</span>qfun <span class="op">=</span> <span class="va">qexp</span>, pfun <span class="op">=</span> <span class="va">pexp</span>, dfun <span class="op">=</span> <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="aggregate">aggregate<a class="anchor" aria-label="anchor" href="#aggregate"></a>
@@ -282,7 +282,7 @@ vector elements by blockwise summation after scaling the elements by
 weights. This can be used for summation, integration, and averaging (for
 <code>rescale=TRUE</code>).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_aggregate</a></span><span class="op">(</span>rescale <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_aggregate.html">bru_mapper_aggregate</a></span><span class="op">(</span>rescale <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>block <span class="op">=</span> <span class="va">...</span>, weights <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
@@ -298,7 +298,7 @@ implementation takes care to avoid numerical overflow. This can be used
 for summation, integration, and averaging (for
 <code>rescale=TRUE</code>).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_logsumexp</a></span><span class="op">(</span>rescale <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_logsumexp.html">bru_mapper_logsumexp</a></span><span class="op">(</span>rescale <span class="op">=</span> <span class="va">...</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>block <span class="op">=</span> <span class="va">...</span>, weights <span class="op">=</span> <span class="va">...</span><span class="op">)</span>,</span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
@@ -325,7 +325,7 @@ sub-mapper. When <code>hidden = TRUE</code>, it can be used for INLA
 models where the user-visible part of the latent state is only a part of
 the internal state, such as for <code>"bym"</code> models.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_collect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_collect.html">bru_mapper_collect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
 <span>  hidden <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
@@ -350,7 +350,7 @@ mapper for <code>main</code>, <code>group</code>, and
 <code>rgeneric</code> or <code>cgeneric</code> model is defined on e.g.
 a space-time product domain.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
@@ -363,7 +363,7 @@ a space-time product domain.</p>
 evaluation result of each mapper is given as the state vector for the
 next mapper.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
 <span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name1 <span class="op">=</span> <span class="va">...</span>, name2 <span class="op">=</span> <span class="va">...</span>, <span class="va">...</span><span class="op">)</span>,</span>
 <span>  state <span class="op">=</span> <span class="va">...</span></span>
@@ -377,10 +377,10 @@ next mapper.</p>
 by a <code>scale</code> mapper:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      mapper <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="va">...</span>, group <span class="op">=</span> <span class="va">...</span>, replicate <span class="op">=</span> <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>      scale <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_scale</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      mapper <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="va">...</span>, group <span class="op">=</span> <span class="va">...</span>, replicate <span class="op">=</span> <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      scale <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_scale.html">bru_mapper_scale</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">mapper</span>,</span>
@@ -442,7 +442,7 @@ and define</li>
 <h3 id="special-mappers">Special mappers<a class="anchor" aria-label="anchor" href="#special-mappers"></a>
 </h3>
 <ul>
-<li><code><a href="../reference/bru_mapper.html">bru_mapper_taylor()</a></code></li>
+<li><code><a href="../reference/bru_mapper_taylor.html">bru_mapper_taylor()</a></code></li>
 </ul>
 </div>
 </div>
@@ -466,10 +466,10 @@ models. For <code>inla_f=FALSE</code> (the default), the
 number of latent variables, but with <code>inla_f=TRUE</code> we get the
 values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> instead:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_collect</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_collect.html">bru_mapper_collect</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span>    b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span>    a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>    b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  hidden <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
@@ -509,9 +509,9 @@ values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="exte
 <p>For the <code>bru_mapper_multi</code> class, the <code>multi</code>
 argument provides access to the inner layers of the multi-mapper:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span>  b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>  b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>

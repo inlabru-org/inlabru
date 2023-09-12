@@ -91,66 +91,7 @@
 <span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, methods <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for fm_mesh_2d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for inla.mesh</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for fm_mesh_1d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for inla.mesh.1d</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_index</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1L</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_taylor</span><span class="op">(</span></span>
-<span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  jacobian <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  state0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  values_mapper <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_linear</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_matrix</span><span class="op">(</span><span class="va">labels</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_factor</span><span class="op">(</span><span class="va">values</span>, <span class="va">factor_mapping</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_const</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_scale</span><span class="op">(</span>mapper <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_aggregate</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_logsumexp</span><span class="op">(</span>rescale <span class="op">=</span> <span class="cn">FALSE</span>, n_block <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_marginal</span><span class="op">(</span></span>
-<span>  <span class="va">qfun</span>,</span>
-<span>  pfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  dfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  dqfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span>,</span>
-<span>  inverse <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_pipe</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_multi</span><span class="op">(</span><span class="va">mappers</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_collect</span><span class="op">(</span><span class="va">mappers</span>, hidden <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_harmonics</span><span class="op">(</span></span>
-<span>  order <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  scaling <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  intercept <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bru_mapper_mesh_B</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">B</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -172,145 +113,6 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 <dt>methods</dt>
 <dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Deprecated.</p></dd>
 
-
-<dt>mesh</dt>
-<dd><p>An <code>fm_mesh_1d</code>, <code>fm_mesh_2d</code>, <code>inla.mesh.1d</code> or <code>inla.mesh.2d</code> object to use as a mapper</p></dd>
-
-
-<dt>indexed</dt>
-<dd><p>logical; if <code>TRUE</code>, the <code><a href="bru_mapper_generics.html">ibm_values()</a></code> method
-will return an integer vector instead of the factor levels.
-This is needed e.g. for <code>group</code> and <code>replicate</code> mappers, since
-<code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> doesn't accept factor values. Default: <code>FALSE</code>, which
-works for the main input mappers. The default mapper constructions
-will set it the required setting.</p></dd>
-
-
-<dt>n</dt>
-<dd><p>Size of a model for <code>bru_mapper_index</code></p></dd>
-
-
-<dt>offset</dt>
-<dd><p>For <code>bru_mapper_taylor</code>, an offset vector evaluated
-at <code>state0</code>.
-May be <code>NULL</code>, interpreted as an all-zero vector of length determined by
-a non-null Jacobian.</p></dd>
-
-
-<dt>jacobian</dt>
-<dd><p>For <code>bru_mapper_taylor()</code>, the Jacobian matrix,
-evaluated at <code>state0</code>, or, a named list of such matrices.
-May be <code>NULL</code> or an empty list, for a constant mapping.</p></dd>
-
-
-<dt>state0</dt>
-<dd><p>For <code>bru_mapper_taylor</code>, the state the linearisation
-was evaluated at, or a list of length matching the <code>jacobian</code> list.
-<code>NULL</code> is interpreted as 0.</p></dd>
-
-
-<dt>values_mapper</dt>
-<dd><p>mapper object to be used for <code>ibm_n</code> and
-<code>ibm_values</code> for <code>inla_f=TRUE</code> (experimental, currently unused)</p></dd>
-
-
-<dt>labels</dt>
-<dd><p>Column labels for matrix mappings</p></dd>
-
-
-<dt>values</dt>
-<dd><p>Input values calculated by <code><a href="input_eval.html">input_eval.bru_input()</a></code></p></dd>
-
-
-<dt>factor_mapping</dt>
-<dd><p>character; selects the type of factor mapping.</p><ul><li><p><code>'contrast'</code> for leaving out the first factor level.</p></li>
-<li><p><code>'full'</code> for keeping all levels.</p></li>
-</ul></dd>
-
-
-<dt>rescale</dt>
-<dd><p>logical; For <code>bru_mapper_aggregate</code> and <code>bru_mapper_logsumexp</code>,
-specifies if the blockwise sums should be normalised by the blockwise weight
-sums or not:</p><ul><li><p><code>FALSE</code>: (default) Straight weighted sum, no rescaling.</p></li>
-<li><p><code>TRUE</code>: Divide by the sum of the weight values within each block.
-This is useful for integration averages, when the given weights are plain
-integration weights. If the weights are <code>NULL</code> or all ones, this is
-the same as dividing by the number of entries in each block.</p></li>
-</ul></dd>
-
-
-<dt>n_block</dt>
-<dd><p>Predetermined number of output blocks. If <code>NULL</code>, overrides
-the maximum block index in the inputs.</p></dd>
-
-
-<dt>qfun</dt>
-<dd><p>A quantile function, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::qnorm()</a></code>.</p></dd>
-
-
-<dt>pfun</dt>
-<dd><p>A CDF, supporting <code>lower.tail</code> and <code>log.p</code> arguments,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::pnorm()</a></code>.  Only needed and used when
-<code>xor(mapper[["inverse"]], reverse)</code> is <code>TRUE</code> in a method call.
-Default <code>NULL</code></p></dd>
-
-
-<dt>dfun</dt>
-<dd><p>A pdf, supporting <code>log</code> argument,
-like <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::dnorm()</a></code>. If <code>NULL</code> (default), uses finite
-differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
-
-
-<dt>dqfun</dt>
-<dd><p>A function evaluating the reciprocal of the derivative of <code>qfun</code>.
-If <code>NULL</code> (default), uses <code>dfun(qfun(...),...)</code> or finite
-differences on <code>qfun</code> or <code>pfun</code> instead.</p></dd>
-
-
-<dt>inverse</dt>
-<dd><p>logical; If <code>FALSE</code> (default), <code>bru_mapper_marginal()</code>
-defines a mapping from standard Normal to a specified distribution.
-If <code>TRUE</code>, it defines a mapping from the specified distribution to a standard
-Normal.</p></dd>
-
-
-<dt>mappers</dt>
-<dd><p>A list of <code>bru_mapper</code> objects</p></dd>
-
-
-<dt>hidden</dt>
-<dd><p><code>logical</code>, set to <code>TRUE</code> to flag that the mapper is to be used
-as a first level input mapper for <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> in a model that requires making
-only the first mapper visible to <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">INLA::f()</a></code> and <code><a href="https://rdrr.io/pkg/INLA/man/inla.stack.html" class="external-link">INLA::inla.stack()</a></code>, such
-as for "bym2" models, as activated by the <code>inla_f</code> argument to <code>ibm_n</code>,
-<code>ibm_values</code>, and <code>ibm_jacobian</code>. Set to <code>FALSE</code> to always access the full
-mapper, e.g. for <code>rgeneric</code> models</p></dd>
-
-
-<dt>order</dt>
-<dd><p>For <code>bru_mapper_harmonics</code>, specifies the maximum <code>cos</code>/<code>sin</code>
-order. (Default 1)</p></dd>
-
-
-<dt>scaling</dt>
-<dd><p>For <code>bru_mapper_harmonics</code>, specifies an optional vector of
-scaling factors of length <code>intercept + order</code>, or a common single scalar.</p></dd>
-
-
-<dt>intercept</dt>
-<dd><p>logical; For <code>bru_mapper_harmonics</code>, if <code>TRUE</code>, the first
-basis function is a constant. (Default <code>TRUE</code>)</p></dd>
-
-
-<dt>interval</dt>
-<dd><p>numeric length-2 vector specifying a domain interval.
-Default <code>c(0, 1)</code>.</p></dd>
-
-
-<dt>B</dt>
-<dd><p>a square or tall basis conversion matrix</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -325,11 +127,6 @@ Default <code>c(0, 1)</code>.</p></dd>
 arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
 instead, and supply at least a <code>new_class</code> class name.
 Use of the <code>bru_mapper.default</code> method will be deprecated from version 2.7.0.</p></li>
-<li><p><code>bru_mapper(fm_mesh_2d)</code>: Creates a mapper for 2D <code>fm_mesh_2d</code> objects</p></li>
-<li><p><code>bru_mapper(inla.mesh)</code>: Creates a mapper for 2D <code>inla.mesh</code> objects</p></li>
-<li><p><code>bru_mapper(fm_mesh_1d)</code>: Create mapper for an <code>fm_mesh_1d</code> object</p></li>
-<li><p><code>bru_mapper(inla.mesh.1d)</code>: Create mapper for an <code>inla.mesh.1d</code> object; converts
-the mesh fo <code>fm_mesh_1d</code> first.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
@@ -353,79 +150,38 @@ registration, e.g.:</p>
 <p>or before each method, use <code>@exportS3Method</code>:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#' @exportS3Method inlabru::bru_get_mapper</span></span></code></pre><p></p></div>
 <p>etc., which semi-automates it.</p></li>
-<li><p><code>bru_mapper_index()</code>: Create a an indexing mapper</p></li>
-<li><p><code>bru_mapper_taylor()</code>: Provides a pre-computed affine mapping,
-internally used to represent and evaluate linearisation information.
-The <code>state0</code> information indicates for which state the <code>offset</code> was evaluated;
-The affine mapper output is defined as
-<code>effect(state) = offset + jacobian %*% (state - state0)</code></p></li>
-<li><p><code>bru_mapper_linear()</code>: Create a mapper for linear effects</p></li>
-<li><p><code>bru_mapper_matrix()</code>: Create a matrix mapper, for a given number of columns</p></li>
-<li><p><code>bru_mapper_factor()</code>: Create a factor mapper</p></li>
-<li><p><code>bru_mapper_const()</code>: Create a constant mapper</p></li>
-<li><p><code>bru_mapper_scale()</code>: Create a standalone
-scaling mapper that can be used as part of a <code>bru_mapper_pipe</code>.
-If <code>mapper</code> is non-null, the <code>bru_mapper_scale()</code> constructor
-returns
-<code>bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))</code></p></li>
-<li><p><code>bru_mapper_aggregate()</code>: Constructs a mapper
-that aggregates elements of the input state, so it can be used e.g.
-for weighted summation or integration over blocks of values.</p></li>
-<li><p><code>bru_mapper_logsumexp()</code>: Constructs a mapper
-that aggregates elements of <code>exp(state)</code>, with optional non-negative weighting,
-and then takes the <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code>, so it can be used e.g.
-for  \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]\)
-and \(v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]\)
-calculations.  Relies on the input handling methods for <code>bru_mapper_aggregate</code>,
-but also allows the weights to be supplied on a logarithmic scale as <code>log_weights</code>.
-To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise with
-<code>(state-log_weights)[block] - max((state-log_weights)[block])</code>,
-and shifting the result back afterwards.</p></li>
-<li><p><code>bru_mapper_marginal()</code>: Constructs a mapper that transforms the marginal distribution <code>state</code> from
-\(\textrm{N}(0,1)\) to the distribution of a given (continuous)
-quantile function. The <code>...</code> arguments are used as parameter arguments to
-<code>qfun</code>, <code>pfun</code>, <code>dfun</code>, and <code>dqfun</code>.</p></li>
-<li><p><code>bru_mapper_pipe()</code>: Create a pipe mapper, where <code>mappers</code> is a list of mappers,
-and the evaluated output of each mapper is handed as the state to the next
-mapper.
-The <code>input</code> format for the <code>ibm_eval</code> and <code>ibm_jacobian</code> methods is
-a list of inputs, one for each mapper.</p></li>
-<li><p><code>bru_mapper_multi()</code>: Constructs a rowwise Kronecker product mapping</p></li>
-<li><p><code>bru_mapper_collect()</code>: Constructs a concatenated collection mapping</p></li>
-<li><p><code>bru_mapper_harmonics()</code>: Constructs a mapper for <code>cos</code>/<code>sin</code> functions
-of orders 1 (if <code>intercept</code> is <code>TRUE</code>, otherwise 0) through <code>order</code>. The total
-number of basis functions is <code>intercept + 2 * order</code>.</p>
-<p>Optionally, each order can be given a non-unit scaling, via the <code>scaling</code>
-vector, of length <code>intercept + order</code>. This can be used to
-give an effective spectral prior. For example, let</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>scaling <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> (<span class="dv">0</span><span class="sc">:</span><span class="dv">4</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">11</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>bmh1 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>, <span class="at">interval =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">ibm_eval</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  bmh1,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> x,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>, <span class="at">sd =</span> <span class="fu">rep</span>(scaling, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>)))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre><p></p></div>
-<p>Then, with</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>bmh2 <span class="ot">=</span> <span class="fu">bru_mapper_harmonics</span>(<span class="at">order =</span> <span class="dv">4</span>, <span class="at">scaling =</span> scaling)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>u2 <span class="ot">=</span> <span class="fu">ibm_eval</span>(bmh2, <span class="at">input =</span> x, <span class="at">state =</span> <span class="fu">rnorm</span>(<span class="dv">9</span>))</span></code></pre><p></p></div>
-<p>the stochastic properties of <code>u1</code> and <code>u2</code> will be the same, with <code>scaling^2</code>
-determining the variance for each frequency contribution.</p>
-<p>The period for the first order harmonics is shifted and scaled to match
-<code>interval</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="bru_mapper_generics.html">bru_mapper_generics</a> for generic methods,
-<a href="bru_mapper_methods.html">bru_mapper_methods</a> for specific method implementations, and
+the individual mapper pages for special method implementations, and
 <a href="bru_get_mapper.html">bru_get_mapper</a> for hooks to extract mappers from latent model object
-class objects.</p></div>
+class objects.</p>
+<p>Other mappers: 
+<code><a href="bru_get_mapper.html">bru_get_mapper</a>()</code>,
+<code><a href="bru_mapper_fm_mesh_1d.html">bru_mapper.fm_mesh_1d</a>()</code>,
+<code><a href="bru_mapper_fm_mesh_2d.html">bru_mapper.fm_mesh_2d</a>()</code>,
+<code><a href="bru_mapper_aggregate.html">bru_mapper_aggregate</a>()</code>,
+<code><a href="bru_mapper_collect.html">bru_mapper_collect</a>()</code>,
+<code><a href="bru_mapper_const.html">bru_mapper_const</a>()</code>,
+<code><a href="bru_mapper_factor.html">bru_mapper_factor</a>()</code>,
+<code><a href="bru_mapper_generics.html">bru_mapper_generics</a></code>,
+<code><a href="bru_mapper_harmonics.html">bru_mapper_harmonics</a>()</code>,
+<code><a href="bru_mapper_index.html">bru_mapper_index</a>()</code>,
+<code><a href="bru_mapper_linear.html">bru_mapper_linear</a>()</code>,
+<code><a href="bru_mapper_logsumexp.html">bru_mapper_logsumexp</a>()</code>,
+<code><a href="bru_mapper_marginal.html">bru_mapper_marginal</a>()</code>,
+<code><a href="bru_mapper_matrix.html">bru_mapper_matrix</a>()</code>,
+<code><a href="bru_mapper_mesh_B.html">bru_mapper_mesh_B</a>()</code>,
+<code><a href="bru_mapper_multi.html">bru_mapper_multi</a>()</code>,
+<code><a href="bru_mapper_pipe.html">bru_mapper_pipe</a>()</code>,
+<code><a href="bru_mapper_scale.html">bru_mapper_scale</a>()</code>,
+<code><a href="bru_mapper_taylor.html">bru_mapper_taylor</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_index</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 x 5 sparse Matrix of class "dgCMatrix"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               </span>
@@ -434,13 +190,6 @@ class objects.</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] . . . 1 .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] . . . . 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] . 1 . . .</span>
-<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">pexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="op">-</span><span class="fl">5</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 2.293213e-06 2.533739e-04 1.080648e-02 1.841033e-01 1.382030e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 5.545177e+00 1.472817e+01 3.026547e+01 5.286181e+01 8.288081e+01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 1.205200e+02</span>
-<span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="va">val</span>, reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -5 -4 -3 -2 -1  0  1  2  3  4  5</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

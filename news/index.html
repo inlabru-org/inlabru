@@ -84,7 +84,7 @@
 <div class="section level3">
 <h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
 <ul><li>Add new <code><a href="../reference/bru_mapper_generics.html">ibm_simplify()</a></code> generic to handle mapper simplification more generally; needed to properly support non-linear component mappers. (version <code>2.9.0.9004</code>)</li>
-<li>Add new <code><a href="../reference/bru_mapper.html">bru_mapper_marginal()</a></code> mapper class that can be used as part of component mapper pipelines. (version <code>2.9.0.9004</code>)</li>
+<li>Add new <code><a href="../reference/bru_mapper_marginal.html">bru_mapper_marginal()</a></code> mapper class that can be used as part of component mapper pipelines. (version <code>2.9.0.9004</code>)</li>
 <li>Add new <code><a href="../reference/bru_mapper_generics.html">ibm_eval2()</a></code> generic that computes both evaluation and Jacobian, avoiding double-computing of the Jacobian, when practical. (version <code>2.9.0.9005</code>)</li>
 <li>Add new <code><a href="../reference/bru_timings_plot.html">bru_timings_plot()</a></code> function that plots the time used for each nonlinear iteration (version <code>2.9.0.2007</code>)</li>
 <li>Speed up <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> (by orders of magnitude) by changing method for finding the nearest available data point. (version <code>2.9.0.2011</code>)</li>
@@ -195,8 +195,8 @@
 <li>
 <p>Further <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> method updates;</p>
 <ul><li>Deprecated <code>ibm_amatrix()</code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
-<li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</li>
-<li>Introduced <code><a href="../reference/bru_mapper.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</li>
+<li>Introduced <code><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</li>
+<li>Introduced <code><a href="../reference/bru_mapper_aggregate.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper_logsumexp.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</li>
 <li>
 <code>summary</code> methods for <code>bru_mapper</code> objects (<code><a href="../reference/bru_mapper_summary.html">summary.bru_mapper()</a></code>)</li>
 <li>Removed <code>methods</code> argument from <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code>. Implementations should register S3 methods instead.</li>
@@ -205,9 +205,9 @@
 <div class="section level3">
 <h3 id="bug-fixes-2-7-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-7-0"></a></h3>
 <ul><li>Remove unused <code>spatstat.core</code> dependency. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/165" class="external-link">#165</a></li>
-<li>Fixed issue with plain mapper evaluation in the <code><a href="../reference/bru_mapper_generics.html">ibm_eval.default()</a></code> and <code><a href="../reference/bru_mapper_methods.html">ibm_eval.bru_mapper_collect()</a></code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code><a href="../reference/bru_mapper.html">bru_mapper_multi()</a></code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</li>
+<li>Fixed issue with plain mapper evaluation in the <code><a href="../reference/bru_mapper_generics.html">ibm_eval.default()</a></code> and <code><a href="../reference/bru_mapper_collect.html">ibm_eval.bru_mapper_collect()</a></code> methods, where they would return zeros instead of the intended values. The main component evaluation and estimation code was not directly affected as that is based on the <code><a href="../reference/bru_mapper_multi.html">bru_mapper_multi()</a></code> class methods that rely on the Jacobians instead. The bug would therefore mainly have impacted the future, not yet supported nonlinear mapper extensions.</li>
 <li>Fix for <code>eval_spatial.SpatRaster</code>; Work around inconsistent logic in <code>terra::extract(..., layer)</code> when <code>length(layer)==1</code> or <code>nrow(where)==1</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/169" class="external-link">#169</a></li>
-<li>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></li>
+<li>Add <code>indexed</code> logical option to <code><a href="../reference/bru_mapper_factor.html">bru_mapper_factor()</a></code>, to allow factor inputs to be mapped to index values, as needed for <code>group</code> and <code>replicate</code>. Fixes <a href="https://github.com/inlabru-org/inlabru/issues/174" class="external-link">#174</a></li>
 </ul></div>
 </div>
     <div class="section level2">

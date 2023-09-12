@@ -198,7 +198,7 @@ useful</p>
 <span><span class="co">#&gt; [5,] . 0.29227293 0.09984048 .         .         .         . . 0.6078866</span></span>
 <span><span class="co">#&gt; [6,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span>
 <span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_taylor</a></span><span class="op">(</span>jacobian <span class="op">=</span> <span class="va">A.loc</span><span class="op">[</span><span class="va">index</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_taylor.html">bru_mapper_taylor</a></span><span class="op">(</span>jacobian <span class="op">=</span> <span class="va">A.loc</span><span class="op">[</span><span class="va">index</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 6 x 9 sparse Matrix of class "dgCMatrix"</span></span>
 <span><span class="co">#&gt;                                                                         </span></span>
@@ -211,10 +211,10 @@ useful</p>
 <span></span>
 <span><span class="co"># For run-time indexing:</span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      matrix <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_taylor</a></span><span class="op">(</span>jacobian <span class="op">=</span> <span class="va">A.loc</span><span class="op">)</span>,</span>
-<span>      index <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">A.loc</span><span class="op">)</span><span class="op">)</span></span>
+<span>      matrix <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_taylor.html">bru_mapper_taylor</a></span><span class="op">(</span>jacobian <span class="op">=</span> <span class="va">A.loc</span><span class="op">)</span>,</span>
+<span>      index <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">A.loc</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">index</span><span class="op">)</span><span class="op">)</span></span>
@@ -233,7 +233,7 @@ useful</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>, group <span class="op">=</span> <span class="va">group.values</span>, group.mesh <span class="op">=</span> <span class="va">group.mesh</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>,</span>
 <span>  group <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">group.mesh</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
@@ -273,10 +273,10 @@ elements in each block.</li>
 aggregation mapper.</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    block <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_aggregate</a></span><span class="op">(</span></span>
+<span>    main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    block <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_aggregate.html">bru_mapper_aggregate</a></span><span class="op">(</span></span>
 <span>      rescale <span class="op">=</span> <span class="op">(</span><span class="va">block_rescale</span> <span class="op">!=</span> <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>      n_block <span class="op">=</span> <span class="va">n_block</span></span>
 <span>    <span class="op">)</span></span>
@@ -314,10 +314,10 @@ aggregation mapper.</li>
 <span><span class="co">#&gt;  3rd Qu.:7   3rd Qu.:2.0   3rd Qu.:3   </span></span>
 <span><span class="co">#&gt;  Max.   :9   Max.   :2.0   Max.   :3</span></span>
 <span></span>
-<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  field.main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>,</span>
-<span>  field.group <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="va">ngroup</span><span class="op">)</span>,</span>
-<span>  field.replicate <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_index</a></span><span class="op">(</span><span class="va">nrepl</span><span class="op">)</span></span>
+<span>  field.group <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="va">ngroup</span><span class="op">)</span>,</span>
+<span>  field.replicate <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="va">nrepl</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    field.main  field.group  field.replicate</span></span>
