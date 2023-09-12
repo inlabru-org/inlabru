@@ -220,9 +220,9 @@ estimated abundance (there are really 647 nests there):</p>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 646.8809 25.43673 597.8701 647.1579 697.8245 647.1579        2.543673</span></span>
+<span><span class="co">#&gt; 1 644.5953 25.48656 595.0554 645.7552 698.2721 645.7552        2.548656</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.782666</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1.839648</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="a-model-with-vegetation-type-and-a-spde-type-smoother">A model with vegetation type and a SPDE type smoother<a class="anchor" aria-label="anchor" href="#a-model-with-vegetation-type-and-a-spde-type-smoother"></a>
@@ -259,10 +259,10 @@ that is not captured by the vegetation covariate, using an SPDE:</p>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">vegetation</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda2</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 675.5661 28.37764 624.4608 676.7604 725.2812 676.7604        2.837764</span></span>
+<span><span class="co">#&gt;       mean      sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 674.6308 28.6756 617.9156 677.0365 729.1077 677.0365         2.86756</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.939474</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1.919749</span></span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and
 from vegetation:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -334,10 +334,10 @@ Intercept, and choose between models on the basis of DIC, using
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda3</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 673.6948 30.43846 616.3315 673.7116 739.5558 673.7116        3.043846</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 672.9505 28.22378 618.4274 672.7854 731.339 672.7854        2.822378</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      2.199906</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      2.104706</span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">fit2</span>, <span class="va">fit3</span>, criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DIC"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -354,12 +354,12 @@ Intercept, and choose between models on the basis of DIC, using
 </tr>
 <tr class="even">
 <td align="left">fit3</td>
-<td align="right">524.1438</td>
+<td align="right">524.1446</td>
 <td align="right">1086.686</td>
 </tr>
 <tr class="odd">
 <td align="left">fit2</td>
-<td align="right">618.9436</td>
+<td align="right">618.9435</td>
 <td align="right">1181.485</td>
 </tr>
 </tbody>
@@ -473,28 +473,27 @@ variable. (First centre elevations for more stable fitting.)</p>
 <p><img src="2d_lgcp_covars_files/figure-html/unnamed-chunk-29-1.png" width="672"></p>
 <p>The elevation variable here is of class ‘SpatialGridDataFrame’, that
 can be handled in the same way as the vegetation covariate. However,
-since in some cases data may be stored differently, and other methods
-are needed to access the stored values. In such cases, we can define a
-function that knows how to evaluate the covariate at arbitrary points in
-the survey region, and call that function in the component definition.
-In this case, we can use a powerful method from the ‘sp’ package to do
-this. We use this to create the needed function. NOTE: There is a new
-method <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> that handles this automatically, and
-supports <code>terra</code> <code>SpatRaster</code> and <code>sf</code>
-geometry points objects, and mismatching coordinate systems as well.</p>
+since in some cases data may be stored differently, other methods are
+needed to access the stored values, or there’s some post-processing to
+be done. In such cases, we can define a function that knows how to
+evaluate the covariate at arbitrary points in the survey region, and
+call that function in the component definition. In this case, we can use
+a powerful method from the ‘sp’ package to do this. We use this to
+create the needed function. The method <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> is
+the method that handles this automatically, and supports
+<code>terra</code> <code>SpatRaster</code> and <code>sf</code> geometry
+points objects, and mismatching coordinate systems as well. In the
+following evaluator example function, we only add infilling of missing
+values as a post-processing step.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f.elev</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">xy</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># turn coordinates into SpatialPoints object:</span></span>
-<span>  <span class="co"># with the appropriate coordinate reference system (CRS)</span></span>
-<span>  <span class="va">spp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xy</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">xy</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>    proj4string <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_CRS_sp.html" class="external-link">fm_CRS</a></span><span class="op">(</span><span class="va">elev</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># Extract elevation values at spp coords, from our elev SpatialGridDataFrame</span></span>
-<span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">over</a></span><span class="op">(</span><span class="va">spp</span>, <span class="va">elev</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">v</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_fill_missing.html">bru_fill_missing</a></span><span class="op">(</span><span class="va">elev</span>, <span class="va">spp</span>, <span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">f.elev</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">where</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Extract the values</span></span>
+<span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eval_spatial.html">eval_spatial</a></span><span class="op">(</span><span class="va">elev</span>, <span class="va">where</span>, layer <span class="op">=</span> <span class="st">"elevation"</span><span class="op">)</span></span>
+<span>  <span class="co"># Fill in missing values</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_fill_missing.html">bru_fill_missing</a></span><span class="op">(</span><span class="va">elev</span>, <span class="va">where</span>, <span class="va">v</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">v</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For brevity we are not going to consider models with elevation only,
 with elevation and a SPDE, and with SPDE only. We will just fit one with
@@ -505,16 +504,18 @@ elevation and SPDE. We create our model to pass to lgcp thus:</p>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ecomp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">ecomp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>Note how the elevation effect is defined. When we used the
-<code>Spatial</code> grid object directly we specified it like</p>
+<code>Spatial</code> grid object directly (causing <code>inlabru</code>
+to automatically call <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code>) we specified it
+like</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_full"</span><span class="op">)</span></span></code></pre></div>
 <p>whereas with the function method we specify the covariate like
 this:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">elev</span><span class="op">(</span><span class="fu">f.elev</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span></span></code></pre></div>
 <p>We also now include an intercept term.</p>
 <p>The model is fitted in the usual way:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -525,7 +526,7 @@ this:</p>
 <span><span class="co">#&gt; inlabru version: 2.9.0.9011</span></span>
 <span><span class="co">#&gt; INLA version: 23.09.09</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; elev: main = linear(f.elev(coordinates(.data.))), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; elev: main = linear(f.elev(.data.)), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; mySmooth: main = spde(coordinates), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
@@ -533,7 +534,7 @@ this:</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ .</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.732, Running = 9.33, Post = 0.527, Total = 10.6 </span></span>
+<span><span class="co">#&gt;     Pre = 0.944, Running = 14.8, Post = 0.733, Total = 16.5 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode kld</span></span>
 <span><span class="co">#&gt; elev      0.004 0.001      0.002    0.004      0.006 0.004   0</span></span>
@@ -563,8 +564,8 @@ this:</p>
 <span><span class="co">#&gt;   Model       DIC Delta.DIC</span></span>
 <span><span class="co">#&gt; 1  fit1 -562.5418     0.000</span></span>
 <span><span class="co">#&gt; 2  efit  520.2770  1082.819</span></span>
-<span><span class="co">#&gt; 3  fit3  524.1438  1086.686</span></span>
-<span><span class="co">#&gt; 4  fit2  618.9436  1181.485</span></span></code></pre></div>
+<span><span class="co">#&gt; 3  fit3  524.1446  1086.686</span></span>
+<span><span class="co">#&gt; 4  fit2  618.9435  1181.485</span></span></code></pre></div>
 <p>Predict and plot the density</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">e.int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">efit</span>, <span class="va">pred.df</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
@@ -646,10 +647,10 @@ this.</p>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Intercept</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">mySmooth</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">LambdaE</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 676.4018 25.83028 629.7483 675.1834 727.8771 675.1834        2.583028</span></span>
+<span><span class="co">#&gt;       mean       sd  q0.025     q0.5  q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 672.9547 26.51083 631.418 673.4396 730.709 673.4396        2.651083</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1       1.79075</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        1.7044</span></span></code></pre></div>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">efit</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -681,10 +682,10 @@ easier plotting.</p>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 672.2285 28.30013 625.3988 668.0569 722.4674 668.0569        2.830013</span></span>
+<span><span class="co">#&gt;       mean      sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 672.5884 27.8695 621.1907 671.4797 733.4833 671.4797         2.78695</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.847699</span></span>
+<span><span class="co">#&gt; 1      1.842163</span></span>
 <span></span>
 <span><span class="va">Nest.e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">efit</span>,</span>
