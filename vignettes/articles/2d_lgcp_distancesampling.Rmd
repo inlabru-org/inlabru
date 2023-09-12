@@ -99,13 +99,13 @@ that converts a $N(0, 1)$ latent variable into an exponentially distributed vari
 expectation 8 (this is a somewhat arbitrary value, but motivated by the maximum observation distance `W`):
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
 sigma <- function(x) {
-  bru_forward_transformation(qexp, x, rate = 1 / 4)
+  bru_forward_transformation(qexp, x, rate = 1 / 8)
 }
 ```
 
 
 Specify and fit an SPDE model to these data using a half-normal detection function form.
-We need to define a (Matern) covariance function for the SPDE
+We need to define a (Matérn) covariance function for the SPDE
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 matern <- inla.spde2.pcmatern(mexdolphin$mesh,
@@ -132,7 +132,21 @@ form <- geometry + distance ~ mySPDE +
   Intercept + log(2)
 ```
 
-Then fit the model, passing both the components and the formula 
+From version `2.9.0.9004`, a more compact option is available, by allowing the
+component itself do the transformation between N(0,1) and Exponential(1/8):
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
+cmp <- ~ mySPDE(main = geometry, model = matern) +
+  sigma(1,
+        prec.linear = 1,
+        marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)) +
+  Intercept(1)
+form <- geometry + distance ~ mySPDE +
+  log(hn(distance, sigma)) +
+  Intercept + log(2)
+```
+
+
+Then we fit the model, passing both the components and the formula 
 (previously the formula was constructed invisibly by `inlabru`),
 and specify integration domains for the spatial and distance dimensions:
 
