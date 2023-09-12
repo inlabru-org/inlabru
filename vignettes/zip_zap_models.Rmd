@@ -1,0 +1,185 @@
+---
+title: "Devel: ZIP and ZAP models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Devel: ZIP and ZAP models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+  - \newcommand{\bm}[1]{\boldsymbol{#1}}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+(Vignette under construction!)
+
+```{r setup, eval=TRUE, echo=TRUE, include=TRUE}
+library(tidyverse)
+library(inlabru)
+library(terra)
+library(sf)
+library(RColorBrewer)
+```
+
+# Count model
+
+In addition to point process models, `inlabru` can handle models with positive integer response, e.g. abundance models where species counts are recorded in every observed location. Count models can be seen as coarse aggregations of point process models.
+
+The following example uses `gorillas` dataset. In order to obtain the counts data we rasterize the species count to the same granularity as the spatial covariates available for the `gorilla` data, and then aggregate the pixels to cover 25 times bigger area (5x5 pixels in original covariate raster dimensions). Finally, we mask the regions outside of study area.
+
+```{r fig-count-raster, fig.cap="Counts of gorilla nests", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
+data(gorillas_sf)
+nests <- gorillas_sf$nests
+mesh <- gorillas_sf$mesh
+boundary <- gorillas_sf$boundary
+gcov <- gorillas_sf_gcov()
+counts_rstr <- terra::rasterize(vect(nests), gcov, fun=sum, background=0) |> 
+  terra::aggregate(fact=4, fun=sum) |> mask(vect(boundary))
+plot(counts_rstr)
+counts_rstr <- counts_rstr |> cellSize(unit="km") |> c(counts_rstr)
+```
+
+Now we need to extract the coordinates for these pixels. The plot below shows pixel locations for all pixels with non-zero counts.
+
+```{r}
+counts_df <- crds(counts_rstr, df=TRUE, na.rm=TRUE) |> 
+  bind_cols(values(counts_rstr, mat=TRUE, na.rm=TRUE)) |> 
+  rename(count=sum) |> mutate(present=count>0) |> 
+  st_as_sf(coords=c("x", "y"), crs=st_crs(nests))
+```
+
+
+> What is the probability of encountering 0,1,2... nests per study site?
+
+We create a mesh over the study sites and define a prior for it.
+
+```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
+px_mesh <- fm_mesh_2d_inla(loc=st_as_sfc(counts_df),
+                           boundary = boundary,
+                           max.edge = c(0.5, 1), 
+                           crs=st_crs(counts_df))
+
+px_matern <- INLA::inla.spde2.pcmatern(px_mesh, 
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.1, 0.01)
+)
+
+ggplot()+
+  geom_fm(data=px_mesh)+
+  #geom_sf(data=counts_df, aes(color=count), size=1, pch=4)+
+  theme_minimal()
+```
+
+## Poisson GLM
+
+Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. 
+
+```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+comps <-  ~ vegetation(gcov$vegetation, model="factor_contrast") + 
+  elevation(eval_spatial(gcov$elevation, where=.data.), model="linear") +
+  field(geometry, model=px_matern) + Intercept(1) 
+
+fit_poi <- bru(comps,
+              like(family = "poisson", data=counts_df,
+                   formula = count~vegetation+elevation+field+Intercept,
+                   E=area,
+                   domain = list(geometry = px_mesh)))
+summary(fit_poi)
+
+
+lambda <- predict(fit_poi, fm_pixels(px_mesh, mask=boundary),
+                  ~ exp(vegetation+elevation+field + Intercept))
+
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda, geom = "tile") +
+  #geom_sf(data=nests, size=1, color="firebrick", pch=4) +
+  ggtitle("Nest intensity per ~1.2 ha")
+
+```
+
+The model fails miserably. It is unable to differentiate between the sites suitable for gorilla nests and those that are not. 
+
+## True zeroes and false zeroes
+
+The Poisson GLM model may produce zeros in some locations. These are called "true zeroes", because they are explained by the model and the covariates. The "false zeroes" do not comply with the covariates. They can appear because the imperfection in sampling (wrong time or place), observer errors, non-suitable environment characteristics, etc. 
+
+The number of zeros in our data is too large and our model is not able to accommodate for them. We should pick a model which can handle "inflated" number of zeros, i.e. in excess of what is implied by a regular Poisson model. For that we pick a "zero-inflated Poisson model", or simply ZIP.
+
+## ZIP model
+
+The [Type 1 Zero-inflated Poisson model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf) is given by
+
+$$
+\text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y)
+$$
+
+where $p=\text{logit}^{-1}(\theta)$
+
+```{r fig-pred-zip, fig.cap="Predictions from zero-inflated model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+fit_zip <- bru(comps,
+                like(family = "zeroinflatedpoisson1", data=counts_df,
+                     formula = count~vegetation+elevation+field+Intercept,
+                     domain = list(geometry = px_mesh)))
+
+summary(fit_zip)
+
+
+lambda <- predict(fit_zip, fm_pixels(px_mesh, mask=boundary),
+                  ~ exp(vegetation+elevation+field + Intercept))
+
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda, geom = "tile") +
+  ggtitle("Nest intensity per 1.2 ha")
+```
+
+This model is much better at differentiating between the sites and produces sensible predictions.
+
+## ZAP model
+
+Judging by the distribution of nests in relation to the [spatial covariates](articles/2d_lgcp_covars.Rmd), gorillas do not like to set their nests in certain vegetation. The type of vegetation may not influence the density of the nests, but it definitely drives the presence/absence. In this case the `vegetation` covariate should be included in the binomial part of the model, but not the Poisson part. 
+
+Whenever the process that drives presence/absence is substantially different from the process that drives the abundance it is wise to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of binomial and the truncated Poisson parts.
+
+Note that we have to switch to `zeroinflatedpoisson0` which has the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+
+$$
+\text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
+$$
+
+where $p=\text{logit}^{-1}(\theta)$.  We achieve the truncation of zeros in the ZIP model by fixing the parameter $\theta=log(p)$ to some large negative value.
+
+Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP model by subsetting the data to include only observations where `present` is `TRUE`.
+
+```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+fit_zap <- bru(comps,
+               like(family = "binomial", data=counts_df,
+                    formula = present~vegetation+field+Intercept,
+                   domain = list(geometry = px_mesh)),
+               like(family ="zeroinflatedpoisson0",
+                    data=counts_df[counts_df$present,],
+                    formula = count~elevation+field+Intercept,
+                    domain = list(geometry = px_mesh),
+                    control.family = list(hyper=list(theta=list(initial=-20, fixed=TRUE)))))
+summary(fit_zap)
+
+lambda <- predict(fit_zap, fm_pixels(px_mesh, mask=boundary),
+                  ~ exp(vegetation+elevation+field + Intercept))
+
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda, geom = "tile") +
+  geom_sf(data=nests, color="firebrick", size=1, pch=4, alpha=0.1)+
+  ggtitle("Nest intensity per km squared")
+
+```
+
+In order to make sure that Poisson distribution will be properly truncated, we include the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\ln(\theta)=p$ it would end up close to zero.
+
