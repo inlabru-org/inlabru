@@ -10,6 +10,8 @@
   avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
 * Add new `bru_timings_plot()` function that plots the time used for each nonlinear iteration
 (version `2.9.0.2007`)
+* Speed up `bru_fill_missing()` (by orders of magnitude) by changing method for
+  finding the nearest available data point. (version `2.9.0.2011`)
 
 ## Bug fixes
 
