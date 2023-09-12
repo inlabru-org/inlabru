@@ -126,6 +126,7 @@ where $p=\text{logit}^{-1}(\theta)$
 fit_zip <- bru(comps,
                 like(family = "zeroinflatedpoisson1", data=counts_df,
                      formula = count~vegetation+elevation+field+Intercept,
+                     E=area,
                      domain = list(geometry = px_mesh)))
 
 summary(fit_zip)
@@ -166,6 +167,7 @@ fit_zap <- bru(comps,
                like(family ="zeroinflatedpoisson0",
                     data=counts_df[counts_df$present,],
                     formula = count~elevation+field+Intercept,
+                    E=area,
                     domain = list(geometry = px_mesh),
                     control.family = list(hyper=list(theta=list(initial=-20, fixed=TRUE)))))
 summary(fit_zap)
