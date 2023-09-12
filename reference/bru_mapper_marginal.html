@@ -16,7 +16,7 @@ qfun, pfun, dfun, and dqfun."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9012</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -215,6 +215,7 @@ stable way. Otherwise, evaluates the inverse <code>qnorm(pfun(x, param))</code> 
 <code><a href="bru_mapper_multi.html">bru_mapper_multi</a>()</code>,
 <code><a href="bru_mapper_pipe.html">bru_mapper_pipe</a>()</code>,
 <code><a href="bru_mapper_scale.html">bru_mapper_scale</a>()</code>,
+<code><a href="bru_mapper_shift.html">bru_mapper_shift</a>()</code>,
 <code><a href="bru_mapper_taylor.html">bru_mapper_taylor</a>()</code>,
 <code><a href="bru_mapper.html">bru_mapper</a>()</code></p></div>
     </div>
@@ -228,6 +229,24 @@ stable way. Otherwise, evaluates the inverse <code>qnorm(pfun(x, param))</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] 1.205200e+02</span>
 <span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="va">val</span>, reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -5 -4 -3 -2 -1  0  1  2  3  4  5</span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_marginal</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">pexp</span>, <span class="va">dexp</span>, rate <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval2</a></span><span class="op">(</span><span class="va">m</span>, state <span class="op">=</span> <span class="op">-</span><span class="fl">3</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $offset</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.01080648  0.18410327  1.38203023  5.54517744 14.72817316 30.26547467</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [7] 52.86180977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $jacobian</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 x 7 diagonal matrix of class "ddiMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1]       [,2]      [,3]   [,4]     [,5]     [,6]     [,7]    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.03550271         .      .        .        .        .        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]          . 0.4419829      .        .        .        .        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]          .         . 2.3008        .        .        .        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]          .         .      . 6.383076        .        .        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]          .         .      .        . 12.20108        .        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]          .         .      .        .        . 18.98572        .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [7,]          .         .      .        .        .        . 26.26479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

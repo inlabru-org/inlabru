@@ -18,7 +18,7 @@ bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))"><!-- mathjax
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9012</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,7 +146,7 @@ that have state dependent output size.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For <code>bru_mapper_scale</code>, <code>input</code> values without a <code>scale</code> element
+    <p>For <code>bru_mapper_scale</code>, <code>input</code> NULL values
 are interpreted as no scaling.</p>
     </div>
     <div class="section level2">
@@ -170,10 +170,29 @@ are interpreted as no scaling.</p>
 <code><a href="bru_mapper_mesh_B.html">bru_mapper_mesh_B</a>()</code>,
 <code><a href="bru_mapper_multi.html">bru_mapper_multi</a>()</code>,
 <code><a href="bru_mapper_pipe.html">bru_mapper_pipe</a>()</code>,
+<code><a href="bru_mapper_shift.html">bru_mapper_shift</a>()</code>,
 <code><a href="bru_mapper_taylor.html">bru_mapper_taylor</a>()</code>,
 <code><a href="bru_mapper.html">bru_mapper</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bru_mapper_scale</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval2</a></span><span class="op">(</span><span class="va">m</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $offset</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 4 3 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $jacobian</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 x 4 diagonal matrix of class "ddiMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3] [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    1    .    .    .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    .    2    .    .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    .    .    1    .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]    .    .    .    2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
