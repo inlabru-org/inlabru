@@ -30,6 +30,8 @@
   crs information at all. Thanks to Dmytro Perepolkin for reporting in issue #205
 * Fix problem in `bru_fill_missing()` for cases where the input data object also
   has missing values. (version `2.9.0.9011`)
+* Make `eval_spatial()` transform the `where` coordinates to the same crs as the
+  input data, for `SpatRaster` and `sf` inputs, to allow different crs specifications.
 
 # inlabru 2.9.0
 

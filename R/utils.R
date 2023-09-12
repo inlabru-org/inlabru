@@ -411,9 +411,11 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
 #' @describeIn eval_spatial Supports point-in-polygon information lookup.
 #' Other combinations are untested.
 eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
-  if (inherits(where, "SpatialPoints")) {
+  if (!inherits(where, c("sf", "sfc", "sfg"))) {
     where <- sf::st_as_sf(where)
   }
+  where <- fm_transform(where, crs = sf::st_crs(data), passthrough = TRUE)
+
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   unique_layer <- unique(layer)
@@ -462,6 +464,7 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
+  where <- terra::project(where, data)
   if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
     # Work around issue in terra::extract() that assumes `layer` to point
     # to a column of `where` (like `selector`) when
