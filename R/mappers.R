@@ -1795,6 +1795,24 @@ ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
 
 ## _marginal ####
 
+require_args <- function(fun, req) {
+  label <- deparse1(substitute(fun))
+  if (is.null(fun)) {
+    return(invisible())
+  }
+  fun_args <- formals(args(fun))
+  subset <- req %in% names(fun_args)
+  if (!all(subset)) {
+    subset <- req[!subset]
+    stop(paste0("The '", label, "' function is missing the argument",
+                if (length(subset) > 1) "s" else "",
+                " ",
+                paste0("'", subset, "'", collapse = ", "),
+                "."))
+  }
+  invisible()
+}
+
 #' @title Mapper for marginal distribution transformation
 #' @export
 #' @description
@@ -1833,6 +1851,10 @@ bru_mapper_marginal <- function(qfun,
                                 dqfun = NULL,
                                 ...,
                                 inverse = FALSE) {
+  require_args(qfun, c("lower.tail", "log.p"))
+  require_args(pfun, c("lower.tail", "log.p"))
+  require_args(dfun, "log")
+  require_args(dqfun, c("lower.tail", "log.p", "log"))
   bru_mapper_define(
     list(
       qfun = qfun,

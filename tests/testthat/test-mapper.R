@@ -539,17 +539,33 @@ test_that("Marginal mapper", {
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
 
-  dqexp <- function(p, rate = 1) {
-    1 / (1 - p) / rate
+  dqexp <- function(p, rate = 1, lower.tail = TRUE, log.p = FALSE, log = FALSE) {
+    if (log.p) {
+      if (lower.tail) {
+        val <- log1p(-exp(p)) + log(rate)
+      } else {
+        val <- p + log(rate)
+      }
+    } else {
+      if (lower.tail) {
+        val <- log1p(-p) + log(rate)
+      } else {
+        val <- log(p) + log(rate)
+      }
+    }
+    if (log) {
+      return(val)
+    }
+    return(exp(val))
   }
   m1_d <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
   m1_dq <- bru_mapper_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
   jac1 <- ibm_jacobian(m1, state = state0)
   jac1_d <- ibm_jacobian(m1_d, state = state0)
   jac1_dq <- ibm_jacobian(m1_dq, state = state0)
-  #  rbind(diag(jac1), diag(jac1_d), diag(jac1_dq))
-  #  sum(abs(diag(jac1) - diag(jac1_d)))
-  #  sum(abs(diag(jac1_d) - diag(jac1_dq)))
+  # rbind(diag(jac1), diag(jac1_d), diag(jac1_dq))
+  expect_equal(sum(abs(diag(jac1) - diag(jac1_d))), 0, tolerance = lowtol)
+  expect_equal(sum(abs(diag(jac1_d) - diag(jac1_dq))), 0, tolerance = lowtol)
 })
 
 
