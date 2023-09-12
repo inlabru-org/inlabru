@@ -1804,11 +1804,13 @@ require_args <- function(fun, req) {
   subset <- req %in% names(fun_args)
   if (!all(subset)) {
     subset <- req[!subset]
-    stop(paste0("The '", label, "' function is missing the argument",
-                if (length(subset) > 1) "s" else "",
-                " ",
-                paste0("'", subset, "'", collapse = ", "),
-                "."))
+    stop(paste0(
+      "The '", label, "' function is missing the argument",
+      if (length(subset) > 1) "s" else "",
+      " ",
+      paste0("'", subset, "'", collapse = ", "),
+      "."
+    ))
   }
   invisible()
 }

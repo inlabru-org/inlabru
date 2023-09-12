@@ -79,9 +79,13 @@ test_that("2D LGCP fitting", {
     return(v$elevation)
   }
 
-  mdl3 <- coordinates ~ beta.elev(main = f.elev(sp::coordinates(.data.),
-                                                fm_CRS(.data.)),
-                                  model = "linear") +
+  mdl3 <- coordinates ~ beta.elev(
+    main = f.elev(
+      sp::coordinates(.data.),
+      fm_CRS(.data.)
+    ),
+    model = "linear"
+  ) +
     Intercept(1)
   fit3 <- lgcp(mdl3, gorillas$nests,
     samplers = gorillas$boundary,

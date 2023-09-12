@@ -137,8 +137,9 @@ component itself do the transformation between N(0,1) and Exponential(1/8):
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
 cmp <- ~ mySPDE(main = geometry, model = matern) +
   sigma(1,
-        prec.linear = 1,
-        marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)) +
+    prec.linear = 1,
+    marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  ) +
   Intercept(1)
 form <- geometry + distance ~ mySPDE +
   log(hn(distance, sigma)) +
