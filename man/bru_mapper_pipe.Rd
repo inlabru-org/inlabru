@@ -58,6 +58,14 @@ names, allowing the original \code{input} structure to be used also with the sim
 mappers, since the \code{taylor} mappers are not dependent on inputs.
 
 }}
+\examples{
+m <- bru_mapper_pipe(list(
+  scale = bru_mapper_scale(),
+  shift = bru_mapper_shift()
+))
+ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -79,6 +87,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

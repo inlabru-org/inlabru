@@ -40,6 +40,14 @@ will set it the required setting.}
 \description{
 Create a factor mapper
 }
+\examples{
+m <- bru_mapper_factor(factor(c("a", "b")), "full")
+ibm_eval2(m, input = c("b", "a", "a", "b"), state = c(1, 3))
+
+m <- bru_mapper_factor(factor(c("a", "b")), "contrast")
+ibm_eval2(m, input = factor(c("b", "a", "a", "b")), state = 2)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -61,6 +69,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

@@ -138,6 +138,13 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 }
 }
+\examples{
+(m <- bru_mapper_collect(list(
+  a = bru_mapper_index(2),
+  b = bru_mapper_index(3)
+), hidden = FALSE))
+ibm_eval2(m, list(a = c(1, 2), b = c(1, 3, 2)), 1:5)
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -159,6 +166,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

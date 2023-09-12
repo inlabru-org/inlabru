@@ -88,6 +88,9 @@ stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instea
 m <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
 (val <- ibm_eval(m, state = -5:5))
 ibm_eval(m, state = val, reverse = TRUE)
+m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+ibm_eval2(m, state = -3:3)
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -110,6 +113,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

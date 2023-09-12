@@ -12,6 +12,8 @@
 (version `2.9.0.2007`)
 * Speed up `bru_fill_missing()` (by orders of magnitude) by changing method for
   finding the nearest available data point. (version `2.9.0.2011`)
+* Add new `bru_mapper_shift()` mapper class that works like `bru_mapper_scale()`
+  but for additive shifts instead of multiplicative scaling. (version `2.9.0.2012`)
 
 ## Bug fixes
 

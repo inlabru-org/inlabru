@@ -44,6 +44,12 @@ Creates a mapper for 2D \code{fm_mesh_2d} objects
 \item \code{bru_mapper(inla.mesh)}: Creates a mapper for 2D \code{inla.mesh} objects
 
 }}
+\examples{
+m <- bru_mapper(fmesher::fmexample$mesh)
+ibm_n(m)
+ibm_eval(m, as.matrix(expand.grid(-2:2, -2:2)), seq_len(ibm_n(m)))
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -65,6 +71,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

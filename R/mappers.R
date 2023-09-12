@@ -751,7 +751,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 
 
 
-## inla.mesh ####
+## fm_mesh_2d ####
 
 #' @title Mapper for `fm_mesh_2d`
 #' @param mesh An `fm_mesh_2d` or `inla.mesh.2d` object to use as a mapper
@@ -761,6 +761,11 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper(fmesher::fmexample$mesh)
+#' ibm_n(m)
+#' ibm_eval(m, as.matrix(expand.grid(-2:2, -2:2)), seq_len(ibm_n(m)))
+#'
 bru_mapper.fm_mesh_2d <- function(mesh, ...) {
   mapper <- list(mesh = mesh)
   bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_2d")
@@ -813,7 +818,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 }
 
 
-## inla.mesh.1d ####
+## fm_mesh_1d ####
 
 #' @title Mapper for `fm_mesh_1d`
 #' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
@@ -830,6 +835,14 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' @inheritParams bru_mapper_fm_mesh_2d
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+#' ibm_values(m)
+#' ibm_eval(m, 1:7, 1:5)
+#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = TRUE)
+#' ibm_values(m)
+#' ibm_eval(m, 1:7, 1:5)
+#'
 bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
     stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
@@ -920,6 +933,9 @@ ibm_jacobian.bru_mapper_inla_mesh_1d <- function(mapper, input, ...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_index(4)
+#' ibm_eval(m, -2:6, 1:4)
 bru_mapper_index <- function(n = 1L, ...) {
   bru_mapper_define(list(n = n), new_class = "bru_mapper_index")
 }
@@ -977,6 +993,12 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_taylor(
+#'   offset = rep(2, 3),
+#'   jacobian = matrix(1:6, 3, 2),
+#'   state0 = c(1, 2))
+#' ibm_eval2(m, state = 2:3)
 bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
                               values_mapper = NULL) {
   stopifnot(!is.null(offset) || !is.null(jacobian))
@@ -1172,6 +1194,10 @@ ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) 
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_linear()
+#' ibm_eval(m, input = 1:4, state = 2)
+#'
 bru_mapper_linear <- function() {
   bru_mapper_define(list(), new_class = "bru_mapper_linear")
 }
@@ -1213,6 +1239,11 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_matrix(labels = c("a", "b"))
+#' ibm_values(m)
+#' ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
+#'
 bru_mapper_matrix <- function(labels) {
   if (is.factor(labels)) {
     mapper <- list(
@@ -1288,6 +1319,13 @@ ibm_jacobian.bru_mapper_matrix <- function(mapper, input, state = NULL,
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_factor(factor(c("a", "b")), "full")
+#' ibm_eval2(m, input = c("b", "a", "a", "b"), state = c(1, 3))
+#'
+#' m <- bru_mapper_factor(factor(c("a", "b")), "contrast")
+#' ibm_eval2(m, input = factor(c("b", "a", "a", "b")), state = 2)
+#'
 bru_mapper_factor <- function(values, factor_mapping, indexed = FALSE) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
@@ -1383,6 +1421,10 @@ ibm_jacobian.bru_mapper_factor <- function(mapper, input, ...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_const()
+#' ibm_eval2(m, input = 1:4)
+#'
 bru_mapper_const <- function() {
   bru_mapper_define(list(), new_class = "bru_mapper_const")
 }
@@ -1429,6 +1471,102 @@ bru_mapper_offset <- function(...) {
 
 
 
+## _shift ####
+
+#' @title Mapper for element-wise shifting
+#' @export
+#' @description Create a standalone
+#' shift mapper that can be used as part of a `bru_mapper_pipe`.
+#' If `mapper` is non-null, the `bru_mapper_shift()` constructor
+#' returns
+#' `bru_mapper_pipe(list(mapper = mapper, shift = bru_mapper_shift()))`
+#' @rdname bru_mapper_shift
+#' @inheritParams bru_mapper_generics
+#' @seealso [bru_mapper], [bru_mapper_generics]
+#' @family mappers
+#' @examples
+#' m <- bru_mapper_shift()
+#' ibm_eval2(m, c(1, 2, 1, 2), 1:4)
+#'
+bru_mapper_shift <- function(mapper = NULL) {
+  m <- bru_mapper_define(
+    list(),
+    new_class = "bru_mapper_shift"
+  )
+  if (!is.null(mapper)) {
+    m <- bru_mapper_pipe(list(mapper = mapper, shift = m))
+  }
+  m
+}
+
+#' @param n_state integer giving the length of the state vector for mappers
+#' that have state dependent output size.
+#' @export
+#' @rdname bru_mapper_shift
+ibm_n.bru_mapper_shift <- function(mapper, ..., state = NULL, n_state = NULL) {
+  # Output size depends on the state size
+  if (!is.null(state)) {
+    length(state)
+  } else if (is.null(n_state)) {
+    NA_integer_
+  } else {
+    n_state
+  }
+}
+#' @export
+#' @rdname bru_mapper_shift
+ibm_n_output.bru_mapper_shift <- function(mapper, input, state = NULL, ...,
+                                          n_state = NULL) {
+  if (!is.null(state)) {
+    length(state)
+  } else if (is.null(n_state)) {
+    # To allow scalar input shifts, do not assume NROW(input) size
+    NA_integer_
+  } else {
+    n_state
+  }
+}
+#' @export
+#' @rdname bru_mapper_shift
+ibm_values.bru_mapper_shift <- function(mapper, ...,
+                                        state = NULL, n_state = NULL) {
+  n_state <- ibm_n(mapper, state = state, n_state = n_state)
+  if (is.na(n_state)) {
+    # Don't know how big the mapper will be
+    NULL
+  } else {
+    seq_len(n_state)
+  }
+}
+
+#' @export
+#' @param sub_lin Internal, optional pre-computed sub-mapper information
+#' @details For `bru_mapper_shift`, `input` NULL values are interpreted as no shift.
+#' @rdname bru_mapper_shift
+ibm_jacobian.bru_mapper_shift <- function(mapper, input, state = NULL, ...,
+                                          sub_lin = NULL) {
+  stopifnot(!is.null(state))
+  return(Matrix::Diagonal(n = length(state), 1.0))
+}
+
+
+#' @export
+#' @rdname bru_mapper_shift
+ibm_eval.bru_mapper_shift <- function(mapper, input, state = NULL, ...,
+                                      sub_lin = NULL) {
+  stopifnot(!is.null(state))
+  if (is.null(input)) {
+    return(state)
+  }
+  shift <- as.vector(input)
+  ok <- !is.na(shift)
+  shift[!ok] <- 0
+  return(state + shift)
+}
+
+
+
+
 ## _scale ####
 
 #' @title Mapper for element-wise scaling
@@ -1442,25 +1580,19 @@ bru_mapper_offset <- function(...) {
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_scale()
+#' ibm_eval2(m, c(1, 2, 1, 2), 1:4)
+#'
 bru_mapper_scale <- function(mapper = NULL) {
-  # TODO:
-  # 1. If mapper is NULL, implement a plain scaling mapper. Done!
-  # 2. First, if mapper is non-null, keep current behaviour. Still allowed
-  #    in the methods, but the constructor doesn't do it anymore, but
-  #    instead returns a pipe mapper.
-  # 3. Later, if mapper is non-null, make a pipe mapper, that pipes
-  #   the mapper into a plain null-mapper scaling mapper. Done!
-  # 4. Remove the old non-null mapper support from the methods. Done!
-  if (is.null(mapper)) {
-    bru_mapper_define(
-      list(
-        is_linear = ibm_is_linear(mapper)
-      ),
-      new_class = "bru_mapper_scale"
-    )
-  } else {
-    bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))
+  m <- bru_mapper_define(
+    list(),
+    new_class = "bru_mapper_scale"
+  )
+  if (!is.null(mapper)) {
+    m <- bru_mapper_pipe(list(mapper = mapper, scale = m))
   }
+  m
 }
 
 #' @param n_state integer giving the length of the state vector for mappers
@@ -1505,7 +1637,7 @@ ibm_values.bru_mapper_scale <- function(mapper, ...,
 
 #' @export
 #' @param sub_lin Internal, optional pre-computed sub-mapper information
-#' @details For `bru_mapper_scale`, `input` values without a `scale` element
+#' @details For `bru_mapper_scale`, `input` NULL values
 #' are interpreted as no scaling.
 #' @rdname bru_mapper_scale
 ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
@@ -1567,6 +1699,10 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #' @inheritParams bru_mapper_scale
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_aggregate()
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+#'
 bru_mapper_aggregate <- function(rescale = FALSE,
                                  n_block = NULL) {
   bru_mapper_define(
@@ -1694,6 +1830,10 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
 #' @inheritParams bru_mapper_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_logsumexp()
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+#'
 bru_mapper_logsumexp <- function(rescale = FALSE,
                                  n_block = NULL) {
   # Arguments documented for bru_mapper_aggregate
@@ -1847,6 +1987,10 @@ require_args <- function(fun, req) {
 #' @inheritParams bru_mapper_scale
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+#' ibm_eval2(m, state = -3:3)
+#'
 bru_mapper_marginal <- function(qfun,
                                 pfun = NULL,
                                 dfun = NULL,
@@ -2049,6 +2193,13 @@ ibm_eval.bru_mapper_marginal <- function(mapper, input, state = NULL,
 #' @inheritParams bru_mapper_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_pipe(list(
+#'   scale = bru_mapper_scale(),
+#'   shift = bru_mapper_shift()
+#' ))
+#' ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
+#'
 bru_mapper_pipe <- function(mappers) {
   is_linear_multi <- vapply(mappers, function(x) ibm_is_linear(x), TRUE)
   n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
@@ -2250,6 +2401,13 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' (m <- bru_mapper_multi(list(
+#'   a = bru_mapper_index(2),
+#'   b = bru_mapper_index(3)
+#' )))
+#' ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
+#'
 bru_mapper_multi <- function(mappers) {
   mapper <- list(
     mappers = mappers,
@@ -2615,6 +2773,12 @@ ibm_invalid_output.bru_mapper_multi <- function(mapper,
 #' @inheritParams bru_mapper_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' (m <- bru_mapper_collect(list(
+#'   a = bru_mapper_index(2),
+#'   b = bru_mapper_index(3)
+#' ), hidden = FALSE))
+#' ibm_eval2(m, list(a = c(1, 2), b = c(1, 3, 2)), 1:5)
 bru_mapper_collect <- function(mappers, hidden = FALSE) {
   mapper <- list(
     mappers = mappers,
@@ -2755,6 +2919,7 @@ bm_collect_sub_lin <- function(mapper, input, state,
   indexing <- names(mapper[["mappers"]])
   n_multi <- unlist(mapper[["n_multi"]])
   n_offset <- c(0, cumsum(n_multi))
+  names(n_offset) <- c(names(n_multi), "THEEND")
   sub_lin <-
     lapply(
       indexing,
@@ -3016,6 +3181,10 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
+#' @examples
+#' m <- bru_mapper_harmonics(2)
+#' ibm_eval2(m, input = c(0, pi/4, pi/2, 3*pi/4), 1:5)
+#'
 bru_mapper_harmonics <- function(order = 1,
                                  scaling = 1,
                                  intercept = TRUE,

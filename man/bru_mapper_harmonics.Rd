@@ -78,6 +78,11 @@ determining the variance for each frequency contribution.
 The period for the first order harmonics is shifted and scaled to match
 \code{interval}.
 }
+\examples{
+m <- bru_mapper_harmonics(2)
+ibm_eval2(m, input = c(0, pi/4, pi/2, 3*pi/4), 1:5)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -99,6 +104,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

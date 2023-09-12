@@ -38,6 +38,12 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 \description{
 Create a matrix mapper, for a given number of columns
 }
+\examples{
+m <- bru_mapper_matrix(labels = c("a", "b"))
+ibm_values(m)
+ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -59,6 +65,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

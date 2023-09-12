@@ -134,6 +134,14 @@ with unnamed but ordered columns.
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 
 }}
+\examples{
+(m <- bru_mapper_multi(list(
+  a = bru_mapper_index(2),
+  b = bru_mapper_index(3)
+)))
+ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -155,6 +163,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

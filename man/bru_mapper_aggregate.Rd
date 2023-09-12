@@ -64,6 +64,11 @@ equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 }
 }
+\examples{
+m <- bru_mapper_aggregate()
+ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -85,6 +90,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }

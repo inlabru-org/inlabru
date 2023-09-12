@@ -81,6 +81,13 @@ the \code{state} argument must also be a named list.  If \code{state} is \code{N
 all-zero is assumed.
 }
 }
+\examples{
+m <- bru_mapper_taylor(
+  offset = rep(2, 3),
+  jacobian = matrix(1:6, 3, 2),
+  state0 = c(1, 2))
+ibm_eval2(m, state = 2:3)
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -103,6 +110,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper}()}
 }
 \concept{mappers}

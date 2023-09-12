@@ -52,6 +52,15 @@ Create mapper for an \code{fm_mesh_1d} object
 the mesh fo \code{fm_mesh_1d} first.
 
 }}
+\examples{
+m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+ibm_values(m)
+ibm_eval(m, 1:7, 1:5)
+m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = TRUE)
+ibm_values(m)
+ibm_eval(m, 1:7, 1:5)
+
+}
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
@@ -73,6 +82,7 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()},
 \code{\link{bru_mapper}()}
 }
