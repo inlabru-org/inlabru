@@ -20,11 +20,13 @@ knitr::opts_chunk$set(
 (Vignette under construction!)
 
 ```{r setup, eval=TRUE, echo=TRUE, include=TRUE}
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(inlabru)
 library(terra)
 library(sf)
 library(RColorBrewer)
+library(magrittr)
 ```
 
 # Count model
@@ -34,24 +36,28 @@ In addition to point process models, `inlabru` can handle models with positive i
 The following example uses `gorillas` dataset. In order to obtain the counts data we rasterize the species count to the same granularity as the spatial covariates available for the `gorilla` data, and then aggregate the pixels to cover 25 times bigger area (5x5 pixels in original covariate raster dimensions). Finally, we mask the regions outside of study area.
 
 ```{r fig-count-raster, fig.cap="Counts of gorilla nests", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
-data(gorillas_sf)
+gorillas_sf <- inlabru::gorillas_sf
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
 gcov <- gorillas_sf_gcov()
-counts_rstr <- terra::rasterize(vect(nests), gcov, fun=sum, background=0) |> 
-  terra::aggregate(fact=4, fun=sum) |> mask(vect(boundary))
+counts_rstr <- terra::rasterize(vect(nests), gcov, fun = sum, background = 0) %>%
+  terra::aggregate(fact = 4, fun = sum) %>%
+  mask(vect(boundary))
 plot(counts_rstr)
-counts_rstr <- counts_rstr |> cellSize(unit="km") |> c(counts_rstr)
+counts_rstr <- counts_rstr %>%
+  cellSize(unit = "km") %>%
+  c(counts_rstr)
 ```
 
 Now we need to extract the coordinates for these pixels. The plot below shows pixel locations for all pixels with non-zero counts.
 
 ```{r}
-counts_df <- crds(counts_rstr, df=TRUE, na.rm=TRUE) |> 
-  bind_cols(values(counts_rstr, mat=TRUE, na.rm=TRUE)) |> 
-  rename(count=sum) |> mutate(present=count>0) |> 
-  st_as_sf(coords=c("x", "y"), crs=st_crs(nests))
+counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
+  bind_cols(values(counts_rstr, mat = TRUE, na.rm = TRUE)) %>%
+  rename(count = sum) %>%
+  mutate(present = count > 0) %>%
+  st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
 
@@ -60,19 +66,21 @@ counts_df <- crds(counts_rstr, df=TRUE, na.rm=TRUE) |>
 We create a mesh over the study sites and define a prior for it.
 
 ```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
-px_mesh <- fm_mesh_2d_inla(loc=st_as_sfc(counts_df),
-                           boundary = boundary,
-                           max.edge = c(0.5, 1), 
-                           crs=st_crs(counts_df))
+px_mesh <- fm_mesh_2d_inla(
+  loc = st_as_sfc(counts_df),
+  boundary = boundary,
+  max.edge = c(0.5, 1),
+  crs = st_crs(counts_df)
+)
 
-px_matern <- INLA::inla.spde2.pcmatern(px_mesh, 
+px_matern <- INLA::inla.spde2.pcmatern(px_mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.1, 0.01)
 )
 
-ggplot()+
-  geom_fm(data=px_mesh)+
-  #geom_sf(data=counts_df, aes(color=count), size=1, pch=4)+
+ggplot() +
+  geom_fm(data = px_mesh) +
+  # geom_sf(data=counts_df, aes(color=count), size=1, pch=4)+
   theme_minimal()
 ```
 
@@ -81,27 +89,32 @@ ggplot()+
 Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. 
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <-  ~ vegetation(gcov$vegetation, model="factor_contrast") + 
-  elevation(eval_spatial(gcov$elevation, where=.data.), model="linear") +
-  field(geometry, model=px_matern) + Intercept(1) 
+comps <- ~ vegetation(gcov$vegetation, model = "factor_contrast") +
+  elevation(gcov$elevation, model = "linear") +
+  field(geometry, model = px_matern) + Intercept(1)
 
-fit_poi <- bru(comps,
-              like(family = "poisson", data=counts_df,
-                   formula = count~vegetation+elevation+field+Intercept,
-                   E=area,
-                   domain = list(geometry = px_mesh)))
+fit_poi <- bru(
+  comps,
+  like(
+    family = "poisson", data = counts_df,
+    formula = count ~ vegetation + elevation + field + Intercept,
+    E = area,
+    domain = list(geometry = px_mesh)
+  )
+)
 summary(fit_poi)
 
 
-lambda <- predict(fit_poi, fm_pixels(px_mesh, mask=boundary),
-                  ~ exp(vegetation+elevation+field + Intercept))
+lambda <- predict(
+  fit_poi, fm_pixels(px_mesh, mask = boundary),
+  ~ exp(vegetation + elevation + field + Intercept)
+)
 
 ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda, geom = "tile") +
-  #geom_sf(data=nests, size=1, color="firebrick", pch=4) +
-  ggtitle("Nest intensity per ~1.2 ha")
-
+  # geom_sf(data=nests, size=1, color="firebrick", pch=4) +
+  ggtitle("Nest intensity per 1.2 ha")
 ```
 
 The model fails miserably. It is unable to differentiate between the sites suitable for gorilla nests and those that are not. 
@@ -123,17 +136,23 @@ $$
 where $p=\text{logit}^{-1}(\theta)$
 
 ```{r fig-pred-zip, fig.cap="Predictions from zero-inflated model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-fit_zip <- bru(comps,
-                like(family = "zeroinflatedpoisson1", data=counts_df,
-                     formula = count~vegetation+elevation+field+Intercept,
-                     E=area,
-                     domain = list(geometry = px_mesh)))
+fit_zip <- bru(
+  comps,
+  like(
+    family = "zeroinflatedpoisson1", data = counts_df,
+    formula = count ~ vegetation + elevation + field + Intercept,
+    E = area,
+    domain = list(geometry = px_mesh)
+  )
+)
 
 summary(fit_zip)
 
 
-lambda <- predict(fit_zip, fm_pixels(px_mesh, mask=boundary),
-                  ~ exp(vegetation+elevation+field + Intercept))
+lambda <- predict(
+  fit_zip, fm_pixels(px_mesh, mask = boundary),
+  ~ exp(vegetation + elevation + field + Intercept)
+)
 
 ggplot() +
   geom_fm(data = px_mesh) +
@@ -160,28 +179,35 @@ where $p=\text{logit}^{-1}(\theta)$.  We achieve the truncation of zeros in the 
 Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP model by subsetting the data to include only observations where `present` is `TRUE`.
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-fit_zap <- bru(comps,
-               like(family = "binomial", data=counts_df,
-                    formula = present~vegetation+field+Intercept,
-                   domain = list(geometry = px_mesh)),
-               like(family ="zeroinflatedpoisson0",
-                    data=counts_df[counts_df$present,],
-                    formula = count~elevation+field+Intercept,
-                    E=area,
-                    domain = list(geometry = px_mesh),
-                    control.family = list(hyper=list(theta=list(initial=-20, fixed=TRUE)))))
+fit_zap <- bru(
+  comps,
+  like(
+    family = "binomial", data = counts_df,
+    formula = present ~ vegetation + field + Intercept,
+    domain = list(geometry = px_mesh)
+  ),
+  like(
+    family = "zeroinflatedpoisson0",
+    data = counts_df[counts_df$present, ],
+    formula = count ~ elevation + field + Intercept,
+    E = area,
+    domain = list(geometry = px_mesh),
+    control.family = list(hyper = list(theta = list(initial = -20, fixed = TRUE)))
+  )
+)
 summary(fit_zap)
 
-lambda <- predict(fit_zap, fm_pixels(px_mesh, mask=boundary),
-                  ~ exp(vegetation+elevation+field + Intercept))
+lambda <- predict(
+  fit_zap, fm_pixels(px_mesh, mask = boundary),
+  ~ exp(vegetation + elevation + field + Intercept)
+)
 
 ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda, geom = "tile") +
-  geom_sf(data=nests, color="firebrick", size=1, pch=4, alpha=0.1)+
-  ggtitle("Nest intensity per km squared")
-
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.1) +
+  ggtitle("Nest intensity per 1.2 ha")
 ```
 
-In order to make sure that Poisson distribution will be properly truncated, we include the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\ln(\theta)=p$ it would end up close to zero.
+In order to make sure that Poisson distribution will be properly truncated, we include the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\text{logit}^{-1}(\theta)=p$ it would end up close to zero.
 
