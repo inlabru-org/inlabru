@@ -395,29 +395,27 @@ ggplot() +
 
 The elevation variable here is of class 'SpatialGridDataFrame', that can be
 handled in the same way as the vegetation covariate. However, since in some
-cases data may be stored differently, and other methods are needed to access
-the stored values. In such cases, we can define a function that knows how to
+cases data may be stored differently, other methods are needed to access
+the stored values, or there's some post-processing to be done.
+In such cases, we can define a function that knows how to
 evaluate the covariate at arbitrary points in the survey region, and call that
 function in the component definition. In this case, we can use a powerful
 method from the 'sp' package to do this. We use this to create the needed
-function.  NOTE: There is a new method `eval_spatial()` that handles this
+function.  The method `eval_spatial()` is the method that handles this
 automatically, and supports `terra` `SpatRaster` and `sf` geometry points
-objects, and mismatching coordinate systems as well.
+objects, and mismatching coordinate systems as well.  In the following evaluator example
+function, we only add infilling of missing values as a post-processing step.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-f.elev <- function(xy) {
-  # turn coordinates into SpatialPoints object:
-  # with the appropriate coordinate reference system (CRS)
-  spp <- SpatialPoints(data.frame(x = xy[, 1], y = xy[, 2]),
-    proj4string = fm_CRS(elev)
-  )
-  # Extract elevation values at spp coords, from our elev SpatialGridDataFrame
-  v <- over(spp, elev)
-  if (any(is.na(v$elevation))) {
-    v$elevation <- bru_fill_missing(elev, spp, v$elevation)
+f.elev <- function(where) {
+  # Extract the values
+  v <- eval_spatial(elev, where, layer = "elevation")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(elev, where, v)
   }
-  return(v$elevation)
+  return(v)
 }
 ```
 
@@ -432,18 +430,19 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(0.1, 0.01)
 )
 
-ecomp <- coordinates ~ elev(f.elev(coordinates(.data.)), model = "linear") +
+ecomp <- coordinates ~ elev(f.elev(.data.), model = "linear") +
   mySmooth(coordinates, model = matern) + Intercept(1)
 ```
 
 Note how the elevation effect is defined. When we used the `Spatial` grid
-object directly we specified it like
+object directly (causing `inlabru` to automatically call `eval_spatial()`)
+we specified it like
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
 vegetation(gcov$vegetation, model = "factor_full")
 ```
 whereas with the function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-elev(f.elev(coordinates(.data.)), model = "linear")
+elev(f.elev(.data.), model = "linear")
 ```
 
 We also now include an intercept term.

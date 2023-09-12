@@ -378,6 +378,7 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
     )
   ))
   if (inherits(where, "SpatialPoints")) {
+    where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
