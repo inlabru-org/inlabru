@@ -145,7 +145,7 @@ This model is much better at differentiating between the sites and produces sens
 
 ## ZAP model
 
-Judging by the distribution of nests in relation to the [spatial covariates](articles/2d_lgcp_covars.Rmd), gorillas do not like to set their nests in certain vegetation. The type of vegetation may not influence the density of the nests, but it definitely drives the presence/absence. In this case the `vegetation` covariate should be included in the binomial part of the model, but not the Poisson part. 
+Judging by the distribution of nests in relation to the [spatial covariates](2d_lgcp_covars.Rmd), gorillas do not like to set their nests in certain vegetation. The type of vegetation may not influence the density of the nests, but it definitely drives the presence/absence. In this case the `vegetation` covariate should be included in the binomial part of the model, but not the Poisson part. 
 
 Whenever the process that drives presence/absence is substantially different from the process that drives the abundance it is wise to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of binomial and the truncated Poisson parts.
 
