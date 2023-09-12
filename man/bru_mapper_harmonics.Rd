@@ -80,7 +80,7 @@ The period for the first order harmonics is shifted and scaled to match
 }
 \examples{
 m <- bru_mapper_harmonics(2)
-ibm_eval2(m, input = c(0, pi/4, pi/2, 3*pi/4), 1:5)
+ibm_eval2(m, input = c(0, pi / 4, pi / 2, 3 * pi / 4), 1:5)
 
 }
 \seealso{

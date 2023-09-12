@@ -997,7 +997,8 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 #' m <- bru_mapper_taylor(
 #'   offset = rep(2, 3),
 #'   jacobian = matrix(1:6, 3, 2),
-#'   state0 = c(1, 2))
+#'   state0 = c(1, 2)
+#' )
 #' ibm_eval2(m, state = 2:3)
 bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
                               values_mapper = NULL) {
@@ -3183,7 +3184,7 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 #' @family mappers
 #' @examples
 #' m <- bru_mapper_harmonics(2)
-#' ibm_eval2(m, input = c(0, pi/4, pi/2, 3*pi/4), 1:5)
+#' ibm_eval2(m, input = c(0, pi / 4, pi / 2, 3 * pi / 4), 1:5)
 #'
 bru_mapper_harmonics <- function(order = 1,
                                  scaling = 1,

@@ -85,7 +85,8 @@ all-zero is assumed.
 m <- bru_mapper_taylor(
   offset = rep(2, 3),
   jacobian = matrix(1:6, 3, 2),
-  state0 = c(1, 2))
+  state0 = c(1, 2)
+)
 ibm_eval2(m, state = 2:3)
 }
 \seealso{
