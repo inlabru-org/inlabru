@@ -40,7 +40,7 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 #' Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
 #' Deprecated in favour of [fm_vertices()]
 #'
-#' @export
+#' @export vertices.inla.mesh
 vertices.inla.mesh <- function(...) {
   lifecycle::deprecate_warn(
     "2.8.0",

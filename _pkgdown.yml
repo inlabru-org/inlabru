@@ -111,11 +111,11 @@ reference:
   - starts_with("bru_mapper")
   - starts_with("ibm_")
   - starts_with("bm_")
-  - starts_with("eval_spatial")
   - starts_with("bru_forward_transformation")
 - title: "Miscellaneous"
   desc: "Miscellaneous functions."
   contents:
+  - starts_with("eval_spatial")
   - starts_with("bru_fill_missing")
   - starts_with("point2count")
   - starts_with("sample.lgcp")
