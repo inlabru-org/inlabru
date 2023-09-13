@@ -13,7 +13,7 @@ header-includes:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -98,8 +98,7 @@ fit_poi <- bru(
   like(
     family = "poisson", data = counts_df,
     formula = count ~ vegetation + elevation + field + Intercept,
-    E = area,
-    domain = list(geometry = px_mesh)
+    E = area
   )
 )
 summary(fit_poi)
@@ -141,8 +140,7 @@ fit_zip <- bru(
   like(
     family = "zeroinflatedpoisson1", data = counts_df,
     formula = count ~ vegetation + elevation + field + Intercept,
-    E = area,
-    domain = list(geometry = px_mesh)
+    E = area
   )
 )
 
@@ -191,7 +189,6 @@ fit_zap <- bru(
     data = counts_df[counts_df$present, ],
     formula = count ~ elevation + field + Intercept,
     E = area,
-    domain = list(geometry = px_mesh),
     control.family = list(hyper = list(theta = list(initial = -20, fixed = TRUE)))
   )
 )
@@ -205,7 +202,7 @@ lambda <- predict(
 ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda, geom = "tile") +
-  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.1) +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
 
