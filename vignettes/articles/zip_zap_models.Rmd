@@ -89,7 +89,8 @@ ggplot() +
 Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. 
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation, model = "factor_contrast") +
+comps <- ~ vegetation(gcov$vegetation, model = "factor_contrast",
+                      hyper = list(theta = list(initial = 20, fixed = TRUE))) +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept(1)
 
