@@ -27,6 +27,9 @@ library(terra)
 library(sf)
 library(RColorBrewer)
 library(magrittr)
+
+# We want to obtain CPO data from the estimations
+bru_options_set(control.compute = list(cpo = TRUE))
 ```
 
 # Count model
@@ -67,7 +70,7 @@ We create a mesh over the study sites and define a prior for it.
 
 ```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
 px_mesh <- fm_mesh_2d_inla(
-  loc = st_as_sfc(counts_df),
+  loc = st_intersection(st_as_sfc(counts_df), st_buffer(boundary, -0.05)),
   boundary = boundary,
   max.edge = c(0.5, 1),
   crs = st_crs(counts_df)
@@ -86,11 +89,14 @@ ggplot() +
 
 ## Poisson GLM
 
-Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. 
+Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. In order to make the vegetation effect
+estimates identifiable relative to the intercept, we use `model = "factor_full"` and a sum-to-zero constraint.
+An alternative would be `model = "factor_contrast"` without constraint, but that would require a factor level reordering to avoid the most uncommon vegetation type being the reference level.
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation, model = "factor_contrast",
-                      hyper = list(theta = list(initial = 20, fixed = TRUE))) +
+comps <- ~ vegetation(gcov$vegetation, model = "factor_full",
+                      hyper = list(prec = list(initial = log(1/1^2), fixed = TRUE)),
+                      constr = TRUE) +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept(1)
 
@@ -105,17 +111,18 @@ fit_poi <- bru(
 summary(fit_poi)
 
 
-lambda <- predict(
-  fit_poi, fm_pixels(px_mesh, mask = boundary),
+lambda_poi <- predict(
+  fit_poi, counts_df,
   ~ exp(vegetation + elevation + field + Intercept)
 )
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda, geom = "tile") +
-  # geom_sf(data=nests, size=1, color="firebrick", pch=4) +
+  gg(lambda_poi, aes(fill = median), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
+
 
 The model fails miserably. It is unable to differentiate between the sites suitable for gorilla nests and those that are not. 
 
@@ -147,19 +154,20 @@ fit_zip <- bru(
 
 summary(fit_zip)
 
-
-lambda <- predict(
-  fit_zip, fm_pixels(px_mesh, mask = boundary),
-  ~ exp(vegetation + elevation + field + Intercept)
+lambda_zip <- predict(
+  fit_zip, counts_df,
+  ~ (1 - zero_probability_parameter_for_zero_inflated_poisson_1) *
+    exp(vegetation + elevation + field + Intercept)
 )
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda, geom = "tile") +
+  gg(lambda_zip, aes(fill = median), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
 
-This model is much better at differentiating between the sites and produces sensible predictions.
+This model is much better at differentiating between the sites and produces sensible predictions. [Note: this may not be the case; need to sort out the factor ordering and priors; check the diagnostic section below as well.]
 
 ## ZAP model
 
@@ -175,37 +183,78 @@ $$
 
 where $p=\text{logit}^{-1}(\theta)$.  We achieve the truncation of zeros in the ZIP model by fixing the parameter $\theta=log(p)$ to some large negative value.
 
-Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP model by subsetting the data to include only observations where `present` is `TRUE`.
+Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+comps <- ~ vegetation(gcov$vegetation, model = "factor_full",
+                      hyper = list(prec = list(initial = log(1/1^2), fixed = TRUE)),
+                      constr = TRUE) +
+  elevation(gcov$elevation, model = "linear") +
+  field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
+  elevation_present(gcov$elevation, model = "linear") +
+  field_present(geometry, copy = "field")
+
 fit_zap <- bru(
   comps,
   like(
-    family = "binomial", data = counts_df,
-    formula = present ~ vegetation + field + Intercept,
-    domain = list(geometry = px_mesh)
+    family = "binomial",
+    data = counts_df,
+    formula = present ~ vegetation + elevation_present + field_present + Intercept_present
   ),
   like(
     family = "zeroinflatedpoisson0",
     data = counts_df[counts_df$present, ],
-    formula = count ~ elevation + field + Intercept,
+    formula = count ~ elevation + field + Intercept_count,
     E = area,
     control.family = list(hyper = list(theta = list(initial = -20, fixed = TRUE)))
   )
 )
 summary(fit_zap)
 
-lambda <- predict(
-  fit_zap, fm_pixels(px_mesh, mask = boundary),
-  ~ exp(vegetation + elevation + field + Intercept)
+# Predict intensity on the original raster locations
+lambda_zap <- predict(
+  fit_zap, counts_df,
+  ~ plogis(vegetation + elevation_present + field_present + Intercept_present) * 
+    exp(elevation + field + Intercept_count)
 )
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda, geom = "tile") +
+  gg(lambda_zap, aes(fill = median), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
 
-In order to make sure that Poisson distribution will be properly truncated, we include the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\text{logit}^{-1}(\theta)=p$ it would end up close to zero.
+In order to make sure that Poisson distribution will be properly truncated, we included the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\text{logit}^{-1}(\theta)=p$ it would end up close to zero.
 
+## Model comparison
+
+```{r}
+zap_pit <- rep(NA_real_, nrow(counts_df))
+zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
+df <- data.frame(
+  count = rep(counts_df$count, times = 3),
+  expectation = c(lambda_poi$mean * counts_df$area,
+                  lambda_zip$mean * counts_df$area,
+                  lambda_zap$mean * counts_df$area),
+  median = c(lambda_poi$median * counts_df$area,
+                  lambda_zip$median * counts_df$area,
+                  lambda_zap$median * counts_df$area),
+  pit = c(fit_poi$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
+          fit_zip$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
+          zap_pit),
+  model = rep(c("poi", "zip", "zap"), each = nrow(counts_df))
+)
+
+ggplot(df) +
+  geom_point(aes(median, count - median, color = model)) +
+  ggtitle("Residuals")
+
+ggplot(df) +
+  stat_ecdf(aes(pit, color = model), na.rm = TRUE) +
+  ggtitle("PIT")
+
+df %>%
+  group_by(model) %>%
+  summarise(mae = mean(abs(count - median)))
+```
