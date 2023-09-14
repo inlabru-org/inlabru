@@ -120,7 +120,7 @@ lambda_poi <- predict(
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_poi, aes(fill = median), geom = "tile") +
+  gg(lambda_poi, aes(fill = mean), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
@@ -233,7 +233,28 @@ In order to make sure that Poisson distribution will be properly truncated, we i
 
 ## Model comparison
 
+The count prediction variance can be obtained from the predictions of the intensity $\lambda_i$
+for each grid box. With $a_i$ denoting the respective grid box areas, the counts
+conditionally on the predictor $\eta_i$ are $(X_i|eta_i) \sim \text{Poisson}(a_i\lambda_i)$.
+$$
+\begin{aligned}
+V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
+&= E(a_i\lambda_i) + V(a_i\lambda_i) \\
+&= a_i m_i + a_i^2s_i^2,
+\end{aligned}
+$$
+where $m_i=E(\lambda_i|\text{data})$ and $s_i^2=V(\lambda_i|\text{data})$ are the
+conditional mean and variance for $\lambda_i$.
+
+
 ```{r}
+lambda_poi$pred_var <-
+  (lambda_poi$mean + lambda_poi$sd^2 * counts_df$area) * counts_df$area
+lambda_zip$pred_var <-
+  (lambda_zip$mean + lambda_zip$sd^2 * counts_df$area) * counts_df$area
+lambda_zap$pred_var <-
+  (lambda_zap$mean + lambda_zap$sd^2 * counts_df$area) * counts_df$area
+
 zap_pit <- rep(NA_real_, nrow(counts_df))
 zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
 df <- data.frame(
@@ -242,6 +263,11 @@ df <- data.frame(
     lambda_poi$mean * counts_df$area,
     lambda_zip$mean * counts_df$area,
     lambda_zap$mean * counts_df$area
+  ),
+  pred_var = c(
+    (lambda_poi$mean + lambda_poi$sd^2 * counts_df$area) * counts_df$area,
+    (lambda_zip$mean + lambda_zip$sd^2 * counts_df$area) * counts_df$area,
+    (lambda_zap$mean + lambda_zap$sd^2 * counts_df$area) * counts_df$area
   ),
   median = c(
     lambda_poi$median * counts_df$area,
@@ -267,4 +293,30 @@ ggplot(df) +
 df %>%
   group_by(model) %>%
   summarise(mae = mean(abs(count - median)))
+```
+
+Dawid-Sebastiani scores
+```{r}
+lambda_poi$DS <- with(lambda_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+lambda_zap$DS <- with(lambda_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS))
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda_poi, aes(fill = DS), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("Poisson Dawid-Sebastiani scores") +
+  guides(fill = guide_legend("score"))
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda_zip, aes(fill = DS-lambda_poi$DS), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("ZIP Dawid-Sebastiani score difference") +
+  guides(fill = guide_legend("score"))
+ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(lambda_zap, aes(fill = DS-lambda_poi$DS), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("ZAP Dawid-Sebastiani scoredifference") +
+  guides(fill = guide_legend("score"))
 ```
