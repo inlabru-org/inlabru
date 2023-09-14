@@ -94,9 +94,11 @@ estimates identifiable relative to the intercept, we use `model = "factor_full"`
 An alternative would be `model = "factor_contrast"` without constraint, but that would require a factor level reordering to avoid the most uncommon vegetation type being the reference level.
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation, model = "factor_full",
-                      hyper = list(prec = list(initial = log(1/1^2), fixed = TRUE)),
-                      constr = TRUE) +
+comps <- ~ vegetation(gcov$vegetation,
+  model = "factor_full",
+  hyper = list(prec = list(initial = log(1 / 1^2), fixed = TRUE)),
+  constr = TRUE
+) +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept(1)
 
@@ -186,9 +188,11 @@ where $p=\text{logit}^{-1}(\theta)$.  We achieve the truncation of zeros in the 
 Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation, model = "factor_full",
-                      hyper = list(prec = list(initial = log(1/1^2), fixed = TRUE)),
-                      constr = TRUE) +
+comps <- ~ vegetation(gcov$vegetation,
+  model = "factor_full",
+  hyper = list(prec = list(initial = log(1 / 1^2), fixed = TRUE)),
+  constr = TRUE
+) +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
   elevation_present(gcov$elevation, model = "linear") +
@@ -214,7 +218,7 @@ summary(fit_zap)
 # Predict intensity on the original raster locations
 lambda_zap <- predict(
   fit_zap, counts_df,
-  ~ plogis(vegetation + elevation_present + field_present + Intercept_present) * 
+  ~ plogis(vegetation + elevation_present + field_present + Intercept_present) *
     exp(elevation + field + Intercept_count)
 )
 
@@ -234,15 +238,21 @@ zap_pit <- rep(NA_real_, nrow(counts_df))
 zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
 df <- data.frame(
   count = rep(counts_df$count, times = 3),
-  expectation = c(lambda_poi$mean * counts_df$area,
-                  lambda_zip$mean * counts_df$area,
-                  lambda_zap$mean * counts_df$area),
-  median = c(lambda_poi$median * counts_df$area,
-                  lambda_zip$median * counts_df$area,
-                  lambda_zap$median * counts_df$area),
-  pit = c(fit_poi$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
-          fit_zip$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
-          zap_pit),
+  expectation = c(
+    lambda_poi$mean * counts_df$area,
+    lambda_zip$mean * counts_df$area,
+    lambda_zap$mean * counts_df$area
+  ),
+  median = c(
+    lambda_poi$median * counts_df$area,
+    lambda_zip$median * counts_df$area,
+    lambda_zap$median * counts_df$area
+  ),
+  pit = c(
+    fit_poi$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
+    fit_zip$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
+    zap_pit
+  ),
   model = rep(c("poi", "zip", "zap"), each = nrow(counts_df))
 )
 
