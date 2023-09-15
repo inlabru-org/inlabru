@@ -96,7 +96,7 @@ An alternative would be `model = "factor_contrast"` without constraint, but that
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
 comps <- ~ vegetation(gcov$vegetation,
   model = "factor_full",
-  hyper = list(prec = list(initial = log(1 / 1^2), fixed = TRUE)),
+  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
   constr = TRUE
 ) +
   elevation(gcov$elevation, model = "linear") +
@@ -115,8 +115,11 @@ summary(fit_poi)
 
 expect_poi <- predict(
   fit_poi, counts_df,
-  ~ exp(vegetation + elevation + field + Intercept) * area
+  ~ exp(vegetation + elevation + field + Intercept) * area,
+  n.samples = 2500
 )
+# For Poisson, the posterior conditional variance is equal to
+# the posterior conditional mean, so no need to compute it separately.
 expect_poi$pred_var <- expect_poi$mean + expect_poi$sd^2
 
 ggplot() +
@@ -170,16 +173,17 @@ pred_zip <- predict(
     scaling_prob <- (1 - zero_probability_parameter_for_zero_inflated_poisson_1)
     lambda <- exp(vegetation + elevation + field + Intercept)
     expect <- scaling_prob * lambda * area
-    expect2 <- expect * (1 + (1 - scaling_prob) * lambda * area)
+    variance <- expect * (1 + (1 - scaling_prob) * lambda * area)
     list(
       lambda = lambda,
       expect = expect,
-      expect2 = expect2 - expect^2
+      variance = variance
     )
-  }
+  },
+  n.samples = 2500
 )
 expect_zip <- pred_zip$expect
-expect_zip$pred_var <- pred_zip$expect2$mean + expect_zip$sd^2
+expect_zip$pred_var <- pred_zip$variance$mean + expect_zip$sd^2
 
 ggplot() +
   geom_fm(data = px_mesh) +
@@ -210,16 +214,21 @@ Here ZIP distribution only governs the positive counts and the absences will be 
 The expectation and variance are computed as
 
 $$
-\begin{gathered}
-E(count)=\frac{1}{1-\exp(-\lambda)}p\lambda \\
-Var(count)= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 
-\end{gathered} 
+\begin{aligned}
+E(count)&=\frac{1}{1-\exp(-\lambda)}p\lambda \\
+Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 \\
+&= E(count) (1+p\lambda) - E(count)^2 \\
+&= E(count) (1+p\lambda-E(count)) \\
+&= E(count) \left(1+p\lambda\left(1-\frac{1}{1-\exp(-\lambda)}\right)\right) \\
+&= E(count) \left(1-p\lambda\frac{\exp(-\lambda)}{1-\exp(-\lambda)}\right) \\
+&= E(count) \left(1-\exp(-\lambda) E(count)\right)
+\end{aligned}
 $$
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
 comps <- ~ vegetation(gcov$vegetation,
   model = "factor_full",
-  hyper = list(prec = list(initial = log(1 / 1^2), fixed = TRUE)),
+  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
   constr = TRUE
 ) +
   elevation(gcov$elevation, model = "linear") +
@@ -253,18 +262,19 @@ pred_zap <- predict(
       plogis(vegetation + elevation_present + field_present + Intercept_present)
     lambda <- exp(elevation + field + Intercept_count)
     expect <- presence_prob * lambda * area / (1 - exp(-lambda * area))
-    expect2 <- expect * (1 + presence_prob * lambda * area)
+    variance <- expect * (1 - exp(-lambda * area) * expect)
     list(
       presence = presence_prob,
       lambda = lambda,
       expect = expect,
-      expect2 = expect2 - expect^2
+      variance = variance
     )
-  }
+  },
+  n.samples = 2500
 )
 presence_zap <- pred_zap$presence
 expect_zap <- pred_zap$expect
-expect_zap$pred_var <- pred_zap$expect2$mean + expect_zap$sd^2
+expect_zap$pred_var <- pred_zap$variance$mean + expect_zap$sd^2
 
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
@@ -284,17 +294,14 @@ In order to make sure that Poisson distribution will be properly truncated, we i
 
 ## Model comparison
 
-The count prediction variance can be obtained from the predictions of the intensity $\lambda_i$ for each grid box. With $a_i$ denoting the respective grid box areas, the counts conditionally on the predictor $\eta_i$ are $(X_i\vert \eta_i) \sim \text{Poisson}(a_i\lambda_i)$.
+The count prediction variance can be obtained from the posterior predictions of expectations and variances previously computed for each grid box. Let $m_i$ denote the count expectation in each grid box, and let $s_i^2$ denote the count variance, both conditionally on the model predictor $\eta_i$. Then the posterior predictive variance of the count $X_i$ is
 
 $$
 \begin{aligned}
 V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
-&= E(a_i\lambda_i) + V(a_i\lambda_i) \\
-&= a_i m_i + a_i^2s_i^2,
+&= E(s_i^2) + V(m_i) .
 \end{aligned}
 $$
-where $m_i=E(\lambda_i|\text{data})$ and $s_i^2=V(\lambda_i|\text{data})$ are the
-conditional mean and variance for $\lambda_i$. Note: this partially ignores the special zero-treatment; just as for the ZAP expectation, need to derive the proper predictive variance expressions for ZIP and ZAP. Also, the equation doesn't quite match the needed notation.
 
 
 ```{r, out.width="100%", fig.width=10, fig.height=5, fig.align='center'}
@@ -340,63 +347,69 @@ patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 
 ### Prediction scores
 
-We compute three prediction scores,
+We compute three prediction scores, Absolute Error (AE), Squared Error (SE),
+and Dawid-Sebastiani (DS):
 
 $$
 \begin{aligned}
-\text{MAE}&=\frac{1}{n}\sum_i |y_i-\text{median}_i|,\\
-\text{RMSE}&=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2}, \text{ and}\\
-\text{DS}&=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right],
+\text{AE}_i&=|y_i-\text{median}_i|,\\
+\text{SE}_i&=(y_i-E(X_i))^2, \text{ and}\\
+\text{DS}_i&=\frac{\sum_i (y_i-E(X_i))^2}{V(X_i)} + \log[V(X_i)].
 \end{aligned}
 $$
-where DS is the Dawid-Sebastiani score that is a proper scoring rule for the
-predictive mean $m_i$ and variance $v_i^2$.
+The Dawid-Sebastiani score is a proper scoring rule for the
+predictive mean $E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for
+the median and expectation, respectively.
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
-expect_poi$DS <- with(expect_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
-expect_zip$DS <- with(expect_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
-expect_zap$DS <- with(expect_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+df <- df %>%
+  mutate(
+    AE = abs(count - pred_median),
+    SE = (count - pred_mean)^2,
+    DS = (count - pred_mean)^2 / pred_var + log(pred_var)
+  )
 
 scores <- df %>%
   group_by(Model) %>%
   summarise(
-    MAE = mean(abs(count - pred_median)),
-    RMSE = sqrt(mean((count - pred_mean)^2))
-  )
-# Add the average Dawid-Sebastiani scores
-scores <- full_join(scores,
-  data.frame(
+    MAE = mean(AE),
+            MSE = sqrt(mean(SE)),
+            MDS = mean(DS)) %>%
+  left_join(data.frame(
     Model = c("Poisson", "ZIP", "ZAP"),
-    DS = c(
-      mean(expect_poi$DS),
-      mean(expect_zip$DS),
-      mean(expect_zap$DS)
-    ),
-    Order = 1:3
-  ),
-  by = "Model"
-)
-knitr::kable(scores %>% arrange(Order) %>% select(-Order))
+                       Order = 1:3),
+            by = "Model") %>%
+  arrange(Order) %>%
+  select(-Order)
+knitr::kable(scores)
 ```
-We see that the MAE and RMS are comparable for the ZAP model and the other two models, but the DS score is clearly lower. That means that gives a better estimate of the prediction uncertainty.
-
+We see that the average scores are very similar between all three models.
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
+df <- df %>%
+  tibble::as_tibble() %>%
+  cbind(geometry = c(counts_df$geometry, counts_df$geometry, counts_df$geometry))
+df_ <- df %>%
+  left_join(df %>%
+              filter(Model == "Poisson") %>%
+              select(geometry, DS_Poisson = DS),
+            by = c("geometry")) %>%
+  sf::st_as_sf()
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(expect_poi, aes(fill = DS), geom = "tile") +
+  gg(df_, aes(fill = DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Poisson Dawid-Sebastiani scores") +
   guides(fill = guide_legend("DS"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(expect_zip, aes(fill = DS - expect_poi$DS), geom = "tile") +
+  gg(df_, aes(fill = DS - DS_Poisson), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(expect_zap, aes(fill = DS - expect_poi$DS), geom = "tile") +
+  gg(df_, aes(fill = DS - DS_Poisson), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
