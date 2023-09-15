@@ -214,17 +214,33 @@ fit_zap <- bru(
 summary(fit_zap)
 
 # Predict intensity on the original raster locations
-lambda_zap <- predict(
-  fit_zap, counts_df,
-  ~ plogis(vegetation + elevation_present + field_present + Intercept_present, lower.tail = FALSE) *
-    exp(elevation + field + Intercept_count)
+pred_zap <- predict(
+  fit_zap,
+  counts_df,
+  ~ {
+    presence_prob <-
+      plogis(vegetation + elevation_present + field_present + Intercept_present)
+    list(
+      presence = presence_prob,
+      lambda = presence_prob * exp(elevation + field + Intercept_count)
+    )
+  }
 )
+presence_zap <- pred_zap$presence
+lambda_zap <- pred_zap$lambda
 
-ggplot() +
+p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zap, aes(fill = median), geom = "tile") +
+  gg(pred_zap$presence, aes(fill = mean), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("Presence probability")
+p2 <- ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(pred_zap$lambda, aes(fill = median), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
+
+patchwork::wrap_plots(p1, p2, nrow = 1)
 ```
 
 In order to make sure that Poisson distribution will be properly truncated, we included the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\text{logit}^{-1}(\theta)=p$ it would end up close to zero.
@@ -277,54 +293,77 @@ df <- data.frame(
     fit_zip$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
     zap_pit
   ),
-  model = rep(c("poi", "zip", "zap"), each = nrow(counts_df))
+  Model = rep(c("Poisson", "ZIP", "ZAP"), each = nrow(counts_df))
 )
 
 p1 <- ggplot(df) +
-  geom_point(aes(median, count - median, color = model)) +
+  geom_point(aes(median, count - median, color = Model)) +
   ggtitle("Residuals")
 
 p2 <- ggplot(df) +
-  stat_ecdf(aes(pit, color = model), na.rm = TRUE) +
+  stat_ecdf(aes(pit, color = Model), na.rm = TRUE) +
   scale_x_continuous(expand = c(0, 0)) +
   ggtitle("PIT")
 
 patchwork::wrap_plots(p1, p2, nrow = 1)
-
-df %>%
-  group_by(model) %>%
-  summarise(mae = mean(abs(count - median)))
 ```
 
-Dawid-Sebastiani scores
+### Prediction scores
 
+We compute three prediction scores,
+$\text{MAE}=\frac{1}{n}\sum_i |y_i-\text{median}_i|$,
+$\text{RMSE}=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2$}, and
+$\text{DS}=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right]$,
+where DS is the Dawid-Sebastiani score that is a proper scoring rule for the
+predictive mean $m_i$ and variance $v_i^2$.
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 lambda_poi$DS <- with(lambda_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 lambda_zap$DS <- with(lambda_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 
-# Mean Dawid-Sebastiani scores
-c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS)) %>%
-  set_names(c("Poisson", "ZIP", "ZAP"))
+scores <- df %>%
+  group_by(Model) %>%
+  summarise(
+    MAE = mean(abs(count - median)),
+    RMSE = sqrt(mean((count - expectation)^2))
+  )
+# Add the average Dawid-Sebastiani scores
+scores <- full_join(scores,
+  data.frame(
+    Model = c("Poisson", "ZIP", "ZAP"),
+    DS = c(
+      mean(lambda_poi$DS),
+      mean(lambda_zip$DS),
+      mean(lambda_zap$DS)
+    ),
+    Order = 1:3
+  ),
+  by = "Model"
+)
+knitr::kable(scores %>% arrange(Order) %>% select(-Order))
+```
+We see that the MAE and RMS are comparable for the ZAP model and the other two models, but the DS score is clearly lower. That means that gives a better estimate of the prediction uncertainty.
 
+
+```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_poi, aes(fill = DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Poisson Dawid-Sebastiani scores") +
-  guides(fill = guide_legend("score"))
+  guides(fill = guide_legend("DS"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_zip, aes(fill = DS - lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
-  guides(fill = guide_legend("score"))
+  guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_zap, aes(fill = DS - lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
-  guides(fill = guide_legend("score"))
+  guides(fill = guide_legend("DS-DS_poi"))
 
 patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```
