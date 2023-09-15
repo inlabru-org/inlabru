@@ -113,14 +113,15 @@ fit_poi <- bru(
 summary(fit_poi)
 
 
-lambda_poi <- predict(
+expect_poi <- predict(
   fit_poi, counts_df,
-  ~ exp(vegetation + elevation + field + Intercept)
+  ~ exp(vegetation + elevation + field + Intercept) * area
 )
+expect_poi$pred_var <- expect_poi$mean + expect_poi$sd^2
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_poi, aes(fill = mean), geom = "tile") +
+  gg(expect_poi, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
@@ -153,15 +154,26 @@ fit_zip <- bru(
 
 summary(fit_zip)
 
-lambda_zip <- predict(
+pred_zip <- predict(
   fit_zip, counts_df,
-  ~ (1 - zero_probability_parameter_for_zero_inflated_poisson_1) *
-    exp(vegetation + elevation + field + Intercept)
+  ~ {
+    scaling_prob <- (1 - zero_probability_parameter_for_zero_inflated_poisson_1)
+    lambda <- exp(vegetation + elevation + field + Intercept)
+    expect <- scaling_prob * lambda * area
+    expect2 <- expect * (1 + (1 - scaling_prob) * lambda * area)
+    list(
+      lambda = lambda,
+      expect = expect,
+      expect2 = expect2 - expect^2
+    )
+  }
 )
+expect_zip <- pred_zip$expect
+expect_zip$pred_var <- pred_zip$expect2$mean + expect_zip$sd^2
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zip, aes(fill = median), geom = "tile") +
+  gg(expect_zip, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 ```
@@ -220,14 +232,20 @@ pred_zap <- predict(
   ~ {
     presence_prob <-
       plogis(vegetation + elevation_present + field_present + Intercept_present)
+    lambda <- exp(elevation + field + Intercept_count)
+    expect <- presence_prob * lambda * area / (1 - exp(-lambda * area))
+    expect2 <- expect * (1 + presence_prob * lambda * area)
     list(
       presence = presence_prob,
-      lambda = presence_prob * exp(elevation + field + Intercept_count)
+      lambda = lambda,
+      expect = expect,
+      expect2 = expect2 - expect^2
     )
   }
 )
 presence_zap <- pred_zap$presence
-lambda_zap <- pred_zap$lambda
+expect_zap <- pred_zap$expect
+expect_zap$pred_var <- pred_zap$expect2$mean + expect_zap$sd^2
 
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
@@ -236,9 +254,9 @@ p1 <- ggplot() +
   ggtitle("Presence probability")
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zap, aes(fill = median), geom = "tile") +
+  gg(expect_zap, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
-  ggtitle("Nest intensity per 1.2 ha")
+  ggtitle("Nest expect per 1.2 ha")
 
 patchwork::wrap_plots(p1, p2, nrow = 1)
 ```
@@ -257,36 +275,29 @@ V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
 \end{aligned}
 $$
 where $m_i=E(\lambda_i|\text{data})$ and $s_i^2=V(\lambda_i|\text{data})$ are the
-conditional mean and variance for $\lambda_i$.
+conditional mean and variance for $\lambda_i$. Note: this partially ignores the special zero-treatment; just as for the ZAP expectation, need to derive the proper predictive variance expressions for ZIP and ZAP. Also, the equation doesn't quite match the needed notation.
 
 
 ```{r, out.width="100%", fig.width=10, fig.height=5, fig.align='center'}
-lambda_poi$pred_var <-
-  (lambda_poi$mean + lambda_poi$sd^2 * counts_df$area) * counts_df$area
-lambda_zip$pred_var <-
-  (lambda_zip$mean + lambda_zip$sd^2 * counts_df$area) * counts_df$area
-lambda_zap$pred_var <-
-  (lambda_zap$mean + lambda_zap$sd^2 * counts_df$area) * counts_df$area
-
 zap_pit <- rep(NA_real_, nrow(counts_df))
 zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
 
 df <- data.frame(
   count = rep(counts_df$count, times = 3),
-  expectation = c(
-    lambda_poi$mean * counts_df$area,
-    lambda_zip$mean * counts_df$area,
-    lambda_zap$mean * counts_df$area
+  pred_mean = c(
+    expect_poi$mean,
+    expect_zip$mean,
+    expect_zap$mean
   ),
   pred_var = c(
-    (lambda_poi$mean + lambda_poi$sd^2 * counts_df$area) * counts_df$area,
-    (lambda_zip$mean + lambda_zip$sd^2 * counts_df$area) * counts_df$area,
-    (lambda_zap$mean + lambda_zap$sd^2 * counts_df$area) * counts_df$area
+    expect_poi$pred_var,
+    expect_zip$pred_var,
+    expect_zap$pred_var
   ),
-  median = c(
-    lambda_poi$median * counts_df$area,
-    lambda_zip$median * counts_df$area,
-    lambda_zap$median * counts_df$area
+  pred_median = c(
+    expect_poi$median,
+    expect_zip$median,
+    expect_zap$median
   ),
   pit = c(
     fit_poi$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
@@ -297,7 +308,7 @@ df <- data.frame(
 )
 
 p1 <- ggplot(df) +
-  geom_point(aes(median, count - median, color = Model)) +
+  geom_point(aes(pred_mean, count - pred_mean, color = Model)) +
   ggtitle("Residuals")
 
 p2 <- ggplot(df) +
@@ -317,24 +328,24 @@ $\text{DS}=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2
 where DS is the Dawid-Sebastiani score that is a proper scoring rule for the
 predictive mean $m_i$ and variance $v_i^2$.
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
-lambda_poi$DS <- with(lambda_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
-lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
-lambda_zap$DS <- with(lambda_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+expect_poi$DS <- with(expect_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+expect_zip$DS <- with(expect_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
+expect_zap$DS <- with(expect_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 
 scores <- df %>%
   group_by(Model) %>%
   summarise(
-    MAE = mean(abs(count - median)),
-    RMSE = sqrt(mean((count - expectation)^2))
+    MAE = mean(abs(count - pred_median)),
+    RMSE = sqrt(mean((count - pred_mean)^2))
   )
 # Add the average Dawid-Sebastiani scores
 scores <- full_join(scores,
   data.frame(
     Model = c("Poisson", "ZIP", "ZAP"),
     DS = c(
-      mean(lambda_poi$DS),
-      mean(lambda_zip$DS),
-      mean(lambda_zap$DS)
+      mean(expect_poi$DS),
+      mean(expect_zip$DS),
+      mean(expect_zap$DS)
     ),
     Order = 1:3
   ),
@@ -348,19 +359,19 @@ We see that the MAE and RMS are comparable for the ZAP model and the other two m
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_poi, aes(fill = DS), geom = "tile") +
+  gg(expect_poi, aes(fill = DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Poisson Dawid-Sebastiani scores") +
   guides(fill = guide_legend("DS"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zip, aes(fill = DS - lambda_poi$DS), geom = "tile") +
+  gg(expect_zip, aes(fill = DS - expect_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zap, aes(fill = DS - lambda_poi$DS), geom = "tile") +
+  gg(expect_zap, aes(fill = DS - expect_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
