@@ -141,6 +141,16 @@ $$
 
 where $p=\text{logit}^{-1}(\theta)$
 
+The expectation and variance for the counts are calculated as 
+
+$$
+\begin{gathered}
+E(count)=(1-p)\lambda \\
+Var(count)= (1-p)(\lambda+p \lambda^2)
+\end{gathered}
+$$
+
+
 ```{r fig-pred-zip, fig.cap="Predictions from zero-inflated model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
 fit_zip <- bru(
   comps,
@@ -184,6 +194,15 @@ $$
 where $p=\text{logit}^{-1}(\theta)$.  
 
 Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
+
+The expectation and variance are computed as
+
+$$
+\begin{gathered}
+E(count)=\frac{1}{1-\exp(-\lambda)}p\lambda \\
+Var(count)= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 
+\end{gathered} 
+$$
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
 comps <- ~ vegetation(gcov$vegetation,
