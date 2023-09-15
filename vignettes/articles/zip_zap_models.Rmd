@@ -286,10 +286,10 @@ p1 <- ggplot(df) +
 
 p2 <- ggplot(df) +
   stat_ecdf(aes(pit, color = model), na.rm = TRUE) +
-  scale_x_continuous(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0, 0)) +
   ggtitle("PIT")
 
-patchwork::wrap_plots(p1, p2, nrow=1)
+patchwork::wrap_plots(p1, p2, nrow = 1)
 
 df %>%
   group_by(model) %>%
@@ -304,7 +304,7 @@ lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pr
 lambda_zap$DS <- with(lambda_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 
 # Mean Dawid-Sebastiani scores
-c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS)) %>% 
+c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS)) %>%
   set_names(c("Poisson", "ZIP", "ZAP"))
 
 p1 <- ggplot() +
@@ -315,16 +315,16 @@ p1 <- ggplot() +
   guides(fill = guide_legend("score"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zip, aes(fill = DS-lambda_poi$DS), geom = "tile") +
+  gg(lambda_zip, aes(fill = DS - lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("score"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(lambda_zap, aes(fill = DS-lambda_poi$DS), geom = "tile") +
+  gg(lambda_zap, aes(fill = DS - lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("score"))
 
-patchwork::wrap_plots(p1, p2, p3, nrow=1)
+patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```
