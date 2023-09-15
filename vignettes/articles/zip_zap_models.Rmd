@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 (Vignette under construction!)
 
-```{r setup, eval=TRUE, echo=TRUE, include=TRUE}
+```{r setup, eval=TRUE, echo=TRUE, include=TRUE, message=FALSE}
 library(dplyr)
 library(ggplot2)
 library(inlabru)
@@ -27,6 +27,7 @@ library(terra)
 library(sf)
 library(RColorBrewer)
 library(magrittr)
+library(patchwork)
 
 # We want to obtain CPO data from the estimations
 bru_options_set(control.compute = list(cpo = TRUE))
@@ -89,8 +90,7 @@ ggplot() +
 
 ## Poisson GLM
 
-Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. In order to make the vegetation effect
-estimates identifiable relative to the intercept, we use `model = "factor_full"` and a sum-to-zero constraint.
+Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. In order to make the vegetation effect estimates identifiable relative to the intercept, we use `model = "factor_full"` and a sum-to-zero constraint. 
 An alternative would be `model = "factor_contrast"` without constraint, but that would require a factor level reordering to avoid the most uncommon vegetation type being the reference level.
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
@@ -125,14 +125,11 @@ ggplot() +
   ggtitle("Nest intensity per 1.2 ha")
 ```
 
-
-The model fails miserably. It is unable to differentiate between the sites suitable for gorilla nests and those that are not. 
-
 ## True zeroes and false zeroes
 
-The Poisson GLM model may produce zeros in some locations. These are called "true zeroes", because they are explained by the model and the covariates. The "false zeroes" do not comply with the covariates. They can appear because the imperfection in sampling (wrong time or place), observer errors, non-suitable environment characteristics, etc. 
+The Poisson GLM model may produce zeros in some locations. These are called "true zeroes", because they are explained by the model and the covariates. The "false zeroes" do not comply with the covariates. They can appear because of the imperfection in sampling (wrong time or place), observer errors, non-suitable environment characteristics, etc. 
 
-The number of zeros in our data is too large and our model is not able to accommodate for them. We should pick a model which can handle "inflated" number of zeros, i.e. in excess of what is implied by a regular Poisson model. For that we pick a "zero-inflated Poisson model", or simply ZIP.
+The number of zeros in our data is large and our model may not be able to accommodate for them. We should pick a model which can handle "inflated" number of zeros, i.e. in excess of what is implied by a regular Poisson model. For that we pick a "zero-inflated Poisson model", or simply, ZIP.
 
 ## ZIP model
 
@@ -169,7 +166,8 @@ ggplot() +
   ggtitle("Nest intensity per 1.2 ha")
 ```
 
-This model is much better at differentiating between the sites and produces sensible predictions. [Note: this may not be the case; need to sort out the factor ordering and priors; check the diagnostic section below as well.]
+We will compare the performance of the models in the diagnostic section below.
+<!-- This model is much better at differentiating between the sites and produces sensible predictions. [Note: this may not be the case; need to sort out the factor ordering and priors; check the diagnostic section below as well.] -->
 
 ## ZAP model
 
@@ -177,13 +175,13 @@ Judging by the distribution of nests in relation to the [spatial covariates](2d_
 
 Whenever the process that drives presence/absence is substantially different from the process that drives the abundance it is wise to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of binomial and the truncated Poisson parts.
 
-Note that we have to switch to `zeroinflatedpoisson0` which has the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+We switch to `zeroinflatedpoisson0` which has the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
 $$
 
-where $p=\text{logit}^{-1}(\theta)$.  We achieve the truncation of zeros in the ZIP model by fixing the parameter $\theta=log(p)$ to some large negative value.
+where $p=\text{logit}^{-1}(\theta)$.  
 
 Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
 
@@ -233,9 +231,8 @@ In order to make sure that Poisson distribution will be properly truncated, we i
 
 ## Model comparison
 
-The count prediction variance can be obtained from the predictions of the intensity $\lambda_i$
-for each grid box. With $a_i$ denoting the respective grid box areas, the counts
-conditionally on the predictor $\eta_i$ are $(X_i|eta_i) \sim \text{Poisson}(a_i\lambda_i)$.
+The count prediction variance can be obtained from the predictions of the intensity $\lambda_i$ for each grid box. With $a_i$ denoting the respective grid box areas, the counts conditionally on the predictor $\eta_i$ are $(X_i\vert \eta_i) \sim \text{Poisson}(a_i\lambda_i)$.
+
 $$
 \begin{aligned}
 V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
@@ -247,7 +244,7 @@ where $m_i=E(\lambda_i|\text{data})$ and $s_i^2=V(\lambda_i|\text{data})$ are th
 conditional mean and variance for $\lambda_i$.
 
 
-```{r}
+```{r, out.width="100%", fig.width=10, fig.height=5, fig.align='center'}
 lambda_poi$pred_var <-
   (lambda_poi$mean + lambda_poi$sd^2 * counts_df$area) * counts_df$area
 lambda_zip$pred_var <-
@@ -257,6 +254,7 @@ lambda_zap$pred_var <-
 
 zap_pit <- rep(NA_real_, nrow(counts_df))
 zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
+
 df <- data.frame(
   count = rep(counts_df$count, times = 3),
   expectation = c(
@@ -282,13 +280,16 @@ df <- data.frame(
   model = rep(c("poi", "zip", "zap"), each = nrow(counts_df))
 )
 
-ggplot(df) +
+p1 <- ggplot(df) +
   geom_point(aes(median, count - median, color = model)) +
   ggtitle("Residuals")
 
-ggplot(df) +
+p2 <- ggplot(df) +
   stat_ecdf(aes(pit, color = model), na.rm = TRUE) +
+  scale_x_continuous(expand = c(0,0)) +
   ggtitle("PIT")
+
+patchwork::wrap_plots(p1, p2, nrow=1)
 
 df %>%
   group_by(model) %>%
@@ -296,27 +297,34 @@ df %>%
 ```
 
 Dawid-Sebastiani scores
-```{r}
+
+```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 lambda_poi$DS <- with(lambda_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 lambda_zap$DS <- with(lambda_zap, (counts_df$count - mean)^2 / pred_var + log(pred_var))
-c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS))
-ggplot() +
+
+# Mean Dawid-Sebastiani scores
+c(mean(lambda_poi$DS), mean(lambda_zip$DS), mean(lambda_zap$DS)) %>% 
+  set_names(c("Poisson", "ZIP", "ZAP"))
+
+p1 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_poi, aes(fill = DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Poisson Dawid-Sebastiani scores") +
   guides(fill = guide_legend("score"))
-ggplot() +
+p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_zip, aes(fill = DS-lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("score"))
-ggplot() +
+p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(lambda_zap, aes(fill = DS-lambda_poi$DS), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
-  ggtitle("ZAP Dawid-Sebastiani scoredifference") +
+  ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("score"))
+
+patchwork::wrap_plots(p1, p2, p3, nrow=1)
 ```
