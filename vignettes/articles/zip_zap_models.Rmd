@@ -231,12 +231,12 @@ lambda_zap <- pred_zap$lambda
 
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(pred_zap$presence, aes(fill = mean), geom = "tile") +
+  gg(presence_zap, aes(fill = mean), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Presence probability")
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(pred_zap$lambda, aes(fill = median), geom = "tile") +
+  gg(lambda_zap, aes(fill = median), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("Nest intensity per 1.2 ha")
 
