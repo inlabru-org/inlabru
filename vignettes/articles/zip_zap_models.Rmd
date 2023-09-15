@@ -185,7 +185,7 @@ where $p=\text{logit}^{-1}(\theta)$.
 
 Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
 
-```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
 comps <- ~ vegetation(gcov$vegetation,
   model = "factor_full",
   hyper = list(prec = list(initial = log(1 / 1^2), fixed = TRUE)),
@@ -305,17 +305,19 @@ p2 <- ggplot(df) +
   scale_x_continuous(expand = c(0, 0)) +
   ggtitle("PIT")
 
-patchwork::wrap_plots(p1, p2, nrow = 1)
+patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 ```
 
 ### Prediction scores
 
 We compute three prediction scores,
-$\text{MAE}=\frac{1}{n}\sum_i |y_i-\text{median}_i|$,
-$\text{RMSE}=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2$}, and
-$\text{DS}=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right]$,
+
+$$\text{MAE}=\frac{1}{n}\sum_i |y_i-\text{median}_i|,$$
+$$\text{RMSE}=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2}, \text{ and}$$
+$$\text{DS}=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right],$$
 where DS is the Dawid-Sebastiani score that is a proper scoring rule for the
 predictive mean $m_i$ and variance $v_i^2$.
+
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 lambda_poi$DS <- with(lambda_poi, (counts_df$count - mean)^2 / pred_var + log(pred_var))
 lambda_zip$DS <- with(lambda_zip, (counts_df$count - mean)^2 / pred_var + log(pred_var))
