@@ -342,9 +342,13 @@ patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 
 We compute three prediction scores,
 
-$$\text{MAE}=\frac{1}{n}\sum_i |y_i-\text{median}_i|,$$
-$$\text{RMSE}=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2}, \text{ and}$$
-$$\text{DS}=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right],$$
+$$
+\begin{aligned}
+\text{MAE}&=\frac{1}{n}\sum_i |y_i-\text{median}_i|,\\
+\text{RMSE}&=\sqrt{\frac{1}{n}\sum_i (y_i-m_i)^2}, \text{ and}\\
+\text{DS}&=\frac{1}{n}\sum_i \left[\frac{\sum_i (y_i-m_i)^2}{v_i^2} + \log{v_i^2}\right],
+\end{aligned}
+$$
 where DS is the Dawid-Sebastiani score that is a proper scoring rule for the
 predictive mean $m_i$ and variance $v_i^2$.
 
