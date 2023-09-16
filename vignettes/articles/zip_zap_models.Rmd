@@ -113,14 +113,22 @@ fit_poi <- bru(
 summary(fit_poi)
 
 
-expect_poi <- predict(
+pred_poi <- predict(
   fit_poi, counts_df,
-  ~ exp(vegetation + elevation + field + Intercept) * area,
+  ~ {
+    expect <- exp(vegetation + elevation + field + Intercept) * area
+    list(
+      expect = expect,
+      obs_prob = dpois(count, expect)
+    )
+  },
   n.samples = 2500
 )
 # For Poisson, the posterior conditional variance is equal to
 # the posterior conditional mean, so no need to compute it separately.
+expect_poi <- pred_poi$expect
 expect_poi$pred_var <- expect_poi$mean + expect_poi$sd^2
+expect_poi$log_score <- -log(pred_poi$obs_prob$mean)
 
 ggplot() +
   geom_fm(data = px_mesh) +
@@ -177,13 +185,15 @@ pred_zip <- predict(
     list(
       lambda = lambda,
       expect = expect,
-      variance = variance
+      variance = variance,
+      obs_prob = (1 - scaling_prob) * (count == 0) + scaling_prob * dpois(count, expect)
     )
   },
   n.samples = 2500
 )
 expect_zip <- pred_zip$expect
 expect_zip$pred_var <- pred_zip$variance$mean + expect_zip$sd^2
+expect_zip$log_score <- -log(pred_zip$obs_prob$mean)
 
 ggplot() +
   geom_fm(data = px_mesh) +
@@ -267,7 +277,9 @@ pred_zap <- predict(
       presence = presence_prob,
       lambda = lambda,
       expect = expect,
-      variance = variance
+      variance = variance,
+      obs_prob = (1 - presence_prob) * (count == 0) +
+        (count > 0) * presence_prob * dpois(count, expect) / (1 - dpois(0, expect))
     )
   },
   n.samples = 2500
@@ -275,6 +287,7 @@ pred_zap <- predict(
 presence_zap <- pred_zap$presence
 expect_zap <- pred_zap$expect
 expect_zap$pred_var <- pred_zap$variance$mean + expect_zap$sd^2
+expect_zap$log_score <- -log(pred_zap$obs_prob$mean)
 
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
@@ -325,6 +338,11 @@ df <- data.frame(
     expect_zip$median,
     expect_zap$median
   ),
+  log_score = c(
+    expect_poi$log_score,
+    expect_zip$log_score,
+    expect_zap$log_score
+  ),
   pit = c(
     fit_poi$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
     fit_zip$cpo$pit * c(NA_real_, 1)[1 + (counts_df$count > 0)],
@@ -347,38 +365,46 @@ patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 
 ### Prediction scores
 
-We compute three prediction scores, Absolute Error (AE), Squared Error (SE),
-and Dawid-Sebastiani (DS):
+We compute four prediction scores, Absolute Error (AE), Squared Error (SE),
+Dawid-Sebastiani (DS), and (negated) Log score (LG):
 
 $$
 \begin{aligned}
 \text{AE}_i&=|y_i-\text{median}_i|,\\
-\text{SE}_i&=(y_i-E(X_i))^2, \text{ and}\\
-\text{DS}_i&=\frac{\sum_i (y_i-E(X_i))^2}{V(X_i)} + \log[V(X_i)].
+\text{SE}_i&=[y_i-E(X_i)]^2, \text{ and}\\
+\text{DS}_i&=\frac{[y_i-E(X_i)]^2}{V(X_i)} + \log[V(X_i)], \\
+\text{LG}_i&=-\log[P(X_i = y_i)].
 \end{aligned}
 $$
 The Dawid-Sebastiani score is a proper scoring rule for the
 predictive mean $E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for
-the median and expectation, respectively.
+the median and expectation, respectively. The (negated) Log score is a strictly
+proper score. (insert ref here to Gneiting and Raftery, 2005(?))
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
   mutate(
     AE = abs(count - pred_median),
     SE = (count - pred_mean)^2,
-    DS = (count - pred_mean)^2 / pred_var + log(pred_var)
+    DS = (count - pred_mean)^2 / pred_var + log(pred_var),
+    LG = log_score
   )
 
 scores <- df %>%
   group_by(Model) %>%
   summarise(
     MAE = mean(AE),
-            MSE = sqrt(mean(SE)),
-            MDS = mean(DS)) %>%
-  left_join(data.frame(
-    Model = c("Poisson", "ZIP", "ZAP"),
-                       Order = 1:3),
-            by = "Model") %>%
+    MSE = sqrt(mean(SE)),
+    MDS = mean(DS),
+    MLG = mean(LG)
+  ) %>%
+  left_join(
+    data.frame(
+      Model = c("Poisson", "ZIP", "ZAP"),
+      Order = 1:3
+    ),
+    by = "Model"
+  ) %>%
   arrange(Order) %>%
   select(-Order)
 knitr::kable(scores)
@@ -390,11 +416,19 @@ df <- df %>%
   tibble::as_tibble() %>%
   cbind(geometry = c(counts_df$geometry, counts_df$geometry, counts_df$geometry))
 df_ <- df %>%
-  left_join(df %>%
-              filter(Model == "Poisson") %>%
-              select(geometry, DS_Poisson = DS),
-            by = c("geometry")) %>%
+  left_join(
+    df %>%
+      filter(Model == "Poisson") %>%
+      select(geometry,
+             AE_Poisson = AE,
+             SE_Poisson = SE,
+             DS_Poisson = DS,
+             LG_Poisson = LG),
+    by = c("geometry")
+  ) %>%
   sf::st_as_sf()
+```
+```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_, aes(fill = DS), geom = "tile") +
@@ -416,3 +450,26 @@ p3 <- ggplot() +
 
 patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```
+```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
+p1 <- ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(df_, aes(fill = LG), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("LG score") +
+  guides(fill = guide_legend("LG"))
+p2 <- ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(df_, aes(fill = LG - LG_Poisson), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("ZIP LG score difference") +
+  guides(fill = guide_legend("LG-LG_poi"))
+p3 <- ggplot() +
+  geom_fm(data = px_mesh) +
+  gg(df_, aes(fill = LG - LG_Poisson), geom = "tile") +
+  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("ZAP LG score difference") +
+  guides(fill = guide_legend("LG-LG_poi"))
+
+patchwork::wrap_plots(p1, p2, p3, nrow = 1)
+```
+
