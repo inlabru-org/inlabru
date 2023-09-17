@@ -35,9 +35,9 @@ bru_options_set(control.compute = list(cpo = TRUE))
 
 # Count model
 
-In addition to point process models, `inlabru` can handle models with positive integer response, e.g. abundance models where species counts are recorded in every observed location. Count models can be seen as coarse aggregations of point process models.
+In addition to the point process models, `inlabru` is capable of handling models with positive integer responses, such as abundance models where species counts are recorded at each observed location. Count models can be considered as coarse aggregations of point process models.
 
-The following example uses `gorillas` dataset. In order to obtain the counts data we rasterize the species count to the same granularity as the spatial covariates available for the `gorilla` data, and then aggregate the pixels to cover 25 times bigger area (5x5 pixels in original covariate raster dimensions). Finally, we mask the regions outside of study area.
+The following example utilizes the `gorillas` dataset. To obtain the count data, we rasterize the species counts to match the spatial covariates available for the 'gorilla' data, and then aggregate the pixels to cover an area 16 times larger (4x4 pixels in the original covariate raster dimensions). Finally, we mask regions outside the study area.
 
 ```{r fig-count-raster, fig.cap="Counts of gorilla nests", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
 gorillas_sf <- inlabru::gorillas_sf
@@ -54,7 +54,7 @@ counts_rstr <- counts_rstr %>%
   c(counts_rstr)
 ```
 
-Now we need to extract the coordinates for these pixels. The plot below shows pixel locations for all pixels with non-zero counts.
+We now need to extract the coordinates for these pixels. The plot below illustrates the pixel locations for all pixels with non-zero counts. We create a mesh over the study area and define a prior for it.
 
 ```{r}
 counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
@@ -64,10 +64,6 @@ counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
   st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
-
-> What is the probability of encountering 0,1,2... nests per study site?
-
-We create a mesh over the study sites and define a prior for it.
 
 ```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
 px_mesh <- fm_mesh_2d_inla(
@@ -90,8 +86,8 @@ ggplot() +
 
 ## Poisson GLM
 
-Now we can define the Poisson model which relates the species count per observation plot to the spatial covariates, such as the vegetation type and elevation. In order to make the vegetation effect estimates identifiable relative to the intercept, we use `model = "factor_full"` and a sum-to-zero constraint. 
-An alternative would be `model = "factor_contrast"` without constraint, but that would require a factor level reordering to avoid the most uncommon vegetation type being the reference level.
+Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation. To ensure identifiability of the vegetation effect estimates relative to the intercept, we use `model = "factor_full"` with a sum-to-zero constraint.
+An alternative approach would be to use `model = "factor_contrast"` without a constraint, but this would require reordering factor levels to prevent the least common vegetation type from becoming the reference level.
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
 comps <- ~ vegetation(gcov$vegetation,
@@ -134,26 +130,25 @@ ggplot() +
   geom_fm(data = px_mesh) +
   gg(expect_poi, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
-  ggtitle("Nest intensity per 1.2 ha")
 ```
 
 ## True zeroes and false zeroes
 
-The Poisson GLM model may produce zeros in some locations. These are called "true zeroes", because they are explained by the model and the covariates. The "false zeroes" do not comply with the covariates. They can appear because of the imperfection in sampling (wrong time or place), observer errors, non-suitable environment characteristics, etc. 
+In the Poisson GLM model, zeros can occur in some locations. These are referred to as "true zeros" because they can be explained by the model and the associated covariates. On the other hand, "false zeros" do not align with the covariates. They can arise due to issues such as sampling at the wrong time or place, observer errors, unsuitable environmental conditions, and so on.
 
-The number of zeros in our data is large and our model may not be able to accommodate for them. We should pick a model which can handle "inflated" number of zeros, i.e. in excess of what is implied by a regular Poisson model. For that we pick a "zero-inflated Poisson model", or simply, ZIP.
+In our dataset, the number of zeros is quite substantial, and our model may struggle to account for them adequately. To address this, we should select a model capable of handling an "inflated" number of zeros, exceeding what a standard Poisson model would imply. For this purpose, we opt for a "zero-inflated Poisson model," commonly abbreviated as ZIP.
 
 ## ZIP model
 
-The [Type 1 Zero-inflated Poisson model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf) is given by
+The [Type 1 Zero-inflated Poisson model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf) is defined as follows:
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y)
 $$
 
-where $p=\text{logit}^{-1}(\theta)$
+Here, $p=\text{logit}^{-1}(\theta)$
 
-The expectation and variance for the counts are calculated as 
+The expected value and variance for the counts are calculated as:
 
 $$
 \begin{gathered}
@@ -199,19 +194,19 @@ ggplot() +
   geom_fm(data = px_mesh) +
   gg(expect_zip, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
-  ggtitle("Nest intensity per 1.2 ha")
+  ggtitle("Nest intensity per ~1.25 ha")
 ```
 
 We will compare the performance of the models in the diagnostic section below.
-<!-- This model is much better at differentiating between the sites and produces sensible predictions. [Note: this may not be the case; need to sort out the factor ordering and priors; check the diagnostic section below as well.] -->
+
 
 ## ZAP model
 
-Judging by the distribution of nests in relation to the [spatial covariates](2d_lgcp_covars.Rmd), gorillas do not like to set their nests in certain vegetation. The type of vegetation may not influence the density of the nests, but it definitely drives the presence/absence. In this case the `vegetation` covariate should be included in the binomial part of the model, but not the Poisson part. 
+Based on the distribution of nests in relation to the [spatial covariates](2d_lgcp_covars.Rmd), it appears that gorillas tend to avoid setting their nests in certain types of vegetation. While the type of vegetation may not directly influence nest density, it does play a significant role in determining their presence or absence. In such cases, the `vegetation` covariate should be included in the binomial part of the model but not in the Poisson part.
 
-Whenever the process that drives presence/absence is substantially different from the process that drives the abundance it is wise to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of binomial and the truncated Poisson parts.
+When the process driving the presence or absence of a species substantially differs from the process governing its abundance, it is advisable to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of both a binomial and a truncated Poisson component.
 
-We switch to `zeroinflatedpoisson0` which has the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+We transition to the `zeroinflatedpoisson0` model, which is defined by the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
@@ -219,9 +214,9 @@ $$
 
 where $p=\text{logit}^{-1}(\theta)$.  
 
-Here ZIP distribution only governs the positive counts and the absences will be handled by a separate binomial model which can have its own covariates. Note, that we exclude the observations with absent nests from the ZIP part of the model by subsetting the data to include only observations where `present` is `TRUE`.
+In this model, the ZIP distribution governs only the positive counts, while the absences are addressed by a separate binomial model that can have its own covariates. It's worth noting that we exclude observations with absent nests from the ZIP part of the model by subsetting the data to include only instances where `present` is `TRUE`.
 
-The expectation and variance are computed as
+The expectation and variance are computed as follows:
 
 $$
 \begin{aligned}
@@ -298,16 +293,16 @@ p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(expect_zap, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
-  ggtitle("Nest expect per 1.2 ha")
+  ggtitle("Expected number of nests per ~1.25 ha")
 
 patchwork::wrap_plots(p1, p2, nrow = 1)
 ```
 
-In order to make sure that Poisson distribution will be properly truncated, we included the `control.family` argument with the parameter `theta` (which gets translated into the probability $p$) is fixed to a large negative value, such that when transformed by $\text{logit}^{-1}(\theta)=p$ it would end up close to zero.
+To ensure proper truncation of the Poisson distribution, we have included the `control.family` argument with the parameter `theta` fixed to a large negative value. This choice ensures that when transformed by $\text{logit}^{-1}(\theta)$ to obtain the probability $p$, it approaches zero.
 
-## Model comparison
+## Model Comparison
 
-The count prediction variance can be obtained from the posterior predictions of expectations and variances previously computed for each grid box. Let $m_i$ denote the count expectation in each grid box, and let $s_i^2$ denote the count variance, both conditionally on the model predictor $\eta_i$. Then the posterior predictive variance of the count $X_i$ is
+The variance in count predictions can be obtained from the posterior predictions of expectations and variances that were previously computed for each grid box. Let's denote the count expectation in each grid box as $m_i$, and the count variance as $s_i^2$, both conditioned on the model predictor $\eta_i$. Then, the posterior predictive variance of the count $X_i$ is given by:
 
 $$
 \begin{aligned}
@@ -316,6 +311,26 @@ V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
 \end{aligned}
 $$
 
+This equation provides the posterior predictive variance of the count $X_i$ based on the expectations and variances of the model predictions $m_i$ and $s_i^2$ for each grid box, conditioned on the model predictor $\eta_i$.
+
+Predictive Integral Transform (PIT) [@marshall2003ApproximateCrossvalidatoryPredictive;@gelman1996PosteriorPredictiveAssessment;@held2010PosteriorCrossvalidatoryPredictive] is calculated as the cumulative distribution function (CDF) of the observed data at each predicted value from the model. Mathematically, for each observation $y_i$ and its corresponding predicted value $\hat{y}_i$ from the model, the PIT is calculated as follows:
+
+$$PIT_i=P(Y_i\leq \hat y_i \vert data)$$
+
+where $Y_i$ is a random variable representing the observed data for the $i$th observation.
+
+The PIT measures how well the model's predicted values align with the distribution of the observed data. Ideally, if the model's predictions are perfect, the PIT values should follow a uniform distribution between 0 and 1. Deviations from this uniform distribution may indicate issues with model calibration or overfitting. It's often used to assess the reliability of model predictions and can be visualized through PIT histograms or quantile-quantile (Q-Q) plots.
+
+The Conditional Predictive Ordinate (CPO) [@pettit1990ConditionalPredictiveOrdinate] is calculated as the posterior probability of the observed data at each observation point, conditional on the rest of the data and the model. For each observation $y_i$, it is computed as:
+
+$$CPO_i=P(y_i\vert data \setminus y_i, model)$$
+ 
+where $\setminus$ means "other than", so that $P(y_i | \text{data}\setminus y_i, \text{model})$ represents the conditional probability given all other observed data and the model. 
+
+CPO provides a measure of how well the model predicts each individual observation while taking into account the rest of the data and the model. A low CPO value suggests that the model has difficulty explaining that particular data point, whereas a high CPO value indicates a good fit for that observation. In practice, CPO values are often used to identify influential observations, potential outliers, or model misspecification. When comparing models, the following summary of the CPO is often used:
+
+$$-\sum_{i=1}^n\log(CPO_i)$$
+where smaller values indicate a better model fit.
 
 ```{r, out.width="100%", fig.width=10, fig.height=5, fig.align='center'}
 zap_pit <- rep(NA_real_, nrow(counts_df))
@@ -365,8 +380,7 @@ patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 
 ### Prediction scores
 
-We compute four prediction scores, Absolute Error (AE), Squared Error (SE),
-Dawid-Sebastiani (DS), and (negated) Log score (LG):
+We use four distinct prediction scores to evaluate model performance:
 
 $$
 \begin{aligned}
@@ -377,9 +391,7 @@ $$
 \end{aligned}
 $$
 The Dawid-Sebastiani score is a proper scoring rule for the
-predictive mean $E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for
-the median and expectation, respectively. The (negated) Log score is a strictly
-proper score. (insert ref here to Gneiting and Raftery, 2005(?))
+predictive mean $E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for the median and expectation, respectively. The (negated) Log score is a strictly proper score [@gneiting2007StrictlyProperScoring]
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
@@ -409,7 +421,9 @@ scores <- df %>%
   select(-Order)
 knitr::kable(scores)
 ```
-We see that the average scores are very similar between all three models.
+
+
+We see that the average scores are very similar between all three models
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
@@ -428,6 +442,7 @@ df_ <- df %>%
   ) %>%
   sf::st_as_sf()
 ```
+
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
@@ -450,6 +465,7 @@ p3 <- ggplot() +
 
 patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```
+
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
