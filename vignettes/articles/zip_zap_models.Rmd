@@ -371,9 +371,9 @@ Dawid-Sebastiani (DS), and (negated) Log score (LG):
 $$
 \begin{aligned}
 \text{AE}_i&=|y_i-\text{median}_i|,\\
-\text{SE}_i&=[y_i-E(X_i)]^2, \text{ and}\\
-\text{DS}_i&=\frac{[y_i-E(X_i)]^2}{V(X_i)} + \log[V(X_i)], \\
-\text{LG}_i&=-\log[P(X_i = y_i)].
+\text{SE}_i&=[y_i-E(X_i|\text{data})]^2, \text{ and}\\
+\text{DS}_i&=\frac{[y_i-E(X_i|\text{data})]^2}{V(X_i|\text{data})} + \log[V(X_i|\text{data})], \\
+\text{LG}_i&=-\log[P(X_i = y_i|\text{data})].
 \end{aligned}
 $$
 The Dawid-Sebastiani score is a proper scoring rule for the
