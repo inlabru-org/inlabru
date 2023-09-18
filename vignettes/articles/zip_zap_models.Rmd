@@ -231,7 +231,7 @@ Based on the distribution of nests in relation to the [spatial covariates](2d_lg
 
 When the process driving the presence or absence of a species substantially differs from the process governing its abundance, it is advisable to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of both a binomial and a truncated Poisson component.
 
-We transition to the `zeroinflatedpoisson0` model, which is defined by the [following likelihood](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+We transition to the `zeroinflatedpoisson0` model, which is defined by the [following observation probability model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
