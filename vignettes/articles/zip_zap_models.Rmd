@@ -7,6 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 header-includes:
   - \newcommand{\bm}[1]{\boldsymbol{#1}}
+bibliography: zip_zap_models.bib
 ---
 
 ```{r, include = FALSE}
@@ -64,6 +65,17 @@ counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
   st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
+We can also aggregate the relevant spatial covariates to the same level of granularity as the nest counts. The vegetation classes are quite unbalances, so it might make sense to split them by class and use proportion of land cover for some classes, say classes 2, and 3 (Disturbed, and Grassland, respectively).
+
+```{r fig-vegetation-raster, fig.cap="Proportion of vegetation cover by class", fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+gcov_lvls <- gcov$vegetation %>% levels()
+gcov_vegetation <- gcov$vegetation %>% segregate() %>%
+  terra::aggregate(fact = 4, fun = mean)
+names(gcov_vegetation)<- gcov_lvls[[1]]$vegetation
+gcov_vegetation %>% plot()
+#focal(w=matrix(1/25,nrow=5,ncol=5)) # alternative - convolution
+```
+
 
 ```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
 px_mesh <- fm_mesh_2d_inla(
@@ -86,15 +98,18 @@ ggplot() +
 
 ## Poisson GLM
 
-Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation. To ensure identifiability of the vegetation effect estimates relative to the intercept, we use `model = "factor_full"` with a sum-to-zero constraint.
-An alternative approach would be to use `model = "factor_contrast"` without a constraint, but this would require reordering factor levels to prevent the least common vegetation type from becoming the reference level.
+Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation. 
+<!-- To ensure identifiability of the vegetation effect estimates relative to the intercept, we use `model = "factor_full"` with a sum-to-zero constraint. -->
+<!-- An alternative approach would be to use `model = "factor_contrast"` without a constraint, but this would require reordering factor levels to prevent the least common vegetation type from becoming the reference level. -->
 
 ```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation,
-  model = "factor_full",
-  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
-  constr = TRUE
-) +
+#comps <- ~ vegetation(gcov$vegetation,
+#  model = "factor_full",
+#  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
+#  constr = TRUE
+#) +
+comps <- ~veg_disturbed(gcov_vegetation$Disturbed, model="linear") +
+  veg_grassland(gcov_vegetation$Grassland, model="linear") +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept(1)
 
@@ -102,7 +117,9 @@ fit_poi <- bru(
   comps,
   like(
     family = "poisson", data = counts_df,
-    formula = count ~ vegetation + elevation + field + Intercept,
+    formula = count ~ #vegetation + 
+      veg_disturbed + veg_grassland + 
+      elevation + field + Intercept,
     E = area
   )
 )
@@ -112,7 +129,9 @@ summary(fit_poi)
 pred_poi <- predict(
   fit_poi, counts_df,
   ~ {
-    expect <- exp(vegetation + elevation + field + Intercept) * area
+    expect <- exp(#vegetation + 
+      veg_disturbed + veg_grassland + 
+        elevation + field + Intercept) * area
     list(
       expect = expect,
       obs_prob = dpois(count, expect)
@@ -130,6 +149,8 @@ ggplot() +
   geom_fm(data = px_mesh) +
   gg(expect_poi, aes(fill = mean / area), geom = "tile") +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  ggtitle("Nest intensity per ~1.25 ha")
+  
 ```
 
 ## True zeroes and false zeroes
@@ -163,7 +184,9 @@ fit_zip <- bru(
   comps,
   like(
     family = "zeroinflatedpoisson1", data = counts_df,
-    formula = count ~ vegetation + elevation + field + Intercept,
+    formula = count ~ #vegetation + 
+      veg_disturbed + veg_grassland + 
+      elevation + field + Intercept,
     E = area
   )
 )
@@ -174,7 +197,9 @@ pred_zip <- predict(
   fit_zip, counts_df,
   ~ {
     scaling_prob <- (1 - zero_probability_parameter_for_zero_inflated_poisson_1)
-    lambda <- exp(vegetation + elevation + field + Intercept)
+    lambda <- exp(#vegetation + 
+      veg_disturbed + veg_grassland + 
+        elevation + field + Intercept)
     expect <- scaling_prob * lambda * area
     variance <- expect * (1 + (1 - scaling_prob) * lambda * area)
     list(
@@ -231,11 +256,13 @@ Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1
 $$
 
 ```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
-comps <- ~ vegetation(gcov$vegetation,
-  model = "factor_full",
-  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
-  constr = TRUE
-) +
+#comps <- ~ vegetation(gcov$vegetation,
+#  model = "factor_full",
+#  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
+#  constr = TRUE
+#) +
+comps <- ~veg_disturbed(gcov_vegetation$Disturbed, model="linear") +
+  veg_grassland(gcov_vegetation$Grassland, model="linear") +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
   elevation_present(gcov$elevation, model = "linear") +
@@ -246,7 +273,9 @@ fit_zap <- bru(
   like(
     family = "binomial",
     data = counts_df,
-    formula = present ~ vegetation + elevation_present + field_present + Intercept_present
+    formula = present ~ #vegetation + 
+      veg_disturbed + veg_grassland + 
+      elevation_present + field_present + Intercept_present
   ),
   like(
     family = "zeroinflatedpoisson0",
@@ -264,7 +293,10 @@ pred_zap <- predict(
   counts_df,
   ~ {
     presence_prob <-
-      plogis(vegetation + elevation_present + field_present + Intercept_present)
+      plogis(#vegetation + 
+        veg_disturbed + veg_grassland + 
+          elevation_present +
+          field_present + Intercept_present)
     lambda <- exp(elevation + field + Intercept_count)
     expect <- presence_prob * lambda * area / (1 - exp(-lambda * area))
     variance <- expect * (1 - exp(-lambda * area) * expect)
@@ -489,3 +521,4 @@ p3 <- ggplot() +
 patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```
 
+# References
