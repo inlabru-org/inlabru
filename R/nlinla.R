@@ -195,7 +195,7 @@ bru_compute_linearisation.component <- function(cmp,
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
         warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
-                state[[label]],
+                label,
                 "'; treated as 0.0",
                 immediate. = TRUE
         )
