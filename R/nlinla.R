@@ -88,6 +88,12 @@ bru_compute_linearisation.component <- function(cmp,
     x = numeric(0)
   )
 
+  if (any(!is.finite(pred0))) {
+    warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
+            immediate. = TRUE
+    )
+  }
+
   symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
     if (is.null(A)) {
@@ -186,6 +192,13 @@ bru_compute_linearisation.component <- function(cmp,
           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
         }
       } else {
+        if (any(!is.finite(pred_eps))) {
+          warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
+                  label,
+                  "' plus eps.\n",
+                  immediate. = TRUE
+          )
+        }
         if (assume_rowwise) {
           values <- (pred_eps - pred0[row_subset])
         } else {
@@ -196,7 +209,7 @@ bru_compute_linearisation.component <- function(cmp,
       if (any(!nonzero)) {
         warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
                 label,
-                "'; treated as 0.0",
+                "'; treated as 0.0.\n",
                 immediate. = TRUE
         )
       }
