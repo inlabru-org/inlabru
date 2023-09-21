@@ -9,11 +9,13 @@
 * Add new `ibm_eval2()` generic that computes both evaluation and Jacobian,
   avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
 * Add new `bru_timings_plot()` function that plots the time used for each nonlinear iteration
-(version `2.9.0.2007`)
+(version `2.9.0.9007`)
 * Speed up `bru_fill_missing()` (by orders of magnitude) by changing method for
-  finding the nearest available data point. (version `2.9.0.2011`)
+  finding the nearest available data point. (version `2.9.0.9011`)
 * Add new `bru_mapper_shift()` mapper class that works like `bru_mapper_scale()`
-  but for additive shifts instead of multiplicative scaling. (version `2.9.0.2012`)
+  but for additive shifts instead of multiplicative scaling. (version `2.9.0.9012`)
+* Added more checks for invalid component or predictor evaluations, to help
+  catch user errors sooner, and with more informative messages. (version `2.9.0.9013`)
 
 ## Bug fixes
 
@@ -34,6 +36,7 @@
   has missing values. (version `2.9.0.9011`)
 * Make `eval_spatial()` transform the `where` coordinates to the same crs as the
   input data, for `SpatRaster` and `sf` inputs, to allow different crs specifications.
+  (version `2.9.0.9012`)
 
 # inlabru 2.9.0
 

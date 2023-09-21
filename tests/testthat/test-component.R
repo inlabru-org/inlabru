@@ -422,3 +422,48 @@ test_that("Component construction: deprecated arguments", {
     "Use of 'map' is deprecated"
   )
 })
+
+test_that("Component inputs: non-numeric input detection", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  bnd <- spoly(data.frame(
+    x = c(-15, 15, 15, -15),
+    y = c(25, 25, 50, 50)
+  ))
+  mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
+  matern <-
+    INLA::inla.spde2.pcmatern(mesh,
+      prior.sigma = c(0.1, 0.01),
+      prior.range = c(1, 0.01)
+    )
+
+  df <- sf::st_as_sf(
+    data.frame(x = runif(10, -10, 10), y = runif(10, 30, 45), obs = rnorm(10)),
+    coords = c("x", "y")
+  )
+
+  # No model specified (argument unnamed), geometry invalid for bru_mapper_linear:
+  cmp <- ~ Intercept(1) + field(geometry, matern)
+  lk <- like(formula = obs ~ ., data = df, family = "gaussian")
+  model <- bru_model(component_list(cmp), c(lk))
+
+  expect_error(
+    ibm_eval(bru_mapper_linear(), input = df$geometry, state = 1),
+    "The input to a bru_mapper_linear evaluation must be numeric or logical."
+  )
+
+  cmp <- ~ Intercept(1) + field(geometry, matern, model = matern)
+  lk <- like(formula = obs ~ ., data = df, family = "gaussian")
+  model <- bru_model(component_list(cmp), c(lk))
+  input <- input_eval(model$effects$field, data = df)
+
+  expect_error(
+    ibm_eval(
+      model$effects$field$mapper,
+      input = input,
+      state = rep(1, fm_dof(mesh))
+    ),
+    "The input to a bru_mapper_scale evaluation must be numeric or logical."
+  )
+})

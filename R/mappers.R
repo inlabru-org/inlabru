@@ -1220,6 +1220,12 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
+  if (!is.null(input) &&
+    !(is.numeric(input) ||
+      is.logical(input) ||
+      is(input, "Matrix"))) {
+    stop("The input to a bru_mapper_linear evaluation must be numeric or logical.")
+  }
   ok <- !is.na(input)
   A <- Matrix::sparseMatrix(
     i = which(ok),
@@ -1648,6 +1654,11 @@ ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
     # No scaling
     return(Matrix::Diagonal(n = length(state), 1.0))
   } else {
+    if (!(is.numeric(input) ||
+      is.logical(input) ||
+      is(input, "Matrix"))) {
+      stop("The input to a bru_mapper_scale evaluation must be numeric or logical.")
+    }
     scale <- as.vector(input)
     ok <- !is.na(scale)
     scale[!ok] <- 0
@@ -1666,6 +1677,12 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
   stopifnot(!is.null(state))
   if (is.null(input)) {
     return(state)
+  }
+  if (!is.null(input) &&
+    !(is.numeric(input) ||
+      is.logical(input) ||
+      is(input, "Matrix"))) {
+    stop("The input to a bru_mapper_scale evaluation must be numeric or logical.")
   }
   scale <- as.vector(input)
   ok <- !is.na(scale)

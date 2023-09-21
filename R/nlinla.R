@@ -89,8 +89,9 @@ bru_compute_linearisation.component <- function(cmp,
   )
 
   if (any(!is.finite(pred0))) {
-    warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
-            immediate. = TRUE
+    warning(
+      "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
+      immediate. = TRUE
     )
   }
 
@@ -193,10 +194,11 @@ bru_compute_linearisation.component <- function(cmp,
         }
       } else {
         if (any(!is.finite(pred_eps))) {
-          warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
-                  label,
-                  "' plus eps.\n",
-                  immediate. = TRUE
+          warning(
+            "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
+            label,
+            "' plus eps.\n",
+            immediate. = TRUE
           )
         }
         if (assume_rowwise) {
@@ -207,10 +209,11 @@ bru_compute_linearisation.component <- function(cmp,
       }
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
-        warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
-                label,
-                "'; treated as 0.0.\n",
-                immediate. = TRUE
+        warning(
+          "Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
+          label,
+          "'; treated as 0.0.\n",
+          immediate. = TRUE
         )
       }
       nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
