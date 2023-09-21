@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9013</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,9 +86,10 @@
 <ul><li>Add new <code><a href="../reference/bru_mapper_generics.html">ibm_simplify()</a></code> generic to handle mapper simplification more generally; needed to properly support non-linear component mappers. (version <code>2.9.0.9004</code>)</li>
 <li>Add new <code><a href="../reference/bru_mapper_marginal.html">bru_mapper_marginal()</a></code> mapper class that can be used as part of component mapper pipelines. (version <code>2.9.0.9004</code>)</li>
 <li>Add new <code><a href="../reference/bru_mapper_generics.html">ibm_eval2()</a></code> generic that computes both evaluation and Jacobian, avoiding double-computing of the Jacobian, when practical. (version <code>2.9.0.9005</code>)</li>
-<li>Add new <code><a href="../reference/bru_timings_plot.html">bru_timings_plot()</a></code> function that plots the time used for each nonlinear iteration (version <code>2.9.0.2007</code>)</li>
-<li>Speed up <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> (by orders of magnitude) by changing method for finding the nearest available data point. (version <code>2.9.0.2011</code>)</li>
-<li>Add new <code><a href="../reference/bru_mapper_shift.html">bru_mapper_shift()</a></code> mapper class that works like <code><a href="../reference/bru_mapper_scale.html">bru_mapper_scale()</a></code> but for additive shifts instead of multiplicative scaling. (version <code>2.9.0.2012</code>)</li>
+<li>Add new <code><a href="../reference/bru_timings_plot.html">bru_timings_plot()</a></code> function that plots the time used for each nonlinear iteration (version <code>2.9.0.9007</code>)</li>
+<li>Speed up <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> (by orders of magnitude) by changing method for finding the nearest available data point. (version <code>2.9.0.9011</code>)</li>
+<li>Add new <code><a href="../reference/bru_mapper_shift.html">bru_mapper_shift()</a></code> mapper class that works like <code><a href="../reference/bru_mapper_scale.html">bru_mapper_scale()</a></code> but for additive shifts instead of multiplicative scaling. (version <code>2.9.0.9012</code>)</li>
+<li>Added more checks for invalid component or predictor evaluations, to help catch user errors sooner, and with more informative messages. (version <code>2.9.0.9013</code>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
@@ -97,7 +98,7 @@
 <li>Allow <code>NULL</code> in automatic component usage detection. (version <code>2.9.0.9003</code>)</li>
 <li>Corrected the crs information for <code>gorillas$plotsample$counts</code> and <code>gorillas_sf$plotsample$counts</code> from <code>+units=m</code> to <code>+units=km</code>. (version <code>2.9.0.9010</code>) The geometry information in <code>counts</code> is unlikely to have been used in examples or analysis code, as the problem would have been immediately obvious; plotting or other geometric operations that use the crs information would heve been completely wrong, and is only detected now that more code uses the crs information at all. Thanks to Dmytro Perepolkin for reporting in issue <a href="https://github.com/inlabru-org/inlabru/issues/205" class="external-link">#205</a></li>
 <li>Fix problem in <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for cases where the input data object also has missing values. (version <code>2.9.0.9011</code>)</li>
-<li>Make <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> transform the <code>where</code> coordinates to the same crs as the input data, for <code>SpatRaster</code> and <code>sf</code> inputs, to allow different crs specifications.</li>
+<li>Make <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> transform the <code>where</code> coordinates to the same crs as the input data, for <code>SpatRaster</code> and <code>sf</code> inputs, to allow different crs specifications. (version <code>2.9.0.9012</code>)</li>
 </ul></div>
 </div>
     <div class="section level2">
