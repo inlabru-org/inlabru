@@ -94,7 +94,7 @@ component's internal random variables.</p>
 <span><span class="fu">evaluate_effect_multi_state</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper</span></span>
-<span><span class="fu">evaluate_effect_single_state</span><span class="op">(</span><span class="va">component</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">evaluate_effect_single_state</span><span class="op">(</span><span class="va">component</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span>, label <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for comp_simple_list</span></span>
 <span><span class="fu">evaluate_effect_single_state</span><span class="op">(</span><span class="va">components</span>, <span class="va">input</span>, <span class="va">state</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -116,7 +116,7 @@ component's internal random variables.</p>
 
 
 <dt>component</dt>
-<dd><p>A <code>bru_component</code>, <code>comp_simple</code>, or <code>comp_simple_list</code>.</p></dd>
+<dd><p>A <code>bru_mapper</code>, <code>bru_component</code>, <code>comp_simple</code>, or <code>comp_simple_list</code>.</p></dd>
 
 
 <dt>input</dt>
@@ -129,6 +129,11 @@ component's internal random variables.</p>
 <li><p><code>evaluate_effect_single_state.*_list</code>: list of named state vectors.</p></li>
 <li><p><code>evaluate_effect_multi_state.*_list</code>: list of lists of named state vectors.</p></li>
 </ul></dd>
+
+
+<dt>label</dt>
+<dd><p>Option label used for any warning messages, specifying the
+affected component.</p></dd>
 
 </dl></div>
     <div class="section level2">
