@@ -268,7 +268,7 @@ evaluate_effect_multi_state <- function(...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component A `bru_component`, `comp_simple`, or `comp_simple_list`.
+#' @param component A `bru_mapper`, `bru_component`, `comp_simple`, or `comp_simple_list`.
 #' @param input Pre-evaluated component input
 #' @param state Specification of one (for `evaluate_effect_single_state`) or several
 #' (for `evaluate_effect_multi_State`) latent variable states:
@@ -276,6 +276,8 @@ evaluate_effect_multi_state <- function(...) {
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
 #' * `evaluate_effect_multi_state.*_list`: list of lists of named state vectors.
 #' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
+#' @param label Option label used for any warning messages, specifying the
+#' affected component.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname evaluate_effect
