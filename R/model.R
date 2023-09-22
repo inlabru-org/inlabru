@@ -281,8 +281,24 @@ evaluate_effect_multi_state <- function(...) {
 #' @rdname evaluate_effect
 
 evaluate_effect_single_state.bru_mapper <- function(component, input, state,
-                                                    ...) {
+                                                    ...,
+                                                    label = NULL) {
   values <- ibm_eval(component, input = input, state = state, ...)
+
+  not_ok <- ibm_invalid_output(
+    component,
+    input = input,
+    state = state
+  )
+  if (any(not_ok)) {
+    if (is.null(label)) {
+      warning("Inputs for a mapper give some invalid outputs.",
+              immediate. = TRUE)
+    } else {
+      warning("Inputs for '", label, "' give some invalid outputs.",
+              immediate. = TRUE)
+    }
+  }
 
   as.vector(as.matrix(values))
 }
@@ -302,7 +318,8 @@ evaluate_effect_single_state.comp_simple_list <- function(components,
       components[[label]],
       input = input[[label]],
       state = state[[label]],
-      ...
+      ...,
+      label = label
     )
   }
   result
@@ -471,7 +488,16 @@ evaluate_predictor <- function(model,
           input = .input,
           state = .state
         )
-        if (.is_iid) {
+        if (!.is_iid) {
+          not_ok <- ibm_invalid_output(
+            .mapper[["mappers"]][[1]],
+            input = .input[[1]],
+            state = .state
+          )
+          if (any(not_ok)) {
+            warning("Inputs for `ibm_eval()` for '", .comp[["label"]], '" give some invalid outputs.')
+          }
+        } else { # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the
           # initial mapper (subsequent mappers in the component pipe
           # are assumed to keep the same length and validity)

@@ -947,7 +947,7 @@ ibm_invalid_output.bru_mapper_index <- function(mapper, input, state, ...) {
   nok <- !is.na(input)
   nok[nok] <-
     !((input[nok] >= 1) &
-      (input[nok] <= ibm_n_output(mapper, input, state, ...)))
+      (input[nok] <= ibm_n(mapper)))
   nok
 }
 
@@ -958,7 +958,8 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  ok <- which((1L <= input) & (input <= ibm_n(mapper)))
+  nok <- ibm_invalid_output(mapper, input = input, state = state, ...)
+  ok <- which(!is.na(input) & !nok)
   Matrix::sparseMatrix(
     i = ok,
     j = input[ok],
