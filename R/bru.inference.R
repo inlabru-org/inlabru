@@ -385,7 +385,7 @@ bru_used_upgrade <- function(lhoods, labels) {
 #' @param x Object to be updated
 #' @param labels character vector of component labels
 #' @param ... Unused
-#'
+#' @returns An updated version of `x`
 #' @keywords internal
 #' @export
 #' @family bru_used
