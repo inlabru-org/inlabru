@@ -484,12 +484,14 @@ bru_used.default <- function(x = NULL, ...,
     ))
   }
 
-  used <- list(
-    effect = effect,
-    latent = latent
+  used <- structure(
+    list(
+      effect = effect,
+      latent = latent
+    ),
+    class = "bru_used"
   )
   used[["effect_exclude"]] <- effect_exclude
-  class(used) <- c("bru_used", class(used))
 
   if (!is.null(labels)) {
     used <- bru_used_update(used, labels = labels)
@@ -706,6 +708,16 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 }
 
 
+#' @describeIn bru_used Print method for `bru_used` objects.
+#' @export
+print.bru_used <- function(x, ...) {
+  cat("Used effects : ", paste0(x$effect, collapse = ", "), "\n", sep = "")
+  cat("Used latent  : ", paste0(x$latent, collapse = ", "), "\n", sep = "")
+  if (!is.null(x$effect_exclude)) {
+    cat("Excluded     : ", paste0(x$effect_exclude, collapse = ", "), "\n", sep = "")
+  }
+  invisible(x)
+}
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
