@@ -144,7 +144,10 @@ supplied, also calls <code><a href="bru_used_update.html">bru_used_update()</a><
 <span><span class="fu">bru_used</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_used</span></span>
-<span><span class="fu">bru_used</span><span class="op">(</span><span class="va">x</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_used</span><span class="op">(</span><span class="va">x</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bru_used</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -206,6 +209,11 @@ an existing <code>bru_used</code> object and calls <code><a href="bru_used_updat
 if <code>labels</code> is non-NULL.</p></li>
 </ul></div>
     <div class="section level2">
+    <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
+    
+<ul><li><p><code>print(bru_used)</code>: Print method for <code>bru_used</code> objects.</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other bru_used: 
 <code><a href="bru_used_update.html">bru_used_update</a>()</code>,
@@ -215,59 +223,23 @@ if <code>labels</code> is non-NULL.</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="op">(</span><span class="va">used</span> <span class="op">&lt;-</span> <span class="fu">bru_used</span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : </span>
 <span class="r-in"><span><span class="fu">bru_used</span><span class="op">(</span><span class="va">used</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "c"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : a, c</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : </span>
 <span class="r-in"><span><span class="op">(</span><span class="va">used</span> <span class="op">&lt;-</span> <span class="fu">bru_used</span><span class="op">(</span><span class="op">~</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c_latent</span> <span class="op">+</span> <span class="va">d_latent</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "c" "d"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : a, b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : c, d</span>
 <span class="r-in"><span><span class="fu">bru_used</span><span class="op">(</span><span class="va">used</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "c"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : c</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">used</span> <span class="op">&lt;-</span> <span class="fu">bru_used</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c_latent</span> <span class="op">+</span> <span class="va">d_latent</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "c" "d"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : a, b</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : c, d</span>
 <span class="r-in"><span><span class="fu">bru_used</span><span class="op">(</span><span class="va">used</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $effect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $latent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "c"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bru_used" "list"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used effects : a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Used latent  : c</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
