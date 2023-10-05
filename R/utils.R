@@ -161,8 +161,10 @@ bru_safe_sp <- function(quietly = FALSE,
   if (sp_version >= "1.6-0") {
     # Default to 2L to allow future sp to stop supporting
     # get_evolution_status; assume everything is fine if it fails.
-    evolution_status <- tryCatch(sp::get_evolution_status(),
-      error = function(e) 2L
+    evolution_status <- tryCatch(
+      sp::get_evolution_status(),
+      error = function(e) 2L,
+      warning = function(e) 2L
     )
     rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
       error = function(e) NA_character_

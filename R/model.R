@@ -295,10 +295,12 @@ evaluate_effect_single_state.bru_mapper <- function(component, input, state,
   if (any(not_ok)) {
     if (is.null(label)) {
       warning("Inputs for a mapper give some invalid outputs.",
-              immediate. = TRUE)
+        immediate. = TRUE
+      )
     } else {
       warning("Inputs for '", label, "' give some invalid outputs.",
-              immediate. = TRUE)
+        immediate. = TRUE
+      )
     }
   }
 

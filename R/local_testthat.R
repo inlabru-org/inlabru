@@ -230,9 +230,20 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     envir = envir
   )
   if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
-    old_sp_evolution_status <- sp::get_evolution_status()
+    old_sp_evolution_status <- tryCatch(
+      sp::get_evolution_status(),
+      error = function(e) {
+        2L
+      },
+      warning = function(e) {
+        2L
+      }
+    )
     withr::defer(
-      sp::set_evolution_status(old_sp_evolution_status),
+      tryCatch(sp::set_evolution_status(old_sp_evolution_status),
+        warning = function(e) invisible(NULL),
+        error = function(e) invisible(NULL)
+      ),
       envir = envir
     )
     bru_safe_sp(quietly = TRUE, force = TRUE)
