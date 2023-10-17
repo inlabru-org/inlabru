@@ -370,7 +370,7 @@ dfit <- lgcp(
 detfun <- predict(dfit, distdf, ~ hn(distance, sigma(sigma_theta)))
 ```
 
-Half-normal next
+Hazard-rate next
 
 ```{r,results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 <- distance ~ log(hr(distance, sigma(sigma_theta))) + Intercept
@@ -385,8 +385,9 @@ detfun1 <- predict(dfit1, distdf, ~ hr(distance, sigma(sigma_theta)))
 ```
 
 
-Plot both lines on histogram of observations
-First scale lines to have same area as that of histogram
+Plot both lines on histogram of observations.
+First scale lines to have same area as that of histogram.
+
 Half-normal:
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
