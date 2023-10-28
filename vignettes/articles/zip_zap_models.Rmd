@@ -273,7 +273,7 @@ truncated_poisson_like <-
   if (package_version(getNamespaceVersion("INLA")) < "2023.10.19-1") {
     like(
       family = "zeroinflatedpoisson0",
-      data = counts_df[counts_df$present,],
+      data = counts_df[counts_df$present, ],
       formula = count ~ elevation + field + Intercept_count,
       E = area,
       control.family = list(hyper = list(theta = list(
@@ -283,7 +283,7 @@ truncated_poisson_like <-
   } else {
     like(
       family = "nzpoisson",
-      data = counts_df[counts_df$present,],
+      data = counts_df[counts_df$present, ],
       formula = count ~ elevation + field + Intercept_count,
       E = area
     )
