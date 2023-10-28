@@ -1,8 +1,9 @@
 ---
-title: "Devel: ZIP and ZAP models"
+title: "ZIP and ZAP models"
+author: "Dmytro Perepolkin and Finn Lindgren"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Devel: ZIP and ZAP models}
+  %\VignetteIndexEntry{ZIP and ZAP models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 header-includes:
@@ -14,7 +15,11 @@ bibliography: zip_zap_models.bib
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = TRUE
+  eval = TRUE,
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5
 )
 ```
 
@@ -40,7 +45,7 @@ In addition to the point process models, `inlabru` is capable of handling models
 
 The following example utilizes the `gorillas` dataset. To obtain the count data, we rasterize the species counts to match the spatial covariates available for the 'gorilla' data, and then aggregate the pixels to cover an area 16 times larger (4x4 pixels in the original covariate raster dimensions). Finally, we mask regions outside the study area.
 
-```{r fig-count-raster, fig.cap="Counts of gorilla nests", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
+```{r fig-count-raster, fig.cap="Counts of gorilla nests", out.width="80%", fig.align='center'}
 gorillas_sf <- inlabru::gorillas_sf
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
@@ -67,18 +72,17 @@ counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
 
 We can also aggregate the relevant spatial covariates to the same level of granularity as the nest counts. The vegetation classes are quite unbalances, so it might make sense to split them by class and use proportion of land cover for some classes, say classes 2, and 3 (Disturbed, and Grassland, respectively).
 
-```{r fig-vegetation-raster, fig.cap="Proportion of vegetation cover by class", fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
+```{r fig-vegetation-raster, fig.cap="Proportion of vegetation cover by class", out.width="80%", fig.align='center'}
 gcov_lvls <- gcov$vegetation %>% levels()
 gcov_vegetation <- gcov$vegetation %>%
   segregate() %>%
   terra::aggregate(fact = 4, fun = mean)
 names(gcov_vegetation) <- gcov_lvls[[1]]$vegetation
 gcov_vegetation %>% plot()
-# focal(w=matrix(1/25,nrow=5,ncol=5)) # alternative - convolution
 ```
 
 
-```{r fig-count-mesh, fig.cap="Mesh over the count locations", fig.width=7, fig.height=5,out.width="80%", fig.align='center'}
+```{r fig-count-mesh, fig.cap="Mesh over the count locations",out.width="80%", fig.align='center'}
 px_mesh <- fm_mesh_2d_inla(
   loc = st_intersection(st_as_sfc(counts_df), st_buffer(boundary, -0.05)),
   boundary = boundary,
@@ -99,16 +103,9 @@ ggplot() +
 
 ## Poisson GLM
 
-Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation. 
-<!-- To ensure identifiability of the vegetation effect estimates relative to the intercept, we use `model = "factor_full"` with a sum-to-zero constraint. -->
-<!-- An alternative approach would be to use `model = "factor_contrast"` without a constraint, but this would require reordering factor levels to prevent the least common vegetation type from becoming the reference level. -->
+Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation.
 
-```{r fig-predict-poi, fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
-# comps <- ~ vegetation(gcov$vegetation,
-#  model = "factor_full",
-#  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
-#  constr = TRUE
-# ) +
+```{r fig-predict-poi, out.width="80%", fig.align='center'}
 comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
   veg_grassland(gcov_vegetation$Grassland, model = "linear") +
   elevation(gcov$elevation, model = "linear") +
@@ -118,7 +115,7 @@ fit_poi <- bru(
   comps,
   like(
     family = "poisson", data = counts_df,
-    formula = count ~ # vegetation +
+    formula = count ~
       veg_disturbed + veg_grassland +
       elevation + field + Intercept,
     E = area
@@ -185,7 +182,7 @@ fit_zip <- bru(
   comps,
   like(
     family = "zeroinflatedpoisson1", data = counts_df,
-    formula = count ~ # vegetation +
+    formula = count ~
       veg_disturbed + veg_grassland +
       elevation + field + Intercept,
     E = area
@@ -233,15 +230,20 @@ Based on the distribution of nests in relation to the [spatial covariates](2d_lg
 
 When the process driving the presence or absence of a species substantially differs from the process governing its abundance, it is advisable to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of both a binomial and a truncated Poisson component.
 
-We transition to the `zeroinflatedpoisson0` model, which is defined by the [following observation probability model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+In the `zeroinflatedpoisson0` model, which is defined by the [following observation probability model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
 $$
 
-where $p=\text{logit}^{-1}(\theta)$.  
+where $p=\text{logit}^{-1}(\theta)$.  In order to allow $p$ to be controlled by a full latent model and not just a single hyperparameter, we set want to set $p=0$, and handle the zero-probability
+modelling with a separate binary observation model modelling presence/absence.
+Before INLA version `23.10.19-1`, this could be done by fixing the hyperparameter
+to a small value.
+The [`nzpossion` model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf), available from INLA version `23.10.19-1` implements the
+$\text{Poisson}(y\vert y>0)$ model exactly.
 
-In this model, the ZIP distribution governs only the positive counts, while the absences are addressed by a separate binomial model that can have its own covariates. It's worth noting that we exclude observations with absent nests from the ZIP part of the model by subsetting the data to include only instances where `present` is `TRUE`.
+In the resulting model, the truncated Poisson distribution governs only the positive counts, while the absences are addressed by a separate binomial model that can have its own covariates. It's worth noting that we exclude observations with absent nests from the truncated Poisson part of the model by subsetting the data to include only instances where `present` is `TRUE`.
 
 The expectation and variance are computed as follows:
 
@@ -257,18 +259,35 @@ Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1
 \end{aligned}
 $$
 
-```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
-# comps <- ~ vegetation(gcov$vegetation,
-#  model = "factor_full",
-#  hyper = list(prec = list(initial = log(1 / 0.1^2), fixed = TRUE)),
-#  constr = TRUE
-# ) +
+
+
+```{r fig-fit-zap}
 comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
   veg_grassland(gcov_vegetation$Grassland, model = "linear") +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
   elevation_present(gcov$elevation, model = "linear") +
   field_present(geometry, copy = "field")
+
+truncated_poisson_like <-
+  if (package_version(getNamespaceVersion("INLA")) < "2023.10.19-1") {
+    like(
+      family = "zeroinflatedpoisson0",
+      data = counts_df[counts_df$present,],
+      formula = count ~ elevation + field + Intercept_count,
+      E = area,
+      control.family = list(hyper = list(theta = list(
+        initial = -20, fixed = TRUE
+      )))
+    )
+  } else {
+    like(
+      family = "nzpoisson",
+      data = counts_df[counts_df$present,],
+      formula = count ~ elevation + field + Intercept_count,
+      E = area
+    )
+  }
 
 fit_zap <- bru(
   comps,
@@ -279,17 +298,15 @@ fit_zap <- bru(
       veg_disturbed + veg_grassland +
       elevation_present + field_present + Intercept_present
   ),
-  like(
-    family = "zeroinflatedpoisson0",
-    data = counts_df[counts_df$present, ],
-    formula = count ~ elevation + field + Intercept_count,
-    E = area,
-    control.family = list(hyper = list(theta = list(initial = -20, fixed = TRUE)))
-  )
+  truncated_poisson_like
 )
 summary(fit_zap)
+```
+
 
 # Predict intensity on the original raster locations
+
+```{r fig-pred-zap, fig.cap="Predictions from zero-adjusted model",fig.width=10, fig.height=5, out.width="100%", fig.align='center'}
 pred_zap <- predict(
   fit_zap,
   counts_df,
