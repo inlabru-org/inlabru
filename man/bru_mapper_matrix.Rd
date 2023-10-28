@@ -16,7 +16,8 @@ bru_mapper_matrix(labels)
 \method{ibm_jacobian}{bru_mapper_matrix}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
-\item{labels}{Column labels for matrix mappings}
+\item{labels}{Column labels for matrix mappings; Can be factor, character,
+or a single integer specifying the number of columns for integer column indexing.}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
@@ -40,6 +41,10 @@ Create a matrix mapper, for a given number of columns
 }
 \examples{
 m <- bru_mapper_matrix(labels = c("a", "b"))
+ibm_values(m)
+ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
+
+m <- bru_mapper_matrix(labels = 2L)
 ibm_values(m)
 ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
 

@@ -16,6 +16,9 @@
   but for additive shifts instead of multiplicative scaling. (version `2.9.0.9012`)
 * Added more checks for invalid component or predictor evaluations, to help
   catch user errors sooner, and with more informative messages. (version `2.9.0.9013`)
+* Expand `bru_mapper_matrix`, previously used only for component `model = "fixed",
+  to allow integer indexing in addition to the previous factor/character-only indexing.
+  (version `2.9.0.9014`)
 
 ## Bug fixes
 

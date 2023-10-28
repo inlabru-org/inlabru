@@ -1240,7 +1240,8 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
 ## _matrix ####
 
 #' @title Mapper for matrix multiplication
-#' @param labels Column labels for matrix mappings
+#' @param labels Column labels for matrix mappings; Can be factor, character,
+#' or a single integer specifying the number of columns for integer column indexing.
 #' @export
 #' @description Create a matrix mapper, for a given number of columns
 #' @rdname bru_mapper_matrix
@@ -1252,10 +1253,18 @@ ibm_jacobian.bru_mapper_linear <- function(mapper, input, ...) {
 #' ibm_values(m)
 #' ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
 #'
+#' m <- bru_mapper_matrix(labels = 2L)
+#' ibm_values(m)
+#' ibm_eval2(m, input = matrix(1:6, 3, 2), state = 2:3)
+#'
 bru_mapper_matrix <- function(labels) {
   if (is.factor(labels)) {
     mapper <- list(
       labels = levels(labels)
+    )
+  } else if (is.integer(labels) && (length(labels) == 1L)) {
+    mapper <- list(
+      labels = seq_len(labels)
     )
   } else {
     mapper <- list(
@@ -1273,7 +1282,11 @@ ibm_n.bru_mapper_matrix <- function(mapper, ...) {
 #' @export
 #' @rdname bru_mapper_matrix
 ibm_values.bru_mapper_matrix <- function(mapper, ...) {
-  factor(x = mapper$labels, levels = mapper$labels)
+  if (is.integer(mapper$labels)) {
+    mapper$labels
+  } else {
+    factor(x = mapper$labels, levels = mapper$labels)
+  }
 }
 
 #' @export
