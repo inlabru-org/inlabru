@@ -16,7 +16,7 @@ mesh (a type of discretization of continuous space) covering the survey region.}
 \item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
 survey region.}
 \item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
-\emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+\emph{simulated} population of dolphin groups. The population was simulated from a \code{inlabru}
 model fitted to the actual survey data. Note that the simulated data do not have any associated
 size information.}
 }
