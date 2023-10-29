@@ -36,7 +36,7 @@ method, called inside bru()."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.9.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -280,11 +280,20 @@ the response <code>y</code> with respect to the likelihood family stated when ca
 the linear predictor \(\eta\) would be written down as</p>
 <p>$$\eta = \beta * x + c,$$</p>
 <p>where:</p>
-<ul><li><p>\(c\) is the <em>intercept</em></p></li>
-<li><p>\(x \)is a <em>covariate</em></p></li>
-<li><p>\(\beta\) is a <em>latent variable</em> associated with \(x\) and</p></li>
-<li><p>\(\psi = \beta * x \) is called the <em>effect</em> of \(x\)</p></li>
-</ul><p>A problem that arises when using this kind of R formula is that it does not
+<dl><dt>\(c\)</dt>
+<dd><p>is the <em>intercept</em></p></dd>
+
+<dt>\(x\)</dt>
+<dd><p>is a <em>covariate</em></p></dd>
+
+<dt>\(\beta\)</dt>
+<dd><p>is a <em>latent variable</em> associated with \(x\) and</p></dd>
+
+<dt>\(\psi = \beta * x\)</dt>
+<dd><p>is called the <em>effect</em> of \(x\)</p></dd>
+
+
+</dl><p>A problem that arises when using this kind of R formula is that it does not
 clearly reflect the mathematical
 formula. For instance, when providing the formula to inla, the resulting
 object will refer to the random
