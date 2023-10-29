@@ -40,6 +40,9 @@
     <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
     <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>General examples</h6>
+    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
+    <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
     <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
@@ -135,16 +138,16 @@ Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may 
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">bru_summarise</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">1000</span><span class="op">)</span>, max_moment <span class="op">=</span> <span class="fl">4</span>, probs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         mean        sd     skew ekurtosis mean.mc_std_err sd.mc_std_err</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9975981 0.9920142 2.073926  6.382517      0.03137024    0.04541789</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9355621 0.9634868 2.401033  8.909754      0.03046813    0.05032260</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0155982 0.9732302 1.707430  3.814658      0.03077624    0.03711269</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.0171493 0.9988535 1.853013  4.812092      0.03158652    0.04122644</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.9978684 0.9873842 1.724878  3.574723      0.03122383    0.03686768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0404370 1.0412146 2.139383  7.344799      0.03292610    0.05033171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9920548 0.9574777 1.688779  3.360384      0.03027810    0.03505724</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  1.0097915 1.0377023 2.010974  5.909838      0.03281503    0.04615104</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.9641143 0.9577373 2.071797  7.339350      0.03028631    0.04628298</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.0264139 1.0309024 1.901758  4.876276      0.03260000    0.04274914</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1.0259336 0.9594271 1.680812  3.824737      0.03033975    0.03661801</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9444130 0.9372169 1.818092  4.360067      0.02963740    0.03737742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0287703 1.0124775 1.615931  2.982193      0.03201735    0.03573987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.9736180 0.9716676 2.140672  6.743547      0.03072683    0.04543403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.9718266 0.9798314 2.008896  5.737873      0.03098499    0.04310110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0174864 1.0230840 1.729272  3.257786      0.03235276    0.03709927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9807677 1.0125815 2.384298  9.887018      0.03202064    0.05520432</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.9621708 0.9740552 2.163870  6.613774      0.03080233    0.04520649</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.9987843 1.0279267 1.991638  5.926046      0.03250590    0.04576308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.9497248 0.9421249 1.901920  4.630392      0.02979260    0.03836309</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

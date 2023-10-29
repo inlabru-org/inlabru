@@ -42,6 +42,9 @@ distributions in predictor expressions"><!-- mathjax --><script src="https://cdn
     <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
     <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>General examples</h6>
+    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
+    <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
     <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
     <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
@@ -133,10 +136,10 @@ and inverse calculations use lower tails only, potentially losing accuracy in th
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">bru_forward_transformation</span><span class="op">(</span><span class="va">qexp</span>, <span class="va">u</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu">bru_inverse_transformation</span><span class="op">(</span><span class="va">pexp</span>, <span class="va">y</span>, rate <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">v</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         [,1]      [,2]       [,3]      [,4]      [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> u -0.7345969 0.9707932 -0.8388732 0.4422712 0.4507690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> y  0.1315224 0.8984092  0.1120534 0.5556262 0.5603093</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> v -0.7345969 0.9707932 -0.8388732 0.4422712 0.4507690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        [,1]     [,2]        [,3]       [,4]       [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> u 0.7992295 0.498264 -1.09950093 -0.4421752 -0.4057306</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> y 0.7753990 0.586966  0.07296096  0.1996281  0.2096326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> v 0.7992295 0.498264 -1.09950093 -0.4421752 -0.4057306</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
