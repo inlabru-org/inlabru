@@ -3,30 +3,19 @@ test_that("Mexdolphin: Hazard rate detection function", {
   local_bru_safe_inla()
   data(mexdolphin, package = "inlabru", envir = environment())
 
-  hr <- function(distance, lsig) {
-    1 - exp(-(distance / exp(lsig))^-1)
+  sig <- function(x) bru_forward_transformation(qexp, x, rate = 1 / 8)
+  hr <- function(distance, sigma) {
+    1 - exp(-(distance / sigma)^-1)
   }
-  cmp <- ~ lsig(1) + Intercept(1)
-  form <- distance ~ log(hr(distance, lsig)) + Intercept
-  ips <- fm_int(list(distance = fm_mesh_1d(seq(0, 8, by = 0.1))))
+  log_hr <- function(distance, sigma) {
+    log1p(-exp(-(distance / sigma)^-1))
+  }
+  cmp <- ~ sig_theta(1, prec.linear = 1) + Intercept(1)
+  form <- distance ~ log_hr(distance, sig(sig_theta)) + Intercept
+  form_list <- list(distance = distance) ~ log(hr(distance, sig(sig_theta))) + Intercept
 
   pts <-
     mexdolphin$points
-
-  fit_classic <- lgcp(
-    components = cmp,
-    pts,
-    ips = ips,
-    formula = form,
-    options = list(
-      bru_verbose = 0,
-      bru_compress_cp = TRUE,
-      bru_max_iter = 10,
-      verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "classic"
-    )
-  )
 
   fit <- bru(
     components = cmp,
@@ -41,189 +30,30 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
+      bru_initial = list(Intercept = 0, sig_theta = -1),
       inla.mode = "compact"
     )
   )
 
-  if (FALSE) {
-    pred <- predict(fit,
-      data = data.frame(distance = seq(-8, 8, by = 0.01)),
-      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
-    )
-
-    ggplot(data.frame(distance = c(
-      pts$distance,
-      -pts$distance
-    ))) +
-      geom_density(aes(distance, after_stat(count))) +
-      geom_line(aes(distance, est, col = "Plugin"),
-        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
-          mutate(est = hr(
-            abs(distance),
-            fit$summary.fixed["lsig", "mean"]
-          ) *
-            exp(fit$summary.fixed["Intercept", "mean"]))
-      ) +
-      geom_line(aes(distance, mean, col = "Pred"),
-        data = pred
-      ) +
-      geom_line(aes(distance, est, col = "1"),
-        data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
-          mutate(est = hr(
-            abs(distance),
-            1
-          ) *
-            exp(2.3))
-      )
-
-    pred <- predict(fit,
-      data = ips,
-      formula = ~ exp(Intercept + log_hr(abs(distance), lsig))
-    )
-    ggplot(data.frame(pts)) +
-      stat_ecdf(aes(distance)) +
-      geom_line(
-        aes(distance,
-          cumsum(hr(distance, fit$summary.fixed["lsig", "mean"])) /
-            sum(hr(distance, fit$summary.fixed["lsig", "mean"])),
-          col = "Plugin"
-        ),
-        data = data.frame(ips)
-      ) +
-      geom_line(
-        aes(distance,
-          cumsum(mean) / sum(mean),
-          col = "Pred"
-        ),
-        data = pred
-      ) +
-      geom_line(
-        aes(distance,
-          cumsum(hr(distance, 1)) /
-            sum(hr(distance, 1)),
-          col = "1"
-        ),
-        data = data.frame(ips)
-      )
-  }
-
   expect_equal(
-    fit_classic$summary.fixed["lsig", "mean"],
-    1.03741,
+    fit$summary.fixed["sig_theta", "mean"],
+    -0.4653159,
     tolerance = midtol
   )
   expect_equal(
-    fit_classic$summary.fixed["lsig", "sd"],
-    0.5184620,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit_classic$summary.fixed["Intercept", "mean"],
-    2.32,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit_classic$summary.fixed["Intercept", "sd"],
-    0.2899217,
-    tolerance = midtol
-  )
-
-  expect_equal(
-    fit$summary.fixed["lsig", "mean"],
-    1.06,
-    tolerance = midtol
-  )
-  expect_equal(
-    fit$summary.fixed["lsig", "sd"],
-    0.5183252,
+    fit$summary.fixed["sig_theta", "sd"],
+    0.3583088,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    2.29,
+    2.2593613,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.2900139,
+    0.2720904,
     tolerance = midtol
-  )
-})
-
-
-# timings <- function() {
-#   data(mexdolphin, package = "inlabru", envir = environment())
-#
-#   hr <- function(distance, lsig) {
-#     1 - exp(-(distance / (exp(lsig)))^-1)
-#   }
-#   cmp <- ~ lsig(1) + Intercept(1)
-#   form <- distance ~ log(hr(distance, lsig)) + Intercept
-#   ips <- fm_int(fm_mesh_1d(seq(0, 8, by = 0.1)), name = "distance")
-#   local_bru_options_set(bru_verbose = FALSE)
-#   bench::mark(
-#     pandemic = {
-#       local_bru_options_set(bru_method = list(taylor = "pandemic"))
-#       fit <- lgcp(
-#         components = cmp,
-#         mexdolphin$points,
-#         ips = ips,
-#         formula = form,
-#         options = list(control.inla = list(int.strategy = "auto"))
-#       )
-#     },
-#     check = FALSE,
-#     min_iterations = 2
-#   )
-# }
-#
-# timings()
-# # A tibble: 2 x 13
-# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time         gc
-# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>       <list>
-#   1 legacy        1.36s    1.39s     0.722        NA     2.17     2     6      2.77s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
-#   2 pandemic      1.36s    1.37s     0.732        NA     2.19     2     6      2.73s <NULL> <NULL> <bch:tm [2]> <tibble [2 × 3]>
-#
-# Unit: seconds
-# expr      min       lq     mean   median       uq      max neval cld
-# legacy 1.447667 1.474479 1.507082 1.496711 1.520239 1.899379   100   b
-# pandemic 1.252985 1.271926 1.291995 1.288727 1.307383 1.402191   100  a
-
-
-
-
-test_that("Mexdolphin: Hazard rate detection function", {
-  skip_on_cran()
-  local_bru_safe_inla()
-  data(mexdolphin, package = "inlabru", envir = environment())
-
-  hr <- function(distance, lsig) {
-    1 - exp(-(distance / exp(lsig))^-1)
-  }
-  cmp <- ~ lsig(1) + Intercept(1)
-  form <- distance ~ log(hr(distance, lsig)) + Intercept
-  form_list <- list(distance = distance) ~ log(hr(distance, lsig)) + Intercept
-
-  pts <-
-    mexdolphin$points
-
-  fit <- bru(
-    components = cmp,
-    like(
-      formula = form,
-      family = "cp",
-      data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
-    ),
-    options = list(
-      bru_verbose = 0,
-      bru_compress_cp = TRUE,
-      bru_max_iter = 10,
-      verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
-      inla.mode = "compact"
-    )
   )
 
   fit_list <- bru(
@@ -239,18 +69,160 @@ test_that("Mexdolphin: Hazard rate detection function", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, lsig = -1),
+      bru_initial = list(Intercept = 0, sig_theta = -1),
       inla.mode = "compact"
     )
   )
 
-  expect_equal(fit$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
-  expect_equal(fit$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "mean"], 2.29, tolerance = midtol)
-  expect_equal(fit$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
+  expect_equal(
+    fit_list$summary.fixed["sig_theta", "mean"],
+    -0.4653159,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["sig_theta", "sd"],
+    0.3583088,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["Intercept", "mean"],
+    2.2593613,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit_list$summary.fixed["Intercept", "sd"],
+    0.2720904,
+    tolerance = midtol
+  )
 
-  expect_equal(fit_list$summary.fixed["lsig", "mean"], 1.06, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["lsig", "sd"], 0.5183252, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["Intercept", "mean"], 2.29, tolerance = midtol)
-  expect_equal(fit_list$summary.fixed["Intercept", "sd"], 0.2900139, tolerance = midtol)
+  ##########
+  # pred <- predict(fit,
+  #                 newdata = data.frame(distance = seq(-8, 8, by = 0.01)),
+  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # )
+  #
+  # library(ggplot2)
+  # library(tidyverse)
+  # ggplot(data.frame(distance = c(
+  #   pts$distance,
+  #   -pts$distance
+  # ))) +
+  #   geom_density(aes(distance, after_stat(count))) +
+  #   geom_line(aes(distance, est, col = "Plugin"),
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #               mutate(est = hr(
+  #                 abs(distance),
+  #                 sig(fit$summary.fixed["sig_theta", "mean"])
+  #               ) *
+  #                 exp(fit$summary.fixed["Intercept", "mean"]))
+  #   ) +
+  #   geom_line(aes(distance, mean, col = "Pred"),
+  #             data = pred
+  #   ) +
+  #   geom_line(aes(distance, est, col = "1"),
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #               mutate(est = hr(
+  #                 abs(distance),
+  #                 1
+  #               ) *
+  #                 exp(2.3))
+  #   )
+  #
+  # pred <- predict(fit,
+  #                 data = ips,
+  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # )
+  # ggplot(data.frame(pts)) +
+  #   stat_ecdf(aes(distance)) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(hr(distance, sig(fit$summary.fixed["sig_theta", "mean"]))) /
+  #           sum(hr(distance, sig(fit$summary.fixed["sig_theta", "mean"]))),
+  #         col = "Plugin"
+  #     ),
+  #     data = data.frame(ips) %>% arrange(distance)
+  #   ) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(mean) / sum(mean),
+  #         col = "Pred"
+  #     ),
+  #     data = pred %>% arrange(distance)
+  #   ) +
+  #   geom_line(
+  #     aes(distance,
+  #         cumsum(hr(distance, 1)) /
+  #           sum(hr(distance, 1)),
+  #         col = "1"
+  #     ),
+  #     data = data.frame(ips) %>% arrange(distance)
+  #   )
+  ##########
+})
+
+
+test_that("Marginal parameter transformation", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  data(mexdolphin_sf, package = "inlabru", envir = environment())
+
+  hr <- function(distance, sigma) {
+    1 - exp(-(distance / sigma)^-1)
+  }
+  log_hr <- function(distance, sigma) {
+    log1p(-exp(-(distance / sigma)^-1))
+  }
+  cmp <- component_list(~
+    sigma(
+      1,
+      prec.linear = 1,
+      marginal = bru_mapper_marginal(
+        qfun = qexp,
+        pfun = pexp,
+        dfun = dexp,
+        rate = 1 / 8
+      )
+    ) + Intercept(1))
+  form <- distance ~ log_hr(distance, sigma = sigma) + Intercept
+
+  pts <- mexdolphin_sf$points
+
+  fit <- bru(
+    components = cmp,
+    like(
+      formula = form,
+      family = "cp",
+      data = pts,
+      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+    ),
+    options = list(
+      bru_verbose = 0,
+      bru_compress_cp = TRUE,
+      bru_max_iter = 10,
+      verbose = FALSE,
+      bru_initial = list(Intercept = 0, sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)),
+      inla.mode = "compact"
+    )
+  )
+
+  expect_equal(
+    fit$summary.fixed["sigma", "mean"],
+    -0.4653159,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["sigma", "sd"],
+    0.3583088,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    2.2593613,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["Intercept", "sd"],
+    0.2720904,
+    tolerance = midtol
+  )
 })

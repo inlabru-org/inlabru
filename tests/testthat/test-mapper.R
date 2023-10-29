@@ -522,3 +522,79 @@ test_that("Collect mapper, automatic construction", {
     )
   }
 })
+
+
+test_that("Marginal mapper", {
+  m1 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
+  state0 <- -5:5
+  val1 <- ibm_eval(m1, state = state0)
+
+  state1 <- ibm_eval(m1, state = val1, reverse = TRUE)
+  expect_equal(state1, state0)
+
+  m2 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8, inverse = TRUE)
+  state2 <- ibm_eval(m2, state = val1)
+  expect_equal(state2, state0)
+
+  val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
+  expect_equal(val2, val1)
+
+  dqexp <- function(p, rate = 1, lower.tail = TRUE, log.p = FALSE, log = FALSE) {
+    if (log.p) {
+      if (lower.tail) {
+        val <- log1p(-exp(p)) + log(rate)
+      } else {
+        val <- p + log(rate)
+      }
+    } else {
+      if (lower.tail) {
+        val <- log1p(-p) + log(rate)
+      } else {
+        val <- log(p) + log(rate)
+      }
+    }
+    if (log) {
+      return(val)
+    }
+    return(exp(val))
+  }
+  m1_d <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  m1_dq <- bru_mapper_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
+  jac1 <- ibm_jacobian(m1, state = state0)
+  jac1_d <- ibm_jacobian(m1_d, state = state0)
+  jac1_dq <- ibm_jacobian(m1_dq, state = state0)
+  # rbind(diag(jac1), diag(jac1_d), diag(jac1_dq))
+  expect_equal(sum(abs(diag(jac1) - diag(jac1_d))), 0, tolerance = lowtol)
+  expect_equal(sum(abs(diag(jac1_d) - diag(jac1_dq))), 0, tolerance = lowtol)
+})
+
+
+test_that("Mapper lists", {
+  m1 <- bru_mapper_index(4L)
+  m2 <- bru_mapper_index(3L)
+
+  expect_s3_class(c(m1), "bm_list")
+  expect_s3_class(c(m1, m2), "bm_list")
+  expect_s3_class(c(c(m1, m2), c(m2, m1)), "bm_list")
+})
+
+test_that("Mesh 1d mapper", {
+  m <- bru_mapper(fmesher::fm_mesh_1d(1:5, boundary = "f"), indexed = TRUE)
+
+  loc <- seq(-2, 7, by = 0.5)
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, length(loc))
+  expect_equal(val, loc)
+})
+
+test_that("Mesh 2d mapper", {
+  m <- bru_mapper(fmesher::fmexample$mesh)
+
+  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = FALSE)
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, 25)
+
+  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
+  val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
+  expect_length(val, 9)
+})

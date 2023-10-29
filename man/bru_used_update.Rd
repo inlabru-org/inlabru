@@ -22,6 +22,9 @@ bru_used_update(x, labels, ...)
 
 \item{...}{Unused}
 }
+\value{
+An updated version of \code{x}
+}
 \description{
 Merge available component labels information with used components
 information.

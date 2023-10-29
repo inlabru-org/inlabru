@@ -34,7 +34,6 @@ Load libraries
 library(inlabru)
 library(INLA)
 library(ggplot2)
-sp::set_evolution_status(2L)
 ```
 
 Get the data

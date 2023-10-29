@@ -116,60 +116,60 @@ Red nodes indicate deprecated behaviour retained for backwards compatibility.
 ```{r, eval=TRUE,echo=FALSE}
 DiagrammeR::mermaid('
 flowchart TD
-  expr([`label`_expr])
-  data([data])
-  _envir([.envir])
-  input(["`label`_input"])
-  input0([input = NULL])
-  input1([input = 1])
-  style input1 color:#f00
+expr([`label`_expr])
+data([data])
+_envir([.envir])
+input(["`label`_input"])
+input0([input = NULL])
+input1([input = 1])
+style input1 color:#f00
 
-  eval[eval]
-  eval_function["value=fun(.data.)"]
-  eval_formula["model.Matrix"]
-  eval_spatial["eval_spatial"]
-  eval_coordinates["SpatialPoints(value, crs)"]
-  style eval_coordinates color:#f00
-  eval_crs["crs=fm_CRS(.data.)"]
+eval[eval]
+eval_function["value=fun(.data.)"]
+eval_formula["model.Matrix"]
+eval_spatial["eval_spatial"]
+eval_coordinates["SpatialPoints(value, crs)"]
+style eval_coordinates color:#f00
+eval_crs["crs=fm_CRS(.data.)"]
 
-  res{"Type of<br/>result"}
-  null_on_fail{"null_on_fail?"}
-  is_coordinates_fun{"Is expr =<br/>coordinates?"}
+res{"Type of<br/>result"}
+null_on_fail{"null_on_fail?"}
+is_coordinates_fun{"Is expr =<br/>coordinates?"}
 
-  expr --> eval
-  eval --> res
-  res -->|error| null_on_fail
-  data --> eval
-  _envir --> eval
+expr --> eval
+eval --> res
+res -->|error| null_on_fail
+data --> eval
+_envir --> eval
 
-  null_on_fail -->|TRUE| input0
-  null_on_fail -->|FALSE| input1
-  input0 --> input
-  input1 --> input
+null_on_fail -->|TRUE| input0
+null_on_fail -->|FALSE| input1
+input0 --> input
+input1 --> input
 
-  res -->|function| eval_function
-  eval_function --> is_coordinates_fun
+res -->|function| eval_function
+eval_function --> is_coordinates_fun
 
-  is_coordinates_fun -->|Yes| eval_coordinates
-  is_coordinates_fun -->|No| input
-  eval_coordinates --> input
-  eval_crs --> eval_coordinates
+is_coordinates_fun -->|Yes| eval_coordinates
+is_coordinates_fun -->|No| input
+eval_coordinates --> input
+eval_crs --> eval_coordinates
 
-  res -->|"vector,<br/>matrix,<br/>data.frame<br/>list"| input
+res -->|"vector,<br/>matrix,<br/>data.frame<br/>list"| input
 
-  res -->|formula| eval_formula
-  eval_formula --> input
+res -->|formula| eval_formula
+eval_formula --> input
 
-  res -->|"spatial<br/>covariate"| eval_spatial
-  eval_spatial --> input
+res -->|"spatial<br/>covariate"| eval_spatial
+eval_spatial --> input
 
 %% spatial covariate layer input
-  layer_expr(["`label`_layer_expr"])
-  layer(["`label`_layer"])
-  layer_eval["eval"]
-  data --> layer_eval
-  _envir --> layer_eval
-  layer_expr --> layer_eval --> layer --> eval_spatial
+layer_expr(["`label`_layer_expr"])
+layer(["`label`_layer"])
+layer_eval["eval"]
+data --> layer_eval
+_envir --> layer_eval
+layer_expr --> layer_eval --> layer --> eval_spatial
 ',
   width = 900,
   height = 700

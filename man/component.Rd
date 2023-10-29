@@ -34,7 +34,8 @@ component(...)
   replicate_layer = NULL,
   replicate_selector = NULL,
   nrep = NULL,
-  A.msk = NULL,
+  marginal = NULL,
+  A.msk = deprecated(),
   .envir = parent.frame(),
   envir_extra = NULL
 )
@@ -100,8 +101,10 @@ passed directly on to \code{INLA::f}}
 \item{replicate, replicate_mapper, replicate_layer, replicate_selector, nrep}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}
 
-\item{A.msk}{TODO: check/fix/deprecate this parameter.
-Likely doesn't work at the moment, and I've found no examples that use it.}
+\item{marginal}{May specify a \code{bru_mapper_marginal()} mapper,
+that is applied before scaling by \code{weights}.}
+
+\item{A.msk}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} and has no effect.}
 
 \item{.envir}{Evaluation environment}
 
@@ -136,11 +139,11 @@ the linear predictor \eqn{\eta} would be written down as
 
 where:
 
-\itemize{
-\item{\eqn{c} }{is the \emph{intercept}}
-\item{\eqn{x }}{is a \emph{covariate}}
-\item{\eqn{\beta} }{is a \emph{latent variable} associated with \eqn{x} and}
-\item{\eqn{\psi = \beta * x }}{ is called the \emph{effect} of \eqn{x}}
+\describe{
+\item{\eqn{c}}{is the \emph{intercept}}
+\item{\eqn{x}}{is a \emph{covariate}}
+\item{\eqn{\beta}}{is a \emph{latent variable} associated with \eqn{x} and}
+\item{\eqn{\psi = \beta * x}}{ is called the \emph{effect} of \eqn{x}}
 }
 
 A problem that arises when using this kind of R formula is that it does not

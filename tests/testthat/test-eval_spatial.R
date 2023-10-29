@@ -132,10 +132,11 @@ test_that("eval_spatial.sf", {
   plots <- sf::st_as_sf(gorillas$plotsample$plots)
   plots$something_num <- seq_len(nrow(plots))
   nests$something_num <- eval_spatial(plots, nests, layer = "something_num")
+  something_num <- eval_spatial(plots, plots, layer = "something_num")
 
   expect_equal(
-    sort(unique(nests$something), na.last = TRUE),
-    c(7, 12, 13, 14, 15, 17, 18, 19, 20, 23, 24, NA)
+    sort(unique(nests$something_num), na.last = TRUE),
+    c(3, 6, 8, 9, 16, 17, 19, 20, 21, 22, 25, NA)
   )
 
   plots$something_char <- as.character(seq_len(nrow(plots)))

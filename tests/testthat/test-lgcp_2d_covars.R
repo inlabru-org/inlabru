@@ -69,16 +69,23 @@ test_that("2D LGCP fitting", {
     tolerance = midtol
   )
 
-  f.elev <- function(x, y) {
-    spp <- SpatialPoints(data.frame(x = x, y = y),
-      proj4string = fm_CRS(elev)
+  f.elev <- function(xy, crs) {
+    spp <- sp::SpatialPoints(
+      as.data.frame(xy),
+      proj4string = fm_CRS(crs)
     )
-    v <- over(spp, elev)
+    v <- sp::over(spp, elev)
     v[is.na(v)] <- 0 # NAs are a problem! Remove them
     return(v$elevation)
   }
 
-  mdl3 <- coordinates ~ beta.elev(main = f.elev(x, y), model = "linear") +
+  mdl3 <- coordinates ~ beta.elev(
+    main = f.elev(
+      sp::coordinates(.data.),
+      fm_CRS(.data.)
+    ),
+    model = "linear"
+  ) +
     Intercept(1)
   fit3 <- lgcp(mdl3, gorillas$nests,
     samplers = gorillas$boundary,

@@ -136,7 +136,9 @@ mappers, as steps in a sequence of transformations, or as individual
 transformation mappers.
 
 * `bru_mapper_scale()`
+* `bru_mapper_marginal(qfun, pfun, ...)`
 * `bru_mapper_aggregate(rescale)`
+* `bru_mapper_logsumexp(rescale)`
 
 #### scale
 
@@ -152,6 +154,25 @@ ibm_eval(mapper,
 )
 ```
 
+#### marginal
+
+The `marginal` mapper transforms the `state` vector from standardised Gaussian marginal distribution
+to the distribution defined by a quantile function.
+This can be used to define components with latent marginal `N(0,1)` distribution but non-Gaussian
+effect.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_marginal(qfun = ..., pfun = ..., dfun = ..., ..., inverse = ...)
+ibm_eval(mapper,
+  input = NULL, # If a list is given, it overrides the parameter specification
+  state = ...
+)
+
+# Examples:
+mapper <- bru_mapper_marginal(qfun = qexp, rate = 1 / 8)
+mapper <- bru_mapper_marginal(qfun = qexp, pfun = pexp, dfun = dexp, rate = 1 / 8)
+```
+
 #### aggregate
 
 The `aggregate` mapper aggregates the `state` vector elements by blockwise
@@ -160,6 +181,21 @@ This can be used for summation, integration, and averaging (for `rescale=TRUE`).
 
 ```{r, eval=FALSE}
 mapper <- bru_mapper_aggregate(rescale = ...)
+ibm_eval(mapper,
+  input = list(block = ..., weights = ...),
+  state = ...
+)
+```
+
+#### logsumexp
+
+The `logsumexp` mapper aggregates the `exp(state)` vector elements by blockwise
+summation after scaling the elements by weights, and takes the logarithm. The
+implementation takes care to avoid numerical overflow.
+This can be used for summation, integration, and averaging (for `rescale=TRUE`).
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_logsumexp(rescale = ...)
 ibm_eval(mapper,
   input = list(block = ..., weights = ...),
   state = ...

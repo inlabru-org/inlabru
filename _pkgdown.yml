@@ -36,6 +36,10 @@ navbar:
       - text: LGCPs - Residuals
         href: articles/2d_lgcp_residuals.html
       - text: ---
+      - text: General examples
+      - text: ZIP and ZAP count models (zero-inflation)
+        href: articles/zip_zap_models.html
+      - text: ---
       - text: Concepts
       - text: Defining a model component
         href: articles/component.html
@@ -103,6 +107,7 @@ reference:
   contents:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
+  - starts_with("bru_timings_plot")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
   contents:
@@ -110,11 +115,11 @@ reference:
   - starts_with("bru_mapper")
   - starts_with("ibm_")
   - starts_with("bm_")
-  - starts_with("eval_spatial")
   - starts_with("bru_forward_transformation")
 - title: "Miscellaneous"
   desc: "Miscellaneous functions."
   contents:
+  - starts_with("eval_spatial")
   - starts_with("bru_fill_missing")
   - starts_with("point2count")
   - starts_with("sample.lgcp")

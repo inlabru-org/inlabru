@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - devel
+      - feature/*
+  pull_request:
+    branches:
+      - devel
   workflow_dispatch:
     inputs:
       debug_enabled:

@@ -1,3 +1,46 @@
+# inlabru 2.10.0
+
+## Feature updates
+
+* Add new `ibm_simplify()` generic to handle mapper simplification more generally;
+  needed to properly support non-linear component mappers. (version `2.9.0.9004`)
+* Add new `bru_mapper_marginal()` mapper class that can be used as part of component
+  mapper pipelines. (version `2.9.0.9004`)
+* Add new `ibm_eval2()` generic that computes both evaluation and Jacobian,
+  avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
+* Add new `bru_timings_plot()` function that plots the time used for each nonlinear iteration
+(version `2.9.0.9007`)
+* Speed up `bru_fill_missing()` (by orders of magnitude) by changing method for
+  finding the nearest available data point. (version `2.9.0.9011`)
+* Add new `bru_mapper_shift()` mapper class that works like `bru_mapper_scale()`
+  but for additive shifts instead of multiplicative scaling. (version `2.9.0.9012`)
+* Added more checks for invalid component or predictor evaluations, to help
+  catch user errors sooner, and with more informative messages. (version `2.9.0.9013`)
+* Expand `bru_mapper_matrix`, previously used only for component `model = "fixed",
+  to allow integer indexing in addition to the previous factor/character-only indexing.
+  (version `2.9.0.9014`)
+
+## Bug fixes
+
+* The `is_linear` flag wasn't correctly set for `bru_mapper_logsumexp` mappers.
+  Since previous versions did not accept non-linear component mappers, this
+  is unlikely to have affected any user code. (Fixed in version `2.9.0.9001`)
+* Improved error messages for missing or incomplete LGCP domain specification.
+  (version `2.9.0.9002` and `2.9.0.9006`)
+* Allow `NULL` in automatic component usage detection. (version `2.9.0.9003`)
+* Corrected the crs information for `gorillas$plotsample$counts` and
+  `gorillas_sf$plotsample$counts` from `+units=m` to `+units=km`. (version `2.9.0.9010`)
+  The geometry information in `counts` is unlikely to have been used in examples
+  or analysis code, as the problem would have been immediately obvious;
+  plotting or other geometric operations that use the crs information would
+  heve been completely wrong, and is only detected now that more code uses the
+  crs information at all. Thanks to Dmytro Perepolkin for reporting in issue #205
+* Fix problem in `bru_fill_missing()` for cases where the input data object also
+  has missing values. (version `2.9.0.9011`)
+* Make `eval_spatial()` transform the `where` coordinates to the same crs as the
+  input data, for `SpatRaster` and `sf` inputs, to allow different crs specifications.
+  (version `2.9.0.9012`)
+
 # inlabru 2.9.0
 
 ## Feature updates
@@ -44,13 +87,13 @@
   test cases. (version `2.8.0.9005`)
 * Removed incorrect code for `sf` method for `eval_spatial()`, causing failure
   when extracting from multiple layers in a single call.
-  (version `2.9.0.9007`)
+  (version `2.8.0.9007`)
 * Improved handling of posterior sample variable extraction in `generate()`
   and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
 * Fixed linearisation issue when using only the `*_latent` form of a component.
   (version `2.8.0.9015`)
 * Workaround for equivalent but textually different CRS/WKT information in
-  `bru_fill_missing()`. (version `2.9.0.9016`, fixes #200)
+  `bru_fill_missing()`. (version `2.8.0.9016`, fixes #200)
 
 ## Deprecation of old functions
 

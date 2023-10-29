@@ -48,15 +48,6 @@ bru_compute_linearisation.component <- function(cmp,
                                                 ...) {
   label <- cmp[["label"]]
 
-  if (!is.null(comp_simple) &&
-    !inherits(comp_simple, "bru_mapper_taylor")) {
-    warning(paste0(
-      "Non-linear component mappers not fully supported!",
-      "\nClass for '", label, "': '",
-      paste0(class(comp_simple), collapse = "', '"),
-      "'"
-    ), immediate. = TRUE)
-  }
   if (is.null(comp_simple)) {
     A <- NULL
     assume_rowwise <- FALSE
@@ -96,6 +87,13 @@ bru_compute_linearisation.component <- function(cmp,
     j = integer(0),
     x = numeric(0)
   )
+
+  if (any(!is.finite(pred0))) {
+    warning(
+      "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
+      immediate. = TRUE
+    )
+  }
 
   symmetric_diffs <- FALSE
   for (k in seq_len(NROW(state[[label]]))) {
@@ -195,6 +193,14 @@ bru_compute_linearisation.component <- function(cmp,
           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
         }
       } else {
+        if (any(!is.finite(pred_eps))) {
+          warning(
+            "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
+            label,
+            "' plus eps.\n",
+            immediate. = TRUE
+          )
+        }
         if (assume_rowwise) {
           values <- (pred_eps - pred0[row_subset])
         } else {
@@ -203,7 +209,10 @@ bru_compute_linearisation.component <- function(cmp,
       }
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
-        warning("Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives; treated as 0.0",
+        warning(
+          "Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
+          label,
+          "'; treated as 0.0.\n",
           immediate. = TRUE
         )
       }

@@ -68,5 +68,28 @@ if (bru_safe_inla(quietly = TRUE)) {
 }
 \seealso{
 \link{bru_mapper} for mapper constructor methods, and
-\link{bru_mapper_methods} for method generics and specific implementations.
+the individual mappers for specific implementation details.
+
+Other mappers: 
+\code{\link{bru_mapper.fm_mesh_1d}()},
+\code{\link{bru_mapper.fm_mesh_2d}()},
+\code{\link{bru_mapper_aggregate}()},
+\code{\link{bru_mapper_collect}()},
+\code{\link{bru_mapper_const}()},
+\code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_generics}},
+\code{\link{bru_mapper_harmonics}()},
+\code{\link{bru_mapper_index}()},
+\code{\link{bru_mapper_linear}()},
+\code{\link{bru_mapper_logsumexp}()},
+\code{\link{bru_mapper_marginal}()},
+\code{\link{bru_mapper_matrix}()},
+\code{\link{bru_mapper_mesh_B}()},
+\code{\link{bru_mapper_multi}()},
+\code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
+\code{\link{bru_mapper_taylor}()},
+\code{\link{bru_mapper}()}
 }
+\concept{mappers}

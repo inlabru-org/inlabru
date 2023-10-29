@@ -343,3 +343,56 @@ make_track_plots <- function(fit) {
 #    pl3 | pl4
 #  )
 # )
+
+
+
+#' @title Plot inlabru iteration timings
+#'
+#' @description
+#' Draws the time per iteration for preprocessing (including linearisation),
+#' `inla()` calls, and
+#' line search. Iteration `0` is the time used for defining the model structure.
+#'
+#' @param x a [bru] object, typically a result from [bru()] for a nonlinear
+#' predictor model
+#'
+#' @details Requires the "ggplot2" package to be installed.
+#' @export
+#' @examples
+#' \dontrun{
+#' fit <- bru(...)
+#' bru_timings_plot(fit)
+#' }
+bru_timings_plot <- function(x) {
+  needed <- c("ggplot2")
+  are_installed <-
+    vapply(
+      needed,
+      function(x) {
+        requireNamespace(x, quietly = TRUE)
+      },
+      TRUE
+    )
+  if (any(!are_installed)) {
+    stop(
+      paste0(
+        "Needed package(s) ",
+        paste0("'", needed[!are_installed], "'", collapse = ", "),
+        " not installed, but are needed by bru_timings_plot()"
+      )
+    )
+  }
+
+  ggplot2::ggplot(x[["bru_timings"]]) +
+    ggplot2::geom_point(ggplot2::aes(
+      .data$Iteration,
+      .data$Time,
+      col = .data$Task,
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$Iteration,
+      .data$Time,
+      col = .data$Task,
+    )) +
+    ggplot2::scale_y_continuous()
+}

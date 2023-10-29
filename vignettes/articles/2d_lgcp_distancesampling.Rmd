@@ -87,16 +87,25 @@ ggplot(mexdolphin$points) +
 ```
 
 We need to define a half-normal detection probability function. This must take distance as its first
-argument and the linear predictor of the sigma parameter (which we will call `lsig`) as its second:
+argument and the linear predictor of the sigma parameter as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-hn <- function(distance, lsig) {
-  exp(-0.5 * (distance / exp(lsig))^2)
+hn <- function(distance, sigma) {
+  exp(-0.5 * (distance / sigma)^2)
+}
+```
+To control the prior distribution for the `sigma` parameter, we define a transformation function
+that converts a $N(0, 1)$ latent variable into an exponentially distributed variable with
+expectation 8 (this is a somewhat arbitrary value, but motivated by the maximum observation distance `W`):
+```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
+sigma <- function(x) {
+  bru_forward_transformation(qexp, x, rate = 1 / 8)
 }
 ```
 
+
 Specify and fit an SPDE model to these data using a half-normal detection function form.
-We need to define a (Matern) covariance function for the SPDE
+We need to define a (Matérn) covariance function for the SPDE
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 matern <- inla.spde2.pcmatern(mexdolphin$mesh,
@@ -106,11 +115,11 @@ matern <- inla.spde2.pcmatern(mexdolphin$mesh,
 ```
 
 We need to now separately define the components of the model 
-(the SPDE, the Intercept and the detection function parameter `lsig`)
+(the SPDE, the Intercept and the detection function parameter `sigma_theta`)
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 cmp <- ~ mySPDE(main = geometry, model = matern) +
-  lsig(1) + Intercept(1)
+  sigma_theta(1, prec.linear = 1) + Intercept(1)
 ```
 
 ... and the formula, which describes how these components are combined to 
@@ -119,11 +128,28 @@ direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 form <- geometry + distance ~ mySPDE +
-  log(hn(distance, lsig)) +
+  log(hn(distance, sigma(sigma_theta))) +
   Intercept + log(2)
 ```
 
-Then fit the model, passing both the components and the formula 
+From version `2.9.0.9004`, a more compact option is available, by allowing the
+component itself do the transformation between N(0,1) and Exponential(1/8):
+```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
+# # An alternative approach available from 2.9.0.9004; requires matching
+# # adjustments to the later predict() calls, etc.
+# cmp <- ~ mySPDE(main = geometry, model = matern) +
+#   sigma(1,
+#     prec.linear = 1,
+#     marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+#   ) +
+#   Intercept(1)
+# form <- geometry + distance ~ mySPDE +
+#   log(hn(distance, sigma)) +
+#   Intercept + log(2)
+```
+
+
+Then we fit the model, passing both the components and the formula 
 (previously the formula was constructed invisibly by `inlabru`),
 and specify integration domains for the spatial and distance dimensions:
 
@@ -168,17 +194,13 @@ ggplot() +
 
 Predict the detection function and plot it, to generate a plot like the one below.
 Here, we should make sure that it doesn't try to evaluate the effects of
-components that can't be evaluated using the given input data. Here, we're only
-providing distances and no spatial coordinates, so we cannot evaluate the
-spatial random field in this `predict()` call. We can specify this by providing
-a vector of component names to include in the prediction calculations, here only
-"lsig", with `include = "lsig"`. See `?predict.bru` for more information.
-From version `2.8.0`, inlabru attmepts to automatically detect which components
-are used by the predictor expression, and the `include` argument can usually be left out.
+components that can't be evaluated using the given input data. From version 2.8.0,
+`inlabru` automatically detects which components are involved.
+See `?predict.bru` for more information.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, lsig))
+dfun <- predict(fit, distdf, ~ hn(distance, sigma(sigma_theta)))
 plot(dfun)
 ```
 The average detection probability within the maximum detection distance is estimated to be
@@ -226,11 +248,14 @@ ggplot(data = Nest) +
 
 Hazard-rate Detection Function
 -----------------------------------------------------------------
-Try doing this all again, but use this hazard-rate detection function model:
+Try doing this all again, but use this hazard-rate detection function model,
+with the same prior for the `sigma` parameter as for the half-Normal model
+(such parameters aren't always comparable, but in this example it's a reasonable
+choice):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
-hr <- function(distance, lsig) {
-  1 - exp(-(distance / exp(lsig))^-1)
+hr <- function(distance, sigma) {
+  1 - exp(-(distance / sigma)^-1)
 }
 ```
 
@@ -238,7 +263,7 @@ Solution:
 
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 <- geometry + distance ~ mySPDE +
-  log(hr(distance, lsig)) +
+  log(hr(distance, sigma(sigma_theta))) +
   Intercept + log(2)
 
 fit1 <- lgcp(
@@ -270,7 +295,7 @@ ggplot() +
   theme(legend.text = element_text(size = 6))
 
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
-dfun1 <- predict(fit1, distdf, ~ hr(distance, lsig))
+dfun1 <- predict(fit1, distdf, ~ hr(distance, sigma(sigma_theta)))
 plot(dfun1)
 
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
@@ -315,7 +340,7 @@ bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
   breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
-  predictor = distance ~ hn(distance, lsig)
+  predictor = distance ~ hn(distance, sigma(sigma_theta))
 )
 attributes(bc)$ggp
 
@@ -323,7 +348,7 @@ bc1 <- bincount(
   result = fit1,
   observations = mexdolphin$points$distance,
   breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
-  predictor = distance ~ hn(distance, lsig)
+  predictor = distance ~ hn(distance, sigma(sigma_theta))
 )
 attributes(bc1)$ggp
 ```
@@ -333,35 +358,36 @@ Fit Models only to the distance sampling data
 Half-normal first
 
 ```{r,results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula <- distance ~ log(hn(distance, lsig)) + Intercept
-cmp <- ~ lsig(1) + Intercept(1)
+formula <- distance ~ log(hn(distance, sigma(sigma_theta))) + Intercept
+cmp <- ~ sigma_theta(1, prec.linear = 1) + Intercept(1)
 dfit <- lgcp(
   components = cmp,
   mexdolphin$points,
   domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula,
-  options = list(bru_initial = list(lsig = 1, Intercept = 3))
+  options = list(bru_initial = list(sigma_theta = 1, Intercept = 3))
 )
-detfun <- predict(dfit, distdf, ~ hn(distance, lsig))
+detfun <- predict(dfit, distdf, ~ hn(distance, sigma(sigma_theta)))
 ```
 
-Half-normal next
+Hazard-rate next
 
 ```{r,results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula1 <- distance ~ log(hr(distance, lsig)) + Intercept
-cmp <- ~ lsig(1) + Intercept(1)
+formula1 <- distance ~ log(hr(distance, sigma(sigma_theta))) + Intercept
+cmp <- ~ sigma_theta(1, prec.linear = 1) + Intercept(1)
 dfit1 <- lgcp(
   components = cmp,
   mexdolphin$points,
   domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
-detfun1 <- predict(dfit1, distdf, ~ hr(distance, lsig))
+detfun1 <- predict(dfit1, distdf, ~ hr(distance, sigma(sigma_theta)))
 ```
 
 
-Plot both lines on histogram of observations
-First scale lines to have same area as that of histogram
+Plot both lines on histogram of observations.
+First scale lines to have same area as that of histogram.
+
 Half-normal:
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}

@@ -382,7 +382,7 @@ potentially be practical benefits.
 
 ### An alternative estimator for CRSP
 For the CRPS score, there are closed form expressions available for some distributions,
-conditionally on their paramters, but not for the full predictive mixture distribution.
+conditionally on their parameters, but not for the full predictive mixture distribution.
 We take a similar approach as for SE,
 and let $F$ and $F_\lambda$ denote the unconditional and conditional 
 cumulative distribution functions for the posterior predictive distribution.

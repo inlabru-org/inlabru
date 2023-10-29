@@ -8,7 +8,9 @@
 \alias{ibm_is_linear}
 \alias{ibm_jacobian}
 \alias{ibm_linear}
+\alias{ibm_simplify}
 \alias{ibm_eval}
+\alias{ibm_eval2}
 \alias{ibm_names}
 \alias{ibm_names<-}
 \alias{ibm_inla_subset}
@@ -19,7 +21,9 @@
 \alias{ibm_is_linear.default}
 \alias{ibm_jacobian.default}
 \alias{ibm_linear.default}
+\alias{ibm_simplify.default}
 \alias{ibm_eval.default}
+\alias{ibm_eval2.default}
 \alias{ibm_names.default}
 \alias{ibm_inla_subset.default}
 \alias{ibm_invalid_output.default}
@@ -37,7 +41,11 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 ibm_linear(mapper, input, state = NULL, ...)
 
+ibm_simplify(mapper, input = NULL, state = NULL, ...)
+
 ibm_eval(mapper, input, state = NULL, ...)
+
+ibm_eval2(mapper, input, state = NULL, ...)
 
 ibm_names(mapper)
 
@@ -59,7 +67,11 @@ ibm_invalid_output(mapper, input, state, ...)
 
 \method{ibm_linear}{default}(mapper, input, state, ...)
 
-\method{ibm_eval}{default}(mapper, input, state = NULL, ...)
+\method{ibm_simplify}{default}(mapper, input = NULL, state = NULL, ...)
+
+\method{ibm_eval}{default}(mapper, input, state = NULL, ..., jacobian = NULL)
+
+\method{ibm_eval2}{default}(mapper, input, state, ...)
 
 \method{ibm_names}{default}(mapper, ...)
 
@@ -87,6 +99,9 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{value}{a character vector of the same length as the number
 of sub-mappers in the mapper}
+
+\item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
+supplied by internal methods that already have the Jacobian.}
 }
 \description{
 A \code{bru_mapper} sub-class implementation must provide an
@@ -130,7 +145,16 @@ The linearised mapper output is defined as
 The default method calls \code{ibm_eval()} and \code{ibm_jacobian()} to generate
 the needed information.
 
+\item \code{ibm_simplify()}: Implementations must return a \link{bru_mapper} object.
+The default method returns \code{ibm_linear(...)} for linear mappers, and the
+original \code{mapper} for non-linear mappers.
+
 \item \code{ibm_eval()}: Implementations must return a vector of length \code{ibm_n_output(...)}.
+The \code{input} contents must
+be in a format accepted by \code{ibm_jacobian(...)}
+for the mapper.
+
+\item \code{ibm_eval2()}: Implementations must return a list with elements \code{offset} and \code{jacobian}.
 The \code{input} contents must
 be in a format accepted by \code{ibm_jacobian(...)}
 for the mapper.
@@ -174,10 +198,20 @@ The \code{state0} information in the affine mapper indicates for which state
 the \code{offset} was evaluated; The affine mapper output is defined as
 \code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}
 
+\item \code{ibm_simplify(default)}: Calls \code{ibm_linear()} for linear mappers, and returns the original mapper
+for non-linear mappers.
+
 \item \code{ibm_eval(default)}: Verifies that the mapper is linear
 with \code{ibm_is_linear()}, and then computes a linear mapping
 as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
 a zero vector of length \code{ibm_n_output(...)} is returned.
+
+\item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and
+\code{offset <- ibm_eval(..., jacobian = jacobian)}
+and returns a list with elements \code{offset} and \code{jacobian}, as needed
+by \code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
+their own \code{ibm_eval2} method if joint construction of evaluation and Jacobian
+is more efficient than separate or sequential construction.
 
 \item \code{ibm_names(default)}: Returns \code{NULL}
 
@@ -204,5 +238,28 @@ ibm_names(mapper)
 \link{bru_get_mapper} for hooks to extract mappers from latent model object
 class objects.
 
-\link{bru_mapper}, \link{bru_mapper_methods}
+\link{bru_mapper}, \code{\link[=bru_get_mapper]{bru_get_mapper()}}
+
+Other mappers: 
+\code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper.fm_mesh_1d}()},
+\code{\link{bru_mapper.fm_mesh_2d}()},
+\code{\link{bru_mapper_aggregate}()},
+\code{\link{bru_mapper_collect}()},
+\code{\link{bru_mapper_const}()},
+\code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_harmonics}()},
+\code{\link{bru_mapper_index}()},
+\code{\link{bru_mapper_linear}()},
+\code{\link{bru_mapper_logsumexp}()},
+\code{\link{bru_mapper_marginal}()},
+\code{\link{bru_mapper_matrix}()},
+\code{\link{bru_mapper_mesh_B}()},
+\code{\link{bru_mapper_multi}()},
+\code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_shift}()},
+\code{\link{bru_mapper_taylor}()},
+\code{\link{bru_mapper}()}
 }
+\concept{mappers}

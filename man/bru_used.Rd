@@ -10,6 +10,7 @@
 \alias{bru_used.list}
 \alias{bru_used.bru_like}
 \alias{bru_used.bru_used}
+\alias{print.bru_used}
 \title{List components used in a model}
 \usage{
 bru_used(x = NULL, ...)
@@ -57,6 +58,8 @@ bru_used(x = NULL, ...)
 \method{bru_used}{bru_like}(x, ...)
 
 \method{bru_used}{bru_used}(x, labels = NULL, ...)
+
+\method{print}{bru_used}(x, ...)
 }
 \arguments{
 \item{x}{An object that contains information about used components}
@@ -103,6 +106,11 @@ right-hand side is used).
 \item \code{bru_used(bru_used)}: Convenience method that takes
 an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_used_update()}}
 if \code{labels} is non-NULL.
+
+}}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{print(bru_used)}: Print method for \code{bru_used} objects.
 
 }}
 \examples{
