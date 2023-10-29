@@ -43,7 +43,7 @@ sfill <- function(data, where = NULL) {
 #' Convert data frame to SpatialLinesDataFrame
 #'
 #' A line in 2D space is defined by a start and an and point, each associated with 2D coordinates.
-#' This function takes a /code{data.frame} as input and assumes that each row defines a line in space.
+#' This function takes a `data.frame` as input and assumes that each row defines a line in space.
 #' In order to do so, the data frame must have at least four columns and the `start.cols` and
 #' `end.cols` parameters must be used to point out the names of the columns that define
 #' the start and end coordinates of the line. The data is then converted to a

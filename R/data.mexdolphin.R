@@ -19,7 +19,7 @@
 #'    \item{`ppoly`:}{ An `SpatialPolygonsDataFrame` object defining the boundary of the
 #'    survey region.}
 #'    \item{`simulated`:}{ A `SpatialPointsDataFrame` object containing the locations of a
-#'    *simulated* population of dolphin groups. The population was simulated from a 'code{inlabru}
+#'    *simulated* population of dolphin groups. The population was simulated from a `inlabru`
 #'    model fitted to the actual survey data. Note that the simulated data do not have any associated
 #'    size information.}
 #'  }
@@ -92,7 +92,7 @@
 #'    \item{`ppoly`:}{ An `sf` object defining the boundary of the
 #'    survey region.}
 #'    \item{`simulated`:}{ A `sf` object containing the locations of a
-#'    *simulated* population of dolphin groups. The population was simulated from a 'code{inlabru}
+#'    *simulated* population of dolphin groups. The population was simulated from a `inlabru`
 #'    model fitted to the actual survey data. Note that the simulated data do not have any associated
 #'    size information.}
 #'  }
