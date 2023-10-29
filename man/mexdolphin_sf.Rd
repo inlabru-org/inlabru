@@ -38,8 +38,7 @@ distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE)) {
   data(mexdolphin_sf, package = "inlabru")
   ggplot() +
     gg(mexdolphin_sf$mesh) +
@@ -54,8 +53,7 @@ if (require("ggplot2", quietly = TRUE) &&
 }
 \dontrun{
 if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE)) {
   gmap(mexdolphin$depth) +
     gm(mexdolphin$ppoly, color = "blue") +
     gm(mexdolphin$samplers) +

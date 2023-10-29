@@ -75,7 +75,6 @@ if (interactive() &&
   bru_safe_sp() &&
   require("sp") &&
   require(ggplot2, quietly = TRUE) &&
-  require(ggpolypath, quietly = TRUE) &&
   requireNamespace("terra")) {
   # plot all the nests, mesh and boundary
   ggplot() +
