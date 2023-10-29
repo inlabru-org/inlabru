@@ -151,8 +151,7 @@ color:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Gorillas nests and group membership"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
 </div>
@@ -259,10 +258,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 1.18, Running = 120, Post = 0.191, Total = 121 </span></span>
+<span><span class="co">#&gt;     Pre = 1.28, Running = 119, Post = 0.222, Total = 121 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.354 1.363     -3.026   -0.354      2.318 -0.354   0</span></span>
+<span><span class="co">#&gt; Intercept -0.354 1.369     -3.038   -0.354       2.33 -0.354   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -270,20 +269,20 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;    Difference SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                         mean       sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common        3.05 6.96e-01      1.983    2.947   4.70e+00 2.718</span></span>
-<span><span class="co">#&gt; Stdev for Common        2.05 3.19e-01      1.510    2.018   2.76e+00 1.948</span></span>
-<span><span class="co">#&gt; Range for Difference 8552.43 4.33e+05      0.023    5.154   1.01e+04 0.010</span></span>
-<span><span class="co">#&gt; Stdev for Difference    0.17 5.00e-02      0.089    0.164   2.85e-01 0.154</span></span>
+<span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for Common     2.921 0.539      2.027    2.865      4.141 2.744</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.043 0.329      1.486    2.013      2.778 1.946</span></span>
+<span><span class="co">#&gt; Range for Difference 1.355 0.640      0.501    1.226      2.958 1.004</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.166 0.078      0.054    0.152      0.353 0.125</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.52</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.06</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -772.93</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.27</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2714.05</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 647.47</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2710.19</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 645.55</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1203.82 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.17 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -303,10 +302,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'SpatialPointsDataFrame'</span></span>
 <span><span class="co">#&gt;     Predictor: coordinates ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.945, Running = 19.5, Post = 0.163, Total = 20.6 </span></span>
+<span><span class="co">#&gt;     Pre = 1.07, Running = 20.1, Post = 0.179, Total = 21.4 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.354 1.362     -3.023   -0.354      2.315 -0.354   0</span></span>
+<span><span class="co">#&gt; Intercept -0.354 1.371     -3.041   -0.354      2.332 -0.354   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -314,20 +313,20 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;    Difference SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.932 0.569      2.005    2.868      4.234 2.728</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.050 0.339      1.483    2.017      2.812 1.942</span></span>
-<span><span class="co">#&gt; Range for Difference 1.354 0.463      0.673    1.279      2.474 1.141</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.163 0.087      0.045    0.146      0.376 0.112</span></span>
+<span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
+<span><span class="co">#&gt; Range for Common     2.921 0.571      1.977    2.860      4.217 2.73</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.037 0.321      1.489    2.009      2.750 1.95</span></span>
+<span><span class="co">#&gt; Range for Difference 1.328 0.435      0.685    1.259      2.379 1.13</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.164 0.105      0.033    0.139      0.428 0.09</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.47</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.93</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -772.97</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.37</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2713.95</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 647.42</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 2710.53</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 645.72</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.39 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1205.23 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>

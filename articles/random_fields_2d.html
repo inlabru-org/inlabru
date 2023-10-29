@@ -147,8 +147,9 @@ level INLA functions</p>
 <code class="sourceCode R"><span><span class="va">bnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spoly.html">spoly</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>easting <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">0</span><span class="op">)</span>, northing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mesh_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link">fm_mesh_2d_inla</a></span><span class="op">(</span>boundary <span class="op">=</span> <span class="va">bnd</span>, max.edge <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh_fine</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mesh_fine</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in fm_as_sfc.fm_segm(data): fm_as_sfc currently only supports</span></span>
+<span><span class="co">#&gt; (multi)linestring output</span></span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -221,8 +222,7 @@ variance is 4 times as large.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link">fm_mesh_2d_inla</a></span><span class="op">(</span>boundary <span class="op">=</span> <span class="va">bnd</span>, max.edge <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_2d_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
 <p>Construct an SPDE model object for a Matern model:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
