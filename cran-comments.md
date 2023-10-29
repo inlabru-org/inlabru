@@ -3,8 +3,8 @@
 * Minor release 2.10.0, including new features and bug fixes
 * CRAN checks for old version, 2.9.0:
   NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.10.0 (with latest INLA, 23.10.28):
-  - Spurious error message about potentially invalid doi, see below
+* Checks for new version, 2.10.0 (with latest INLA, 23.10.28)
+  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
 
 ## R CMD check results and comments
 
