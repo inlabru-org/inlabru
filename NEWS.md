@@ -1,10 +1,18 @@
 # inlabru (development version)
 
+## Feature updates
+
 * Add new web article on ZIP/ZAP models (zero inflated Poisson models)
   where the non-zero probability is modelled with a separate predictor from the
   predictor for the Poisson model parameter:
   <https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html>.
   (Thanks to Dmytro Perepolkin)
+
+## Bug fixes and dependency simplification
+  
+* Remove dependence on the `ggpolypath` package, and the
+  `ggplot2::fortify.SpatialPolygons/DataFrame()` methods that were deprecated in
+  `ggplot2` version `3.4.4`.
 
 # inlabru 2.10.0
 
