@@ -470,8 +470,7 @@ e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
 ggplot() +
   gg(e.int, aes(fill = log(sd))) +
   gg(boundary, alpha = 0) +
-  gg(nests, shape = "+") +
-  coord_equal()
+  gg(nests, shape = "+")
 ggplot() +
   gg(e.int.log, aes(fill = exp(mean + sd^2 / 2))) +
   gg(boundary, alpha = 0) +
