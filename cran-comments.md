@@ -18,19 +18,6 @@ Availability using Additional_repositories specification:
   INLA   yes   https://inla.r-inla-download.org/R/testing
 ``` 
 
-Spurious URL notes:
-```
-Found the following (possibly) invalid URLs:
-  URL: https://inlabru-org.r-universe.dev
-    From: README.md
-    Status: Error
-    Message: Recv failure: Connection was reset
-  URL: https://inlabru-org.r-universe.dev/builds
-    From: README.md
-    Status: Error
-    Message: Recv failure: Connection was reset
-```
-
 ## revdepcheck results
 
 We checked 7 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
