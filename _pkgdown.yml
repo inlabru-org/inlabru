@@ -36,6 +36,10 @@ navbar:
       - text: LGCPs - Residuals
         href: articles/2d_lgcp_residuals.html
       - text: ---
+      - text: General examples
+      - text: ZIP and ZAP count models (zero-inflation)
+        href: articles/zip_zap_models.html
+      - text: ---
       - text: Concepts
       - text: Defining a model component
         href: articles/component.html
