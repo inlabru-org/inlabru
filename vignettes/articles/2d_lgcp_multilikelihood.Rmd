@@ -54,8 +54,7 @@ Plot the nests and visualize the group membership (major/minor) by color:
 ggplot() +
   gg(gorillas$mesh) +
   gg(gorillas$nests, aes(color = group)) +
-  gg(gorillas$boundary) +
-  coord_fixed() +
+  gg(gorillas$boundary, alpha = 0) +
   ggtitle("Gorillas nests and group membership")
 ```
 

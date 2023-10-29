@@ -74,8 +74,7 @@ Look at the vegetation type, nests and boundary:
 ggplot() +
   gg(gcov$vegetation) +
   gg(boundary) +
-  gg(nests, color = "white", cex = 0.5) +
-  coord_equal()
+  gg(nests, color = "white", cex = 0.5)
 ```
 
 Or, with the mesh:
@@ -86,8 +85,7 @@ ggplot() +
   gg(gcov$vegetation) +
   gg(mesh) +
   gg(boundary) +
-  gg(nests, color = "white", cex = 0.5) +
-  coord_equal()
+  gg(nests, color = "white", cex = 0.5)
 ```
 
 #### A model with vegetation type only
@@ -148,8 +146,7 @@ int1 <- predict(fit1, pred.df, ~ exp(vegetation))
 ggplot() +
   gg(int1) +
   gg(boundary, alpha = 0, lwd = 2) +
-  gg(nests, color = "DarkGreen") +
-  coord_equal()
+  gg(nests, color = "DarkGreen")
 ```
 
 Not surprisingly, given that most nests are in `Primary` vegetation, the high density 
@@ -201,8 +198,7 @@ int2 <- predict(fit2, pred.df, ~ exp(mySmooth + vegetation), n.samples = 1000)
 ggplot() +
   gg(int2, aes(fill = q0.025)) +
   gg(boundary, alpha = 0, lwd = 2) +
-  gg(nests) +
-  coord_equal()
+  gg(nests)
 ```
 
 ... and the expected integrated intensity (mean of abundance)
@@ -240,24 +236,21 @@ plot.lp2 <- ggplot() +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("mySmooth + vegetation") +
-  coord_equal()
+  ggtitle("mySmooth + vegetation")
 
 plot.lp2.spde <- ggplot() +
   gg(lp2$smooth) +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("mySmooth") +
-  coord_equal()
+  ggtitle("mySmooth")
 
 plot.lp2.veg <- ggplot() +
   gg(lp2$veg) +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("vegetation") +
-  coord_equal()
+  ggtitle("vegetation")
 
 multiplot(plot.lp2, plot.lp2.spde, plot.lp2.veg, cols = 3)
 ```
@@ -294,8 +287,7 @@ int3 <- predict(fit3, pred.df, ~ exp(mySmooth + Intercept))
 ggplot() +
   gg(int3) +
   gg(boundary, alpha = 0) +
-  gg(nests) +
-  coord_equal()
+  gg(nests)
 ```
 ```{r warning=FALSE,message=FALSE}
 Lambda3 <- predict(
@@ -345,8 +337,7 @@ coefficient of variation
 ggplot() +
   gg(int2, aes(fill = sd / mean)) +
   gg(boundary, alpha = 0) +
-  gg(nests) +
-  coord_fixed()
+  gg(nests)
 ```
 
 Plot the vegetation "fixed effect" posteriors. First get their names - from `$marginals.random$vegetation` of the fitted object, 
@@ -389,8 +380,7 @@ elev$elevation <- elev$elevation - mean(elev$elevation, na.rm = TRUE)
 
 ggplot() +
   gg(elev) +
-  gg(boundary, alpha = 0) +
-  coord_fixed()
+  gg(boundary, alpha = 0)
 ```
 
 The elevation variable here is of class 'SpatialGridDataFrame', that can be
@@ -485,8 +475,7 @@ ggplot() +
 ggplot() +
   gg(e.int.log, aes(fill = exp(mean + sd^2 / 2))) +
   gg(boundary, alpha = 0) +
-  gg(nests, shape = "+") +
-  coord_equal()
+  gg(nests, shape = "+")
 ```
 
 Now look at the elevation and SPDE effects in space. Leave out the Intercept
@@ -521,24 +510,21 @@ plot.e.lp <- ggplot() +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("SPDE + elevation") +
-  coord_equal()
+  ggtitle("SPDE + elevation")
 
 plot.e.lp.spde <- ggplot() +
   gg(e.lp$smooth, mask = boundary) +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("SPDE") +
-  coord_equal()
+  ggtitle("SPDE")
 
 plot.e.lp.elev <- ggplot() +
   gg(e.lp$elev, mask = boundary) +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
-  ggtitle("elevation") +
-  coord_equal()
+  ggtitle("elevation")
 
 multiplot(plot.e.lp,
   plot.e.lp.spde,

@@ -59,15 +59,13 @@ mesh <- gorillas$mesh
 boundary <- gorillas$boundary
 ```
 
-Plot the points (the nests). (The `ggplot2` function `coord_fixed()` sets the aspect ratio, 
-which defaults to 1.)
+Plot the points (the nests).
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
-  gg(mesh) +
+  geom_fm(data = mesh) +
   gg(nests) +
-  gg(boundary) +
-  coord_fixed() +
+  gg(boundary, fill = "red", alpha = 0.2) +
   ggtitle("Points")
 ```
 
@@ -126,14 +124,12 @@ pred <- predict(
 pl1 <- ggplot() +
   gg(pred$lambda) +
   gg(boundary) +
-  ggtitle("LGCP fit to Points", subtitle = "(Response Scale)") +
-  coord_fixed()
+  ggtitle("LGCP fit to Points", subtitle = "(Response Scale)")
 
 pl2 <- ggplot() +
   gg(pred$loglambda) +
-  gg(boundary) +
-  ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)") +
-  coord_fixed()
+  gg(boundary, alpha = 0) +
+  ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)")
 
 multiplot(pl1, pl2, cols = 2)
 ```
