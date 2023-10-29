@@ -1,5 +1,11 @@
 # inlabru (development version)
 
+* Add new web article on ZIP/ZAP models (zero inflated Poisson models)
+  where the non-zero probability is modelled with a separate predictor from the
+  predictor for the Poisson model parameter:
+  <https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html>.
+  (Thanks to Dmytro Perepolkin)
+
 # inlabru 2.10.0
 
 ## Feature updates
@@ -49,7 +55,7 @@
 
 * Conversion of code to use `fmesher` for mesh and geometry handling;
   the interface supports existing objects and methods.
-  See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
+  See <https://inlabru-org.github.io/fmesher/articles/inla_conversion.html> for
   more information.
 * General speed improvements, see below for details.
 * Added `gg.sf()` method.
@@ -171,7 +177,7 @@
 * Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
   calls that don't account for the `geos` canonical representation being CW,
   whereas the canonical Simple Features representation being CCW. See
-  https://github.com/r-spatial/sf/issues/2096
+  <https://github.com/r-spatial/sf/issues/2096>
   
 # inlabru 2.7.0
 
