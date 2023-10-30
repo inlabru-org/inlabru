@@ -39,13 +39,27 @@
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
     <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
     <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
     <a class="dropdown-item" href="../articles/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
     <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
     <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
@@ -56,24 +70,20 @@
     <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>General examples</h6>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
     <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/website_examples.html">Website articles</a>
   </div>
 </li>
 <li class="nav-item">
@@ -245,7 +255,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.72, Running = 4.24, Post = 0.742, Total = 5.7 </span></span>
+<span><span class="co">#&gt;     Pre = 0.63, Running = 4.03, Post = 0.628, Total = 5.29 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.632 0.324     -1.271   -0.631      0.000 -0.631   0</span></span>
@@ -360,13 +370,13 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.712, Running = 2.73, Post = 0.2, Total = 3.65 </span></span>
+<span><span class="co">#&gt;     Pre = 0.633, Running = 2.63, Post = 0.177, Total = 3.44 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed -0.737 0.312     -1.345   -0.738     -0.123 -0.738   0</span></span>
-<span><span class="co">#&gt; veg_grassland -1.623 0.345     -2.298   -1.623     -0.946 -1.623   0</span></span>
+<span><span class="co">#&gt; veg_disturbed -0.737 0.312     -1.346   -0.738     -0.122 -0.738   0</span></span>
+<span><span class="co">#&gt; veg_grassland -1.622 0.345     -2.298   -1.623     -0.945 -1.623   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.001      0.001    0.003      0.005  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -3.312 1.803     -6.904   -3.294      0.180 -3.294   0</span></span>
+<span><span class="co">#&gt; Intercept     -3.310 1.805     -6.907   -3.292      0.183 -3.292   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -374,26 +384,26 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                                                         mean    sd 0.025quant</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.116 0.036      0.056</span></span>
-<span><span class="co">#&gt; Range for field                                        1.298 0.196      0.963</span></span>
-<span><span class="co">#&gt; Stdev for field                                        1.024 0.091      0.858</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.115 0.038      0.052</span></span>
+<span><span class="co">#&gt; Range for field                                        1.299 0.198      0.960</span></span>
+<span><span class="co">#&gt; Stdev for field                                        1.024 0.092      0.856</span></span>
 <span><span class="co">#&gt;                                                        0.5quant 0.975quant</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1    0.112      0.197</span></span>
-<span><span class="co">#&gt; Range for field                                           1.280      1.733</span></span>
-<span><span class="co">#&gt; Stdev for field                                           1.020      1.218</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1    0.111      0.202</span></span>
+<span><span class="co">#&gt; Range for field                                           1.281      1.738</span></span>
+<span><span class="co">#&gt; Stdev for field                                           1.019      1.218</span></span>
 <span><span class="co">#&gt;                                                         mode</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.105</span></span>
-<span><span class="co">#&gt; Range for field                                        1.242</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.103</span></span>
+<span><span class="co">#&gt; Range for field                                        1.243</span></span>
 <span><span class="co">#&gt; Stdev for field                                        1.009</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1588.22</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 787.23</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 83.57</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1588.38</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 787.11</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 83.56</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1601.93</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 84.81</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1602.18</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 84.89</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -907.34 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -907.26 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
@@ -547,15 +557,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.837, Running = 14.8, Post = 0.421, Total = 16 </span></span>
+<span><span class="co">#&gt;     Pre = 0.747, Running = 14.1, Post = 0.402, Total = 15.3 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed     -2.151 0.414     -2.958   -2.152     -1.336 -2.152   0</span></span>
 <span><span class="co">#&gt; veg_grassland     -1.904 0.402     -2.690   -1.905     -1.112 -1.905   0</span></span>
-<span><span class="co">#&gt; Intercept_present -5.688 1.798     -9.259   -5.674     -2.199 -5.674   0</span></span>
+<span><span class="co">#&gt; Intercept_present -5.688 1.798     -9.258   -5.674     -2.199 -5.674   0</span></span>
 <span><span class="co">#&gt; elevation_present  0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
 <span><span class="co">#&gt; elevation          0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count   -1.369 1.763     -4.874   -1.354      2.051 -1.354   0</span></span>
+<span><span class="co">#&gt; Intercept_count   -1.369 1.763     -4.873   -1.353      2.051 -1.353   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -564,15 +574,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field 1.368 0.237      0.976    1.343       1.91 1.284</span></span>
-<span><span class="co">#&gt; Stdev for field 0.897 0.096      0.723    0.892       1.10 0.882</span></span>
+<span><span class="co">#&gt; Range for field 1.368 0.237      0.976    1.343       1.91 1.285</span></span>
+<span><span class="co">#&gt; Stdev for field 0.898 0.096      0.723    0.892       1.10 0.882</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1620.02</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1620.03</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 69.95</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 69.94</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.71</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 72.52</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.72</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 72.51</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -921.15 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
@@ -795,24 +805,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2711157</td>
-<td align="right">0.6265556</td>
-<td align="right">-2.189106</td>
-<td align="right">0.4126887</td>
+<td align="right">0.2708290</td>
+<td align="right">0.6254719</td>
+<td align="right">-2.203340</td>
+<td align="right">0.4120701</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2920306</td>
-<td align="right">0.6880271</td>
-<td align="right">-2.165591</td>
-<td align="right">0.4287869</td>
+<td align="right">0.2918337</td>
+<td align="right">0.6878385</td>
+<td align="right">-2.164246</td>
+<td align="right">0.4288458</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.3038956</td>
-<td align="right">0.7186751</td>
-<td align="right">-2.166134</td>
-<td align="right">0.4474186</td>
+<td align="right">0.3044735</td>
+<td align="right">0.7190986</td>
+<td align="right">-2.160285</td>
+<td align="right">0.4473999</td>
 </tr>
 </tbody>
 </table>

@@ -34,6 +34,9 @@
     <loc>https://inlabru-org.github.io/inlabru/articles/Apptainer.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/articles/articles.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/bru_mapper.html</loc>
   </url>
   <url>
@@ -68,9 +71,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/svc.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/website_examples.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html</loc>

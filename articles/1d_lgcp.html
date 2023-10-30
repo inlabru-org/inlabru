@@ -38,14 +38,28 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
     <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
     <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
     <a class="dropdown-item" href="../articles/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
+  </div>
+</li>
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
     <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
     <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
@@ -56,24 +70,20 @@
     <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>General examples</h6>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
     <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/website_examples.html">Website articles</a>
   </div>
 </li>
 <li class="nav-item">
@@ -294,7 +304,7 @@ are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 129.3466 10.48381 107.3517 130.1699 148.2621 130.1699        1.048381     0.9715905</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 128.7563 11.72249 105.5136 129.3292 153.1111 129.3292        1.172249      1.063558</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -330,24 +340,24 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 250, rather than for the posterior mean <code>N</code> alone:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;      N        mean          sd       q0.025        q0.5     q0.975      median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.004473624 0.007325718 3.583688e-07 0.001032488 0.02668600 0.001032488    0.0007325718</span></span>
-<span><span class="co">#&gt; 52 101 0.005058109 0.007864961 5.543880e-07 0.001324032 0.02847027 0.001324032    0.0007864961</span></span>
-<span><span class="co">#&gt; 53 102 0.005691702 0.008434367 8.492170e-07 0.001681254 0.02826177 0.001681254    0.0008434367</span></span>
-<span><span class="co">#&gt; 54 103 0.006373122 0.009021611 1.288209e-06 0.002114128 0.02973470 0.002114128    0.0009021611</span></span>
-<span><span class="co">#&gt; 55 104 0.007100159 0.009613190 1.935344e-06 0.002632893 0.03165970 0.002632893    0.0009613190</span></span>
-<span><span class="co">#&gt; 56 105 0.007869685 0.010195238 2.879876e-06 0.003247724 0.03338903 0.003247724    0.0010195238</span></span>
+<span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 51 100 0.003797934 0.007006037 2.115217e-06 0.0007668971 0.02501806 0.0007668971    0.0007006037</span></span>
+<span><span class="co">#&gt; 52 101 0.004331262 0.007527305 3.165263e-06 0.0009931756 0.02721296 0.0009931756    0.0007527305</span></span>
+<span><span class="co">#&gt; 53 102 0.004912724 0.008045938 4.690168e-06 0.0012736106 0.02931296 0.0012736106    0.0008045938</span></span>
+<span><span class="co">#&gt; 54 103 0.005542637 0.008557923 6.882283e-06 0.0016173748 0.03127140 0.0016173748    0.0008557923</span></span>
+<span><span class="co">#&gt; 55 104 0.006220689 0.009059016 1.000191e-05 0.0020341783 0.03304301 0.0020341783    0.0009059016</span></span>
+<span><span class="co">#&gt; 56 105 0.006945887 0.009544705 1.439727e-05 0.0025340306 0.03458571 0.0025340306    0.0009544705</span></span>
 <span><span class="co">#&gt;    sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51  0.0008845283</span></span>
-<span><span class="co">#&gt; 52  0.0008574356</span></span>
-<span><span class="co">#&gt; 53  0.0008517524</span></span>
-<span><span class="co">#&gt; 54  0.0008561218</span></span>
-<span><span class="co">#&gt; 55  0.0008612753</span></span>
-<span><span class="co">#&gt; 56  0.0008611978</span></span></code></pre></div>
+<span><span class="co">#&gt; 51  0.0011659136</span></span>
+<span><span class="co">#&gt; 52  0.0011462888</span></span>
+<span><span class="co">#&gt; 53  0.0011180255</span></span>
+<span><span class="co">#&gt; 54  0.0010826603</span></span>
+<span><span class="co">#&gt; 55  0.0010417217</span></span>
+<span><span class="co">#&gt; 56  0.0009966246</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  98.58851 129.96207 166.13011</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 100.5052 130.3951 162.1467</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>

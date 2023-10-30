@@ -38,14 +38,28 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
     <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
     <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
     <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
     <a class="dropdown-item" href="../articles/publications.html">Publications</a>
     <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
+    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
+    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
+    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
+    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
+  </div>
+</li>
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
     <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
     <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
     <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sp version)</a>
@@ -56,24 +70,20 @@
     <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
     <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>General examples</h6>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
+    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
+    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
     <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
     <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
     <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
     <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/website_examples.html">Website articles</a>
   </div>
 </li>
 <li class="nav-item">
@@ -269,10 +279,10 @@ integration <code>weight</code> values are contained in the
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd  q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 673.5985 25.44781 628.786 670.9314 719.5177 670.9314        2.544781</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 666.7851 29.25217 605.7484 666.1348 720.8467 666.1348        2.925217</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.521178</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       2.08681</span></span></code></pre></div>
 <p>Given some generous interval boundaries (500, 800) for lambda we can
 estimate the posterior abundance distribution via</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -288,11 +298,11 @@ estimate the posterior abundance distribution via</p>
 <p>Get its quantiles via</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 593.3308 667.5799 741.5880</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 594.4051 670.1778 748.5216</span></span></code></pre></div>
 <p>… the mean via</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.emarginal</a></span><span class="op">(</span><span class="va">identity</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 667.6502</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 670.4844</span></span></code></pre></div>
 <p>and plot posteriors:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">$</span><span class="va">plugin_estimate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, lambda <span class="op">=</span> <span class="va">Lambda</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
