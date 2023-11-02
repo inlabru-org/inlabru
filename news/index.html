@@ -100,7 +100,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-and-dependency-simplification-development-version">Bug fixes and dependency simplification<a class="anchor" aria-label="anchor" href="#bug-fixes-and-dependency-simplification-development-version"></a></h3>
-<ul><li>Remove dependence on the <code>ggpolypath</code> package, and the <code>ggplot2::fortify.SpatialPolygons/DataFrame()</code> methods that were deprecated in <code>ggplot2</code> version <code>3.4.4</code>.</li>
+<ul><li>Remove dependence on the <code>ggpolypath</code> package, and the <code>ggplot2::fortify.SpatialPolygons/DataFrame()</code> methods that were deprecated in <code>ggplot2</code> version <code>3.4.4</code>. Code using <code><a href="../reference/gg.SpatialPolygons.html">gg.SpatialPolygons()</a></code> together with <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal()</a></code> for coordinate axis control needs to use <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf()</a></code> instead.</li>
 </ul></div>
 </div>
     <div class="section level2">
