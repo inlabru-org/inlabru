@@ -12,7 +12,9 @@
   
 * Remove dependence on the `ggpolypath` package, and the
   `ggplot2::fortify.SpatialPolygons/DataFrame()` methods that were deprecated in
-  `ggplot2` version `3.4.4`.
+  `ggplot2` version `3.4.4`.  Code using `gg.SpatialPolygons()` together with
+  `coord_fixed()`/`coord_equal()` for coordinate axis control needs to use
+  `coord_sf()` instead.
 
 # inlabru 2.10.0
 
