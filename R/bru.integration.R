@@ -550,21 +550,18 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #' @examples
 #' \donttest{
-#' # ipoints needs INLA
-#' if (bru_safe_inla()) {
-#'   # Create integration points in dimension 'myDim' and 'myDiscreteDim'
-#'   ips1 <- fm_int(fm_mesh_1d(0:20),
-#'     rbind(c(0, 3), c(3, 8)),
-#'     name = "myDim"
-#'   )
-#'   ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
+#' # Create integration points in dimension 'myDim' and 'myDiscreteDim'
+#' ips1 <- fm_int(fm_mesh_1d(0:20),
+#'   rbind(c(0, 3), c(3, 8)),
+#'   name = "myDim"
+#' )
+#' ips2 <- fm_int(domain = c(1, 2, 4), name = "myDiscreteDim")
 #'
-#'   # Calculate the cross product
-#'   ips <- cprod(ips1, ips2)
+#' # Calculate the cross product
+#' ips <- cprod(ips1, ips2)
 #'
-#'   # Plot the integration points
-#'   plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
-#' }
+#' # Plot the integration points
+#' plot(ips$myDim, ips$myDiscreteDim, cex = 10 * ips$weight)
 #' }
 #'
 cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {

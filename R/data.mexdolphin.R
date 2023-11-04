@@ -38,8 +38,7 @@
 #'
 #' @examples
 #' \donttest{
-#' if (bru_safe_inla(quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE)) {
 #'   data(mexdolphin, package = "inlabru")
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +
@@ -120,19 +119,6 @@
 #'
 #'   ggplot() +
 #'     gg(mexdolphin_sf$mesh, color = mexdolphin_sf$lambda, mask = mexdolphin_sf$ppoly)
-#' }
-#' }
-#' \dontrun{
-#' if (requireNamespace("ggmap", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$ppoly, color = "blue") +
-#'     gm(mexdolphin$samplers) +
-#'     gm(mexdolphin$points, aes(size = size), color = "red")
-#'
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$depth, aes(col = depth)) +
-#'     gm(mexdolphin$ppoly)
 #' }
 #' }
 "mexdolphin_sf"

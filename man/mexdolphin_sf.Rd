@@ -51,19 +51,6 @@ if (require("ggplot2", quietly = TRUE)) {
     gg(mexdolphin_sf$mesh, color = mexdolphin_sf$lambda, mask = mexdolphin_sf$ppoly)
 }
 }
-\dontrun{
-if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
-  gmap(mexdolphin$depth) +
-    gm(mexdolphin$ppoly, color = "blue") +
-    gm(mexdolphin$samplers) +
-    gm(mexdolphin$points, aes(size = size), color = "red")
-
-  gmap(mexdolphin$depth) +
-    gm(mexdolphin$depth, aes(col = depth)) +
-    gm(mexdolphin$ppoly)
-}
-}
 }
 \references{
 Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian,

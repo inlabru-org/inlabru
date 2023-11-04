@@ -1,7 +1,7 @@
 #' Plot a map using extent of a spatial object
 #'
-#' Uses get_map() to query map services like Google Maps for a region centered around
-#' the spatial object provided. Then calls ggmap() to plot the map.
+#' Uses `ggmap::get_map()` to query map services like Google Maps for a region centered around
+#' the spatial object provided. Then calls `ggmap()` to plot the map.
 #'
 #' This function requires the `ggmap` package.
 #'
@@ -14,20 +14,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (requireNamespace("ggmap", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
 #'   # Create a base map centred around the nests and plot the boundary as well
 #'   # as the nests
-#'   ggplot() +
-#'     gg(gorillas$boundary) +
-#'     gg(gorillas$nests, color = "white", size = 0.5)
-#'   if (requireNamespace("ggmap", quietly = TRUE)) {
-#'     gmap(gorillas$nests, maptype = "satellite") +
-#'       gm(gorillas$boundary) +
-#'       gm(gorillas$nests, color = "white", size = 0.5)
-#'   }
+#'   gmap(gorillas$nests, maptype = "satellite") +
+#'     gm(gorillas$boundary) +
+#'     gm(gorillas$nests, color = "white", size = 0.5)
 #' }
 #' }
 gmap <- function(data, ...) {
@@ -42,7 +38,10 @@ gmap <- function(data, ...) {
 
   # Create map
   requireNamespace("ggmap")
-  myMap <- ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
+  myMap <-
+    ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
+      ...
+    )
 
   # Return map
   ggmap::ggmap(myMap)
