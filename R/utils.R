@@ -466,7 +466,10 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
-  where <- terra::project(where, data)
+  if (!fm_crs_is_null(fm_crs(where)) &&
+      !fm_crs_is_null(fm_crs(data))) {
+    where <- terra::project(where, data)
+  }
   if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
     # Work around issue in terra::extract() that assumes `layer` to point
     # to a column of `where` (like `selector`) when
