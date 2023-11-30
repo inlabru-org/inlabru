@@ -8,8 +8,8 @@
 <meta name="description" content="inlabru">
 <title>LGCPs - An example in one dimension • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="LGCPs - An example in one dimension">
 <meta property="og:description" content="inlabru">
@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-11-09</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-11-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/1d_lgcp.Rmd" class="external-link"><code>vignettes/articles/1d_lgcp.Rmd</code></a></small>
       <div class="d-none name"><code>1d_lgcp.Rmd</code></div>
@@ -304,7 +304,7 @@ are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 130.7588 12.16836 108.7771 130.5302 156.1053 130.5302        1.216836     0.7482949</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 131.1039 10.73791 112.4563 130.8165 148.4944 130.8165        1.073791     0.9963068</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -340,24 +340,24 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 250, rather than for the posterior mean <code>N</code> alone:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;      N        mean          sd       q0.025        q0.5     q0.975      median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.004242386 0.007086812 5.490205e-07 0.001038762 0.02635017 0.001038762    0.0007086812</span></span>
-<span><span class="co">#&gt; 52 101 0.004848589 0.007682479 8.424794e-07 0.001331804 0.02838134 0.001331804    0.0007682479</span></span>
-<span><span class="co">#&gt; 53 102 0.005506548 0.008275888 1.280140e-06 0.001690774 0.03028504 0.001690774    0.0008275888</span></span>
-<span><span class="co">#&gt; 54 103 0.006215338 0.008861096 1.926306e-06 0.002125661 0.03201943 0.002125661    0.0008861096</span></span>
-<span><span class="co">#&gt; 55 104 0.006973203 0.009431845 2.870801e-06 0.002646710 0.03354535 0.002646710    0.0009431845</span></span>
-<span><span class="co">#&gt; 56 105 0.007777527 0.009981524 4.237711e-06 0.003264095 0.03482784 0.003264095    0.0009981524</span></span>
+<span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 51 100 0.004664457 0.007331386 3.726187e-07 0.0009069537 0.02405157 0.0009069537    0.0007331386</span></span>
+<span><span class="co">#&gt; 52 101 0.005318877 0.007939816 5.758406e-07 0.0011681203 0.02625280 0.0011681203    0.0007939816</span></span>
+<span><span class="co">#&gt; 53 102 0.006025737 0.008550918 8.811829e-07 0.0014897429 0.02837829 0.0014897429    0.0008550918</span></span>
+<span><span class="co">#&gt; 54 103 0.006782990 0.009158617 1.335358e-06 0.0018814734 0.03038206 0.0018814734    0.0009158617</span></span>
+<span><span class="co">#&gt; 55 104 0.007587571 0.009756093 2.004187e-06 0.0023533624 0.03221881 0.0023533624    0.0009756093</span></span>
+<span><span class="co">#&gt; 56 105 0.008435396 0.010335811 2.979392e-06 0.0029155712 0.03384572 0.0029155712    0.0010335811</span></span>
 <span><span class="co">#&gt;    sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51  0.0010549751</span></span>
-<span><span class="co">#&gt; 52  0.0010533605</span></span>
-<span><span class="co">#&gt; 53  0.0010373023</span></span>
-<span><span class="co">#&gt; 54  0.0010079940</span></span>
-<span><span class="co">#&gt; 55  0.0009674572</span></span>
-<span><span class="co">#&gt; 56  0.0009184322</span></span></code></pre></div>
+<span><span class="co">#&gt; 51  0.0010336891</span></span>
+<span><span class="co">#&gt; 52  0.0010080685</span></span>
+<span><span class="co">#&gt; 53  0.0009723509</span></span>
+<span><span class="co">#&gt; 54  0.0009291742</span></span>
+<span><span class="co">#&gt; 55  0.0008814845</span></span>
+<span><span class="co">#&gt; 56  0.0008322135</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 100.0425 129.4392 164.2077</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  99.42798 129.07685 165.58731</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>
