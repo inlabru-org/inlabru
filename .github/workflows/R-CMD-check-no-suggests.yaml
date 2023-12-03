@@ -58,11 +58,6 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
 
-      - name: Fix temporary out-of-sync binary packages
-        run: |
-          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
-        shell: Rscript {0}
-
       - name: Has Suggests?
         run: |
           options(width = 100)
@@ -109,6 +104,11 @@ jobs:
                      "\n"))
         shell: Rscript {0}
 
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
+
       - name: Session info without INLA
         run: |
           options(width = 100)
@@ -144,6 +144,11 @@ jobs:
           cat(paste0("Installed Suggests: ",
                      paste0(sug[sug %in% pkgs], collapse = ", "),
                      "\n"))
+        shell: Rscript {0}
+
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
         shell: Rscript {0}
 
       - name: Session info with INLA
