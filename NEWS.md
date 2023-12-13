@@ -15,6 +15,9 @@
   `ggplot2` version `3.4.4`.  Code using `gg.SpatialPolygons()` together with
   `coord_fixed()`/`coord_equal()` for coordinate axis control needs to use
   `coord_sf()` instead.
+* Detect the need for vectorised parameters in `bru_forward_transformation` to
+  allow `bru_mapper_marginal` to be applied with e.g. spatially varying parameters.
+  (version 2.10.0.9001)
 
 # inlabru 2.10.0
 
