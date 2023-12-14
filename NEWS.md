@@ -17,7 +17,11 @@
   `coord_sf()` instead.
 * Detect the need for vectorised parameters in `bru_forward_transformation` to
   allow `bru_mapper_marginal` to be applied with e.g. spatially varying parameters.
-  (version 2.10.0.9001)
+  (version `2.10.0.9001`)
+* Detect `terra` version `>= 1.7-64` that removed the need for
+  detecting special cases (`nrow(where) == 1` and `terra::nlyr(data) == 1`).
+  Workaround code used for versions `< 1.7-64`. (version `2.10.0.9002`)
+  (Thanks to Robert J. Hijmans)
 
 # inlabru 2.10.0
 
