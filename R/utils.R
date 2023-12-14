@@ -470,7 +470,7 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
       !fm_crs_is_null(fm_crs(data))) {
     where <- terra::project(where, data)
   }
-  if (getNamespaceVersion("terra") >= "1.7-64") {
+  if (getNamespaceVersion("terra") >= "1.7-66") {
     val <- terra::extract(
       data,
       where,
