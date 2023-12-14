@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.0.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,7 +102,7 @@
 <h3 id="bug-fixes-and-dependency-simplification-development-version">Bug fixes and dependency simplification<a class="anchor" aria-label="anchor" href="#bug-fixes-and-dependency-simplification-development-version"></a></h3>
 <ul><li>Remove dependence on the <code>ggpolypath</code> package, and the <code>ggplot2::fortify.SpatialPolygons/DataFrame()</code> methods that were deprecated in <code>ggplot2</code> version <code>3.4.4</code>. Code using <code><a href="../reference/gg.SpatialPolygons.html">gg.SpatialPolygons()</a></code> together with <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal()</a></code> for coordinate axis control needs to use <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf()</a></code> instead.</li>
 <li>Detect the need for vectorised parameters in <code>bru_forward_transformation</code> to allow <code>bru_mapper_marginal</code> to be applied with e.g. spatially varying parameters. (version <code>2.10.0.9001</code>)</li>
-<li>Detect <code>terra</code> version <code>&gt;= 1.7-64</code> that removed the need for detecting special cases (<code>nrow(where) == 1</code> and <code>terra::nlyr(data) == 1</code>). Workaround code used for versions <code>&lt; 1.7-64</code>. (version <code>2.10.0.9002</code>) (Thanks to Robert J. Hijmans)</li>
+<li>Detect <code>terra</code> version <code>&gt;= 1.7-66</code> that removes the need for detecting special cases (<code>nrow(where) == 1</code> and <code>terra::nlyr(data) == 1</code>). Workaround code used for versions <code>&lt;&lt; 1.7-66</code>. (version <code>2.10.0.9002</code>) (Thanks to Robert J. Hijmans)</li>
 </ul></div>
 </div>
     <div class="section level2">
