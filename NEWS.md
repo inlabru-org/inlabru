@@ -20,7 +20,7 @@
   (version `2.10.0.9001`)
 * Detect `terra` version `>= 1.7-66` that removes the need for
   detecting special cases (`nrow(where) == 1` and `terra::nlyr(data) == 1`).
-  Workaround code used for versions `<< 1.7-66`. (version `2.10.0.9002`)
+  Workaround code used for versions `< 1.7-66`. (version `2.10.0.9002`)
   (Thanks to Robert J. Hijmans)
 
 # inlabru 2.10.0
