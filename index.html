@@ -48,7 +48,7 @@
     
     <a class="navbar-brand me-2" href="index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,7 +171,7 @@
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; This is INLA_23.10.28 built 2023-10-28 10:43:31 UTC.</span></span>
+<span><span class="co">#&gt; This is INLA_23.12.17 built 2023-12-17 16:59:33 UTC.</span></span>
 <span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">#&gt;  - List available models/likelihoods/etc with inla.list.models()</span></span>
 <span><span class="co">#&gt;  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span>
@@ -200,6 +200,10 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in inla.model.properties.generic(inla.trim.family(model), mm[names(mm) == : Model 'scopy' in section 'latent' is marked as 'experimental'; changes may appear at any time.</span></span>
+<span><span class="co">#&gt;   Use this model with extra care!!! Further warnings are disabled.</span></span>
+<span><span class="co">#&gt; Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'</span></span>
+<span><span class="co">#&gt; had status 1</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
 <span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
