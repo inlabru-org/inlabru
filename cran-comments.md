@@ -3,7 +3,6 @@
 * Patch release 2.10.1
 * Fixes deprecation issue with ggplot2
 * Adds compatibility with an upcoming change in terra version 1.7-66
-  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
 
 ## R CMD check results and comments
 
