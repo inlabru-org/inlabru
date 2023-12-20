@@ -1,13 +1,12 @@
 ## Submission notes
 
-* Minor release 2.10.0, including new features and bug fixes
-* CRAN checks for old version, 2.9.0:
-  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-* Checks for new version, 2.10.0 (with latest INLA, 23.10.28)
-  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
+* Patch release 2.10.1
+* Fixes deprecation issue with ggplot2
+* Adds compatibility with an upcoming change in terra version 1.7-66
 
 ## R CMD check results and comments
 
+* No change in RMD CMD check results
 * The non-CRAN Suggested package INLA has been extensively tested with inlabru
   locally and in github actions for both Linux, Windows, and macOS.
   The needed repository specification is included in the package DESCRIPTION:
