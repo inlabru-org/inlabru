@@ -56,8 +56,7 @@ First, we build a high resolution mesh for the true field, using low level INLA 
 bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
 mesh_fine <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.2)
 ggplot() +
-  gg(mesh_fine) +
-  coord_equal()
+  geom_fm(data = mesh_fine)
 
 # Note: the priors here will not be used in estimation
 matern_fine <-
@@ -129,11 +128,10 @@ Estimating the field
 
 Construct a mesh covering the data:
 
-```{r }
+```{r warning=FALSE}
 mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.5)
 ggplot() +
-  gg(mesh) +
-  coord_equal()
+  geom_fm(data = mesh)
 ```
 
 Construct an SPDE model object for a Matern model:

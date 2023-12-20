@@ -14,7 +14,7 @@ test_that("basic intercept model", {
 
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
-    0.090405156,
+    0.09140515,
     tolerance = lowtol
   )
 })
@@ -39,7 +39,7 @@ test_that("basic intercept model, spatial data", {
 
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
-    0.090405156,
+    0.09140515,
     tolerance = lowtol
   )
 })
@@ -60,7 +60,7 @@ test_that("basic fixed effect model", {
 
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
-    0.08537663,
+    0.08637662,
     tolerance = lowtol
   )
 })

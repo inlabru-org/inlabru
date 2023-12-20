@@ -74,6 +74,11 @@ jobs:
           source("vignettes/articles/mermaid_updater.R")
         shell: Rscript {0}
 
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
+
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}

@@ -14,8 +14,7 @@ if (bru_safe_inla(multicore = FALSE) &&
   ggplot() +
     gg(gorillas$mesh) +
     gg(gorillas$nests) +
-    gg(gorillas$boundary) +
-    coord_fixed()
+    gg(gorillas$boundary)
 
   # Define SPDE prior
 

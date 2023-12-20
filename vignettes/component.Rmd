@@ -136,7 +136,7 @@ There are a few shortcuts to defining model components.  They are for
 3. Defining linear effects using an `lm`-style syntax.
 4. Behaviour for if `main`, `group` or `replicate` is a function given with no arguments.
 
-#### Intercept-like components
+### Intercept-like components
 
 The syntax
 ```{r eval=FALSE}
@@ -151,9 +151,9 @@ can be used as a shortcut for
 ```
 where `n` is the length of the predictor vector.  Note that this shortcut makes an assumption about the approriate length of the predictor.  For many models this can be easily deduced by inspecting input data, but this is not always the case, for example if the response and covariate data are of different dimensions or for joint likelihood models with shared components.
 
-#### `sp` covariates
+### Spatial covariates
 
-If `main`, `group`, or `replicate`, is the name of an `Spatial*` or `SpatRaster` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `SpatialPoints*` or `sf` object**.  For `Spatial*` inputs, `inlabru` does this by applying `sp::coordinates()` to the data and then extracting the covariate information using `sp::over()`. 
+If `main`, `group`, or `replicate`, is the name of an `sf`, `SpatRaster`, or `Spatial*` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `sf` or `SpatialPoints*` object**. `inlabru` does this by calling the `inlabru::eval_spatial()` method, which supports several covariate storage types.
 
 The shorcut
 ```{r eval=FALSE}
@@ -162,39 +162,41 @@ The shorcut
   model = "linear"
 )
 ```
-internally calls `eval_spatial()` which is almost equivalent to
+internally calls `eval_spatial()` which equivalent to
 ```{r, eval=FALSE}
-get_sp_covariate <- function(df) {
-  locs <- coordinates(df)
-  over(locs, an_sp_object)[, 1]
-}
-
 ~ my_sp_effect(
-  main = get_sp_covariate(.data.),
+  main = eval_spatial(a_spatial_object, .data.),
   model = "linear"
 )
 ```
 Note that this requires `a_spatial_object` to be stored in the global `R` environment
-(or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `get_sp_covariate` function above extracts the first column of the `sp` object evaluation.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
+(or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `eval_spatial()` function by default extracts the first column of the raster object.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
 use `main = eval_spatial(a_spatial_object, .data., layer = some_layer)`.
 
-Note that this assumes that `coordinates()` applied to the input data is a sensible thing to do, this might not be the case for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates()` returns the centroid of each polygon.  As more specific input type support is developed, and support for `sp` is gradually deprecated in favour of `sf` and `terra`,
-these special cases may be given more precise meaning.
+Note that this assumes that the data is either `sf`, so that `st_geometry(.data.)` retrieves point locations, or `sf`, where `coordinates(.data.)` retrieves coordinates.  This might not be a sensible thing for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates(.data.)` returns the centroid of each polygon.  As more specific input type support is developed, and support for `sp` is gradually deprecated in favour of `sf` and `terra`,
+these special cases may be given more precise meaning.  For example, the `a_spatial_object` above may be an `sf` or `sp` polygon object with data columns, which is interpreted as a spatially piecewise constant
+covariate.
 
-#### `lm`-style syntax
+### `lm`-style fixed effect and interaction syntax
 
-Since `inlabru` version 2.5.0, a feature has been added to allow users to specify linear fixed effects using a formula as input.  This uses the `model = 'fixed'` component type.  The syntax is
+Since `inlabru` version 2.5.0, a feature has been added to allow users to specify linear fixed effects using a formula as input.  This uses the `model = 'fixed'` component type.  The basic component input is a model matrix. Alternatively, one can supply a formula specification, which is then used to generate a model matrix automatically, with `MatrixModels::model.Matrix(formula, data = .data.)`. If you want a different kind of model matrix construction, replace `~ x1 + x2` by some other R code that generates the needed matrix, using the `.data.` object as input.
+
+Example syntax:
 ```{r eval=FALSE}
 ~ my_fixed_effects(
   main = ~ x1:x2 + x3 * x4,
   model = "fixed"
 )
 ```
-where the data has columns named `x1`, `x2`, `x3`, and `x4`.
-In this case, `inlabru` creates the design matrix for this component by running
+which is equvalent to
 ```{r eval=FALSE}
-MatrixModels::model.Matrix(~ x1:x2 + x3 * x4, .data.)
+~ my_fixed_effects(
+  main = MatrixModels::model.Matrix(~ x1:x2 + x3 * x4, .data.),
+  model = "fixed"
+)
 ```
+where the data has columns named `x1`, `x2`, `x3`, and `x4`.
+
 This allows users to define interactions in a concise way, by utilising the functionality already supported by the `MatrixModels` package.
 The formula is interpreted in the conventional way, `x1:x2` is the interaction of covariates `x1` and `x2`, not including their individual fixed effects, and `x3:x4` is the interaction of `x3` and `x4` inclusive of the individual fixed effects `x3` and `x4`.
 Note that for implementation technical reasons, the estimated parameters appear in
@@ -203,7 +205,7 @@ part of the `inla`/`bru` output object.
 
 The alternative to using this shortcut would be for the user to define and name individual components for each term in the formula.
 
-#### A function given with no arguments
+### A function given with no arguments
 
 If `main`, `group`, or `replicate` are given as a function with no covariates, then this function is applied to the data.  For example,
 ```{r eval=FALSE}
@@ -220,6 +222,6 @@ is equivalent to
 )
 ```
 
-#### Non-linear predictors
+### Non-linear predictors
 
 `inlabru` supports non-linear predictors, where $\tilde{\eta}(u,v)$ is a non-linear function of $\eta_u$ and $\eta_v$.  It is important to note that the mapping each component effect vector $\eta_u=A^{(u)} u$ happens **before** the non-linear function is applied.  So, for example, if $\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v)$ then this is evaluated as $\exp(A^{(u)} u + A^{(v)} v)$.

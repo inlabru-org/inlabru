@@ -15,29 +15,24 @@ gmap(data, ...)
 a ggplot object
 }
 \description{
-Uses get_map() to query map services like Google Maps for a region centered around
-the spatial object provided. Then calls ggmap() to plot the map.
+Uses \code{ggmap::get_map()} to query map services like Google Maps for a region centered around
+the spatial object provided. Then calls \code{ggmap()} to plot the map.
 }
 \details{
 This function requires the \code{ggmap} package.
 }
 \examples{
 \dontrun{
-if (require("ggplot2", quietly = TRUE) &&
-  require(ggpolypath, quietly = TRUE)) {
+if (requireNamespace("ggmap", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE)) {
   # Load the Gorilla data
   data(gorillas, package = "inlabru")
 
   # Create a base map centred around the nests and plot the boundary as well
   # as the nests
-  ggplot() +
-    gg(gorillas$boundary) +
-    gg(gorillas$nests, color = "white", size = 0.5)
-  if (requireNamespace("ggmap", quietly = TRUE)) {
-    gmap(gorillas$nests, maptype = "satellite") +
-      gm(gorillas$boundary) +
-      gm(gorillas$nests, color = "white", size = 0.5)
-  }
+  gmap(gorillas$nests, maptype = "satellite") +
+    gm(gorillas$boundary) +
+    gm(gorillas$nests, color = "white", size = 0.5)
 }
 }
 }

@@ -69,7 +69,6 @@ plotdets <- ggplot() +
   gg(sample$plots) +
   gg(sample$nests, pch = "+", cex = 4, color = "red") +
   geom_text(aes(label = sample$counts$count, x = sample$counts$x, y = sample$counts$y)) +
-  coord_fixed() +
   labs(x = "Easting", y = "Northing")
 plot(plotdets)
 ```
@@ -86,7 +85,6 @@ plotwithall <- ggplot() +
   gg(nests, pch = "+", cex = 4, color = "blue") +
   geom_text(aes(label = sample$counts$count, x = sample$counts$x, y = sample$counts$y)) +
   gg(sample$nests, pch = "+", cex = 4, color = "red") +
-  coord_fixed() +
   labs(x = "Easting", y = "Northing")
 plot(plotwithall)
 ```
@@ -128,8 +126,7 @@ lambda.sample <- predict(fit, pxl, ~ exp(my.spde + Intercept))
 lambda.sample.plot <- ggplot() +
   gg(lambda.sample) +
   gg(sample$plots) +
-  gg(boundary, col = "yellow") +
-  coord_fixed()
+  gg(boundary, col = "yellow")
 
 lambda.sample.plot
 ```
@@ -177,8 +174,7 @@ Your plot should look like this:
 lambda.all.plot <- ggplot() +
   gg(lambda.all) +
   gg(sample$plots) +
-  gg(boundary, col = "yellow") +
-  coord_fixed()
+  gg(boundary, col = "yellow")
 
 lambda.all.plot
 ```

@@ -25,29 +25,49 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
   } else {
     upper <- x >= tail.split.
   }
+  param <- list(...)
+  param_upper <- param_lower <- param
+  for (k in seq_along(param)) {
+    if (length(param[[k]]) == length(x)) {
+      param_upper[[k]] <- param[[k]][upper]
+      param_lower[[k]] <- param[[k]][!upper]
+    }
+  }
   res <- numeric(length(x))
   if (sum(upper) > 0) {
     res[upper] <-
-      qfun(
-        pnorm(x[upper],
-          lower.tail = FALSE,
-          log.p = TRUE
-        ),
-        ...,
-        lower.tail = FALSE,
-        log.p = TRUE
+      do.call(
+        qfun,
+        c(
+          list(
+            pnorm(x[upper],
+                  lower.tail = FALSE,
+                  log.p = TRUE
+            )),
+          param_upper,
+          list(
+            lower.tail = FALSE,
+            log.p = TRUE
+          )
+        )
       )
   }
   if (sum(!upper) > 0) {
     res[!upper] <-
-      qfun(
-        pnorm(x[!upper],
-          lower.tail = TRUE,
-          log.p = TRUE
-        ),
-        ...,
-        lower.tail = TRUE,
-        log.p = TRUE
+      do.call(
+        qfun,
+        c(
+          list(
+            pnorm(x[!upper],
+                  lower.tail = TRUE,
+                  log.p = TRUE
+            )),
+          param_lower,
+          list(
+            lower.tail = TRUE,
+            log.p = TRUE
+          )
+        )
       )
   }
   res
@@ -66,15 +86,27 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
   } else {
     upper <- x >= tail.split.
   }
+  param <- list(...)
+  param_upper <- param_lower <- param
+  for (k in seq_along(param)) {
+    if (length(param[[k]]) == length(x)) {
+      param_upper[[k]] <- param[[k]][upper]
+      param_lower[[k]] <- param[[k]][!upper]
+    }
+  }
   res <- numeric(length(x))
   if (sum(upper) > 0) {
     res[upper] <-
       qnorm(
-        pfun(x[upper],
-          ...,
-          lower.tail = FALSE,
-          log.p = TRUE
-        ),
+        do.call(
+          pfun,
+          c(
+            list(x[upper]),
+            param_upper,
+            list(
+              lower.tail = FALSE,
+              log.p = TRUE)
+          )),
         lower.tail = FALSE,
         log.p = TRUE
       )
@@ -82,11 +114,15 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
   if (sum(!upper) > 0) {
     res[!upper] <-
       qnorm(
-        pfun(x[!upper],
-          ...,
-          lower.tail = TRUE,
-          log.p = TRUE
-        ),
+        do.call(
+          pfun,
+          c(
+            list(x[!upper]),
+            param_lower,
+            list(
+              lower.tail = TRUE,
+              log.p = TRUE
+            ))),
         lower.tail = TRUE,
         log.p = TRUE
       )

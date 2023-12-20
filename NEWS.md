@@ -1,3 +1,28 @@
+# inlabru 2.10.1
+
+## Feature updates
+
+* Add new web article on ZIP/ZAP models (zero inflated Poisson models)
+  where the non-zero probability is modelled with a separate predictor from the
+  predictor for the Poisson model parameter:
+  <https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html>.
+  (Thanks to Dmytro Perepolkin)
+
+## Bug fixes and dependency simplification
+  
+* Remove dependence on the `ggpolypath` package, and the
+  `ggplot2::fortify.SpatialPolygons/DataFrame()` methods that were deprecated in
+  `ggplot2` version `3.4.4`.  Code using `gg.SpatialPolygons()` together with
+  `coord_fixed()`/`coord_equal()` for coordinate axis control needs to use
+  `coord_sf()` instead.
+* Detect the need for vectorised parameters in `bru_forward_transformation` to
+  allow `bru_mapper_marginal` to be applied with e.g. spatially varying parameters.
+  (version `2.10.0.9001`)
+* Detect `terra` version `>= 1.7-66` that removes the need for
+  detecting special cases (`nrow(where) == 1` and `terra::nlyr(data) == 1`).
+  Workaround code used for versions `< 1.7-66`. (version `2.10.0.9002`)
+  (Thanks to Robert J. Hijmans)
+
 # inlabru 2.10.0
 
 ## Feature updates
@@ -16,7 +41,7 @@
   but for additive shifts instead of multiplicative scaling. (version `2.9.0.9012`)
 * Added more checks for invalid component or predictor evaluations, to help
   catch user errors sooner, and with more informative messages. (version `2.9.0.9013`)
-* Expand `bru_mapper_matrix`, previously used only for component `model = "fixed",
+* Expand `bru_mapper_matrix`, previously used only for component `model = "fixed"`,
   to allow integer indexing in addition to the previous factor/character-only indexing.
   (version `2.9.0.9014`)
 
@@ -47,7 +72,7 @@
 
 * Conversion of code to use `fmesher` for mesh and geometry handling;
   the interface supports existing objects and methods.
-  See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
+  See <https://inlabru-org.github.io/fmesher/articles/inla_conversion.html> for
   more information.
 * General speed improvements, see below for details.
 * Added `gg.sf()` method.
@@ -169,7 +194,7 @@
 * Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
   calls that don't account for the `geos` canonical representation being CW,
   whereas the canonical Simple Features representation being CCW. See
-  https://github.com/r-spatial/sf/issues/2096
+  <https://github.com/r-spatial/sf/issues/2096>
   
 # inlabru 2.7.0
 

@@ -466,32 +466,46 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
-  where <- terra::project(where, data)
-  if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
-    # Work around issue in terra::extract() that assumes `layer` to point
-    # to a column of `where` (like `selector`) when
-    # length(layer)==1 (NROW(where)==1),
-    # but otherwise be used directly for indexing into data.
-    # When nlyr == 1, terra::extract ignores the layer input.
-    val <- terra::extract(
-      data,
-      rbind(where, where),
-      ID = FALSE,
-      layer = c(layer, layer)
-    )
-    val <- val[1, , drop = FALSE]
-  } else {
+  if (!fm_crs_is_null(fm_crs(where)) &&
+      !fm_crs_is_null(fm_crs(data))) {
+    where <- terra::project(where, data)
+  }
+  if (getNamespaceVersion("terra") >= "1.7-66") {
     val <- terra::extract(
       data,
       where,
       ID = FALSE,
       layer = layer
     )
-  }
-  if (terra::nlyr(data) == 1) {
-    val <- val[[1]]
-  } else {
     val <- val[["value"]]
+  } else {
+    # For terra pre-1.7-64:
+    if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
+      # Work around issue in terra::extract() that assumes `layer` to point
+      # to a column of `where` (like `selector`) when
+      # length(layer)==1 (NROW(where)==1),
+      # but otherwise be used directly for indexing into data.
+      # When nlyr == 1, terra::extract ignores the layer input.
+      val <- terra::extract(
+        data,
+        rbind(where, where),
+        ID = FALSE,
+        layer = c(layer, layer)
+      )
+      val <- val[1, , drop = FALSE]
+    } else {
+      val <- terra::extract(
+        data,
+        where,
+        ID = FALSE,
+        layer = layer
+      )
+    }
+    if (terra::nlyr(data) == 1) {
+      val <- val[[1]]
+    } else {
+      val <- val[["value"]]
+    }
   }
   val
 }

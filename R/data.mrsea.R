@@ -24,8 +24,7 @@
 #'
 #' @examples
 #' if (bru_safe_inla() &&
-#'   require(ggplot2, quietly = TRUE) &&
-#'   require(ggpolypath, quietly = TRUE)) {
+#'   require(ggplot2, quietly = TRUE)) {
 #'   ggplot() +
 #'     gg(mrsea$mesh) +
 #'     gg(mrsea$samplers) +
