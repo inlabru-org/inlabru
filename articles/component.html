@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">Andy
 Seaton</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-12-14</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-12-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/component.Rmd" class="external-link"><code>vignettes/component.Rmd</code></a></small>
       <div class="d-none name"><code>component.Rmd</code></div>
@@ -318,9 +318,9 @@ or <code>terra</code> <code>SpatRaster</code> object.</li>
 <li>Behaviour for if <code>main</code>, <code>group</code> or
 <code>replicate</code> is a function given with no arguments.</li>
 </ol>
-<div class="section level4">
-<h4 id="intercept-like-components">Intercept-like components<a class="anchor" aria-label="anchor" href="#intercept-like-components"></a>
-</h4>
+<div class="section level3">
+<h3 id="intercept-like-components">Intercept-like components<a class="anchor" aria-label="anchor" href="#intercept-like-components"></a>
+</h3>
 <p>The syntax</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -337,75 +337,81 @@ input data, but this is not always the case, for example if the response
 and covariate data are of different dimensions or for joint likelihood
 models with shared components.</p>
 </div>
-<div class="section level4">
-<h4 id="sp-covariates">
-<code>sp</code> covariates<a class="anchor" aria-label="anchor" href="#sp-covariates"></a>
-</h4>
+<div class="section level3">
+<h3 id="spatial-covariates">Spatial covariates<a class="anchor" aria-label="anchor" href="#spatial-covariates"></a>
+</h3>
 <p>If <code>main</code>, <code>group</code>, or <code>replicate</code>,
-is the name of an <code>Spatial*</code> or <code>SpatRaster</code>
-object stored in the global <code>R</code> environment, then
-<code>inlabru</code> attempts to do something intelligent by extracting
-the covariate information at the locations of the data passed to
-<code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/like.html">like()</a></code>. This <strong>requires that
-this data is a <code>SpatialPoints*</code> or <code>sf</code>
-object</strong>. For <code>Spatial*</code> inputs, <code>inlabru</code>
-does this by applying <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">sp::coordinates()</a></code> to the data and
-then extracting the covariate information using
-<code><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">sp::over()</a></code>.</p>
+is the name of an <code>sf</code>, <code>SpatRaster</code>, or
+<code>Spatial*</code> object stored in the global <code>R</code>
+environment, then <code>inlabru</code> attempts to do something
+intelligent by extracting the covariate information at the locations of
+the data passed to <code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/like.html">like()</a></code>. This
+<strong>requires that this data is a <code>sf</code> or
+<code>SpatialPoints*</code> object</strong>. <code>inlabru</code> does
+this by calling the <code><a href="../reference/eval_spatial.html">inlabru::eval_spatial()</a></code> method, which
+supports several covariate storage types.</p>
 <p>The shorcut</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
 <span>  main <span class="op">=</span> <span class="va">a_spatial_object</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>internally calls <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> which is almost
-equivalent to</p>
+<p>internally calls <code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> which equivalent to</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">get_sp_covariate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/sp/man/over.html" class="external-link">over</a></span><span class="op">(</span><span class="va">locs</span>, <span class="va">an_sp_object</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
-<span>  main <span class="op">=</span> <span class="fu">get_sp_covariate</span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_sp_effect</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="../reference/eval_spatial.html">eval_spatial</a></span><span class="op">(</span><span class="va">a_spatial_object</span>, <span class="va">.data.</span><span class="op">)</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"linear"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Note that this requires <code>a_spatial_object</code> to be stored in
 the global <code>R</code> environment (or in the environment associated
 with the model definition code) so it is findable when the expression is
 internally evaluated by <code>inlabru</code>. Also note that the
-<code>get_sp_covariate</code> function above extracts the first column
-of the <code>sp</code> object evaluation. For more general situations,
-one can either specify the optional <code>main_layer</code> argument to
-extract another named or indexed column, or directly use
+<code><a href="../reference/eval_spatial.html">eval_spatial()</a></code> function by default extracts the first
+column of the raster object. For more general situations, one can either
+specify the optional <code>main_layer</code> argument to extract another
+named or indexed column, or directly use
 <code>main = eval_spatial(a_spatial_object, .data., layer = some_layer)</code>.</p>
-<p>Note that this assumes that <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code> applied to the
-input data is a sensible thing to do, this might not be the case for all
-models! For example, if the input data is a
-<code>SpatialPolygonsDataFrame</code> then <code><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates()</a></code>
-returns the centroid of each polygon. As more specific input type
-support is developed, and support for <code>sp</code> is gradually
-deprecated in favour of <code>sf</code> and <code>terra</code>, these
-special cases may be given more precise meaning.</p>
+<p>Note that this assumes that the data is either <code>sf</code>, so
+that <code>st_geometry(.data.)</code> retrieves point locations, or
+<code>sf</code>, where <code>coordinates(.data.)</code> retrieves
+coordinates. This might not be a sensible thing for all models! For
+example, if the input data is a <code>SpatialPolygonsDataFrame</code>
+then <code>coordinates(.data.)</code> returns the centroid of each
+polygon. As more specific input type support is developed, and support
+for <code>sp</code> is gradually deprecated in favour of <code>sf</code>
+and <code>terra</code>, these special cases may be given more precise
+meaning. For example, the <code>a_spatial_object</code> above may be an
+<code>sf</code> or <code>sp</code> polygon object with data columns,
+which is interpreted as a spatially piecewise constant covariate.</p>
 </div>
-<div class="section level4">
-<h4 id="lm-style-syntax">
-<code>lm</code>-style syntax<a class="anchor" aria-label="anchor" href="#lm-style-syntax"></a>
-</h4>
+<div class="section level3">
+<h3 id="lm-style-fixed-effect-and-interaction-syntax">
+<code>lm</code>-style fixed effect and interaction syntax<a class="anchor" aria-label="anchor" href="#lm-style-fixed-effect-and-interaction-syntax"></a>
+</h3>
 <p>Since <code>inlabru</code> version 2.5.0, a feature has been added to
 allow users to specify linear fixed effects using a formula as input.
-This uses the <code>model = 'fixed'</code> component type. The syntax
-is</p>
+This uses the <code>model = 'fixed'</code> component type. The basic
+component input is a model matrix. Alternatively, one can supply a
+formula specification, which is then used to generate a model matrix
+automatically, with
+<code>MatrixModels::model.Matrix(formula, data = .data.)</code>. If you
+want a different kind of model matrix construction, replace
+<code>~ x1 + x2</code> by some other R code that generates the needed
+matrix, using the <code>.data.</code> object as input.</p>
+<p>Example syntax:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_fixed_effects</span><span class="op">(</span></span>
 <span>  main <span class="op">=</span> <span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">*</span> <span class="va">x4</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"fixed"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>where the data has columns named <code>x1</code>, <code>x2</code>,
-<code>x3</code>, and <code>x4</code>. In this case, <code>inlabru</code>
-creates the design matrix for this component by running</p>
+<p>which is equvalent to</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">MatrixModels</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">model.Matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">*</span> <span class="va">x4</span>, <span class="va">.data.</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">~</span> <span class="fu">my_fixed_effects</span><span class="op">(</span></span>
+<span>  main <span class="op">=</span> <span class="fu">MatrixModels</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MatrixModels/man/model.Matrix.html" class="external-link">model.Matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">x1</span><span class="op">:</span><span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">*</span> <span class="va">x4</span>, <span class="va">.data.</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"fixed"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>where the data has columns named <code>x1</code>, <code>x2</code>,
+<code>x3</code>, and <code>x4</code>.</p>
 <p>This allows users to define interactions in a concise way, by
 utilising the functionality already supported by the
 <code>MatrixModels</code> package. The formula is interpreted in the
@@ -421,9 +427,9 @@ implementation technical reasons, the estimated parameters appear in
 <p>The alternative to using this shortcut would be for the user to
 define and name individual components for each term in the formula.</p>
 </div>
-<div class="section level4">
-<h4 id="a-function-given-with-no-arguments">A function given with no arguments<a class="anchor" aria-label="anchor" href="#a-function-given-with-no-arguments"></a>
-</h4>
+<div class="section level3">
+<h3 id="a-function-given-with-no-arguments">A function given with no arguments<a class="anchor" aria-label="anchor" href="#a-function-given-with-no-arguments"></a>
+</h3>
 <p>If <code>main</code>, <code>group</code>, or <code>replicate</code>
 are given as a function with no covariates, then this function is
 applied to the data. For example,</p>
@@ -439,9 +445,9 @@ applied to the data. For example,</p>
 <span>  model <span class="op">=</span> <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="non-linear-predictors">Non-linear predictors<a class="anchor" aria-label="anchor" href="#non-linear-predictors"></a>
-</h4>
+<div class="section level3">
+<h3 id="non-linear-predictors">Non-linear predictors<a class="anchor" aria-label="anchor" href="#non-linear-predictors"></a>
+</h3>
 <p><code>inlabru</code> supports non-linear predictors, where <span class="math inline">\(\tilde{\eta}(u,v)\)</span> is a non-linear
 function of <span class="math inline">\(\eta_u\)</span> and <span class="math inline">\(\eta_v\)</span>. It is important to note that the
 mapping each component effect vector <span class="math inline">\(\eta_u=A^{(u)} u\)</span> happens

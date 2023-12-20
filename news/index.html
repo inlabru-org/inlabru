@@ -102,7 +102,7 @@
 <h3 id="bug-fixes-and-dependency-simplification-development-version">Bug fixes and dependency simplification<a class="anchor" aria-label="anchor" href="#bug-fixes-and-dependency-simplification-development-version"></a></h3>
 <ul><li>Remove dependence on the <code>ggpolypath</code> package, and the <code>ggplot2::fortify.SpatialPolygons/DataFrame()</code> methods that were deprecated in <code>ggplot2</code> version <code>3.4.4</code>. Code using <code><a href="../reference/gg.SpatialPolygons.html">gg.SpatialPolygons()</a></code> together with <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal()</a></code> for coordinate axis control needs to use <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf()</a></code> instead.</li>
 <li>Detect the need for vectorised parameters in <code>bru_forward_transformation</code> to allow <code>bru_mapper_marginal</code> to be applied with e.g. spatially varying parameters. (version <code>2.10.0.9001</code>)</li>
-<li>Detect <code>terra</code> version <code>&gt;= 1.7-66</code> that removes the need for detecting special cases (<code>nrow(where) == 1</code> and <code>terra::nlyr(data) == 1</code>). Workaround code used for versions <code>&lt;&lt; 1.7-66</code>. (version <code>2.10.0.9002</code>) (Thanks to Robert J. Hijmans)</li>
+<li>Detect <code>terra</code> version <code>&gt;= 1.7-66</code> that removes the need for detecting special cases (<code>nrow(where) == 1</code> and <code>terra::nlyr(data) == 1</code>). Workaround code used for versions <code>&lt; 1.7-66</code>. (version <code>2.10.0.9002</code>) (Thanks to Robert J. Hijmans)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -223,7 +223,7 @@
 <li><p>Allow <code>sf</code> input to <code>family="cp"</code> models.</p></li>
 <li>
 <p>Further <code><a href="../reference/bru_mapper.html">bru_mapper()</a></code> method updates;</p>
-<ul><li>Deprecated <code>ibm_amatrix()</code> and <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
+<ul><li>Deprecated <code>ibm_amatrix()</code> and <code><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names()</a></code> methods, replaced by <code><a href="../reference/bru_mapper_generics.html">ibm_jacobian()</a></code> and <code><a href="../reference/bru_mapper_generics.html">ibm_names()</a></code>.</li>
 <li>Introduced <code><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe()</a></code>, used to link mappers in sequence.</li>
 <li>Introduced <code><a href="../reference/bru_mapper_aggregate.html">bru_mapper_aggregate()</a></code> and <code><a href="../reference/bru_mapper_logsumexp.html">bru_mapper_logsumexp()</a></code>, used for blockwise weighted sums and log-sum-exp mappings, <code>output[k] = sum(weights[block==k]*state[block==k])))</code> and <code>output[k] = log(sum(weights[block==k]*exp(state[block==k])))</code>, with optional weight normalisation within each block. Allows providing the weights as log-weights, and uses block-wise shifts to avoid potential overflow.</li>
 <li>

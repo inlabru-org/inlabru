@@ -118,7 +118,7 @@
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2023-12-14</h4>
+            <h4 data-toc-skip class="date">Generated on 2023-12-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
@@ -544,13 +544,13 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.34595041    0.48495149</span></span>
-<span><span class="co">#&gt; Range for alpha      924.58253578  321.41604689</span></span>
-<span><span class="co">#&gt; Stdev for alpha        1.95511028    0.43236247</span></span>
-<span><span class="co">#&gt; Range for eps       7139.00472590 7356.37832290</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.47796549    0.28833977</span></span>
-<span><span class="co">#&gt; Range for tau        684.07122116  263.28458438</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06190512    0.01202274</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.32100069    0.46759218</span></span>
+<span><span class="co">#&gt; Range for alpha      992.56415660  325.40201807</span></span>
+<span><span class="co">#&gt; Stdev for alpha        2.06075687    0.43488107</span></span>
+<span><span class="co">#&gt; Range for eps       7333.79357518 8600.74097433</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.41730876    0.20587215</span></span>
+<span><span class="co">#&gt; Range for tau        743.66526651  316.51043164</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06540837    0.01619598</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
@@ -558,7 +558,7 @@ of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.04842  1.03792  3.08857  6.61254  8.27903 51.35628</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.03308  0.95062  3.05353  6.76739  8.04127 58.60233</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -567,7 +567,7 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.7444  0.8887  0.9892  0.9777  1.0568  1.2119</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.6739  0.8771  0.9991  0.9863  1.0648  1.3397</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -575,7 +575,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -13.013  -4.970  -1.709  -1.112   2.555  11.183</span></span></code></pre></div>
+<span><span class="co">#&gt; -13.452  -5.712  -2.045  -1.360   2.627  11.617</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
@@ -587,7 +587,7 @@ and then projecting this mapping grid to the modeling mesh.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get easting and northing limits</span></span>
 <span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_bbox.html" class="external-link">fm_bbox</a></span><span class="op">(</span><span class="va">hull</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">grd_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span></span>
+<span><span class="va">grd_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">25</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># make mesh projector to get model summaries from the mesh to the mapping grid</span></span>
 <span><span class="va">mesh_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html" class="external-link">fm_evaluator</a></span><span class="op">(</span></span>
@@ -640,7 +640,7 @@ the raster stack to the study area.</p>
 <span>  <span class="va">out_j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_j</span>, <span class="va">range95_j</span><span class="op">)</span></span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu">add</span><span class="op">(</span><span class="va">out_stk</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">out_j</span></span>
 <span><span class="op">}</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out_stk</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out_stk</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"alpha_median"</span>, <span class="st">"alpha_range95"</span>, <span class="st">"epsilon_median"</span>,</span>
 <span>  <span class="st">"epsilon_range95"</span>, <span class="st">"tau_median"</span>, <span class="st">"tau_range95"</span></span>
 <span><span class="op">)</span></span>

@@ -190,7 +190,7 @@ proportion of land cover for some classes, say classes 2, and 3
 <span><span class="va">gcov_vegetation</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/terra/man/segregate.html" class="external-link">segregate</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">gcov_lvls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">vegetation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">gcov_lvls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">vegetation</span></span>
 <span><span class="va">gcov_vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="zip_zap_models_files/figure-html/fig-vegetation-raster-1.png" alt="Proportion of vegetation cover by class" width="80%"><p class="caption">
@@ -241,9 +241,11 @@ vegetation type and elevation.</p>
 <span>    E <span class="op">=</span> <span class="va">area</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in inla.model.properties.generic(inla.trim.family(model), mm[names(mm) == : Model 'scopy' in section 'latent' is marked as 'experimental'; changes may appear at any time.</span></span>
+<span><span class="co">#&gt;   Use this model with extra care!!! Further warnings are disabled.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.0.9003</span></span>
-<span><span class="co">#&gt; INLA version: 23.12.06-1</span></span>
+<span><span class="co">#&gt; INLA version: 23.12.17</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,7 +257,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.337, Running = 2.75, Post = 0.571, Total = 3.65 </span></span>
+<span><span class="co">#&gt;     Pre = 0.348, Running = 2.77, Post = 0.563, Total = 3.68 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.632 0.324     -1.271   -0.630      0.001 -0.630   0</span></span>
@@ -358,7 +360,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.0.9003</span></span>
-<span><span class="co">#&gt; INLA version: 23.12.06-1</span></span>
+<span><span class="co">#&gt; INLA version: 23.12.17</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -370,7 +372,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.339, Running = 1.78, Post = 0.119, Total = 2.24 </span></span>
+<span><span class="co">#&gt;     Pre = 0.382, Running = 1.82, Post = 0.12, Total = 2.32 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.734 0.314     -1.349   -0.734     -0.116 -0.734   0</span></span>
@@ -537,7 +539,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.0.9003</span></span>
-<span><span class="co">#&gt; INLA version: 23.12.06-1</span></span>
+<span><span class="co">#&gt; INLA version: 23.12.17</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -557,15 +559,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.367, Running = 9.45, Post = 0.288, Total = 10.1 </span></span>
+<span><span class="co">#&gt;     Pre = 0.389, Running = 9.46, Post = 0.292, Total = 10.1 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed     -2.150 0.413     -2.958   -2.152     -1.336 -2.152   0</span></span>
 <span><span class="co">#&gt; veg_grassland     -1.903 0.402     -2.690   -1.904     -1.112 -1.904   0</span></span>
-<span><span class="co">#&gt; Intercept_present -5.689 1.798     -9.260   -5.675     -2.199 -5.675   0</span></span>
+<span><span class="co">#&gt; Intercept_present -5.690 1.799     -9.262   -5.676     -2.199 -5.676   0</span></span>
 <span><span class="co">#&gt; elevation_present  0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
 <span><span class="co">#&gt; elevation          0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count   -1.370 1.763     -4.875   -1.355      2.051 -1.355   0</span></span>
+<span><span class="co">#&gt; Intercept_count   -1.371 1.764     -4.877   -1.356      2.051 -1.356   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -573,16 +575,16 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;    field_present Copy</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
-<span><span class="co">#&gt; Range for field 1.368 0.238      0.976    1.343       1.91 1.28</span></span>
-<span><span class="co">#&gt; Stdev for field 0.898 0.098      0.720    0.892       1.11 0.88</span></span>
+<span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for field 1.368 0.238      0.977    1.343       1.91 1.284</span></span>
+<span><span class="co">#&gt; Stdev for field 0.898 0.098      0.720    0.892       1.11 0.881</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1619.23</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1619.16</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 69.24</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 69.28</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.63</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 72.51</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.59</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 72.57</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -921.13 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
@@ -805,24 +807,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2705597</td>
-<td align="right">0.6247600</td>
-<td align="right">-2.193356</td>
-<td align="right">0.4120557</td>
+<td align="right">0.2708819</td>
+<td align="right">0.6252485</td>
+<td align="right">-2.193926</td>
+<td align="right">0.4123529</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2910414</td>
-<td align="right">0.6863590</td>
-<td align="right">-2.167572</td>
-<td align="right">0.4282028</td>
+<td align="right">0.2915823</td>
+<td align="right">0.6871664</td>
+<td align="right">-2.160184</td>
+<td align="right">0.4287090</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.3040156</td>
-<td align="right">0.7190874</td>
-<td align="right">-2.164252</td>
-<td align="right">0.4471918</td>
+<td align="right">0.3040876</td>
+<td align="right">0.7182142</td>
+<td align="right">-2.159362</td>
+<td align="right">0.4471152</td>
 </tr>
 </tbody>
 </table>
