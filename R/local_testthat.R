@@ -210,13 +210,13 @@ local_bru_safe_inla <- function(multicore = FALSE,
   if (!multicore) {
     local_bru_options_set(num.threads = "1:1", envir = envir)
   }
-  # Ignore spurious warnings for INLA 23.12.17. Is fixed in later INLA versions
+  testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
+  # Ignore spurious warnings for INLA 23.12.17. Is fixed in later INLA versions:
   assign(
     "processed.status.for.model.scopy.in.section.latent",
     TRUE,
     INLA::inla.get.inlaEnv()
   )
-  testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
 }
 
 
