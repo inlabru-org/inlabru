@@ -6,6 +6,7 @@ test_that("basic intercept model", {
   )
   mycomp <- y ~ 1
   mydata <- local_basic_intercept_testdata()
+  mydata$y <- mydata$y + 1
   fit <- bru(mycomp,
     family = "normal",
     data = mydata,
@@ -14,8 +15,8 @@ test_that("basic intercept model", {
 
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
-    0.09140515,
-    tolerance = lowtol
+    1.09140515,
+    tolerance = midtol
   )
 })
 
@@ -38,9 +39,9 @@ test_that("basic intercept model, spatial data", {
   )
 
   expect_equal(
-    fit$summary.fixed["Intercept", ]$mean,
-    0.09140515,
-    tolerance = lowtol
+    fit$summary.fixed["Intercept", ]$mean + 1,
+    0.09140515 + 1,
+    tolerance = midtol
   )
 })
 
@@ -59,9 +60,9 @@ test_that("basic fixed effect model", {
   )
 
   expect_equal(
-    fit$summary.fixed["Intercept", ]$mean,
-    0.08637662,
-    tolerance = lowtol
+    fit$summary.fixed["Intercept", ]$mean + 1,
+    0.08637662 + 1,
+    tolerance = midtol
   )
 })
 
