@@ -3,7 +3,6 @@
 \docType{package}
 \name{inlabru-package}
 \alias{inlabru-package}
-\alias{_PACKAGE}
 \alias{inlabru}
 \title{inlabru}
 \description{

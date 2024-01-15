@@ -1,4 +1,4 @@
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom rlang .env
 
