@@ -39,7 +39,8 @@ gmap <- function(data, ...) {
   # Create map
   requireNamespace("ggmap")
   myMap <-
-    ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
+    ggmap::get_map(
+      c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
       ...
     )
 

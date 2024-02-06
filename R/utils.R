@@ -467,7 +467,7 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
     where <- terra::vect(where)
   }
   if (!fm_crs_is_null(fm_crs(where)) &&
-      !fm_crs_is_null(fm_crs(data))) {
+    !fm_crs_is_null(fm_crs(data))) {
     where <- terra::project(where, data)
   }
   if (getNamespaceVersion("terra") >= "1.7-66") {

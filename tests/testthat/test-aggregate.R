@@ -29,7 +29,14 @@ test_that("Aggregated Gaussian observations", {
       family = "normal",
       response_data = obs,
       data = pred,
-      control.family = list(hyper = list(prec = list(initial = 6, fixed = TRUE)))
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
     )
   )
 
