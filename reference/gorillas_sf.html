@@ -123,7 +123,7 @@ of the region that was searched for the nests.</p></dd>
 with function <code>lgcp</code> to fit a LGCP to the nest data.</p></dd>
 
 <dt><code>gcov_file</code>:</dt>
-<dd><p>The in-package filename of a <code><a href="https://rdrr.io/pkg/terra/man/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> object,
+<dd><p>The in-package filename of a <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> object,
 with one layer for each of these spatial covariates:</p><dl><dt><code>aspect</code></dt>
 <dd><p>Compass direction of the terrain slope. Categorical, with levels
 N, NE, E, SE, S, SW, W and NW, which are coded as integers 1 to 8.</p></dd>
@@ -182,7 +182,7 @@ plot and the area of each plot.</p></dd>
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
 <ul><li><p><code>gorillas_sf_gcov()</code>: Access the <code>gorillas_sf</code> covariates data as a
-<code><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">terra::rast()</a></code> object.</p></li>
+<code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -212,7 +212,7 @@ in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk A
 <span class="r-in"><span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Plot the elevation covariate</span></span></span>
-<span class="r-in"><span>  <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">gcov_file</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span></span></span>

@@ -157,10 +157,10 @@ area.</p>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">mesh</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span></span>
 <span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gorillas_sf.html">gorillas_sf_gcov</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">counts_rstr</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rasterize.html" class="external-link">rasterize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span>, <span class="va">gcov</span>, fun <span class="op">=</span> <span class="va">sum</span>, background <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">sum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">counts_rstr</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">counts_rstr</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rasterize.html" class="external-link">rasterize</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span>, <span class="va">gcov</span>, fun <span class="op">=</span> <span class="va">sum</span>, background <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">sum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">counts_rstr</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="zip_zap_models_files/figure-html/fig-count-raster-1.png" alt="Counts of gorilla nests" width="80%"><p class="caption">
 Counts of gorilla nests
@@ -168,15 +168,15 @@ Counts of gorilla nests
 </div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">counts_rstr</span> <span class="op">&lt;-</span> <span class="va">counts_rstr</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/terra/man/cellSize.html" class="external-link">cellSize</a></span><span class="op">(</span>unit <span class="op">=</span> <span class="st">"km"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/cellSize.html" class="external-link">cellSize</a></span><span class="op">(</span>unit <span class="op">=</span> <span class="st">"km"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">counts_rstr</span><span class="op">)</span></span></code></pre></div>
 <p>We now need to extract the coordinates for these pixels. The plot
 below illustrates the pixel locations for all pixels with non-zero
 counts. We create a mesh over the study area and define a prior for
 it.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">counts_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/crds.html" class="external-link">crds</a></span><span class="op">(</span><span class="va">counts_rstr</span>, df <span class="op">=</span> <span class="cn">TRUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">counts_rstr</span>, mat <span class="op">=</span> <span class="cn">TRUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">counts_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/crds.html" class="external-link">crds</a></span><span class="op">(</span><span class="va">counts_rstr</span>, df <span class="op">=</span> <span class="cn">TRUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">counts_rstr</span>, mat <span class="op">=</span> <span class="cn">TRUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">sum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>present <span class="op">=</span> <span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -186,12 +186,12 @@ quite unbalances, so it might make sense to split them by class and use
 proportion of land cover for some classes, say classes 2, and 3
 (Disturbed, and Grassland, respectively).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gcov_lvls</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/factors.html" class="external-link">levels</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">gcov_lvls</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/factors.html" class="external-link">levels</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">gcov_vegetation</span> <span class="op">&lt;-</span> <span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/terra/man/segregate.html" class="external-link">segregate</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">gcov_lvls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">vegetation</span></span>
-<span><span class="va">gcov_vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/segregate.html" class="external-link">segregate</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">gcov_lvls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">vegetation</span></span>
+<span><span class="va">gcov_vegetation</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="zip_zap_models_files/figure-html/fig-vegetation-raster-1.png" alt="Proportion of vegetation cover by class" width="80%"><p class="caption">
 Proportion of vegetation cover by class
@@ -241,9 +241,9 @@ vegetation type and elevation.</p>
 <span>    E <span class="op">=</span> <span class="va">area</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9000</span></span>
-<span><span class="co">#&gt; INLA version: 24.01.14</span></span>
+<span><span class="co">#&gt; INLA version: 24.01.29</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,13 +255,13 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.324, Running = 2.7, Post = 0.541, Total = 3.56 </span></span>
+<span><span class="co">#&gt;     Pre = 0.321, Running = 2.28, Post = 0.539, Total = 3.14 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.631 0.324     -1.270   -0.630      0.001 -0.630   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.600 0.352     -2.291   -1.600     -0.911 -1.600   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.001      0.001    0.003      0.006  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -4.048 1.867     -7.761   -4.032     -0.431 -4.032   0</span></span>
+<span><span class="co">#&gt; Intercept     -4.049 1.867     -7.761   -4.032     -0.431 -4.032   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -285,7 +285,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
 <span></span>
 <span></span>
-<span><span class="va">pred_poi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span><span class="va">pred_poi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_poi</span>, <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span> <span class="co"># vegetation +</span></span>
@@ -356,9 +356,9 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9000</span></span>
-<span><span class="co">#&gt; INLA version: 24.01.14</span></span>
+<span><span class="co">#&gt; INLA version: 24.01.29</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -370,7 +370,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.321, Running = 1.71, Post = 0.12, Total = 2.15 </span></span>
+<span><span class="co">#&gt;     Pre = 0.326, Running = 1.43, Post = 0.132, Total = 1.89 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.735 0.314     -1.350   -0.735     -0.117 -0.735   0</span></span>
@@ -408,7 +408,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
 <span></span>
-<span><span class="va">pred_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span><span class="va">pred_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zip</span>, <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">scaling_prob</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">zero_probability_parameter_for_zero_inflated_poisson_1</span><span class="op">)</span></span>
@@ -535,9 +535,9 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>  <span class="op">)</span>,</span>
 <span>  <span class="va">truncated_poisson_like</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9000</span></span>
-<span><span class="co">#&gt; INLA version: 24.01.14</span></span>
+<span><span class="co">#&gt; INLA version: 24.01.29</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -557,15 +557,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.369, Running = 9.32, Post = 0.304, Total = 9.99 </span></span>
+<span><span class="co">#&gt;     Pre = 0.362, Running = 3.73, Post = 0.618, Total = 4.71 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed     -2.150 0.413     -2.957   -2.151     -1.335 -2.151   0</span></span>
-<span><span class="co">#&gt; veg_grassland     -1.903 0.402     -2.690   -1.904     -1.112 -1.904   0</span></span>
-<span><span class="co">#&gt; Intercept_present -5.690 1.799     -9.262   -5.676     -2.199 -5.676   0</span></span>
+<span><span class="co">#&gt; veg_disturbed     -2.150 0.413     -2.957   -2.151     -1.336 -2.151   0</span></span>
+<span><span class="co">#&gt; veg_grassland     -1.903 0.402     -2.689   -1.904     -1.112 -1.904   0</span></span>
+<span><span class="co">#&gt; Intercept_present -5.690 1.798     -9.260   -5.675     -2.199 -5.675   0</span></span>
 <span><span class="co">#&gt; elevation_present  0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
 <span><span class="co">#&gt; elevation          0.002 0.001      0.000    0.002      0.004  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count   -1.371 1.764     -4.877   -1.356      2.051 -1.356   0</span></span>
+<span><span class="co">#&gt; Intercept_count   -1.370 1.763     -4.875   -1.355      2.051 -1.355   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -573,18 +573,18 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;    field_present Copy</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field 1.368 0.237      0.976    1.343       1.91 1.285</span></span>
-<span><span class="co">#&gt; Stdev for field 0.897 0.098      0.720    0.892       1.11 0.881</span></span>
+<span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
+<span><span class="co">#&gt; Range for field 1.368 0.237      0.976    1.343       1.91 1.29</span></span>
+<span><span class="co">#&gt; Stdev for field 0.897 0.098      0.720    0.892       1.11 0.88</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1619.17</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1619.24</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: NA</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 69.25</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 69.21</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.60</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 72.54</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.63</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 72.48</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -921.13 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -921.12 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -594,7 +594,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <h2 id="predict-intensity-on-the-original-raster-locations">Predict intensity on the original raster locations<a class="anchor" aria-label="anchor" href="#predict-intensity-on-the-original-raster-locations"></a>
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">pred_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zap</span>,</span>
 <span>  <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
@@ -704,8 +704,8 @@ CPO is often used:</p>
 <p><span class="math display">\[-\sum_{i=1}^n\log(CPO_i)\]</span> where
 smaller values indicate a better model fit.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">zap_pit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">zap_pit</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">fit_zap</span><span class="op">$</span><span class="va">cpo</span><span class="op">$</span><span class="va">pit</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">zap_pit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">zap_pit</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">fit_zap</span><span class="op">$</span><span class="va">cpo</span><span class="op">$</span><span class="va">pit</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span>, times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
@@ -734,7 +734,7 @@ smaller values indicate a better model fit.</p>
 <span>    <span class="va">fit_zip</span><span class="op">$</span><span class="va">cpo</span><span class="op">$</span><span class="va">pit</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fl">1</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>    <span class="va">zap_pit</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Poisson"</span>, <span class="st">"ZIP"</span>, <span class="st">"ZAP"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span></span>
+<span>  Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Poisson"</span>, <span class="st">"ZIP"</span>, <span class="st">"ZAP"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span>
@@ -779,10 +779,10 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    MAE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">AE</span><span class="op">)</span>,</span>
-<span>    MSE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">SE</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    MDS <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">DS</span><span class="op">)</span>,</span>
-<span>    MLG <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">LG</span><span class="op">)</span></span>
+<span>    MAE <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">AE</span><span class="op">)</span>,</span>
+<span>    MSE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">SE</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    MDS <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">DS</span><span class="op">)</span>,</span>
+<span>    MLG <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">LG</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -805,24 +805,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2707118</td>
-<td align="right">0.6258777</td>
-<td align="right">-2.197290</td>
-<td align="right">0.4123376</td>
+<td align="right">0.2709818</td>
+<td align="right">0.6265908</td>
+<td align="right">-2.195252</td>
+<td align="right">0.4126296</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2911459</td>
-<td align="right">0.6858351</td>
-<td align="right">-2.171496</td>
-<td align="right">0.4279799</td>
+<td align="right">0.2918662</td>
+<td align="right">0.6872426</td>
+<td align="right">-2.162669</td>
+<td align="right">0.4286459</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.3043698</td>
-<td align="right">0.7191579</td>
-<td align="right">-2.162545</td>
-<td align="right">0.4475445</td>
+<td align="right">0.3044611</td>
+<td align="right">0.7199232</td>
+<td align="right">-2.165303</td>
+<td align="right">0.4476880</td>
 </tr>
 </tbody>
 </table>

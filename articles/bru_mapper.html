@@ -653,9 +653,9 @@ include a <code>min_degree</code> parameter to control if an intercept
 (<code>min_degree &lt;= 1</code>) should be included in the model.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/is.bool.html" class="external-link">is.factor</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">is.factor</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/factors.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span>,</span>
+<span>      labels <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/factors.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span>,</span>
 <span>      min_degree <span class="op">=</span> <span class="va">min_degree</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>

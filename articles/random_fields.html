@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">Finn
 Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-01-15</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-02-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/random_fields.Rmd" class="external-link"><code>vignettes/articles/random_fields.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields.Rmd</code></div>
@@ -138,7 +138,7 @@ Lindgren</h4>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">colsc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span></span>
-<span>    colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"RdYlBu"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    colours <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/flip.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu">RColorBrewer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">11</span>, <span class="st">"RdYlBu"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -192,12 +192,12 @@ spline methods are defined, without discretisation dependent penalty);
 <code>offset=</code>. (Refer to slides for an explanation of
 <code>offset</code>.) The variable <code>exposure</code> in data frame
 <code>cd</code> is the size of the bin in which each count was made.</p>
-<p>You can look at the fitted model using <code><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary( )</a></code> as
+<p>You can look at the fitted model using <code><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary( )</a></code> as
 below if you want to, but you do not need to understand this output, or
 the code that makes the predictions immediately below it if you are not
 familiar with GAMs.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.gam</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.gam</span><span class="op">)</span></span></code></pre></div>
 <p>Make a prediction data frame, get predictions and add them to the
 data frame First make vectors of x-values and associated (equal)
 exposures:</p>
@@ -288,9 +288,9 @@ add all components (unless a subset is selected via the
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9000</span></span>
-<span><span class="co">#&gt; INLA version: 24.01.14</span></span>
+<span><span class="co">#&gt; INLA version: 24.01.29</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; field: main = spde(x), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -299,7 +299,7 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt;     Data class: 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.491, Running = 0.31, Post = 0.104, Total = 0.904 </span></span>
+<span><span class="co">#&gt;     Pre = 0.498, Running = 0.305, Post = 0.114, Total = 0.917 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span></span>
 <span><span class="co">#&gt; Intercept 0.977 0.701     -0.007    0.855      3.164 0.811 0.004</span></span>
@@ -370,19 +370,19 @@ the curve.</p>
 <h3 id="looking-at-the-posterior-distributions">Looking at the posterior distributions<a class="anchor" aria-label="anchor" href="#looking-at-the-posterior-distributions"></a>
 </h3>
 <p>We can look at the Intercept posterior using the function
-<code><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot( )</a></code>, as below.</p>
+<code><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot( )</a></code>, as below.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"Intercept"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-19-1.png" width="672"></p>
 <p>You have to know that there is a variable called
 <code>Intercept</code> in order to use this function. To see what fixed
 effect parameters’ posterior distributions are available to be plotted,
 you can type</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.fixed</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.fixed</span><span class="op">)</span></span></code></pre></div>
 <p>This does not tell you about the SPDE parameters, and if you type</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.random</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">$</span><span class="va">marginals.random</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "field"</span></span></code></pre></div>
 <p>this just tells you that there is an SPDE in fit2.bru called ‘field’,
 it does not tell you what the associated parameter names are. The
@@ -397,17 +397,17 @@ skewed and so it is easier to view the log of the variance)</p>
 <code class="sourceCode R"><span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
 <span><span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span>
-<span><span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span>
+<span><span class="va">range.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span>
+<span><span class="va">var.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">range.plot</span>, <span class="va">var.plot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
 <p>We can look at the posterior distributions of the Matern correlatioin
 and covariance funcitons as follows:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-1.png" width="672"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit2.bru</span>, <span class="st">"field"</span>, what <span class="op">=</span> <span class="st">"matern.covariance"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="random_fields_files/figure-html/unnamed-chunk-23-2.png" width="672"></p>
 </div>
 </div>

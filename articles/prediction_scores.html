@@ -319,12 +319,12 @@ posterior expectation and variance: <span class="math display">\[
 lambda.</p>
 <p>The SE and DS scores are therefore relatively easy to compute after
 estimating a model with <code>inlabru</code>. You just need to estimate
-the posterior mean and variance with <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> for each
+the posterior mean and variance with <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code> for each
 test data point. If <code>eta</code> is an expression for the linear
 predictor, and <code>newdata</code> holds the covariate information for
 the prediction points, run</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span>, n.samples <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span>
 <span><span class="va">post_E</span> <span class="op">&lt;-</span> <span class="va">pred</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="va">post_Var</span> <span class="op">&lt;-</span> <span class="va">pred</span><span class="op">$</span><span class="va">mean</span> <span class="op">+</span> <span class="va">pred</span><span class="op">$</span><span class="va">sd</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="va">SE_score</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">newdata</span><span class="op">$</span><span class="va">y</span> <span class="op">-</span> <span class="va">post_E</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
@@ -338,9 +338,9 @@ similar way. We seek, for a fixed observation y, <span class="math inline">\(\lo
 probability is <span class="math display">\[
   \mathbb{P}(Y = y | \text{data}) = \mathbb{E}[\mathbb{P}(Y = y |
 \lambda, \text{data}) | \text{data}],
-\]</span> so we can estimate it using <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code>:</p>
+\]</span> so we can estimate it using <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span>
+<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span>
 <span>  <span class="va">newdata</span>,</span>
 <span>  formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">y</span>, rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  n.samples <span class="op">=</span> <span class="fl">2000</span></span>
@@ -359,7 +359,7 @@ S_\text{CRPS}(F_i,y_i) = \sum_{k=0}^\infty [\mathbb{P}(Y_i \leq k
 \]</span> For this, one would first need to get <span class="math inline">\(\mathbb{P}(Y \leq k | \text{data})\)</span> from a
 predict call with <code>ppois(k, rate = exp(eta))</code>, for a vector
 <span class="math inline">\(k=0,1\dots,K\)</span>, for each <span class="math inline">\(y_i\)</span>, for some sufficiently large <span class="math inline">\(K&gt;\max_i{y_i}\)</span> for the remainder to be
-negligible. However, to avoid repeated <code><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict()</a></code> calls for
+negligible. However, to avoid repeated <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code> calls for
 each <span class="math inline">\(y_i\)</span>, the storage requirements
 is of order <span class="math inline">\((K+1) \times N\times
 N_\text{samples}\)</span>. To avoid that, one option would be to
@@ -469,7 +469,7 @@ posterior distribution, one score estimator is <span class="math display">\[
 \]</span> with the averaging over the samples inside the quadratic
 expression, and we can use</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">pred</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span></code></pre></div>
 <p>If we instead take advantage of the new expression above, we have
 <span class="math display">\[
@@ -480,7 +480,7 @@ expression, and we can use</p>
 \mathbb{V}(\lambda|\text{data})
 \]</span> so the score can be estimated by</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  cond_scores <span class="op">=</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
@@ -536,7 +536,7 @@ CRPS expression.</p>
 <span>  <span class="co"># compute the CRPS score for a single y, for the given rate paramter.</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">max_K</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="co"># some large value, so that 1-F(K) is small</span></span>
-<span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>,</span>
+<span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>,</span>
 <span>  formula <span class="op">=</span> <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
