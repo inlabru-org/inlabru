@@ -140,7 +140,7 @@ large.</p>
 is available on your HPC. If not, ask the administrator to install it.
 Type on your HPC terminal to check which version is installed.</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apptainer</span> version</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">apptainer</span> version</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Type the code below to pull the <a href="https://rocker-project.org/images/versioned/rstudio.html" class="external-link">rocker/geospatial</a>
 Singularity Image Format (SIF) file with the latest R version. For
@@ -148,12 +148,12 @@ illustration, we will assume the file is stored at
 <code>./your_container.sif</code>.</li>
 </ol>
 <p>In a shell:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To pull the docker image</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">apptainer</span> pull your_container.sif docker://rocker/geospatial:latest</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># once the sif is downloaded, get into an interactive shell</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">apptainer</span> shell your_container.sif</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Inside the interactive shell, one can install INLA on a personal library path</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">R</span> <span class="at">--verbose</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># To pull the docker image</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">apptainer</span> pull your_container.sif docker://rocker/geospatial:latest</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># once the sif is downloaded, get into an interactive shell</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="ex">apptainer</span> shell your_container.sif</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Inside the interactive shell, one can install INLA on a personal library path</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="ex">R</span> <span class="at">--verbose</span></span></code></pre></div>
 <p>In R:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Now, in a R environment</span></span>
@@ -170,8 +170,8 @@ illustration, we will assume the file is stored at
 <li>Put the following in your job script to execute an R file
 non-interactively.</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute an R file with apptainer</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">apptainer</span> exec ./your_container.sif Rscript <span class="at">--no-restore</span> <span class="at">--no-save</span> <span class="at">--verbose</span> file_to_run.R</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># To execute an R file with apptainer</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">apptainer</span> exec ./your_container.sif Rscript <span class="at">--no-restore</span> <span class="at">--no-save</span> <span class="at">--verbose</span> file_to_run.R</span></code></pre></div>
 <p>Note: Use <code>inla.setOption(num.threads = ncpu)</code> to limit
 the number of threads (ncpu) since INLA does not set it automatically.
 The <code>ncpu</code> also directly links to RAM requirements.</p>

@@ -1,4 +1,4 @@
-pandoc: 2.19.2
+pandoc: 3.1.11
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
@@ -25,7 +25,7 @@ articles:
   linearapprox: linearapprox.html
   method: method.html
   prediction_scores: prediction_scores.html
-last_built: 2024-02-06T15:36Z
+last_built: 2024-03-22T15:39Z
 urls:
   reference: https://inlabru-org.github.io/inlabru/reference
   article: https://inlabru-org.github.io/inlabru/articles

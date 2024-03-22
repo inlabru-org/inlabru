@@ -178,9 +178,9 @@ inlabru will call the function as <code>myOtherSquareFun(.data.)</code>, where <
 is the data provided via the <code><a href="like.html">like()</a></code> <code>data</code> parameter.
 The function needs to know what parts of the data to use to construct the
 needed output. For example,</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>myOtherSquareFun <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  data[ ,<span class="st">"x"</span>]<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>myOtherSquareFun <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  data[ ,<span class="st">"x"</span>]<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>}</span></code></pre><p></p></div>
     </div>
     <div class="section level2">
     <h2 id="spatial-covariates">Spatial Covariates<a class="anchor" aria-label="anchor" href="#spatial-covariates"></a></h2>
@@ -196,10 +196,10 @@ the input expressions if they are supported by <code><a href="eval_spatial.html"
 the <code><a href="like.html">like()</a></code> data is an <code>sf</code> or <code>SpatialPointsDataFrame</code> object.
 <code>inlabru</code> will then automatically
 evaluate and/or interpolate the covariate at your data locations when using code like</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(mySpatialPixels, <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(mySpatialPixels, <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
 <p>For more precise control, use the the <code>layer</code> and <code>selector</code> arguments (see <code><a href="component.html">component()</a></code>),
 or call <code><a href="eval_spatial.html">eval_spatial()</a></code> directly, e.g.:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(<span class="fu">eval_spatial</span>(mySpatialPixels, <span class="at">where =</span> .data.), <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">psi</span>(<span class="fu">eval_spatial</span>(mySpatialPixels, <span class="at">where =</span> .data.), <span class="at">model =</span> <span class="st">"linear"</span>)</span></code></pre><p></p></div>
     </div>
     <div class="section level2">
     <h2 id="coordinates">Coordinates<a class="anchor" aria-label="anchor" href="#coordinates"></a></h2>
@@ -213,12 +213,12 @@ values at the mesh vertices to values at the data locations. For this purpose, t
 can be set to <code>coordinates</code>, which is the <code>sp</code> package function that extracts point
 coordinates from the <code>SpatialPointsDataFrame</code> that was provided as input to <code><a href="like.html">like()</a></code>. The code for
 this would look as follows:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(coordinates, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(coordinates, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
 <p>Since <code>coordinates</code> is a function from the <code>sp</code> package, this results in
 evaluation of <code>sp::coordinates(.data.)</code>, which loses any CRS information
 from the data object.</p>
 <p>For <code>sf</code> data with a geometry column (by default named <code>geometry</code>), use</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(geometry, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>components <span class="ot">=</span> y <span class="sc">~</span> <span class="fu">field</span>(geometry, <span class="at">model =</span> <span class="fu">inla.spde2.matern</span>(...))</span></code></pre><p></p></div>
 <p>Since the CRS information is part of the geometry column of the <code>sf</code> object,
 this retains CRS information, so this is more robust, and allows the model
 to be built on a different CRS than the observation data.</p>
