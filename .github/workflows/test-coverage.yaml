@@ -36,6 +36,11 @@ jobs:
           extra-packages: any::covr
           needs: coverage
 
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
+
       - name: Session info
         run: |
           options(width = 100)
