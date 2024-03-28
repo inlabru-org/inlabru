@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">Andy
 Seaton</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-03-22</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-03-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/component.Rmd" class="external-link"><code>vignettes/component.Rmd</code></a></small>
       <div class="d-none name"><code>component.Rmd</code></div>
@@ -373,7 +373,7 @@ named or indexed column, or directly use
 <code>main = eval_spatial(a_spatial_object, .data., layer = some_layer)</code>.</p>
 <p>Note that this assumes that the data is either <code>sf</code>, so
 that <code>st_geometry(.data.)</code> retrieves point locations, or
-<code>sf</code>, where <code>coordinates(.data.)</code> retrieves
+<code>sp</code> where <code>coordinates(.data.)</code> retrieves
 coordinates. This might not be a sensible thing for all models! For
 example, if the input data is a <code>SpatialPolygonsDataFrame</code>
 then <code>coordinates(.data.)</code> returns the centroid of each
@@ -417,7 +417,7 @@ utilising the functionality already supported by the
 <code>MatrixModels</code> package. The formula is interpreted in the
 conventional way, <code>x1:x2</code> is the interaction of covariates
 <code>x1</code> and <code>x2</code>, not including their individual
-fixed effects, and <code>x3:x4</code> is the interaction of
+fixed effects, and <code>x3 * x4</code> is the interaction of
 <code>x3</code> and <code>x4</code> inclusive of the individual fixed
 effects <code>x3</code> and <code>x4</code>. Note that for
 implementation technical reasons, the estimated parameters appear in
