@@ -2407,6 +2407,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
       mapper[["mappers"]][[k]] <- ibm_simplify(
         mapper[["mappers"]][[k]],
         input = input[[k]],
+        ...,
         n_state = n
       )
     }
