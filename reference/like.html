@@ -108,6 +108,7 @@
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
+  scale = NULL,
   samplers = NULL,
   ips = NULL,
   domain = NULL,
@@ -194,6 +195,11 @@ is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 interpreted with great care.</p></dd>
 
 
+<dt>scale</dt>
+<dd><p>Fixed (optional) scale parameters of the precision for several
+models, such as Gaussian and student-t response models.</p></dd>
+
+
 <dt>samplers</dt>
 <dd><p>Integration domain for 'cp' family.</p></dd>
 
@@ -263,7 +269,7 @@ on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
 
 <dt>.envir</dt>
 <dd><p>The evaluation environment to use for special arguments (<code>E</code>,
-<code>Ntrials</code>, and <code>weights</code>) if not found in <code>response_data</code> or <code>data</code>.
+<code>Ntrials</code>, <code>weights</code>, and <code>scale</code>) if not found in <code>response_data</code> or <code>data</code>.
 Defaults to the calling environment.</p></dd>
 
 
