@@ -55,8 +55,8 @@ if (require("INLA", quietly = TRUE) &&
 }
 \seealso{
 Other geomes for meshes: 
-\code{\link{gg.inla.mesh}()},
 \code{\link{gg}()},
+\code{\link{gg.inla.mesh}()},
 \code{\link{gm}()}
 }
 \concept{geomes for meshes}

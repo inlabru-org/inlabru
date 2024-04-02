@@ -1155,6 +1155,8 @@ extended_bind_rows <- function(...) {
 #' Default value is `1`. WARNING: The normalizing constant for the likelihood
 #' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 #' interpreted with great care.
+#' @param scale Fixed (optional) scale parameters of the precision for several
+#'  models, such as Gaussian and student-t response models.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
@@ -1190,7 +1192,7 @@ extended_bind_rows <- function(...) {
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments (`E`,
-#'   `Ntrials`, and `weights`) if not found in `response_data` or `data`.
+#'   `Ntrials`, `weights`, and `scale`) if not found in `response_data` or `data`.
 #'   Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
@@ -1199,7 +1201,11 @@ extended_bind_rows <- function(...) {
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = deprecated(), E = NULL, Ntrials = NULL, weights = NULL,
+                 mesh = deprecated(),
+                 E = NULL,
+                 Ntrials = NULL,
+                 weights = NULL,
+                 scale = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL,
                  exclude = NULL,
@@ -1303,6 +1309,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   )
   weights <- eval_in_data_context(
     substitute(weights),
+    data = data,
+    response_data = response_data,
+    default = 1,
+    .envir = .envir
+  )
+  scale <- eval_in_data_context(
+    substitute(scale),
     data = data,
     response_data = response_data,
     default = 1,
@@ -1491,7 +1504,8 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response_data <- list(
       BRU_response = response,
       BRU_E = E,
-      BRU_Ntrials = Ntrials
+      BRU_Ntrials = Ntrials,
+      BRU_scale = scale
     )
     response <- "BRU_response"
   }
@@ -1528,6 +1542,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     E = E,
     Ntrials = Ntrials,
     weights = weights,
+    scale = scale,
     samplers = samplers,
     linear = linear,
     expr = expr,
@@ -1784,7 +1799,7 @@ bru_like_expr <- function(lhood, components) {
 #'   factor.
 #' @param options See [bru_options_set()]
 #' @param .envir The evaluation environment to use for special arguments
-#' (`E`, `Ntrials`, and `weights`) if not found in response_data or data.
+#' (`E`, `Ntrials`, `weights`, `scale`) if not found in response_data or data.
 #' Defaults to the calling environment.
 #' @return An [bru()] object
 #' @examples
@@ -3472,6 +3487,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
           weights = stk.data[["BRU.weights"]],
+          scale = stk.data[["BRU.scale"]],
           offset = stk.data[["BRU.offset"]]
         )
       )

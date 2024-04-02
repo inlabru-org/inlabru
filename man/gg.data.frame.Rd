@@ -101,9 +101,9 @@ if (bru_safe_inla() &&
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
+\code{\link{gg}()},
 \code{\link{gg.bru_prediction}()},
 \code{\link{gg.matrix}()},
-\code{\link{gg}()},
 \code{\link{gm}()}
 }
 \concept{geomes for inla and inlabru predictions}

@@ -109,8 +109,8 @@ if (bru_safe_inla() &&
 }
 \seealso{
 Other geomes for meshes: 
-\code{\link{gg.inla.mesh.1d}()},
 \code{\link{gg}()},
+\code{\link{gg.inla.mesh.1d}()},
 \code{\link{gm}()}
 }
 \concept{geomes for meshes}

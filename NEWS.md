@@ -1,5 +1,9 @@
 # inlabru (development version)
 
+## Feature updates
+
+* Add support for the `scale` parameter to `like()`.
+
 # inlabru 2.10.1
 
 ## Feature updates

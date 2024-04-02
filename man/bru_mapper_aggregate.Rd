@@ -74,6 +74,7 @@ ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 
 Other mappers: 
 \code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
 \code{\link{bru_mapper_collect}()},
@@ -91,7 +92,6 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()},
-\code{\link{bru_mapper}()}
+\code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

@@ -35,6 +35,7 @@ Creates a mapper for handling basis conversions
 
 Other mappers: 
 \code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
 \code{\link{bru_mapper_aggregate}()},
@@ -52,7 +53,6 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()},
-\code{\link{bru_mapper}()}
+\code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}
