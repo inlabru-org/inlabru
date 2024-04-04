@@ -51,8 +51,8 @@ Other geomes for spatial data:
 \code{\link{gm}()}
 
 Other geomes for meshes: 
-\code{\link{gg.inla.mesh}()},
-\code{\link{gg.inla.mesh.1d}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
 \code{\link{gm}()}
 
 Other geomes for Raster data: 

@@ -1,5 +1,5 @@
 \donttest{
-if (bru_safe_inla() &&
+if (require(fmesher, quietly = TRUE) &&
     require(ggplot2, quietly = TRUE)) {
 
   # Load Gorilla data
