@@ -2647,6 +2647,11 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
       ...
     )
   } else {
+    print(mapper)
+    print(class(mapper))
+    print(inla_f)
+    print(jacobian)
+    print(state)
     if (is.null(jacobian)) {
       jacobian <- ibm_jacobian(mapper,
         input = input, state = state,
