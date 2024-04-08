@@ -2376,7 +2376,7 @@ ibm_eval2.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
 #' names, allowing the original `input` structure to be used also with the simplified
 #' mappers, since the `taylor` mappers are not dependent on inputs.
 #' @export
-ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
+ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL, inla_f = FALSE,
                                          ..., n_state = NULL) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
@@ -2386,12 +2386,15 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
   }
   if (ibm_is_linear(mapper)) {
     if (is.null(state)) {
-      state <- rep(0, ibm_n(mapper[["mappers"]][[1]],
-        ...,
-        input = input[[names(mapper[["mappers"]])[1]]]
-      ))
+      n <- ibm_n(mapper[["mappers"]][[1]],
+                 ..., inla_f = FALSE,
+                 input = input[[names(mapper[["mappers"]])[1]]],
+                 n_state = n_state
+      )
+      state <- rep(0, n)
     }
-    return(ibm_linear(mapper, input = input, state = state, ..., n_state = n_state))
+    return(ibm_linear(mapper, input = input, state = state, ...,
+                      inla_f = inla_f, n_state = n_state))
   }
 
   # Basic version, that just replaces each individual mapper with a simplification.
@@ -2400,6 +2403,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
     input = input[[names(mapper[["mappers"]])[1]]],
     state = state,
     ...,
+    inla_f = FALSE,
     n_state = n_state
   )
   for (k in names(mapper[["mappers"]])) {
@@ -2415,6 +2419,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
       mapper[["mappers"]][[k]],
       input = input[[k]],
       ...,
+      inla_f = FALSE,
       n_state = n
     )
   }
@@ -2647,11 +2652,6 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
       ...
     )
   } else {
-    print(mapper)
-    print(class(mapper))
-    print(inla_f)
-    print(jacobian)
-    print(state)
     if (is.null(jacobian)) {
       jacobian <- ibm_jacobian(mapper,
         input = input, state = state,
