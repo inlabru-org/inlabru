@@ -18,7 +18,7 @@ a list of inputs, one for each mapper."><!-- mathjax --><script src="https://cdn
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,14 @@ a list of inputs, one for each mapper.</p>
 <span><span class="fu"><a href="bru_mapper_generics.html">ibm_eval2</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bru_mapper_pipe</span></span>
-<span><span class="fu"><a href="bru_mapper_generics.html">ibm_simplify</a></span><span class="op">(</span><span class="va">mapper</span>, input <span class="op">=</span> <span class="cn">NULL</span>, state <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, n_state <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="bru_mapper_generics.html">ibm_simplify</a></span><span class="op">(</span></span>
+<span>  <span class="va">mapper</span>,</span>
+<span>  input <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  state <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  inla_f <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  n_state <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -161,6 +168,16 @@ of length <code>ibm_n(mapper, inla_f = FALSE)</code></p></dd>
 <dt>n_state</dt>
 <dd><p>integer giving the length of the state vector for mappers
 that have state dependent output size.</p></dd>
+
+
+<dt>inla_f</dt>
+<dd><p>logical; when <code>TRUE</code> for <code><a href="bru_mapper_generics.html">ibm_n()</a></code> and <code><a href="bru_mapper_generics.html">ibm_values()</a></code>, the
+result must be compatible with the <code>INLA::f(...)</code> and corresponding
+<code>INLA::inla.stack(...)</code> constructions.  For <code>ibm_{eval,jacobian,linear}</code>,
+the <code>input</code> interpretation may be different.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
