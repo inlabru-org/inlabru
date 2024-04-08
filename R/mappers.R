@@ -2387,14 +2387,17 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL, inl
   if (ibm_is_linear(mapper)) {
     if (is.null(state)) {
       n <- ibm_n(mapper[["mappers"]][[1]],
-                 ..., inla_f = FALSE,
-                 input = input[[names(mapper[["mappers"]])[1]]],
-                 n_state = n_state
+        ...,
+        inla_f = FALSE,
+        input = input[[names(mapper[["mappers"]])[1]]],
+        n_state = n_state
       )
       state <- rep(0, n)
     }
-    return(ibm_linear(mapper, input = input, state = state, ...,
-                      inla_f = inla_f, n_state = n_state))
+    return(ibm_linear(mapper,
+      input = input, state = state, ...,
+      inla_f = inla_f, n_state = n_state
+    ))
   }
 
   # Basic version, that just replaces each individual mapper with a simplification.

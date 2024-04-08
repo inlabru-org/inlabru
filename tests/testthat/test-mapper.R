@@ -529,25 +529,33 @@ test_that("Collect mapper works", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  graph <- Matrix::sparseMatrix(i=c(1,2,3,2,3,4),
-                                j=c(2,3,4,1,2,3),
-                                x=rep(1,6),
-                                dims=c(4,4))
+  graph <- Matrix::sparseMatrix(
+    i = c(1, 2, 3, 2, 3, 4),
+    j = c(2, 3, 4, 1, 2, 3),
+    x = rep(1, 6),
+    dims = c(4, 4)
+  )
 
   set.seed(12345L)
-  data <- data.frame(y=4 + rnorm(6),
-                     x=c(1,2,3,2,3,4))
+  data <- data.frame(
+    y = 4 + rnorm(6),
+    x = c(1, 2, 3, 2, 3, 4)
+  )
 
   fit_inla <- INLA::inla(y ~ 1 + f(x, model = "bym", graph = graph),
-                         data = data)
+    data = data
+  )
 
-  expect_error({
-    fit_bru <-
-      bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
+  expect_error(
+    {
+      fit_bru <-
+        bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
           data = data,
-          options=list(bru_initial=list(field=rep(10,8))))
-  },
-  NA)
+          options = list(bru_initial = list(field = rep(10, 8)))
+        )
+    },
+    NA
+  )
 })
 
 
