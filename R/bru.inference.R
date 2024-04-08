@@ -2171,7 +2171,6 @@ predict.bru <- function(object,
 #'
 #' @return List of generated samples
 #' @seealso [predict.bru]
-#' @example inst/examples/generate.bru.R
 #' @rdname generate
 
 generate.bru <- function(object,
