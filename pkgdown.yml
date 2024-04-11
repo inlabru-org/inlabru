@@ -1,9 +1,8 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.0.8
 pkgdown_sha: ~
 articles:
   1d_lgcp: 1d_lgcp.html
-  2d_lgcp: 2d_lgcp.html
   2d_lgcp_covars: 2d_lgcp_covars.html
   2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
   2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
@@ -11,21 +10,22 @@ articles:
   2d_lgcp_residuals: 2d_lgcp_residuals.html
   2d_lgcp_sf: 2d_lgcp_sf.html
   2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
+  2d_lgcp: 2d_lgcp.html
   Apptainer: Apptainer.html
-  devel_flow: devel_flow.html
-  mesh_mapping: mesh_mapping.html
-  publications: publications.html
-  random_fields: random_fields.html
-  random_fields_2d: random_fields_2d.html
-  svc: svc.html
-  zip_zap_models: zip_zap_models.html
   articles: articles.html
   bru_mapper: bru_mapper.html
   component: component.html
+  devel_flow: devel_flow.html
   linearapprox: linearapprox.html
+  mesh_mapping: mesh_mapping.html
   method: method.html
   prediction_scores: prediction_scores.html
-last_built: 2024-04-08T14:15Z
+  publications: publications.html
+  random_fields_2d: random_fields_2d.html
+  random_fields: random_fields.html
+  svc: svc.html
+  zip_zap_models: zip_zap_models.html
+last_built: 2024-04-11T13:06Z
 urls:
   reference: https://inlabru-org.github.io/inlabru/reference
   article: https://inlabru-org.github.io/inlabru/articles
