@@ -1854,9 +1854,9 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
 #' calculations.  Relies on the input handling methods for `bru_mapper_aggregate`,
 #' but also allows the weights to be supplied on a logarithmic scale as `log_weights`.
 #' To avoid numerical overflow, it uses the common method of internally
-#' shifting the state blockwise with
-#' `(state-log_weights)[block] - max((state-log_weights)[block])`,
-#' and shifting the result back afterwards.
+#' shifting the state blockwise;
+#' \eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
+#' where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
 #' @rdname bru_mapper_logsumexp
 #' @inheritParams bru_mapper_generics
 #' @inheritParams bru_mapper_aggregate

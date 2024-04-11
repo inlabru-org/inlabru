@@ -50,9 +50,9 @@ and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(bloc
 calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
 but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
 To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise with
-\code{(state-log_weights)[block] - max((state-log_weights)[block])},
-and shifting the result back afterwards.
+shifting the state blockwise;
+\eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
+where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
 }
 \details{
 \itemize{

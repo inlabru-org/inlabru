@@ -1147,7 +1147,9 @@ extended_bind_rows <- function(...) {
 #' @param mesh Deprecated.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from `options$E`, normally `1`.
+#'   weights by a scalar E. For sampler specific reweighting/effort, use a `weight`
+#'   column in the `samplers` object, see [fmesher::fm_int()].
+#'   Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'  likelihood. Default taken from `options$Ntrials`, normally `1`.
 #' @param weights Fixed (optional) weights parameters of the likelihood,

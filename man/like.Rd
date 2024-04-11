@@ -72,7 +72,9 @@ object.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
-weights by E. Default taken from \code{options$E}, normally \code{1}.}
+weights by a scalar E. For sampler specific reweighting/effort, use a \code{weight}
+column in the \code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
