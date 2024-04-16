@@ -675,7 +675,8 @@ resave_package_data <- function() {
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
     "seals_sp", "shrimp", "toygroups",
-    "robins_subset"
+    "robins_subset",
+    "toypoints"
   )
   compress_values <- c("gzip", "bzip2", "xz")
 
