@@ -87,8 +87,10 @@ sigma_noise <- 0.2
 set.seed(1320)
 samp <- fm_matern_sample(mesh, rho = rho, sigma = sigma_matern)[, 1]
 locs$z <- beta_0 + fm_evaluate(mesh, loc = locs, field = samp) +
-  rnorm(n = nrow(locs),
-        sd = sigma_noise)
+  rnorm(
+    n = nrow(locs),
+    sd = sigma_noise
+  )
 
 ggplot() +
   geom_sf(
