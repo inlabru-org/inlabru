@@ -161,6 +161,7 @@ reference:
   - matches("seals")
   - matches("shrimp")
   - matches("toygroups")
+  - matches("toypoints")
 - title: "Internal helper functions"
   desc: "Helper functions for more low level operations."
   contents:
