@@ -5,6 +5,8 @@
 * Add support for the `scale` parameter to `like()`.
 * Fix regression bug in "bym" model support, where the latent state size
   wasn't correctly handled by the mapper system (version 2.10.1.9002)
+* New `toypoints` example data set, for basic modelling examples
+  (version 2.10.1.9003)
 
 # inlabru 2.10.1
 
