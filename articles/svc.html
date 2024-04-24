@@ -544,21 +544,21 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.32573921    0.47218533</span></span>
-<span><span class="co">#&gt; Range for alpha      939.28463208  293.58107930</span></span>
-<span><span class="co">#&gt; Stdev for alpha        2.00546039    0.40930689</span></span>
-<span><span class="co">#&gt; Range for eps       5511.23753572 3622.02119606</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.46072726    0.24282619</span></span>
-<span><span class="co">#&gt; Range for tau        714.06688568  277.50120770</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06408236    0.01263996</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.35000009    0.45552479</span></span>
+<span><span class="co">#&gt; Range for alpha      935.46275747  272.79566214</span></span>
+<span><span class="co">#&gt; Stdev for alpha        2.01553258    0.40816595</span></span>
+<span><span class="co">#&gt; Range for eps       5672.19112545 4145.85416475</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.42215979    0.16447236</span></span>
+<span><span class="co">#&gt; Range for tau        719.46417401  265.32108459</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06385024    0.01276031</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
 is effort-corrected relative abundance at year = 0 (1987), given 1 hour
 of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.0447  1.0173  3.0821  6.6886  8.2695 54.1278</span></span></code></pre></div>
+<span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span><span class="co">#&gt;  0.03379  0.95302  3.07676  6.78030  8.05568 58.37122</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
@@ -567,7 +567,7 @@ space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.7379  0.8860  0.9898  0.9776  1.0556  1.2243</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.6830  0.8794  0.9958  0.9853  1.0633  1.3307</span></span></code></pre></div>
 <p>The <span class="math inline">\(\tau_s\)</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -575,7 +575,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -13.159  -5.033  -1.747  -1.136   2.567  11.332</span></span></code></pre></div>
+<span><span class="co">#&gt; -13.222  -5.193  -1.856  -1.190   2.529  11.327</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
