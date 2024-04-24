@@ -330,10 +330,10 @@ make_track_plots <- function(fit) {
         dplyr::summarise(
           MaxSD = max(.data$sd),
           MeanSD = mean(.data$sd),
-          MinSD = mean(.data$sd),
+          MinSD = min(.data$sd),
           MaxMode = max(.data$mode - .data$mode.prev),
           MeanMode = mean(.data$mode - .data$mode.prev),
-          MinMode = mean(.data$mode - .data$mode.prev),
+          MinMode = min(.data$mode - .data$mode.prev),
           MaxLin = max(.data$new_linearisation - .data$new_linearisation.prev),
           MeanLin = mean(.data$new_linearisation - .data$new_linearisation.prev),
           MinLin = min(.data$new_linearisation - .data$new_linearisation.prev),
