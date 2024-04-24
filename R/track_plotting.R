@@ -81,6 +81,10 @@ make_track_plots <- function(fit) {
     levels = c("Mode", "Lin", "Mode-Lin", "SD")
   )
   names(lty_) <- levels(lty_)
+  col_ <- factor(c("Max", "Mean", "Min"),
+    levels = c("Max", "Mean", "Min")
+  )
+  names(col_) <- levels(col_)
 
   sc <- ggplot2::scale_linetype_discrete(
     name = "Lines",
@@ -88,119 +92,170 @@ make_track_plots <- function(fit) {
     labels = labels(lty_),
     drop = FALSE
   )
+  sc_minmax <- ggplot2::scale_color_discrete(
+    name = "Aspect",
+    breaks = names(col_),
+    labels = labels(col_),
+    drop = FALSE
+  )
 
   pl_theme_abs <-
     list(
       ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free"),
       sc,
-      ggplot2::guides(color = "none")
+      sc_minmax #
+      #      ggplot2::guides(color = "none")
     )
   pl_theme_rel <-
     list(
       ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free"),
       sc,
-      ggplot2::guides(color = "none")
+      sc_minmax # ,
+      #      ggplot2::guides(color = "none")
     )
   pl_theme_norm <-
     list(
       ggplot2::facet_wrap(ggplot2::vars(.data$effect)),
       sc,
-      ggplot2::guides(color = "none")
+      sc_minmax # ,
+      #      ggplot2::guides(color = "none")
     )
 
-  pl1 <-
-    ggplot2::ggplot(track_data) +
+  pl_tracks <-
+    ggplot2::ggplot(
+      track_data %>%
+        dplyr::group_by(
+          .data$effect,
+          .data$iteration
+        ) %>%
+        dplyr::summarise(
+          MaxMode = max(.data$mode),
+          MeanMode = mean(.data$mode),
+          MinMode = min(.data$mode),
+          MaxLin = max(.data$new_linearisation),
+          MeanLin = mean(.data$new_linearisation),
+          MinLin = min(.data$new_linearisation),
+          .groups = "drop"
+        )
+    ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      .data$mode,
-      col = .data$index,
-      group = factor(.data$index),
+      .data$MaxMode,
       lty = lty_["Mode"],
-      alpha = .data$alpha_value
+      color = col_["Max"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      .data$new_linearisation,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Lin"],
-      alpha = .data$alpha_value * alpha_value_lin_scale
+      .data$MinMode,
+      lty = lty_["Mode"],
+      color = col_["Min"]
     )) +
-    ggplot2::guides(alpha = "none") +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      .data$MeanMode,
+      lty = lty_["Mode"],
+      color = col_["Mean"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      .data$MaxLin,
+      lty = lty_["Lin"],
+      col = "Max"
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      .data$MinLin,
+      lty = lty_["Lin"],
+      col = "Min"
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      .data$MeanLin,
+      lty = lty_["Lin"],
+      col = "Mean"
+    )) +
+    ggplot2::ylab("Value") +
     pl_theme_abs +
     ggplot2::ggtitle("Tracks")
 
-  pl2 <-
-    ggplot2::ggplot(track_data) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      .data$mode - .data$mode_end,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Mode"]
-    )) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      .data$new_linearisation - .data$mode_end,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Lin"]
-    )) +
-    pl_theme_rel +
-    ggplot2::ggtitle("Rel end mode")
-  pl3 <-
+  pl_mode_lin <-
     ggplot2::ggplot(
       track_data %>%
         dplyr::filter(
           is.finite(.data$sd),
           is.finite(.data$new_linearisation)
+        ) %>%
+        dplyr::group_by(
+          .data$effect,
+          .data$iteration
+        ) %>%
+        dplyr::summarise(
+          MaxSD = max(.data$sd),
+          MeanSD = mean(.data$sd),
+          MinSD = min(.data$sd),
+          MaxDiff = max(.data$mode - .data$new_linearisation),
+          MeanDiff = mean(.data$mode - .data$new_linearisation),
+          MinDiff = min(.data$mode - .data$new_linearisation),
+          .groups = "drop"
         )
     ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      .data$mode - .data$new_linearisation,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Mode-Lin"],
-      alpha = .data$alpha_value
+      MaxDiff,
+      col = col_["Max"],
+      lty = lty_["Mode-Lin"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      -.data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["SD"],
-      alpha = .data$alpha_value
+      MinDiff,
+      col = col_["Min"],
+      lty = lty_["Mode-Lin"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["SD"],
-      alpha = .data$alpha_value
+      MeanDiff,
+      col = col_["Mean"],
+      lty = lty_["Mode-Lin"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MaxSD,
+      col = col_["Max"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MinSD,
+      col = col_["Min"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MeanSD,
+      col = col_["Mean"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MaxSD,
+      col = col_["Max"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MinSD,
+      col = col_["Min"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MeanSD,
+      col = col_["Mean"],
+      lty = lty_["SD"]
     )) +
     ggplot2::guides(alpha = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Mode - Lin")
-  pl4 <-
-    ggplot2::ggplot(track_data) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      (.data$mode - .data$mode_end) / .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Mode"]
-    )) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      (.data$new_linearisation - .data$mode_end) / .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Lin"]
-    )) +
-    pl_theme_norm +
-    ggplot2::ggtitle("Rel end mode / sd")
 
   track_data_prev <- dplyr::filter(track_data, .data$iteration < max(.data$iteration))
   track_data_prev$iteration <- track_data_prev$iteration + 1
@@ -209,27 +264,7 @@ make_track_plots <- function(fit) {
     suffix = c("", ".prev")
   )
 
-  pl5 <-
-    ggplot2::ggplot(track_data) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      abs(.data$mode - .data$mode.prev) / .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Mode"]
-    )) +
-    ggplot2::geom_line(ggplot2::aes(
-      .data$iteration,
-      abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Lin"]
-    )) +
-    pl_theme_norm +
-    ggplot2::scale_y_log10() +
-    ggplot2::ggtitle("|Change| / sd")
-
-  pl5b <-
+  pl_relative_change <-
     ggplot2::ggplot(
       track_data %>%
         dplyr::group_by(
@@ -258,91 +293,148 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MaxMode,
-      lty = lty_["Mode"]
+      lty = lty_["Mode"],
+      col = col_["Max"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanMode,
-      lty = lty_["Mode"]
+      lty = lty_["Mode"],
+      col = col_["Mean"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MaxLin,
-      lty = lty_["Lin"]
+      lty = lty_["Lin"],
+      col = col_["Max"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanLin,
-      lty = lty_["Lin"]
+      lty = lty_["Lin"],
+      col = col_["Mean"]
     )) +
     pl_theme_norm +
     ggplot2::scale_y_log10() +
     ggplot2::ggtitle("|Change| / sd (Max and Mean)") +
     ggplot2::geom_hline(yintercept = fit$bru_info$options$bru_method$rel_tol)
 
-  pl6 <-
+  pl_change <-
     ggplot2::ggplot(
       track_data %>%
-        dplyr::filter(is.finite(.data$sd))
+        dplyr::filter(is.finite(.data$sd)) %>%
+        dplyr::group_by(
+          .data$effect,
+          .data$iteration
+        ) %>%
+        dplyr::summarise(
+          MaxSD = max(.data$sd),
+          MeanSD = mean(.data$sd),
+          MinSD = mean(.data$sd),
+          MaxMode = max(.data$mode - .data$mode.prev),
+          MeanMode = mean(.data$mode - .data$mode.prev),
+          MinMode = mean(.data$mode - .data$mode.prev),
+          MaxLin = max(.data$new_linearisation - .data$new_linearisation.prev),
+          MeanLin = mean(.data$new_linearisation - .data$new_linearisation.prev),
+          MinLin = min(.data$new_linearisation - .data$new_linearisation.prev),
+          .groups = "drop"
+        )
     ) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      (.data$mode - .data$mode.prev),
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Mode"],
-      alpha = .data$alpha_value
+      MaxMode,
+      col = col_["Max"],
+      lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      (.data$new_linearisation - .data$new_linearisation.prev),
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["Lin"],
-      alpha = .data$alpha_value * alpha_value_lin_scale
+      MinMode,
+      col = col_["Min"],
+      lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      .data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["SD"],
-      alpha = .data$alpha_value
+      MeanMode,
+      col = col_["Mean"],
+      lty = lty_["Mode"]
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
-      -.data$sd,
-      col = .data$index,
-      group = factor(.data$index),
-      lty = lty_["SD"],
-      alpha = .data$alpha_value
+      MaxLin,
+      col = col_["Max"],
+      lty = lty_["Lin"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MinLin,
+      col = col_["Min"],
+      lty = lty_["Lin"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MeanLin,
+      col = col_["Mean"],
+      lty = lty_["Lin"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MaxSD,
+      col = col_["Max"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MinSD,
+      col = col_["Min"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      MeanSD,
+      col = col_["Mean"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MaxSD,
+      col = col_["Max"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MinSD,
+      col = col_["Min"],
+      lty = lty_["SD"]
+    )) +
+    ggplot2::geom_line(ggplot2::aes(
+      .data$iteration,
+      -MeanSD,
+      col = col_["Mean"],
+      lty = lty_["SD"]
     )) +
     ggplot2::guides(alpha = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Change & sd")
 
   pl_combined <-
-    ((pl1 |
-      pl3 + ggplot2::guides(linetype = "none")) /
-      (pl5b + ggplot2::guides(linetype = "none") |
-        pl6 + ggplot2::guides(linetype = "none"))) +
+    ((pl_tracks +
+      ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["Mode-Lin"])) +
+      ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["SD"])) |
+      pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")) /
+      (pl_relative_change + ggplot2::guides(linetype = "none", color = "none") |
+        pl_change + ggplot2::guides(linetype = "none", color = "none"))) +
       patchwork::plot_layout(guides = "collect") &
       ggplot2::theme(legend.position = "bottom")
 
 
-  list(pl1, pl2, pl3, pl4, pl5, pl5b, pl6,
+  list(
+    tracks = pl_tracks,
+    mode_lin = pl_mode_lin,
+    relative_change = pl_relative_change,
+    change = pl_change,
     default = pl_combined
   )
 }
-
-# (
-#   (
-#     pl1 |
-#      pl2
-#  ) / (
-#    pl3 | pl4
-#  )
-# )
 
 
 
