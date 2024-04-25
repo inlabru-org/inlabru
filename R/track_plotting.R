@@ -94,14 +94,22 @@ make_track_plots <- function(fit) {
     na.translate = FALSE
   )
   # Colour blind friendliness, see https://davidmathlogic.com/colorblind/
-  sc_minmax <- ggplot2::scale_color_discrete(
+  sc_minmax <- list(ggplot2::scale_color_discrete(
     name = "Aspect",
     type = c("#DC3220", "#000000", "#005AB5"),
     breaks = names(col_),
     labels = labels(col_),
     drop = FALSE,
     na.translate = FALSE
-  )
+  ),
+  ggplot2::scale_fill_discrete(
+    name = "Aspect",
+    type = c("#DC3220", "#000000", "#005AB5"),
+    breaks = names(col_),
+    labels = labels(col_),
+    drop = FALSE,
+    na.translate = FALSE
+  ))
 
   pl_theme_abs <-
     list(
