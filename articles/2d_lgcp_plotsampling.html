@@ -256,19 +256,17 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  <span class="va">Lambda.empirical</span>,</span>
 <span>  <span class="va">Lambda.all</span>,</span>
 <span>  Lambda.all.empirical <span class="op">=</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in rbind(deparse.level, ...): number of columns of result, 8, is not a</span></span>
-<span><span class="co">#&gt; multiple of vector length 9 of arg 4</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 578.7496 65.67929 480.0630 569.2475 713.4542 569.2475        6.567929</span></span>
-<span><span class="co">#&gt; 2 601.9709 53.34362 517.1918 593.0177 697.5219 593.0177        5.334362</span></span>
-<span><span class="co">#&gt; 3 672.7563 26.23037 628.2524 670.3215 734.1692 670.3215        2.623037</span></span>
+<span><span class="co">#&gt; 1 561.8248 60.24484 466.4569 561.7373 691.2628 561.7373        6.024484</span></span>
+<span><span class="co">#&gt; 2 578.0121 42.68798 506.3595 578.4533 678.3126 578.4533        4.268798</span></span>
+<span><span class="co">#&gt; 3 669.0456 26.09109 616.4174 672.6727 716.3438 672.6727        2.609109</span></span>
 <span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.838311</span></span>
-<span><span class="co">#&gt; 2      2.996870</span></span>
-<span><span class="co">#&gt; 3      1.984544</span></span>
+<span><span class="co">#&gt; 1      5.626581</span></span>
+<span><span class="co">#&gt; 2      3.748097</span></span>
+<span><span class="co">#&gt; 3      2.014581</span></span>
 <span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
