@@ -232,8 +232,8 @@ make_track_plots <- function(fit) {
     ggplot2::geom_ribbon(
       ggplot2::aes(
         .data$iteration,
-        ymin = -MaxSD,
-        ymax = MaxSD,
+        ymin = -.data$MaxSD,
+        ymax = .data$MaxSD,
         fill = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -243,8 +243,8 @@ make_track_plots <- function(fit) {
     ggplot2::geom_ribbon(
       ggplot2::aes(
         .data$iteration,
-        ymin = -MeanSD,
-        ymax = MeanSD,
+        ymin = -.data$MeanSD,
+        ymax = .data$MeanSD,
         fill = col_["Mean"],
         lty = lty_["SD"]
       ),
@@ -254,7 +254,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MaxDiff,
+        .data$MaxDiff,
         col = col_["Max"],
         lty = lty_["Mode-Lin"]
       ),
@@ -263,7 +263,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MinDiff,
+        .data$MinDiff,
         col = col_["Min"],
         lty = lty_["Mode-Lin"]
       ),
@@ -272,7 +272,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MeanDiff,
+        .data$MeanDiff,
         col = col_["Mean"],
         lty = lty_["Mode-Lin"]
       ),
@@ -281,7 +281,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MaxSD,
+        .data$MaxSD,
         col = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -291,7 +291,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MinSD,
+        .data$MinSD,
         col = col_["Min"],
         lty = lty_["SD"]
       ),
@@ -300,7 +300,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MeanSD,
+        .data$MeanSD,
         col = col_["Mean"],
         lty = lty_["SD"]
       ),
@@ -310,7 +310,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MaxSD,
+        -.data$MaxSD,
         col = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -320,7 +320,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MinSD,
+        -.data$MinSD,
         col = col_["Min"],
         lty = lty_["SD"]
       ),
@@ -330,7 +330,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MeanSD,
+        -.data$MeanSD,
         col = col_["Mean"],
         lty = lty_["SD"]
       ),
@@ -439,8 +439,8 @@ make_track_plots <- function(fit) {
     ggplot2::geom_ribbon(
       ggplot2::aes(
         .data$iteration,
-        ymin = -MaxSD,
-        ymax = MaxSD,
+        ymin = -.data$MaxSD,
+        ymax = .data$MaxSD,
         fill = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -450,8 +450,8 @@ make_track_plots <- function(fit) {
     ggplot2::geom_ribbon(
       ggplot2::aes(
         .data$iteration,
-        ymin = -MeanSD,
-        ymax = MeanSD,
+        ymin = -.data$MeanSD,
+        ymax = .data$MeanSD,
         fill = col_["Mean"],
         lty = lty_["SD"]
       ),
@@ -461,7 +461,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MaxMode,
+        .data$MaxMode,
         col = col_["Max"],
         lty = lty_["Mode"]
       ),
@@ -470,7 +470,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MinMode,
+        .data$MinMode,
         col = col_["Min"],
         lty = lty_["Mode"]
       ),
@@ -479,7 +479,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MeanMode,
+        .data$MeanMode,
         col = col_["Mean"],
         lty = lty_["Mode"]
       ),
@@ -488,7 +488,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MaxLin,
+        .data$MaxLin,
         col = col_["Max"],
         lty = lty_["Lin"]
       ),
@@ -497,7 +497,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MinLin,
+        .data$MinLin,
         col = col_["Min"],
         lty = lty_["Lin"]
       ),
@@ -506,7 +506,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MeanLin,
+        .data$MeanLin,
         col = col_["Mean"],
         lty = lty_["Lin"]
       ),
@@ -515,7 +515,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MaxSD,
+        .data$MaxSD,
         col = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -525,7 +525,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MinSD,
+        .data$MinSD,
         col = col_["Min"],
         lty = lty_["SD"]
       ),
@@ -535,7 +535,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        MeanSD,
+        .data$MeanSD,
         col = col_["Mean"],
         lty = lty_["SD"]
       ),
@@ -545,7 +545,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MaxSD,
+        -.data$MaxSD,
         col = col_["Max"],
         lty = lty_["SD"]
       ),
@@ -555,7 +555,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MinSD,
+        -.data$MinSD,
         col = col_["Min"],
         lty = lty_["SD"]
       ),
@@ -565,7 +565,7 @@ make_track_plots <- function(fit) {
     ggplot2::geom_line(
       ggplot2::aes(
         .data$iteration,
-        -MeanSD,
+        -.data$MeanSD,
         col = col_["Mean"],
         lty = lty_["SD"]
       ),
