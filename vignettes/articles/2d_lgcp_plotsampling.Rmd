@@ -189,7 +189,7 @@ rbind(
   Lambda.empirical,
   Lambda.all,
   Lambda.all.empirical =
-    c(nrow(gorillas$nests), 0, rep(nrow(gorillas$nests), 3), rep(NA, 4))
+    c(nrow(gorillas$nests), 0, rep(nrow(gorillas$nests), 3), rep(NA, 3))
 )
 ```
 
