@@ -87,16 +87,21 @@ make_track_plots <- function(fit) {
   names(col_) <- levels(col_)
 
   sc <- ggplot2::scale_linetype_discrete(
-    name = "Lines",
+    name = "Quantity",
     breaks = names(lty_),
     labels = labels(lty_),
-    drop = FALSE
+    drop = FALSE,
+    na.translate = FALSE
   )
+  # Colour blind friendliness, see https://davidmathlogic.com/colorblind/
   sc_minmax <- ggplot2::scale_color_discrete(
     name = "Aspect",
+    type = c("#DC3220", "#000000", "#005AB5"),
+#    type = c("orange", "black", "blue"),
     breaks = names(col_),
     labels = labels(col_),
-    drop = FALSE
+    drop = FALSE,
+    na.translate = FALSE
   )
 
   pl_theme_abs <-
@@ -143,37 +148,43 @@ make_track_plots <- function(fit) {
       .data$MaxMode,
       lty = lty_["Mode"],
       color = col_["Max"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MinMode,
       lty = lty_["Mode"],
       color = col_["Min"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanMode,
       lty = lty_["Mode"],
       color = col_["Mean"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MaxLin,
       lty = lty_["Lin"],
       col = "Max"
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MinLin,
       lty = lty_["Lin"],
       col = "Min"
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanLin,
       lty = lty_["Lin"],
       col = "Mean"
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::ylab("Value") +
     pl_theme_abs +
     ggplot2::ggtitle("Tracks")
@@ -199,61 +210,93 @@ make_track_plots <- function(fit) {
           .groups = "drop"
         )
     ) +
+    ggplot2::geom_ribbon(ggplot2::aes(
+      .data$iteration,
+      ymin = -MaxSD,
+      ymax = MaxSD,
+      fill = col_["Max"],
+      lty = lty_["SD"]
+    ),
+    alpha = 0.1,
+    na.rm = TRUE) +
+    ggplot2::geom_ribbon(ggplot2::aes(
+      .data$iteration,
+      ymin = -MeanSD,
+      ymax = MeanSD,
+      fill = col_["Mean"],
+      lty = lty_["SD"]
+    ),
+    alpha = 0.1,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MaxDiff,
       col = col_["Max"],
       lty = lty_["Mode-Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MinDiff,
       col = col_["Min"],
       lty = lty_["Mode-Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MeanDiff,
       col = col_["Mean"],
       lty = lty_["Mode-Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MaxSD,
       col = col_["Max"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MinSD,
       col = col_["Min"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MeanSD,
       col = col_["Mean"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MaxSD,
       col = col_["Max"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MinSD,
       col = col_["Min"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MeanSD,
       col = col_["Mean"],
       lty = lty_["SD"]
-    )) +
-    ggplot2::guides(alpha = "none") +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
+    ggplot2::guides(alpha = "none", fill = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Mode - Lin")
 
@@ -295,25 +338,29 @@ make_track_plots <- function(fit) {
       .data$MaxMode,
       lty = lty_["Mode"],
       col = col_["Max"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanMode,
       lty = lty_["Mode"],
       col = col_["Mean"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MaxLin,
       lty = lty_["Lin"],
       col = col_["Max"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       .data$MeanLin,
       lty = lty_["Lin"],
       col = col_["Mean"]
-    )) +
+    ),
+    na.rm = TRUE) +
     pl_theme_norm +
     ggplot2::scale_y_log10() +
     ggplot2::ggtitle("|Change| / sd (Max and Mean)") +
@@ -340,91 +387,134 @@ make_track_plots <- function(fit) {
           .groups = "drop"
         )
     ) +
+    ggplot2::geom_ribbon(ggplot2::aes(
+      .data$iteration,
+      ymin = -MaxSD,
+      ymax = MaxSD,
+      fill = col_["Max"],
+      lty = lty_["SD"]
+    ),
+    alpha = 0.1,
+    na.rm = TRUE) +
+    ggplot2::geom_ribbon(ggplot2::aes(
+      .data$iteration,
+      ymin = -MeanSD,
+      ymax = MeanSD,
+      fill = col_["Mean"],
+      lty = lty_["SD"]
+    ),
+    alpha = 0.1,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MaxMode,
       col = col_["Max"],
       lty = lty_["Mode"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MinMode,
       col = col_["Min"],
       lty = lty_["Mode"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MeanMode,
       col = col_["Mean"],
       lty = lty_["Mode"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MaxLin,
       col = col_["Max"],
       lty = lty_["Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MinLin,
       col = col_["Min"],
       lty = lty_["Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MeanLin,
       col = col_["Mean"],
       lty = lty_["Lin"]
-    )) +
+    ),
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MaxSD,
       col = col_["Max"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MinSD,
       col = col_["Min"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       MeanSD,
       col = col_["Mean"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MaxSD,
       col = col_["Max"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MinSD,
       col = col_["Min"],
       lty = lty_["SD"]
-    )) +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
     ggplot2::geom_line(ggplot2::aes(
       .data$iteration,
       -MeanSD,
       col = col_["Mean"],
       lty = lty_["SD"]
-    )) +
-    ggplot2::guides(alpha = "none") +
+    ),
+    alpha = 0.5,
+    na.rm = TRUE) +
+    ggplot2::guides(alpha = "none", fill = "none") +
     pl_theme_rel +
     ggplot2::ggtitle("Change & sd")
 
   pl_combined <-
-    ((pl_tracks +
-      ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["Mode-Lin"])) +
-      ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["SD"])) |
-      pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")) /
-      (pl_relative_change + ggplot2::guides(linetype = "none", color = "none") |
-        pl_change + ggplot2::guides(linetype = "none", color = "none"))) +
-      patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "bottom")
+    ((
+      pl_tracks +
+        ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["Mode-Lin"]),
+                           na.rm = TRUE) +
+        ggplot2::geom_line(ggplot2::aes(.data$iteration, NA_real_, lty = lty_["SD"]),
+                           na.rm = TRUE) |
+        pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")
+    ) /
+      (
+        pl_relative_change + ggplot2::guides(linetype = "none", color = "none") |
+          pl_change + ggplot2::guides(linetype = "none", color = "none")
+      )
+    ) +
+    patchwork::plot_layout(guides = "collect") &
+    ggplot2::theme(legend.position = "bottom")
 
 
   list(
