@@ -134,7 +134,8 @@ ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
   gg(lambda, geom = "tile") +
   gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
-  ggtitle("Nest intensity per km squared")
+  ggtitle("Nest intensity per km squared") +
+  xlab("") + ylab("")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />
