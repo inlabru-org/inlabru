@@ -12,7 +12,7 @@ estimation"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9005</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,7 +102,7 @@ estimation</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_convergence_plot</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_convergence_plot</span><span class="op">(</span><span class="va">x</span>, from <span class="op">=</span> <span class="fl">1</span>, to <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -111,11 +111,34 @@ estimation</p>
 <dd><p>a <a href="bru.html">bru</a> object, typically a result from <code><a href="bru.html">bru()</a></code> for a nonlinear
 predictor model</p></dd>
 
+
+<dt>from, to</dt>
+<dd><p>integer values for the range of iterations to plot.
+Default <code>from = 1</code> (start from the first iteration) and <code>to = NULL</code> (end at the last iteration).
+Set <code>from = 0</code> to include the initial linearisation point in the track plot.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A ggplot object with four panels of convergence diagnostics:</p><ul><li><p><code>Tracks</code>: Mode and linearisation values for each effect</p></li>
+<li><p><code>Mode - Lin</code>: Difference between mode and linearisation values for each effect</p></li>
+<li><p><code>|Change| / sd</code>: Absolute change in mode and linearisation values
+divided by the standard deviation for each effect</p></li>
+<li><p><code>Change &amp; sd</code>: Absolute change in mode and linearisation values
+and standard deviation for each effect</p></li>
+</ul><p>For multidimensional components, only the overall average, maximum, and
+minimum values are shown.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
 packages to be installed.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="bru.html">bru()</a></code></p></div>
     </div>
 
     <div class="section level2">
