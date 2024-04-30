@@ -7,8 +7,11 @@
   wasn't correctly handled by the mapper system (version 2.10.1.9002)
 * New `toypoints` example data set, for basic modelling examples
   (version 2.10.1.9003)
-* Updated converence plots, reducing random effect aspects to summary statistics,
+* Updated convergence plots, reducing random effect aspects to summary statistics,
   improving speed and visual coherence (version 2.10.1.9004)
+* Add options to `bru_convergence_plot()` to control the number of iterations
+  shown, and optionally show the initial values that are stored from this version
+  (version 2.10.1.9005)
 
 # inlabru 2.10.1
 

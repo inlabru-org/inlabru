@@ -3182,6 +3182,24 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
+    if (is.null(original_track)) {
+      track_df <- list()
+      for (label in names(states[[1]])) {
+        if (length(states[[1]][[label]]) > 0) {
+          track_df[[label]] <-
+            data.frame(
+              effect = label,
+              index = seq_along(states[[1]][[label]]),
+              iteration = 0,
+              mode = NA_real_,
+              sd = NA_real_,
+              new_linearisation = states[[1]][[label]]
+            )
+        }
+      }
+      original_track <- do.call(rbind, track_df)
+    }
+
     list(
       log = c(original_log, bru_log()["iinla"]),
       states = states,
@@ -3190,7 +3208,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         setequal(names(original_track), names(track[[1]]))) {
         do.call(rbind, c(list(original_track), track))
       } else {
-        track <- do.call(rbind, track)
+        track <- do.call(dplyr::bind_rows, track)
         original_names <- names(original_track)
         new_names <- names(track)
         for (nn in setdiff(new_names, original_names)) {
@@ -3199,7 +3217,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         for (nn in setdiff(original_names, new_names)) {
           track[[nn]] <- NA
         }
-        rbind(original_track, track)
+        dplyr::bind_rows(original_track, track)
       },
       timings = {
         iteration_offset <- if (is.null(original_timings)) {

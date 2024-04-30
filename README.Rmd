@@ -76,11 +76,8 @@ install.packages("inlabru")
 
 ## Example
 
-This is a basic example which shows you how fit a simple spatial Log Gaussian Cox Process (LGCP)
+This is a basic example which shows how fit a simple spatial Log Gaussian Cox Process (LGCP)
 and predicts its intensity:
-```{r special-setup, echo=FALSE}
-suppressPackageStartupMessages(library(sp))
-```
 ```{r example}
 # Load libraries
 library(INLA)

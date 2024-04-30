@@ -10,6 +10,20 @@
 #'
 #' @param x a [bru] object, typically a result from [bru()] for a nonlinear
 #' predictor model
+#' @param from,to integer values for the range of iterations to plot.
+#' Default `from = 1` (start from the first iteration) and `to = NULL` (end at the last iteration).
+#' Set `from = 0` to include the initial linearisation point in the track plot.
+#' @return A ggplot object with four panels of convergence diagnostics:
+#' - `Tracks`: Mode and linearisation values for each effect
+#' - `Mode - Lin`: Difference between mode and linearisation values for each effect
+#' - `|Change| / sd`: Absolute change in mode and linearisation values
+#' divided by the standard deviation for each effect
+#' - `Change & sd`: Absolute change in mode and linearisation values
+#' and standard deviation for each effect
+#'
+#' For multidimensional components, only the overall average, maximum, and
+#' minimum values are shown.
+#' @seealso [bru()]
 #'
 #' @details Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
 #' packages to be installed.
@@ -19,14 +33,14 @@
 #' fit <- bru(...)
 #' bru_convergence_plot(fit)
 #' }
-bru_convergence_plot <- function(x) {
+bru_convergence_plot <- function(x, from = 1, to = NULL) {
   stopifnot(inherits(x, "bru"))
   x <- bru_check_object_bru(x)
-  make_track_plots(x)[["default"]]
+  make_track_plots(x, from = from, to = to)[["default"]]
 }
 
 
-make_track_plots <- function(fit) {
+make_track_plots <- function(fit, from = 1, to = NULL) {
   needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
   are_installed <-
     vapply(
@@ -45,30 +59,20 @@ make_track_plots <- function(fit) {
       )
     )
   }
-  track_data <-
-    fit$bru_iinla$track %>%
-    dplyr::left_join(
-      fit$bru_iinla$track %>%
-        dplyr::filter(.data$iteration == max(.data$iteration)) %>%
-        dplyr::rename(
-          mode_end = .data$mode,
-          new_linearisation_end = .data$new_linearisation,
-          sd_end = .data$sd
-        ),
-      by = c("effect", "index"),
-    ) %>%
-    dplyr::mutate(iteration = .data$iteration.x) %>%
-    dplyr::left_join(
-      fit$bru_iinla$track %>%
-        dplyr::filter(.data$iteration == 1) %>%
-        dplyr::rename(
-          mode_start = .data$mode,
-          new_linearisation_start = .data$new_linearisation,
-          sd_start = .data$sd
-        ),
-      by = c("effect", "index"),
-    ) %>%
-    dplyr::mutate(iteration = .data$iteration.x)
+
+  track_data <- fit$bru_iinla$track
+  if (!is.null(from)) {
+    stopifnot(is.numeric(from))
+    stopifnot(from >= 0)
+  } else {
+    from <- min(track_data$iteration)
+  }
+  if (!is.null(to)) {
+    stopifnot(is.numeric(to))
+    stopifnot(to >= 0)
+  } else {
+    to <- max(track_data$iteration)
+  }
 
   track_data <- track_data %>%
     dplyr::group_by(.data$effect, .data$iteration) %>%
@@ -94,40 +98,42 @@ make_track_plots <- function(fit) {
     na.translate = FALSE
   )
   # Colour blind friendliness, see https://davidmathlogic.com/colorblind/
-  sc_minmax <- list(ggplot2::scale_color_discrete(
-    name = "Aspect",
-    type = c("#DC3220", "#000000", "#005AB5"),
-    breaks = names(col_),
-    labels = labels(col_),
-    drop = FALSE,
-    na.translate = FALSE
-  ),
-  ggplot2::scale_fill_discrete(
-    name = "Aspect",
-    type = c("#DC3220", "#000000", "#005AB5"),
-    breaks = names(col_),
-    labels = labels(col_),
-    drop = FALSE,
-    na.translate = FALSE
-  ))
+  sc_minmax <- list(
+    ggplot2::scale_color_discrete(
+      name = "Aspect",
+      type = c("#DC3220", "#000000", "#005AB5"),
+      breaks = names(col_),
+      labels = labels(col_),
+      drop = FALSE,
+      na.translate = FALSE
+    ),
+    ggplot2::scale_fill_discrete(
+      name = "Aspect",
+      type = c("#DC3220", "#000000", "#005AB5"),
+      breaks = names(col_),
+      labels = labels(col_),
+      drop = FALSE,
+      na.translate = FALSE
+    )
+  )
 
   pl_theme_abs <-
     list(
-      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free"),
+      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free_y"),
       sc,
       sc_minmax #
       #      ggplot2::guides(color = "none")
     )
   pl_theme_rel <-
     list(
-      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free"),
+      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free_y"),
       sc,
       sc_minmax # ,
       #      ggplot2::guides(color = "none")
     )
   pl_theme_norm <-
     list(
-      ggplot2::facet_wrap(ggplot2::vars(.data$effect)),
+      ggplot2::facet_wrap(ggplot2::vars(.data$effect), scales = "free_y"),
       sc,
       sc_minmax # ,
       #      ggplot2::guides(color = "none")
@@ -136,6 +142,7 @@ make_track_plots <- function(fit) {
   pl_tracks <-
     ggplot2::ggplot(
       track_data %>%
+        dplyr::filter(.data$iteration >= from, .data$iteration <= to) %>%
         dplyr::group_by(
           .data$effect,
           .data$iteration
@@ -211,6 +218,10 @@ make_track_plots <- function(fit) {
   pl_mode_lin <-
     ggplot2::ggplot(
       track_data %>%
+        dplyr::filter(
+          .data$iteration >= max(1, from),
+          .data$iteration <= to
+        ) %>%
         dplyr::filter(
           is.finite(.data$sd),
           is.finite(.data$new_linearisation)
@@ -351,6 +362,10 @@ make_track_plots <- function(fit) {
   pl_relative_change <-
     ggplot2::ggplot(
       track_data %>%
+        dplyr::filter(
+          .data$iteration >= max(1, from),
+          .data$iteration <= to
+        ) %>%
         dplyr::group_by(
           .data$effect,
           .data$iteration
@@ -412,12 +427,16 @@ make_track_plots <- function(fit) {
     ) +
     pl_theme_norm +
     ggplot2::scale_y_log10() +
-    ggplot2::ggtitle("|Change| / sd (Max and Mean)") +
+    ggplot2::ggtitle("|Change| / sd") +
     ggplot2::geom_hline(yintercept = fit$bru_info$options$bru_method$rel_tol)
 
   pl_change <-
     ggplot2::ggplot(
       track_data %>%
+        dplyr::filter(
+          .data$iteration >= max(1, from),
+          .data$iteration <= to
+        ) %>%
         dplyr::filter(is.finite(.data$sd)) %>%
         dplyr::group_by(
           .data$effect,
