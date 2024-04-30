@@ -255,7 +255,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.345, Running = 2.45, Post = 0.536, Total = 3.33 </span></span>
+<span><span class="co">#&gt;     Pre = 0.343, Running = 2.44, Post = 0.545, Total = 3.33 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.621 0.323     -1.260   -0.620      0.009 -0.620   0</span></span>
@@ -370,7 +370,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.36, Running = 1.52, Post = 0.12, Total = 2 </span></span>
+<span><span class="co">#&gt;     Pre = 0.358, Running = 1.5, Post = 0.12, Total = 1.97 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.738 0.315     -1.354   -0.739     -0.118 -0.739   0</span></span>
@@ -553,15 +553,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.403, Running = 84.4, Post = 0.289, Total = 85.1 </span></span>
+<span><span class="co">#&gt;     Pre = 0.402, Running = 75.7, Post = 0.288, Total = 76.4 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed     -3.557 0.307     -4.158   -3.557     -2.955 -3.557   0</span></span>
-<span><span class="co">#&gt; veg_grassland     -3.153 0.326     -3.793   -3.153     -2.514 -3.153   0</span></span>
-<span><span class="co">#&gt; Intercept_present -3.171 0.952     -5.038   -3.171     -1.304 -3.171   0</span></span>
+<span><span class="co">#&gt; veg_disturbed     -3.416 0.311     -4.026   -3.416     -2.805 -3.416   0</span></span>
+<span><span class="co">#&gt; veg_grassland     -3.013 0.330     -3.660   -3.013     -2.366 -3.013   0</span></span>
+<span><span class="co">#&gt; Intercept_present -3.610 0.973     -5.518   -3.610     -1.701 -3.610   0</span></span>
 <span><span class="co">#&gt; elevation_present  0.002 0.001      0.001    0.002      0.003  0.002   0</span></span>
 <span><span class="co">#&gt; elevation          0.002 0.000      0.001    0.002      0.003  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count    1.237 0.609      0.042    1.237      2.431  1.237   0</span></span>
+<span><span class="co">#&gt; Intercept_count    0.715 0.658     -0.575    0.715      2.006  0.715   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -570,17 +570,17 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                  mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field 7.634 0.018      7.603    7.634      7.673 7.629</span></span>
-<span><span class="co">#&gt; Stdev for field 0.117 0.001      0.116    0.117      0.118 0.116</span></span>
+<span><span class="co">#&gt; Range for field 4.043 0.008      4.031    4.043      4.061 4.039</span></span>
+<span><span class="co">#&gt; Stdev for field 0.144 0.000      0.144    0.144      0.145 0.144</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1886.87</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1442.23</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 7.08</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1842.78</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1398.14</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 8.53</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1887.76</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 7.91</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1843.90</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 9.56</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1053.96 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1080.18 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -801,24 +801,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2715276</td>
-<td align="right">0.6266358</td>
-<td align="right">-2.1972286</td>
-<td align="right">0.4125783</td>
+<td align="right">0.2714928</td>
+<td align="right">0.6266792</td>
+<td align="right">-2.203857</td>
+<td align="right">0.4126144</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2913536</td>
-<td align="right">0.6863713</td>
-<td align="right">-2.1680797</td>
-<td align="right">0.4283115</td>
+<td align="right">0.2914224</td>
+<td align="right">0.6866100</td>
+<td align="right">-2.163806</td>
+<td align="right">0.4281880</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.4283984</td>
-<td align="right">0.9303438</td>
-<td align="right">-0.9238771</td>
-<td align="right">0.6017605</td>
+<td align="right">0.4109859</td>
+<td align="right">0.9090855</td>
+<td align="right">-1.113308</td>
+<td align="right">0.5820699</td>
 </tr>
 </tbody>
 </table>
