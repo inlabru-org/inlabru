@@ -119,5 +119,6 @@ ggplot() +
   gg(lambda, geom = "tile") +
   gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
   ggtitle("Nest intensity per km squared") +
-  xlab("") + ylab("")
+  xlab("") +
+  ylab("")
 ```
