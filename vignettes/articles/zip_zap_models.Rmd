@@ -267,10 +267,10 @@ comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
   elevation(gcov$elevation, model = "linear") +
   field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
   elevation_present(gcov$elevation, model = "linear") +
-  field_present(geometry, copy = "field")
+  field_present(geometry, copy = "field", fixed = FALSE)
 
 truncated_poisson_like <-
-  if (package_version(getNamespaceVersion("INLA")) < "2023.10.19-1") {
+  if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
     like(
       family = "zeroinflatedpoisson0",
       data = counts_df[counts_df$present, ],
