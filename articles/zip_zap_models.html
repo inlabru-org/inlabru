@@ -255,7 +255,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.346, Running = 2.44, Post = 0.542, Total = 3.33 </span></span>
+<span><span class="co">#&gt;     Pre = 0.342, Running = 2.45, Post = 0.556, Total = 3.35 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.621 0.323     -1.260   -0.620      0.009 -0.620   0</span></span>
@@ -370,7 +370,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.354, Running = 1.53, Post = 0.13, Total = 2.01 </span></span>
+<span><span class="co">#&gt;     Pre = 0.346, Running = 1.52, Post = 0.132, Total = 2 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.738 0.315     -1.354   -0.739     -0.118 -0.739   0</span></span>
@@ -498,10 +498,10 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>  <span class="fu">elevation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">field</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">px_matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept_present</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept_count</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">elevation_present</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">field_present</span><span class="op">(</span><span class="va">geometry</span>, copy <span class="op">=</span> <span class="st">"field"</span><span class="op">)</span></span>
+<span>  <span class="fu">field_present</span><span class="op">(</span><span class="va">geometry</span>, copy <span class="op">=</span> <span class="st">"field"</span>, fixed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">truncated_poisson_like</span> <span class="op">&lt;-</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">package_version</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"2023.10.19-1"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">package_version</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"23.10.19-1"</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
 <span>      family <span class="op">=</span> <span class="st">"zeroinflatedpoisson0"</span>,</span>
 <span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span>, <span class="op">]</span>,</span>
@@ -549,19 +549,19 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Predictor: </span></span>
 <span><span class="co">#&gt;         present ~ veg_disturbed + veg_grassland + elevation_present + </span></span>
 <span><span class="co">#&gt;             field_present + Intercept_present</span></span>
-<span><span class="co">#&gt;   Family: 'zeroinflatedpoisson0'</span></span>
+<span><span class="co">#&gt;   Family: 'nzpoisson'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.401, Running = 157, Post = 0.284, Total = 157 </span></span>
+<span><span class="co">#&gt;     Pre = 0.387, Running = 58.6, Post = 0.16, Total = 59.2 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed     -3.453 0.310     -4.061   -3.453     -2.846 -3.453   0</span></span>
-<span><span class="co">#&gt; veg_grassland     -3.054 0.329     -3.699   -3.054     -2.410 -3.054   0</span></span>
-<span><span class="co">#&gt; Intercept_present -3.522 0.964     -5.413   -3.522     -1.631 -3.522   0</span></span>
-<span><span class="co">#&gt; elevation_present  0.002 0.001      0.001    0.002      0.003  0.002   0</span></span>
-<span><span class="co">#&gt; elevation          0.002 0.000      0.001    0.002      0.003  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count    0.827 0.638     -0.423    0.827      2.078  0.827   0</span></span>
+<span><span class="co">#&gt; veg_disturbed     -3.821 0.299     -4.408   -3.821     -3.234 -3.821   0</span></span>
+<span><span class="co">#&gt; veg_grassland     -3.315 0.321     -3.944   -3.315     -2.687 -3.315   0</span></span>
+<span><span class="co">#&gt; Intercept_present -2.155 0.903     -3.925   -2.155     -0.386 -2.155   0</span></span>
+<span><span class="co">#&gt; elevation_present  0.001 0.001      0.000    0.001      0.002  0.001   0</span></span>
+<span><span class="co">#&gt; elevation          0.001 0.000      0.001    0.001      0.002  0.001   0</span></span>
+<span><span class="co">#&gt; Intercept_count    2.397 0.523      1.372    2.397      3.422  2.397   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -569,18 +569,19 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;    field_present Copy</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                  mean   sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field 4.841 0.01      4.821    4.842      4.859 4.843</span></span>
-<span><span class="co">#&gt; Stdev for field 0.134 0.00      0.133    0.134      0.134 0.133</span></span>
+<span><span class="co">#&gt;                         mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for field        9.278 0.027      9.217    9.280      9.320 9.295</span></span>
+<span><span class="co">#&gt; Stdev for field        0.113 0.000      0.113    0.113      0.114 0.113</span></span>
+<span><span class="co">#&gt; Beta for field_present 1.149 0.002      1.145    1.149      1.152 1.150</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1856.27</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1411.63</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 7.96</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1835.00</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1390.37</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -46.41</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1857.27</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 8.89</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1889.19</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 7.73</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1069.96 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1058.49 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -801,24 +802,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2714899</td>
-<td align="right">0.6270080</td>
-<td align="right">-2.198894</td>
-<td align="right">0.4127371</td>
+<td align="right">0.2713642</td>
+<td align="right">0.6266007</td>
+<td align="right">-2.1978626</td>
+<td align="right">0.4125681</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2917655</td>
-<td align="right">0.6871324</td>
-<td align="right">-2.163755</td>
-<td align="right">0.4284061</td>
+<td align="right">0.2915351</td>
+<td align="right">0.6861950</td>
+<td align="right">-2.1657839</td>
+<td align="right">0.4282712</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.4165394</td>
-<td align="right">0.9161117</td>
-<td align="right">-1.057406</td>
-<td align="right">0.5884165</td>
+<td align="right">0.4303014</td>
+<td align="right">0.9320264</td>
+<td align="right">-0.9109851</td>
+<td align="right">0.6021324</td>
 </tr>
 </tbody>
 </table>
