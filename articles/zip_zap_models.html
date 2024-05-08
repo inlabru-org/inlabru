@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -242,7 +242,7 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.10.1.9005</span></span>
+<span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
 <span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,7 +255,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.342, Running = 2.45, Post = 0.556, Total = 3.35 </span></span>
+<span><span class="co">#&gt;     Pre = 0.348, Running = 2.48, Post = 0.547, Total = 3.37 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.621 0.323     -1.260   -0.620      0.009 -0.620   0</span></span>
@@ -357,7 +357,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.10.1.9005</span></span>
+<span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
 <span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -370,7 +370,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.346, Running = 1.52, Post = 0.132, Total = 2 </span></span>
+<span><span class="co">#&gt;     Pre = 0.352, Running = 1.55, Post = 0.132, Total = 2.04 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.738 0.315     -1.354   -0.739     -0.118 -0.739   0</span></span>
@@ -532,17 +532,17 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>  <span class="va">truncated_poisson_like</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.10.1.9005</span></span>
+<span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
 <span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Intercept_present: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; Intercept_count: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; elevation_present: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; field_present(=field): main = unknown(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; Intercept_count: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'binomial'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
@@ -553,15 +553,15 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.387, Running = 58.6, Post = 0.16, Total = 59.2 </span></span>
+<span><span class="co">#&gt;     Pre = 0.407, Running = 155, Post = 0.163, Total = 155 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed     -3.821 0.299     -4.408   -3.821     -3.234 -3.821   0</span></span>
-<span><span class="co">#&gt; veg_grassland     -3.315 0.321     -3.944   -3.315     -2.687 -3.315   0</span></span>
-<span><span class="co">#&gt; Intercept_present -2.155 0.903     -3.925   -2.155     -0.386 -2.155   0</span></span>
-<span><span class="co">#&gt; elevation_present  0.001 0.001      0.000    0.001      0.002  0.001   0</span></span>
-<span><span class="co">#&gt; elevation          0.001 0.000      0.001    0.001      0.002  0.001   0</span></span>
-<span><span class="co">#&gt; Intercept_count    2.397 0.523      1.372    2.397      3.422  2.397   0</span></span>
+<span><span class="co">#&gt; veg_disturbed     -3.473 0.314     -4.089   -3.473     -2.857 -3.473   0</span></span>
+<span><span class="co">#&gt; veg_grassland     -2.984 0.331     -3.633   -2.984     -2.335 -2.984   0</span></span>
+<span><span class="co">#&gt; Intercept_present -2.957 1.020     -4.958   -2.957     -0.957 -2.957   0</span></span>
+<span><span class="co">#&gt; elevation_present  0.002 0.001      0.000    0.002      0.003  0.002   0</span></span>
+<span><span class="co">#&gt; elevation          0.002 0.000      0.001    0.002      0.003  0.002   0</span></span>
+<span><span class="co">#&gt; Intercept_count    1.545 0.742      0.089    1.545      3.000  1.545   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -570,18 +570,18 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                         mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field        9.278 0.027      9.217    9.280      9.320 9.295</span></span>
-<span><span class="co">#&gt; Stdev for field        0.113 0.000      0.113    0.113      0.114 0.113</span></span>
-<span><span class="co">#&gt; Beta for field_present 1.149 0.002      1.145    1.149      1.152 1.150</span></span>
+<span><span class="co">#&gt; Range for field        1.028 0.001      1.027    1.028      1.031 1.028</span></span>
+<span><span class="co">#&gt; Stdev for field        0.193 0.000      0.192    0.193      0.193 0.193</span></span>
+<span><span class="co">#&gt; Beta for field_present 1.143 0.001      1.140    1.143      1.145 1.144</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1835.00</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1390.37</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -46.41</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1788.05</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1343.42</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 18.14</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1889.19</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 7.73</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1791.55</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 21.11</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1058.49 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -988.05 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -802,24 +802,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2713642</td>
-<td align="right">0.6266007</td>
-<td align="right">-2.1978626</td>
-<td align="right">0.4125681</td>
+<td align="right">0.2713482</td>
+<td align="right">0.6272655</td>
+<td align="right">-2.198465</td>
+<td align="right">0.4126004</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2915351</td>
-<td align="right">0.6861950</td>
-<td align="right">-2.1657839</td>
-<td align="right">0.4282712</td>
+<td align="right">0.2913536</td>
+<td align="right">0.6864347</td>
+<td align="right">-2.163335</td>
+<td align="right">0.4282271</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.4303014</td>
-<td align="right">0.9320264</td>
-<td align="right">-0.9109851</td>
-<td align="right">0.6021324</td>
+<td align="right">0.3854392</td>
+<td align="right">0.8612592</td>
+<td align="right">-1.213081</td>
+<td align="right">0.5496022</td>
 </tr>
 </tbody>
 </table>
