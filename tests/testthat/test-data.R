@@ -65,6 +65,7 @@ test_that("Component construction: default mesh/mapping construction, data is li
 test_that("Component construction: unsafe intercepts, data is list", {
   cmp <- component_list(~ something_unknown - 1)
   lik <- like(formula = response ~ ., data = list(response = 1:5))
+  lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
       model <- bru_model(cmp, like_list(list(lik)))

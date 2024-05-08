@@ -398,6 +398,7 @@ test_that("Component construction: replicate iid factor construction", {
 test_that("Component construction: unsafe intercepts", {
   cmp <- component_list(~ something_unknown - 1)
   lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
+  lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
       model <- bru_model(cmp, like_list(list(lik)))
@@ -444,18 +445,20 @@ test_that("Component inputs: non-numeric input detection", {
   )
 
   # No model specified (argument unnamed), geometry invalid for bru_mapper_linear:
-  cmp <- ~ Intercept(1) + field(geometry, matern)
+  cmp <- component_list(~ Intercept(1) + field(geometry, matern))
   lk <- like(formula = obs ~ ., data = df, family = "gaussian")
-  model <- bru_model(component_list(cmp), c(lk))
+  lk <- bru_used_update(lk, labels = names(cmp))
+  model <- bru_model(cmp, c(lk))
 
   expect_error(
     ibm_eval(bru_mapper_linear(), input = df$geometry, state = 1),
     "The input to a bru_mapper_linear evaluation must be numeric or logical."
   )
 
-  cmp <- ~ Intercept(1) + field(geometry, matern, model = matern)
+  cmp <- component_list(~ Intercept(1) + field(geometry, matern, model = matern))
   lk <- like(formula = obs ~ ., data = df, family = "gaussian")
-  model <- bru_model(component_list(cmp), c(lk))
+  lk <- bru_used_update(lk, labels = names(cmp))
+  model <- bru_model(cmp, c(lk))
   input <- input_eval(model$effects$field, data = df)
 
   expect_error(

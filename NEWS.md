@@ -12,6 +12,9 @@
 * Add options to `bru_convergence_plot()` to control the number of iterations
   shown, and optionally show the initial values that are stored from this version
   (version 2.10.1.9005)
+* Add filter to limit mapper construction to only the components used in the
+  predictor expression, to avoid unused components breaking the initialisation.
+  This allows easier testing of multi-likelihood models (version 2.10.1.9006)
 
 # inlabru 2.10.1
 
