@@ -265,13 +265,15 @@ $$
 ```{r fig-fit-zap}
 comps <- ~
   Intercept_count(1) +
-  veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
-  veg_grassland(gcov_vegetation$Grassland, model = "linear") +
-  elevation(gcov$elevation, model = "linear") +
-  field_present(geometry, model = px_matern) +
-  Intercept_present(1) +
-  elevation_present(gcov$elevation, model = "linear") +
-  field_count(geometry, model = px_matern)# +
+    veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
+    veg_grassland(gcov_vegetation$Grassland, model = "linear") +
+    elevation(gcov$elevation, model = "linear") +
+    field_present(geometry, model = px_matern) +
+    Intercept_present(1) +
+    elevation_present(gcov$elevation, model = "linear") +
+    field_count(geometry, model = px_matern)
+
+## Alternative with a shared field component:
 #  field_count(geometry, copy = "field_present", fixed = FALSE)
 
 truncated_poisson_like <-
@@ -294,13 +296,13 @@ truncated_poisson_like <-
     )
   }
 
-present_like <-   like(
-    family = "binomial",
-    data = counts_df,
-    formula = present ~ # vegetation +
-      veg_disturbed + veg_grassland +
-      elevation_present + field_present + Intercept_present
-  )
+present_like <- like(
+  family = "binomial",
+  data = counts_df,
+  formula = present ~ # vegetation +
+    veg_disturbed + veg_grassland +
+    elevation_present + field_present + Intercept_present
+)
 
 fit_zap <- bru(
   comps,
@@ -532,14 +534,14 @@ p1 <- ggplot() +
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZIP"), aes(fill = DS - DS_Poisson), geom = "tile") +
-  scale_fill_distiller(type="div", palette = "RdBu", limits = c(-5, 5)) +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZAP"), aes(fill = DS - DS_Poisson), geom = "tile") +
-  scale_fill_distiller(type="div", palette = "RdBu", limits = c(-5, 5)) +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
@@ -569,14 +571,14 @@ p1 <- ggplot() +
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZIP"), aes(fill = LG - LG_Poisson), geom = "tile") +
-  scale_fill_distiller(type="div", palette = "RdBu", limits = c(-2, 2)) +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP LG score difference") +
   guides(fill = guide_legend("LG-LG_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZAP"), aes(fill = LG - LG_Poisson), geom = "tile") +
-  scale_fill_distiller(type="div", palette = "RdBu", limits = c(-2, 2)) +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP LG score difference") +
   guides(fill = guide_legend("LG-LG_poi"))
