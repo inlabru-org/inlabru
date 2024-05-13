@@ -206,7 +206,7 @@ Proportion of vegetation cover by class
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">px_matern</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">px_mesh</span>,</span>
-<span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -243,7 +243,7 @@ vegetation type and elevation.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,13 +255,13 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.348, Running = 2.48, Post = 0.547, Total = 3.37 </span></span>
+<span><span class="co">#&gt;     Pre = 0.347, Running = 2.72, Post = 0.807, Total = 3.87 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed -0.621 0.323     -1.260   -0.620      0.009 -0.620   0</span></span>
-<span><span class="co">#&gt; veg_grassland -1.595 0.352     -2.286   -1.594     -0.906 -1.594   0</span></span>
-<span><span class="co">#&gt; elevation      0.003 0.001      0.001    0.003      0.006  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -4.063 1.874     -7.790   -4.047     -0.432 -4.046   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.086 0.351     -0.603    0.086      0.774  0.086   0</span></span>
+<span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
+<span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
+<span><span class="co">#&gt; Intercept     -6.173 3.465    -13.002   -6.167      0.638 -6.157   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -269,17 +269,17 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
-<span><span class="co">#&gt; Range for field 1.09 0.160      0.815     1.08       1.44 1.06</span></span>
-<span><span class="co">#&gt; Stdev for field 1.10 0.096      0.924     1.10       1.30 1.09</span></span>
+<span><span class="co">#&gt; Range for field 2.35 0.654       1.38     2.25       3.92 2.04</span></span>
+<span><span class="co">#&gt; Stdev for field 2.94 0.679       1.88     2.85       4.54 2.66</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1578.37</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 849.12</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 111.77</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1555.97</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 826.72</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 146.78</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1599.88</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 112.79</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1569.59</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 130.85</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -909.10 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -844.69 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
@@ -358,7 +358,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -370,13 +370,13 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.352, Running = 1.55, Post = 0.132, Total = 2.04 </span></span>
+<span><span class="co">#&gt;     Pre = 0.363, Running = 1.65, Post = 0.121, Total = 2.13 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed -0.738 0.315     -1.354   -0.739     -0.118 -0.739   0</span></span>
-<span><span class="co">#&gt; veg_grassland -1.624 0.347     -2.303   -1.624     -0.943 -1.624   0</span></span>
-<span><span class="co">#&gt; elevation      0.003 0.001      0.001    0.003      0.005  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -3.332 1.818     -6.963   -3.311      0.180 -3.310   0</span></span>
+<span><span class="co">#&gt; veg_disturbed -0.006 0.346     -0.682   -0.007      0.677 -0.007   0</span></span>
+<span><span class="co">#&gt; veg_grassland -1.240 0.377     -1.979   -1.240     -0.501 -1.240   0</span></span>
+<span><span class="co">#&gt; elevation      0.003 0.002     -0.001    0.003      0.006  0.003   0</span></span>
+<span><span class="co">#&gt; Intercept     -5.510 3.428    -12.365   -5.481      1.193 -5.479   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -384,22 +384,26 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                                                         mean    sd 0.025quant</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.111 0.039      0.047</span></span>
-<span><span class="co">#&gt; Range for field                                        1.283 0.202      0.931</span></span>
-<span><span class="co">#&gt; Stdev for field                                        1.020 0.098      0.840</span></span>
-<span><span class="co">#&gt;                                                        0.5quant 0.975quant mode</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1    0.107      0.198 0.10</span></span>
-<span><span class="co">#&gt; Range for field                                           1.267      1.723 1.24</span></span>
-<span><span class="co">#&gt; Stdev for field                                           1.015      1.227 1.01</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.058 0.036      0.011</span></span>
+<span><span class="co">#&gt; Range for field                                        2.600 0.750      1.483</span></span>
+<span><span class="co">#&gt; Stdev for field                                        2.941 0.707      1.853</span></span>
+<span><span class="co">#&gt;                                                        0.5quant 0.975quant</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1     0.05      0.146</span></span>
+<span><span class="co">#&gt; Range for field                                            2.48      4.407</span></span>
+<span><span class="co">#&gt; Stdev for field                                            2.84      4.616</span></span>
+<span><span class="co">#&gt;                                                         mode</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.032</span></span>
+<span><span class="co">#&gt; Range for field                                        2.247</span></span>
+<span><span class="co">#&gt; Stdev for field                                        2.625</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1588.57</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 786.77</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 84.89</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1553.47</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.15</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 125.15</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1602.69</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 86.19</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.20</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 109.65</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -907.13 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -845.31 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
@@ -412,13 +416,14 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span>      <span class="va">veg_disturbed</span> <span class="op">+</span> <span class="va">veg_grassland</span> <span class="op">+</span></span>
 <span>        <span class="va">elevation</span> <span class="op">+</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span></span>
 <span>    <span class="op">)</span></span>
-<span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="va">scaling_prob</span> <span class="op">*</span> <span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span></span>
-<span>    <span class="va">variance</span> <span class="op">&lt;-</span> <span class="va">expect</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">scaling_prob</span><span class="op">)</span> <span class="op">*</span> <span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span><span class="op">)</span></span>
+<span>    <span class="va">expect_param</span> <span class="op">&lt;-</span> <span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span></span>
+<span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="va">scaling_prob</span> <span class="op">*</span> <span class="va">expect_param</span></span>
+<span>    <span class="va">variance</span> <span class="op">&lt;-</span> <span class="va">scaling_prob</span> <span class="op">*</span> <span class="va">expect_param</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">scaling_prob</span><span class="op">)</span> <span class="op">*</span> <span class="va">expect_param</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      lambda <span class="op">=</span> <span class="va">lambda</span>,</span>
 <span>      expect <span class="op">=</span> <span class="va">expect</span>,</span>
 <span>      variance <span class="op">=</span> <span class="va">variance</span>,</span>
-<span>      obs_prob <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">scaling_prob</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">count</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="va">scaling_prob</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">count</span>, <span class="va">expect</span><span class="op">)</span></span>
+<span>      obs_prob <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">scaling_prob</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">count</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="va">scaling_prob</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">count</span>, <span class="va">expect_param</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span>,</span>
 <span>  n.samples <span class="op">=</span> <span class="fl">2500</span></span>
@@ -493,19 +498,23 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 \end{aligned}
 \]</span></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comps</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="fu">veg_disturbed</span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">$</span><span class="va">Disturbed</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">comps</span> <span class="op">&lt;-</span> <span class="op">~</span></span>
+<span>  <span class="fu">Intercept_count</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">veg_disturbed</span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">$</span><span class="va">Disturbed</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">veg_grassland</span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">$</span><span class="va">Grassland</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">elevation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">field</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">px_matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept_present</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept_count</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">field_present</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">px_matern</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">Intercept_present</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">elevation_present</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">elevation</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">field_present</span><span class="op">(</span><span class="va">geometry</span>, copy <span class="op">=</span> <span class="st">"field"</span>, fixed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="fu">field_count</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">px_matern</span><span class="op">)</span><span class="co"># +</span></span>
+<span><span class="co">#  field_count(geometry, copy = "field_present", fixed = FALSE)</span></span>
 <span></span>
 <span><span class="va">truncated_poisson_like</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">package_version</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"23.10.19-1"</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
 <span>      family <span class="op">=</span> <span class="st">"zeroinflatedpoisson0"</span>,</span>
 <span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span>, <span class="op">]</span>,</span>
-<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
+<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
 <span>      E <span class="op">=</span> <span class="va">area</span>,</span>
 <span>      control.family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hyper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>        initial <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -515,34 +524,64 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>    <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
 <span>      family <span class="op">=</span> <span class="st">"nzpoisson"</span>,</span>
 <span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span>, <span class="op">]</span>,</span>
-<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
+<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
 <span>      E <span class="op">=</span> <span class="va">area</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
-<span><span class="va">fit_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
-<span>  <span class="va">comps</span>,</span>
-<span>  <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span><span class="va">present_like</span> <span class="op">&lt;-</span>   <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
 <span>    family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">counts_df</span>,</span>
 <span>    formula <span class="op">=</span> <span class="va">present</span> <span class="op">~</span> <span class="co"># vegetation +</span></span>
 <span>      <span class="va">veg_disturbed</span> <span class="op">+</span> <span class="va">veg_grassland</span> <span class="op">+</span></span>
 <span>      <span class="va">elevation_present</span> <span class="op">+</span> <span class="va">field_present</span> <span class="op">+</span> <span class="va">Intercept_present</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  <span class="va">truncated_poisson_like</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
+<span>  <span class="va">comps</span>,</span>
+<span>  <span class="va">present_like</span>,</span>
+<span>  <span class="va">truncated_poisson_like</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bru_verbose <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; iinla: Evaluate component inputs</span></span>
+<span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
+<span><span class="co">#&gt; iinla: Evaluate component simplifications</span></span>
+<span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
+<span><span class="co">#&gt; iinla: Construct inla stack</span></span>
+<span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
+<span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.9, norm1 = 3.629e-14, norm01 = 220.9)</span></span>
+<span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 220.9</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.593e-16</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.764e-14</span></span>
+<span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
+<span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
+<span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 162%, Expand (norm0 = 0.486, norm1 = 0.1856, norm01 = 0.3004)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Overstep (norm0 = 0.3004, norm1 = 4.353e-11, norm01 = 0.3004)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.3004, norm1 = 4.346e-11, norm01 = 0.3004)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.3004</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 5.362e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 4.346e-11</span></span>
+<span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
+<span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
+<span><span class="co">#&gt; iinla: Max deviation from previous: 8.66% of SD, and line search is inactive [stop if: &lt;10% and line search inactive]</span></span>
+<span><span class="co">#&gt; iinla: Convergence criterion met, running final INLA integration with known theta mode.</span></span>
+<span><span class="co">#&gt; iinla: Iteration 3 [max:10]</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9006</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.01-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; field_present: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Intercept_present: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; elevation_present: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field_present(=field): main = unknown(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Intercept_count: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; field_count: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'binomial'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
@@ -551,40 +590,54 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;             field_present + Intercept_present</span></span>
 <span><span class="co">#&gt;   Family: 'nzpoisson'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
-<span><span class="co">#&gt;     Predictor: count ~ elevation + field + Intercept_count</span></span>
+<span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.407, Running = 155, Post = 0.163, Total = 155 </span></span>
+<span><span class="co">#&gt;     Pre = 0.525, Running = 3.95, Post = 0.602, Total = 5.07 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;                     mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed     -3.473 0.314     -4.089   -3.473     -2.857 -3.473   0</span></span>
-<span><span class="co">#&gt; veg_grassland     -2.984 0.331     -3.633   -2.984     -2.335 -2.984   0</span></span>
-<span><span class="co">#&gt; Intercept_present -2.957 1.020     -4.958   -2.957     -0.957 -2.957   0</span></span>
-<span><span class="co">#&gt; elevation_present  0.002 0.001      0.000    0.002      0.003  0.002   0</span></span>
-<span><span class="co">#&gt; elevation          0.002 0.000      0.001    0.002      0.003  0.002   0</span></span>
-<span><span class="co">#&gt; Intercept_count    1.545 0.742      0.089    1.545      3.000  1.545   0</span></span>
+<span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
+<span><span class="co">#&gt; veg_disturbed      -1.264 0.550     -2.336   -1.266     -0.179  -1.266   0</span></span>
+<span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.460   -1.443     -0.431  -1.443   0</span></span>
+<span><span class="co">#&gt; Intercept_present -10.563 4.192    -19.047  -10.486     -2.500 -10.483   0</span></span>
+<span><span class="co">#&gt; elevation_present   0.004 0.002     -0.001    0.004      0.008   0.004   0</span></span>
+<span><span class="co">#&gt; Intercept_count     2.328 1.443     -0.724    2.371      5.116   2.363   0</span></span>
+<span><span class="co">#&gt; elevation           0.001 0.001      0.000    0.001      0.003   0.001   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
-<span><span class="co">#&gt;     field SPDE2 model</span></span>
-<span><span class="co">#&gt;    field_present Copy</span></span>
+<span><span class="co">#&gt;     field_present SPDE2 model</span></span>
+<span><span class="co">#&gt;    field_count SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                         mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field        1.028 0.001      1.027    1.028      1.031 1.028</span></span>
-<span><span class="co">#&gt; Stdev for field        0.193 0.000      0.192    0.193      0.193 0.193</span></span>
-<span><span class="co">#&gt; Beta for field_present 1.143 0.001      1.140    1.143      1.145 1.144</span></span>
+<span><span class="co">#&gt;                          mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
+<span><span class="co">#&gt; Range for field_present 2.357 0.730      1.299    2.235      4.137 1.994</span></span>
+<span><span class="co">#&gt; Stdev for field_present 2.935 0.676      1.871    2.847      4.516 2.660</span></span>
+<span><span class="co">#&gt; Range for field_count   0.489 0.229      0.202    0.439      1.078 0.355</span></span>
+<span><span class="co">#&gt; Stdev for field_count   0.704 0.126      0.492    0.691      0.986 0.666</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1788.05</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1343.42</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 18.14</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1605.85</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1161.21</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 160.60</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1791.55</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 21.11</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1602.26</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 131.92</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -988.05 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -872.56 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
+<p>Note that in this model, there is no direct link between the
+parameters of the two observation parts, and we could estimate them
+separately. However, if for example the <code>field_count</code>
+component could be used for both predictors, it would be possible to use
+the <code>copy</code> argument to share the same component between the
+two parts, with
+<code>field_present(geometry, copy = "field_count", fixed = TRUE)</code>,
+where <code>fixed = TRUE</code> tells <code><a href="../reference/bru.html">bru()</a></code> to estimate a
+scaling parameter instead of using the same linear effect parameter for
+both version of the field. In the results above, we see that the
+estimated covariance parameters for the two fields are very different,
+so it is not sensible to share the same component between the two
+parts.</p>
 </div>
 </div>
 <div class="section level2">
@@ -601,8 +654,9 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>          <span class="va">elevation_present</span> <span class="op">+</span></span>
 <span>          <span class="va">field_present</span> <span class="op">+</span> <span class="va">Intercept_present</span></span>
 <span>      <span class="op">)</span></span>
-<span>    <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">elevation</span> <span class="op">+</span> <span class="va">field</span> <span class="op">+</span> <span class="va">Intercept_count</span><span class="op">)</span></span>
-<span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="va">presence_prob</span> <span class="op">*</span> <span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span><span class="op">)</span></span>
+<span>    <span class="va">expect_param</span> <span class="op">&lt;-</span> <span class="va">presence_prob</span> <span class="op">*</span> <span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span></span>
+<span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="va">expect_param</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="va">variance</span> <span class="op">&lt;-</span> <span class="va">expect</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">lambda</span> <span class="op">*</span> <span class="va">area</span><span class="op">)</span> <span class="op">*</span> <span class="va">expect</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      presence <span class="op">=</span> <span class="va">presence_prob</span>,</span>
@@ -610,7 +664,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span>      expect <span class="op">=</span> <span class="va">expect</span>,</span>
 <span>      variance <span class="op">=</span> <span class="va">variance</span>,</span>
 <span>      obs_prob <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">presence_prob</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">count</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>        <span class="op">(</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">*</span> <span class="va">presence_prob</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">count</span>, <span class="va">expect</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">expect</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="op">(</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">*</span> <span class="va">presence_prob</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="va">count</span>, <span class="va">expect_param</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">dpois</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">expect_param</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span>,</span>
 <span>  n.samples <span class="op">=</span> <span class="fl">2500</span></span>
@@ -802,24 +856,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2713482</td>
-<td align="right">0.6272655</td>
-<td align="right">-2.198465</td>
-<td align="right">0.4126004</td>
+<td align="right">0.2424831</td>
+<td align="right">0.5609733</td>
+<td align="right">-2.599359</td>
+<td align="right">0.3928669</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2913536</td>
-<td align="right">0.6864347</td>
-<td align="right">-2.163335</td>
-<td align="right">0.4282271</td>
+<td align="right">0.2541777</td>
+<td align="right">0.5994960</td>
+<td align="right">-2.655938</td>
+<td align="right">0.4022476</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.3854392</td>
-<td align="right">0.8612592</td>
-<td align="right">-1.213081</td>
-<td align="right">0.5496022</td>
+<td align="right">0.2798330</td>
+<td align="right">0.6539249</td>
+<td align="right">-2.305142</td>
+<td align="right">0.3998802</td>
 </tr>
 </tbody>
 </table>
@@ -845,19 +899,33 @@ models</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"Poisson"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span></span>
+<span>    type <span class="op">=</span> <span class="st">"seq"</span>,</span>
+<span>    palette <span class="op">=</span> <span class="st">"Reds"</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7.5</span>, <span class="fl">25</span><span class="op">)</span>,</span>
+<span>    direction <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">nests</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"firebrick"</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    pch <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Poisson Dawid-Sebastiani scores"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"DS"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span> <span class="op">-</span> <span class="va">DS_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"ZIP"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span> <span class="op">-</span> <span class="va">DS_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>type<span class="op">=</span><span class="st">"div"</span>, palette <span class="op">=</span> <span class="st">"RdBu"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"ZIP Dawid-Sebastiani score difference"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"DS-DS_poi"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span> <span class="op">-</span> <span class="va">DS_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"ZAP"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span> <span class="op">-</span> <span class="va">DS_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>type<span class="op">=</span><span class="st">"div"</span>, palette <span class="op">=</span> <span class="st">"RdBu"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"ZAP Dawid-Sebastiani score difference"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"DS-DS_poi"</span><span class="op">)</span><span class="op">)</span></span>
@@ -867,19 +935,33 @@ models</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"Poisson"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span></span>
+<span>    type <span class="op">=</span> <span class="st">"seq"</span>,</span>
+<span>    palette <span class="op">=</span> <span class="st">"Reds"</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>    direction <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">nests</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"firebrick"</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    pch <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"LG score"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"LG"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span> <span class="op">-</span> <span class="va">LG_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"ZIP"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span> <span class="op">-</span> <span class="va">LG_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>type<span class="op">=</span><span class="st">"div"</span>, palette <span class="op">=</span> <span class="st">"RdBu"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"ZIP LG score difference"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"LG-LG_poi"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span> <span class="op">-</span> <span class="va">LG_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"ZAP"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span> <span class="op">-</span> <span class="va">LG_Poisson</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>type<span class="op">=</span><span class="st">"div"</span>, palette <span class="op">=</span> <span class="st">"RdBu"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">nests</span>, color <span class="op">=</span> <span class="st">"firebrick"</span>, size <span class="op">=</span> <span class="fl">1</span>, pch <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"ZAP LG score difference"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span><span class="st">"LG-LG_poi"</span><span class="op">)</span><span class="op">)</span></span>

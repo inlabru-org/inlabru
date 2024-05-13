@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">Niharika Reddy
 Peddinenikalva</h4>
             
-            <h4 data-toc-skip class="date">2024-05-08</h4>
+            <h4 data-toc-skip class="date">2024-05-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_residuals.Rmd</code></div>
@@ -369,11 +369,11 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Type"</span>, <span class="st">"mean.mc_std_err"</span>, <span class="st">"sd.mc_std_err"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="26%">
-<col width="14%">
-<col width="14%">
+<col width="25%">
 <col width="15%">
 <col width="14%">
+<col width="15%">
+<col width="15%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
@@ -387,27 +387,27 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">2.9228364</td>
-<td align="right">24.414517</td>
-<td align="right">-41.413004</td>
-<td align="right">1.4061537</td>
-<td align="right">48.333739</td>
+<td align="right">-0.1213533</td>
+<td align="right">27.307690</td>
+<td align="right">-59.573900</td>
+<td align="right">-2.4495407</td>
+<td align="right">50.375689</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.6228497</td>
-<td align="right">1.220047</td>
-<td align="right">-1.603852</td>
-<td align="right">0.5767537</td>
-<td align="right">3.021791</td>
+<td align="right">0.4482133</td>
+<td align="right">1.423895</td>
+<td align="right">-1.941990</td>
+<td align="right">0.3970695</td>
+<td align="right">3.606417</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">1.4785740</td>
-<td align="right">3.969286</td>
-<td align="right">-5.424097</td>
-<td align="right">1.1169398</td>
-<td align="right">9.290572</td>
+<td align="right">0.7410291</td>
+<td align="right">4.504130</td>
+<td align="right">-8.864522</td>
+<td align="right">0.6261416</td>
+<td align="right">9.564363</td>
 </tr>
 </tbody>
 </table>
@@ -451,13 +451,13 @@ plot.</p>
 <p><img src="2d_lgcp_residuals_files/figure-html/elev-mod-1.png" width="700"></p>
 <p>The residuals of the model when <span class="math inline">\(B =
 W\)</span> are given below:</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="25%">
+<col width="26%">
 <col width="15%">
 <col width="14%">
 <col width="14%">
-<col width="15%">
+<col width="14%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
@@ -471,27 +471,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-22.544076</td>
-<td align="right">26.592684</td>
-<td align="right">-69.58549</td>
-<td align="right">-23.447811</td>
-<td align="right">28.125168</td>
+<td align="right">-26.389800</td>
+<td align="right">28.728272</td>
+<td align="right">-79.44244</td>
+<td align="right">-22.92922</td>
+<td align="right">19.896804</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.543031</td>
-<td align="right">1.269684</td>
-<td align="right">-10.52644</td>
-<td align="right">-8.710515</td>
-<td align="right">-5.959066</td>
+<td align="right">-8.277098</td>
+<td align="right">1.349002</td>
+<td align="right">-10.52971</td>
+<td align="right">-8.40884</td>
+<td align="right">-5.602725</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-10.938238</td>
-<td align="right">3.486368</td>
-<td align="right">-17.29998</td>
-<td align="right">-10.936723</td>
-<td align="right">-4.275191</td>
+<td align="right">-11.001598</td>
+<td align="right">3.460800</td>
+<td align="right">-17.73957</td>
+<td align="right">-11.18165</td>
+<td align="right">-5.082993</td>
 </tr>
 </tbody>
 </table>
@@ -546,27 +546,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">3.3855069</td>
-<td align="right">28.1176068</td>
-<td align="right">-54.511352</td>
-<td align="right">4.4207911</td>
-<td align="right">54.980819</td>
+<td align="right">1.6268599</td>
+<td align="right">27.6398459</td>
+<td align="right">-55.135843</td>
+<td align="right">5.0772047</td>
+<td align="right">53.412470</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.1421038</td>
-<td align="right">0.8702398</td>
-<td align="right">-1.544283</td>
-<td align="right">0.1367535</td>
-<td align="right">1.846153</td>
+<td align="right">0.0859921</td>
+<td align="right">0.8483469</td>
+<td align="right">-1.560291</td>
+<td align="right">0.1571894</td>
+<td align="right">1.789678</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">0.7017097</td>
-<td align="right">4.9406928</td>
-<td align="right">-9.175018</td>
-<td align="right">0.7775336</td>
-<td align="right">10.074841</td>
+<td align="right">0.3878195</td>
+<td align="right">4.8361853</td>
+<td align="right">-9.275107</td>
+<td align="right">0.8933547</td>
+<td align="right">9.776993</td>
 </tr>
 </tbody>
 </table>
@@ -622,27 +622,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-26.523620</td>
-<td align="right">27.158759</td>
-<td align="right">-88.99935</td>
-<td align="right">-25.024232</td>
-<td align="right">20.009348</td>
+<td align="right">-30.172825</td>
+<td align="right">28.842296</td>
+<td align="right">-85.23494</td>
+<td align="right">-27.888299</td>
+<td align="right">20.059873</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.766651</td>
-<td align="right">1.504185</td>
-<td align="right">-10.69160</td>
-<td align="right">-9.023544</td>
-<td align="right">-4.337294</td>
+<td align="right">-8.799447</td>
+<td align="right">1.593930</td>
+<td align="right">-10.67221</td>
+<td align="right">-9.245876</td>
+<td align="right">-4.725310</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.881821</td>
-<td align="right">3.670583</td>
-<td align="right">-18.32225</td>
-<td align="right">-11.383257</td>
-<td align="right">-4.291366</td>
+<td align="right">-12.512862</td>
+<td align="right">3.737615</td>
+<td align="right">-19.36188</td>
+<td align="right">-12.775012</td>
+<td align="right">-5.449811</td>
 </tr>
 </tbody>
 </table>
@@ -704,51 +704,51 @@ residuals for this choice of <span class="math inline">\(B\)</span>.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">41.745187</td>
-<td align="right">17.4596105</td>
-<td align="right">4.878919</td>
-<td align="right">41.555091</td>
-<td align="right">78.191347</td>
+<td align="right">44.922126</td>
+<td align="right">12.6052143</td>
+<td align="right">21.697375</td>
+<td align="right">46.122563</td>
+<td align="right">66.563703</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-43.950583</td>
-<td align="right">10.5303628</td>
-<td align="right">-64.438787</td>
-<td align="right">-42.294571</td>
-<td align="right">-22.908162</td>
+<td align="right">-41.869369</td>
+<td align="right">8.2671023</td>
+<td align="right">-59.198040</td>
+<td align="right">-41.414330</td>
+<td align="right">-28.564446</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">5.191979</td>
-<td align="right">1.0916382</td>
-<td align="right">3.168026</td>
-<td align="right">5.025799</td>
-<td align="right">7.516237</td>
+<td align="right">5.251777</td>
+<td align="right">1.0840779</td>
+<td align="right">3.293311</td>
+<td align="right">5.257568</td>
+<td align="right">7.249297</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">-4.878225</td>
-<td align="right">0.4385972</td>
-<td align="right">-5.584191</td>
-<td align="right">-4.955552</td>
-<td align="right">-3.910827</td>
+<td align="right">-4.904350</td>
+<td align="right">0.4223275</td>
+<td align="right">-5.584550</td>
+<td align="right">-4.942705</td>
+<td align="right">-3.965343</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">15.245354</td>
-<td align="right">2.9575502</td>
-<td align="right">9.409811</td>
-<td align="right">15.321666</td>
-<td align="right">21.502547</td>
+<td align="right">15.638416</td>
+<td align="right">2.4292099</td>
+<td align="right">10.821794</td>
+<td align="right">15.743448</td>
+<td align="right">19.594701</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">-14.959521</td>
-<td align="right">1.7650241</td>
-<td align="right">-18.529219</td>
-<td align="right">-14.905997</td>
-<td align="right">-11.238345</td>
+<td align="right">-14.778930</td>
+<td align="right">1.5687865</td>
+<td align="right">-17.978427</td>
+<td align="right">-14.699265</td>
+<td align="right">-12.282508</td>
 </tr>
 </tbody>
 </table>
@@ -781,75 +781,75 @@ region and its residuals are as displayed below:
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">70.682583</td>
-<td align="right">8.3299817</td>
-<td align="right">55.1015633</td>
-<td align="right">70.394846</td>
-<td align="right">87.158518</td>
+<td align="right">69.838844</td>
+<td align="right">8.3149571</td>
+<td align="right">55.3818528</td>
+<td align="right">69.889766</td>
+<td align="right">85.616671</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-20.974591</td>
-<td align="right">16.8255573</td>
-<td align="right">-54.5627039</td>
-<td align="right">-21.162055</td>
-<td align="right">9.996246</td>
+<td align="right">-23.261310</td>
+<td align="right">16.6606353</td>
+<td align="right">-55.7514728</td>
+<td align="right">-22.902565</td>
+<td align="right">6.927782</td>
 </tr>
 <tr class="odd">
 <td align="left">Scaling_Residuals.3</td>
-<td align="right">-46.622784</td>
-<td align="right">4.6697559</td>
-<td align="right">-54.6588679</td>
-<td align="right">-46.310543</td>
-<td align="right">-37.928668</td>
+<td align="right">-46.097894</td>
+<td align="right">4.2968073</td>
+<td align="right">-55.1487218</td>
+<td align="right">-46.689722</td>
+<td align="right">-38.049561</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">2.902812</td>
-<td align="right">0.7891408</td>
-<td align="right">1.6820298</td>
-<td align="right">2.854335</td>
-<td align="right">4.563685</td>
+<td align="right">2.977423</td>
+<td align="right">0.7488215</td>
+<td align="right">1.7763637</td>
+<td align="right">2.894906</td>
+<td align="right">4.964738</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">3.002530</td>
-<td align="right">0.7746763</td>
-<td align="right">1.8069035</td>
-<td align="right">2.959915</td>
-<td align="right">4.830159</td>
+<td align="right">3.027470</td>
+<td align="right">0.7309457</td>
+<td align="right">1.7693253</td>
+<td align="right">2.943869</td>
+<td align="right">4.729657</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.3</td>
-<td align="right">-5.457607</td>
-<td align="right">0.0564254</td>
-<td align="right">-5.5478286</td>
-<td align="right">-5.464613</td>
-<td align="right">-5.339227</td>
+<td align="right">-5.447803</td>
+<td align="right">0.0532610</td>
+<td align="right">-5.5354803</td>
+<td align="right">-5.457778</td>
+<td align="right">-5.321933</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">11.667065</td>
-<td align="right">1.9474379</td>
-<td align="right">8.6519701</td>
-<td align="right">11.709917</td>
-<td align="right">15.731315</td>
+<td align="right">11.684804</td>
+<td align="right">1.8137086</td>
+<td align="right">8.2006508</td>
+<td align="right">11.471631</td>
+<td align="right">15.717137</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">4.650723</td>
-<td align="right">2.3793889</td>
-<td align="right">0.6788546</td>
-<td align="right">4.542174</td>
-<td align="right">9.221481</td>
+<td align="right">4.509086</td>
+<td align="right">2.1869719</td>
+<td align="right">0.6925766</td>
+<td align="right">4.334815</td>
+<td align="right">9.257582</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.3</td>
-<td align="right">-15.324228</td>
-<td align="right">0.9031891</td>
-<td align="right">-16.9473118</td>
-<td align="right">-15.333524</td>
-<td align="right">-13.571490</td>
+<td align="right">-15.203701</td>
+<td align="right">0.8390585</td>
+<td align="right">-16.7692437</td>
+<td align="right">-15.243215</td>
+<td align="right">-13.409452</td>
 </tr>
 </tbody>
 </table>
