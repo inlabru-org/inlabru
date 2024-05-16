@@ -665,16 +665,32 @@ bru_timings_plot <- function(x) {
     )
   }
 
-  ggplot2::ggplot(x[["bru_timings"]]) +
+  timings <- bru_timings(x)
+
+  ggplot2::ggplot(
+    tidyr::pivot_longer(
+      dplyr::rename(timings, CPU = .data$Time),
+      cols = c("CPU", "System", "Elapsed"),
+      names_to = "Time",
+      values_to = "Value"
+    )
+  ) +
     ggplot2::geom_point(ggplot2::aes(
       .data$Iteration,
-      .data$Time,
+      .data$Value,
       col = .data$Task,
+      shape = .data$Task
     )) +
     ggplot2::geom_line(ggplot2::aes(
       .data$Iteration,
-      .data$Time,
+      .data$Value,
       col = .data$Task,
+      linetype = .data$Time
     )) +
-    ggplot2::scale_y_continuous()
+    ggplot2::scale_y_continuous() +
+    ggplot2::ylab("Time (s)") +
+    ggplot2::guides(
+      color = ggplot2::guide_legend(title = "Task"),
+      linetype = ggplot2::guide_legend(title = "Time")
+    )
 }

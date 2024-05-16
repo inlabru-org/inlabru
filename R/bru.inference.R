@@ -220,6 +220,30 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.7.0.9021"
     }
 
+    if (utils::compareVersion("2.10.1.9007", old_ver) > 0) {
+      message("Upgrading bru_info to 2.10.1.9007")
+      # Update timings info to difftime format
+
+      warning(
+        paste0(
+          "From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.",
+          "\n  Copying old elapsed time to both Elapsed and Time, setting System to zero;",
+          "  Do not over-interpret."
+        ),
+        immediate. = TRUE
+      )
+      conversion <- as.difftime(
+        object[["bru_timings"]][["Time"]],
+        units = "secs"
+      )
+      object[["bru_timings"]][["Time"]] <- conversion
+      object[["bru_timings"]][["System"]] <-
+        as.difftime(rep(0.0, length(conversion)), units = "secs")
+      object[["bru_timings"]][["Elapsed"]] <- conversion
+
+      object[["inlabru_version"]] <- "2.10.1.9007"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(paste0("Upgraded bru_info to ", new_version))
   }
@@ -342,6 +366,27 @@ bru_info.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
   object[["bru_info"]]
 }
+
+
+#' @title Extract timing information from fitted [bru] object
+#' @description
+#' Extracts a data.frame or tibble with information about the `Time` (CPU),
+#' `System`, and `Elapsed` time for each step of a `bru()` run.
+#' @param object A fitted `bru` object
+#' @param ... unused
+#' @export
+bru_timings <- function(object, ...) {
+  UseMethod("bru_timings")
+}
+
+#' @export
+#' @rdname bru_timings
+bru_timings.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+  object[["bru_timings"]]
+}
+
+
 
 
 # Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
@@ -775,7 +820,17 @@ bru <- function(components = ~ Intercept(1),
                 .envir = parent.frame()) {
   stopifnot(bru_safe_inla())
 
-  timing_start <- Sys.time()
+  timing_convert <- function(x) {
+    if (!is.na(x[4])) {
+      x[1] <- x[1] + x[4]
+    }
+    if (!is.na(x[5])) {
+      x[2] <- x[2] + x[5]
+    }
+    x[1:3]
+  }
+
+  timing_start <- timing_convert(proc.time())
 
   # Update default options
   options <- bru_call_options(options)
@@ -851,7 +906,7 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
-  timing_setup <- Sys.time()
+  timing_setup <- timing_convert(proc.time())
 
   # Run iterated INLA
   if (options$bru_run) {
@@ -864,13 +919,15 @@ bru <- function(components = ~ Intercept(1),
     result <- list()
   }
 
-  timing_end <- Sys.time()
+  timing_end <- timing_convert(proc.time())
   result$bru_timings <-
     rbind(
       data.frame(
         Task = c("Preprocess"),
         Iteration = 0L,
-        Time = c(timing_setup - timing_start)
+        Time = as.difftime(c(timing_setup[1] - timing_start[1]), units = "secs"),
+        System = as.difftime(c(timing_setup[2] - timing_start[2]), units = "secs"),
+        Elapsed = as.difftime(c(timing_setup[3] - timing_start[3]), units = "secs")
       ),
       result[["bru_iinla"]][["timings"]]
     )
@@ -908,7 +965,6 @@ bru_rerun <- function(result, options = list()) {
     options = info[["options"]]
   )
 
-  timing_end <- Sys.time()
   new_timings <- result[["bru_iinla"]][["timings"]]$Iteration >
     max(original_timings$Iteration)
   result$bru_timings <-
@@ -3164,12 +3220,21 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 
 iinla <- function(model, lhoods, initial = NULL, options) {
   add_timing <- function(timings, task, iteration = NA_integer_) {
+    AbsTime <- proc.time()
+    if (!is.na(AbsTime[4])) {
+      AbsTime[1] <- AbsTime[1] + AbsTime[4]
+    }
+    if (!is.na(AbsTime[5])) {
+      AbsTime[2] <- AbsTime[2] + AbsTime[2]
+    }
     return(rbind(
       timings,
       data.frame(
         Task = task,
         Iteration = iteration,
-        AbsoluteTime = Sys.time()
+        Time = AbsTime[1],
+        System = AbsTime[2],
+        Elapsed = AbsTime[3]
       )
     ))
   }
@@ -3230,7 +3295,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           data.frame(
             Task = timings$Task[-1],
             Iteration = timings$Iteration[-1] + iteration_offset,
-            Time = diff(timings$AbsoluteTime)
+            Time = as.difftime(diff(timings$Time), units = "secs"),
+            System = as.difftime(diff(timings$System), units = "secs"),
+            Elapsed = as.difftime(diff(timings$Elapsed), units = "secs")
           )
         )
       },

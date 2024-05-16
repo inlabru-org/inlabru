@@ -15,6 +15,9 @@
 * Add filter to limit mapper construction to only the components used in the
   predictor expression, to avoid unused components breaking the initialisation.
   This allows easier testing of multi-likelihood models (version 2.10.1.9006)
+* Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
+  instead of elapsed clock time. Added `bru_timings()` method to extract the timings
+  safely from a fitted `bru` object (version 2.10.1.9007)
 
 # inlabru 2.10.1
 
