@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,8 +210,9 @@ useful</p>
 <span><span class="co">#&gt; [3,] . .          .          .         0.1923363 0.2974006 . . 0.5102631</span></span>
 <span><span class="co">#&gt; [4,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span>
 <span><span class="co">#&gt; [5,] . 0.29227293 0.09984048 .         .         .         . . 0.6078866</span></span>
-<span><span class="co">#&gt; [6,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span>
-<span></span>
+<span><span class="co">#&gt; [6,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_taylor.html">bru_mapper_taylor</a></span><span class="op">(</span>jacobian <span class="op">=</span> <span class="va">A.loc</span><span class="op">[</span><span class="va">index</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_jacobian</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 6 x 9 sparse Matrix of class "dgCMatrix"</span></span>
@@ -221,8 +222,9 @@ useful</p>
 <span><span class="co">#&gt; [3,] . .          .          .         0.1923363 0.2974006 . . 0.5102631</span></span>
 <span><span class="co">#&gt; [4,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span>
 <span><span class="co">#&gt; [5,] . 0.29227293 0.09984048 .         .         .         . . 0.6078866</span></span>
-<span><span class="co">#&gt; [6,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span>
-<span></span>
+<span><span class="co">#&gt; [6,] . 0.02324195 0.36614606 .         .         .         . . 0.6106120</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># For run-time indexing:</span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
@@ -244,7 +246,7 @@ useful</p>
 <div class="section level3">
 <h3 id="group-mapping-with-a-group-mesh">Group mapping with a group mesh<a class="anchor" aria-label="anchor" href="#group-mapping-with-a-group-mesh"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>, group <span class="op">=</span> <span class="va">group.values</span>, group.mesh <span class="op">=</span> <span class="va">group.mesh</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -258,7 +260,7 @@ useful</p>
 </h3>
 <p>Blockwise aggregation can be implemented with a
 <code>bru_mapper_aggregate</code> mapper.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">block_rescale</span> <span class="op">&lt;-</span> <span class="st">"none"</span> <span class="co"># one of "none", "count", "weights", "sum"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span><span class="va">...</span>,</span>
 <span>  weights <span class="op">=</span> <span class="va">weights</span>,</span>
@@ -286,7 +288,7 @@ elements in each block.</li>
 <code>block_rescale = "sum"</code> is not supported by the
 aggregation mapper.</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_pipe.html">bru_mapper_pipe</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -307,7 +309,7 @@ aggregation mapper.</li>
 <div class="section level2">
 <h2 id="inla-spde-make-index">inla.spde.make.index<a class="anchor" aria-label="anchor" href="#inla-spde-make-index"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ngroup</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span><span class="va">nrepl</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span></span>
@@ -326,8 +328,9 @@ aggregation mapper.</li>
 <span><span class="co">#&gt;  Median :5   Median :1.5   Median :2   </span></span>
 <span><span class="co">#&gt;  Mean   :5   Mean   :1.5   Mean   :2   </span></span>
 <span><span class="co">#&gt;  3rd Qu.:7   3rd Qu.:2.0   3rd Qu.:3   </span></span>
-<span><span class="co">#&gt;  Max.   :9   Max.   :2.0   Max.   :3</span></span>
-<span></span>
+<span><span class="co">#&gt;  Max.   :9   Max.   :2.0   Max.   :3</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  field.main <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>,</span>
 <span>  field.group <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="va">ngroup</span><span class="op">)</span>,</span>

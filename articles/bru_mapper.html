@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -487,33 +487,39 @@ values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="exte
 <span>  hidden <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 1 2</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -521,22 +527,25 @@ values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="exte
 <span><span class="co">#&gt; [1] 1 2</span></span></code></pre></div>
 <p>For the <code>bru_mapper_multi</code> class, the <code>multi</code>
 argument provides access to the inner layers of the multi-mapper:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   a b</span></span>
 <span><span class="co">#&gt; 1 1 1</span></span>
 <span><span class="co">#&gt; 2 2 1</span></span>
@@ -544,18 +553,21 @@ argument provides access to the inner layers of the multi-mapper:</p>
 <span><span class="co">#&gt; 4 1 2</span></span>
 <span><span class="co">#&gt; 5 2 2</span></span>
 <span><span class="co">#&gt; 6 3 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
-<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   a b</span></span>
 <span><span class="co">#&gt; 1 1 1</span></span>
 <span><span class="co">#&gt; 2 2 1</span></span>
@@ -582,11 +594,11 @@ default <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link
 mappers can be constructed by the pre-defined <code>bru_mapper</code> S3
 methods. For 2d meshes (<code>fm_mesh_2d</code>,
 <code>inla.mesh</code>),</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>For 1d meshes (<code>fm_mesh_1d</code>,
 <code>inla.mesh.1d</code>),</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models</span></span>
 <span><span class="co"># with degree=1 meshes)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -607,13 +619,13 @@ implementations. More commonly, one would instead start with a basic
 object, and then add methods that know how to use that information. In
 all these cases, the <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code> method should be
 used to properly set the class information:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">new_class</span><span class="op">)</span></span></code></pre></div>
 <p>Implementations can avoid having to define <code>ibm_n</code> and
 <code>ibm_values</code> methods, by instead computing and storing
 <code>n</code>, <code>n_inla</code>, <code>values</code>, and
 <code>values_inla</code> in the mapper object during construction:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span></span>
 <span>  mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
 <span>  new_class <span class="op">=</span> <span class="st">"my_bru_mapper_class_name"</span></span>
@@ -651,7 +663,7 @@ of covariate labels, and store them as a character vector. We also
 include a <code>min_degree</code> parameter to control if an intercept
 (<code>min_degree &lt;= 0</code>) and linear terms
 (<code>min_degree &lt;= 1</code>) should be included in the model.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">is.factor</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -667,7 +679,7 @@ include a <code>min_degree</code> parameter to control if an intercept
 <span>  <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The <code>ibm_n</code> method can compute the value of <span class="math inline">\(n\)</span> from <span class="math inline">\(n=1+p+\frac{p(p+1)}{2}\)</span>:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_n.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="va">p</span> <span class="op">+</span> <span class="va">p</span> <span class="op">*</span> <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
@@ -679,7 +691,7 @@ with <span class="math inline">\(n\)</span> obtained by
 use a character vector, at least for INLA <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> models that
 allow it (we could have an option argument to the
 <code>bru_mapper_p_quadratic</code> constructor to control this):</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_values.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
@@ -699,7 +711,7 @@ are stored in the mapper object, and then return them. If we change the
 <code>.</code> in the method definitions to <code>_</code>, we can end
 the constructor method like this, making subsequent method calls
 faster:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">...</span></span>
 <span>  <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
@@ -713,7 +725,7 @@ faster:</p>
 <p>We can now define the main part of the mapper interface that computes
 the model matrix linking the latent variables to the component effect.
 It’s required that <code>NULL</code> input should return a <span class="math inline">\(0\)</span>-by-<span class="math inline">\(n\)</span> matrix.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_jacobian.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">input</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
