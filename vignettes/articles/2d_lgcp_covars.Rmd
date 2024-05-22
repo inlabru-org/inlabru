@@ -52,7 +52,6 @@ Get the data
 
 ```{r }
 data(gorillas_sf, package = "inlabru")
-gorillas_sf$gcov <- gorillas_sf_gcov()
 ```
 
 This dataset is a list (see `help(gorillas_sf)` for details. Extract the objects
@@ -62,7 +61,7 @@ you need from the list, for convenience:
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
-gcov <- gorillas_sf$gcov
+gcov <- gorillas_sf_gcov()
 ```
 
 Factor covariates
@@ -481,6 +480,7 @@ p2 <- ggplot() +
   gg(e.int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
+library(patchwork)
 p1 | p2
 ```
 
