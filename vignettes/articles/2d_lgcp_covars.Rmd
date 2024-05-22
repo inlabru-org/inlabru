@@ -51,17 +51,18 @@ Get the data
 -----------------------------------
 
 ```{r }
-data(gorillas, package = "inlabru")
+data(gorillas_sf, package = "inlabru")
+gorillas_sf$gcov <- gorillas_sf_gcov()
 ```
 
-This dataset is a list (see `help(gorillas)` for details. Extract the objects
+This dataset is a list (see `help(gorillas_sf)` for details. Extract the objects
 you need from the list, for convenience:
 
 ```{r }
-nests <- gorillas$nests
-mesh <- gorillas$mesh
-boundary <- gorillas$boundary
-gcov <- gorillas$gcov
+nests <- gorillas_sf$nests
+mesh <- gorillas_sf$mesh
+boundary <- gorillas_sf$boundary
+gcov <- gorillas_sf$gcov
 ```
 
 Factor covariates
@@ -73,7 +74,7 @@ Look at the vegetation type, nests and boundary:
 ```{r warning=FALSE,message=FALSE}
 ggplot() +
   gg(gcov$vegetation) +
-  gg(boundary) +
+  gg(boundary, alpha = 0.2) +
   gg(nests, color = "white", cex = 0.5)
 ```
 
@@ -84,7 +85,7 @@ Or, with the mesh:
 ggplot() +
   gg(gcov$vegetation) +
   gg(mesh) +
-  gg(boundary) +
+  gg(boundary, alpha = 0.2) +
   gg(nests, color = "white", cex = 0.5)
 ```
 
@@ -99,7 +100,7 @@ anything), as follows:
 
 
 ```{r warning=FALSE,message=FALSE}
-comp1 <- coordinates ~ vegetation(gcov$vegetation, model = "factor_full") - 1
+comp1 <- geometry ~ vegetation(gcov$vegetation, model = "factor_full") - 1
 ```
 
 Notes:
@@ -112,12 +113,12 @@ an intercept. Instead, we can either use `model="factor_full"` without an interc
 or `model="factor_contrast"`, which does remove the first level.
 
 ```{r warning=FALSE,message=FALSE}
-comp1alt <- coordinates ~ vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
+comp1alt <- geometry ~ vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
 ```
 
 Fit the model as usual:
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
-fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
+fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(geometry = mesh))
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit1.rds")
@@ -125,7 +126,7 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit1 <- readRDS(file = .cache_file)
 } else {
-  fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(coordinates = mesh))
+  fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(geometry = mesh))
   saveRDS(fit1, .cache_file)
 }
 ```
@@ -134,17 +135,18 @@ Predict the intensity, and plot the median intensity surface. (In older versions
 time because we did not have vegetation values outside the mesh so 'inlabru' needed 
 to predict these first. Since v2.0.0, the vegetation has been pre-extended.)
 
-The `predidct` function of `inlabru` takes into its `data` argument a `SpatialPointsDataFrame`, 
-a `SpatialPixelsDataFrame` or a `data.frame`. We can use the `inlabru` function `pixels` to generate
-a `SpatialPixelsDataFrame` only within the boundary, using its `mask` argument, as shown below.
+The `predict` function of `inlabru` takes into its `data` argument an `sf` object or other object
+supported by the predictor evaluation code (for non-geographical data, typically a `data.frame`).
+We can use the `inlabru` function `pixels` to generate
+an `sf` object with points only within the boundary, using its `mask` argument, as shown below.
 
 
 ```{r warning=FALSE,message=FALSE}
-pred.df <- fm_pixels(mesh, mask = boundary, format = "sp")
+pred.df <- fm_pixels(mesh, mask = boundary)
 int1 <- predict(fit1, pred.df, ~ exp(vegetation))
 
 ggplot() +
-  gg(int1) +
+  gg(int1, geom = "tile") + # gg() with sf points and geom = "tile" plots a raster
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests, color = "DarkGreen")
 ```
@@ -171,13 +173,13 @@ pcmatern <- inla.spde2.pcmatern(mesh,
   prior.range = c(0.1, 0.01)
 )
 
-comp2 <- coordinates ~
+comp2 <- geometry ~
   -1 +
   vegetation(gcov$vegetation, model = "factor_full") +
-  mySmooth(coordinates, model = pcmatern)
+  mySmooth(geometry, model = pcmatern)
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
-fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
+fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(geometry = mesh))
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit2.rds")
@@ -185,18 +187,18 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit2 <- readRDS(file = .cache_file)
 } else {
-  fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(coordinates = mesh))
+  fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(geometry = mesh))
   saveRDS(fit2, .cache_file)
 }
 ```
 
-And plot the median intensity surface
+And plot the posterior median intensity surface
 
 ```{r warning=FALSE,message=FALSE}
 int2 <- predict(fit2, pred.df, ~ exp(mySmooth + vegetation), n.samples = 1000)
 
 ggplot() +
-  gg(int2, aes(fill = q0.025)) +
+  gg(int2, aes(fill = q0.5), geom = "tile") +
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests)
 ```
@@ -232,21 +234,21 @@ lprange <- range(lp2$smooth_veg$median, lp2$smooth$median, lp2$veg$median)
 csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
 
 plot.lp2 <- ggplot() +
-  gg(lp2$smooth_veg) +
+  gg(lp2$smooth_veg, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("mySmooth + vegetation")
 
 plot.lp2.spde <- ggplot() +
-  gg(lp2$smooth) +
+  gg(lp2$smooth, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("mySmooth")
 
 plot.lp2.veg <- ggplot() +
-  gg(lp2$veg) +
+  gg(lp2$veg, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
@@ -262,21 +264,21 @@ between models on the basis of DIC, using 'deltaIC()'.
 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
-comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
+comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
 fit3 <- lgcp(comp3,
   data = nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
-comp3 <- coordinates ~ mySmooth(coordinates, model = pcmatern) + Intercept(1)
+comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
 .cache_file <- file.path(.cache_dir, "fit3.rds")
 if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit3 <- readRDS(file = .cache_file)
 } else {
-  fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(coordinates = mesh))
+  fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(geometry = mesh))
   saveRDS(fit3, .cache_file)
 }
 ```
@@ -285,7 +287,7 @@ if ((!.cache_recompute) &&
 int3 <- predict(fit3, pred.df, ~ exp(mySmooth + Intercept))
 
 ggplot() +
-  gg(int3) +
+  gg(int3, geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests)
 ```
@@ -335,7 +337,7 @@ coefficient of variation
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
-  gg(int2, aes(fill = sd / mean)) +
+  gg(int2, aes(fill = sd / mean), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests)
 ```
@@ -376,35 +378,36 @@ for more stable fitting.)
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 elev <- gcov$elevation
-elev$elevation <- elev$elevation - mean(elev$elevation, na.rm = TRUE)
+elev <- elev - mean(terra::values(elev), na.rm = TRUE)
 
 ggplot() +
-  gg(elev) +
+  gg(elev, geom = "tile") +
   gg(boundary, alpha = 0)
 ```
 
-The elevation variable here is of class 'SpatialGridDataFrame', that can be
-handled in the same way as the vegetation covariate. However, since in some
+
+The elevation variable here is of class 'SpatRaster', that can be
+handled in the same way as the vegetation covariate, with automatic evaluation via an `eval_spatial()` method. However, since in some
 cases data may be stored differently, other methods are needed to access
 the stored values, or there's some post-processing to be done.
 In such cases, we can define a function that knows how to
 evaluate the covariate at arbitrary points in the survey region, and call that
-function in the component definition. In this case, we can use a powerful
-method from the 'sp' package to do this. We use this to create the needed
-function.  The method `eval_spatial()` is the method that handles this
+function in the component definition. The method `eval_spatial()` is the method that handles this
 automatically, and supports `terra` `SpatRaster` and `sf` geometry points
 objects, and mismatching coordinate systems as well.  In the following evaluator example
 function, we only add infilling of missing values as a post-processing step.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
+# Note: this method is usually not needed; the automatic invocation of
+# `eval_spatial()` method by the component input evaluator is usually sufficient.
 f.elev <- function(where) {
   # Extract the values
   v <- eval_spatial(elev, where, layer = "elevation")
-  # Fill in missing values
-  if (any(is.na(v))) {
-    v <- bru_fill_missing(elev, where, v)
-  }
+  # Fill in missing values; this example would work for SpatialPixelsDataFrame data
+  # if (any(is.na(v))) {
+  #   v <- bru_fill_missing(elev, where, v)
+  # }
   return(v)
 }
 ```
@@ -420,26 +423,29 @@ matern <- inla.spde2.pcmatern(mesh,
   prior.range = c(0.1, 0.01)
 )
 
-ecomp <- coordinates ~ elev(f.elev(.data.), model = "linear") +
-  mySmooth(coordinates, model = matern) + Intercept(1)
+ecomp <- geometry ~ elev(f.elev(.data.), model = "linear") +
+  mySmooth(geometry, model = matern) + Intercept(1)
 ```
 
-Note how the elevation effect is defined. When we used the `Spatial` grid
-object directly (causing `inlabru` to automatically call `eval_spatial()`)
+Note how the elevation effect is defined. We could alternatively use the `terra` grid
+object directly (causing `inlabru` to automatically call `eval_spatial()`), like
+in the vegetation case:
 we specified it like
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-vegetation(gcov$vegetation, model = "factor_full")
+elev(elev, model = "factor_full")
 ```
-whereas with the function method we specify the covariate like this:
+whereas with the special function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
 elev(f.elev(.data.), model = "linear")
 ```
+Most applications can use the automatic method, and the special function method is
+included only as an example of how to handle more complex cases.
 
-We also now include an intercept term.
+We also now include an intercept term in the model.
 
 The model is fitted in the usual way:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
-efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
+efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(geometry = mesh))
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "efit.rds")
@@ -447,7 +453,7 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   efit <- readRDS(file = .cache_file)
 } else {
-  efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(coordinates = mesh))
+  efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(geometry = mesh))
   saveRDS(efit, .cache_file)
 }
 ```
@@ -467,14 +473,15 @@ Predict and plot the density
 e.int <- predict(efit, pred.df, ~ exp(mySmooth + elev + Intercept))
 e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
 
-ggplot() +
-  gg(e.int, aes(fill = log(sd))) +
+p1 <- ggplot() +
+  gg(e.int, aes(fill = log(sd)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
-ggplot() +
-  gg(e.int.log, aes(fill = exp(mean + sd^2 / 2))) +
+p2 <- ggplot() +
+  gg(e.int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
+p1 | p2
 ```
 
 Now look at the elevation and SPDE effects in space. Leave out the Intercept
@@ -505,21 +512,21 @@ library(RColorBrewer)
 csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
 
 plot.e.lp <- ggplot() +
-  gg(e.lp$smooth_elev, mask = boundary) +
+  gg(e.lp$smooth_elev, mask = boundary, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("SPDE + elevation")
 
 plot.e.lp.spde <- ggplot() +
-  gg(e.lp$smooth, mask = boundary) +
+  gg(e.lp$smooth, mask = boundary, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("SPDE")
 
 plot.e.lp.elev <- ggplot() +
-  gg(e.lp$elev, mask = boundary) +
+  gg(e.lp$elev, mask = boundary, geom = "tile") +
   csc +
   theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
@@ -614,7 +621,7 @@ expression, and disabling normal component evaluation for all components with
 (since we're both bypassing the normal input to the `elev` component, and not
 supplying data for the other components).  From version `2.8.0`, `inlabru` attempts
 to automatically detect which model components are used in the expression, and the
-`include` argument can usually be left out entirely.
+`include` argument can be left out entirely.
 
 Since the elevation effect in this
 model is linear, the resulting plot isn't very interesting, but the same method
@@ -624,8 +631,8 @@ can be applied to non-linear effects as well, and combined into general R expres
 elev.pred <- predict(
   efit,
   data.frame(elevation = seq(0, 100, length.out = 1000)),
-  formula = ~ elev_eval(elevation),
-  include = character(0) # Not needed from version 2.8.0
+  formula = ~ elev_eval(elevation)
+  # include = character(0) # Not needed from version 2.8.0
 )
 
 ggplot(elev.pred) +
