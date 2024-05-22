@@ -243,7 +243,7 @@ vegetation type and elevation.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9007</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,13 +255,13 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.355, Running = 2.75, Post = 0.581, Total = 3.68 </span></span>
+<span><span class="co">#&gt;     Pre = 0.347, Running = 2.67, Post = 0.552, Total = 3.57 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed  0.086 0.351     -0.603    0.086      0.774  0.086   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -6.173 3.465    -13.002   -6.167      0.638 -6.157   0</span></span>
+<span><span class="co">#&gt; Intercept     -6.173 3.464    -13.001   -6.167      0.637 -6.157   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -272,12 +272,12 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; Range for field 2.35 0.654       1.38     2.25       3.92 2.04</span></span>
 <span><span class="co">#&gt; Stdev for field 2.94 0.679       1.88     2.85       4.54 2.66</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1555.97</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1555.96</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 826.72</span></span>
 <span><span class="co">#&gt; Effective number of parameters .....................: 146.78</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1569.59</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 130.85</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1569.57</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 130.84</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -844.69 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
@@ -356,15 +356,10 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span>    E <span class="op">=</span> <span class="va">area</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  *** inla.core.safe:  rerun with improved initial values</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9007</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -376,13 +371,13 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.355, Running = 1.63, Post = 0.144, Total = 2.13 </span></span>
+<span><span class="co">#&gt;     Pre = 0.36, Running = 1.58, Post = 0.134, Total = 2.07 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
-<span><span class="co">#&gt; veg_grassland -1.240 0.377     -1.978   -1.240     -0.501 -1.240   0</span></span>
+<span><span class="co">#&gt; veg_grassland -1.240 0.377     -1.979   -1.240     -0.501 -1.240   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002     -0.001    0.003      0.006  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -5.511 3.432    -12.376   -5.482      1.200 -5.480   0</span></span>
+<span><span class="co">#&gt; Intercept     -5.511 3.432    -12.375   -5.482      1.200 -5.480   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -391,29 +386,29 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                                                         mean    sd 0.025quant</span></span>
 <span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.058 0.036      0.011</span></span>
-<span><span class="co">#&gt; Range for field                                        2.599 0.750      1.475</span></span>
+<span><span class="co">#&gt; Range for field                                        2.599 0.751      1.476</span></span>
 <span><span class="co">#&gt; Stdev for field                                        2.940 0.707      1.845</span></span>
 <span><span class="co">#&gt;                                                        0.5quant 0.975quant</span></span>
-<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1     0.05      0.148</span></span>
-<span><span class="co">#&gt; Range for field                                            2.48      4.402</span></span>
-<span><span class="co">#&gt; Stdev for field                                            2.84      4.610</span></span>
+<span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1     0.05      0.147</span></span>
+<span><span class="co">#&gt; Range for field                                            2.48      4.403</span></span>
+<span><span class="co">#&gt; Stdev for field                                            2.84      4.611</span></span>
 <span><span class="co">#&gt;                                                         mode</span></span>
 <span><span class="co">#&gt; zero-probability parameter for zero-inflated poisson_1 0.031</span></span>
-<span><span class="co">#&gt; Range for field                                        2.254</span></span>
+<span><span class="co">#&gt; Range for field                                        2.253</span></span>
 <span><span class="co">#&gt; Stdev for field                                        2.632</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1553.47</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.37</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.35</span></span>
 <span><span class="co">#&gt; Effective number of parameters .....................: 125.16</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.24</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 109.71</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 109.70</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -845.29 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pred_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zip</span>, <span class="va">counts_df</span>,</span>
@@ -504,7 +499,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 &amp;= E(count) \left(1-\exp(-\lambda) E(count)\right)
 \end{aligned}
 \]</span></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comps</span> <span class="op">&lt;-</span> <span class="op">~</span></span>
 <span>  <span class="fu">Intercept_count</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">veg_disturbed</span><span class="op">(</span><span class="va">gcov_vegetation</span><span class="op">$</span><span class="va">Disturbed</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -559,28 +554,28 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.3, norm1 = 3.618e-14, norm01 = 220.3)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.538e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 220.3</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -3.153e-15</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.768e-14</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 7.263e-16</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.687e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.05589, norm1 = 1.366e-11, norm01 = 0.05589)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.05589</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -1.862e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.366e-11</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04559, norm1 = 7.806e-12, norm01 = 0.04559)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04559</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.596e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.806e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
-<span><span class="co">#&gt; iinla: Max deviation from previous: 0.943% of SD, and line search is inactive [stop if: &lt;10% and line search inactive]</span></span>
+<span><span class="co">#&gt; iinla: Max deviation from previous: 0.727% of SD, and line search is inactive [stop if: &lt;10% and line search inactive]</span></span>
 <span><span class="co">#&gt; iinla: Convergence criterion met, running final INLA integration with known theta mode.</span></span>
 <span><span class="co">#&gt; iinla: Iteration 3 [max:10]</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.10.1.9007</span></span>
-<span><span class="co">#&gt; INLA version: 24.05.13-1</span></span>
+<span><span class="co">#&gt; INLA version: 24.05.22</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -600,14 +595,14 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.554, Running = 3.91, Post = 0.279, Total = 4.74 </span></span>
+<span><span class="co">#&gt;     Pre = 0.525, Running = 3.87, Post = 0.263, Total = 4.66 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.335   -1.266     -0.179  -1.266   0</span></span>
-<span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.459   -1.442     -0.431  -1.442   0</span></span>
-<span><span class="co">#&gt; Intercept_present -10.560 4.192    -19.043  -10.483     -2.497 -10.479   0</span></span>
+<span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
+<span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.460   -1.442     -0.431  -1.442   0</span></span>
+<span><span class="co">#&gt; Intercept_present -10.561 4.192    -19.045  -10.484     -2.498 -10.480   0</span></span>
 <span><span class="co">#&gt; elevation_present   0.004 0.002     -0.001    0.004      0.008   0.004   0</span></span>
-<span><span class="co">#&gt; Intercept_count     2.328 1.442     -0.722    2.371      5.114   2.364   0</span></span>
+<span><span class="co">#&gt; Intercept_count     2.328 1.441     -0.721    2.371      5.114   2.364   0</span></span>
 <span><span class="co">#&gt; elevation           0.001 0.001      0.000    0.001      0.003   0.001   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
@@ -617,19 +612,19 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                          mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field_present 2.358 0.729      1.298    2.236      4.136 1.996</span></span>
-<span><span class="co">#&gt; Stdev for field_present 2.935 0.677      1.869    2.847      4.517 2.660</span></span>
-<span><span class="co">#&gt; Range for field_count   0.489 0.229      0.202    0.439      1.078 0.355</span></span>
+<span><span class="co">#&gt; Range for field_present 2.357 0.729      1.299    2.236      4.136 1.995</span></span>
+<span><span class="co">#&gt; Stdev for field_present 2.935 0.676      1.870    2.847      4.517 2.660</span></span>
+<span><span class="co">#&gt; Range for field_count   0.489 0.229      0.202    0.439      1.077 0.355</span></span>
 <span><span class="co">#&gt; Stdev for field_count   0.703 0.126      0.492    0.691      0.985 0.666</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1605.85</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1605.84</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1161.21</span></span>
 <span><span class="co">#&gt; Effective number of parameters .....................: 160.56</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1602.26</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 131.89</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -872.56 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -872.57 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -651,7 +646,7 @@ parts.</p>
 <div class="section level2">
 <h2 id="predict-intensity-on-the-original-raster-locations">Predict intensity on the original raster locations<a class="anchor" aria-label="anchor" href="#predict-intensity-on-the-original-raster-locations"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zap</span>,</span>
 <span>  <span class="va">counts_df</span>,</span>
@@ -762,7 +757,7 @@ misspecification. When comparing models, the following summary of the
 CPO is often used:</p>
 <p><span class="math display">\[-\sum_{i=1}^n\log(CPO_i)\]</span> where
 smaller values indicate a better model fit.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">zap_pit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">zap_pit</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">fit_zap</span><span class="op">$</span><span class="va">cpo</span><span class="op">$</span><span class="va">pit</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
@@ -826,7 +821,7 @@ predictive mean <span class="math inline">\(E(X_i)\)</span> and variance
 for the median and expectation, respectively. The (negated) Log score is
 a strictly proper score <span class="citation">(Gneiting and Raftery
 2007)</span></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    AE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">count</span> <span class="op">-</span> <span class="va">pred_median</span><span class="op">)</span>,</span>
@@ -864,30 +859,30 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2423661</td>
-<td align="right">0.5605566</td>
-<td align="right">-2.590527</td>
-<td align="right">0.3926893</td>
+<td align="right">0.2424055</td>
+<td align="right">0.5611288</td>
+<td align="right">-2.618241</td>
+<td align="right">0.3927060</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2541952</td>
-<td align="right">0.6001751</td>
-<td align="right">-2.680108</td>
-<td align="right">0.4023803</td>
+<td align="right">0.2544226</td>
+<td align="right">0.6003719</td>
+<td align="right">-2.670022</td>
+<td align="right">0.4024346</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2805980</td>
-<td align="right">0.6551307</td>
-<td align="right">-2.302808</td>
-<td align="right">0.4004767</td>
+<td align="right">0.2797821</td>
+<td align="right">0.6527702</td>
+<td align="right">-2.297009</td>
+<td align="right">0.4001748</td>
 </tr>
 </tbody>
 </table>
 <p>We see that the average scores are very similar between all three
 models</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">counts_df</span><span class="op">$</span><span class="va">geometry</span>, <span class="va">counts_df</span><span class="op">$</span><span class="va">geometry</span>, <span class="va">counts_df</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span><span class="op">)</span></span>
@@ -904,7 +899,7 @@ models</p>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geometry"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"Poisson"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">DS</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -940,7 +935,7 @@ models</p>
 <span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="zip_zap_models_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">df_</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Model</span> <span class="op">==</span> <span class="st">"Poisson"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">LG</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>

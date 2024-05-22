@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-05-16</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-05-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -147,24 +147,26 @@ points from only a sample of plots in the survey region.</p>
 <h2 id="get-the-data">Get the data<a class="anchor" aria-label="anchor" href="#get-the-data"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas_sf</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
 <p>This dataset is a list (see <code><a href="../reference/gorillas.html">help(gorillas)</a></code> for details.
 Extract the the objects you need from the list, for convenience:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
-<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
-<span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span>
-<span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span></span>
+<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">mesh</span></span>
+<span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span></span>
+<span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gorillas_sf.html">gorillas_sf_gcov</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>gorillas</code> data also contains a plot sample subset
 which covers 60% of the survey region.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">plotsample</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">plotsample</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plotdets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">nests</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">4</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">count</span>, x <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">count</span>,</span>
+<span>                x <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
+<span>                y <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Easting"</span>, y <span class="op">=</span> <span class="st">"Northing"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">plotdets</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
@@ -177,7 +179,9 @@ them all).</p>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">4</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">count</span>, x <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">count</span>,</span>
+<span>                x <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
+<span>                y <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">nests</span>, pch <span class="op">=</span> <span class="st">"+"</span>, cex <span class="op">=</span> <span class="fl">4</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Easting"</span>, y <span class="op">=</span> <span class="st">"Northing"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">plotwithall</span><span class="op">)</span></span></code></pre></div>
@@ -199,18 +203,18 @@ the following SPDE setup:</p>
 <code>samplers=</code> argument of the function
 <code><a href="../reference/lgcp.html">lgcp( )</a></code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">my.spde</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span> <span class="fu">my.spde</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">sample</span><span class="op">$</span><span class="va">nests</span>, samplers <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">plots</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">sample</span><span class="op">$</span><span class="va">nests</span>, samplers <span class="op">=</span> <span class="va">sample</span><span class="op">$</span><span class="va">plots</span>, domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Plot the density surface from your fitted model</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span><span class="op">)</span></span>
 <span><span class="va">lambda.sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">pxl</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">my.spde</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lambda.sample.plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">lambda.sample</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">plots</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, col <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">lambda.sample</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">sample</span><span class="op">$</span><span class="va">plots</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, col <span class="op">=</span> <span class="st">"yellow"</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">lambda.sample.plot</span></span></code></pre></div>
 <p><img src="2d_lgcp_plotsampling_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
@@ -236,12 +240,12 @@ complete information in the surveyed plots.</p>
 <span>  <span class="va">Lambda.empirical</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Fit the same model to the full dataset (the points in
-<code>gorillas$nests</code>), or get your previous fit, if you kept it.
-Plot the intensity surface and estimate the integrated intensity</p>
+<code>gorillas_sf$nests</code>), or get your previous fit, if you kept
+it. Plot the intensity surface and estimate the integrated intensity</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span>,</span>
-<span>  samplers <span class="op">=</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span>,</span>
-<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">cmp</span>, <span class="va">nests</span>,</span>
+<span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">lambda.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.all</span>, <span class="va">pxl</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">my.spde</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.all</span>, <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="va">mesh</span>, <span class="va">boundary</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">my.spde</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -252,22 +256,21 @@ Plot the intensity surface and estimate the integrated intensity</p>
 samples gave sufficient information for the overall prediction:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="va">Lambda</span>,</span>
-<span>  <span class="va">Lambda.empirical</span>,</span>
-<span>  <span class="va">Lambda.all</span>,</span>
-<span>  Lambda.all.empirical <span class="op">=</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>  Plots <span class="op">=</span> <span class="va">Lambda</span>,</span>
+<span>  PlotsEmp <span class="op">=</span> <span class="va">Lambda.empirical</span>,</span>
+<span>  All <span class="op">=</span> <span class="va">Lambda.all</span>,</span>
+<span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 656.8753 54.36316 570.1041 652.3836 772.4212 652.3836        5.436316</span></span>
-<span><span class="co">#&gt; 2 646.5616 40.02913 573.8033 643.9233 721.4465 643.9233        4.002913</span></span>
-<span><span class="co">#&gt; 3 668.3723 24.48256 627.6876 666.5534 710.3540 666.5534        2.448256</span></span>
-<span><span class="co">#&gt; 4 647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
-<span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      3.583957</span></span>
-<span><span class="co">#&gt; 2      2.695594</span></span>
-<span><span class="co">#&gt; 3      1.802011</span></span>
-<span><span class="co">#&gt; 4            NA</span></span></code></pre></div>
+<span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; Plots    655.7564 53.12987 550.9976 654.7427 766.1377 654.7427        5.312987</span></span>
+<span><span class="co">#&gt; PlotsEmp 639.0258 40.29019 565.1425 635.1207 726.7271 635.1207        4.029019</span></span>
+<span><span class="co">#&gt; All      669.2546 26.58164 620.6780 670.6565 727.8718 670.6565        2.658164</span></span>
+<span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
+<span><span class="co">#&gt;          sd.mc_std_err</span></span>
+<span><span class="co">#&gt; Plots         3.641723</span></span>
+<span><span class="co">#&gt; PlotsEmp      3.300371</span></span>
+<span><span class="co">#&gt; All           2.151765</span></span>
+<span><span class="co">#&gt; AllEmp              NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
