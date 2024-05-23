@@ -155,7 +155,7 @@ where `n` is the length of the predictor vector.  Note that this shortcut makes 
 
 If `main`, `group`, or `replicate`, is the name of an `sf`, `SpatRaster`, or `Spatial*` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `sf` or `SpatialPoints*` object**. `inlabru` does this by calling the `inlabru::eval_spatial()` method, which supports several covariate storage types.
 
-The shorcut
+The shortcut
 ```{r eval=FALSE}
 ~ my_sp_effect(
   main = a_spatial_object,

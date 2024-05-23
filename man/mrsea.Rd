@@ -11,7 +11,7 @@ A list of objects:
 XXXXX.}
 \item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
 that were surveyed.}
-\item{\code{mesh}:}{ An \code{inla.mesh} object containing a Delaunay triangulation
+\item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a Delaunay triangulation
 mesh (a type of discretization of continuous space) covering the survey region.}
 \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
 survey region.}

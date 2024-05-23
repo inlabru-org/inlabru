@@ -9,7 +9,7 @@
 #'    XXXXX.}
 #'    \item{`samplers`:}{ A `SpatialLinesDataFrame` object containing the transect lines
 #'    that were surveyed.}
-#'    \item{`mesh`:}{ An `inla.mesh` object containing a Delaunay triangulation
+#'    \item{`mesh`:}{ An `fm_mesh_2d` object containing a Delaunay triangulation
 #'    mesh (a type of discretization of continuous space) covering the survey region.}
 #'    \item{`boundary`:}{ An `SpatialPolygonsDataFrame` object defining the boundary of the
 #'    survey region.}
