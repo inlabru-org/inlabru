@@ -39,10 +39,10 @@ navbar:
       - text: Point process examples
       - text: LGCPs - An example in one dimension
         href: articles/1d_lgcp.html
-      - text: LGCPs - An example in two dimensions (sp version)
-        href: articles/2d_lgcp.html
       - text: LGCPs - An example in two dimensions (sf version)
-        href: articles/2d_lgcp_sf.html
+        href: articles/2d_lgcp.html
+      - text: LGCPs - An example in two dimensions (sp version)
+        href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
@@ -91,6 +91,7 @@ redirects:
   - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
   - ["articles/web/svc.html", "articles/svc.html"]
   - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
+  - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
 
 reference:
 - title: "Model construction and estimation"
