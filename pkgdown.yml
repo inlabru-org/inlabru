@@ -8,7 +8,7 @@ articles:
   2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
   2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
   2d_lgcp_residuals: 2d_lgcp_residuals.html
-  2d_lgcp_sf: 2d_lgcp_sf.html
+  2d_lgcp_sp: 2d_lgcp_sp.html
   2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
   2d_lgcp: 2d_lgcp.html
   Apptainer: Apptainer.html
@@ -25,7 +25,7 @@ articles:
   random_fields: random_fields.html
   svc: svc.html
   zip_zap_models: zip_zap_models.html
-last_built: 2024-05-22T23:16Z
+last_built: 2024-05-23T08:32Z
 urls:
   reference: https://inlabru-org.github.io/inlabru/reference
   article: https://inlabru-org.github.io/inlabru/articles
