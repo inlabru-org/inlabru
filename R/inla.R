@@ -339,18 +339,6 @@ inla.stack.mexpand <- function(...,
   stacks
 }
 
-# Stack multiple exposures
-# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
-#
-# @aliases inla.stack.e
-# @param ... observation vectors
-# @return e observation vector
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
-
-inla.stack.e <- function(...) {
-  stop("This function is obsolete and should not be used.")
-}
-
 
 #' Join stacks intended to be run with different likelihoods
 #'
