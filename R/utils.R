@@ -379,6 +379,10 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "sf")) {
+    where <- sf::as_Spatial(where)
+  }
+
   if (inherits(where, "SpatialPoints")) {
     where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
     if (ncol(sp::coordinates(where)) >= 3) {

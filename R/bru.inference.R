@@ -1397,10 +1397,18 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           "    names(domain)   = (", paste0(names(domain), collapse = ", "), ")"
         ))
       }
+      if (inherits(samplers, "Spatial") ||
+          inherits(data, "Spatial") ||
+          inherits(response[["coordinates"]], "Spatial")) {
+        int_format <- "sp"
+      } else {
+        int_format <- NULL
+      }
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
-        int.args = options[["bru_int_args"]]
+        int.args = options[["bru_int_args"]],
+        format = int_format
       )
     }
 

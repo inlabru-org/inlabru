@@ -4,20 +4,22 @@
 
 * Add support for the `scale` parameter to `like()`.
 * Fix regression bug in "bym" model support, where the latent state size
-  wasn't correctly handled by the mapper system (version 2.10.1.9002)
+  wasn't correctly handled by the mapper system (version `2.10.1.9002`)
 * New `toypoints` example data set, for basic modelling examples
-  (version 2.10.1.9003)
+  (version `2.10.1.9003`)
 * Updated convergence plots, reducing random effect aspects to summary statistics,
-  improving speed and visual coherence (version 2.10.1.9004)
+  improving speed and visual coherence (version `2.10.1.9004`)
 * Add options to `bru_convergence_plot()` to control the number of iterations
   shown, and optionally show the initial values that are stored from this version
-  (version 2.10.1.9005)
+  (version `2.10.1.9005`)
 * Add filter to limit mapper construction to only the components used in the
   predictor expression, to avoid unused components breaking the initialisation.
-  This allows easier testing of multi-likelihood models (version 2.10.1.9006)
+  This allows easier testing of multi-likelihood models (version `2.10.1.9006`)
 * Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
   instead of elapsed clock time. Added `bru_timings()` method to extract the timings
-  safely from a fitted `bru` object (version 2.10.1.9007)
+  safely from a fitted `bru` object (version `2.10.1.9007`)
+* Improved backwards compatibility support for `sp` data, by using
+  `fm_int(..., format = "sp")` for `Spatial` data input (version `2.10.1.9008`)
 
 # inlabru 2.10.1
 
