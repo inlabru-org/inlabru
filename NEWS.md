@@ -18,8 +18,8 @@
 * Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
   instead of elapsed clock time. Added `bru_timings()` method to extract the timings
   safely from a fitted `bru` object (version `2.10.1.9007`)
-* Improved backwards compatibility support for `sp` data, by using
-  `fm_int(..., format = "sp")` for `Spatial` data input (version `2.10.1.9008`)
+* Improved backwards compatibility support for `sp` data input for `family = "cp"`
+  (version `2.10.1.9008`)
 
 # inlabru 2.10.1
 
