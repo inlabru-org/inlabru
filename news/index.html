@@ -103,7 +103,7 @@
 <li>Add options to <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code> to control the number of iterations shown, and optionally show the initial values that are stored from this version (version <code>2.10.1.9005</code>)</li>
 <li>Add filter to limit mapper construction to only the components used in the predictor expression, to avoid unused components breaking the initialisation. This allows easier testing of multi-likelihood models (version <code>2.10.1.9006</code>)</li>
 <li>Switch timing mechanism from <code><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time()</a></code> to <code><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time()</a></code> to capture CPU time instead of elapsed clock time. Added <code><a href="../reference/bru_timings.html">bru_timings()</a></code> method to extract the timings safely from a fitted <code>bru</code> object (version <code>2.10.1.9007</code>)</li>
-<li>Improved backwards compatibility support for <code>sp</code> data, by using <code>fm_int(..., format = "sp")</code> for <code>Spatial</code> data input (version <code>2.10.1.9008</code>)</li>
+<li>Improved backwards compatibility support for <code>sp</code> data input for <code>family = "cp"</code> (version <code>2.10.1.9008</code>)</li>
 </ul></div>
 </div>
     <div class="section level2">
