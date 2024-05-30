@@ -92,6 +92,7 @@ redirects:
   - ["articles/web/svc.html", "articles/svc.html"]
   - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
   - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
+  - ["articles/components_vignette.html", "articles/component.html"]
 
 reference:
 - title: "Model construction and estimation"
