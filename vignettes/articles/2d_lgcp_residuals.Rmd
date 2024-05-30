@@ -271,8 +271,7 @@ int1 <- predict(fit1,
 ggplot() +
   gg(int1) +
   gg(boundary, alpha = 0, lwd = 2) +
-  gg(nests, color = "DarkGreen") +
-  coord_equal()
+  gg(nests, color = "DarkGreen")
 
 # Calculate the residuals for the vegetation model
 veg_res <- residual_df(
@@ -325,8 +324,7 @@ int2 <- predict(
 ggplot() +
   gg(int2) +
   gg(boundary, alpha = 0) +
-  gg(nests, shape = "+") +
-  coord_equal()
+  gg(nests, shape = "+")
 ```
 
 The residuals of the model when $B = W$ are given below:
@@ -370,8 +368,7 @@ int3 <- predict(
 ggplot() +
   gg(int3) +
   gg(boundary, alpha = 0) +
-  gg(nests, shape = "+") +
-  coord_equal()
+  gg(nests, shape = "+")
 ```
 
 The residuals of the model when $B = W$ are given below:
@@ -416,8 +413,7 @@ int4 <- predict(
 ggplot() +
   gg(int4) +
   gg(boundary) +
-  gg(nests, shape = "+") +
-  coord_equal()
+  gg(nests, shape = "+")
 ```
 
 The residuals of the model when $B = W$ are given below:

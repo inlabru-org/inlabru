@@ -78,10 +78,10 @@ if (interactive()) {
 }
 \seealso{
 Other inlabru log methods: 
+\code{\link{bru_log}()},
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_new}()},
 \code{\link{bru_log_offset}()},
-\code{\link{bru_log_reset}()},
-\code{\link{bru_log}()}
+\code{\link{bru_log_reset}()}
 }
 \concept{inlabru log methods}

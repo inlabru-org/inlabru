@@ -524,20 +524,84 @@ test_that("Collect mapper, automatic construction", {
 })
 
 
+
+test_that("Collect mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  graph <- Matrix::sparseMatrix(
+    i = c(1, 2, 3, 2, 3, 4),
+    j = c(2, 3, 4, 1, 2, 3),
+    x = rep(1, 6),
+    dims = c(4, 4)
+  )
+
+  set.seed(12345L)
+  data <- data.frame(
+    y = 4 + rnorm(6),
+    x = c(1, 2, 3, 2, 3, 4)
+  )
+
+  fit_inla <- INLA::inla(y ~ 1 + f(x, model = "bym", graph = graph),
+    data = data
+  )
+
+  expect_error(
+    {
+      fit_bru <-
+        bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
+          data = data,
+          options = list(bru_initial = list(field = rep(10, 8)))
+        )
+    },
+    NA
+  )
+})
+
+
+
 test_that("Marginal mapper", {
-  m1 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  m1 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
   state0 <- -5:5
   val1 <- ibm_eval(m1, state = state0)
 
   state1 <- ibm_eval(m1, state = val1, reverse = TRUE)
   expect_equal(state1, state0)
 
-  m2 <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8, inverse = TRUE)
+  m2 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8, inverse = TRUE)
   state2 <- ibm_eval(m2, state = val1)
   expect_equal(state2, state0)
 
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
+
+  dqexp <- function(p, rate = 1, lower.tail = TRUE, log.p = FALSE, log = FALSE) {
+    if (log.p) {
+      if (lower.tail) {
+        val <- log1p(-exp(p)) + log(rate)
+      } else {
+        val <- p + log(rate)
+      }
+    } else {
+      if (lower.tail) {
+        val <- log1p(-p) + log(rate)
+      } else {
+        val <- log(p) + log(rate)
+      }
+    }
+    if (log) {
+      return(val)
+    }
+    return(exp(val))
+  }
+  m1_d <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  m1_dq <- bru_mapper_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
+  jac1 <- ibm_jacobian(m1, state = state0)
+  jac1_d <- ibm_jacobian(m1_d, state = state0)
+  jac1_dq <- ibm_jacobian(m1_dq, state = state0)
+  # rbind(diag(jac1), diag(jac1_d), diag(jac1_dq))
+  expect_equal(sum(abs(diag(jac1) - diag(jac1_d))), 0, tolerance = lowtol)
+  expect_equal(sum(abs(diag(jac1_d) - diag(jac1_dq))), 0, tolerance = lowtol)
 })
 
 

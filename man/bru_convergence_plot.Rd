@@ -4,11 +4,29 @@
 \alias{bru_convergence_plot}
 \title{Plot inlabru convergence diagnostics}
 \usage{
-bru_convergence_plot(x)
+bru_convergence_plot(x, from = 1, to = NULL)
 }
 \arguments{
 \item{x}{a \link{bru} object, typically a result from \code{\link[=bru]{bru()}} for a nonlinear
 predictor model}
+
+\item{from, to}{integer values for the range of iterations to plot.
+Default \code{from = 1} (start from the first iteration) and \code{to = NULL} (end at the last iteration).
+Set \code{from = 0} to include the initial linearisation point in the track plot.}
+}
+\value{
+A ggplot object with four panels of convergence diagnostics:
+\itemize{
+\item \code{Tracks}: Mode and linearisation values for each effect
+\item \code{Mode - Lin}: Difference between mode and linearisation values for each effect
+\item \verb{|Change| / sd}: Absolute change in mode and linearisation values
+divided by the standard deviation for each effect
+\item \code{Change & sd}: Absolute change in mode and linearisation values
+and standard deviation for each effect
+}
+
+For multidimensional components, only the overall average, maximum, and
+minimum values are shown.
 }
 \description{
 Draws four panels of convergence diagnostics for an iterated INLA method
@@ -23,4 +41,7 @@ packages to be installed.
 fit <- bru(...)
 bru_convergence_plot(fit)
 }
+}
+\seealso{
+\code{\link[=bru]{bru()}}
 }

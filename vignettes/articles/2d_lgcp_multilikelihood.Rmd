@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 Introduction
 ----------------
-For this vignette we are going to be working with the inlabru's ´gorillas´ dataset which was originally obtained from 
+For this vignette we are going to be working with the inlabru's ´gorillas_sf´ dataset which was originally obtained from 
 the `R` package `spatstat`. The data set contains two types of gorillas nests which are marked as either major or minor. We will set up a multi-likelihood model for these nests which creates two spatial LGCPs that share a common intercept but have employ different spatial smoothers.
 
 
@@ -45,17 +45,16 @@ the `R` package `spatstat`, which contains the locations of 647 gorilla nests. W
 dataset like this:
 
 ```{r }
-data(gorillas, package = "inlabru")
+data(gorillas_sf, package = "inlabru")
 ```
 
 Plot the nests and visualize the group membership (major/minor) by color:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
-  gg(gorillas$mesh) +
-  gg(gorillas$nests, aes(color = group)) +
-  gg(gorillas$boundary) +
-  coord_fixed() +
+  gg(gorillas_sf$mesh) +
+  gg(gorillas_sf$nests, aes(color = group)) +
+  gg(gorillas_sf$boundary, alpha = 0) +
   ggtitle("Gorillas nests and group membership")
 ```
 
@@ -67,14 +66,14 @@ First, we define all components that enter the joint model. That is, the interce
 the two different spatial smoothers, one for each nest group.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-matern <- inla.spde2.pcmatern(gorillas$mesh,
+matern <- inla.spde2.pcmatern(gorillas_sf$mesh,
   prior.range = c(0.1, 0.01),
   prior.sigma = c(1, 0.01)
 )
 
 cmp <- ~
-  Common(coordinates, model = matern) +
-    Difference(coordinates, model = matern) +
+  Common(geometry, model = matern) +
+    Difference(geometry, model = matern) +
     Intercept(1)
 ```
 
@@ -82,23 +81,23 @@ Given these components we define the linear predictor for each of the likelihood
 (Using "." indicates a pure additive model, and one can use include/exclude
 options for `like()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.major <- coordinates ~ Intercept + Common + Difference / 2
-fml.minor <- coordinates ~ Intercept + Common - Difference / 2
+fml.major <- geometry ~ Intercept + Common + Difference / 2
+fml.minor <- geometry ~ Intercept + Common - Difference / 2
 ```
 
 Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 lik_minor <- like("cp",
   formula = fml.major,
-  data = gorillas$nests[gorillas$nests$group == "major", ],
-  samplers = gorillas$boundary,
-  domain = list(coordinates = gorillas$mesh)
+  data = gorillas_sf$nests[gorillas_sf$nests$group == "major", ],
+  samplers = gorillas_sf$boundary,
+  domain = list(geometry = gorillas_sf$mesh)
 )
 lik_major <- like("cp",
   formula = fml.minor,
-  data = gorillas$nests[gorillas$nests$group == "minor", ],
-  samplers = gorillas$boundary,
-  domain = list(coordinates = gorillas$mesh)
+  data = gorillas_sf$nests[gorillas_sf$nests$group == "minor", ],
+  samplers = gorillas_sf$boundary,
+  domain = list(geometry = gorillas_sf$mesh)
 )
 ```
 ... which we provide to the ´bru´ function.
@@ -114,13 +113,13 @@ jfit <- bru(cmp, lik_major, lik_minor,
 ```{r, warning=FALSE,fig.width=8}
 library(patchwork)
 pl.major <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit$summary.random$Common$mean)
   )
 pl.minor <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit$summary.random$Difference$mean)
   )
 (pl.major + scale_fill_continuous(trans = "log")) +
@@ -143,13 +142,13 @@ jfit <- bru_rerun(jfit)
 ```{r, warning=FALSE,fig.width=8}
 library(patchwork)
 pl.major <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit$summary.random$Common$mean)
   )
 pl.minor <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit$summary.random$Difference$mean)
   )
 (pl.major + scale_fill_continuous(trans = "log")) +
@@ -169,20 +168,20 @@ summary(jfit)
 
 In this particular model, we can also rewrite the problem as a single point process
 over a product domain over space and `group`.  In versions `<= 2.7.0`, the integration
-domain has to be numeric, so we convert the group variable to a 0/1 variable,
-`group_major <- group == "major"`.
+domain had to be numeric, so we convert the group variable to a 0/1 variable,
+`group_major <- group == "major"`, which is also useful in the predictor expression:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.joint <- coordinates + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
+fml.joint <- geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
 ```
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-gorillas$nests$group_major <- gorillas$nests$group == "major"
+gorillas_sf$nests$group_major <- gorillas_sf$nests$group == "major"
 lik_joint <- like("cp",
   formula = fml.joint,
-  data = gorillas$nests,
-  samplers = gorillas$boundary,
+  data = gorillas_sf$nests,
+  samplers = gorillas_sf$boundary,
   domain = list(
-    coordinates = gorillas$mesh,
+    geometry = gorillas_sf$mesh,
     group_major = c(0, 1)
   )
 )
@@ -191,8 +190,7 @@ lik_joint <- like("cp",
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
-    control.inla = list(int.strategy = "eb"),
-    bru_max_iter = 2
+    control.inla = list(int.strategy = "eb") # Approximate for faster vignette
   )
 )
 ```
@@ -202,14 +200,14 @@ the old confirms that the results are the same up to small numerical differences
 ```{r, warning=FALSE,fig.width=8}
 library(patchwork)
 pl.major <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit_joint$summary.random$Common$mean -
       jfit$summary.random$Common$mean)
   )
 pl.minor <- ggplot() +
-  gg(gorillas$mesh,
-    mask = gorillas$boundary,
+  gg(gorillas_sf$mesh,
+    mask = gorillas_sf$boundary,
     col = exp(jfit_joint$summary.random$Difference$mean -
       jfit$summary.random$Difference$mean)
   )

@@ -1,8 +1,8 @@
 ---
-title: "Examples on the inlabru website"
+title: "Articles list"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Examples on the inlabru website}
+  %\VignetteIndexEntry{Articles list}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

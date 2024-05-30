@@ -14,7 +14,7 @@ evaluate_effect_single_state(...)
 
 evaluate_effect_multi_state(...)
 
-\method{evaluate_effect_single_state}{bru_mapper}(component, input, state, ...)
+\method{evaluate_effect_single_state}{bru_mapper}(component, input, state, ..., label = NULL)
 
 \method{evaluate_effect_single_state}{comp_simple_list}(components, input, state, ...)
 
@@ -27,7 +27,7 @@ evaluate_effect_multi_state(...)
 \arguments{
 \item{...}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
 
-\item{component}{A \code{bru_component}, \code{comp_simple}, or \code{comp_simple_list}.}
+\item{component}{A \code{bru_mapper}, \code{bru_component}, \code{comp_simple}, or \code{comp_simple_list}.}
 
 \item{input}{Pre-evaluated component input}
 
@@ -38,6 +38,9 @@ evaluate_effect_multi_state(...)
 \item \verb{evaluate_effect_single_state.*_list}: list of named state vectors.
 \item \verb{evaluate_effect_multi_state.*_list}: list of lists of named state vectors.
 }}
+
+\item{label}{Option label used for any warning messages, specifying the
+affected component.}
 }
 \value{
 \itemize{

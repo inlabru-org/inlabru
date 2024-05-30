@@ -19,7 +19,7 @@
 #'    \item{`ppoly`:}{ An `SpatialPolygonsDataFrame` object defining the boundary of the
 #'    survey region.}
 #'    \item{`simulated`:}{ A `SpatialPointsDataFrame` object containing the locations of a
-#'    *simulated* population of dolphin groups. The population was simulated from a 'code{inlabru}
+#'    *simulated* population of dolphin groups. The population was simulated from a `inlabru`
 #'    model fitted to the actual survey data. Note that the simulated data do not have any associated
 #'    size information.}
 #'  }
@@ -38,9 +38,7 @@
 #'
 #' @examples
 #' \donttest{
-#' if (bru_safe_inla(quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE) &&
-#'   require("ggpolypath", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE)) {
 #'   data(mexdolphin, package = "inlabru")
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +
@@ -56,8 +54,7 @@
 #' }
 #' \dontrun{
 #' if (requireNamespace("ggmap", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE) &&
-#'   require("ggpolypath", quietly = TRUE)) {
+#'   require("ggplot2", quietly = TRUE)) {
 #'   gmap(mexdolphin$depth) +
 #'     gm(mexdolphin$ppoly, color = "blue") +
 #'     gm(mexdolphin$samplers) +
@@ -92,7 +89,7 @@
 #'    \item{`ppoly`:}{ An `sf` object defining the boundary of the
 #'    survey region.}
 #'    \item{`simulated`:}{ A `sf` object containing the locations of a
-#'    *simulated* population of dolphin groups. The population was simulated from a 'code{inlabru}
+#'    *simulated* population of dolphin groups. The population was simulated from a `inlabru`
 #'    model fitted to the actual survey data. Note that the simulated data do not have any associated
 #'    size information.}
 #'  }
@@ -111,8 +108,7 @@
 #'
 #' @examples
 #' \donttest{
-#' if (require("ggplot2", quietly = TRUE) &&
-#'   require("ggpolypath", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE)) {
 #'   data(mexdolphin_sf, package = "inlabru")
 #'   ggplot() +
 #'     gg(mexdolphin_sf$mesh) +
@@ -123,20 +119,6 @@
 #'
 #'   ggplot() +
 #'     gg(mexdolphin_sf$mesh, color = mexdolphin_sf$lambda, mask = mexdolphin_sf$ppoly)
-#' }
-#' }
-#' \dontrun{
-#' if (requireNamespace("ggmap", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE) &&
-#'   require("ggpolypath", quietly = TRUE)) {
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$ppoly, color = "blue") +
-#'     gm(mexdolphin$samplers) +
-#'     gm(mexdolphin$points, aes(size = size), color = "red")
-#'
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$depth, aes(col = depth)) +
-#'     gm(mexdolphin$ppoly)
 #' }
 #' }
 "mexdolphin_sf"

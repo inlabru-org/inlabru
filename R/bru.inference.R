@@ -220,6 +220,30 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.7.0.9021"
     }
 
+    if (utils::compareVersion("2.10.1.9007", old_ver) > 0) {
+      message("Upgrading bru_info to 2.10.1.9007")
+      # Update timings info to difftime format
+
+      warning(
+        paste0(
+          "From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.",
+          "\n  Copying old elapsed time to both Elapsed and Time, setting System to zero;",
+          "  Do not over-interpret."
+        ),
+        immediate. = TRUE
+      )
+      conversion <- as.difftime(
+        object[["bru_timings"]][["Time"]],
+        units = "secs"
+      )
+      object[["bru_timings"]][["Time"]] <- conversion
+      object[["bru_timings"]][["System"]] <-
+        as.difftime(rep(0.0, length(conversion)), units = "secs")
+      object[["bru_timings"]][["Elapsed"]] <- conversion
+
+      object[["inlabru_version"]] <- "2.10.1.9007"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(paste0("Upgraded bru_info to ", new_version))
   }
@@ -344,6 +368,27 @@ bru_info.bru <- function(object, ...) {
 }
 
 
+#' @title Extract timing information from fitted [bru] object
+#' @description
+#' Extracts a data.frame or tibble with information about the `Time` (CPU),
+#' `System`, and `Elapsed` time for each step of a `bru()` run.
+#' @param object A fitted `bru` object
+#' @param ... unused
+#' @export
+bru_timings <- function(object, ...) {
+  UseMethod("bru_timings")
+}
+
+#' @export
+#' @rdname bru_timings
+bru_timings.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+  object[["bru_timings"]]
+}
+
+
+
+
 # Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
 bru_used_upgrade <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
@@ -385,7 +430,7 @@ bru_used_upgrade <- function(lhoods, labels) {
 #' @param x Object to be updated
 #' @param labels character vector of component labels
 #' @param ... Unused
-#'
+#' @returns An updated version of `x`
 #' @keywords internal
 #' @export
 #' @family bru_used
@@ -484,12 +529,14 @@ bru_used.default <- function(x = NULL, ...,
     ))
   }
 
-  used <- list(
-    effect = effect,
-    latent = latent
+  used <- structure(
+    list(
+      effect = effect,
+      latent = latent
+    ),
+    class = "bru_used"
   )
   used[["effect_exclude"]] <- effect_exclude
-  class(used) <- c("bru_used", class(used))
 
   if (!is.null(labels)) {
     used <- bru_used_update(used, labels = labels)
@@ -706,6 +753,16 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 }
 
 
+#' @describeIn bru_used Print method for `bru_used` objects.
+#' @export
+print.bru_used <- function(x, ...) {
+  cat("Used effects : ", paste0(x$effect, collapse = ", "), "\n", sep = "")
+  cat("Used latent  : ", paste0(x$latent, collapse = ", "), "\n", sep = "")
+  if (!is.null(x$effect_exclude)) {
+    cat("Excluded     : ", paste0(x$effect_exclude, collapse = ", "), "\n", sep = "")
+  }
+  invisible(x)
+}
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
@@ -763,7 +820,17 @@ bru <- function(components = ~ Intercept(1),
                 .envir = parent.frame()) {
   stopifnot(bru_safe_inla())
 
-  timing_start <- Sys.time()
+  timing_convert <- function(x) {
+    if (!is.na(x[4])) {
+      x[1] <- x[1] + x[4]
+    }
+    if (!is.na(x[5])) {
+      x[2] <- x[2] + x[5]
+    }
+    x[1:3]
+  }
+
+  timing_start <- timing_convert(proc.time())
 
   # Update default options
   options <- bru_call_options(options)
@@ -839,7 +906,7 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
-  timing_setup <- Sys.time()
+  timing_setup <- timing_convert(proc.time())
 
   # Run iterated INLA
   if (options$bru_run) {
@@ -852,13 +919,15 @@ bru <- function(components = ~ Intercept(1),
     result <- list()
   }
 
-  timing_end <- Sys.time()
+  timing_end <- timing_convert(proc.time())
   result$bru_timings <-
     rbind(
       data.frame(
         Task = c("Preprocess"),
         Iteration = 0L,
-        Time = c(timing_setup - timing_start)
+        Time = as.difftime(c(timing_setup[1] - timing_start[1]), units = "secs"),
+        System = as.difftime(c(timing_setup[2] - timing_start[2]), units = "secs"),
+        Elapsed = as.difftime(c(timing_setup[3] - timing_start[3]), units = "secs")
       ),
       result[["bru_iinla"]][["timings"]]
     )
@@ -896,7 +965,6 @@ bru_rerun <- function(result, options = list()) {
     options = info[["options"]]
   )
 
-  timing_end <- Sys.time()
   new_timings <- result[["bru_iinla"]][["timings"]]$Iteration >
     max(original_timings$Iteration)
   result$bru_timings <-
@@ -1135,7 +1203,9 @@ extended_bind_rows <- function(...) {
 #' @param mesh Deprecated.
 #' @param E Exposure parameter for family = 'poisson' passed on to
 #'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by E. Default taken from `options$E`, normally `1`.
+#'   weights by a scalar E. For sampler specific reweighting/effort, use a `weight`
+#'   column in the `samplers` object, see [fmesher::fm_int()].
+#'   Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'  likelihood. Default taken from `options$Ntrials`, normally `1`.
 #' @param weights Fixed (optional) weights parameters of the likelihood,
@@ -1143,6 +1213,8 @@ extended_bind_rows <- function(...) {
 #' Default value is `1`. WARNING: The normalizing constant for the likelihood
 #' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 #' interpreted with great care.
+#' @param scale Fixed (optional) scale parameters of the precision for several
+#'  models, such as Gaussian and student-t response models.
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
@@ -1178,7 +1250,7 @@ extended_bind_rows <- function(...) {
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments (`E`,
-#'   `Ntrials`, and `weights`) if not found in `response_data` or `data`.
+#'   `Ntrials`, `weights`, and `scale`) if not found in `response_data` or `data`.
 #'   Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
@@ -1187,7 +1259,11 @@ extended_bind_rows <- function(...) {
 
 like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  response_data = NULL, # agg
-                 mesh = deprecated(), E = NULL, Ntrials = NULL, weights = NULL,
+                 mesh = deprecated(),
+                 E = NULL,
+                 Ntrials = NULL,
+                 weights = NULL,
+                 scale = NULL,
                  samplers = NULL, ips = NULL, domain = NULL,
                  include = NULL,
                  exclude = NULL,
@@ -1296,6 +1372,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     default = 1,
     .envir = .envir
   )
+  scale <- eval_in_data_context(
+    substitute(scale),
+    data = data,
+    response_data = response_data,
+    default = 1,
+    .envir = .envir
+  )
 
   # More on special bru likelihoods
   if (family == "cp") {
@@ -1312,13 +1395,19 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
           "Mismatch between names of observed dimensions and the given domain names:\n",
           "    names(response) = (", paste0(names(response), collapse = ", "), ")\n",
           "    names(domain)   = (", paste0(names(domain), collapse = ", "), ")"
-          ))
+        ))
       }
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
         int.args = options[["bru_int_args"]]
       )
+      if ((inherits(samplers, "Spatial") ||
+          inherits(data, "Spatial") ||
+          inherits(response[["coordinates"]], "Spatial")) &&
+          inherits(ips, "sf")) {
+        ips <- sf::as_Spatial(ips)
+      }
     }
 
     if (length(E) > 1) {
@@ -1479,7 +1568,8 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     response_data <- list(
       BRU_response = response,
       BRU_E = E,
-      BRU_Ntrials = Ntrials
+      BRU_Ntrials = Ntrials,
+      BRU_scale = scale
     )
     response <- "BRU_response"
   }
@@ -1516,6 +1606,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     E = E,
     Ntrials = Ntrials,
     weights = weights,
+    scale = scale,
     samplers = samplers,
     linear = linear,
     expr = expr,
@@ -1772,7 +1863,7 @@ bru_like_expr <- function(lhood, components) {
 #'   factor.
 #' @param options See [bru_options_set()]
 #' @param .envir The evaluation environment to use for special arguments
-#' (`E`, `Ntrials`, and `weights`) if not found in response_data or data.
+#' (`E`, `Ntrials`, `weights`, `scale`) if not found in response_data or data.
 #' Defaults to the calling environment.
 #' @return An [bru()] object
 #' @examples
@@ -2144,7 +2235,6 @@ predict.bru <- function(object,
 #'
 #' @return List of generated samples
 #' @seealso [predict.bru]
-#' @example inst/examples/generate.bru.R
 #' @rdname generate
 
 generate.bru <- function(object,
@@ -3136,12 +3226,21 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 
 iinla <- function(model, lhoods, initial = NULL, options) {
   add_timing <- function(timings, task, iteration = NA_integer_) {
+    AbsTime <- proc.time()
+    if (!is.na(AbsTime[4])) {
+      AbsTime[1] <- AbsTime[1] + AbsTime[4]
+    }
+    if (!is.na(AbsTime[5])) {
+      AbsTime[2] <- AbsTime[2] + AbsTime[2]
+    }
     return(rbind(
       timings,
       data.frame(
         Task = task,
         Iteration = iteration,
-        AbsoluteTime = Sys.time()
+        Time = AbsTime[1],
+        System = AbsTime[2],
+        Elapsed = AbsTime[3]
       )
     ))
   }
@@ -3154,6 +3253,24 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
+    if (is.null(original_track)) {
+      track_df <- list()
+      for (label in names(states[[1]])) {
+        if (length(states[[1]][[label]]) > 0) {
+          track_df[[label]] <-
+            data.frame(
+              effect = label,
+              index = seq_along(states[[1]][[label]]),
+              iteration = 0,
+              mode = NA_real_,
+              sd = NA_real_,
+              new_linearisation = states[[1]][[label]]
+            )
+        }
+      }
+      original_track <- do.call(rbind, track_df)
+    }
+
     list(
       log = c(original_log, bru_log()["iinla"]),
       states = states,
@@ -3162,7 +3279,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         setequal(names(original_track), names(track[[1]]))) {
         do.call(rbind, c(list(original_track), track))
       } else {
-        track <- do.call(rbind, track)
+        track <- do.call(dplyr::bind_rows, track)
         original_names <- names(original_track)
         new_names <- names(track)
         for (nn in setdiff(new_names, original_names)) {
@@ -3171,7 +3288,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         for (nn in setdiff(original_names, new_names)) {
           track[[nn]] <- NA
         }
-        rbind(original_track, track)
+        dplyr::bind_rows(original_track, track)
       },
       timings = {
         iteration_offset <- if (is.null(original_timings)) {
@@ -3184,7 +3301,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           data.frame(
             Task = timings$Task[-1],
             Iteration = timings$Iteration[-1] + iteration_offset,
-            Time = diff(timings$AbsoluteTime)
+            Time = as.difftime(diff(timings$Time), units = "secs"),
+            System = as.difftime(diff(timings$System), units = "secs"),
+            Elapsed = as.difftime(diff(timings$Elapsed), units = "secs")
           )
         )
       },
@@ -3460,6 +3579,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           E = stk.data[["BRU.E"]],
           Ntrials = stk.data[["BRU.Ntrials"]],
           weights = stk.data[["BRU.weights"]],
+          scale = stk.data[["BRU.scale"]],
           offset = stk.data[["BRU.offset"]]
         )
       )

@@ -63,14 +63,17 @@ bru_model <- function(components, lhoods) {
   # Back up environment
   env <- environment(components)
 
-  # Complete the component definitions based on data
-  components <- component_list(components, lhoods)
-
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
+
+  # Detect linearity
   linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
+  # TODO: detect pure effect additivity (allowing nonlinear components)
+
+  # Complete the used component definitions based on data
+  components <- component_list(components[included], lhoods)
 
   for (cmp in included) {
     if (linear ||
@@ -80,6 +83,7 @@ bru_model <- function(components, lhoods) {
   }
 
   # Restore environment
+  environment(components) <- env
   environment(formula) <- env
 
   # Make model
@@ -268,7 +272,7 @@ evaluate_effect_multi_state <- function(...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component A `bru_component`, `comp_simple`, or `comp_simple_list`.
+#' @param component A `bru_mapper`, `bru_component`, `comp_simple`, or `comp_simple_list`.
 #' @param input Pre-evaluated component input
 #' @param state Specification of one (for `evaluate_effect_single_state`) or several
 #' (for `evaluate_effect_multi_State`) latent variable states:
@@ -276,13 +280,33 @@ evaluate_effect_multi_state <- function(...) {
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
 #' * `evaluate_effect_multi_state.*_list`: list of lists of named state vectors.
 #' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
+#' @param label Option label used for any warning messages, specifying the
+#' affected component.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname evaluate_effect
 
 evaluate_effect_single_state.bru_mapper <- function(component, input, state,
-                                                    ...) {
+                                                    ...,
+                                                    label = NULL) {
   values <- ibm_eval(component, input = input, state = state, ...)
+
+  not_ok <- ibm_invalid_output(
+    component,
+    input = input,
+    state = state
+  )
+  if (any(not_ok)) {
+    if (is.null(label)) {
+      warning("Inputs for a mapper give some invalid outputs.",
+        immediate. = TRUE
+      )
+    } else {
+      warning("Inputs for '", label, "' give some invalid outputs.",
+        immediate. = TRUE
+      )
+    }
+  }
 
   as.vector(as.matrix(values))
 }
@@ -302,7 +326,8 @@ evaluate_effect_single_state.comp_simple_list <- function(components,
       components[[label]],
       input = input[[label]],
       state = state[[label]],
-      ...
+      ...,
+      label = label
     )
   }
   result
@@ -471,7 +496,16 @@ evaluate_predictor <- function(model,
           input = .input,
           state = .state
         )
-        if (.is_iid) {
+        if (!.is_iid) {
+          not_ok <- ibm_invalid_output(
+            .mapper[["mappers"]][[1]],
+            input = .input[[1]],
+            state = .state
+          )
+          if (any(not_ok)) {
+            warning("Inputs for `ibm_eval()` for '", .comp[["label"]], '" give some invalid outputs.')
+          }
+        } else { # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the
           # initial mapper (subsequent mappers in the component pipe
           # are assumed to keep the same length and validity)

@@ -20,7 +20,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -35,6 +35,11 @@ jobs:
           dependencies: '"all"'
           extra-packages: any::covr
           needs: coverage
+
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
 
       - name: Session info
         run: |
@@ -62,7 +67,7 @@ jobs:
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package

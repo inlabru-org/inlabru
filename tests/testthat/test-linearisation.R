@@ -67,6 +67,7 @@ test_that("Linearisation", {
             BRU.E = lh[["E"]],
             BRU.Ntrials = lh[["Ntrials"]],
             BRU.weights = lh[["weights"]],
+            BRU.scale = lh[["scale"]],
             BRU.offset = as.vector(lin_off)
           ),
           A = lapply(nms, function(nm) {

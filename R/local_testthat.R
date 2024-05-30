@@ -211,6 +211,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
     local_bru_options_set(num.threads = "1:1", envir = envir)
   }
   testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
+  # Ignore spurious warnings for INLA 23.12.17. Is fixed in later INLA versions:
+  assign(
+    "processed.status.for.model.scopy.in.section.latent",
+    TRUE,
+    INLA::inla.get.inlaEnv()
+  )
 }
 
 
@@ -230,9 +236,20 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     envir = envir
   )
   if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
-    old_sp_evolution_status <- sp::get_evolution_status()
+    old_sp_evolution_status <- tryCatch(
+      sp::get_evolution_status(),
+      error = function(e) {
+        2L
+      },
+      warning = function(e) {
+        2L
+      }
+    )
     withr::defer(
-      sp::set_evolution_status(old_sp_evolution_status),
+      tryCatch(sp::set_evolution_status(old_sp_evolution_status),
+        warning = function(e) invisible(NULL),
+        error = function(e) invisible(NULL)
+      ),
       envir = envir
     )
     bru_safe_sp(quietly = TRUE, force = TRUE)

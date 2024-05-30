@@ -19,6 +19,7 @@ like(
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
+  scale = NULL,
   samplers = NULL,
   ips = NULL,
   domain = NULL,
@@ -71,7 +72,9 @@ object.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to
 \code{INLA::inla}. Special case if family is 'cp': rescale all integration
-weights by E. Default taken from \code{options$E}, normally \code{1}.}
+weights by a scalar E. For sampler specific reweighting/effort, use a \code{weight}
+column in the \code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
@@ -81,6 +84,9 @@ so the log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihoo
 Default value is \code{1}. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 interpreted with great care.}
+
+\item{scale}{Fixed (optional) scale parameters of the precision for several
+models, such as Gaussian and student-t response models.}
 
 \item{samplers}{Integration domain for 'cp' family.}
 
@@ -128,7 +134,7 @@ or the likelihood construction requires it.}
 on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{.envir}{The evaluation environment to use for special arguments (\code{E},
-\code{Ntrials}, and \code{weights}) if not found in \code{response_data} or \code{data}.
+\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or \code{data}.
 Defaults to the calling environment.}
 
 \item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}

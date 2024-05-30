@@ -57,9 +57,8 @@ The most basic `inla.spde.make.A` call is to map purely spatial points to a mesh
 mesh <- fm_mesh_2d_inla(cbind(0, 0), offset = 2, max.edge = 10)
 loc <- matrix(runif(10) * 2 - 1, 5, 2)
 ggplot() +
-  gg(mesh) +
-  geom_point(aes(loc[, 1], loc[, 2])) +
-  coord_equal()
+  geom_fm(data = mesh) +
+  geom_point(aes(loc[, 1], loc[, 2]))
 ```
 
 ```{r}

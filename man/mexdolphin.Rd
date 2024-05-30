@@ -16,7 +16,7 @@ mesh (a type of discretization of continuous space) covering the survey region.}
 \item{\code{ppoly}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
 survey region.}
 \item{\code{simulated}:}{ A \code{SpatialPointsDataFrame} object containing the locations of a
-\emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+\emph{simulated} population of dolphin groups. The population was simulated from a \code{inlabru}
 model fitted to the actual survey data. Note that the simulated data do not have any associated
 size information.}
 }
@@ -37,9 +37,7 @@ distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (bru_safe_inla(quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE)) {
   data(mexdolphin, package = "inlabru")
   ggplot() +
     gg(mexdolphin$mesh) +
@@ -55,8 +53,7 @@ if (bru_safe_inla(quietly = TRUE) &&
 }
 \dontrun{
 if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
+  require("ggplot2", quietly = TRUE)) {
   gmap(mexdolphin$depth) +
     gm(mexdolphin$ppoly, color = "blue") +
     gm(mexdolphin$samplers) +

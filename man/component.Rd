@@ -139,11 +139,11 @@ the linear predictor \eqn{\eta} would be written down as
 
 where:
 
-\itemize{
-\item{\eqn{c} }{is the \emph{intercept}}
-\item{\eqn{x }}{is a \emph{covariate}}
-\item{\eqn{\beta} }{is a \emph{latent variable} associated with \eqn{x} and}
-\item{\eqn{\psi = \beta * x }}{ is called the \emph{effect} of \eqn{x}}
+\describe{
+\item{\eqn{c}}{is the \emph{intercept}}
+\item{\eqn{x}}{is a \emph{covariate}}
+\item{\eqn{\beta}}{is a \emph{latent variable} associated with \eqn{x} and}
+\item{\eqn{\psi = \beta * x}}{ is called the \emph{effect} of \eqn{x}}
 }
 
 A problem that arises when using this kind of R formula is that it does not

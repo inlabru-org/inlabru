@@ -2,6 +2,54 @@
 
 ## Feature updates
 
+* Add support for the `scale` parameter to `like()`.
+* Fix regression bug in "bym" model support, where the latent state size
+  wasn't correctly handled by the mapper system (version `2.10.1.9002`)
+* New `toypoints` example data set, for basic modelling examples
+  (version `2.10.1.9003`)
+* Updated convergence plots, reducing random effect aspects to summary statistics,
+  improving speed and visual coherence (version `2.10.1.9004`)
+* Add options to `bru_convergence_plot()` to control the number of iterations
+  shown, and optionally show the initial values that are stored from this version
+  (version `2.10.1.9005`)
+* Add filter to limit mapper construction to only the components used in the
+  predictor expression, to avoid unused components breaking the initialisation.
+  This allows easier testing of multi-likelihood models (version `2.10.1.9006`)
+* Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
+  instead of elapsed clock time. Added `bru_timings()` method to extract the timings
+  safely from a fitted `bru` object (version `2.10.1.9007`)
+* Improved backwards compatibility support for `sp` data input for `family = "cp"`
+  (version `2.10.1.9008`)
+
+# inlabru 2.10.1
+
+## Feature updates
+
+* Add new web article on ZIP/ZAP models (zero inflated Poisson models)
+  where the non-zero probability is modelled with a separate predictor from the
+  predictor for the Poisson model parameter:
+  <https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html>.
+  (Thanks to Dmytro Perepolkin)
+
+## Bug fixes and dependency simplification
+  
+* Remove dependence on the `ggpolypath` package, and the
+  `ggplot2::fortify.SpatialPolygons/DataFrame()` methods that were deprecated in
+  `ggplot2` version `3.4.4`.  Code using `gg.SpatialPolygons()` together with
+  `coord_fixed()`/`coord_equal()` for coordinate axis control needs to use
+  `coord_sf()` instead.
+* Detect the need for vectorised parameters in `bru_forward_transformation` to
+  allow `bru_mapper_marginal` to be applied with e.g. spatially varying parameters.
+  (version `2.10.0.9001`)
+* Detect `terra` version `>= 1.7-66` that removes the need for
+  detecting special cases (`nrow(where) == 1` and `terra::nlyr(data) == 1`).
+  Workaround code used for versions `< 1.7-66`. (version `2.10.0.9002`)
+  (Thanks to Robert J. Hijmans)
+
+# inlabru 2.10.0
+
+## Feature updates
+
 * Add new `ibm_simplify()` generic to handle mapper simplification more generally;
   needed to properly support non-linear component mappers. (version `2.9.0.9004`)
 * Add new `bru_mapper_marginal()` mapper class that can be used as part of component
@@ -9,7 +57,16 @@
 * Add new `ibm_eval2()` generic that computes both evaluation and Jacobian,
   avoiding double-computing of the Jacobian, when practical. (version `2.9.0.9005`)
 * Add new `bru_timings_plot()` function that plots the time used for each nonlinear iteration
-(version `2.9.0.2007`)
+(version `2.9.0.9007`)
+* Speed up `bru_fill_missing()` (by orders of magnitude) by changing method for
+  finding the nearest available data point. (version `2.9.0.9011`)
+* Add new `bru_mapper_shift()` mapper class that works like `bru_mapper_scale()`
+  but for additive shifts instead of multiplicative scaling. (version `2.9.0.9012`)
+* Added more checks for invalid component or predictor evaluations, to help
+  catch user errors sooner, and with more informative messages. (version `2.9.0.9013`)
+* Expand `bru_mapper_matrix`, previously used only for component `model = "fixed"`,
+  to allow integer indexing in addition to the previous factor/character-only indexing.
+  (version `2.9.0.9014`)
 
 ## Bug fixes
 
@@ -19,6 +76,18 @@
 * Improved error messages for missing or incomplete LGCP domain specification.
   (version `2.9.0.9002` and `2.9.0.9006`)
 * Allow `NULL` in automatic component usage detection. (version `2.9.0.9003`)
+* Corrected the crs information for `gorillas$plotsample$counts` and
+  `gorillas_sf$plotsample$counts` from `+units=m` to `+units=km`. (version `2.9.0.9010`)
+  The geometry information in `counts` is unlikely to have been used in examples
+  or analysis code, as the problem would have been immediately obvious;
+  plotting or other geometric operations that use the crs information would
+  heve been completely wrong, and is only detected now that more code uses the
+  crs information at all. Thanks to Dmytro Perepolkin for reporting in issue #205
+* Fix problem in `bru_fill_missing()` for cases where the input data object also
+  has missing values. (version `2.9.0.9011`)
+* Make `eval_spatial()` transform the `where` coordinates to the same crs as the
+  input data, for `SpatRaster` and `sf` inputs, to allow different crs specifications.
+  (version `2.9.0.9012`)
 
 # inlabru 2.9.0
 
@@ -26,7 +95,7 @@
 
 * Conversion of code to use `fmesher` for mesh and geometry handling;
   the interface supports existing objects and methods.
-  See https://inlabru-org.github.io/fmesher/articles/inla_conversion.html for
+  See <https://inlabru-org.github.io/fmesher/articles/inla_conversion.html> for
   more information.
 * General speed improvements, see below for details.
 * Added `gg.sf()` method.
@@ -66,13 +135,13 @@
   test cases. (version `2.8.0.9005`)
 * Removed incorrect code for `sf` method for `eval_spatial()`, causing failure
   when extracting from multiple layers in a single call.
-  (version `2.9.0.9007`)
+  (version `2.8.0.9007`)
 * Improved handling of posterior sample variable extraction in `generate()`
   and `predict()`. Now much faster for large models. (version `2.8.0.9009`)
 * Fixed linearisation issue when using only the `*_latent` form of a component.
   (version `2.8.0.9015`)
 * Workaround for equivalent but textually different CRS/WKT information in
-  `bru_fill_missing()`. (version `2.9.0.9016`, fixes #200)
+  `bru_fill_missing()`. (version `2.8.0.9016`, fixes #200)
 
 ## Deprecation of old functions
 
@@ -148,7 +217,7 @@
 * Add workarounds for inconsistent polygon orientation resulting from `sf::st_*`
   calls that don't account for the `geos` canonical representation being CW,
   whereas the canonical Simple Features representation being CCW. See
-  https://github.com/r-spatial/sf/issues/2096
+  <https://github.com/r-spatial/sf/issues/2096>
   
 # inlabru 2.7.0
 

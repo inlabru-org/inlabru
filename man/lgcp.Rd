@@ -41,7 +41,7 @@ factor.}
 \item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
 
 \item{.envir}{The evaluation environment to use for special arguments
-(\code{E}, \code{Ntrials}, and \code{weights}) if not found in response_data or data.
+(\code{E}, \code{Ntrials}, \code{weights}, \code{scale}) if not found in response_data or data.
 Defaults to the calling environment.}
 }
 \value{

@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - devel
+      - feature/*
+  pull_request:
+    branches:
+      - devel
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -25,7 +29,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -68,6 +72,11 @@ jobs:
       - name: Mermaid update
         run: |
           source("vignettes/articles/mermaid_updater.R")
+        shell: Rscript {0}
+
+      - name: Fix temporary out-of-sync binary packages
+        run: |
+          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
         shell: Rscript {0}
 
       - name: Build site

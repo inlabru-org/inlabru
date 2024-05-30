@@ -1,7 +1,7 @@
 #' Plot a map using extent of a spatial object
 #'
-#' Uses get_map() to query map services like Google Maps for a region centered around
-#' the spatial object provided. Then calls ggmap() to plot the map.
+#' Uses `ggmap::get_map()` to query map services like Google Maps for a region centered around
+#' the spatial object provided. Then calls `ggmap()` to plot the map.
 #'
 #' This function requires the `ggmap` package.
 #'
@@ -14,21 +14,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' if (require("ggplot2", quietly = TRUE) &&
-#'   require(ggpolypath, quietly = TRUE)) {
+#' if (requireNamespace("ggmap", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
 #'   # Create a base map centred around the nests and plot the boundary as well
 #'   # as the nests
-#'   ggplot() +
-#'     gg(gorillas$boundary) +
-#'     gg(gorillas$nests, color = "white", size = 0.5)
-#'   if (requireNamespace("ggmap", quietly = TRUE)) {
-#'     gmap(gorillas$nests, maptype = "satellite") +
-#'       gm(gorillas$boundary) +
-#'       gm(gorillas$nests, color = "white", size = 0.5)
-#'   }
+#'   gmap(gorillas$nests, maptype = "satellite") +
+#'     gm(gorillas$boundary) +
+#'     gm(gorillas$nests, color = "white", size = 0.5)
 #' }
 #' }
 gmap <- function(data, ...) {
@@ -43,7 +38,11 @@ gmap <- function(data, ...) {
 
   # Create map
   requireNamespace("ggmap")
-  myMap <- ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]), ...)
+  myMap <-
+    ggmap::get_map(
+      c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
+      ...
+    )
 
   # Return map
   ggmap::ggmap(myMap)
@@ -68,8 +67,7 @@ gmap <- function(data, ...) {
 #' @family geomes for Raster data
 #'
 #' @examples
-#' if (require("ggplot2", quietly = TRUE) &&
-#'   require(ggpolypath, quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE)) {
 #'   # Load Gorilla data
 #'
 #'   data(gorillas, package = "inlabru")
@@ -106,8 +104,7 @@ gg <- function(data, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' if (require("ggplot2", quietly = TRUE) &&
-#'   require(ggpolypath, quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data(gorillas, package = "inlabru")
 #'
@@ -574,73 +571,31 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @export
 #' @param data A `SpatialPolygons` or `SpatialPolygonsDataFrame` object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
-#'                mapping. The default mapping is
-#'                `ggplot2::aes(x = long, y = lat, group = group)`.
+#'                mapping.
 #' @param crs A `CRS` object defining the coordinate system to project the data to before plotting.
-#' @param ... Arguments passed on to `geom_polypath`.
+#' @param ... Arguments passed on to `geom_sf`.
 #' Unless specified by the user,
-#' the arguments `colour = "black"` (polygon colour) and
-#' `alpha = 0.2` (Alpha level for polygon filling).
-#' @return A `ggpolypath::geom_polypath` object.
-#' @details Requires the `ggpolypath` package to ensure proper plotting, since
-#'   the `ggplot::geom_polygon` function doesn't always handle geometries with
-#'   holes properly.
+#' the argument `alpha = 0.2` (alpha level for polygon filling) is added.
+#' @return A `geom_sf` object.
+#' @details Up to version `2.10.0`, the `ggpolypath` package was used to ensure
+#' proper plotting, since the `ggplot2::geom_polygon` function doesn't always
+#' handle geometries with holes properly. After `2.10.0`, the object is converted
+#' to `sf` format and passed on to [gg.sf()] instead, as `ggplot2` version `3.4.4`
+#' deprecated the intenrally used `ggplot2::fortify()` method for
+#' `SpatialPolygons/DataFrame` objects.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.spatial.R
 
 gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
-  requireNamespace("ggplot2")
-  if (!requireNamespace("ggpolypath", quietly = TRUE)) {
-    stop("The 'ggpolypath' package is required for SpatialPolygons plotting, but it is not installed.")
-  }
+  data <- sf::st_as_sf(data)
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs)
+    data <- fm_transform(data, crs, passthrough = TRUE)
   }
-
-  df <- ggplot2::fortify(data)
-  if (inherits(data, "SpatialPolygonsDataFrame")) {
-    data[["id"]] <- unique(df[["id"]])
-    df <- dplyr::left_join(df, as.data.frame(data), by = "id")
-  }
-
-  cnames <- names(df)[1:2]
-  if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    dmap <- ggplot2::aes(
-      x = .data[[cnames[1]]],
-      y = .data[[cnames[2]]],
-      group = .data[["group"]]
-    )
+  arg <- list(...)
+  if ("alpha" %in% names(arg)) {
+    gg(data, mapping = mapping, ...)
   } else {
-    dmap <- ggplot2::aes(
-      x = .data[[cnames[1]]],
-      y = .data[[cnames[2]]],
-      group = .data[["id"]],
-      subgroup = .data[["hole"]]
-    )
-  }
-
-  if (!is.null(mapping)) {
-    dmap <- modifyList(dmap, mapping)
-  }
-
-  params <- list(...)
-  arg <- list(
-    data = df,
-    mapping = dmap
-  )
-
-  if (!any(names(params) %in% c("colour", "color"))) {
-    arg$colour <- "black"
-  }
-  if (!any(names(params) %in% "alpha")) {
-    arg$alpha <- 0.2
-  }
-  arg <- modifyList(arg, params)
-
-  if (requireNamespace("ggpolypath", quietly = TRUE)) {
-    do.call(ggpolypath::geom_polypath, arg)
-  } else {
-    do.call(ggplot2::geom_polygon, arg)
+    gg(data, mapping = mapping, ..., alpha = 0.2)
   }
 }
 
@@ -796,11 +751,11 @@ gg.SpatRaster <- function(data, ...) {
 #' to plot the interpolation.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.inla.mesh
-#' @name gg.inla.mesh
+#' @aliases gg.fm_mesh_2d
+#' @name gg.fm_mesh_2d
 #' @export
 
-#' @param data An `inla.mesh` object.
+#' @param data An `fm_mesh_2d` object.
 #' @param color A vector of scalar values to fill the mesh with colors.
 #' The length of the vector mus correspond to the number of mesh vertices.
 #' The alternative name `colour` is also recognised.
@@ -824,21 +779,21 @@ gg.SpatRaster <- function(data, ...) {
 #' @family geomes for meshes
 #' @example inst/examples/gg.inla.mesh.R
 
-gg.inla.mesh <- function(data,
-                         color = NULL,
-                         alpha = NULL,
-                         edge.color = "grey",
-                         edge.linewidth = 0.25,
-                         interior = TRUE,
-                         int.color = "blue",
-                         int.linewidth = 0.5,
-                         exterior = TRUE,
-                         ext.color = "black",
-                         ext.linewidth = 1,
-                         crs = NULL,
-                         mask = NULL,
-                         nx = 500, ny = 500,
-                         ...) {
+gg.fm_mesh_2d <- function(data,
+                          color = NULL,
+                          alpha = NULL,
+                          edge.color = "grey",
+                          edge.linewidth = 0.25,
+                          interior = TRUE,
+                          int.color = "blue",
+                          int.linewidth = 0.5,
+                          exterior = TRUE,
+                          ext.color = "black",
+                          ext.linewidth = 1,
+                          crs = NULL,
+                          mask = NULL,
+                          nx = 500, ny = 500,
+                          ...) {
   requireNamespace("INLA")
   requireNamespace("ggplot2")
   if (is.null(color) && ("colour" %in% names(list(...)))) {
@@ -933,14 +888,14 @@ gg.inla.mesh <- function(data,
 }
 
 
-#' Geom for inla.mesh.1d objects
+#' Geom for fm_mesh_1d objects
 #'
 #' This function generates a `geom_point` object showing the knots (vertices)
 #' of a 1D mesh.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.inla.mesh.1d
-#' @name gg.inla.mesh.1d
+#' @aliases gg.fm_mesh_1d gg.inla.mesh.1d
+#' @name gg.fm_mesh_1d
 #' @export
 #' @param data An inla.mesh.1d object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_point`.
@@ -952,12 +907,11 @@ gg.inla.mesh <- function(data,
 #'
 #' @examples
 #' \donttest{
-#' # Some features use the INLA package.
-#' if (require("INLA", quietly = TRUE) &&
+#' if (require("fmesher", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   # Create a 1D mesh
 #'
-#'   mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
+#'   mesh <- fm_mesh_1d(seq(0, 10, by = 0.5))
 #'
 #'   # Plot it
 #'
@@ -971,11 +925,21 @@ gg.inla.mesh <- function(data,
 #' }
 #' }
 #'
-gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
-                            y = 0, shape = 4, ...) {
+gg.fm_mesh_1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
+                          y = 0, shape = 4, ...) {
   df <- data.frame(x = data$loc, y = y)
   ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
+
+#' @describeIn gg.fm_mesh_2d Alias for `gg.fm_mesh_2d`, supporting `inla.mesh`
+#' objects.
+#' @export
+gg.inla.mesh <- gg.fm_mesh_2d
+
+#' @describeIn gg.fm_mesh_1d Alias for `gg.fm_mesh_1d`, supporting
+#' `inla.mesh.1d` objects.
+#' @export
+gg.inla.mesh.1d <- gg.fm_mesh_1d
 
 
 

@@ -84,15 +84,18 @@ install.packages("inlabru")
 
 ## Example
 
-This is a basic example which shows you how fit a simple spatial Log
+This is a basic example which shows how fit a simple spatial Log
 Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> This is INLA_23.08.26 built 2023-08-26 14:18:34 UTC.
+#> Loading required package: sp
+#> This is INLA_24.05.01-1 built 2024-05-01 18:49:50 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
+#>  - List available models/likelihoods/etc with inla.list.models()
+#>  - Use inla.doc(<NAME>) to access documentation
 library(inlabru)
 #> Loading required package: fmesher
 library(fmesher)
@@ -131,7 +134,9 @@ ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
   gg(lambda, geom = "tile") +
   gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
-  ggtitle("Nest intensity per km squared")
+  ggtitle("Nest intensity per km squared") +
+  xlab("") +
+  ylab("")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />

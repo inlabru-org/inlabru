@@ -16,7 +16,7 @@ mesh (a type of discretization of continuous space) covering the survey region.}
 \item{\code{ppoly}:}{ An \code{sf} object defining the boundary of the
 survey region.}
 \item{\code{simulated}:}{ A \code{sf} object containing the locations of a
-\emph{simulated} population of dolphin groups. The population was simulated from a 'code{inlabru}
+\emph{simulated} population of dolphin groups. The population was simulated from a \code{inlabru}
 model fitted to the actual survey data. Note that the simulated data do not have any associated
 size information.}
 }
@@ -38,8 +38,7 @@ distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE)) {
   data(mexdolphin_sf, package = "inlabru")
   ggplot() +
     gg(mexdolphin_sf$mesh) +
@@ -50,20 +49,6 @@ if (require("ggplot2", quietly = TRUE) &&
 
   ggplot() +
     gg(mexdolphin_sf$mesh, color = mexdolphin_sf$lambda, mask = mexdolphin_sf$ppoly)
-}
-}
-\dontrun{
-if (requireNamespace("ggmap", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE) &&
-  require("ggpolypath", quietly = TRUE)) {
-  gmap(mexdolphin$depth) +
-    gm(mexdolphin$ppoly, color = "blue") +
-    gm(mexdolphin$samplers) +
-    gm(mexdolphin$points, aes(size = size), color = "red")
-
-  gmap(mexdolphin$depth) +
-    gm(mexdolphin$depth, aes(col = depth)) +
-    gm(mexdolphin$ppoly)
 }
 }
 }

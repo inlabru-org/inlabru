@@ -52,6 +52,68 @@ test_that("bru: inla copy feature", {
   expect_equal(pr[, "mean"], c(3, 6), tolerance = midtol)
 })
 
+
+# test_that("bru: Non-copy option", {
+#   skip_on_cran()
+#   local_bru_safe_inla()
+#
+#   # Seed influences data as well as predict()!
+#   set.seed(123L)
+#
+#   df1 <- data.frame(x = cos(1:100))
+#   df2 <- data.frame(x = sin(1:100))
+#   df1 <- within(df1, eta <- 1 + 2 * x)
+#   df2 <- within(df2, eta <- 1 + 6 * x)
+#   df1 <- within(df1, y <- rnorm(length(eta), mean = eta, sd = 0.1))
+#   df2 <- within(df2, y <- rpois(length(x), lambda = exp(eta)))
+#
+#   cmp <- ~
+#     0 + I1(1) + I2(1) +
+#     myLin1(x,
+#            model = "rw1",
+#            mapper = bru_mapper(fm_mesh_1d(seq(-1, 1, length.out = 100)),
+#                                indexed = FALSE
+#            ),
+#            scale.model = TRUE
+#     ) +
+#         myLin2(x, copy = "myLin1", fixed = FALSE, initial = 1)
+# #    myLin2(1)
+#   cmps <- component_list(cmp)
+#
+#   fit <- bru(
+#     cmp,
+#     like(y ~ I1 + myLin1, family = "gaussian", data = df1),
+# #    like(y ~ I2 + myLin2*myLin1, family = "poisson", data = df2),
+#     like(y ~ I2 + myLin2, family = "poisson", data = df2),
+#     options = list(control.inla = list(int.strategy = "eb"),
+#                    bru_initial = list(myLin2 = 1, myLin1 = rnorm(100)))
+#   )
+#
+#
+#   expect_equal(
+#     fit$summary.fixed["Intercept", "mean"],
+#     1,
+#     tolerance = midtol
+#   )
+#   expect_equal(
+#     fit$summary.hyperpar["Beta for myLin2", "mean"],
+#     3,
+#     tolerance = midtol
+#   )
+#
+#   skip_if_not_installed("sn")
+#   pr <- predict(
+#     fit,
+#     data.frame(x = c(0.5, 1)),
+#     ~myLin2,
+#     n.samples = 500,
+#     seed = 1L
+#   )
+#
+#   expect_equal(pr[, "mean"], c(3, 6), tolerance = midtol)
+# })
+
+
 test_that("Component copy feature", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -140,21 +202,21 @@ test_that("Component copy feature with group", {
     )
   )
 
-  cmp2 <- ~ -1 + Intercept +
-    x1(x1, model = "rw1", scale.model = TRUE, group = z) +
-    x1copy(x2, copy = "x1", fixed = TRUE, group = z2) +
-    beta(1, model = "linear")
-  fit_bru2 <- bru(
-    cmp2,
-    formula = y ~ Intercept + x1 + beta * x1copy,
-    family = "normal",
-    data = mydata,
-    options = list(
-      bru_max_iter = 5,
-      bru_initial = list(beta = 1),
-      control.inla = list(int.strategy = "eb")
-    )
-  )
+  # cmp2 <- ~ -1 + Intercept +
+  #   x1(x1, model = "rw1", scale.model = TRUE, group = z) +
+  #   x1copy(x2, copy = "x1", fixed = TRUE, group = z2) +
+  #   beta(1, model = "linear")
+  # fit_bru2 <- bru(
+  #   cmp2,
+  #   formula = y ~ Intercept + x1 + beta * exp(x1copy),
+  #   family = "normal",
+  #   data = mydata,
+  #   options = list(
+  #     bru_max_iter = 5,
+  #     bru_initial = list(beta = 1),
+  #     control.inla = list(int.strategy = "eb")
+  #   )
+  # )
 
   expect_equal(
     fit_bru$summary.hyperpar$mean,

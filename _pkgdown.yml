@@ -4,9 +4,12 @@ template:
   bootstrap: 5
 
 navbar:
+  structure:
+    left: [home, intro, reference, general-articles, lgcp-articles, technical-articles, news]
+    right: [github]
   components:
-    articles:
-      text: Articles
+    general-articles:
+      text: General examples
       menu:
       - text: Basic examples
       - text: Random field models in 1D
@@ -16,13 +19,30 @@ navbar:
       - text: Publications
         href: articles/publications.html
       - text: ---
+      - text: Concepts
+      - text: Defining a model component
+        href: articles/component.html
+      - text: ---
+      - text: Special models and techniques
+      - text: Spatially varying coefficient models
+        href: articles/svc.html
+      - text: ZIP and ZAP count models (zero-inflation)
+        href: articles/zip_zap_models.html
+      - text: Computing posterior prediction scores
+        href: articles/prediction_scores.html
+      - text: ---
+      - text: Full articles list
+        href: articles/articles.html
+    lgcp-articles:
+      text: Point processes
+      menu:
       - text: Point process examples
       - text: LGCPs - An example in one dimension
         href: articles/1d_lgcp.html
-      - text: LGCPs - An example in two dimensions (sp version)
-        href: articles/2d_lgcp.html
       - text: LGCPs - An example in two dimensions (sf version)
-        href: articles/2d_lgcp_sf.html
+        href: articles/2d_lgcp.html
+      - text: LGCPs - An example in two dimensions (sp version)
+        href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
@@ -35,14 +55,14 @@ navbar:
         href: articles/2d_lgcp_spatiotemporal.html
       - text: LGCPs - Residuals
         href: articles/2d_lgcp_residuals.html
-      - text: ---
-      - text: Concepts
-      - text: Defining a model component
-        href: articles/component.html
-      - text: Spatially varying coefficient models
-        href: articles/svc.html
-      - text: Computing posterior prediction scores
-        href: articles/prediction_scores.html
+    technical-articles:
+      text: Technical articles
+      menu:
+      - text: Mapper techniques
+      - text: Customised model component with the bru_mapper system
+        href: articles/bru_mapper.html
+      - text: Converting inla.spde.make.A calls to the bru_mapper system
+        href: articles/mesh_mapping.html
       - text: ---
       - text: Theory and technical documentation
       - text: Installation of INLA and inlabru with Apptainer on HPC
@@ -51,15 +71,8 @@ navbar:
         href: articles/method.html
       - text: A nonlinear model approximation example
         href: articles/linearapprox.html
-      - text: Customised model component with the bru_mapper system
-        href: articles/bru_mapper.html
-      - text: Converting inla.spde.make.A calls to the bru_mapper system
-        href: articles/mesh_mapping.html
       - text: Code internal flow diagrams for model evaluation
         href: articles/devel_flow.html
-      - text: ---
-      - text: Website articles
-        href: articles/website_examples.html
 
 redirects:
   - ["articles/web/Apptainer.html", "articles/Apptainer.html"]
@@ -78,6 +91,8 @@ redirects:
   - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
   - ["articles/web/svc.html", "articles/svc.html"]
   - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
+  - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
+  - ["articles/components_vignette.html", "articles/component.html"]
 
 reference:
 - title: "Model construction and estimation"
@@ -103,6 +118,7 @@ reference:
   contents:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
+  - starts_with("bru_timings")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
   contents:
@@ -110,11 +126,11 @@ reference:
   - starts_with("bru_mapper")
   - starts_with("ibm_")
   - starts_with("bm_")
-  - starts_with("eval_spatial")
   - starts_with("bru_forward_transformation")
 - title: "Miscellaneous"
   desc: "Miscellaneous functions."
   contents:
+  - starts_with("eval_spatial")
   - starts_with("bru_fill_missing")
   - starts_with("point2count")
   - starts_with("sample.lgcp")
@@ -147,6 +163,7 @@ reference:
   - matches("seals")
   - matches("shrimp")
   - matches("toygroups")
+  - matches("toypoints")
 - title: "Internal helper functions"
   desc: "Helper functions for more low level operations."
   contents:

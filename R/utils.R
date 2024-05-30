@@ -161,8 +161,10 @@ bru_safe_sp <- function(quietly = FALSE,
   if (sp_version >= "1.6-0") {
     # Default to 2L to allow future sp to stop supporting
     # get_evolution_status; assume everything is fine if it fails.
-    evolution_status <- tryCatch(sp::get_evolution_status(),
-      error = function(e) 2L
+    evolution_status <- tryCatch(
+      sp::get_evolution_status(),
+      error = function(e) 2L,
+      warning = function(e) 2L
     )
     rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
       error = function(e) NA_character_
@@ -377,7 +379,12 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "sf")) {
+    where <- sf::as_Spatial(where)
+  }
+
   if (inherits(where, "SpatialPoints")) {
+    where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
@@ -410,9 +417,11 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
 #' @describeIn eval_spatial Supports point-in-polygon information lookup.
 #' Other combinations are untested.
 eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
-  if (inherits(where, "SpatialPoints")) {
+  if (!inherits(where, c("sf", "sfc", "sfg"))) {
     where <- sf::st_as_sf(where)
   }
+  where <- fm_transform(where, crs = sf::st_crs(data), passthrough = TRUE)
+
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   unique_layer <- unique(layer)
@@ -461,31 +470,46 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
   if (!inherits(where, "SpatVector")) {
     where <- terra::vect(where)
   }
-  if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
-    # Work around issue in terra::extract() that assumes `layer` to point
-    # to a column of `where` (like `selector`) when
-    # length(layer)==1 (NROW(where)==1),
-    # but otherwise be used directly for indexing into data.
-    # When nlyr == 1, terra::extract ignores the layer input.
-    val <- terra::extract(
-      data,
-      rbind(where, where),
-      ID = FALSE,
-      layer = c(layer, layer)
-    )
-    val <- val[1, , drop = FALSE]
-  } else {
+  if (!fm_crs_is_null(fm_crs(where)) &&
+    !fm_crs_is_null(fm_crs(data))) {
+    where <- terra::project(where, data)
+  }
+  if (getNamespaceVersion("terra") >= "1.7-66") {
     val <- terra::extract(
       data,
       where,
       ID = FALSE,
       layer = layer
     )
-  }
-  if (terra::nlyr(data) == 1) {
-    val <- val[[1]]
-  } else {
     val <- val[["value"]]
+  } else {
+    # For terra pre-1.7-64:
+    if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
+      # Work around issue in terra::extract() that assumes `layer` to point
+      # to a column of `where` (like `selector`) when
+      # length(layer)==1 (NROW(where)==1),
+      # but otherwise be used directly for indexing into data.
+      # When nlyr == 1, terra::extract ignores the layer input.
+      val <- terra::extract(
+        data,
+        rbind(where, where),
+        ID = FALSE,
+        layer = c(layer, layer)
+      )
+      val <- val[1, , drop = FALSE]
+    } else {
+      val <- terra::extract(
+        data,
+        where,
+        ID = FALSE,
+        layer = layer
+      )
+    }
+    if (terra::nlyr(data) == 1) {
+      val <- val[[1]]
+    } else {
+      val <- val[["value"]]
+    }
   }
   val
 }
@@ -533,7 +557,8 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
 #' extract data, see [component()] for details.
-#' @param batch_size Size of nearest-neighbour calculation blocks, to limit the
+#' @param batch_size `r lifecycle::badge("deprecated")` due to improved algorithm.
+#' Size of nearest-neighbour calculation blocks, to limit the
 #' memory and computational complexity.
 #' @return An infilled vector of values
 #' @export
@@ -563,7 +588,7 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' }
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
-                             batch_size = 50) {
+                             batch_size = deprecated()) {
   stopifnot(inherits(
     data,
     c(
@@ -615,8 +640,12 @@ bru_fill_missing <- function(data, where, values,
 
   data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
-    data_values <- terra::values(data[[layer]], dataframe = TRUE)[[layer]]
-    data_coord <- as.data.frame(terra::crds(data))
+    data_values <- terra::values(
+      data[[layer]],
+      dataframe = TRUE,
+      na.rm = TRUE
+    )[[layer]]
+    data_coord <- as.data.frame(terra::crds(data[[layer]], na.rm = TRUE))
     data_coord <- sf::st_as_sf(data_coord,
       coords = seq_len(ncol(data_coord)),
       crs = data_crs
@@ -628,27 +657,15 @@ bru_fill_missing <- function(data, where, values,
 
   where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
 
-  notok <- is.na(values)
-  ok <- which(!notok)
-  notok <- which(notok)
-  data_notok <- is.na(data_values)
-  data_ok <- which(!data_notok)
-  data_notok <- which(data_notok)
+  values_notok <- is.na(values)
 
-  for (batch in seq_len(ceiling(length(notok) / batch_size))) {
-    subset <- notok[seq((batch - 1) * batch_size,
-      min(length(notok), batch * batch_size),
-      by = 1
-    )]
-    dst <- sf::st_distance(
-      data_coord[data_ok, , drop = FALSE],
-      where[subset, , drop = FALSE],
-      by_element = FALSE
-    )
+  nn <- sf::st_nearest_feature(
+    where[values_notok, , drop = FALSE],
+    data_coord
+  )
 
-    nn <- apply(dst, MARGIN = 2, function(col) which.min(col)[[1]])
-    values[subset] <- data_values[data_ok[nn]]
-  }
+  values[values_notok] <- data_values[nn]
+
   values
 }
 
@@ -662,7 +679,8 @@ resave_package_data <- function() {
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
     "seals_sp", "shrimp", "toygroups",
-    "robins_subset"
+    "robins_subset",
+    "toypoints"
   )
   compress_values <- c("gzip", "bzip2", "xz")
 

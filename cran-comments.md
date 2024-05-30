@@ -1,21 +1,12 @@
 ## Submission notes
 
-* Minor release 2.9.0, including new features, speed improvements, bug fixes,
-  and package dependency updates (Moved 'sp' from Depends to Imports to prepare
-  for future move to Suggests, and added dependency on the new 'fmesher' package)
-* CRAN checks for old version, 2.8.0:
-  NOTE: Additional_repositories is used for non-CRAN Suggested package INLA
-  NOTE: Documented arguments not in \usage in documentation object
-* Checks for new version, 2.9.0 (with latest INLA, 23.08.26):
-  - Spurious error message about potentially invalid doi, see below
+* Patch release 2.10.1
+* Fixes deprecation issue with ggplot2
+* Adds compatibility with an upcoming change in terra version 1.7-66
 
-## R CMD check results
+## R CMD check results and comments
 
-Comments:
-
-* All "Documented arguments not in \usage in documentation object" cases have
-  been corrected
-
+* No change in RMD CMD check results
 * The non-CRAN Suggested package INLA has been extensively tested with inlabru
   locally and in github actions for both Linux, Windows, and macOS.
   The needed repository specification is included in the package DESCRIPTION:
@@ -25,17 +16,6 @@ Suggests or Enhances not in mainstream repositories:
 Availability using Additional_repositories specification:
   INLA   yes   https://inla.r-inla-download.org/R/testing
 ``` 
-* Spurious URL issue noted by `urlchecker`:
-```
-> urlchecker::url_check()
-✖ Error: README.md:37:31 403: Forbidden
-[doi:10.1111/2041-210X.13168](https://doi.org/10.1111/2041-210X.13168),
-                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```                              
-  Manually accessing https://doi.org/10.1111/2041-210X.13168 correctly leads to
-```
-  https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.13168
-```
 
 ## revdepcheck results
 
