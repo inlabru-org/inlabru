@@ -169,7 +169,7 @@ reference:
   contents:
   - starts_with("evaluate_")
   - starts_with("expand_labels")
-  - starts_with("inla.stack.mjoin")
+  - starts_with("bru_inla.stack.mjoin")
   - starts_with("spatial.to.ppp")
   - starts_with("bru_make_stack")
   - starts_with("bru_summarise")

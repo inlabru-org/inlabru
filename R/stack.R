@@ -28,21 +28,39 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
     BRU.response <- lhood$response_data[[lhood$response]]
   }
   nms <- names(lin$jacobian)
-  INLA::inla.stack(
-    list(
-      BRU.response = BRU.response,
-      BRU.E = lhood[["E"]],
-      BRU.Ntrials = lhood[["Ntrials"]],
-      BRU.weights = lhood[["weights"]],
-      BRU.scale = lhood[["scale"]],
-      BRU.offset = as.vector(lin$offset)
-    ),
-    A = lapply(nms, function(nm) {
-      lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
-    }),
-    effects = idx[["idx_inla"]][nms],
-    remove.unused = FALSE
-  )
+  if (packageVersion("INLA") <= "24.06.02") {
+    INLA::inla.stack(
+      list(
+        BRU.response = BRU.response,
+        BRU.E = lhood[["E"]],
+        BRU.Ntrials = lhood[["Ntrials"]],
+        BRU.weights = lhood[["weights"]],
+        BRU.scale = lhood[["scale"]],
+        BRU.offset = as.vector(lin$offset)
+      ),
+      A = lapply(nms, function(nm) {
+        lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+      }),
+      effects = idx[["idx_inla"]][nms],
+      remove.unused = FALSE
+    )
+  } else {
+    INLA::inla.stack(
+      list(
+        BRU.E = lhood[["E"]],
+        BRU.Ntrials = lhood[["Ntrials"]],
+        BRU.weights = lhood[["weights"]],
+        BRU.scale = lhood[["scale"]],
+        BRU.offset = as.vector(lin$offset)
+      ),
+      A = lapply(nms, function(nm) {
+        lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+      }),
+      effects = idx[["idx_inla"]][nms],
+      responses = list(BRU.response),
+      remove.unused = FALSE
+    )
+  }
 }
 
 #' @param lhoods A `bru_like_list` object
@@ -68,7 +86,7 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
   # above or in bru_make_stack.bru_like, and keep using remove.unused=FALSE here.
   stk <-
     do.call(
-      inlabru::inla.stack.mjoin,
+      bru_inla.stack.mjoin,
       c(stks, list(compress = TRUE, remove.unused = FALSE))
     )
 

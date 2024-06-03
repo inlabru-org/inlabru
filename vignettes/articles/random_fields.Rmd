@@ -242,10 +242,10 @@ ggplot() +
 
 ### Looking at the posterior distributions
 We can look at the Intercept posterior using the function 
-`plot( )`, as below. 
+`plotmarginal.inla( )`, as below. 
 
 ```{r }
-plot(fit2.bru, "Intercept")
+plotmarginal.inla(fit2.bru, "Intercept")
 ```
 
 You have to know that there is a variable called `Intercept` in order to use this 
