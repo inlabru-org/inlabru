@@ -200,7 +200,7 @@ Plot the SPDE parameter and fixed effect parameter posteriors.
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-int.plot <- plot(fit, "Intercept")
+int.plot <- plotmarginal.inla(fit, "Intercept")
 spde.range <- spde.posterior(fit, "field", what = "range")
 spde.logvar <- spde.posterior(fit, "field", what = "log.variance")
 range.plot <- plot(spde.range)

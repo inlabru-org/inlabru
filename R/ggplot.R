@@ -992,23 +992,19 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #'
 #' @description
 #'
-#' [bru()] uses `INLA::inla()` to fit models. The latter estimates the posterior densities of
-#' all random effects in the model. This function serves to access and plot the posterior
-#' densities in a convenient way.
+#' From version `2.11.0`, `plot.bru(x, ...)` calls `plot(x, ...)` from the `INLA` package.
+#' For the old `inlabru` behaviour, call `plotmarginal.inla(x, ...)` instead.
 #'
 #' Requires the `ggplot2` package.
 #'
 #' @method plot bru
 #' @export
 #' @param x a fitted [bru()] model.
-#' @param ... A character naming the effect to plot, e.g. "Intercept". For random
-#' effects, adding `index = ...` plots the density for a single component of the
-#' latent model.
-#' @return an object of class `gg`
-#'
+#' @param ... Options passed on to the `inla` plot method.
 #'
 #' @examples
 #' \dontrun{
+#' # Example for old inlabru behaviour
 #' if (require("ggplot2", quietly = TRUE)) {
 #'   # Generate some data and fit a simple model
 #'   input.df <- data.frame(x = cos(1:10))
@@ -1017,12 +1013,12 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #'   summary(fit)
 #'
 #'   # Plot the posterior of the model's x-effect
-#'   plot(fit, "x")
+#'   plotmarginal.inla(fit, "x")
 #' }
 #' }
 #'
 plot.bru <- function(x, ...) {
-  plotmarginal.inla(x, ...)
+  NextMethod()
 }
 
 #' Plot prediction using ggplot2

@@ -3458,7 +3458,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   idx <- evaluate_index(model, lhoods)
   stk <- bru_make_stack(lhoods, lin, idx)
 
-  stk.data <- INLA::inla.stack.data(stk)
+  if (packageVersion("INLA") <= "24.06.02") {
+      stk.data <- INLA::inla.stack.data(stk)
+  } else {
+      stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
+  }
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
   bru_log_message(
     "iinla: Model initialisation completed",
@@ -3765,7 +3769,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
         stk <- bru_make_stack(lhoods, lin, idx)
 
-        stk.data <- INLA::inla.stack.data(stk)
+        if (packageVersion("INLA") <= "24.06.02") {
+          stk.data <- INLA::inla.stack.data(stk)
+        } else {
+          stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
+        }
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }
       # Store the state
