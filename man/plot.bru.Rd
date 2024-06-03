@@ -24,6 +24,20 @@ plotmarginal.inla(
 \item{x}{a fitted \code{\link[=bru]{bru()}} model.}
 
 \item{...}{Options passed on to the \code{inla} plot method.}
+
+\item{result}{an \code{inla} or \code{bru} result object}
+
+\item{varname}{character; name of the variable to plot}
+
+\item{index}{integer; index of the random effect to plot}
+
+\item{link}{function; link function to apply to the variable}
+
+\item{add}{logical; if \code{TRUE}, add to an existing plot}
+
+\item{ggp}{logical; unused}
+
+\item{lwd}{numeric; line width}
 }
 \description{
 From version \verb{2.11.0}, \code{plot.bru(x, ...)} calls \code{plot(x, ...)} from the \code{INLA} package.

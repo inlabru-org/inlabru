@@ -407,6 +407,13 @@ bru_inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
 
 
 #' @rdname plot.bru
+#' @param result an `inla` or `bru` result object
+#' @param varname character; name of the variable to plot
+#' @param index integer; index of the random effect to plot
+#' @param link function; link function to apply to the variable
+#' @param add logical; if `TRUE`, add to an existing plot
+#' @param ggp logical; unused
+#' @param lwd numeric; line width
 #' @export
 plotmarginal.inla <- function(result,
                               varname = NULL,
