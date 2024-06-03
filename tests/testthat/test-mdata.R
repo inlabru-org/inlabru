@@ -1,6 +1,6 @@
 test_that("mdata", {
   local_bru_safe_inla()
-  skip_if(packageVersion("INLA") <= "24.06.02")
+  skip_if(utils::packageVersion("INLA") <= "24.06.02")
 
   sim.poisson <- function(prob, m) {
     stopifnot(length(prob) == length(m) && length(prob) > 0)

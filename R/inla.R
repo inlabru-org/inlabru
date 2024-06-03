@@ -296,7 +296,7 @@ extract.entries <- function(name, smpl, .contents = NULL) {
 bru_inla.stack.mexpand <- function(...,
                                    old.names = "BRU.response",
                                    new.name = "BRU.response") {
-  if (packageVersion("INLA") > "24.06.02") {
+  if (utils::packageVersion("INLA") > "24.06.02") {
     return(
       INLA::inla.stack.mexpand(
         ...,
@@ -381,7 +381,7 @@ bru_inla.stack.mexpand <- function(...,
 
 bru_inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
                              old.names = "BRU.response", new.name = "BRU.response") {
-  if (packageVersion("INLA") <= "24.06.02") {
+  if (utils::packageVersion("INLA") <= "24.06.02") {
     stacks <- bru_inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
     do.call(INLA::inla.stack.join, c(
       stacks,

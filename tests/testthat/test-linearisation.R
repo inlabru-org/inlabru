@@ -53,7 +53,7 @@ test_that("Linearisation", {
     comp_simple = comp_lin
   )
 
-  if (packageVersion("INLA") > "24.06.02") {
+  if (utils::packageVersion("INLA") > "24.06.02") {
     stks0 <-
       lapply(
         seq_along(lhoods),

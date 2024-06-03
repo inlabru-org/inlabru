@@ -28,7 +28,7 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
     BRU.response <- lhood$response_data[[lhood$response]]
   }
   nms <- names(lin$jacobian)
-  if (packageVersion("INLA") <= "24.06.02") {
+  if (utils::packageVersion("INLA") <= "24.06.02") {
     INLA::inla.stack(
       list(
         BRU.response = BRU.response,

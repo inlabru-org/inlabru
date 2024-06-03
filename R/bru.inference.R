@@ -3458,7 +3458,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   idx <- evaluate_index(model, lhoods)
   stk <- bru_make_stack(lhoods, lin, idx)
 
-  if (packageVersion("INLA") <= "24.06.02") {
+  if (utils::packageVersion("INLA") <= "24.06.02") {
       stk.data <- INLA::inla.stack.data(stk)
   } else {
       stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
@@ -3769,7 +3769,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
         stk <- bru_make_stack(lhoods, lin, idx)
 
-        if (packageVersion("INLA") <= "24.06.02") {
+        if (utils::packageVersion("INLA") <= "24.06.02") {
           stk.data <- INLA::inla.stack.data(stk)
         } else {
           stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
