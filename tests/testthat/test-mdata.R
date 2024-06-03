@@ -75,8 +75,11 @@ test_that("mdata", {
   #
 
   r_bru <- bru(
-    ~ 0 + fix(~ 1 + xx + zz + xx * zz, model = "fixed",
-              hyper = list(prec=list(initial = 0, fixed = TRUE))),
+    ~ 0 + fix(
+      ~ 1 + xx + zz + xx * zz,
+      model = "fixed",
+      hyper = list(prec = list(initial = 0, fixed = TRUE))
+    ),
     like(
       INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x * z)) ~ .,
       family = "0poisson",
@@ -92,9 +95,7 @@ test_that("mdata", {
         )
       )
     ),
-    options = list(
-      control.compute = list(cpo = TRUE)
-    )
+    options = list(control.compute = list(cpo = TRUE))
   )
 
   expect_equal(
