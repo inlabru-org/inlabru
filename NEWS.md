@@ -20,6 +20,8 @@
   safely from a fitted `bru` object (version `2.10.1.9007`)
 * Improved backwards compatibility support for `sp` data input for `family = "cp"`
   (version `2.10.1.9008`)
+* Add support for special response objects like `inla.mdata()`, when INLA
+  version `> 24.06.02` is available (version `2.10.1.9009`)
 
 # inlabru 2.10.1
 
