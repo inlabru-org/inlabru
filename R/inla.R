@@ -298,10 +298,13 @@ bru_inla.stack.mexpand <- function(...,
                                    new.name = "BRU.response") {
   if (utils::packageVersion("INLA") > "24.06.02") {
     return(
-      INLA::inla.stack.mexpand(
-        ...,
-        old.names = old.names,
-        new.name = new.name
+      do.call(
+        "INLA::inla.stack.mexpand",
+        list(
+          ...,
+          old.names = old.names,
+          new.name = new.name
+        )
       )
     )
   }
