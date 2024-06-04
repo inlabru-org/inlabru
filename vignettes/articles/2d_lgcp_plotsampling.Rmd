@@ -68,9 +68,11 @@ plotdets <- ggplot() +
   gg(boundary) +
   gg(sample$plots) +
   gg(sample$nests, pch = "+", cex = 4, color = "red") +
-  geom_text(aes(label = sample$counts$count,
-                x = sf::st_coordinates(sample$counts)[, 1],
-                y = sf::st_coordinates(sample$counts)[, 2])) +
+  geom_text(aes(
+    label = sample$counts$count,
+    x = sf::st_coordinates(sample$counts)[, 1],
+    y = sf::st_coordinates(sample$counts)[, 2]
+  )) +
   labs(x = "Easting", y = "Northing")
 plot(plotdets)
 ```
@@ -85,9 +87,11 @@ plotwithall <- ggplot() +
   gg(boundary) +
   gg(sample$plots) +
   gg(nests, pch = "+", cex = 4, color = "blue") +
-  geom_text(aes(label = sample$counts$count,
-                x = sf::st_coordinates(sample$counts)[, 1],
-                y = sf::st_coordinates(sample$counts)[, 2])) +
+  geom_text(aes(
+    label = sample$counts$count,
+    x = sf::st_coordinates(sample$counts)[, 1],
+    y = sf::st_coordinates(sample$counts)[, 2]
+  )) +
   gg(sample$nests, pch = "+", cex = 4, color = "red") +
   labs(x = "Easting", y = "Northing")
 plot(plotwithall)

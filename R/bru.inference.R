@@ -1403,9 +1403,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
         int.args = options[["bru_int_args"]]
       )
       if ((inherits(samplers, "Spatial") ||
-          inherits(data, "Spatial") ||
-          inherits(response[["coordinates"]], "Spatial")) &&
-          inherits(ips, "sf")) {
+        inherits(data, "Spatial") ||
+        inherits(response[["coordinates"]], "Spatial")) &&
+        inherits(ips, "sf")) {
         ips <- sf::as_Spatial(ips)
       }
     }
@@ -3459,9 +3459,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   stk <- bru_make_stack(lhoods, lin, idx)
 
   if (utils::packageVersion("INLA") <= "24.06.02") {
-      stk.data <- INLA::inla.stack.data(stk)
+    stk.data <- INLA::inla.stack.data(stk)
   } else {
-      stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
+    stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
   }
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
   bru_log_message(

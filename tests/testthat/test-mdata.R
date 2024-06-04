@@ -137,10 +137,10 @@ test_that("mdata", {
       "0poissonS" = c(rr$summary.hyperpar$mean, rr$summary.fixed$mean)
     )
     res <- cbind(res,
-                 diff = (res[, 2] - beta),
-                 diffS = (res[, 3] - beta),
-                 "diff/sd" = (res[, 2] - beta) / c(r$summary.fixed$sd, r$summary.hyperpar$sd),
-                 "diffS/sd" = (res[, 3] - beta) / c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
+      diff = (res[, 2] - beta),
+      diffS = (res[, 3] - beta),
+      "diff/sd" = (res[, 2] - beta) / c(r$summary.fixed$sd, r$summary.hyperpar$sd),
+      "diffS/sd" = (res[, 3] - beta) / c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
     )
     mm <- nrow(res) %/% 2
     rownames(res) <- c(paste0("beta", 1:mm, ".poisson"), paste0("beta", 1:mm, ".prob"))
