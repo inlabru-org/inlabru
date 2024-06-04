@@ -81,6 +81,7 @@ jobs:
           extra-packages: |
              rcmdcheck
              testthat
+             remotes
 
       - name: Has Suggests? Remove INLA.
         run: |
