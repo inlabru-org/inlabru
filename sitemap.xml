@@ -127,6 +127,9 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_info.html</loc>
   </url>
   <url>
+    <loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mjoin.html</loc>
+  </url>
+  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/bru_int_polygon.html</loc>
   </url>
   <url>
@@ -386,9 +389,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/index_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/inla.stack.mjoin.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/inla_subset_eval.html</loc>
