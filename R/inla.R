@@ -276,43 +276,32 @@ extract.entries <- function(name, smpl, .contents = NULL) {
   return(vals)
 }
 
-# Backwards compatibility to handle mexpand for INLA <= 24.06.02
-#
-# Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
-#
-# @aliases inla.stack.mexpand
-# @name inla.stack.mexpand
-# @export
-# @param ... List of stacks that contain vector observations
-#            (existing multilikelihood observation matrices are also permitted)
-# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "BRU.response")
-# @param new.name The name to be used for the expanded observation matrix,
-#        possibly the same as an old name. (default "BRU.response")
-# @return a list of modified stacks with multicolumn observations
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#
+#' Backwards compatibility to handle mexpand for INLA <= 24.06.02
+#'
+#' Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
+#'
+#' @export
+#' @param ... List of stacks that contain vector observations
+#'            (existing multilikelihood observation matrices are also permitted)
+#' @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
+#'        If a single string, this is assumed for all the stacks. (default "BRU.response")
+#' @param new.name The name to be used for the expanded observation matrix,
+#'        possibly the same as an old name. (default "BRU.response")
+#' @return a list of modified stacks with multicolumn observations
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#'
+#' @keywords internal
+#' @rdname bru_inla.stack.mexpand
 
 bru_inla.stack.mexpand <- function(...,
                                    old.names = "BRU.response",
                                    new.name = "BRU.response") {
-  if (utils::packageVersion("INLA") > "24.06.02") {
-    return(
-      do.call(
-        "INLA::inla.stack.mexpand",
-        list(
-          ...,
-          old.names = old.names,
-          new.name = new.name
-        )
-      )
-    )
-  }
   stacks <- list(...)
   if (length(old.names) == 1) {
     old.names <- rep(old.names, length(stacks))
   }
-  y.cols <- unlist(lapply(seq_along(stacks),
+  y.cols <- unlist(lapply(
+    seq_along(stacks),
     function(x, stacks, old.names) {
       LHS <- INLA::inla.stack.LHS(stacks[[x]])[[old.names[x]]]
       ifelse(is.vector(LHS), 1, NCOL(LHS))
@@ -325,6 +314,7 @@ bru_inla.stack.mexpand <- function(...,
     LHS <- INLA::inla.stack.LHS(stacks[[j]])
     RHS <- INLA::inla.stack.RHS(stacks[[j]])
     A <- INLA::inla.stack.A(stacks[[j]])
+    responses <- stacks[[j]][["responses"]]
     # Access the raw tag indexing information
     tags <- list(
       data = stacks[[j]]$data$index,
@@ -343,6 +333,7 @@ bru_inla.stack.mexpand <- function(...,
     }
 
     # Create the modified stack, with model compression disabled to prevent modifications:
+    if (utils::packageVersion("INLA") <= "24.06.02") {
     stacks[[j]] <-
       INLA::inla.stack.sum(
         data = LHS,
@@ -351,6 +342,17 @@ bru_inla.stack.mexpand <- function(...,
         compress = FALSE,
         remove.unused = FALSE
       )
+    } else {
+      stacks[[j]] <-
+        INLA::inla.stack.sum(
+          data = LHS,
+          A = A,
+          effects = RHS,
+          compress = FALSE,
+          remove.unused = FALSE,
+          responses = responses
+        )
+    }
 
     # Since the row indexing is unchanged, copy the tag index information:
     stacks[[j]]$data$index <- tags$data
