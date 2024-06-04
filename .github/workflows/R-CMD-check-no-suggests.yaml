@@ -148,7 +148,7 @@ jobs:
 
       - name: Limit INLA version to 24.06.02 on old R version
         run: |
-          if (getRversion() < "4.3") {
+          if (getRversion() < "4.4.0") {
             remotes::install_version("INLA", version = "24.06.02", repos = "https://inla.r-inla-download.org/R/testing")
           }
         shell: Rscript {0}
