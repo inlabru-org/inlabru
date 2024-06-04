@@ -62,11 +62,18 @@ jobs:
         with:
           dependencies: '"all"'
           extra-packages: |
-             rcmdcheck
+             rcmdcheck, remotes
+
 
       - name: Fix temporary out-of-sync binary packages
         run: |
           install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
+
+      - name: Limit INLA version to 24.06.02 on old R version
+        if: runner.r == 'oldrel-1'
+        run: |
+          remotes::install_version("INLA", version = "24.06.02", repos = "https://inla.r-inla-download.org/R/testing", type = "binary")
         shell: Rscript {0}
 
       - name: Session info
