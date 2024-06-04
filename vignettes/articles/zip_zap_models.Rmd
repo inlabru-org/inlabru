@@ -66,7 +66,7 @@ We now need to extract the coordinates for these pixels. The plot below illustra
 counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
   bind_cols(values(counts_rstr, mat = TRUE, na.rm = TRUE)) %>%
   rename(count = sum) %>%
-  mutate(present = count > 0) %>%
+  mutate(present = (count > 0) * 1L) %>%
   st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
@@ -280,7 +280,7 @@ truncated_poisson_like <-
   if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
     like(
       family = "zeroinflatedpoisson0",
-      data = counts_df[counts_df$present, ],
+      data = counts_df[counts_df$present > 0, ],
       formula = count ~ elevation + field_count + Intercept_count,
       E = area,
       control.family = list(hyper = list(theta = list(
@@ -290,7 +290,7 @@ truncated_poisson_like <-
   } else {
     like(
       family = "nzpoisson",
-      data = counts_df[counts_df$present, ],
+      data = counts_df[counts_df$present > 0, ],
       formula = count ~ elevation + field_count + Intercept_count,
       E = area
     )
