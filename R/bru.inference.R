@@ -3271,13 +3271,26 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       original_track <- do.call(rbind, track_df)
     }
 
+    track_names <- if (length(track) > 0) {
+      names(track[[1]])
+    } else {
+      c(
+        "effect",
+        "index",
+        "iteration",
+        "mode",
+        "sd",
+        "new_linearisation"
+      )
+    }
+
     list(
       log = c(original_log, bru_log()["iinla"]),
       states = states,
       inla_stack = stk,
       track = if (is.null(original_track) ||
-        setequal(names(original_track), names(track[[1]]))) {
-        do.call(rbind, c(list(original_track), track))
+        setequal(names(original_track), track_names)) {
+        do.call(dplyr::bind_rows, c(list(original_track), track))
       } else {
         track <- do.call(dplyr::bind_rows, track)
         original_names <- names(original_track)
