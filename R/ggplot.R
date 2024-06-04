@@ -992,19 +992,20 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #'
 #' @description
 #'
-#' From version `2.11.0`, `plot.bru(x, ...)` calls `plot(x, ...)` from the `INLA` package.
-#' For the old `inlabru` behaviour, call `plotmarginal.inla(x, ...)` instead.
+#' From version `2.11.0`, `plot.bru(x, ...)` calls `plot.inla(x, ...)`
+#' from the `INLA` package, unless the first argument after `x` is a
+#' `character`, in which case the pre-`2.11.0` behaviour is used, calling
+#' `plotmarginal.inla(x, ...)` instead.
 #'
 #' Requires the `ggplot2` package.
 #'
 #' @method plot bru
 #' @export
 #' @param x a fitted [bru()] model.
-#' @param ... Options passed on to the `inla` plot method.
+#' @param ... Options passed on to other methods.
 #'
 #' @examples
 #' \dontrun{
-#' # Example for old inlabru behaviour
 #' if (require("ggplot2", quietly = TRUE)) {
 #'   # Generate some data and fit a simple model
 #'   input.df <- data.frame(x = cos(1:10))
@@ -1013,12 +1014,19 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #'   summary(fit)
 #'
 #'   # Plot the posterior of the model's x-effect
-#'   plotmarginal.inla(fit, "x")
+#'   plot(fit, "x")
 #' }
 #' }
 #'
 plot.bru <- function(x, ...) {
-  NextMethod()
+  ll <- list(...)
+  if (length(ll) == 0) {
+    NextMethod("plot")
+  } else if (is.character(ll[[1]])) {
+    plotmarginal.inla(x, ...)
+  } else {
+    NextMethod("plot")
+  }
 }
 
 #' Plot prediction using ggplot2

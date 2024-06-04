@@ -23,7 +23,7 @@ plotmarginal.inla(
 \arguments{
 \item{x}{a fitted \code{\link[=bru]{bru()}} model.}
 
-\item{...}{Options passed on to the \code{inla} plot method.}
+\item{...}{Options passed on to other methods.}
 
 \item{result}{an \code{inla} or \code{bru} result object}
 
@@ -40,14 +40,15 @@ plotmarginal.inla(
 \item{lwd}{numeric; line width}
 }
 \description{
-From version \verb{2.11.0}, \code{plot.bru(x, ...)} calls \code{plot(x, ...)} from the \code{INLA} package.
-For the old \code{inlabru} behaviour, call \code{plotmarginal.inla(x, ...)} instead.
+From version \verb{2.11.0}, \code{plot.bru(x, ...)} calls \code{plot.inla(x, ...)}
+from the \code{INLA} package, unless the first argument after \code{x} is a
+\code{character}, in which case the pre-\verb{2.11.0} behaviour is used, calling
+\code{plotmarginal.inla(x, ...)} instead.
 
 Requires the \code{ggplot2} package.
 }
 \examples{
 \dontrun{
-# Example for old inlabru behaviour
 if (require("ggplot2", quietly = TRUE)) {
   # Generate some data and fit a simple model
   input.df <- data.frame(x = cos(1:10))
@@ -56,7 +57,7 @@ if (require("ggplot2", quietly = TRUE)) {
   summary(fit)
 
   # Plot the posterior of the model's x-effect
-  plotmarginal.inla(fit, "x")
+  plot(fit, "x")
 }
 }
 
