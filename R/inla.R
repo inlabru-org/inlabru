@@ -334,14 +334,14 @@ bru_inla.stack.mexpand <- function(...,
 
     # Create the modified stack, with model compression disabled to prevent modifications:
     if (utils::packageVersion("INLA") <= "24.06.02") {
-    stacks[[j]] <-
-      INLA::inla.stack.sum(
-        data = LHS,
-        A = A,
-        effects = RHS,
-        compress = FALSE,
-        remove.unused = FALSE
-      )
+      stacks[[j]] <-
+        INLA::inla.stack.sum(
+          data = LHS,
+          A = A,
+          effects = RHS,
+          compress = FALSE,
+          remove.unused = FALSE
+        )
     } else {
       stacks[[j]] <-
         INLA::inla.stack.sum(
