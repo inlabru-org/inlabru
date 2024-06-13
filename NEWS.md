@@ -17,7 +17,7 @@
   This allows easier testing of multi-likelihood models (version `2.10.1.9006`)
 * Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
   instead of elapsed clock time. Added `bru_timings()` method to extract the timings
-  safely from a fitted `bru` object (version `2.10.1.9007`)
+  safely from a fitted `bru` object (version `2.10.1.9007` and `2.10.1.9010`)
 * Improved backwards compatibility support for `sp` data input for `family = "cp"`
   (version `2.10.1.9008`)
 * Add support for special response objects like `inla.mdata()`, when INLA

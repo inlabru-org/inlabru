@@ -31,9 +31,9 @@ bru_check_object_bru <- function(object,
   } else {
     old <- FALSE
   }
-  object[["bru_info"]] <-
+  object <-
     bru_info_upgrade(
-      object[["bru_info"]],
+      object,
       old = old,
       new_version = new_version
     )
@@ -43,6 +43,8 @@ bru_check_object_bru <- function(object,
 bru_info_upgrade <- function(object,
                              old = FALSE,
                              new_version = getNamespaceVersion("inlabru")) {
+  object_full <- object
+  object <- object[["bru_info"]]
   if (!is.list(object)) {
     stop("bru_info part of the object can't be converted to `bru_info`; not a list")
   }
@@ -233,21 +235,23 @@ bru_info_upgrade <- function(object,
         immediate. = TRUE
       )
       conversion <- as.difftime(
-        object[["bru_timings"]][["Time"]],
+        object_full[["bru_timings"]][["Time"]],
         units = "secs"
       )
-      object[["bru_timings"]][["Time"]] <- conversion
-      object[["bru_timings"]][["System"]] <-
+      object_full[["bru_timings"]][["Time"]] <- conversion
+      object_full[["bru_timings"]][["System"]] <-
         as.difftime(rep(0.0, length(conversion)), units = "secs")
-      object[["bru_timings"]][["Elapsed"]] <- conversion
+      object_full[["bru_timings"]][["Elapsed"]] <- conversion
 
       object[["inlabru_version"]] <- "2.10.1.9007"
     }
 
     object[["inlabru_version"]] <- new_version
     message(paste0("Upgraded bru_info to ", new_version))
+
+    object_full[["bru_info"]] <- object
   }
-  object
+  object_full
 }
 
 
@@ -3608,6 +3612,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             inla.options.merged,
             list(
               control.mode = list(restart = FALSE)
+#              control.mode = list(restart = TRUE)
             )
           )
       }
