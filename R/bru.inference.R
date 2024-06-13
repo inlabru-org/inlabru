@@ -51,10 +51,12 @@ bru_info_upgrade <- function(object,
   if (!inherits(object, "bru_info")) {
     old <- TRUE
     class(object) <- c("bru_info", "list")
+    object_full[["bru_info"]] <- object
   }
   if (is.null(object[["inlabru_version"]])) {
     object[["inlabru_version"]] <- "0.0.0"
     old <- TRUE
+    object_full[["bru_info"]] <- object
   }
   old_ver <- object[["inlabru_version"]]
   if (old || (utils::compareVersion(new_version, old_ver) > 0)) {
