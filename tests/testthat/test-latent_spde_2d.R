@@ -139,8 +139,10 @@ test_that("Georeferenced data with sf, with groups", {
     Northing = seq(10, 30, by = 10),
     KEEP.OUT.ATTRS = FALSE
   )
-  mydata <- rbind(cbind(mydata, season = 1L),
-                  cbind(mydata, season = 2L))
+  mydata <- rbind(
+    cbind(mydata, season = 1L),
+    cbind(mydata, season = 2L)
+  )
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
   mydata <- sf::st_as_sf(mydata, coords = c("Easting", "Northing"))
 
@@ -158,9 +160,10 @@ test_that("Georeferenced data with sf, with groups", {
   )
 
   cmp <- obs ~ Intercept(1) + field(geometry,
-                                    model = matern,
-                                    group = season,
-                                    ngroup = 2)
+    model = matern,
+    group = season,
+    ngroup = 2
+  )
 
   fit <- bru(
     cmp,
