@@ -3614,7 +3614,6 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             inla.options.merged,
             list(
               control.mode = list(restart = FALSE)
-#              control.mode = list(restart = TRUE)
             )
           )
       }
