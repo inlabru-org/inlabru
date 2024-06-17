@@ -62,8 +62,12 @@ jobs:
         with:
           dependencies: '"all"'
           extra-packages: |
-             rcmdcheck, remotes, stars
+             rcmdcheck, remotes
 
+      - name: Add stars, without starsdata
+        run: |
+          install.packages("stars")
+        shell: Rscript {0}
 
       - name: Fix temporary out-of-sync binary packages
         run: |
