@@ -67,6 +67,7 @@ jobs:
       - name: Add stars, without starsdata
         run: |
           install.packages("stars")
+          requireNamespace(stars, quietly = FALSE)
         shell: Rscript {0}
 
       - name: Fix temporary out-of-sync binary packages
