@@ -62,7 +62,7 @@ jobs:
         with:
           dependencies: '"all"'
           extra-packages: |
-             rcmdcheck, remotes
+             rcmdcheck, remotes, stars
 
 
       - name: Fix temporary out-of-sync binary packages
