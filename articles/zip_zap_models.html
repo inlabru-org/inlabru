@@ -255,7 +255,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.343, Running = 2.58, Post = 0.549, Total = 3.48 </span></span>
+<span><span class="co">#&gt;     Pre = 0.611, Running = 2.71, Post = 0.286, Total = 3.6 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
@@ -270,7 +270,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
 <span><span class="co">#&gt; Range for field 2.35 0.654       1.38     2.25       3.92 2.04</span></span>
-<span><span class="co">#&gt; Stdev for field 2.94 0.679       1.88     2.85       4.54 2.66</span></span>
+<span><span class="co">#&gt; Stdev for field 2.94 0.679       1.89     2.85       4.54 2.66</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1555.96</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 826.72</span></span>
@@ -371,7 +371,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.365, Running = 1.62, Post = 0.127, Total = 2.11 </span></span>
+<span><span class="co">#&gt;     Pre = 0.365, Running = 1.63, Post = 0.129, Total = 2.13 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -554,18 +554,18 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.578e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.722e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -6.302e-17</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.675e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 2.397e-15</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.923e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04568, norm1 = 6.939e-12, norm01 = 0.04568)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04568</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.603e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 6.939e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04561, norm1 = 7.524e-12, norm01 = 0.04561)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04561</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.755e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.523e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Max deviation from previous: 0.726% of SD, and line search is inactive [stop if: &lt;10% and line search inactive]</span></span>
@@ -595,7 +595,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.524, Running = 3.84, Post = 0.298, Total = 4.66 </span></span>
+<span><span class="co">#&gt;     Pre = 0.524, Running = 3.87, Post = 0.306, Total = 4.7 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
@@ -859,24 +859,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2423080</td>
-<td align="right">0.5606923</td>
-<td align="right">-2.545679</td>
-<td align="right">0.3925855</td>
+<td align="right">0.2423967</td>
+<td align="right">0.5613288</td>
+<td align="right">-2.553395</td>
+<td align="right">0.3926007</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2543421</td>
-<td align="right">0.6004794</td>
-<td align="right">-2.621904</td>
-<td align="right">0.4025081</td>
+<td align="right">0.2541958</td>
+<td align="right">0.5998480</td>
+<td align="right">-2.668240</td>
+<td align="right">0.4022332</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2802585</td>
-<td align="right">0.6538906</td>
-<td align="right">-2.304074</td>
-<td align="right">0.4001990</td>
+<td align="right">0.2801463</td>
+<td align="right">0.6542625</td>
+<td align="right">-2.287446</td>
+<td align="right">0.4002518</td>
 </tr>
 </tbody>
 </table>
