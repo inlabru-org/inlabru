@@ -452,7 +452,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     # Only retain points within the samplers
     if (!is.null(samplers) && (length(ret) > 0)) {
       if (inherits(samplers, "fm_mesh_2d")) {
-        proj <- fm_evaluator(samplers, points)
+        proj <- fm_evaluator(samplers, ret)
         ret <- ret[proj$proj$ok]
       } else if (inherits(samplers, "Spatial")) {
         ret <- ret[!is.na(sp::over(ret, samplers))]
