@@ -8,7 +8,7 @@
 \usage{
 bru_make_stack(...)
 
-\method{bru_make_stack}{bru_like}(lhood, lin, idx, ...)
+\method{bru_make_stack}{bru_like}(lhood, lin, idx, ..., family_index = 1L)
 
 \method{bru_make_stack}{bru_like_list}(lhoods, lin, idx, ...)
 }
