@@ -3603,7 +3603,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           Ntrials = stk.data[["BRU.Ntrials"]],
           weights = stk.data[["BRU.weights"]],
           scale = stk.data[["BRU.scale"]],
-          offset = stk.data[["BRU.offset"]]
+          offset = stk.data[["BRU.offset"]],
+          control.predictor = list(link = stk.data[["BRU.link"]])
         )
       )
     if (do_final_integration) {

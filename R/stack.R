@@ -16,7 +16,7 @@ bru_make_stack <- function(...) {
 #' @param idx Output from `evaluate_index(...)`
 #' @export
 #' @rdname bru_make_stack
-bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
+bru_make_stack.bru_like <- function(lhood, lin, idx, ..., family_index = 1L) {
   stopifnot(inherits(lin, "bru_mapper_taylor"))
   stopifnot(!is.null(lin[["offset"]]))
   stopifnot(is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]))
@@ -36,7 +36,8 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
         BRU.Ntrials = lhood[["Ntrials"]],
         BRU.weights = lhood[["weights"]],
         BRU.scale = lhood[["scale"]],
-        BRU.offset = as.vector(lin$offset)
+        BRU.offset = as.vector(lin$offset),
+        BRU.link = family_index
       ),
       A = lapply(nms, function(nm) {
         lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
@@ -51,7 +52,8 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ...) {
         BRU.Ntrials = lhood[["Ntrials"]],
         BRU.weights = lhood[["weights"]],
         BRU.scale = lhood[["scale"]],
-        BRU.offset = as.vector(lin$offset)
+        BRU.offset = as.vector(lin$offset),
+        BRU.link = family_index
       ),
       A = lapply(nms, function(nm) {
         lin$jacobian[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
@@ -74,7 +76,8 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
         bru_make_stack(
           lhood = lhoods[[lh_idx]],
           lin = lin[[lh_idx]],
-          idx = idx
+          idx = idx,
+          family_index = lh_idx
         )
       }
     )

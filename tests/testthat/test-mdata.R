@@ -137,13 +137,107 @@ test_that("mdata", {
       "0poissonS" = c(rr$summary.hyperpar$mean, rr$summary.fixed$mean)
     )
     res <- cbind(res,
-      diff = (res[, 2] - beta),
-      diffS = (res[, 3] - beta),
-      "diff/sd" = (res[, 2] - beta) / c(r$summary.fixed$sd, r$summary.hyperpar$sd),
-      "diffS/sd" = (res[, 3] - beta) / c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
+                 diff = (res[, 2] - beta),
+                 diffS = (res[, 3] - beta),
+                 "diff/sd" = (res[, 2] - beta) / c(r$summary.fixed$sd, r$summary.hyperpar$sd),
+                 "diffS/sd" = (res[, 3] - beta) / c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
     )
     mm <- nrow(res) %/% 2
     rownames(res) <- c(paste0("beta", 1:mm, ".poisson"), paste0("beta", 1:mm, ".prob"))
     print(round(dig = 2, res))
   }
+})
+
+
+
+test_that("surv", {
+  local_bru_safe_inla()
+  skip_if(utils::packageVersion("INLA") <= "24.06.26")
+
+  df <- data.frame(time = 1:4, event = c(1, 1, 0, 1), xx = rnorm(4), Intercept = 1)
+
+  r_inla <- INLA::inla(
+    INLA::inla.surv(time, event) ~ 0 + f(Intercept, model = "linear", prec.linear = 0) +
+      f(xx, model = "linear"),
+    family = "weibullsurv",
+    data = df
+  )
+
+  r_bru <- bru(
+    INLA::inla.surv(time, event) ~ 0 + Intercept(1, prec.linear = 0) + xx(xx),
+    family = "weibullsurv",
+    data = df
+  )
+
+  expect_equal(
+    r_bru$summary.fixed[,c("mean", "sd")],
+    r_inla$summary.fixed[,c("mean", "sd")],
+    tolerance = lowtol
+  )
+
+  expect_equal(
+    r_bru$summary.hyperpar[,c("mean", "sd")],
+    r_inla$summary.hyperpar[,c("mean", "sd")],
+    tolerance = lowtol
+  )
+
+  # Multi-family
+  stk1.est <- INLA::inla.stack(
+    data = list(.dummy = rep(1, 4), link = 1),
+    A = list(1),
+    effects = list(list(Intercept = 1, xx = df$xx)),
+    responses = list(with(data = df, expr = INLA::inla.surv(time, event)))
+  )
+  stk1.pred <- INLA::inla.stack(
+    data = list(.dummy = rep(1, 4), link = 1),
+    A = list(1),
+    effects = list(list(Intercept = 1, xx = df$xx)),
+    responses = list(with(data = df, expr = INLA::inla.surv(time * NA, event)))
+  )
+  stk2 <- INLA::inla.stack(
+    data = list(.dummy = rep(1, 4), link = 2),
+    A = list(1),
+    effects = list(list(Intercept = 1, xx = df$xx)),
+    responses = list(with(data = df, expr = INLA::inla.surv(time, event)))
+  )
+  stk <- INLA::inla.stack(
+    INLA::inla.stack(stk1.est, stk1.pred),
+    stk2,
+    multi.family = TRUE)
+
+
+  stk_data <- INLA::inla.stack.data(stk, .response.name = "response")
+  r2_inla <- INLA::inla(
+    response ~ 0 + f(Intercept, model = "linear", prec.linear = 0) + f(xx, model = "linear"),
+    family = c("exponentialsurv", "weibullsurv"),
+    data = stk_data,
+    control.predictor = list(A = INLA::inla.stack.A(stk), link = stk_data$link)
+  )
+
+  r2_bru <- bru(
+    ~ 0 + Intercept(Intercept, prec.linear = 0) + xx(xx),
+    like(
+      INLA::inla.surv(time, event) ~ .,
+      family = "exponentialsurv",
+      data = rbind(df, data.frame(time = NA, event = df$event, xx = df$xx, Intercept = 1))
+    ),
+    like(
+      INLA::inla.surv(time, event) ~ .,
+      family = "weibullsurv",
+      data = df,
+    )
+  )
+
+  expect_equal(
+    r2_bru$summary.fixed[,c("mean", "sd")],
+    r2_inla$summary.fixed[,c("mean", "sd")],
+    tolerance = lowtol
+  )
+
+  expect_equal(
+    r2_bru$summary.hyperpar[,c("mean", "sd")],
+    r2_inla$summary.hyperpar[,c("mean", "sd")],
+    tolerance = midtol
+  )
+
 })

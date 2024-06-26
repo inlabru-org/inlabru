@@ -3,7 +3,7 @@
 ## Feature updates
 
 * Add support for the `scale` parameter to `like()`.
-* Fix regression bug in "bym" model support, where the latent state size
+* Fix regression bug in `"bym"` model support, where the latent state size
   wasn't correctly handled by the mapper system (version `2.10.1.9002`)
 * New `toypoints` example data set, for basic modelling examples
   (version `2.10.1.9003`)
@@ -20,8 +20,9 @@
   safely from a fitted `bru` object (version `2.10.1.9007` and `2.10.1.9010`)
 * Improved backwards compatibility support for `sp` data input for `family = "cp"`
   (version `2.10.1.9008`)
-* Add support for special response objects like `inla.mdata()`, when INLA
-  version `> 24.06.02` is available (version `2.10.1.9009`)
+* Add support for special response objects like `inla.mdata()` and `inla.surv()`,
+  when INLA version `> 24.06.02` (for `mdata`) or `> 24.06.26` (for `surv`) are
+  available (version `2.10.1.9011`)
 
 # inlabru 2.10.1
 
