@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9011</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,7 +117,7 @@
                         <h4 data-toc-skip class="author">Niharika Reddy
 Peddinenikalva</h4>
             
-            <h4 data-toc-skip class="date">2024-06-18</h4>
+            <h4 data-toc-skip class="date">2024-06-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_residuals.Rmd</code></div>
@@ -348,9 +348,11 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp1</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Display the model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in normalizePath(inla.dir): path[1]="/tmp/RtmpJy6Gtu/filee57147fcacee":</span></span>
+<span><span class="co">## No such file or directory</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
 <span><span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
@@ -360,7 +362,7 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"DarkGreen"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/veg-mod-1.png" width="700"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for the vegetation model</span></span>
 <span><span class="va">veg_res</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  <span class="va">fit1</span>, <span class="va">As</span><span class="op">$</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -387,27 +389,27 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-0.1488383</td>
-<td align="right">26.570010</td>
-<td align="right">-54.521818</td>
-<td align="right">0.5525901</td>
-<td align="right">47.682021</td>
+<td align="right">-0.1532086</td>
+<td align="right">28.667502</td>
+<td align="right">-62.118983</td>
+<td align="right">3.1144591</td>
+<td align="right">47.378530</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.3609391</td>
-<td align="right">1.503136</td>
-<td align="right">-1.978918</td>
-<td align="right">0.4730125</td>
-<td align="right">3.273100</td>
+<td align="right">0.4846828</td>
+<td align="right">1.469944</td>
+<td align="right">-2.528504</td>
+<td align="right">0.3965099</td>
+<td align="right">3.200066</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">0.5895106</td>
-<td align="right">4.855391</td>
-<td align="right">-8.557988</td>
-<td align="right">0.8361652</td>
-<td align="right">9.352397</td>
+<td align="right">0.8397416</td>
+<td align="right">4.932431</td>
+<td align="right">-9.229894</td>
+<td align="right">1.1834025</td>
+<td align="right">8.161532</td>
 </tr>
 </tbody>
 </table>
@@ -428,7 +430,7 @@ continuous variable.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a
 plot.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Elevation model</span></span>
 <span><span class="va">comp2</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="va">elev</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -436,9 +438,11 @@ plot.</p>
 <span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp2</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Display the model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in normalizePath(inla.dir): path[1]="/tmp/RtmpJy6Gtu/filee5713a463b48":</span></span>
+<span><span class="co">## No such file or directory</span></span></code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
 <span><span class="va">int2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit2</span>,</span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
@@ -471,27 +475,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-26.128808</td>
-<td align="right">24.716708</td>
-<td align="right">-68.40342</td>
-<td align="right">-27.542352</td>
-<td align="right">13.189711</td>
+<td align="right">-28.427804</td>
+<td align="right">23.678823</td>
+<td align="right">-74.91810</td>
+<td align="right">-27.760841</td>
+<td align="right">14.707577</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.219811</td>
-<td align="right">1.655998</td>
-<td align="right">-10.92328</td>
-<td align="right">-8.573564</td>
-<td align="right">-4.103731</td>
+<td align="right">-8.580393</td>
+<td align="right">1.322553</td>
+<td align="right">-10.81110</td>
+<td align="right">-8.802839</td>
+<td align="right">-5.827234</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.070542</td>
-<td align="right">3.234126</td>
-<td align="right">-17.31367</td>
-<td align="right">-11.099018</td>
-<td align="right">-5.165918</td>
+<td align="right">-11.443725</td>
+<td align="right">3.230450</td>
+<td align="right">-17.40707</td>
+<td align="right">-11.609547</td>
+<td align="right">-5.413720</td>
 </tr>
 </tbody>
 </table>
@@ -505,15 +509,17 @@ effect.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
 The residuals of the model are also computed where <span class="math inline">\(B = W\)</span>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Intercept model</span></span>
 <span><span class="va">comp3</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp3</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Display the model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in normalizePath(inla.dir): path[1]="/tmp/RtmpJy6Gtu/filee5715d4292a3":</span></span>
+<span><span class="co">## No such file or directory</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
 <span><span class="va">int3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit3</span>,</span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
@@ -532,8 +538,8 @@ W\)</span> are given below:</p>
 <col width="15%">
 <col width="15%">
 <col width="15%">
-<col width="15%">
-<col width="13%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
@@ -546,27 +552,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-2.2813842</td>
-<td align="right">24.9047025</td>
-<td align="right">-53.026662</td>
-<td align="right">-2.9947866</td>
-<td align="right">46.568553</td>
+<td align="right">-3.3526881</td>
+<td align="right">25.4561406</td>
+<td align="right">-51.924718</td>
+<td align="right">0.4265085</td>
+<td align="right">46.507492</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-0.0410188</td>
-<td align="right">0.7598251</td>
-<td align="right">-1.503628</td>
-<td align="right">-0.0915521</td>
-<td align="right">1.541375</td>
+<td align="right">-0.0724578</td>
+<td align="right">0.7752123</td>
+<td align="right">-1.476438</td>
+<td align="right">0.0131109</td>
+<td align="right">1.539260</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-0.3167439</td>
-<td align="right">4.3461270</td>
-<td align="right">-8.929193</td>
-<td align="right">-0.5236210</td>
-<td align="right">8.472284</td>
+<td align="right">-0.5002306</td>
+<td align="right">4.4380978</td>
+<td align="right">-8.755774</td>
+<td align="right">0.0747792</td>
+<td align="right">8.460915</td>
 </tr>
 </tbody>
 </table>
@@ -580,16 +586,18 @@ type smooth function.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
 The residuals of the model are also computed where <span class="math inline">\(B = W\)</span>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Smooth model</span></span>
 <span><span class="va">comp4</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp4</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Display the model</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in normalizePath(inla.dir): path[1]="/tmp/RtmpJy6Gtu/filee5716b21e845":</span></span>
+<span><span class="co">## No such file or directory</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
 <span><span class="va">int4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit4</span>,</span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
@@ -622,27 +630,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-25.108347</td>
-<td align="right">26.722465</td>
-<td align="right">-79.97807</td>
-<td align="right">-22.459584</td>
-<td align="right">25.130825</td>
+<td align="right">-24.379724</td>
+<td align="right">28.174360</td>
+<td align="right">-78.58554</td>
+<td align="right">-21.788548</td>
+<td align="right">29.423276</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.617376</td>
-<td align="right">1.434099</td>
-<td align="right">-10.77003</td>
-<td align="right">-8.858478</td>
-<td align="right">-5.598774</td>
+<td align="right">-8.923146</td>
+<td align="right">1.375264</td>
+<td align="right">-11.08510</td>
+<td align="right">-9.036441</td>
+<td align="right">-6.396778</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.594108</td>
-<td align="right">3.438367</td>
-<td align="right">-18.80022</td>
-<td align="right">-11.772735</td>
-<td align="right">-5.481177</td>
+<td align="right">-12.006531</td>
+<td align="right">3.910483</td>
+<td align="right">-18.78743</td>
+<td align="right">-11.623700</td>
+<td align="right">-4.689766</td>
 </tr>
 </tbody>
 </table>
@@ -665,12 +673,12 @@ function which divides a polygon into grids based on number of rows and
 columns or by a desired resolution. The code chunk below demonstrates a
 use of the function for dividing the polygon and calculating the
 residuals for this choice of <span class="math inline">\(B\)</span>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a grid for B partitioned into two</span></span>
 <span><span class="va">B1</span> <span class="op">&lt;-</span> <span class="fu">partition</span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">boundary</span>, nrows <span class="op">=</span> <span class="fl">1</span>, ncols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">B1</span>, main <span class="op">=</span> <span class="st">"Two partitions of B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/partitioning-B-two-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">As1</span> <span class="op">&lt;-</span> <span class="fu">prepare_residual_calculations</span><span class="op">(</span></span>
 <span>  samplers <span class="op">=</span> <span class="va">B1</span>, domain <span class="op">=</span> <span class="va">mesh</span>,</span>
 <span>  observations <span class="op">=</span> <span class="va">nests</span></span>
@@ -704,51 +712,51 @@ residuals for this choice of <span class="math inline">\(B\)</span>.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">42.493981</td>
-<td align="right">16.3451262</td>
-<td align="right">9.742374</td>
-<td align="right">41.305061</td>
-<td align="right">76.789631</td>
+<td align="right">43.091118</td>
+<td align="right">17.2060066</td>
+<td align="right">11.391437</td>
+<td align="right">43.339651</td>
+<td align="right">73.118802</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-42.931416</td>
-<td align="right">10.6048126</td>
-<td align="right">-60.755255</td>
-<td align="right">-43.661721</td>
-<td align="right">-23.094848</td>
+<td align="right">-43.010578</td>
+<td align="right">11.0746924</td>
+<td align="right">-64.396520</td>
+<td align="right">-42.190663</td>
+<td align="right">-23.626262</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">5.327138</td>
-<td align="right">1.0747084</td>
-<td align="right">3.365801</td>
-<td align="right">5.257131</td>
-<td align="right">7.483728</td>
+<td align="right">5.347575</td>
+<td align="right">1.0054019</td>
+<td align="right">3.377390</td>
+<td align="right">5.384027</td>
+<td align="right">7.199462</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">-4.857793</td>
-<td align="right">0.4204925</td>
-<td align="right">-5.505786</td>
-<td align="right">-4.911134</td>
-<td align="right">-4.010088</td>
+<td align="right">-4.852570</td>
+<td align="right">0.4105032</td>
+<td align="right">-5.669943</td>
+<td align="right">-4.887822</td>
+<td align="right">-4.052449</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">15.557994</td>
-<td align="right">2.8132339</td>
-<td align="right">10.627647</td>
-<td align="right">15.552671</td>
-<td align="right">20.732091</td>
+<td align="right">15.618995</td>
+<td align="right">2.8604638</td>
+<td align="right">10.368412</td>
+<td align="right">15.213451</td>
+<td align="right">21.065190</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">-14.788266</td>
-<td align="right">1.7162469</td>
-<td align="right">-17.848704</td>
-<td align="right">-14.907492</td>
-<td align="right">-11.713497</td>
+<td align="right">-14.790418</td>
+<td align="right">1.7313594</td>
+<td align="right">-18.261819</td>
+<td align="right">-14.886337</td>
+<td align="right">-11.427678</td>
 </tr>
 </tbody>
 </table>
@@ -781,75 +789,75 @@ region and its residuals are as displayed below:
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">68.134727</td>
-<td align="right">8.2397887</td>
-<td align="right">53.4393717</td>
-<td align="right">67.431841</td>
-<td align="right">85.854400</td>
+<td align="right">70.297895</td>
+<td align="right">8.8021109</td>
+<td align="right">51.8180879</td>
+<td align="right">69.676650</td>
+<td align="right">86.288583</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-25.378568</td>
-<td align="right">16.8109393</td>
-<td align="right">-54.2737956</td>
-<td align="right">-25.799366</td>
-<td align="right">4.802725</td>
+<td align="right">-21.031092</td>
+<td align="right">17.9671750</td>
+<td align="right">-55.3584484</td>
+<td align="right">-22.042803</td>
+<td align="right">14.949339</td>
 </tr>
 <tr class="odd">
 <td align="left">Scaling_Residuals.3</td>
-<td align="right">-47.347693</td>
-<td align="right">4.6316546</td>
-<td align="right">-56.0929757</td>
-<td align="right">-47.703393</td>
-<td align="right">-38.806348</td>
+<td align="right">-46.526675</td>
+<td align="right">4.4174727</td>
+<td align="right">-55.2315251</td>
+<td align="right">-46.631383</td>
+<td align="right">-36.377608</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">2.794999</td>
-<td align="right">0.7184084</td>
-<td align="right">1.7604994</td>
-<td align="right">2.679654</td>
-<td align="right">4.175961</td>
+<td align="right">2.974820</td>
+<td align="right">0.8322749</td>
+<td align="right">1.6759115</td>
+<td align="right">2.845902</td>
+<td align="right">4.975778</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">2.840802</td>
-<td align="right">0.7146117</td>
-<td align="right">1.6402683</td>
-<td align="right">2.743579</td>
-<td align="right">4.337523</td>
+<td align="right">3.024169</td>
+<td align="right">0.8089525</td>
+<td align="right">1.7614783</td>
+<td align="right">2.924675</td>
+<td align="right">4.917442</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.3</td>
-<td align="right">-5.458170</td>
-<td align="right">0.0485285</td>
-<td align="right">-5.5337889</td>
-<td align="right">-5.465053</td>
-<td align="right">-5.365578</td>
+<td align="right">-5.447642</td>
+<td align="right">0.0590679</td>
+<td align="right">-5.5203840</td>
+<td align="right">-5.460253</td>
+<td align="right">-5.295619</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">11.207945</td>
-<td align="right">1.8621760</td>
-<td align="right">8.0954412</td>
-<td align="right">11.008928</td>
-<td align="right">15.021477</td>
+<td align="right">11.689063</td>
+<td align="right">1.9741203</td>
+<td align="right">8.0156840</td>
+<td align="right">11.591375</td>
+<td align="right">16.061618</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">4.018076</td>
-<td align="right">2.2432351</td>
-<td align="right">0.0845981</td>
-<td align="right">3.922223</td>
-<td align="right">8.545476</td>
+<td align="right">4.679755</td>
+<td align="right">2.4651969</td>
+<td align="right">-0.3197989</td>
+<td align="right">4.502039</td>
+<td align="right">10.181352</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.3</td>
-<td align="right">-15.429237</td>
-<td align="right">0.8640840</td>
-<td align="right">-16.9574531</td>
-<td align="right">-15.538115</td>
-<td align="right">-13.825137</td>
+<td align="right">-15.266985</td>
+<td align="right">0.8587115</td>
+<td align="right">-16.7795826</td>
+<td align="right">-15.371621</td>
+<td align="right">-13.379088</td>
 </tr>
 </tbody>
 </table>
@@ -872,7 +880,7 @@ below demonstrates how this plotting is done for the vegetation model at
 resolution <span class="math inline">\(B = B_3\)</span>. Here, it is
 useful for each type of residual to have the same colour scale at both
 resolutions.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Residuals of Vegetation model</span></span>
 <span><span class="va">Residual_fit1_B3</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As3</span><span class="op">$</span><span class="va">df</span>,</span>
@@ -958,7 +966,7 @@ residual and choice of <span class="math inline">\(B\)</span>. Here, it
 is useful to have the same colour scale for all the 4 models.</p>
 <p>The code chunk below demonstrates the code for plotting the “Pearson”
 residuals when <span class="math inline">\(B = B_4\)</span>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for all models at B4</span></span>
 <span><span class="va">Residual_fit1_B4</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As4</span><span class="op">$</span><span class="va">df</span>,</span>
@@ -1049,7 +1057,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <div class="section level3">
 <h3 id="function-definitions">Function definitions<a class="anchor" aria-label="anchor" href="#function-definitions"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Niharika Reddy Peddinenikalva</span></span>
 <span><span class="co"># Vacation Scholarship project</span></span>
 <span></span>
