@@ -329,6 +329,7 @@ bru_log.iinla <- function(x, verbosity = NULL) {
 #' @rdname bru_log
 #' @export
 bru_log.bru <- function(x, verbosity = NULL) {
+  x <- bru_check_object_bru(x)
   if (is.null(x[["bru_iinla"]][["log"]])) {
     return(bru_log_new(character(0)))
   }
@@ -345,18 +346,18 @@ bru_log.bru <- function(x, verbosity = NULL) {
 #' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
 #'
 print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
-  if (verbosity) {
-    cat(
-      paste0(
-        x[["log"]][["timestamp"]], ": ",
-        x[["log"]][["message"]],
-        " (level ", x[["log"]][["verbosity"]], ")"
-      ),
-      sep = "\n"
+  msg <- x[["log"]][["message"]]
+  if (timestamp) {
+    msg <- paste0(
+      x[["log"]][["timestamp"]], ": ", msg
     )
-  } else {
-    cat(x[["log"]][["message"]], sep = "\n")
   }
+  if (verbosity) {
+    msg <- paste0(
+      msg, " (level ", x[["log"]][["verbosity"]], ")"
+    )
+  }
+  cat(msg, sep = "\n")
   invisible(x)
 }
 

@@ -248,6 +248,19 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.10.1.9007"
     }
 
+    if (utils::compareVersion("2.10.1.9012", old_ver) > 0) {
+      message("Upgrading bru_info to 2.10.1.9012")
+      # Update log format to new format
+
+      object_full[["bru_iinla"]][["log"]] <-
+        bru_log_new(
+          object_full[["bru_iinla"]][["log"]][["log"]],
+          bookmarks = object_full[["bru_iinla"]][["log"]][["bookmarks"]]
+        )
+
+      object[["inlabru_version"]] <- "2.10.1.9012"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(paste0("Upgraded bru_info to ", new_version))
 
