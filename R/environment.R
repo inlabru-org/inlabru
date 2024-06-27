@@ -319,20 +319,20 @@ bru_log.bru_log <- function(x, verbosity = NULL) {
 
 #' @rdname bru_log
 #' @export
-bru_log.iinla <- function(x) {
+bru_log.iinla <- function(x, verbosity = NULL) {
   if (is.null(x[["log"]])) {
     return(bru_log_new(character(0)))
   }
-  bru_log(x[["log"]])
+  bru_log(x[["log"]], verbosity = verbosity)
 }
 
 #' @rdname bru_log
 #' @export
-bru_log.bru <- function(x) {
+bru_log.bru <- function(x, verbosity = NULL) {
   if (is.null(x[["bru_iinla"]][["log"]])) {
     return(bru_log_new(character(0)))
   }
-  bru_log(x[["bru_iinla"]][["log"]])
+  bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity)
 }
 
 #' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.

@@ -19,9 +19,9 @@ bru_log(x = NULL, verbosity = NULL)
 
 \method{bru_log}{bru_log}(x, verbosity = NULL)
 
-\method{bru_log}{iinla}(x)
+\method{bru_log}{iinla}(x, verbosity = NULL)
 
-\method{bru_log}{bru}(x)
+\method{bru_log}{bru}(x, verbosity = NULL)
 
 \method{print}{bru_log}(x, ..., timestamp = TRUE, verbosity = FALSE)
 
