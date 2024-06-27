@@ -25,8 +25,11 @@ bru_make_stack(...)
 
 \item{idx}{Output from \code{evaluate_index(...)}}
 
+\item{family_index}{integer specifying the family sequence index of the observation model}
+
 \item{lhoods}{A \code{bru_like_list} object}
 }
 \description{
 Combine linearisation for multiple likelihoods
 }
+\keyword{internal}

@@ -23,6 +23,7 @@
 * Add support for special response objects like `inla.mdata()` and `inla.surv()`,
   when INLA version `> 24.06.02` (for `mdata`) or `> 24.06.26` (for `surv`) are
   available (version `2.10.1.9011`)
+* Add verbosity level information to the bru log data structure (version `2.10.1.9012`)
 
 # inlabru 2.10.1
 

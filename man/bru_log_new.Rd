@@ -7,9 +7,11 @@
 bru_log_new(x = NULL, bookmarks = NULL)
 }
 \arguments{
-\item{x}{An optional character vector of log messages}
+\item{x}{An optional character vector of log messages, or \code{data.frame}
+with columns \code{message}, \code{timestamp}, and \code{verbosity}.}
 
-\item{bookmarks}{An optional \code{integer} vector of named bookmarks}
+\item{bookmarks}{An optional \code{integer} vector of named bookmarks
+message in \code{x}.}
 }
 \description{
 Create a \code{bru_log} object, by default empty.

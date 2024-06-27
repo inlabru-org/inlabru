@@ -8,7 +8,7 @@ bru_log_message(
   ...,
   domain = NULL,
   appendLF = TRUE,
-  verbosity = 1,
+  verbosity = 1L,
   allow_verbose = TRUE,
   verbose = NULL,
   verbose_store = NULL,
