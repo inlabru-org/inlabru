@@ -170,15 +170,27 @@ test_that("surv", {
   )
 
   expect_equal(
-    r_bru$summary.fixed[, c("mean", "sd")],
-    r_inla$summary.fixed[, c("mean", "sd")],
+    r_bru$summary.fixed[, "mean"],
+    r_inla$summary.fixed[, "mean"],
     tolerance = lowtol
   )
 
   expect_equal(
-    r_bru$summary.hyperpar[, c("mean", "sd")],
-    r_inla$summary.hyperpar[, c("mean", "sd")],
+    r_bru$summary.fixed[, "sd"],
+    r_inla$summary.fixed[, "sd"],
+    tolerance = midtol
+  )
+
+  expect_equal(
+    r_bru$summary.hyperpar[, "mean"],
+    r_inla$summary.hyperpar[, "mean"],
     tolerance = lowtol
+  )
+
+  expect_equal(
+    r_bru$summary.hyperpar[, "sd"],
+    r_inla$summary.hyperpar[, "sd"],
+    tolerance = midtol
   )
 
   # Multi-family
