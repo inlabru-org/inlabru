@@ -3829,7 +3829,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           signif(100 * max(dev), 3),
           "% of SD, and line search is ",
           if (line_search[["active"]]) "active" else "inactive",
-          " [stop if: <", 100 * max.dev, "% and line search inactive]"
+          "\n       [stop if: <", 100 * max.dev, "% and line search inactive]"
         ),
         verbose = options$bru_verbose,
         verbose_store = options$bru_verbose_store,
@@ -3839,7 +3839,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       if (do_final_integration) {
         do_final_theta_no_restart <- TRUE
         bru_log_message(
-          "iinla: Convergence criterion met, running final INLA integration with known theta mode.",
+          "iinla: Convergence criterion met.",
+          "\n       Running final INLA integration step with known theta mode.",
           verbose = options$bru_verbose,
           verbose_store = options$bru_verbose_store
         )
