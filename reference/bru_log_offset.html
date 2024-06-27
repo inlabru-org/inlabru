@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9012</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_log_offset</span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, bookmark <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_log_index</span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">i</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_log_index</span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">i</span>, verbosity <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -125,6 +125,10 @@ shift (forwards or backwards) to the bookmark list.</p></dd>
 <dd><p>indices specifying elements to extract. If <code>character</code>, denotes
 the sequence between bookmark <code>i</code> and the next bookmark (or the end of the
 log if <code>i</code> is the last bookmark)</p></dd>
+
+
+<dt>verbosity</dt>
+<dd><p>integer value for limiting the highest verbosity level being returned.</p></dd>
 
 </dl></div>
     <div class="section level2">
