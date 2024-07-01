@@ -1,5 +1,11 @@
 # inlabru 2.11.1
 
+## Bug fixes
+
+* Fix documentation link issues not spotted by local and github package checks
+* Work around invalid geometry in map data used by the Spatially Varying
+  Coefficients vignette
+
 # inlabru 2.11.0
 
 ## New features
