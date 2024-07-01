@@ -142,12 +142,15 @@ epsg6703km <- paste(
 )
 
 # make a base map
-states <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE)) %>%
+states <- maps::map("state", plot = FALSE, fill = TRUE) %>%
+  sf::st_as_sf() %>%
   filter(ID %in% c(
     "texas", "oklahoma", "kansas", "missouri",
     "arkansas", "louisiana"
   )) %>%
-  st_transform(epsg6703km)
+  sf::st_make_valid() %>%
+  sf::st_transform(epsg6703km) %>%
+  sf::st_make_valid() %>%
 ```
 
 ## Import data
@@ -552,7 +555,11 @@ names(out_stk) <- c(
   "alpha_median", "alpha_range95", "epsilon_median",
   "epsilon_range95", "tau_median", "tau_range95"
 )
-out_stk <- terra::mask(out_stk, states, touches = FALSE)
+out_stk <- terra::mask(
+  out_stk,
+  terra::vect(sf::st_union(states)),
+  updatevalue = NA,
+  touches = FALSE)
 ```
 
 Finally, we plot the SVCs with the following code. We plot the posterior median and 95% uncertainty width ("range95")
