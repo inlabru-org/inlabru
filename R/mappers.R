@@ -535,6 +535,7 @@ bru_mapper_define <- function(mapper,
 #' instead, and supply at least a `new_class` class name.
 #' Use of the `bru_mapper.default` method was deprecated from version 2.7.0,
 #' and removed in version 2.11.0
+#' @export
 bru_mapper.default <- function(...) {
   lifecycle::deprecate_stop(
     "2.7.0",
