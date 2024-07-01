@@ -158,20 +158,20 @@ string that will determine the label of the effect. See Details for further info
 <p>A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-<a href="inlabru-package.html">inlabru</a> provides the new <code>main</code> agument. For convenience, the <code>main</code> argument can be used
-like the first argument of the f function, e.g., and is the first argument of the component definition.</p>
+<a href="inlabru-package.html">inlabru</a> provides the <code>main</code> argument. For convenience, the <code>main</code> argument can be used
+like the first argument of the f function, e.g., and is the first argument of the component definition.
+The <code>INLA</code> model formula</p>
 <p><code>y ~ f(temperature, model = 'linear')</code></p>
-<p>is equivalent to</p>
+<p>is equivalent to the <code>inlabru</code> component and formula definition</p>
 <p><code>y ~ temperature(temperature, model = 'linear')</code>
 and
 <code>y ~ temperature(main = temperature, model = 'linear')</code>
 as well as
 <code>y ~ temperature(model = 'linear')</code>
 which sets <code>main = temperature</code>.</p>
-<p>On the other hand, map can also be a function mapping, e.g the <a href="https://edzer.github.io/sp/reference/coordinates.html" class="external-link">coordinates</a> function of the
-<a href="https://edzer.github.io/sp/reference/00sp.html" class="external-link">sp</a> package :</p>
+<p>On the other hand, <code>main</code> can also be a function mapping, e.g the <code><a href="https://edzer.github.io/sp/reference/coordinates.html" class="external-link">sp::coordinates()</a></code> function:</p>
 <p><code>y ~ mySPDE(coordinates, ...)</code></p>
-<p>This exctract the coordinates from the data object, and maps it to the latent
+<p>This extracts the coordinates from the data object, and maps it to the latent
 field via the information given in the <code>mapper</code>, which by default is
 extracted from the <code>model</code> object, in the case of <code>spde</code> model
 objects.</p>
