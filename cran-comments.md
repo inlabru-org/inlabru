@@ -1,8 +1,6 @@
 ## Submission notes
 
-* Patch release 2.10.1
-* Fixes deprecation issue with ggplot2
-* Adds compatibility with an upcoming change in terra version 1.7-66
+* Minor feature and bugfix release 2.11.0
 
 ## R CMD check results and comments
 
