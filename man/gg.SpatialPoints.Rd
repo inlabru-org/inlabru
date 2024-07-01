@@ -13,7 +13,7 @@
 mapping. The default mapping is
 \code{ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]])}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the data to before plotting.}
 
 \item{...}{Arguments passed on to \code{geom_point}.}
 }

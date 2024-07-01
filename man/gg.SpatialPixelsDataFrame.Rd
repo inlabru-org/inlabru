@@ -12,7 +12,7 @@
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
 mapping. The default mapping is \code{ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])}.}
 
-\item{crs}{A \link{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the data to before plotting.}
 
 \item{mask}{A SpatialPolygon defining the region that is plotted.}
 

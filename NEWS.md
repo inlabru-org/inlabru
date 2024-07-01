@@ -1,3 +1,11 @@
+# inlabru 2.11.1
+
+## Bug fixes
+
+* Fix documentation link issues not spotted by local and github package checks
+* Work around invalid geometry in map data used by the Spatially Varying
+  Coefficients vignette
+
 # inlabru 2.11.0
 
 ## New features
@@ -20,7 +28,7 @@
   instead of elapsed clock time. Added `bru_timings()` method to extract the timings
   safely from a fitted `bru` object (version `2.10.1.9007` and `2.10.1.9010`)
 * Add verbosity level information to the bru log data structure,
-  allowing flitered log extraction and more flexible log display
+  allowing filtered log extraction and more flexible log display
   (version `2.10.1.9012`)
 
 ## Bug fixes

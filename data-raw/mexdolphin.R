@@ -100,7 +100,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 #' Mexdolphin data import
 #'
 #'
-#' Load `mexdolphins` survey data from `dsm` package and convert to spatial formats defined by the [sp] package.
+#' Load `mexdolphins` survey data from `dsm` package and convert to spatial formats defined by the `sp` package.
 #'
 #' @aliases import.mexdolphin
 #' @keywords internal

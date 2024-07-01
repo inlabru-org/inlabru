@@ -1,6 +1,10 @@
 ## Submission notes
 
-* Minor feature and bugfix release 2.11.0
+* Resubmission of 2.11.0 as 2.11.1, with additional bugfixes
+* Fixes issue with package cross references in documentation; these had gone
+  undetected by all local and github testing, but were caught by CRAN checks.
+  I was unable to get any R version check (including the very latest devel version)
+  to generate the actual NOTE, but the problem was clear and quickly fixed.
 
 ## R CMD check results and comments
 

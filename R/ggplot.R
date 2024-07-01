@@ -380,7 +380,7 @@ gg.prediction <- function(data, ...) {
 #'                mapping. The default mapping is
 #'                `ggplot2::aes(x = .data[[coordnames(data)[1]]],
 #'                 y = .data[[coordnames(data)[2]]])`.
-#' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
+#' @param crs A [sp::CRS] object defining the coordinate system to project the data to before plotting.
 #' @param ... Arguments passed on to `geom_point`.
 #' @return A `geom_point` return value
 #' @family geomes for spatial data
@@ -631,7 +631,7 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
 #'                mapping. The default mapping is `ggplot2::aes(x = .data[[coordnames(data)[1]]],
 #'                y = .data[[coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])`.
-#' @param crs A [CRS] object defining the coordinate system to project the data to before plotting.
+#' @param crs A [sp::CRS] object defining the coordinate system to project the data to before plotting.
 #' @param mask A SpatialPolygon defining the region that is plotted.
 #' @param ... Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
@@ -681,7 +681,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @aliases gg.SpatialPixels
 #' @name gg.SpatialPixels
 #' @export
-#' @param data A [SpatialPixels] object.
+#' @param data A [sp::SpatialPixels] object.
 #' @param ... Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data

@@ -161,11 +161,11 @@ Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
 
 \item \code{integration_weight_aggregation()}: Aggregate integration weights onto mesh nodes
 
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_vertex_projection]{fm_vertex_projection()}} instead.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[fmesher:fm_vertex_projection]{fmesher::fm_vertex_projection()}} instead.
 
 \item \code{mesh_triangle_integration()}: Integration scheme for mesh triangle interiors
 
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[=fm_int_mesh_2d_core]{fm_int_mesh_2d_core()}} instead.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[fmesher:fm_int_mesh_2d_core]{fmesher::fm_int_mesh_2d_core()}} instead.
 
 \item \code{bru_mapper(default)}: Calls \code{bru_mapper_define}, passing all
 arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}

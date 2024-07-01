@@ -3,7 +3,7 @@ source(here::here("data-raw", "dsmdata.R"))
 
 #' MRSea data import
 #'
-#' Load mrsea survey data from the MRSea package and convert to spatial formats defined by the [sp] package.
+#' Load mrsea survey data from the MRSea package and convert to spatial formats defined by the `sp` package.
 #' Requires the MRSea package from <https://github.com/lindesaysh/MRSea>, and
 #' is normally only run by the package maintainer. For regular inlabru use of the data,
 #' use `data("MRSea", package = "inlabru")`, which does not require the MRSea package.
