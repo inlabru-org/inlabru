@@ -207,7 +207,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
 
     # Extract simulated predictor and fixed effects
     for (name in unique(c("Predictor", result$names.fixed))) {
-      vals[[name]] <- extract.entries(name, smpl.latent, .contents = .contents)
+      vals[[name]] <- extract_entries(name, smpl.latent, .contents = .contents)
     }
 
     # Extract simulated latent variables.
@@ -220,7 +220,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
         name <- names(result$summary.random)[k]
         #        model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
-        vals[[name]] <- extract.entries(name, smpl.latent, .contents = .contents)
+        vals[[name]] <- extract_entries(name, smpl.latent, .contents = .contents)
         #        }
         #        else {
         #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
@@ -258,7 +258,7 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
   return(ssmpl)
 }
 
-extract.entries <- function(name, smpl, .contents = NULL) {
+extract_entries <- function(name, smpl, .contents = NULL) {
   if (is.null(.contents)) {
     ename <- gsub("\\.", "\\\\.", name)
     ename <- gsub("\\(", "\\\\(", ename)
