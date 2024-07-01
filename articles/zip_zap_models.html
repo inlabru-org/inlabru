@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -242,7 +242,7 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.0.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9000</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -255,10 +255,10 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.355, Running = 2.68, Post = 0.53, Total = 3.56 </span></span>
+<span><span class="co">#&gt;     Pre = 0.351, Running = 2.65, Post = 0.53, Total = 3.53 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
 <span><span class="co">#&gt; Intercept     -6.173 3.464    -13.001   -6.167      0.637 -6.157   0</span></span>
@@ -358,7 +358,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.0.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9000</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -371,7 +371,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.356, Running = 1.65, Post = 0.142, Total = 2.15 </span></span>
+<span><span class="co">#&gt;     Pre = 0.357, Running = 1.62, Post = 0.14, Total = 2.12 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -399,7 +399,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1553.47</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.35</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 125.17</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 125.16</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.24</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 109.70</span></span>
@@ -554,21 +554,21 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.578e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.608e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -9.311e-16</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.71e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 2.342e-15</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.678e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04421, norm1 = 6.819e-12, norm01 = 0.04421)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04421</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.824e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 6.818e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04439, norm1 = 7.079e-12, norm01 = 0.04439)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04439</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.458e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.079e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
-<span><span class="co">#&gt; iinla: Max deviation from previous: 0.675% of SD, and line search is inactive</span></span>
+<span><span class="co">#&gt; iinla: Max deviation from previous: 0.678% of SD, and line search is inactive</span></span>
 <span><span class="co">#&gt;        [stop if: &lt;10% and line search inactive]</span></span>
 <span><span class="co">#&gt; iinla: Convergence criterion met.</span></span>
 <span><span class="co">#&gt;        Running final INLA integration step with known theta mode.</span></span>
@@ -576,7 +576,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.0.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9000</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -597,7 +597,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.534, Running = 3.88, Post = 0.269, Total = 4.68 </span></span>
+<span><span class="co">#&gt;     Pre = 0.515, Running = 3.87, Post = 0.257, Total = 4.64 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
@@ -861,24 +861,24 @@ a strictly proper score <span class="citation">(Gneiting and Raftery
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2425728</td>
-<td align="right">0.5608761</td>
-<td align="right">-2.602507</td>
-<td align="right">0.3928524</td>
+<td align="right">0.2424472</td>
+<td align="right">0.5617842</td>
+<td align="right">-2.493088</td>
+<td align="right">0.3926521</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2544570</td>
-<td align="right">0.6008170</td>
-<td align="right">-2.645545</td>
-<td align="right">0.4024659</td>
+<td align="right">0.2544793</td>
+<td align="right">0.6006409</td>
+<td align="right">-2.663985</td>
+<td align="right">0.4024878</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2801882</td>
-<td align="right">0.6537585</td>
-<td align="right">-2.304583</td>
-<td align="right">0.4002930</td>
+<td align="right">0.2800219</td>
+<td align="right">0.6534538</td>
+<td align="right">-2.314282</td>
+<td align="right">0.4001666</td>
 </tr>
 </tbody>
 </table>
