@@ -3,14 +3,11 @@
 \name{bru_mapper}
 \alias{bru_mapper}
 \alias{bru_mapper_define}
-\alias{bru_mapper.default}
 \title{Constructors for \code{bru_mapper} objects}
 \usage{
 bru_mapper(...)
 
 bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
-
-\method{bru_mapper}{default}(...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to sub-methods, or used for special purposes,
@@ -31,14 +28,6 @@ For \code{bru_mapper_scale}, a mapper to be scaled.}
 \description{
 Constructors for \code{bru_mapper} objects
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{bru_mapper(default)}: Calls \code{bru_mapper_define}, passing all
-arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
-instead, and supply at least a \code{new_class} class name.
-Use of the \code{bru_mapper.default} method will be deprecated from version 2.7.0.
-
-}}
 \section{Functions}{
 \itemize{
 \item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing

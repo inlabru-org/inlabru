@@ -507,7 +507,7 @@ bru_mapper_define <- function(mapper,
         "  #' @exportS3Method inlabru::bru_get_mapper",
         "etc., which semi-automates it."
       )
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.7.0",
       what = "bru_mapper_define(methods)",
       details =
@@ -529,13 +529,15 @@ bru_mapper_define <- function(mapper,
 
 ## Default methods ----
 
-#' @describeIn bru_mapper Calls `bru_mapper_define`, passing all
+#' @describeIn inlabru-deprecated
+#' Calls `bru_mapper_define`, passing all
 #' arguments along. Mapper implementations should call [bru_mapper_define()]
 #' instead, and supply at least a `new_class` class name.
-#' Use of the `bru_mapper.default` method will be deprecated from version 2.7.0.
+#' Use of the `bru_mapper.default` method was deprecated from version 2.7.0,
+#' and removed in version 2.11.0
 #' @export
 bru_mapper.default <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.7.0",
     "bru_mapper.default()",
     "bru_mapper_define()"
@@ -1854,9 +1856,9 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
 #' calculations.  Relies on the input handling methods for `bru_mapper_aggregate`,
 #' but also allows the weights to be supplied on a logarithmic scale as `log_weights`.
 #' To avoid numerical overflow, it uses the common method of internally
-#' shifting the state blockwise with
-#' `(state-log_weights)[block] - max((state-log_weights)[block])`,
-#' and shifting the result back afterwards.
+#' shifting the state blockwise;
+#' \eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
+#' where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
 #' @rdname bru_mapper_logsumexp
 #' @inheritParams bru_mapper_generics
 #' @inheritParams bru_mapper_aggregate
@@ -2376,7 +2378,7 @@ ibm_eval2.bru_mapper_pipe <- function(mapper, input, state = NULL, ...) {
 #' names, allowing the original `input` structure to be used also with the simplified
 #' mappers, since the `taylor` mappers are not dependent on inputs.
 #' @export
-ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
+ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL, inla_f = FALSE,
                                          ..., n_state = NULL) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
@@ -2386,12 +2388,18 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
   }
   if (ibm_is_linear(mapper)) {
     if (is.null(state)) {
-      state <- rep(0, ibm_n(mapper[["mappers"]][[1]],
+      n <- ibm_n(mapper[["mappers"]][[1]],
         ...,
-        input = input[[names(mapper[["mappers"]])[1]]]
-      ))
+        inla_f = FALSE,
+        input = input[[names(mapper[["mappers"]])[1]]],
+        n_state = n_state
+      )
+      state <- rep(0, n)
     }
-    return(ibm_linear(mapper, input = input, state = state, ..., n_state = n_state))
+    return(ibm_linear(mapper,
+      input = input, state = state, ...,
+      inla_f = inla_f, n_state = n_state
+    ))
   }
 
   # Basic version, that just replaces each individual mapper with a simplification.
@@ -2400,6 +2408,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
     input = input[[names(mapper[["mappers"]])[1]]],
     state = state,
     ...,
+    inla_f = FALSE,
     n_state = n_state
   )
   for (k in names(mapper[["mappers"]])) {
@@ -2407,6 +2416,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
       mapper[["mappers"]][[k]] <- ibm_simplify(
         mapper[["mappers"]][[k]],
         input = input[[k]],
+        ...,
         n_state = n
       )
     }
@@ -2414,6 +2424,7 @@ ibm_simplify.bru_mapper_pipe <- function(mapper, input = NULL, state = NULL,
       mapper[["mappers"]][[k]],
       input = input[[k]],
       ...,
+      inla_f = FALSE,
       n_state = n
     )
   }

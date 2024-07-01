@@ -379,6 +379,10 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
       "SpatialGridDataFrame"
     )
   ))
+  if (inherits(where, "sf")) {
+    where <- sf::as_Spatial(where)
+  }
+
   if (inherits(where, "SpatialPoints")) {
     where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
     if (ncol(sp::coordinates(where)) >= 3) {
@@ -467,7 +471,7 @@ eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) 
     where <- terra::vect(where)
   }
   if (!fm_crs_is_null(fm_crs(where)) &&
-      !fm_crs_is_null(fm_crs(data))) {
+    !fm_crs_is_null(fm_crs(data))) {
     where <- terra::project(where, data)
   }
   if (getNamespaceVersion("terra") >= "1.7-66") {
@@ -675,7 +679,8 @@ resave_package_data <- function() {
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
     "seals_sp", "shrimp", "toygroups",
-    "robins_subset"
+    "robins_subset",
+    "toypoints"
   )
   compress_values <- c("gzip", "bzip2", "xz")
 

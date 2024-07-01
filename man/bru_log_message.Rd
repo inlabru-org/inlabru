@@ -8,7 +8,7 @@ bru_log_message(
   ...,
   domain = NULL,
   appendLF = TRUE,
-  verbosity = 1,
+  verbosity = 1L,
   allow_verbose = TRUE,
   verbose = NULL,
   verbose_store = NULL,
@@ -78,10 +78,10 @@ if (interactive()) {
 }
 \seealso{
 Other inlabru log methods: 
+\code{\link{bru_log}()},
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_new}()},
 \code{\link{bru_log_offset}()},
-\code{\link{bru_log_reset}()},
-\code{\link{bru_log}()}
+\code{\link{bru_log_reset}()}
 }
 \concept{inlabru log methods}

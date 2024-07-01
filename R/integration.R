@@ -160,6 +160,7 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 
 
 
+#' @describeIn inlabru-deprecated
 #' Aggregate integration weights onto mesh nodes
 #'
 #' `r lifecycle::badge("deprecated")` Use [fm_vertex_projection()] instead.
@@ -171,9 +172,8 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 #'   are handled.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
-#' @export
 integration_weight_aggregation <- function(mesh, integ) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.8.0",
     "integration_weight_aggregation()",
     "fmesher::fm_vertex_projection()"
@@ -199,7 +199,7 @@ integration_weight_aggregation <- function(mesh, integ) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @keywords internal
 mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.8.0",
     "mesh_triangle_integration()",
     "fmesher::fm_int_mesh_2d_core()"

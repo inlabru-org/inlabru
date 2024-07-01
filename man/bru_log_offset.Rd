@@ -7,7 +7,7 @@
 \usage{
 bru_log_offset(x = NULL, bookmark = NULL, offset = NULL)
 
-bru_log_index(x = NULL, i)
+bru_log_index(x = NULL, i, verbosity = NULL)
 }
 \arguments{
 \item{x}{A \code{bru_log} object. If \code{NULL}, the global \code{inlabru} log is used.}
@@ -22,6 +22,8 @@ shift (forwards or backwards) to the bookmark list.}
 \item{i}{indices specifying elements to extract. If \code{character}, denotes
 the sequence between bookmark \code{i} and the next bookmark (or the end of the
 log if \code{i} is the last bookmark)}
+
+\item{verbosity}{integer value for limiting the highest verbosity level being returned.}
 }
 \description{
 Position methods for \code{bru_log} objects.
@@ -36,10 +38,10 @@ for \code{bru_log} objects.
 }}
 \seealso{
 Other inlabru log methods: 
+\code{\link{bru_log}()},
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_message}()},
 \code{\link{bru_log_new}()},
-\code{\link{bru_log_reset}()},
-\code{\link{bru_log}()}
+\code{\link{bru_log_reset}()}
 }
 \concept{inlabru log methods}

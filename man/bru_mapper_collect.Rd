@@ -150,6 +150,7 @@ ibm_eval2(m, list(a = c(1, 2), b = c(1, 3, 2)), 1:5)
 
 Other mappers: 
 \code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
 \code{\link{bru_mapper_aggregate}()},
@@ -167,7 +168,6 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()},
-\code{\link{bru_mapper}()}
+\code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

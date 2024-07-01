@@ -63,14 +63,17 @@ bru_model <- function(components, lhoods) {
   # Back up environment
   env <- environment(components)
 
-  # Complete the component definitions based on data
-  components <- component_list(components, lhoods)
-
   # Create joint formula that will be used by inla
   formula <- BRU_response ~ -1
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
+
+  # Detect linearity
   linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
+  # TODO: detect pure effect additivity (allowing nonlinear components)
+
+  # Complete the used component definitions based on data
+  components <- component_list(components[included], lhoods)
 
   for (cmp in included) {
     if (linear ||
@@ -80,6 +83,7 @@ bru_model <- function(components, lhoods) {
   }
 
   # Restore environment
+  environment(components) <- env
   environment(formula) <- env
 
   # Make model

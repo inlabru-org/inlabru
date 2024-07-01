@@ -50,9 +50,9 @@ and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(bloc
 calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
 but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
 To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise with
-\code{(state-log_weights)[block] - max((state-log_weights)[block])},
-and shifting the result back afterwards.
+shifting the state blockwise;
+\eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
+where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
 }
 \details{
 \itemize{
@@ -79,6 +79,7 @@ ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 
 Other mappers: 
 \code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
 \code{\link{bru_mapper_aggregate}()},
@@ -96,7 +97,6 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()},
-\code{\link{bru_mapper}()}
+\code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

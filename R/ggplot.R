@@ -39,7 +39,8 @@ gmap <- function(data, ...) {
   # Create map
   requireNamespace("ggmap")
   myMap <-
-    ggmap::get_map(c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
+    ggmap::get_map(
+      c(lonlim[1], latlim[1], lonlim[2], latlim[2]),
       ...
     )
 
@@ -750,11 +751,11 @@ gg.SpatRaster <- function(data, ...) {
 #' to plot the interpolation.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.inla.mesh
-#' @name gg.inla.mesh
+#' @aliases gg.fm_mesh_2d
+#' @name gg.fm_mesh_2d
 #' @export
 
-#' @param data An `inla.mesh` object.
+#' @param data An `fm_mesh_2d` object.
 #' @param color A vector of scalar values to fill the mesh with colors.
 #' The length of the vector mus correspond to the number of mesh vertices.
 #' The alternative name `colour` is also recognised.
@@ -778,21 +779,21 @@ gg.SpatRaster <- function(data, ...) {
 #' @family geomes for meshes
 #' @example inst/examples/gg.inla.mesh.R
 
-gg.inla.mesh <- function(data,
-                         color = NULL,
-                         alpha = NULL,
-                         edge.color = "grey",
-                         edge.linewidth = 0.25,
-                         interior = TRUE,
-                         int.color = "blue",
-                         int.linewidth = 0.5,
-                         exterior = TRUE,
-                         ext.color = "black",
-                         ext.linewidth = 1,
-                         crs = NULL,
-                         mask = NULL,
-                         nx = 500, ny = 500,
-                         ...) {
+gg.fm_mesh_2d <- function(data,
+                          color = NULL,
+                          alpha = NULL,
+                          edge.color = "grey",
+                          edge.linewidth = 0.25,
+                          interior = TRUE,
+                          int.color = "blue",
+                          int.linewidth = 0.5,
+                          exterior = TRUE,
+                          ext.color = "black",
+                          ext.linewidth = 1,
+                          crs = NULL,
+                          mask = NULL,
+                          nx = 500, ny = 500,
+                          ...) {
   requireNamespace("INLA")
   requireNamespace("ggplot2")
   if (is.null(color) && ("colour" %in% names(list(...)))) {
@@ -887,14 +888,14 @@ gg.inla.mesh <- function(data,
 }
 
 
-#' Geom for inla.mesh.1d objects
+#' Geom for fm_mesh_1d objects
 #'
 #' This function generates a `geom_point` object showing the knots (vertices)
 #' of a 1D mesh.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.inla.mesh.1d
-#' @name gg.inla.mesh.1d
+#' @aliases gg.fm_mesh_1d gg.inla.mesh.1d
+#' @name gg.fm_mesh_1d
 #' @export
 #' @param data An inla.mesh.1d object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_point`.
@@ -906,12 +907,11 @@ gg.inla.mesh <- function(data,
 #'
 #' @examples
 #' \donttest{
-#' # Some features use the INLA package.
-#' if (require("INLA", quietly = TRUE) &&
+#' if (require("fmesher", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
 #'   # Create a 1D mesh
 #'
-#'   mesh <- inla.mesh.1d(seq(0, 10, by = 0.5))
+#'   mesh <- fm_mesh_1d(seq(0, 10, by = 0.5))
 #'
 #'   # Plot it
 #'
@@ -925,11 +925,21 @@ gg.inla.mesh <- function(data,
 #' }
 #' }
 #'
-gg.inla.mesh.1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
-                            y = 0, shape = 4, ...) {
+gg.fm_mesh_1d <- function(data, mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
+                          y = 0, shape = 4, ...) {
   df <- data.frame(x = data$loc, y = y)
   ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
+
+#' @describeIn gg.fm_mesh_2d Alias for `gg.fm_mesh_2d`, supporting `inla.mesh`
+#' objects.
+#' @export
+gg.inla.mesh <- gg.fm_mesh_2d
+
+#' @describeIn gg.fm_mesh_1d Alias for `gg.fm_mesh_1d`, supporting
+#' `inla.mesh.1d` objects.
+#' @export
+gg.inla.mesh.1d <- gg.fm_mesh_1d
 
 
 
@@ -982,37 +992,44 @@ gg.RasterLayer <- function(data, mapping = ggplot2::aes(x = .data[["x"]], y = .d
 #'
 #' @description
 #'
-#' [bru()] uses `INLA::inla()` to fit models. The latter estimates the posterior densities of
-#' all random effects in the model. This function serves to access and plot the posterior
-#' densities in a convenient way.
+#' From version `2.11.0`, `plot.bru(x, ...)` calls `plot.inla(x, ...)`
+#' from the `INLA` package, unless the first argument after `x` is a
+#' `character`, in which case the pre-`2.11.0` behaviour is used, calling
+#' `plotmarginal.inla(x, ...)` instead.
 #'
 #' Requires the `ggplot2` package.
 #'
 #' @method plot bru
 #' @export
 #' @param x a fitted [bru()] model.
-#' @param ... A character naming the effect to plot, e.g. "Intercept". For random
-#' effects, adding `index = ...` plots the density for a single component of the
-#' latent model.
-#' @return an object of class `gg`
-#'
+#' @param ... Options passed on to other methods.
 #'
 #' @examples
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE)) {
 #'   # Generate some data and fit a simple model
 #'   input.df <- data.frame(x = cos(1:10))
-#'   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+#'   input.df <- within(
+#'     input.df,
+#'     y <- 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1)
+#'   )
 #'   fit <- bru(y ~ x, family = "gaussian", data = input.df)
 #'   summary(fit)
 #'
-#'   # Plot the posterior of the model's x-effect
+#'   # Plot the posterior density of the model's x-effect
 #'   plot(fit, "x")
 #' }
 #' }
 #'
 plot.bru <- function(x, ...) {
-  plotmarginal.inla(x, ...)
+  ll <- list(...)
+  if (length(ll) == 0) {
+    NextMethod("plot")
+  } else if (is.character(ll[[1]])) {
+    plotmarginal.inla(x, ...)
+  } else {
+    NextMethod("plot")
+  }
 }
 
 #' Plot prediction using ggplot2

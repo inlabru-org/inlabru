@@ -53,33 +53,61 @@ test_that("Linearisation", {
     comp_simple = comp_lin
   )
 
-  stks0 <-
-    lapply(
-      seq_along(lhoods),
-      function(lh_idx) {
-        lh <- lhoods[[lh_idx]]
-        lin_off <- ibm_eval(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
-        lin_A <- ibm_jacobian(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
-        nms <- names(lin_A)
-        INLA::inla.stack(
-          list(
-            BRU.response = lh$response_data[[lh$response]],
-            BRU.E = lh[["E"]],
-            BRU.Ntrials = lh[["Ntrials"]],
-            BRU.weights = lh[["weights"]],
-            BRU.offset = as.vector(lin_off)
-          ),
-          A = lapply(nms, function(nm) {
-            lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
-          }),
-          effects = idx[["idx_inla"]][nms]
-        )
-      }
-    )
+  if (utils::packageVersion("INLA") > "24.06.02") {
+    stks0 <-
+      lapply(
+        seq_along(lhoods),
+        function(lh_idx) {
+          lh <- lhoods[[lh_idx]]
+          lin_off <- ibm_eval(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+          lin_A <- ibm_jacobian(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+          nms <- names(lin_A)
+          INLA::inla.stack(
+            list(
+              BRU.E = lh[["E"]],
+              BRU.Ntrials = lh[["Ntrials"]],
+              BRU.weights = lh[["weights"]],
+              BRU.scale = lh[["scale"]],
+              BRU.offset = as.vector(lin_off)
+            ),
+            A = lapply(nms, function(nm) {
+              lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+            }),
+            effects = idx[["idx_inla"]][nms],
+            responses = list(lh$response_data[[lh$response]])
+          )
+        }
+      )
+  } else {
+    stks0 <-
+      lapply(
+        seq_along(lhoods),
+        function(lh_idx) {
+          lh <- lhoods[[lh_idx]]
+          lin_off <- ibm_eval(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+          lin_A <- ibm_jacobian(lin0[[lh_idx]], multi = TRUE, inla_f = TRUE)
+          nms <- names(lin_A)
+          INLA::inla.stack(
+            list(
+              BRU.response = lh$response_data[[lh$response]],
+              BRU.E = lh[["E"]],
+              BRU.Ntrials = lh[["Ntrials"]],
+              BRU.weights = lh[["weights"]],
+              BRU.scale = lh[["scale"]],
+              BRU.offset = as.vector(lin_off)
+            ),
+            A = lapply(nms, function(nm) {
+              lin_A[[nm]][, idx[["inla_subset"]][[nm]], drop = FALSE]
+            }),
+            effects = idx[["idx_inla"]][nms]
+          )
+        }
+      )
+  }
 
   stk0 <-
     do.call(
-      inlabru::inla.stack.mjoin,
+      bru_inla.stack.mjoin,
       c(stks0, list(compress = TRUE, remove.unused = FALSE))
     )
 

@@ -7,9 +7,11 @@
 bru_log_new(x = NULL, bookmarks = NULL)
 }
 \arguments{
-\item{x}{An optional character vector of log messages}
+\item{x}{An optional character vector of log messages, or \code{data.frame}
+with columns \code{message}, \code{timestamp}, and \code{verbosity}.}
 
-\item{bookmarks}{An optional \code{integer} vector of named bookmarks}
+\item{bookmarks}{An optional \code{integer} vector of named bookmarks
+message in \code{x}.}
 }
 \description{
 Create a \code{bru_log} object, by default empty.
@@ -21,10 +23,10 @@ print(x)
 }
 \seealso{
 Other inlabru log methods: 
+\code{\link{bru_log}()},
 \code{\link{bru_log_bookmark}()},
 \code{\link{bru_log_message}()},
 \code{\link{bru_log_offset}()},
-\code{\link{bru_log_reset}()},
-\code{\link{bru_log}()}
+\code{\link{bru_log_reset}()}
 }
 \concept{inlabru log methods}

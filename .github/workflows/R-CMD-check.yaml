@@ -34,7 +34,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -63,10 +63,20 @@ jobs:
           dependencies: '"all"'
           extra-packages: |
              rcmdcheck
+             remotes
+             stars
+             starsdata=?ignore
 
       - name: Fix temporary out-of-sync binary packages
         run: |
           install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+        shell: Rscript {0}
+
+      - name: Limit INLA version to 24.05.10 on old R version
+        run: |
+          if (getRversion() < "4.4.0") {
+            remotes::install_version("INLA", version = "24.05.10", repos = "https://inla.r-inla-download.org/R/testing")
+          }
         shell: Rscript {0}
 
       - name: Session info

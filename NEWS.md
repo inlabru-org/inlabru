@@ -1,3 +1,57 @@
+# inlabru 2.11.0
+
+## New features
+
+* Add support for the `scale` parameter to `like()`.
+* Add support for special response objects like `inla.mdata()` and `inla.surv()`,
+  when INLA version `> 24.06.02` (for `mdata`) or `> 24.06.26` (for `surv`) are
+  available (version `2.10.1.9011`)
+* New `toypoints` example data set, for basic modelling examples
+  (version `2.10.1.9003`)
+  
+## Feature updates
+
+* Updated convergence plots, reducing random effect aspects to summary statistics,
+  improving speed and visual coherence (version `2.10.1.9004`)
+* Add options to `bru_convergence_plot()` to control the number of iterations
+  shown, and optionally show the initial values that are stored from this version
+  (version `2.10.1.9005`)
+* Switch timing mechanism from `Sys.time()` to `proc.time()` to capture CPU time
+  instead of elapsed clock time. Added `bru_timings()` method to extract the timings
+  safely from a fitted `bru` object (version `2.10.1.9007` and `2.10.1.9010`)
+* Add verbosity level information to the bru log data structure,
+  allowing flitered log extraction and more flexible log display
+  (version `2.10.1.9012`)
+
+## Bug fixes
+
+* Fix regression bug in `"bym"` model support, where the latent state size
+  wasn't correctly handled by the mapper system (version `2.10.1.9002`)
+* Add filter to limit mapper construction to only the components used in the
+  predictor expression, to avoid unused components breaking the initialisation.
+  This allows easier testing of multi-likelihood models (version `2.10.1.9006`)
+* Improved backwards compatibility support for `sp` data input for `family = "cp"`
+  (version `2.10.1.9008`)
+  
+## Deprecated methods
+
+* Deprecated (since 2.9.0) method `ipoints(samplers, domain)` is no longer available.
+  Use `fmesher::fm_int(domain, samplers)` instead.
+* The `allow_latent`, `include_latent` arguments to `like()` have been deprecated in favour
+  of the general `bru_used()` framework, that auto-detects what component effects and
+  latent effects are used by a predictor expression.
+* The deprecated (since 2.8.0) `cprod()` method now gives a warning and will be removed in a future version.
+  Use `fmesher::fm_cprod()` instead.
+* The `integration_weight_aggregation` method has been removed (deprecated since 2.8.0).
+  Use `fmesher::fm_vertex_projection()` instead.
+* The `mesh_triangle_integration` method has been removed (deprecated since 2.8.0).
+  Use `fmesher::fm_int()` instead.
+* Old use of `bru_mapper.default()` to define new mapper classes has been disabled
+  (deprecated since 2.7.0). Use `bru_mapper_define()` instead.
+* Deprecated (since 2.8.0) methods `is.inside()`, `vertices.inla.mesh()`, and
+  `pixels()` have been disabled. Use `fmesher::fm_is_within()`, `fmesher::fm_vertices()`,
+  and `fmesher::fm_pixels()` instead.
+
 # inlabru 2.10.1
 
 ## Feature updates

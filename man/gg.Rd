@@ -43,16 +43,16 @@ Other geomes for spatial data:
 \code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
 \code{\link{gg.sf}()},
 \code{\link{gm}()}
 
 Other geomes for meshes: 
-\code{\link{gg.inla.mesh.1d}()},
-\code{\link{gg.inla.mesh}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
 \code{\link{gm}()}
 
 Other geomes for Raster data: 

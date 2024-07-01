@@ -92,24 +92,46 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
 #' @title Create a `bru_log` object
 #' @description
 #' Create a `bru_log` object, by default empty.
-#' @param x An optional character vector of log messages
+#' @param x An optional character vector of log messages, or `data.frame`
+#' with columns `message`, `timestamp`, and `verbosity`.
 #' @param bookmarks An optional `integer` vector of named bookmarks
+#' message in `x`.
 #' @family inlabru log methods
 #' @examples
 #' x <- bru_log_new()
 #' x <- bru_log_message("Test message", x = x)
 #' print(x)
 bru_log_new <- function(x = NULL, bookmarks = NULL) {
-  x <- list(
-    log = if (is.null(x)) character(0) else as.character(x),
-    bookmarks = if (is.null(bookmarks)) {
-      integer(0)
-    } else {
-      storage.mode(bookmarks) <- "integer"
-      bookmarks
-    }
+  if (is.null(x)) {
+    x <- character(0)
+  }
+  if (!is.data.frame(x)) {
+    x <- data.frame(
+      message = as.character(x)
+    )
+  }
+  if (is.null(x[["timestamp"]])) {
+    ts <- Sys.time()
+    is.na(ts) <- TRUE
+    ts <- rep(ts, nrow(x))
+    x[["timestamp"]] <- ts
+  }
+  if (is.null(x[["verbosity"]])) {
+    x[["verbosity"]] <- integer(nrow(x))
+  }
+  bookmarks <- if (is.null(bookmarks)) {
+    integer(0)
+  } else {
+    storage.mode(bookmarks) <- "integer"
+    bookmarks
+  }
+  x <- structure(
+    list(
+      log = x,
+      bookmarks = bookmarks
+    ),
+    class = "bru_log"
   )
-  class(x) <- "bru_log"
   x
 }
 
@@ -217,23 +239,28 @@ bru_log_offset <- function(x = NULL,
 #' @param i indices specifying elements to extract. If `character`, denotes
 #' the sequence between bookmark `i` and the next bookmark (or the end of the
 #' log if `i` is the last bookmark)
-bru_log_index <- function(x = NULL, i) {
-  log_length <- NULL
-  if (is.character(i)) {
+#' @param verbosity integer value for limiting the highest verbosity level being returned.
+bru_log_index <- function(x = NULL, i, verbosity = NULL) {
+  if (is.null(x)) {
+    x <- bru_env_get()[["log"]]
+  }
+  log_length <- length(x)
+  if (is.null(i)) {
+    i <- seq_len(log_length)
+  } else if (is.character(i)) {
     offset0 <- bru_log_offset(x, bookmark = i, offset = 0L)
     offset1 <- bru_log_offset(x, bookmark = i, offset = 1L)
     i <- offset0 + seq_len(offset1 - offset0)
   } else if (is.logical(i)) {
-    log_length <- if (is.null(x)) length(bru_env_get()[["log"]]) else length(x)
     stopifnot(length(i) == log_length)
     i <- which(i)
   }
   if (any(i < 0L)) {
     stopifnot(all(i < 0L))
-    if (is.null(log_length)) {
-      log_length <- if (is.null(x)) length(bru_env_get()[["log"]]) else length(x)
-    }
     i <- setdiff(seq_len(log_length), -i)
+  }
+  if ((length(i) > 0) && !is.null(verbosity)) {
+    i <- i[x[["log"]][["verbosity"]][i] <= verbosity]
   }
   i
 }
@@ -245,19 +272,25 @@ bru_log_index <- function(x = NULL, i) {
 #' When running on `2.8.0` or earlier, use `bru_log_get()` to access the global
 #' log, and `cat(fit$bru_iinla$log, sep = "\n")` to print a stored estimation object log.
 #' After version `2.8.0`, use `bru_log()` to access the global log, and
-#' `bru_log(fit)` to access a stores estimation log.
+#' `bru_log(fit)` to access a stored estimation log.
 #' @param x An object that is, contains, or can be converted to,
 #' a `bru_log` object. If `NULL`, refers to the global `inlabru` log.
+#' @param verbosity integer value for limiting the highest verbosity level being returned.
 #' @return `bru_log` A `bru_log` object, containing a
 #' character vector of log messages, and potentially a vector of bookmarks.
 #' @export
 #' @family inlabru log methods
-#' @describeIn bru_log Extract stored log messages
-bru_log <- function(x = NULL) {
+#' @describeIn bru_log Extract stored log messages. If non-`NULL`, the `verbosity` argument
+#' determines the maximum verbosity level of the messages to extract.
+bru_log <- function(x = NULL, verbosity = NULL) {
   if (is.null(x)) {
     x <- bru_env_get()[["log"]]
   }
   if (inherits(x, "bru_log")) {
+    if (!is.null(verbosity)) {
+      i <- bru_log_index(x, i = NULL, verbosity = verbosity)
+      x <- x[i]
+    }
     return(x)
   }
   UseMethod("bru_log")
@@ -265,39 +298,66 @@ bru_log <- function(x = NULL) {
 
 #' @rdname bru_log
 #' @export
-bru_log.character <- function(x) {
-  bru_log_new(x = x)
+bru_log.character <- function(x, verbosity = NULL) {
+  y <- bru_log_new(x = x)
+  if (!is.null(verbosity)) {
+    i <- bru_log_index(y, i = NULL, verbosity = verbosity)
+    y <- y[i]
+  }
+  y
 }
 
 #' @rdname bru_log
 #' @export
-bru_log.bru_log <- function(x) {
+bru_log.bru_log <- function(x, verbosity = NULL) {
+  if (!is.null(verbosity)) {
+    i <- bru_log_index(x, i = NULL, verbosity = verbosity)
+    x <- x[i]
+  }
   x
 }
 
 #' @rdname bru_log
 #' @export
-bru_log.iinla <- function(x) {
+bru_log.iinla <- function(x, verbosity = NULL) {
   if (is.null(x[["log"]])) {
     return(bru_log_new(character(0)))
   }
-  bru_log(x[["log"]])
+  bru_log(x[["log"]], verbosity = verbosity)
 }
 
 #' @rdname bru_log
 #' @export
-bru_log.bru <- function(x) {
+bru_log.bru <- function(x, verbosity = NULL) {
+  x <- bru_check_object_bru(x)
   if (is.null(x[["bru_iinla"]][["log"]])) {
     return(bru_log_new(character(0)))
   }
-  bru_log(x[["bru_iinla"]][["log"]])
+  bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity)
 }
 
-#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`
+#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
+#' If `verbosity` is `TRUE`, include the verbosity level of each message.
 #' @param ... further arguments passed to or from other methods.
+#' @param timestamp If `TRUE`, include the timestamp of each message. Default `TRUE`.
 #' @export
-print.bru_log <- function(x, ...) {
-  cat(x[["log"]], sep = "\n")
+#' @examples
+#' bru_log(verbosity = 2L)
+#' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+#'
+print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
+  msg <- x[["log"]][["message"]]
+  if (timestamp) {
+    msg <- paste0(
+      x[["log"]][["timestamp"]], ": ", msg
+    )
+  }
+  if (verbosity) {
+    msg <- paste0(
+      msg, " (level ", x[["log"]][["verbosity"]], ")"
+    )
+  }
+  cat(msg, sep = "\n")
   invisible(x)
 }
 
@@ -305,7 +365,7 @@ print.bru_log <- function(x, ...) {
 #' @export
 #' @describeIn bru_log Convert `bru_log` object to a plain `character` vector
 as.character.bru_log <- function(x, ...) {
-  x[["log"]]
+  x[["log"]][["message"]]
 }
 
 
@@ -326,7 +386,7 @@ as.character.bru_log <- function(x, ...) {
     }
   }
   bru_log_new(
-    x = x[["log"]][i],
+    x = x[["log"]][i, , drop = FALSE],
     bookmarks = marks
   )
 }
@@ -354,10 +414,10 @@ as.character.bru_log <- function(x, ...) {
   offset <- 0L
   for (k in seq_along(obj)) {
     obj[[k]][["bookmarks"]] <- obj[[k]][["bookmarks"]] + offset
-    offset <- offset + length(obj[[k]][["log"]])
+    offset <- offset + length(obj[[k]])
   }
   bru_log_new(
-    x = do.call(c, lapply(obj, function(x) x[["log"]])),
+    x = do.call(rbind, lapply(obj, function(x) x[["log"]])),
     bookmarks = do.call(c, lapply(obj, function(x) x[["bookmarks"]]))
   )
 }
@@ -366,7 +426,7 @@ as.character.bru_log <- function(x, ...) {
 #' @describeIn bru_log Obtain the number of log entries
 #' into a `bru_log` object.
 `length.bru_log` <- function(x) {
-  length(x[["log"]])
+  NROW(x[["log"]])
 }
 
 
@@ -423,15 +483,23 @@ as.character.bru_log <- function(x, ...) {
 #' @export
 
 bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
-                            verbosity = 1,
+                            verbosity = 1L,
                             allow_verbose = TRUE, verbose = NULL,
                             verbose_store = NULL,
                             x = NULL) {
+  new_x <- data.frame(
+    message = .makeMessage(...,
+      domain = domain,
+      appendLF = FALSE
+    ),
+    timestamp = Sys.time(),
+    verbosity = as.integer(verbosity)
+  )
   if (allow_verbose) {
     if ((!is.null(verbose) && (verbose >= verbosity)) ||
       (is.null(verbose) &&
         bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
-      message(..., domain = domain, appendLF = appendLF)
+      message(new_x[["message"]], domain = NA, appendLF = appendLF)
     }
   }
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
@@ -440,21 +508,9 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
       bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
     if (is.null(x)) {
       envir <- bru_env_get()
-      envir[["log"]][["log"]] <- c(
-        envir[["log"]][["log"]],
-        .makeMessage(Sys.time(), ": ", ...,
-          domain = domain,
-          appendLF = FALSE
-        )
-      )
+      envir[["log"]][["log"]] <- rbind(envir[["log"]][["log"]], new_x)
     } else {
-      x[["log"]] <- c(
-        x[["log"]],
-        .makeMessage(Sys.time(), ": ", ...,
-          domain = domain,
-          appendLF = FALSE
-        )
-      )
+      x[["log"]] <- rbind(x[["log"]], new_x)
     }
   }
   if (is.null(x)) {

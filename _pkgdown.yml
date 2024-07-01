@@ -39,10 +39,10 @@ navbar:
       - text: Point process examples
       - text: LGCPs - An example in one dimension
         href: articles/1d_lgcp.html
-      - text: LGCPs - An example in two dimensions (sp version)
-        href: articles/2d_lgcp.html
       - text: LGCPs - An example in two dimensions (sf version)
-        href: articles/2d_lgcp_sf.html
+        href: articles/2d_lgcp.html
+      - text: LGCPs - An example in two dimensions (sp version)
+        href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
@@ -91,6 +91,8 @@ redirects:
   - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
   - ["articles/web/svc.html", "articles/svc.html"]
   - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
+  - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
+  - ["articles/components_vignette.html", "articles/component.html"]
 
 reference:
 - title: "Model construction and estimation"
@@ -116,7 +118,7 @@ reference:
   contents:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
-  - starts_with("bru_timings_plot")
+  - starts_with("bru_timings")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
   contents:
@@ -161,12 +163,13 @@ reference:
   - matches("seals")
   - matches("shrimp")
   - matches("toygroups")
+  - matches("toypoints")
 - title: "Internal helper functions"
   desc: "Helper functions for more low level operations."
   contents:
   - starts_with("evaluate_")
   - starts_with("expand_labels")
-  - starts_with("inla.stack.mjoin")
+  - starts_with("bru_inla.stack.mjoin")
   - starts_with("spatial.to.ppp")
   - starts_with("bru_make_stack")
   - starts_with("bru_summarise")

@@ -40,10 +40,12 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
         qfun,
         c(
           list(
-            pnorm(x[upper],
-                  lower.tail = FALSE,
-                  log.p = TRUE
-            )),
+            pnorm(
+              x[upper],
+              lower.tail = FALSE,
+              log.p = TRUE
+            )
+          ),
           param_upper,
           list(
             lower.tail = FALSE,
@@ -58,10 +60,12 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
         qfun,
         c(
           list(
-            pnorm(x[!upper],
-                  lower.tail = TRUE,
-                  log.p = TRUE
-            )),
+            pnorm(
+              x[!upper],
+              lower.tail = TRUE,
+              log.p = TRUE
+            )
+          ),
           param_lower,
           list(
             lower.tail = TRUE,
@@ -105,8 +109,10 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
             param_upper,
             list(
               lower.tail = FALSE,
-              log.p = TRUE)
-          )),
+              log.p = TRUE
+            )
+          )
+        ),
         lower.tail = FALSE,
         log.p = TRUE
       )
@@ -122,7 +128,9 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
             list(
               lower.tail = TRUE,
               log.p = TRUE
-            ))),
+            )
+          )
+        ),
         lower.tail = TRUE,
         log.p = TRUE
       )

@@ -50,7 +50,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   #      gg(ips_new, aes(size=weight, col = factor(ID)))
   #  }
 
-  cmp <- coordinates ~ my.spde(main = coordinates, model = matern)
+  cmp <- coordinates ~ my.spde(main = sp::coordinates, model = matern)
   fit <- lgcp(cmp,
     data = gorillas$plotsample$nests,
     samplers = gorillas$plotsample$plots,
@@ -64,15 +64,17 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
     tolerance = lowtol
   )
   # Test points selected with sd+sd less than 1.2, for a more stable check.
+  mean_est <- fit$summary.fixed["Intercept", "mean"] +
+    fit$summary.random$my.spde$mean[c(19, 100, 212)]
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "mean"] +
-      fit$summary.random$my.spde$mean[c(19, 100, 212)],
+    mean_est,
     tolerance = midtol,
     style = "serialize"
   )
+  sd_est <- fit$summary.fixed["Intercept", "sd"] +
+    fit$summary.random$my.spde$sd[c(19, 100, 212)]
   expect_snapshot_value(
-    fit$summary.fixed["Intercept", "sd"] +
-      fit$summary.random$my.spde$sd[c(19, 100, 212)],
+    sd_est,
     tolerance = hitol,
     style = "serialize"
   )

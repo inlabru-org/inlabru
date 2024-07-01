@@ -84,19 +84,26 @@ install.packages("inlabru")
 
 ## Example
 
-This is a basic example which shows you how fit a simple spatial Log
+This is a basic example which shows how fit a simple spatial Log
 Gaussian Cox Process (LGCP) and predicts its intensity:
 
 ``` r
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> This is INLA_23.12.17 built 2023-12-17 16:59:33 UTC.
+#> Loading required package: sp
+#> This is INLA_24.06.27 built 2024-06-27 02:36:04 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - List available models/likelihoods/etc with inla.list.models()
 #>  - Use inla.doc(<NAME>) to access documentation
+```
+
+``` r
 library(inlabru)
 #> Loading required package: fmesher
+```
+
+``` r
 library(fmesher)
 library(ggplot2)
 
@@ -120,10 +127,6 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
-#> Warning in inla.model.properties.generic(inla.trim.family(model), mm[names(mm) == : Model 'scopy' in section 'latent' is marked as 'experimental'; changes may appear at any time.
-#>   Use this model with extra care!!! Further warnings are disabled.
-#> Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
-#> had status 1
 
 # Predict Gorilla nest intensity
 lambda <- predict(
@@ -137,7 +140,9 @@ ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
   gg(lambda, geom = "tile") +
   gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
-  ggtitle("Nest intensity per km squared")
+  ggtitle("Nest intensity per km squared") +
+  xlab("") +
+  ylab("")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />

@@ -37,30 +37,30 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
+\code{\link{gg}()},
 \code{\link{gg.bru_prediction}()},
 \code{\link{gg.data.frame}()},
-\code{\link{gg.matrix}()},
-\code{\link{gg}()}
+\code{\link{gg.matrix}()}
 
 Other geomes for spatial data: 
+\code{\link{gg}()},
 \code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialGridDataFrame}()},
 \code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
-\code{\link{gg.sf}()},
-\code{\link{gg}()}
+\code{\link{gg.sf}()}
 
 Other geomes for meshes: 
-\code{\link{gg.inla.mesh.1d}()},
-\code{\link{gg.inla.mesh}()},
-\code{\link{gg}()}
+\code{\link{gg}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()}
 
 Other geomes for Raster data: 
-\code{\link{gg.RasterLayer}()},
-\code{\link{gg}()}
+\code{\link{gg}()},
+\code{\link{gg.RasterLayer}()}
 }
 \concept{geomes for Raster data}
 \concept{geomes for inla and inlabru predictions}

@@ -25,7 +25,14 @@ bru_mapper_pipe(mappers)
 
 \method{ibm_eval2}{bru_mapper_pipe}(mapper, input, state = NULL, ...)
 
-\method{ibm_simplify}{bru_mapper_pipe}(mapper, input = NULL, state = NULL, ..., n_state = NULL)
+\method{ibm_simplify}{bru_mapper_pipe}(
+  mapper,
+  input = NULL,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  n_state = NULL
+)
 }
 \arguments{
 \item{mappers}{A list of \code{bru_mapper} objects}
@@ -41,6 +48,14 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{n_state}{integer giving the length of the state vector for mappers
 that have state dependent output size.}
+
+\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
+result must be compatible with the \code{INLA::f(...)} and corresponding
+\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
+the \code{input} interpretation may be different.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bru_mapper_collect}.}
 }
 \description{
 Create a pipe mapper, where \code{mappers} is a list of mappers,
@@ -71,6 +86,7 @@ ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
 
 Other mappers: 
 \code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
 \code{\link{bru_mapper_aggregate}()},
@@ -88,7 +104,6 @@ Other mappers:
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()},
-\code{\link{bru_mapper}()}
+\code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

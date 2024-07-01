@@ -76,14 +76,14 @@ Requires the \code{ggplot2} package.
 }
 \seealso{
 Other geomes for spatial data: 
+\code{\link{gg}()},
 \code{\link{gg.SpatRaster}()},
 \code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPixels}()},
+\code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
 \code{\link{gg.sf}()},
-\code{\link{gg}()},
 \code{\link{gm}()}
 }
 \concept{geomes for spatial data}

@@ -155,7 +155,7 @@ where `n` is the length of the predictor vector.  Note that this shortcut makes 
 
 If `main`, `group`, or `replicate`, is the name of an `sf`, `SpatRaster`, or `Spatial*` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `sf` or `SpatialPoints*` object**. `inlabru` does this by calling the `inlabru::eval_spatial()` method, which supports several covariate storage types.
 
-The shorcut
+The shortcut
 ```{r eval=FALSE}
 ~ my_sp_effect(
   main = a_spatial_object,
@@ -173,7 +173,7 @@ Note that this requires `a_spatial_object` to be stored in the global `R` enviro
 (or in the environment associated with the model definition code) so it is findable when the expression is internally evaluated by `inlabru`.  Also note that the `eval_spatial()` function by default extracts the first column of the raster object.  For more general situations, one can either specify the optional `main_layer` argument to extract another named or indexed column, or directly
 use `main = eval_spatial(a_spatial_object, .data., layer = some_layer)`.
 
-Note that this assumes that the data is either `sf`, so that `st_geometry(.data.)` retrieves point locations, or `sf`, where `coordinates(.data.)` retrieves coordinates.  This might not be a sensible thing for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates(.data.)` returns the centroid of each polygon.  As more specific input type support is developed, and support for `sp` is gradually deprecated in favour of `sf` and `terra`,
+Note that this assumes that the data is either `sf`, so that `st_geometry(.data.)` retrieves point locations, or `sp` where `coordinates(.data.)` retrieves coordinates.  This might not be a sensible thing for all models!  For example, if the input data is a `SpatialPolygonsDataFrame` then `coordinates(.data.)` returns the centroid of each polygon.  As more specific input type support is developed, and support for `sp` is gradually deprecated in favour of `sf` and `terra`,
 these special cases may be given more precise meaning.  For example, the `a_spatial_object` above may be an `sf` or `sp` polygon object with data columns, which is interpreted as a spatially piecewise constant
 covariate.
 
@@ -198,7 +198,7 @@ which is equvalent to
 where the data has columns named `x1`, `x2`, `x3`, and `x4`.
 
 This allows users to define interactions in a concise way, by utilising the functionality already supported by the `MatrixModels` package.
-The formula is interpreted in the conventional way, `x1:x2` is the interaction of covariates `x1` and `x2`, not including their individual fixed effects, and `x3:x4` is the interaction of `x3` and `x4` inclusive of the individual fixed effects `x3` and `x4`.
+The formula is interpreted in the conventional way, `x1:x2` is the interaction of covariates `x1` and `x2`, not including their individual fixed effects, and `x3 * x4` is the interaction of `x3` and `x4` inclusive of the individual fixed effects `x3` and `x4`.
 Note that for implementation technical reasons, the estimated parameters appear in
 `'summary.random'` instead of the normal `'summary.fixed'`
 part of the `inla`/`bru` output object.

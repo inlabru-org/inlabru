@@ -276,32 +276,35 @@ extract.entries <- function(name, smpl, .contents = NULL) {
   return(vals)
 }
 
-# Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
-#
-# @aliases inla.stack.mexpand
-# @name inla.stack.mexpand
-# @export
-# @param ... List of stacks that contain vector observations
-#            (existing multilikelihood observation matrices are also permitted)
-# @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#        If a single string, this is assumed for all the stacks. (default "BRU.response")
-# @param new.name The name to be used for the expanded observation matrix,
-#        possibly the same as an old name. (default "BRU.response")
-# @return a list of modified stacks with multicolumn observations
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
-#
+#' Backwards compatibility to handle mexpand for INLA <= 24.06.02
+#'
+#' Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
+#'
+#' @export
+#' @param ... List of stacks that contain vector observations
+#'            (existing multilikelihood observation matrices are also permitted)
+#' @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
+#'        If a single string, this is assumed for all the stacks. (default "BRU.response")
+#' @param new.name The name to be used for the expanded observation matrix,
+#'        possibly the same as an old name. (default "BRU.response")
+#' @return a list of modified stacks with multicolumn observations
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#'
+#' @keywords internal
+#' @rdname bru_inla.stack.mexpand
 
-inla.stack.mexpand <- function(...,
-                               old.names = "BRU.response",
-                               new.name = "BRU.response") {
+bru_inla.stack.mexpand <- function(...,
+                                   old.names = "BRU.response",
+                                   new.name = "BRU.response") {
   stacks <- list(...)
   if (length(old.names) == 1) {
     old.names <- rep(old.names, length(stacks))
   }
-  y.cols <- unlist(lapply(seq_along(stacks),
+  y.cols <- unlist(lapply(
+    seq_along(stacks),
     function(x, stacks, old.names) {
       LHS <- INLA::inla.stack.LHS(stacks[[x]])[[old.names[x]]]
-      ifelse(is.vector(LHS), 1, ncol(LHS))
+      ifelse(is.vector(LHS), 1, NCOL(LHS))
     },
     stacks = stacks, old.names = old.names
   ))
@@ -311,6 +314,7 @@ inla.stack.mexpand <- function(...,
     LHS <- INLA::inla.stack.LHS(stacks[[j]])
     RHS <- INLA::inla.stack.RHS(stacks[[j]])
     A <- INLA::inla.stack.A(stacks[[j]])
+    responses <- stacks[[j]][["responses"]]
     # Access the raw tag indexing information
     tags <- list(
       data = stacks[[j]]$data$index,
@@ -318,20 +322,38 @@ inla.stack.mexpand <- function(...,
     )
 
     # Expand the observation vector/matrix into a multilikelihood observation matrix:
-    y.rows <- ifelse(is.vector(LHS[[old.names[j]]]),
-      length(LHS[[old.names[j]]]),
-      nrow(LHS[[old.names[j]]])
-    )
-    LHS[[new.name]] <-
-      cbind(
-        matrix(NA, nrow = y.rows, ncol = y.offset[j]),
-        LHS[[old.names[j]]],
-        matrix(NA, nrow = y.rows, ncol = y.cols.total - y.offset[j + 1])
-      )
+    y.rows <- NROW(A)
+    if (!is.null(LHS[[old.names[j]]])) {
+      LHS[[new.name]] <-
+        cbind(
+          matrix(NA, nrow = y.rows, ncol = y.offset[j]),
+          LHS[[old.names[j]]],
+          matrix(NA, nrow = y.rows, ncol = y.cols.total - y.offset[j + 1])
+        )
+    }
 
     # Create the modified stack, with model compression disabled to prevent modifications:
-    stacks[[j]] <-
-      INLA::inla.stack.sum(data = LHS, A = A, effects = RHS, compress = FALSE, remove.unused = FALSE)
+    if (utils::packageVersion("INLA") <= "24.06.02") {
+      stacks[[j]] <-
+        INLA::inla.stack.sum(
+          data = LHS,
+          A = A,
+          effects = RHS,
+          compress = FALSE,
+          remove.unused = FALSE
+        )
+    } else {
+      stacks[[j]] <-
+        INLA::inla.stack.sum(
+          data = LHS,
+          A = A,
+          effects = RHS,
+          compress = FALSE,
+          remove.unused = FALSE,
+          responses = responses
+        )
+    }
+
     # Since the row indexing is unchanged, copy the tag index information:
     stacks[[j]]$data$index <- tags$data
     stacks[[j]]$effects$index <- tags$effects
@@ -339,20 +361,11 @@ inla.stack.mexpand <- function(...,
   stacks
 }
 
-# Stack multiple exposures
-# Obsolete. Do not use. Exposure vector stacking is handled automatically by inla.stack
-#
-# @aliases inla.stack.e
-# @param ... observation vectors
-# @return e observation vector
-# @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
-inla.stack.e <- function(...) {
-  stop("This function is obsolete and should not be used.")
-}
-
-
-#' Join stacks intended to be run with different likelihoods
+#' @title Join stacks intended to be run with different likelihoods
+#'
+#' @description
+#' Helper functions for multi-likelihood models
 #'
 #' @param ... List of stacks that contain vector observations
 #'            (existing multi-likelihood observation matrices are also permitted)
@@ -367,22 +380,46 @@ inla.stack.e <- function(...) {
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
 #' @export
-#' @rdname inla.stack.mjoin
+#' @keywords internal
+#' @rdname bru_inla.stack.mjoin
 #'
 
-inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
-                             old.names = "BRU.response", new.name = "BRU.response") {
-  stacks <- inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
-  do.call(
-    INLA::inla.stack.join,
-    c(stacks, list(compress = compress, remove.unused = remove.unused))
-  )
+bru_inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
+                                 old.names = "BRU.response", new.name = "BRU.response") {
+  if (utils::packageVersion("INLA") <= "24.06.02") {
+    stacks <- bru_inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
+    do.call(INLA::inla.stack.join, c(
+      stacks,
+      list(
+        compress = compress,
+        remove.unused = remove.unused
+      )
+    ))
+  } else {
+    stacks <- bru_inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
+    do.call(INLA::inla.stack.join, c(
+      stacks,
+      list(
+        compress = compress,
+        remove.unused = remove.unused,
+        multi.family = TRUE
+      )
+    ))
+  }
 }
 
 
 
 
-
+#' @rdname plot.bru
+#' @param result an `inla` or `bru` result object
+#' @param varname character; name of the variable to plot
+#' @param index integer; index of the random effect to plot
+#' @param link function; link function to apply to the variable
+#' @param add logical; if `TRUE`, add to an existing plot
+#' @param ggp logical; unused
+#' @param lwd numeric; line width
+#' @export
 plotmarginal.inla <- function(result,
                               varname = NULL,
                               index = NULL,

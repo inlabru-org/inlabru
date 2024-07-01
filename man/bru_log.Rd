@@ -13,17 +13,17 @@
 \alias{length.bru_log}
 \title{Access methods for \code{bru_log} objects}
 \usage{
-bru_log(x = NULL)
+bru_log(x = NULL, verbosity = NULL)
 
-\method{bru_log}{character}(x)
+\method{bru_log}{character}(x, verbosity = NULL)
 
-\method{bru_log}{bru_log}(x)
+\method{bru_log}{bru_log}(x, verbosity = NULL)
 
-\method{bru_log}{iinla}(x)
+\method{bru_log}{iinla}(x, verbosity = NULL)
 
-\method{bru_log}{bru}(x)
+\method{bru_log}{bru}(x, verbosity = NULL)
 
-\method{print}{bru_log}(x, ...)
+\method{print}{bru_log}(x, ..., timestamp = TRUE, verbosity = FALSE)
 
 \method{as.character}{bru_log}(x, ...)
 
@@ -37,7 +37,11 @@ bru_log(x = NULL)
 \item{x}{An object that is, contains, or can be converted to,
 a \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
 
+\item{verbosity}{integer value for limiting the highest verbosity level being returned.}
+
 \item{...}{further arguments passed to or from other methods.}
+
+\item{timestamp}{If \code{TRUE}, include the timestamp of each message. Default \code{TRUE}.}
 
 \item{i}{indices specifying elements to extract. If \code{character}, denotes
 the sequence between bookmark \code{i} and the next bookmark (or the end of the
@@ -53,11 +57,12 @@ Note: Up to version \verb{2.8.0}, \code{bru_log()} was a deprecated alias for \c
 When running on \verb{2.8.0} or earlier, use \code{bru_log_get()} to access the global
 log, and \code{cat(fit$bru_iinla$log, sep = "\\n")} to print a stored estimation object log.
 After version \verb{2.8.0}, use \code{bru_log()} to access the global log, and
-\code{bru_log(fit)} to access a stores estimation log.
+\code{bru_log(fit)} to access a stored estimation log.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{print(bru_log)}: Print a \code{bru_log} object with \code{cat(x, sep = "\\n")}
+\item \code{print(bru_log)}: Print a \code{bru_log} object with \code{cat(x, sep = "\\n")}.
+If \code{verbosity} is \code{TRUE}, include the verbosity level of each message.
 
 \item \code{as.character(bru_log)}: Convert \code{bru_log} object to a plain \code{character} vector
 
@@ -72,9 +77,15 @@ into a \code{bru_log} object.
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_log()}: Extract stored log messages
+\item \code{bru_log()}: Extract stored log messages. If non-\code{NULL}, the \code{verbosity} argument
+determines the maximum verbosity level of the messages to extract.
 
 }}
+\examples{
+bru_log(verbosity = 2L)
+print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+
+}
 \seealso{
 Other inlabru log methods: 
 \code{\link{bru_log_bookmark}()},

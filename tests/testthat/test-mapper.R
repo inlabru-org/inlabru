@@ -524,6 +524,42 @@ test_that("Collect mapper, automatic construction", {
 })
 
 
+
+test_that("Collect mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  graph <- Matrix::sparseMatrix(
+    i = c(1, 2, 3, 2, 3, 4),
+    j = c(2, 3, 4, 1, 2, 3),
+    x = rep(1, 6),
+    dims = c(4, 4)
+  )
+
+  set.seed(12345L)
+  data <- data.frame(
+    y = 4 + rnorm(6),
+    x = c(1, 2, 3, 2, 3, 4)
+  )
+
+  fit_inla <- INLA::inla(y ~ 1 + f(x, model = "bym", graph = graph),
+    data = data
+  )
+
+  expect_error(
+    {
+      fit_bru <-
+        bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
+          data = data,
+          options = list(bru_initial = list(field = rep(10, 8)))
+        )
+    },
+    NA
+  )
+})
+
+
+
 test_that("Marginal mapper", {
   m1 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
   state0 <- -5:5

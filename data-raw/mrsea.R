@@ -171,5 +171,5 @@ makeobsdata <- function(data) {
 }
 # ---------------------------------------------------------------------
 
-# import.mrsea()
+# mrsea <- import.mrsea()
 # usethis::use_data(mrsea, overwrite = TRUE)

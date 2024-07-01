@@ -119,7 +119,7 @@ test_that("Georeferenced data with sp", {
     tolerance = midtol
   )
 
-  pred_df <- fm_pixels(mesh, format = "sp")
+  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sp")
   coordnames(pred_df) <- coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
 
@@ -129,43 +129,45 @@ test_that("Georeferenced data with sp", {
 })
 
 
+test_that("Georeferenced data with sf, with groups", {
+  skip_on_cran()
+  local_bru_safe_inla()
 
-
-latent_spde2D_group_testdata <- function() {
   set.seed(123)
+  mydata <- expand.grid(
+    Easting = seq(5, 45, by = 20),
+    Northing = seq(10, 30, by = 10),
+    KEEP.OUT.ATTRS = FALSE
+  )
+  mydata <- rbind(
+    cbind(mydata, season = 1L),
+    cbind(mydata, season = 2L)
+  )
+  mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
+  mydata <- sf::st_as_sf(mydata, coords = c("Easting", "Northing"))
 
-  # Load and reduce data set
-  data(mrsea, package = "inlabru", envir = environment())
-  mrsea <- local_mrsea_convert(mrsea, use_km = TRUE)
-  coordnames(mrsea$points) <- c("Easting", "Northing")
-  coordnames(mrsea$samplers) <- c("Easting", "Northing")
-
-  mrsea$points <- mrsea$points[mrsea$points$season %in% c(1, 2), ]
-  mrsea$samplers <- mrsea$samplers[mrsea$samplers$season %in% c(1, 2), ]
-
-  # Integration points
-  ips <- fm_int(
-    domain = list(
-      coordinates = mrsea$mesh,
-      season = seq_len(2)
-    ),
-    samplers = mrsea$samplers
+  mesh <- fm_mesh_2d_inla(
+    loc = mydata,
+    offset = 5,
+    max.edge = 4,
+    n = 16
   )
 
-  # Run the model
-  matern <- INLA::inla.spde2.pcmatern(mrsea$mesh,
-    prior.sigma = c(0.1, 0.01),
-    prior.range = c(10, 0.01)
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh,
+    prior.sigma = c(10, 0.01),
+    prior.range = c(4, 0.01)
   )
 
-  cmp <-
-    coordinates + season ~
-    mySmooth(
-      main = coordinates, model = matern,
-      group = season, ngroup = 2
-    ) + Intercept(1)
-  fit <- lgcp(cmp, mrsea$points,
-    ips = ips,
+  cmp <- obs ~ Intercept(1) + field(geometry,
+    model = matern,
+    group = season,
+    ngroup = 2
+  )
+
+  fit <- bru(
+    cmp,
+    data = mydata,
     options = list(
       control.inla = list(
         int.strategy = "eb"
@@ -173,40 +175,25 @@ latent_spde2D_group_testdata <- function() {
     )
   )
 
-  list(
-    mrsea = mrsea,
-    matern = matern,
-    cmp = cmp,
-    fit = fit
-  )
-}
-
-test_that("Latent models: SPDE with group parameter (spatiotemporal)", {
-  skip_on_cran()
-  local_bru_safe_inla()
-
-  suppressWarnings(
-    data_ <- latent_spde2D_group_testdata()
-  )
-
   # Check Intercept
-  expect_snapshot_value(
-    data_$fit$summary.fixed["Intercept", "mean"],
-    tolerance = midtol,
-    style = "serialize"
+  expect_equal(
+    fit$summary.fixed["Intercept", "mean"],
+    0.6343082,
+    tolerance = midtol
   )
 
   # Check SPDE
-  expect_snapshot_value(
-    data_$fit$summary.random$mySmooth$mean[c(1, 250, 550)],
-    tolerance = midtol,
-    style = "serialize"
+  expect_equal(
+    fit$summary.random$field$mean[mesh$idx$loc[1:3]],
+    c(-2.6947679, -0.3644125, 3.4244099),
+    tolerance = midtol
   )
-  expect_snapshot_value(
-    data_$fit$summary.random$mySmooth$sd[c(1, 250, 550)],
-    tolerance = midtol,
-    style = "serialize"
-  )
-  # No error should appear
-  expect_error(spde.posterior(data_$fit, "mySmooth", what = "range"), NA)
+
+  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sf")
+  expect_s3_class(pred_df, "sf")
+  pred_df <- fm_cprod(pred_df, data.frame(season = seq_len(2)))
+
+  skip_if_not_installed("sn")
+  pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
+  expect_s3_class(pred, "sf")
 })

@@ -66,7 +66,7 @@ We now need to extract the coordinates for these pixels. The plot below illustra
 counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
   bind_cols(values(counts_rstr, mat = TRUE, na.rm = TRUE)) %>%
   rename(count = sum) %>%
-  mutate(present = count > 0) %>%
+  mutate(present = (count > 0) * 1L) %>%
   st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
@@ -91,7 +91,7 @@ px_mesh <- fm_mesh_2d_inla(
 )
 
 px_matern <- INLA::inla.spde2.pcmatern(px_mesh,
-  prior.sigma = c(0.1, 0.01),
+  prior.sigma = c(5, 0.01),
   prior.range = c(0.1, 0.01)
 )
 
@@ -199,13 +199,14 @@ pred_zip <- predict(
       veg_disturbed + veg_grassland +
         elevation + field + Intercept
     )
-    expect <- scaling_prob * lambda * area
-    variance <- expect * (1 + (1 - scaling_prob) * lambda * area)
+    expect_param <- lambda * area
+    expect <- scaling_prob * expect_param
+    variance <- scaling_prob * expect_param * (1 + (1 - scaling_prob) * expect_param)
     list(
       lambda = lambda,
       expect = expect,
       variance = variance,
-      obs_prob = (1 - scaling_prob) * (count == 0) + scaling_prob * dpois(count, expect)
+      obs_prob = (1 - scaling_prob) * (count == 0) + scaling_prob * dpois(count, expect_param)
     )
   },
   n.samples = 2500
@@ -262,19 +263,25 @@ $$
 
 
 ```{r fig-fit-zap}
-comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
-  veg_grassland(gcov_vegetation$Grassland, model = "linear") +
-  elevation(gcov$elevation, model = "linear") +
-  field(geometry, model = px_matern) + Intercept_present(1) + Intercept_count(1) +
-  elevation_present(gcov$elevation, model = "linear") +
-  field_present(geometry, copy = "field")
+comps <- ~
+  Intercept_count(1) +
+    veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
+    veg_grassland(gcov_vegetation$Grassland, model = "linear") +
+    elevation(gcov$elevation, model = "linear") +
+    field_present(geometry, model = px_matern) +
+    Intercept_present(1) +
+    elevation_present(gcov$elevation, model = "linear") +
+    field_count(geometry, model = px_matern)
+
+## Alternative with a shared field component:
+#  field_count(geometry, copy = "field_present", fixed = FALSE)
 
 truncated_poisson_like <-
-  if (package_version(getNamespaceVersion("INLA")) < "2023.10.19-1") {
+  if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
     like(
       family = "zeroinflatedpoisson0",
-      data = counts_df[counts_df$present, ],
-      formula = count ~ elevation + field + Intercept_count,
+      data = counts_df[counts_df$present > 0, ],
+      formula = count ~ elevation + field_count + Intercept_count,
       E = area,
       control.family = list(hyper = list(theta = list(
         initial = -20, fixed = TRUE
@@ -283,26 +290,34 @@ truncated_poisson_like <-
   } else {
     like(
       family = "nzpoisson",
-      data = counts_df[counts_df$present, ],
-      formula = count ~ elevation + field + Intercept_count,
+      data = counts_df[counts_df$present > 0, ],
+      formula = count ~ elevation + field_count + Intercept_count,
       E = area
     )
   }
 
+present_like <- like(
+  family = "binomial",
+  data = counts_df,
+  formula = present ~ # vegetation +
+    veg_disturbed + veg_grassland +
+    elevation_present + field_present + Intercept_present
+)
+
 fit_zap <- bru(
   comps,
-  like(
-    family = "binomial",
-    data = counts_df,
-    formula = present ~ # vegetation +
-      veg_disturbed + veg_grassland +
-      elevation_present + field_present + Intercept_present
-  ),
-  truncated_poisson_like
+  present_like,
+  truncated_poisson_like,
+  options = list(bru_verbose = 4)
 )
+
 summary(fit_zap)
 ```
 
+Note that in this model, there is no direct link between the parameters of the two observation parts, and we could estimate them separately.
+However, if for example the `field_count` component could be used for both predictors, it would be possible to use the `copy` argument to share the same component between the two parts, with `field_present(geometry, copy = "field_count", fixed = TRUE)`, where `fixed = TRUE` tells `bru()` to estimate a scaling parameter instead of using the same linear effect parameter for both
+version of the field.  In the results above, we see that the estimated covariance parameters for the two fields
+are very different, so it is not sensible to share the same component between the two parts.
 
 # Predict intensity on the original raster locations
 
@@ -317,8 +332,9 @@ pred_zap <- predict(
           elevation_present +
           field_present + Intercept_present
       )
-    lambda <- exp(elevation + field + Intercept_count)
-    expect <- presence_prob * lambda * area / (1 - exp(-lambda * area))
+    lambda <- exp(elevation + field_count + Intercept_count)
+    expect_param <- presence_prob * lambda * area
+    expect <- expect_param / (1 - exp(-lambda * area))
     variance <- expect * (1 - exp(-lambda * area) * expect)
     list(
       presence = presence_prob,
@@ -326,7 +342,7 @@ pred_zap <- predict(
       expect = expect,
       variance = variance,
       obs_prob = (1 - presence_prob) * (count == 0) +
-        (count > 0) * presence_prob * dpois(count, expect) / (1 - dpois(0, expect))
+        (count > 0) * presence_prob * dpois(count, expect_param) / (1 - dpois(0, expect_param))
     )
   },
   n.samples = 2500
@@ -499,19 +515,33 @@ df_ <- df %>%
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = DS), geom = "tile") +
-  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  gg(df_ %>% filter(Model == "Poisson"), aes(fill = DS), geom = "tile") +
+  scale_fill_distiller(
+    type = "seq",
+    palette = "Reds",
+    limits = c(-7.5, 25),
+    direction = 1
+  ) +
+  geom_sf(
+    data = nests,
+    color = "firebrick",
+    size = 1,
+    pch = 4,
+    alpha = 0.2
+  ) +
   ggtitle("Poisson Dawid-Sebastiani scores") +
   guides(fill = guide_legend("DS"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = DS - DS_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZIP"), aes(fill = DS - DS_Poisson), geom = "tile") +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = DS - DS_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZAP"), aes(fill = DS - DS_Poisson), geom = "tile") +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
@@ -522,19 +552,33 @@ patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = LG), geom = "tile") +
-  geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
+  gg(df_ %>% filter(Model == "Poisson"), aes(fill = LG), geom = "tile") +
+  scale_fill_distiller(
+    type = "seq",
+    palette = "Reds",
+    limits = c(0, 5),
+    direction = 1
+  ) +
+  geom_sf(
+    data = nests,
+    color = "firebrick",
+    size = 1,
+    pch = 4,
+    alpha = 0.2
+  ) +
   ggtitle("LG score") +
   guides(fill = guide_legend("LG"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = LG - LG_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZIP"), aes(fill = LG - LG_Poisson), geom = "tile") +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP LG score difference") +
   guides(fill = guide_legend("LG-LG_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_, aes(fill = LG - LG_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZAP"), aes(fill = LG - LG_Poisson), geom = "tile") +
+  scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP LG score difference") +
   guides(fill = guide_legend("LG-LG_poi"))
