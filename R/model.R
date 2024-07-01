@@ -20,12 +20,13 @@
 #' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
 #' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
 #' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' [inlabru] provides the new `main` agument. For convenience, the `main` argument can be used
+#' [inlabru] provides the `main` argument. For convenience, the `main` argument can be used
 #' like the first argument of the f function, e.g., and is the first argument of the component definition.
+#' The `INLA` model formula
 #'
 #' `y ~ f(temperature, model = 'linear')`
 #'
-#' is equivalent to
+#' is equivalent to the `inlabru` component and formula definition
 #'
 #' `y ~ temperature(temperature, model = 'linear')`
 #' and
@@ -34,12 +35,11 @@
 #' `y ~ temperature(model = 'linear')`
 #' which sets `main = temperature`.
 #'
-#' On the other hand, map can also be a function mapping, e.g the [coordinates] function of the
-#' [sp] package :
+#' On the other hand, `main` can also be a function mapping, e.g the [sp::coordinates()] function:
 #'
 #' `y ~ mySPDE(coordinates, ...)`
 #'
-#' This exctract the coordinates from the data object, and maps it to the latent
+#' This extracts the coordinates from the data object, and maps it to the latent
 #' field via the information given in the `mapper`, which by default is
 #' extracted from the `model` object, in the case of `spde` model
 #' objects.
