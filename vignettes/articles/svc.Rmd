@@ -150,7 +150,7 @@ states <- maps::map("state", plot = FALSE, fill = TRUE) %>%
   )) %>%
   sf::st_make_valid() %>%
   sf::st_transform(epsg6703km) %>%
-  sf::st_make_valid() %>%
+  sf::st_make_valid()
 ```
 
 ## Import data
