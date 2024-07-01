@@ -19,7 +19,7 @@
 #'   inside the mesh.
 #'
 is.inside <- function(mesh, loc, mesh.coords = NULL) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.8.0",
     "is.inside()",
     "fmesher::fm_is_within()",
@@ -42,7 +42,7 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 #'
 #' @export vertices.inla.mesh
 vertices.inla.mesh <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.8.0",
     "vertices.inla.mesh()",
     "fmesher::fm_vertices()",
@@ -60,17 +60,9 @@ vertices.inla.mesh <- function(...) {
 }
 
 
-#' @title Generate `SpatialPixels` covering an `inla.mesh`
-#'
-#' @description
-#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_pixels()]
-#'
+#' @describeIn inlabru-deprecated
 #' Generate `SpatialPixels` covering an `inla.mesh`.
-#'
-#' @export
-#' @seealso [fm_pixels()]
-#'
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
+#'`r lifecycle::badge("deprecated")` in favour of [fmesher::fm_pixels()]
 #'
 #' @param mesh An `inla.mesh` object
 #' @param nx Number of pixels in x direction
@@ -78,37 +70,8 @@ vertices.inla.mesh <- function(...) {
 #' @param mask If logical and TRUE, remove pixels that are outside the mesh.
 #' If `mask` is a `Spatial` object, only return pixels covered by this object.
 #' @return `SpatialPixelsDataFrame` covering the mesh
-#'
-#' @examples
-#' \donttest{
-#' if (require(ggplot2, quietly = TRUE)) {
-#'   data("mrsea", package = "inlabru")
-#'   pxl <- fm_pixels(
-#'     mrsea$mesh,
-#'     dims = c(50, 50),
-#'     mask = mrsea$boundary,
-#'     format = "sp",
-#'     minimal = TRUE
-#'   )
-#'   ggplot() +
-#'     gg(pxl, fill = "blue", alpha = 0.75) +
-#'     gg(mrsea$mesh)
-#'
-#'   pxl <- fm_pixels(
-#'     mrsea$mesh,
-#'     dims = c(50, 50),
-#'     mask = mrsea$boundary,
-#'     format = "sf",
-#'     minimal = TRUE
-#'   )
-#'   ggplot() +
-#'     gg(pxl, geom = "tile", fill = "blue", alpha = 0.75) +
-#'     gg(mrsea$mesh)
-#' }
-#' }
-#'
 pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.8.0",
     "pixels()",
     "fmesher::fm_pixels(format = 'sp')",

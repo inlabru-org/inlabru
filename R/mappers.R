@@ -507,7 +507,7 @@ bru_mapper_define <- function(mapper,
         "  #' @exportS3Method inlabru::bru_get_mapper",
         "etc., which semi-automates it."
       )
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       when = "2.7.0",
       what = "bru_mapper_define(methods)",
       details =
@@ -529,13 +529,14 @@ bru_mapper_define <- function(mapper,
 
 ## Default methods ----
 
-#' @describeIn bru_mapper Calls `bru_mapper_define`, passing all
+#' @describeIn inlabru-deprecated
+#' Calls `bru_mapper_define`, passing all
 #' arguments along. Mapper implementations should call [bru_mapper_define()]
 #' instead, and supply at least a `new_class` class name.
-#' Use of the `bru_mapper.default` method will be deprecated from version 2.7.0.
-#' @export
+#' Use of the `bru_mapper.default` method was deprecated from version 2.7.0,
+#' and removed in version 2.11.0
 bru_mapper.default <- function(...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     "2.7.0",
     "bru_mapper.default()",
     "bru_mapper_define()"

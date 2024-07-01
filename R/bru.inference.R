@@ -1602,7 +1602,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     )
   }
   if (lifecycle::is_present(allow_latent)) {
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       "2.8.0",
       "like(allow_latent = 'is deprecated')",
       "like(include_latent)",
@@ -2098,12 +2098,11 @@ predict.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       "2.8.0",
       "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
-    newdata <- fm_vertices(newdata, format = "sp")
   } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
   }
@@ -2286,12 +2285,11 @@ generate.bru <- function(object,
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_warn(
+    lifecycle::deprecate_stop(
       "2.8.0",
       "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
       details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
     )
-    newdata <- fm_vertices(newdata, format = "sp")
   } else if (inherits(newdata, "formula")) {
     stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
   }

@@ -32,6 +32,25 @@
   This allows easier testing of multi-likelihood models (version `2.10.1.9006`)
 * Improved backwards compatibility support for `sp` data input for `family = "cp"`
   (version `2.10.1.9008`)
+  
+## Deprecated methods
+
+* Deprecated (since 2.9.0) method `ipoints(samplers, domain)` is no longer available.
+  Use `fmesher::fm_int(domain, samplers)` instead.
+* The `allow_latent`, `include_latent` arguments to `like()` have been deprecated in favour
+  of the general `bru_used()` framework, that auto-detects what component effects and
+  latent effects are used by a predictor expression.
+* The deprecated (since 2.8.0) `cprod()` method now gives a warning and will be removed in a future version.
+  Use `fmesher::fm_cprod()` instead.
+* The `integration_weight_aggregation` method has been removed (deprecated since 2.8.0).
+  Use `fmesher::fm_vertex_projection()` instead.
+* The `mesh_triangle_integration` method has been removed (deprecated since 2.8.0).
+  Use `fmesher::fm_int()` instead.
+* Old use of `bru_mapper.default()` to define new mapper classes has been disabled
+  (deprecated since 2.7.0). Use `bru_mapper_define()` instead.
+* Deprecated (since 2.8.0) methods `is.inside()`, `vertices.inla.mesh()`, and
+  `pixels()` have been disabled. Use `fmesher::fm_is_within()`, `fmesher::fm_vertices()`,
+  and `fmesher::fm_pixels()` instead.
 
 # inlabru 2.10.1
 
