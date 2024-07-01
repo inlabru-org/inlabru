@@ -22,7 +22,7 @@
   instead of elapsed clock time. Added `bru_timings()` method to extract the timings
   safely from a fitted `bru` object (version `2.10.1.9007` and `2.10.1.9010`)
 * Add verbosity level information to the bru log data structure,
-  allowing flitered log extraction and more flexible log display
+  allowing filtered log extraction and more flexible log display
   (version `2.10.1.9012`)
 
 ## Bug fixes
