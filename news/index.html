@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,18 +94,37 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.11.0" id="inlabru-2110">inlabru 2.11.0<a class="anchor" aria-label="anchor" href="#inlabru-2110"></a></h2>
 <div class="section level3">
-<h3 id="feature-updates-development-version">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-development-version"></a></h3>
+<h3 id="new-features-2-11-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-11-0"></a></h3>
 <ul><li>Add support for the <code>scale</code> parameter to <code><a href="../reference/like.html">like()</a></code>.</li>
-<li>Fix regression bug in <code>"bym"</code> model support, where the latent state size wasn’t correctly handled by the mapper system (version <code>2.10.1.9002</code>)</li>
-<li>New <code>toypoints</code> example data set, for basic modelling examples (version <code>2.10.1.9003</code>)</li>
-<li>Updated convergence plots, reducing random effect aspects to summary statistics, improving speed and visual coherence (version <code>2.10.1.9004</code>)</li>
-<li>Add options to <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code> to control the number of iterations shown, and optionally show the initial values that are stored from this version (version <code>2.10.1.9005</code>)</li>
-<li>Add filter to limit mapper construction to only the components used in the predictor expression, to avoid unused components breaking the initialisation. This allows easier testing of multi-likelihood models (version <code>2.10.1.9006</code>)</li>
-<li>Switch timing mechanism from <code><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time()</a></code> to <code><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time()</a></code> to capture CPU time instead of elapsed clock time. Added <code><a href="../reference/bru_timings.html">bru_timings()</a></code> method to extract the timings safely from a fitted <code>bru</code> object (version <code>2.10.1.9007</code> and <code>2.10.1.9010</code>)</li>
-<li>Improved backwards compatibility support for <code>sp</code> data input for <code>family = "cp"</code> (version <code>2.10.1.9008</code>)</li>
 <li>Add support for special response objects like <code><a href="https://rdrr.io/pkg/INLA/man/mdata.html" class="external-link">inla.mdata()</a></code> and <code><a href="https://rdrr.io/pkg/INLA/man/surv.html" class="external-link">inla.surv()</a></code>, when INLA version <code>&gt; 24.06.02</code> (for <code>mdata</code>) or <code>&gt; 24.06.26</code> (for <code>surv</code>) are available (version <code>2.10.1.9011</code>)</li>
-<li>Add verbosity level information to the bru log data structure (version <code>2.10.1.9012</code>)</li>
+<li>New <code>toypoints</code> example data set, for basic modelling examples (version <code>2.10.1.9003</code>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="feature-updates-2-11-0">Feature updates<a class="anchor" aria-label="anchor" href="#feature-updates-2-11-0"></a></h3>
+<ul><li>Updated convergence plots, reducing random effect aspects to summary statistics, improving speed and visual coherence (version <code>2.10.1.9004</code>)</li>
+<li>Add options to <code><a href="../reference/bru_convergence_plot.html">bru_convergence_plot()</a></code> to control the number of iterations shown, and optionally show the initial values that are stored from this version (version <code>2.10.1.9005</code>)</li>
+<li>Switch timing mechanism from <code><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time()</a></code> to <code><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time()</a></code> to capture CPU time instead of elapsed clock time. Added <code><a href="../reference/bru_timings.html">bru_timings()</a></code> method to extract the timings safely from a fitted <code>bru</code> object (version <code>2.10.1.9007</code> and <code>2.10.1.9010</code>)</li>
+<li>Add verbosity level information to the bru log data structure, allowing flitered log extraction and more flexible log display (version <code>2.10.1.9012</code>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-2-11-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-11-0"></a></h3>
+<ul><li>Fix regression bug in <code>"bym"</code> model support, where the latent state size wasn’t correctly handled by the mapper system (version <code>2.10.1.9002</code>)</li>
+<li>Add filter to limit mapper construction to only the components used in the predictor expression, to avoid unused components breaking the initialisation. This allows easier testing of multi-likelihood models (version <code>2.10.1.9006</code>)</li>
+<li>Improved backwards compatibility support for <code>sp</code> data input for <code>family = "cp"</code> (version <code>2.10.1.9008</code>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecated-methods-2-11-0">Deprecated methods<a class="anchor" aria-label="anchor" href="#deprecated-methods-2-11-0"></a></h3>
+<ul><li>Deprecated (since 2.9.0) method <code>ipoints(samplers, domain)</code> is no longer available. Use <code>fmesher::fm_int(domain, samplers)</code> instead.</li>
+<li>The <code>allow_latent</code>, <code>include_latent</code> arguments to <code><a href="../reference/like.html">like()</a></code> have been deprecated in favour of the general <code><a href="../reference/bru_used.html">bru_used()</a></code> framework, that auto-detects what component effects and latent effects are used by a predictor expression.</li>
+<li>The deprecated (since 2.8.0) <code><a href="../reference/inlabru-deprecated.html">cprod()</a></code> method now gives a warning and will be removed in a future version. Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_cprod.html" class="external-link">fmesher::fm_cprod()</a></code> instead.</li>
+<li>The <code>integration_weight_aggregation</code> method has been removed (deprecated since 2.8.0). Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertex_projection.html" class="external-link">fmesher::fm_vertex_projection()</a></code> instead.</li>
+<li>The <code>mesh_triangle_integration</code> method has been removed (deprecated since 2.8.0). Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fmesher::fm_int()</a></code> instead.</li>
+<li>Old use of <code><a href="../reference/inlabru-deprecated.html">bru_mapper.default()</a></code> to define new mapper classes has been disabled (deprecated since 2.7.0). Use <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code> instead.</li>
+<li>Deprecated (since 2.8.0) methods <code><a href="../reference/inlabru-deprecated.html">is.inside()</a></code>, <code><a href="../reference/inlabru-deprecated.html">vertices.inla.mesh()</a></code>, and <code><a href="../reference/inlabru-deprecated.html">pixels()</a></code> have been disabled. Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_is_within.html" class="external-link">fmesher::fm_is_within()</a></code>, <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertices.html" class="external-link">fmesher::fm_vertices()</a></code>, and <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fmesher::fm_pixels()</a></code> instead.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -197,8 +216,8 @@
 <p>The <code><a href="../reference/bru_used.html">bru_used()</a></code> methods are used to guess the needed component names, applied to the right-hand side of the <code>formula</code> arguments. The <code>allow_latent</code> argument to <code><a href="../reference/like.html">like()</a></code> has been deprecated in favour of <code>include_latent</code> (by default auto-detected for use of <code>_latent</code> and <code>_eval</code>).</p>
 <p>The internal information storage is handled by the new <code><a href="../reference/bru_used.html">bru_used()</a></code> methods, that can also be used directly by the user and supplied via the <code>used</code> argument to <code><a href="../reference/like.html">like()</a></code>/<code><a href="../reference/generate.html">generate()</a></code>/<code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code>.</p>
 </li>
-<li><p>Add <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code> integration methods, replacing the old <code>ipmaker()</code> and <code><a href="../reference/ipoints.html">ipoints()</a></code> methods. Supports both <code>sf</code> and <code>sp</code> sampler objects.</p></li>
-<li><p>Add <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels()</a></code> methods for gridded points. The old <code><a href="../reference/pixels.html">pixels()</a></code> method now calls <code>fm_pixels(..., format = "sp")</code></p></li>
+<li><p>Add <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code> integration methods, replacing the old <code>ipmaker()</code> and <code><a href="../reference/inlabru-deprecated.html">ipoints()</a></code> methods. Supports both <code>sf</code> and <code>sp</code> sampler objects.</p></li>
+<li><p>Add <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels()</a></code> methods for gridded points. The old <code><a href="../reference/inlabru-deprecated.html">pixels()</a></code> method now calls <code>fm_pixels(..., format = "sp")</code></p></li>
 <li><p><code>eval_spatial</code> support for sf objects (for point-in-polygon data lookups)</p></li>
 <li><p>Allow precomputed spatial covariates in the data for point process observations</p></li>
 <li><p>Add <code>edge|int|ext.linewidth</code> arguments to <code>gg.inla.mesh</code> <a href="https://github.com/inlabru-org/inlabru/issues/188" class="external-link">#188</a></p></li>
@@ -424,7 +443,7 @@
 <ul><li>Fixed issue with <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code> logic for converting output to <code>Spatial*DataFrame</code>
 </li>
 <li>Use <code>control.mode=list(restart=FALSE)</code> in the final inla run for nonlinear models, to avoid an unnecessary optimisation.</li>
-<li>Fix issues in <code><a href="../reference/pixels.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</li>
+<li>Fix issues in <code><a href="../reference/inlabru-deprecated.html">pixels()</a></code> and <code><a href="../reference/bru_fill_missing.html">bru_fill_missing()</a></code> for <code>Spatial*DataFrame</code> objects with <code>ncol=0</code> data frame parts.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.1" id="inlabru-221">inlabru 2.2.1<a class="anchor" aria-label="anchor" href="#inlabru-221"></a></h2>
@@ -470,7 +489,7 @@
 <ul><li>Add CITATION file</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.1.10" id="inlabru-2110">inlabru 2.1.10<a class="anchor" aria-label="anchor" href="#inlabru-2110"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.1.10" id="inlabru-2110-1">inlabru 2.1.10<a class="anchor" aria-label="anchor" href="#inlabru-2110-1"></a></h2>
 <ul><li>Fix internal sampling bug due to INLA changes</li>
 </ul></div>
     <div class="section level2">

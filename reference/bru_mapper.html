@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.10.1.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,10 +101,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, methods <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, methods <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -132,14 +129,6 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
     
 
 <ul><li><p><code>bru_mapper()</code> returns a <code>bru_mapper</code> object</p></li>
-</ul></div>
-    <div class="section level2">
-    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
-    
-<ul><li><p><code>bru_mapper(default)</code>: Calls <code>bru_mapper_define</code>, passing all
-arguments along. Mapper implementations should call <code>bru_mapper_define()</code>
-instead, and supply at least a <code>new_class</code> class name.
-Use of the <code>bru_mapper.default</code> method will be deprecated from version 2.7.0.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>

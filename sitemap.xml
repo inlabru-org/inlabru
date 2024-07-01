@@ -274,9 +274,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/component_list.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/cprod.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/deltaIC.html</loc>
   </url>
   <url>
@@ -406,12 +403,6 @@
     <loc>https://inlabru-org.github.io/inlabru/reference/input_eval.html</loc>
   </url>
   <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/integration_weight_aggregation.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/ipoints.html</loc>
-  </url>
-  <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/lgcp.html</loc>
   </url>
   <url>
@@ -440,9 +431,6 @@
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/pcmatern_B.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/pixels.html</loc>
   </url>
   <url>
     <loc>https://inlabru-org.github.io/inlabru/reference/plot.bru.html</loc>
