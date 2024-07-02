@@ -210,111 +210,19 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
 
 
 
+#' @describeIn inlabru-deprecated
 #' Integration points for polygons inside an inla.mesh
 #'
-#' @export
-#' @param mesh An inla.mesh object
-#' @param method Which integration method to use ("stable",
-#'   with aggregation to mesh vertices, or "direct")
-#' @param samplers If non-NULL, a SpatialPolygons* object
-#' @param ... Arguments passed to the low level integration method (`make_triangle_integration`)
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' `r lifecycle::badge("deprecated")` Use [fmesher::fm_int()] instead.
+#'
 #' @keywords internal
 
-bru_int_polygon <- function(mesh,
-                            method = NULL,
-                            samplers = NULL,
-                            ...) {
-  method <- match.arg(method, c("stable", "direct"))
-
-  ipsl <- list()
-
-  # Compute direct integration points
-  # TODO: Allow blockwise construction to avoid
-  # overly large temporary coordinate matrices (via tri_subset)
-  integ <- fm_int_mesh_2d_core(mesh, ...)
-
-  # Keep points with positive weights (This should be all,
-  # but if there's a degenerate triangle, this gets rid of it)
-  ok <- (integ$weight > 0)
-  integ$loc <- integ$loc[ok, , drop = FALSE]
-  integ$weight <- integ$weight[ok]
-
-  if (!is.null(samplers)) {
-    mesh_crs <- fm_CRS(mesh)
-    samplers_crs <- fm_CRS(samplers)
-    integ_sp <- sp::SpatialPoints(integ$loc, proj4string = mesh_crs)
-    if (!identical(mesh_crs, samplers_crs) &&
-      !fm_crs_is_null(mesh_crs) &&
-      !fm_crs_is_null(samplers_crs)) {
-      integ_sp <- fm_transform(integ_sp,
-        crs = samplers_crs,
-        passthrough = TRUE
-      )
-    }
-
-    #    idx_ <- sp::over(samplers, integ_sp, returnList = TRUE)
-    samplers_sf <- sf::st_as_sf(samplers)
-    integ_sp_sf <- sf::st_as_sf(integ_sp)
-    idx <- sf::st_contains(samplers_sf, integ_sp_sf, sparse = TRUE)
-
-    for (g in seq_along(idx)) {
-      if (length(idx[[g]]) > 0) {
-        integ_ <- list(
-          loc = integ$loc[idx[[g]], , drop = FALSE],
-          weight = integ$weight[idx[[g]]]
-        )
-
-        if (method %in% c("stable")) {
-          # Project integration points and weights to mesh nodes
-          integ_ <- fm_vertex_projection(integ_, mesh)
-        }
-
-        if (ncol(integ_$loc) > 2) {
-          ips <- data.frame(
-            x = integ_$loc[, 1],
-            y = integ_$loc[, 2],
-            z = integ_$loc[, 3],
-            weight = integ_$weight,
-            .block = g
-          )
-        } else {
-          ips <- data.frame(
-            x = integ_$loc[, 1],
-            y = integ_$loc[, 2],
-            weight = integ_$weight,
-            .block = g
-          )
-        }
-
-        ipsl <- c(ipsl, list(ips))
-      }
-    }
-  } else {
-    if (method %in% c("stable")) {
-      # Project integration points and weights to mesh nodes
-      integ <- fm_vertex_projection(integ, mesh)
-    }
-
-    if (ncol(integ$loc) > 2) {
-      ipsl <- list(data.frame(
-        x = integ$loc[, 1],
-        y = integ$loc[, 2],
-        z = integ$loc[, 3],
-        weight = integ$weight,
-        .block = 1
-      ))
-    } else {
-      ipsl <- list(data.frame(
-        x = integ$loc[, 1],
-        y = integ$loc[, 2],
-        weight = integ$weight,
-        .block = 1
-      ))
-    }
-  }
-
-  do.call(rbind, ipsl)
+bru_int_polygon <- function(...) {
+  lifecycle::deprecate_stop(
+    "2.8.0",
+    "bru_int_polygon()",
+    "fmesher::fm_int()"
+  )
 }
 
 

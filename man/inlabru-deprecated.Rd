@@ -7,6 +7,7 @@
 \alias{inlabru-deprecated}
 \alias{integration_weight_aggregation}
 \alias{mesh_triangle_integration}
+\alias{bru_int_polygon}
 \alias{bru_mapper.default}
 \alias{bru_mapper_offset}
 \alias{is.inside}
@@ -28,6 +29,8 @@ cprod(..., na.rm = NULL, .blockwise = FALSE)
 integration_weight_aggregation(mesh, integ)
 
 mesh_triangle_integration(mesh, tri_subset = NULL, nsub = NULL)
+
+bru_int_polygon(...)
 
 \method{bru_mapper}{default}(...)
 
@@ -166,6 +169,10 @@ Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
 \item \code{mesh_triangle_integration()}: Integration scheme for mesh triangle interiors
 
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[fmesher:fm_int_mesh_2d_core]{fmesher::fm_int_mesh_2d_core()}} instead.
+
+\item \code{bru_int_polygon()}: Integration points for polygons inside an inla.mesh
+
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{\link[fmesher:fm_int]{fmesher::fm_int()}} instead.
 
 \item \code{bru_mapper(default)}: Calls \code{bru_mapper_define}, passing all
 arguments along. Mapper implementations should call \code{\link[=bru_mapper_define]{bru_mapper_define()}}
