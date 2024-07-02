@@ -117,6 +117,8 @@ future version.</p>
 <span></span>
 <span><span class="fu">mesh_triangle_integration</span><span class="op">(</span><span class="va">mesh</span>, tri_subset <span class="op">=</span> <span class="cn">NULL</span>, nsub <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">bru_int_polygon</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu"><a href="bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -282,6 +284,8 @@ weights attached to it all weights are assumed to be 1.</p>
 <p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_vertex_projection.html" class="external-link">fmesher::fm_vertex_projection()</a></code> instead.</p></li>
 <li><p><code>mesh_triangle_integration()</code>: Integration scheme for mesh triangle interiors</p>
 <p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int_mesh_2d_core.html" class="external-link">fmesher::fm_int_mesh_2d_core()</a></code> instead.</p></li>
+<li><p><code>bru_int_polygon()</code>: Integration points for polygons inside an inla.mesh</p>
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fmesher::fm_int()</a></code> instead.</p></li>
 <li><p><code>bru_mapper(default)</code>: Calls <code>bru_mapper_define</code>, passing all
 arguments along. Mapper implementations should call <code><a href="bru_mapper.html">bru_mapper_define()</a></code>
 instead, and supply at least a <code>new_class</code> class name.
