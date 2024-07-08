@@ -1,32 +1,31 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
-  1d_lgcp: 1d_lgcp.html
-  2d_lgcp_covars: 2d_lgcp_covars.html
-  2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
-  2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
-  2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
-  2d_lgcp_residuals: 2d_lgcp_residuals.html
-  2d_lgcp_sp: 2d_lgcp_sp.html
-  2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
-  2d_lgcp: 2d_lgcp.html
-  Apptainer: Apptainer.html
+  articles/1d_lgcp: 1d_lgcp.html
+  articles/2d_lgcp_covars: 2d_lgcp_covars.html
+  articles/2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
+  articles/2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
+  articles/2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
+  articles/2d_lgcp_residuals: 2d_lgcp_residuals.html
+  articles/2d_lgcp_sp: 2d_lgcp_sp.html
+  articles/2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
+  articles/2d_lgcp: 2d_lgcp.html
+  articles/Apptainer: Apptainer.html
   articles: articles.html
   bru_mapper: bru_mapper.html
   component: component.html
-  devel_flow: devel_flow.html
+  articles/devel_flow: devel_flow.html
   linearapprox: linearapprox.html
-  mesh_mapping: mesh_mapping.html
+  articles/mesh_mapping: mesh_mapping.html
   method: method.html
   prediction_scores: prediction_scores.html
-  publications: publications.html
-  random_fields_2d: random_fields_2d.html
-  random_fields: random_fields.html
-  svc: svc.html
-  zip_zap_models: zip_zap_models.html
-last_built: 2024-07-02T15:03Z
+  articles/publications: publications.html
+  articles/random_fields_2d: random_fields_2d.html
+  articles/random_fields: random_fields.html
+  articles/svc: svc.html
+  articles/zip_zap_models: zip_zap_models.html
+last_built: 2024-07-08T12:33Z
 urls:
   reference: https://inlabru-org.github.io/inlabru/reference
   article: https://inlabru-org.github.io/inlabru/articles
-

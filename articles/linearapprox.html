@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Nonlinear model approximation • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Nonlinear model approximation">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Nonlinear model approximation">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
-</li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,10 +94,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Nonlinear model approximation</h1>
+
+      <h1>Nonlinear model approximation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/linearapprox.Rmd" class="external-link"><code>vignettes/linearapprox.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/linearapprox.Rmd" class="external-link"><code>vignettes/linearapprox.Rmd</code></a></small>
       <div class="d-none name"><code>linearapprox.Rmd</code></div>
     </div>
 
@@ -130,36 +112,43 @@ methods.</p>
 <div class="section level2">
 <h2 id="a-small-toy-problem">A small toy problem<a class="anchor" aria-label="anchor" href="#a-small-toy-problem"></a>
 </h2>
-<p>Hierarchical model: <span class="math display">\[
+<p>Hierarchical model:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>λ</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mrow><mi>𝖤</mi><mi>𝗑</mi><mi>𝗉</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>γ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mrow><mi>𝖯</mi><mi>𝗈</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mrow><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> independent across </mtext><mspace width="0.333em"></mspace></mrow><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>n</mi></mrow></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \lambda &amp;\sim \mathsf{Exp}(\gamma) \\
-(y_i|\lambda) &amp;\sim \mathsf{Po}(\lambda), \text{ independent across
-$i=1,\dots,n$}
+(y_i|\lambda) &amp;\sim \mathsf{Po}(\lambda), \text{ independent across $i=1,\dots,n$}
 \end{aligned}
-\]</span> With <span class="math inline">\(\overline{y}=\frac{1}{n}\sum_{i=1}^n y_i\)</span>,
-the posterior density is <span class="math display">\[
+</annotation></semantics></math> With
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>y</mi><mo accent="true">¯</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>y</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\overline{y}=\frac{1}{n}\sum_{i=1}^n y_i</annotation></semantics></math>,
+the posterior density is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>∝</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>n</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>∝</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>γ</mi><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>n</mi><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><msup><mi>λ</mi><mrow><mi>n</mi><mover><mi>y</mi><mo accent="true">¯</mo></mover></mrow></msup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>exp</mo><mo stretchy="false" form="prefix">{</mo><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>γ</mi><mo>+</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>λ</mi><mo stretchy="false" form="postfix">}</mo><msup><mi>λ</mi><mrow><mi>n</mi><mover><mi>y</mi><mo accent="true">¯</mo></mover></mrow></msup><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 p(\lambda | \{y_i\}) &amp;\propto p(\lambda, y_1,\dots,y_n) \\
-&amp;\propto \exp(-\gamma\lambda) \exp(-n\lambda)
-\lambda^{n\overline{y}} \\
+&amp;\propto \exp(-\gamma\lambda) \exp(-n\lambda) \lambda^{n\overline{y}} \\
 &amp;= \exp\{-(\gamma+n)\lambda\} \lambda^{n\overline{y}},
 \end{aligned}
-\]</span> which is the density of a <span class="math inline">\(\mathsf{Ga}(\alpha = 1+n\overline{y}, \beta =
-\gamma+n)\)</span> distribution.</p>
+</annotation></semantics></math> which is the density of a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝖦</mi><mi>𝖺</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo>=</mo><mn>1</mn><mo>+</mo><mi>n</mi><mover><mi>y</mi><mo accent="true">¯</mo></mover><mo>,</mo><mi>β</mi><mo>=</mo><mi>γ</mi><mo>+</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathsf{Ga}(\alpha = 1+n\overline{y}, \beta = \gamma+n)</annotation></semantics></math>
+distribution.</p>
 </div>
 <div class="section level2">
 <h2 id="latent-gaussian-predictor-version">Latent Gaussian predictor version<a class="anchor" aria-label="anchor" href="#latent-gaussian-predictor-version"></a>
 </h2>
-<p>Introducing a latent Gaussian variable <span class="math inline">\(u\sim\mathsf{N}(0,1)\)</span>, the model can be
-reformulated as <span class="math display">\[
+<p>Introducing a latent Gaussian variable
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>∼</mo><mi>𝖭</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">u\sim\mathsf{N}(0,1)</annotation></semantics></math>,
+the model can be reformulated as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mo>ln</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>/</mi><mi>γ</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mrow><mi>𝖯</mi><mi>𝗈</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \lambda(u) &amp;=-\ln\{1-\Phi(u)\}/\gamma \\
 (y_i|u) &amp;\sim \mathsf{Po}(\lambda(u))
 \end{aligned}
-\]</span> We will need some derivatives of <span class="math inline">\(\lambda\)</span> with respect to <span class="math inline">\(u\)</span>: <span class="math display">\[
+</annotation></semantics></math> We will need some derivatives of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+with respect to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><mi>∂</mi><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mi>γ</mi></mfrac><mfrac><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>=</mo><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mfrac><mn>1</mn><mi>γ</mi></mfrac><mfrac><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo>+</mo><mfrac><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>−</mo><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">{</mo><mi>u</mi><mo>−</mo><mi>γ</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><mi>∂</mi><mo>ln</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mfrac><mrow><mi>∂</mi><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mo>−</mo><mo>ln</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow></mfrac><mfrac><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mn>1</mn><mo>−</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ln</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac><mo>−</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>∂</mi><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>=</mo><mfrac><mrow><mo>−</mo><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">{</mo><mi>u</mi><mo>−</mo><mi>γ</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>−</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mi>λ</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mrow><mo stretchy="true" form="prefix">{</mo><mi>u</mi><mo>−</mo><mi>γ</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">}</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\frac{\partial\lambda(u)}{\partial u} &amp;=
-\frac{1}{\gamma}\frac{\phi(u)}{1-\Phi(u)}
+\frac{\partial\lambda(u)}{\partial u} &amp;= \frac{1}{\gamma}\frac{\phi(u)}{1-\Phi(u)}
   = \lambda'(u) \\
 \frac{\partial^2\lambda(u)}{\partial u^2} &amp;=
 -
@@ -176,15 +165,14 @@ u + \frac{\phi(u)}{1-\Phi(u)}
   = \frac{\lambda'(u)}{\lambda(u)} \\
 \frac{\partial^2\ln\lambda(u)}{\partial u^2} &amp;=
   \frac{1}{\lambda(u)} \frac{\partial^2\lambda(u)}{\partial u^2}
-  -\frac{1}{\lambda(u)^2} \left(\frac{\partial\lambda(u)}{\partial
-u}\right)^2
+  -\frac{1}{\lambda(u)^2} \left(\frac{\partial\lambda(u)}{\partial u}\right)^2
   = \frac{-\lambda'(u)\{u - \gamma\lambda'(u)\}}{\lambda(u)}
   - \frac{\lambda'(u)^2}{\lambda(u)^2}\\
   &amp;= -\frac{\lambda'(u)}{\lambda(u)}\left\{
   u - \gamma\lambda'(u) +\frac{\lambda'(u)}{\lambda(u)}
   \right\}
 \end{aligned}
-\]</span></p>
+</annotation></semantics></math></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span>, <span class="va">gamma</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="va">u</span>, lower.tail <span class="op">=</span> <span class="cn">FALSE</span>, log.p <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">/</span> <span class="va">gamma</span></span>
@@ -210,14 +198,21 @@ u}\right)^2
 <div class="section level2">
 <h2 id="latent-gaussian-posterior-approximations">Latent Gaussian posterior approximations<a class="anchor" aria-label="anchor" href="#latent-gaussian-posterior-approximations"></a>
 </h2>
-<p>A basic approximation of the posterior distribution for <span class="math inline">\(\lambda\)</span> given <span class="math inline">\(y\)</span> can be defined as a deterministic
-transformation of a Gaussian distribution obtained from a 2nd order
-Taylor approximation of <span class="math inline">\(\ln
-p(u|\{y_i\})\)</span> at the posterior mode <span class="math inline">\(u_0\)</span> of <span class="math inline">\(p(u|\{y_i\})\)</span>. The needed derivatives are
-<span class="math display">\[
+<p>A basic approximation of the posterior distribution for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+can be defined as a deterministic transformation of a Gaussian
+distribution obtained from a 2nd order Taylor approximation of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ln p(u|\{y_i\})</annotation></semantics></math>
+at the posterior mode
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mn>0</mn></msub><annotation encoding="application/x-tex">u_0</annotation></semantics></math>
+of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(u|\{y_i\})</annotation></semantics></math>.
+The needed derivatives are
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><mi>∂</mi><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mrow><mi>∂</mi><mo>ln</mo><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><mi>u</mi></mrow></mfrac><mo>−</mo><mi>n</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>n</mi><mover><mi>y</mi><mo accent="true">¯</mo></mover><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>=</mo><mo>−</mo><mi>u</mi><mo>+</mo><mi>n</mi><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mrow><mo stretchy="true" form="prefix">{</mo><mover><mi>y</mi><mo accent="true">¯</mo></mover><mo>−</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mn>1</mn><mo>−</mo><mi>n</mi><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mrow><mo stretchy="true" form="prefix">{</mo><mi>u</mi><mo>−</mo><mi>γ</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">}</mo></mrow><mrow><mo stretchy="true" form="prefix">{</mo><mover><mi>y</mi><mo accent="true">¯</mo></mover><mo>−</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow><mo>−</mo><mi>n</mi><mfrac><mrow><mi>λ</mi><mi>′</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\frac{\partial\ln p(u|\{y_i\})}{\partial u} &amp;=
-\frac{\partial\ln\phi(u)}{\partial u}
+\frac{\partial\ln p(u|\{y_i\})}{\partial u} &amp;= \frac{\partial\ln\phi(u)}{\partial u}
 - n\lambda'(u) + n\overline{y}\frac{\lambda'(u)}{\lambda(u)}
 = -u + n\frac{\lambda'(u)}{\lambda(u)}\left\{
 \overline{y} - \lambda(u)
@@ -238,8 +233,10 @@ u - \gamma\lambda'(u) + \frac{\lambda'(u)}{\lambda(u)}
 n
 \frac{\lambda'(u)^2}{\lambda(u)}
 \end{aligned}
-\]</span> At the mode <span class="math inline">\(u_0\)</span>, the
-first order derivative is zero, and <span class="math display">\[
+</annotation></semantics></math> At the mode
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mn>0</mn></msub><annotation encoding="application/x-tex">u_0</annotation></semantics></math>,
+the first order derivative is zero, and
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mrow><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mrow><mi>u</mi><mo>=</mo><msub><mi>u</mi><mn>0</mn></msub></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mn>1</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">{</mo><msub><mi>u</mi><mn>0</mn></msub><mo>−</mo><mi>γ</mi><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">}</mo></mrow><msub><mi>u</mi><mn>0</mn></msub><mo>−</mo><mi>n</mi><mfrac><mrow><mi>λ</mi><mi>′</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \left.\frac{\partial^2\ln p(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
 &amp;=
@@ -253,34 +250,41 @@ u_0
 n
 \frac{\lambda'(u_0)^2}{\lambda(u_0)} .
 \end{aligned}
-\]</span> The quadratic approximation of the log-posterior density at
-the mode <span class="math inline">\(u_0\)</span> is then <span class="math display">\[
+</annotation></semantics></math> The quadratic approximation of the
+log-posterior density at the mode
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mn>0</mn></msub><annotation encoding="application/x-tex">u_0</annotation></semantics></math>
+is then
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mover><mi>p</mi><mo accent="true">̆</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="normal">const</mtext><mo>−</mo><mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo>−</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><msub><mrow><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mrow><mi>u</mi><mo>=</mo><msub><mi>u</mi><mn>0</mn></msub></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \ln \breve{p}(u|\{y_i\}) = \text{const} - \frac{(u-u_0)^2}{2}
 \left[
 -
 \left.\frac{\partial^2\ln p(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
 \right]
-\]</span> In <code>inlabru</code>, the approximation first linearises
-<span class="math inline">\(\ln \lambda(u)\)</span> at <span class="math inline">\(u_0\)</span> before applying the Taylor
-approximation of <span class="math inline">\(\ln p(u|\{y_i\})\)</span>.
-The linearised log-predictor is <span class="math display">\[
-\ln \overline{\lambda}(u) = \ln \lambda(u_0) +
-\frac{\lambda'(u_0)}{\lambda(u_0)}(u - u_0)
-\]</span> so that <span class="math display">\[
-\overline{\lambda}'(u) = \frac{\lambda'(u_0)}{\lambda(u_0)}
-\overline{\lambda}(u)
-\]</span> and the second order derivative of the linearised
-log-posterior density is <span class="math display">\[
+</annotation></semantics></math> In <code>inlabru</code>, the
+approximation first linearises
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ln \lambda(u)</annotation></semantics></math>
+at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mn>0</mn></msub><annotation encoding="application/x-tex">u_0</annotation></semantics></math>
+before applying the Taylor approximation of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ln p(u|\{y_i\})</annotation></semantics></math>.
+The linearised log-predictor is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mover><mi>λ</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>ln</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo>−</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+\ln \overline{\lambda}(u) = \ln \lambda(u_0) + \frac{\lambda'(u_0)}{\lambda(u_0)}(u - u_0)
+</annotation></semantics></math> so that
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>λ</mi><mo accent="true">¯</mo></mover><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mi>λ</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mover><mi>λ</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+\overline{\lambda}'(u) = \frac{\lambda'(u_0)}{\lambda(u_0)} \overline{\lambda}(u)
+</annotation></semantics></math> and the second order derivative of the
+linearised log-posterior density is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mrow><mfrac><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="false" form="prefix">|</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>∂</mi><msup><mi>u</mi><mn>2</mn></msup></mrow></mfrac><mo stretchy="true" form="postfix">|</mo></mrow><mrow><mi>u</mi><mo>=</mo><msub><mi>u</mi><mn>0</mn></msub></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><mn>1</mn><mo>−</mo><mi>n</mi><mfrac><mrow><mi>λ</mi><mi>′</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\left.\frac{\partial^2\ln \overline{p}(u|\{y_i\})}{\partial
-u^2}\right|_{u=u_0}
+\left.\frac{\partial^2\ln \overline{p}(u|\{y_i\})}{\partial u^2}\right|_{u=u_0}
 &amp;=
 -1
 -
 n
 \frac{\lambda'(u_0)^2}{\lambda(u_0)} .
 \end{aligned}
-\]</span></p>
+</annotation></semantics></math></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_p</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span>, <span class="va">y</span>, <span class="va">gamma</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">L</span> <span class="op">&lt;-</span> <span class="fu">lambda</span><span class="op">(</span><span class="va">u</span>, <span class="va">gamma</span><span class="op">)</span></span>
@@ -489,7 +493,7 @@ n
 <p><img src="linearapprox_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -500,15 +504,15 @@ n
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

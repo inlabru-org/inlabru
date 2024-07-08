@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Prediction scores • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Prediction scores">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Prediction scores">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,12 +94,13 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Prediction scores</h1>
+
+      <h1>Prediction scores</h1>
                         <h4 data-toc-skip class="author">Finn
 Lindgren</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/prediction_scores.Rmd" class="external-link"><code>vignettes/prediction_scores.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/prediction_scores.Rmd" class="external-link"><code>vignettes/prediction_scores.Rmd</code></a></small>
       <div class="d-none name"><code>prediction_scores.Rmd</code></div>
     </div>
 
@@ -127,19 +109,26 @@ Lindgren</h4>
 <div class="section level2">
 <h2 id="proper-posterior-prediction-scores">Proper posterior prediction scores<a class="anchor" aria-label="anchor" href="#proper-posterior-prediction-scores"></a>
 </h2>
-<p>A prediction <strong>score</strong> <span class="math inline">\(S(F,y)\)</span> evaluates some measure of
-<strong>closeness</strong> between a prediction distribution identified
-by <span class="math inline">\(F\)</span>, and an observed value <span class="math inline">\(y\)</span>.</p>
+<p>A prediction <strong>score</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(F,y)</annotation></semantics></math>
+evaluates some measure of <strong>closeness</strong> between a
+prediction distribution identified by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>,
+and an observed value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.</p>
 <div class="section level3">
 <h3 id="a-basic-score-and-motivating-remarks">A basic score, and motivating remarks<a class="anchor" aria-label="anchor" href="#a-basic-score-and-motivating-remarks"></a>
 </h3>
-<p>A common score is the <strong>Squared Error</strong>, <span class="math display">\[
+<p>A common score is the <strong>Squared Error</strong>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">SE</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><msub><mi>𝔼</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">
 S_\text{SE}(F,y) = [y - \mathbb{E}_F(Y)]^2,
-\]</span> and we would like predictions to have low values for <span class="math inline">\(S_\text{SE}(F,y)\)</span>, indicating a “good”
-prediction, in that specific sense that puts a penalty on the squared
-deviation of the prediction mean from the true observed value. We can
-imagine constructing other such scoring functions that penalise other
-aspects of the prediction.</p>
+</annotation></semantics></math> and we would like predictions to have
+low values for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">SE</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S_\text{SE}(F,y)</annotation></semantics></math>,
+indicating a “good” prediction, in that specific sense that puts a
+penalty on the squared deviation of the prediction mean from the true
+observed value. We can imagine constructing other such scoring functions
+that penalise other aspects of the prediction.</p>
 <p>A score where “lower is better” is called negatively oriented, and a
 score where “higher is better” is called positively oriented. One can
 always turn one type of score into the other by changing the sign, so to
@@ -157,81 +146,123 @@ idea more precise.</p>
 <div class="section level3">
 <h3 id="proper-and-strictly-proper-scores">Proper and strictly proper scores<a class="anchor" aria-label="anchor" href="#proper-and-strictly-proper-scores"></a>
 </h3>
-<p>The expected value under a distribution identified by <span class="math inline">\(G\)</span> is denoted <span class="math inline">\(S(F,G):=\mathbb{E}_{Y\sim F}[S(F,Y)]\)</span>. For
-a negatively oriented score, we seek scoring functions that are
+<p>The expected value under a distribution identified by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>G</mi><annotation encoding="application/x-tex">G</annotation></semantics></math>
+is denoted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>:=</mo><msub><mi>𝔼</mi><mrow><mi>Y</mi><mo>∼</mo><mi>F</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">S(F,G):=\mathbb{E}_{Y\sim F}[S(F,Y)]</annotation></semantics></math>.
+For a negatively oriented score, we seek scoring functions that are
 <strong>fair</strong>, in the sense that one cannot, on average, make a
 better prediction that that which generated the data. This requires
-<span class="math inline">\(S(F,G)\geq S(G,G)\)</span> for all
-predictive distributions <span class="math inline">\(F\)</span> and any
-distribution <span class="math inline">\(G\)</span>. Such scores are
-call <strong>proper</strong>. If in addition, equality of the score
-expectations only hold when <span class="math inline">\(F=G\)</span>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≥</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>G</mi><mo>,</mo><mi>G</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(F,G)\geq S(G,G)</annotation></semantics></math>
+for all predictive distributions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+and any distribution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>G</mi><annotation encoding="application/x-tex">G</annotation></semantics></math>.
+Such scores are call <strong>proper</strong>. If in addition, equality
+of the score expectations only hold when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><mi>G</mi></mrow><annotation encoding="application/x-tex">F=G</annotation></semantics></math>,
 the score is <strong>strictly proper</strong>.</p>
 <p>Non-strict proper scores ignore some aspect of the prediction,
 typically by only being sensitive to some summary information, such as
 the mean, median, and/or variance.</p>
 <p>It’s notable that proper scores retain their properness under affine
 transformations, with just potential changes in whether they are
-positively or negatively oriented. If <span class="math inline">\(S(F,y)\)</span> is a proper score, then <span class="math display">\[
+positively or negatively oriented. If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(F,y)</annotation></semantics></math>
+is a proper score, then
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>a</mi><mo>+</mo><mi>b</mi><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="1.0em"></mspace><mi>a</mi><mo>,</mo><mi>b</mi><mo>∈</mo><mi>ℝ</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">
 S'(F,y) = a + b S(F,y),\quad a,b\in\mathbb{R},
-\]</span> is also a proper score, with the same orientation if <span class="math inline">\(b&gt;0\)</span> and the opposite orientation if
-<span class="math inline">\(b&lt;0\)</span>. The degenerate case <span class="math inline">\(b=0\)</span> gives the score <span class="math inline">\(a\)</span> to all predictions, which is
-technically a proper score (you cannot to better than an ideal
-prediction), but a useless one (an ideal prediction is no better than
-any other prediction).</p>
+</annotation></semantics></math> is also a proper score, with the same
+orientation if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">b&gt;0</annotation></semantics></math>
+and the opposite orientation if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">b&lt;0</annotation></semantics></math>.
+The degenerate case
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">b=0</annotation></semantics></math>
+gives the score
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+to all predictions, which is technically a proper score (you cannot to
+better than an ideal prediction), but a useless one (an ideal prediction
+is no better than any other prediction).</p>
 </div>
 <div class="section level3">
 <h3 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h3>
 <ul>
-<li><p>log-score: <span class="math inline">\(S_\text{log}(F,y) =
--\log\{p_F(y)\}\)</span>, where <span class="math inline">\(p_F(y)\)</span> is a predictive pdf or pmf for
-<span class="math inline">\(y\)</span>, is a strictly proper
-score.</p></li>
-<li><p>Squared Error: <span class="math inline">\(S_\text{SE}(F,y) = [y
-- \mathbb{E}_F(Y)]^2\)</span> is a proper score</p></li>
+<li><p>log-score:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">log</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>−</mo><mo>log</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>p</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">S_\text{log}(F,y) = -\log\{p_F(y)\}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_F(y)</annotation></semantics></math>
+is a predictive pdf or pmf for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>,
+is a strictly proper score.</p></li>
+<li><p>Squared Error:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">SE</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><msub><mi>𝔼</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">S_\text{SE}(F,y) = [y - \mathbb{E}_F(Y)]^2</annotation></semantics></math>
+is a proper score</p></li>
 <li>
 <p>Brier score:</p>
 <ul>
-<li>Binary events: <span class="math display">\[S_\text{Brier}(F,z) = [z
-- \mathbb{P}_F(Z = 1)]^2,\]</span> where <span class="math inline">\(Z\in\{0,1\}\)</span> is a binary event indicator,
-is a strictly proper score for the event prediction, but non-strict with
-respect to any underlying outcome <span class="math inline">\(y\)</span>
-generating the event indicator, e.g. via <span class="math inline">\(z=I(y=0)\)</span>.</li>
-<li>Class indicator events: if <span class="math inline">\(y\in\{1,\dots,K\}\)</span> is a class category
-outcome, the Brier score can be generalised to <span class="math display">\[S_\text{MultiBrier}(F,y) = \sum_{k=1}^K [I(y = k)
-- \mathbb{P}_F(Y=k)]^2\]</span> which can be seen as the Squared Error
-for the Multinomial prediction model for <span class="math inline">\(z_k=I(y=k)\)</span>, with <span class="math inline">\(\{z_1,\dots,z_K\}\sim\text{Multinomial}(1,\{p_1,\dots,p_K\})\)</span>,
-where <span class="math inline">\(p_k=\mathbb{P}_F(Y=k)\)</span>.
-Sometimes, the sum is normalised by <span class="math inline">\(1/K\)</span>. This generalised Brier score is a
-proper score.</li>
+<li>Binary events:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">Brier</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>z</mi><mo>−</mo><msub><mi>ℙ</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Z</mi><mo>=</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">S_\text{Brier}(F,z) = [z - \mathbb{P}_F(Z = 1)]^2,</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">Z\in\{0,1\}</annotation></semantics></math>
+is a binary event indicator, is a strictly proper score for the event
+prediction, but non-strict with respect to any underlying outcome
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+generating the event indicator, e.g. via
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>=</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">z=I(y=0)</annotation></semantics></math>.</li>
+<li>Class indicator events: if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>K</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">y\in\{1,\dots,K\}</annotation></semantics></math>
+is a class category outcome, the Brier score can be generalised to
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">MultiBrier</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>=</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>ℙ</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">S_\text{MultiBrier}(F,y) = \sum_{k=1}^K [I(y = k) - \mathbb{P}_F(Y=k)]^2</annotation></semantics></math>
+which can be seen as the Squared Error for the Multinomial prediction
+model for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>k</mi></msub><mo>=</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>=</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">z_k=I(y=k)</annotation></semantics></math>,
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>z</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>z</mi><mi>K</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>∼</mo><mtext mathvariant="normal">Multinomial</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>p</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>p</mi><mi>K</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\{z_1,\dots,z_K\}\sim\text{Multinomial}(1,\{p_1,\dots,p_K\})</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>k</mi></msub><mo>=</mo><msub><mi>ℙ</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_k=\mathbb{P}_F(Y=k)</annotation></semantics></math>.
+Sometimes, the sum is normalised by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>K</mi></mrow><annotation encoding="application/x-tex">1/K</annotation></semantics></math>.
+This generalised Brier score is a proper score.</li>
 </ul>
 </li>
-<li><p>Dawid-Sebastiani: <span class="math display">\[S_\text{DS}(F,y)=[y - \mathbb{E}_F(Y)]^2 /
-\mathbb{V}_F(Y) + \log[\mathbb{V}_F(Y)]\]</span> is a proper score. It’s
-derived from the strictly proper log-score of a Gaussian prediction, but
-it’s also a non-strict proper score for other distributions. It has the
-advantage that it only involves the predictive mean and variance, making
-it computable also in cases when log-densities are hard to obtain. Since
-it’s based on the symmetric Gaussian distribution, it tends to be
-affected by skewness, so should be applied with care in such
-cases.</p></li>
-<li><p>Absolute (Median) Error: <span class="math inline">\(S_\text{AE}(F,y)=|y - \text{median}_F|\)</span> is
-a proper score, with expectation minimised when the medians of <span class="math inline">\(F\)</span> and <span class="math inline">\(G\)</span> match. Note that <span class="math inline">\(|y-\mathbb{E}_F(Y)|\)</span>, the absolute error
-with respect to the <em>expectation</em>, is <em>not</em> a proper
-score! Another way of expressing this is that if <span class="math inline">\(|y-m_F|\)</span> is a proper score <em>with
-respect to the median</em>, i.e. it is proper when <span class="math inline">\(m_F\)</span> is taken to be the median of <span class="math inline">\(F\)</span>, and not some other point prediction.
-In the applied literature, this distinction is often overlooked, and the
-predictive mean is inserted into both the SE and AE scores, making the
-resulting AE score comparisons less clear than they could be.</p></li>
+<li><p>Dawid-Sebastiani:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">DS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><msub><mi>𝔼</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mi>/</mi><msub><mi>𝕍</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>𝕍</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">S_\text{DS}(F,y)=[y - \mathbb{E}_F(Y)]^2 / \mathbb{V}_F(Y) + \log[\mathbb{V}_F(Y)]</annotation></semantics></math>
+is a proper score. It’s derived from the strictly proper log-score of a
+Gaussian prediction, but it’s also a non-strict proper score for other
+distributions. It has the advantage that it only involves the predictive
+mean and variance, making it computable also in cases when log-densities
+are hard to obtain. Since it’s based on the symmetric Gaussian
+distribution, it tends to be affected by skewness, so should be applied
+with care in such cases.</p></li>
+<li><p>Absolute (Median) Error:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">AE</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">|</mo><mi>y</mi><mo>−</mo><msub><mtext mathvariant="normal">median</mtext><mi>F</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow></mrow><annotation encoding="application/x-tex">S_\text{AE}(F,y)=|y - \text{median}_F|</annotation></semantics></math>
+is a proper score, with expectation minimised when the medians of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>G</mi><annotation encoding="application/x-tex">G</annotation></semantics></math>
+match. Note that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">|</mo><mi>y</mi><mo>−</mo><msub><mi>𝔼</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">|y-\mathbb{E}_F(Y)|</annotation></semantics></math>,
+the absolute error with respect to the <em>expectation</em>, is
+<em>not</em> a proper score! Another way of expressing this is that if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">|</mo><mi>y</mi><mo>−</mo><msub><mi>m</mi><mi>F</mi></msub><mo stretchy="true" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">|y-m_F|</annotation></semantics></math>
+is a proper score <em>with respect to the median</em>, i.e. it is proper
+when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>F</mi></msub><annotation encoding="application/x-tex">m_F</annotation></semantics></math>
+is taken to be the median of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>,
+and not some other point prediction. In the applied literature, this
+distinction is often overlooked, and the predictive mean is inserted
+into both the SE and AE scores, making the resulting AE score
+comparisons less clear than they could be.</p></li>
 <li>
 <p>CRPS (Continuous Ranked Probability Score):</p>
-<p><span class="math display">\[
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">CRPS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>ℙ</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>≤</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>≤</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mspace width="0.167em"></mspace><mi mathvariant="normal">d</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">
 S_\text{CRPS}(F,y)=
-  \int_{-\infty}^\infty [\mathbb{P}_F(Y \leq x) - I(y \leq x)]^2
-\,\mathrm{d}x
-\]</span> This is a strictly proper score, related to the absolute error
-of point predictions.</p>
+  \int_{-\infty}^\infty [\mathbb{P}_F(Y \leq x) - I(y \leq x)]^2 \,\mathrm{d}x
+</annotation></semantics></math> This is a strictly proper score,
+related to the absolute error of point predictions.</p>
 </li>
 </ul>
 <p>Other scores include the Interval score that is minimised for short
@@ -247,38 +278,48 @@ are only proper scores, sensitive to specific aspects of the predictive
 distribution, such as mean, median, and/or variance.</p>
 <p>In contrast, <em>improper</em> scores do not fulfil the fairness
 idea. Such scores include the the aforementioned penalised squared
-error, <span class="math inline">\([y-\mathbb{E}(Y)]^2+\mathbb{V}_F(Y)\)</span>, but
-also the probability/density function, <span class="math inline">\(p_F(y)\)</span>. The latter might come as a
-surprise, as the log-score <em>is</em> proper.</p>
+error,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>+</mo><msub><mi>𝕍</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[y-\mathbb{E}(Y)]^2+\mathbb{V}_F(Y)</annotation></semantics></math>,
+but also the probability/density function,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>F</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_F(y)</annotation></semantics></math>.
+The latter might come as a surprise, as the log-score <em>is</em>
+proper.</p>
 </div>
 <div class="section level3">
 <h3 id="mean-errorscore">Mean error/score<a class="anchor" aria-label="anchor" href="#mean-errorscore"></a>
 </h3>
 <p>Up to this point, we only considered individual scores. When
-summarising predictions <span class="math inline">\(\{F_i\}\)</span> for
-a collection of observations <span class="math inline">\(\{y_i\}\)</span>, we usually compute the mean
-score, <span class="math display">\[
+summarising predictions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>F</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{F_i\}</annotation></semantics></math>
+for a collection of observations
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{y_i\}</annotation></semantics></math>,
+we usually compute the mean score,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>F</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>,</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
 S(\{F_i\},\{y_i\}) = \frac{1}{N}\sum_{i=1}^N S(F_i,y_i) .
-\]</span></p>
-<p>When comparing two different prediction models <span class="math inline">\(F\)</span> and <span class="math inline">\(F'\)</span>, the scores are dependent with
-respect to the observations <span class="math inline">\(y_i\)</span>.
+</annotation></semantics></math></p>
+<p>When comparing two different prediction models
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">F'</annotation></semantics></math>,
+the scores are dependent with respect to the observations
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>.
 This means that in order to more easily handle the score variability in
 the comparison, we should treat it as a paired sample problem. The
-pairwise score differences are given by <span class="math display">\[
+pairwise score differences are given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><mi>F</mi><msub><mi>′</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><msub><mi>′</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
 S(F_i,F'_i,y_i) = S(F_i,y_i) - S(F'_i,y_i) .
-\]</span> It’s also much more reasonable to make conditional
-independence assumptions about these differences, than for the plain
-score values <span class="math inline">\(S(F_i,y_i)\)</span>; <span class="math display">\[
-\mathbb{V}_{\{y_i\}\sim G}\left[\frac{1}{N}\sum_{i=1}^N
-S(F_i,y_i)\right] =
-\frac{1}{N^2}\sum_{i=1}^N\sum_{j=1}^N\mathbb{C}_{\{y_i\}\sim
-G}\left[S(F_i,y_i),S(F_j,y_j)\right]
-\]</span> but <span class="math display">\[
-\mathbb{V}_{\{y_i\}\sim G}\left[\frac{1}{N}\sum_{i=1}^N S(F_i,y_i) -
-S(F'_i,y_i)\right] \approx
-\frac{1}{N^2}\sum_{i=1}^N\mathbb{V}_{y_i\sim G_i}\left[ S(F_i,y_i) -
-S(F'_i,y_i)\right].
-\]</span></p>
+</annotation></semantics></math> It’s also much more reasonable to make
+conditional independence assumptions about these differences, than for
+the plain score values
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(F_i,y_i)</annotation></semantics></math>;
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝕍</mi><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>∼</mo><mi>G</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msup><mi>N</mi><mn>2</mn></msup></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>ℂ</mi><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>∼</mo><mi>G</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>j</mi></msub><mo>,</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+\mathbb{V}_{\{y_i\}\sim G}\left[\frac{1}{N}\sum_{i=1}^N S(F_i,y_i)\right] =
+\frac{1}{N^2}\sum_{i=1}^N\sum_{j=1}^N\mathbb{C}_{\{y_i\}\sim G}\left[S(F_i,y_i),S(F_j,y_j)\right]
+</annotation></semantics></math> but
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝕍</mi><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>∼</mo><mi>G</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><msub><mi>′</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>≈</mo><mfrac><mn>1</mn><msup><mi>N</mi><mn>2</mn></msup></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>𝕍</mi><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><msub><mi>G</mi><mi>i</mi></msub></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><msub><mi>′</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\mathbb{V}_{\{y_i\}\sim G}\left[\frac{1}{N}\sum_{i=1}^N S(F_i,y_i) - S(F'_i,y_i)\right] \approx
+\frac{1}{N^2}\sum_{i=1}^N\mathbb{V}_{y_i\sim G_i}\left[ S(F_i,y_i) - S(F'_i,y_i)\right].
+</annotation></semantics></math></p>
 <p>Note that taking the average of prediction scores, or averages of
 prediction score differences, is quite different from assessing summary
 statistics of the collection of predictions, since the scores are
@@ -295,28 +336,31 @@ would be sensitive to this.</p>
 <div class="section level2">
 <h2 id="poisson-model-example">Poisson model example<a class="anchor" aria-label="anchor" href="#poisson-model-example"></a>
 </h2>
-<p>Consider a model with Poisson outcomes <span class="math inline">\(y\)</span>, conditionally on a log-linear
-predictor <span class="math inline">\(\lambda=\exp(\eta)\)</span>, where
-<span class="math inline">\(\eta\)</span> is some linear expression in
-latent variables.</p>
+<p>Consider a model with Poisson outcomes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>,
+conditionally on a log-linear predictor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>η</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda=\exp(\eta)</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math>
+is some linear expression in latent variables.</p>
 <p>The posterior predictive distributions are Poisson mixture
-distributions across the posterior distribution of <span class="math inline">\(\lambda\)</span>, <span class="math inline">\(p(\lambda|\text{data})\)</span>.</p>
+distributions across the posterior distribution of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\lambda|\text{data})</annotation></semantics></math>.</p>
 <div class="section level3">
 <h3 id="moment-scores">Moment scores<a class="anchor" aria-label="anchor" href="#moment-scores"></a>
 </h3>
 <p>For the Squared Error and Dawid-Sebastiani scores, we’ll need the
-posterior expectation and variance: <span class="math display">\[
-  \mathbb{E}(Y|\text{data}) =
-\mathbb{E}[\mathbb{E}(Y|\lambda,\text{data}) | \text{data}] =
-\mathbb{E}(\lambda | \text{data})
-\]</span> and <span class="math display">\[
-  \mathbb{V}(Y|\text{data}) =
-\mathbb{E}[\mathbb{V}(Y|\lambda,\text{data}) | \text{data}] +
+posterior expectation and variance:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝔼</mi><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mrow><mo stretchy="true" form="prefix">|</mo><mi>λ</mi><mo>,</mo><mtext mathvariant="normal">data</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">|</mo></mrow><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+  \mathbb{E}(Y|\text{data}) = \mathbb{E}[\mathbb{E}(Y|\lambda,\text{data}) | \text{data}] = \mathbb{E}(\lambda | \text{data})
+</annotation></semantics></math> and
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝕍</mi><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mrow><mo stretchy="true" form="prefix">|</mo><mi>λ</mi><mo>,</mo><mtext mathvariant="normal">data</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">|</mo></mrow><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝔼</mi><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mrow><mo stretchy="true" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">|</mo></mrow><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+  \mathbb{V}(Y|\text{data}) = \mathbb{E}[\mathbb{V}(Y|\lambda,\text{data}) | \text{data}] +
     \mathbb{V}[\mathbb{E}(Y | \text{data}) | \text{data}]
-     = \mathbb{E}[\lambda | \text{data}] + \mathbb{V}[\lambda |
-\text{data}]
-\]</span> i.e. the sum of the posterior mean and variance for
-lambda.</p>
+     = \mathbb{E}[\lambda | \text{data}] + \mathbb{V}[\lambda | \text{data}]
+</annotation></semantics></math> i.e. the sum of the posterior mean and
+variance for lambda.</p>
 <p>The SE and DS scores are therefore relatively easy to compute after
 estimating a model with <code>inlabru</code>. You just need to estimate
 the posterior mean and variance with <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for each
@@ -334,11 +378,13 @@ the prediction points, run</p>
 <h3 id="log-probability-and-log-density-scores">Log-Probability and log-density scores<a class="anchor" aria-label="anchor" href="#log-probability-and-log-density-scores"></a>
 </h3>
 <p>The full log-score can actually also be estimated/computed in a
-similar way. We seek, for a fixed observation y, <span class="math inline">\(\log[\mathbb{P}(Y = y | \text{data})]\)</span> The
-probability is <span class="math display">\[
-  \mathbb{P}(Y = y | \text{data}) = \mathbb{E}[\mathbb{P}(Y = y |
-\lambda, \text{data}) | \text{data}],
-\]</span> so we can estimate it using <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>:</p>
+similar way. We seek, for a fixed observation y,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">[</mo><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mi>y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\log[\mathbb{P}(Y = y | \text{data})]</annotation></semantics></math>
+The probability is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mi>y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>ℙ</mi><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mi>y</mi><mrow><mo stretchy="true" form="prefix">|</mo><mi>λ</mi><mo>,</mo><mtext mathvariant="normal">data</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">|</mo></mrow><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+  \mathbb{P}(Y = y | \text{data}) = \mathbb{E}[\mathbb{P}(Y = y | \lambda, \text{data}) | \text{data}],
+</annotation></semantics></math> so we can estimate it using
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span>
 <span>  <span class="va">newdata</span>,</span>
@@ -353,44 +399,60 @@ for sufficiently small Monte Carlo error).</p>
 <h3 id="crps">CRPS<a class="anchor" aria-label="anchor" href="#crps"></a>
 </h3>
 <p>Yet another option would be to use the CRPS, which for each
-prediction value <span class="math inline">\(y_i\)</span> would be <span class="math display">\[
-S_\text{CRPS}(F_i,y_i) = \sum_{k=0}^\infty [\mathbb{P}(Y_i \leq k
-|\text{data}) - I(y_i \leq k)]^2
-\]</span> For this, one would first need to get <span class="math inline">\(\mathbb{P}(Y \leq k | \text{data})\)</span> from a
-predict call with <code>ppois(k, rate = exp(eta))</code>, for a vector
-<span class="math inline">\(k=0,1\dots,K\)</span>, for each <span class="math inline">\(y_i\)</span>, for some sufficiently large <span class="math inline">\(K&gt;\max_i{y_i}\)</span> for the remainder to be
-negligible. However, to avoid repeated <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> calls for
-each <span class="math inline">\(y_i\)</span>, the storage requirements
-is of order <span class="math inline">\((K+1) \times N\times
-N_\text{samples}\)</span>. To avoid that, one option would be to
-reformulate the estimator into a recursive estimator, so that batches of
-simulations could be used to iteratively compute the estimator.</p>
+prediction value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
+would be
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">CRPS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mo accent="false">∞</mo></munderover><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>≤</mo><mi>k</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>≤</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">
+S_\text{CRPS}(F_i,y_i) = \sum_{k=0}^\infty [\mathbb{P}(Y_i \leq k |\text{data}) - I(y_i \leq k)]^2
+</annotation></semantics></math> For this, one would first need to get
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>≤</mo><mi>k</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{P}(Y \leq k | \text{data})</annotation></semantics></math>
+from a predict call with <code>ppois(k, rate = exp(eta))</code>, for a
+vector
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mi>…</mi><mo>,</mo><mi>K</mi></mrow><annotation encoding="application/x-tex">k=0,1\dots,K</annotation></semantics></math>,
+for each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>,
+for some sufficiently large
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>&gt;</mo><msub><mo>max</mo><mi>i</mi></msub><msub><mi>y</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">K&gt;\max_i{y_i}</annotation></semantics></math>
+for the remainder to be negligible. However, to avoid repeated
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> calls for each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>,
+the storage requirements is of order
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>K</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>N</mi><mo>×</mo><msub><mi>N</mi><mtext mathvariant="normal">samples</mtext></msub></mrow><annotation encoding="application/x-tex">(K+1) \times N\times N_\text{samples}</annotation></semantics></math>.
+To avoid that, one option would be to reformulate the estimator into a
+recursive estimator, so that batches of simulations could be used to
+iteratively compute the estimator.</p>
 <p>A basic estimator can proceed as follows:</p>
-<p>Define <span class="math inline">\(K\geq K_0=\max_i(y_i)\)</span>
-sufficiently large for the posterior predictive probability above <span class="math inline">\(K\)</span> to be negligible. Perhaps a value like
-<span class="math inline">\(K=K_0+4\sqrt{K_0}\)</span> might be
-sufficient. You can check afterwards, and change if needed.</p>
+<p>Define
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>≥</mo><msub><mi>K</mi><mn>0</mn></msub><mo>=</mo><msub><mo>max</mo><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">K\geq K_0=\max_i(y_i)</annotation></semantics></math>
+sufficiently large for the posterior predictive probability above
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+to be negligible. Perhaps a value like
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><msub><mi>K</mi><mn>0</mn></msub><mo>+</mo><mn>4</mn><msqrt><msub><mi>K</mi><mn>0</mn></msub></msqrt></mrow><annotation encoding="application/x-tex">K=K_0+4\sqrt{K_0}</annotation></semantics></math>
+might be sufficient. You can check afterwards, and change if needed.</p>
 <ol style="list-style-type: decimal">
-<li>Simulate samples from <span class="math inline">\(\lambda^{(j)}\sim
-p(\lambda|\text{data})\)</span> using <code><a href="../reference/generate.html">generate()</a></code> (size
-<span class="math inline">\(N\times N_\text{samples}\)</span>).</li>
-<li>For each <span class="math inline">\(i=1,\dots,N\)</span>, use the
-samples to estimate the residuals <span class="math inline">\(r_{ik}=\mathbb{P}(Y\leq k|\text{data})-I(y_i\leq
-k)\)</span>, for <span class="math inline">\(k\in
-0,1,2,\dots,K\)</span>, with</li>
+<li>Simulate samples from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>∼</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda^{(j)}\sim p(\lambda|\text{data})</annotation></semantics></math>
+using <code><a href="../reference/generate.html">generate()</a></code> (size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>×</mo><msub><mi>N</mi><mtext mathvariant="normal">samples</mtext></msub></mrow><annotation encoding="application/x-tex">N\times N_\text{samples}</annotation></semantics></math>).</li>
+<li>For each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">i=1,\dots,N</annotation></semantics></math>,
+use the samples to estimate the residuals
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>≤</mo><mi>k</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>≤</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_{ik}=\mathbb{P}(Y\leq k|\text{data})-I(y_i\leq k)</annotation></semantics></math>,
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>∈</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>K</mi></mrow><annotation encoding="application/x-tex">k\in 0,1,2,\dots,K</annotation></semantics></math>,
+with</li>
 </ol>
-<p><span class="math display">\[
-  \widehat{p}_{ik} = \frac{1}{N_\text{samples}}
-\sum_{j=1}^{N_\text{samples}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>N</mi><mtext mathvariant="normal">samples</mtext></msub></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mtext mathvariant="normal">samples</mtext></msub></munderover><mo stretchy="false" form="prefix">{</mo><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Y</mi><mo>≤</mo><mi>k</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>λ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>≤</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+  \widehat{p}_{ik} = \frac{1}{N_\text{samples}} \sum_{j=1}^{N_\text{samples}}
   \{
   \mathbb{P}(Y\leq k|\lambda^{(j)}_i)
   -
   I(y_i\leq k)
   \} .
-  \]</span> 3. Compute</p>
-<p><span class="math display">\[
+  </annotation></semantics></math> 3. Compute</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">CRPS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>0</mn></mrow><mi>K</mi></munderover><msubsup><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">
 S_\text{CRPS}(F_i,y_i) \approx \sum_{k=0}^{K} r_{ik}^2
-  \]</span></p>
+  </annotation></semantics></math></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># some large value, so that 1-F(K) is small</span></span>
 <span><span class="va">max_K</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">4</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
@@ -438,47 +500,53 @@ S_\text{CRPS}(F_i,y_i) \approx \sum_{k=0}^{K} r_{ik}^2
 </h2>
 <p>In some cases, one might be tempted to consider posterior
 distribution properties of conditional predictive scores, e.g. the
-posterior expectation <span class="math inline">\(\mathbb{E}_{\lambda|\text{data}}[S(F_\lambda,
-y)]\)</span> for <span class="math inline">\(S(F_\lambda, y)\)</span>
-under the posterior distribution for <span class="math inline">\(\lambda\)</span> in the Poisson model.</p>
-<p>For Squared Error, <span class="math display">\[
+posterior expectation
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>λ</mi></msub><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbb{E}_{\lambda|\text{data}}[S(F_\lambda, y)]</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>λ</mi></msub><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(F_\lambda, y)</annotation></semantics></math>
+under the posterior distribution for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+in the Poisson model.</p>
+<p>For Squared Error,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo stretchy="false" form="prefix">{</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>λ</mi><msup><mo stretchy="false" form="postfix">}</mo><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>+</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>λ</mi><msup><mo stretchy="false" form="postfix">}</mo><mn>2</mn></msup><mo stretchy="false" form="postfix">]</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>+</mo><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\mathbb{E}_{\lambda|\text{data}}[(y - \lambda)^2] &amp;=
-\mathbb{E}_{\lambda|\text{data}}[\{y - \mathbb{E}(\lambda|\text{data}) +
-\mathbb{E}(\lambda|\text{data}) - \lambda\}^2] \\
+\mathbb{E}_{\lambda|\text{data}}[(y - \lambda)^2] &amp;= 
+\mathbb{E}_{\lambda|\text{data}}[\{y - \mathbb{E}(\lambda|\text{data}) + \mathbb{E}(\lambda|\text{data}) - \lambda\}^2] \\
 &amp;=
 [y - \mathbb{E}(\lambda|\text{data})]^2 +
-\mathbb{E}_{\lambda|\text{data}}(\mathbb{E}(\lambda|\text{data}) -
-\lambda\}^2] \\
+\mathbb{E}_{\lambda|\text{data}}(\mathbb{E}(\lambda|\text{data}) - \lambda\}^2] \\
 &amp;=
 [y - \mathbb{E}(\lambda|\text{data})]^2 +
 \mathbb{V}(\lambda|\text{data}) .
 \end{aligned}
-\]</span> It’s noteworthy that this is similar to the <em>improper</em>
-score <span class="math inline">\([y - \mathbb{E}(y|\text{data})]^2 +
-\mathbb{V}(y|\text{data})\)</span>, and also in this new case, one can
-have a model with artificially small posterior variance with a smaller
-expected score, making this type of construction problematic to
-interpret.</p>
+</annotation></semantics></math> It’s noteworthy that this is similar to
+the <em>improper</em> score
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>+</mo><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[y - \mathbb{E}(y|\text{data})]^2 +
+\mathbb{V}(y|\text{data})</annotation></semantics></math>, and also in
+this new case, one can have a model with artificially small posterior
+variance with a smaller expected score, making this type of construction
+problematic to interpret.</p>
 <p>However, in some cases it does provide alternative approaches for how
 to compute the proper scores for the full posterior predictive
-distributions. If <span class="math inline">\(\lambda_{ij}\)</span>,
-<span class="math inline">\(j=1,\dots,J\)</span> are samples from the
-posterior distribution, one score estimator is <span class="math display">\[
+distributions. If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\lambda_{ij}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>J</mi></mrow><annotation encoding="application/x-tex">j=1,\dots,J</annotation></semantics></math>
+are samples from the posterior distribution, one score estimator is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>S</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><mfrac><mn>1</mn><mi>J</mi></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>J</mi></munderover><msub><mi>λ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \widehat{S}(F_i,y_i) = (y_i - \frac{1}{J}\sum_{j=1}^J \lambda_{ij})^2 ,
-\]</span> with the averaging over the samples inside the quadratic
-expression, and we can use</p>
+</annotation></semantics></math> with the averaging over the samples
+inside the quadratic expression, and we can use</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">pred</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span></code></pre></div>
 <p>If we instead take advantage of the new expression above, we have
-<span class="math display">\[
-[y - \mathbb{E}(\lambda|\text{data})]^2
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>y</mi><mo>−</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><mi>𝕍</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+[y - \mathbb{E}(\lambda|\text{data})]^2 
 =
 \mathbb{E}_{\lambda|\text{data}}[(y - \lambda)^2]
 -
 \mathbb{V}(\lambda|\text{data})
-\]</span> so the score can be estimated by</p>
+</annotation></semantics></math> so the score can be estimated by</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">newdata</span>, formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  cond_scores <span class="op">=</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>,</span>
@@ -494,37 +562,45 @@ scores there may potentially be practical benefits.</p>
 <p>For the CRPS score, there are closed form expressions available for
 some distributions, conditionally on their parameters, but not for the
 full predictive mixture distribution. We take a similar approach as for
-SE, and let <span class="math inline">\(F\)</span> and <span class="math inline">\(F_\lambda\)</span> denote the unconditional and
-conditional cumulative distribution functions for the posterior
-predictive distribution. Then <span class="math inline">\(F(x)=\mathbb{E}_{\lambda|\text{data}}[F_\lambda(x)]\)</span>
-for all <span class="math inline">\(x\)</span>, and <span class="math display">\[
+SE, and let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>F</mi><mi>λ</mi></msub><annotation encoding="application/x-tex">F_\lambda</annotation></semantics></math>
+denote the unconditional and conditional cumulative distribution
+functions for the posterior predictive distribution. Then
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>F</mi><mi>λ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">F(x)=\mathbb{E}_{\lambda|\text{data}}[F_\lambda(x)]</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+and
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>S</mi><mtext mathvariant="normal">CRPS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>F</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">[</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>≤</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mspace width="0.167em"></mspace><mi mathvariant="normal">d</mi><mi>x</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>F</mi><mi>λ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>≤</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mspace width="0.167em"></mspace><mi mathvariant="normal">d</mi><mi>x</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mrow><mo stretchy="true" form="prefix">{</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>F</mi><mi>λ</mi></msub><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>F</mi><mi>λ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">}</mo></mrow><mspace width="0.167em"></mspace><mi mathvariant="normal">d</mi><mi>x</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝔼</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>S</mi><mtext mathvariant="normal">CRPS</mtext></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>F</mi><mi>λ</mi></msub><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msub><mi>𝕍</mi><mrow><mi>λ</mi><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">data</mtext></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>F</mi><mi>λ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mspace width="0.167em"></mspace><mi mathvariant="normal">d</mi><mi>x</mi><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 S_\text{CRPS}(F,y) &amp;=
-\int_{-\infty}^\infty [F(x) - I(y\leq x)]^2 \,\mathrm{d}x
+\int_{-\infty}^\infty [F(x) - I(y\leq x)]^2 \,\mathrm{d}x 
 \\
 &amp;=
 \mathbb{E}_{\lambda|\text{data}}\left[
-\int_{-\infty}^\infty [F_\lambda(x) - I(y\leq x)]^2 \,\mathrm{d}x
+\int_{-\infty}^\infty [F_\lambda(x) - I(y\leq x)]^2 \,\mathrm{d}x 
 \right] -
-\int_{-\infty}^\infty
-\left\{\mathbb{E}_{\lambda|\text{data}}\left[F_\lambda(x)^2\right]
-- \mathbb{E}_{\lambda|\text{data}}[F_\lambda(x)]^2\right\} \,\mathrm{d}x
+\int_{-\infty}^\infty \left\{\mathbb{E}_{\lambda|\text{data}}\left[F_\lambda(x)^2\right] 
+- \mathbb{E}_{\lambda|\text{data}}[F_\lambda(x)]^2\right\} \,\mathrm{d}x 
 \\
 &amp;=
 \mathbb{E}_{\lambda|\text{data}}\left[
 S_\text{CRPS}(F_\lambda,y)
 \right] -
-\int_{-\infty}^\infty \mathbb{V}_{\lambda|\text{data}}[F_\lambda(x)]
-\,\mathrm{d}x .
+\int_{-\infty}^\infty \mathbb{V}_{\lambda|\text{data}}[F_\lambda(x)] \,\mathrm{d}x .
 \end{aligned}
-\]</span> Note that we didn’t need to use any particular model
-properties here, so this holds for any predictive model with mixture
-structure, when <span class="math inline">\(\lambda\)</span> is the
-collection of model parameters. We also note the resemblance to the
-alternative expression for the Squared Error; this is because CRPS can
-be seen as the integral over all Brier scores for predicting event
-indicators of the form <span class="math inline">\(z=I(y\leq
-x)\)</span>, with probability <span class="math inline">\(F(x)\)</span>.</p>
+</annotation></semantics></math> Note that we didn’t need to use any
+particular model properties here, so this holds for any predictive model
+with mixture structure, when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+is the collection of model parameters. We also note the resemblance to
+the alternative expression for the Squared Error; this is because CRPS
+can be seen as the integral over all Brier scores for predicting event
+indicators of the form
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>≤</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">z=I(y\leq x)</annotation></semantics></math>,
+with probability
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F(x)</annotation></semantics></math>.</p>
 <p>In the Poisson case, we can now estimate the CRPS scores like this,
 that makes the code a bit easier than the previous version that needed
 <code><a href="../reference/generate.html">generate()</a></code>. However, it can be shown that the two
@@ -571,7 +647,7 @@ CRPS expression.</p>
 distributions, can be found at <a href="http://cran.nexr.com/web/packages/scoringRules/vignettes/crpsformulas.html#poisson-distribution-pois" class="external-link uri">http://cran.nexr.com/web/packages/scoringRules/vignettes/crpsformulas.html#poisson-distribution-pois</a></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -582,15 +658,15 @@ distributions, can be found at <a href="http://cran.nexr.com/web/packages/scorin
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

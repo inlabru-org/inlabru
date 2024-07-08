@@ -1,492 +1,166 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/404.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/1d_lgcp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_distancesampling.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_multilikelihood.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_plotsampling.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_sp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_spatiotemporal.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/Apptainer.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/articles.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/bru_mapper.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/component.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/devel_flow.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/linearapprox.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/mesh_mapping.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/method.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/prediction_scores.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/publications.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/random_fields.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/random_fields_2d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/svc.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/Poisson1_1D.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/Poisson2_1D.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/Poisson3_1D.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/add_mappers.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bincount.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bm_list.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_call_options.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_compute_linearisation.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_convergence_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_env_get.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_fill_missing.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_get_mapper.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_info.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mexpand.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mjoin.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_like_methods.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_bookmark.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_message.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_new.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_offset.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_log_reset.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_make_stack.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_aggregate.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_collect.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_const.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_factor.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_1d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_2d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_harmonics.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_linear.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_logsumexp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_marginal.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_mesh_B.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_multi.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_scale.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_shift.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_summary.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_taylor.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_model.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_options.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_inla.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_sp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_standardise_names.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_summarise.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_timings.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_timings_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_transformation.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_update.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/bru_used_vars.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/code.components.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/comp_lin_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/component.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/component_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/component_list.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/deltaIC.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/devel.cvmeasure.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/eval_in_data_context.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/eval_spatial.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_lin.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_simple.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_simple_list_subsetting.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_effect.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_inputs.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_model.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/evaluate_predictor.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/expand_labels.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/extract_property.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/generate.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.RasterLayer.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatRaster.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialGridDataFrame.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialLines.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPixels.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPixelsDataFrame.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPoints.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPolygons.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.bru_prediction.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.data.frame.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.fm_mesh_1d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.fm_mesh_2d.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gg.sf.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/globe.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/glplot.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gm.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gmap.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gorillas.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/gorillas_sf.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/iinla.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/index_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/inla_subset_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/inlabru-package.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/input_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/lgcp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/like.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/local_testthat.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/materncov.bands.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/mexdolphin.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/mexdolphin_sf.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/mrsea.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/multiplot.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/parse_inclusion.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/pcmatern_B.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/plot.bru.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/plot.bru_prediction.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/plotsample.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/point2count.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/predict.bru.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/robins_subset.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/row_kron.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/sample.lgcp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/seals.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/shrimp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/sline.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/spatial.to.ppp.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/spde.posterior.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/spoly.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/summary.bru.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/summary.bru_options.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/summary.component.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/toygroups.html</loc>
-  </url>
-  <url>
-    <loc>https://inlabru-org.github.io/inlabru/reference/toypoints.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://inlabru-org.github.io/inlabru/404.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/1d_lgcp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_distancesampling.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_multilikelihood.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_plotsampling.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_sp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/2d_lgcp_spatiotemporal.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/Apptainer.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/articles.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/bru_mapper.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/component.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/devel_flow.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/linearapprox.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/mesh_mapping.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/method.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/prediction_scores.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/publications.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/random_fields.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/random_fields_2d.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/svc.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/articles/zip_zap_models.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/authors.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/news/index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/Poisson1_1D.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/Poisson2_1D.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/Poisson3_1D.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/add_mappers.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bincount.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bm_list.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_call_options.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_compute_linearisation.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_convergence_plot.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_env_get.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_fill_missing.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_get_mapper.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_info.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mexpand.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mjoin.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_like_methods.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_bookmark.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_message.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_new.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_offset.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_reset.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_make_stack.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_aggregate.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_collect.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_const.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_factor.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_1d.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_fm_mesh_2d.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_harmonics.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_linear.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_logsumexp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_marginal.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_matrix.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_mesh_B.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_multi.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_pipe.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_scale.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_shift.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_summary.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_mapper_taylor.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_model.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_options.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_inla.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_safe_sp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_standardise_names.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_summarise.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_timings.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_timings_plot.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_transformation.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_used.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_used_update.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_used_vars.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/code.components.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/comp_lin_eval.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/component.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/component_eval.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/component_list.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/deltaIC.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/devel.cvmeasure.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/eval_in_data_context.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/eval_spatial.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_lin.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_simple.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_comp_simple_list_subsetting.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_effect.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_inputs.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_model.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/evaluate_predictor.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/expand_labels.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/extract_property.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/generate.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.RasterLayer.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatRaster.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialGridDataFrame.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialLines.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPixels.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPixelsDataFrame.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPoints.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.SpatialPolygons.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.bru_prediction.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.data.frame.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.fm_mesh_1d.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.fm_mesh_2d.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.matrix.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gg.sf.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/globe.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/glplot.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gm.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gmap.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gorillas.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/gorillas_sf.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/iinla.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/index.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/index_eval.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/inla_subset_eval.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/inlabru-package.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/input_eval.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/lgcp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/like.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/local_testthat.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/materncov.bands.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/mexdolphin.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/mexdolphin_sf.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/mrsea.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/multiplot.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/parse_inclusion.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/pcmatern_B.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/plot.bru.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/plot.bru_prediction.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/plotsample.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/point2count.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/predict.bru.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/reexports.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/robins_subset.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/row_kron.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/sample.lgcp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/seals.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/shrimp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/sline.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/spatial.to.ppp.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/spde.posterior.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/spoly.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/summary.bru.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/summary.bru_options.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/summary.component.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/toygroups.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/toypoints.html</loc></url>
 </urlset>
+

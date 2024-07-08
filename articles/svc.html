@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Spatially Varying Coefficient Models with inlabru • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Spatially Varying Coefficient Models with inlabru">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Spatially Varying Coefficient Models with inlabru">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,14 +94,15 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Spatially Varying Coefficient Models with inlabru</h1>
+
+      <h1>Spatially Varying Coefficient Models with inlabru</h1>
                         <h4 data-toc-skip class="author">Timothy D.
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-07-02</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-07-08</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
     </div>
 
@@ -170,24 +152,40 @@ effort.</p>
 <p>The model used to analyze these data assumes that counts come from a
 negative binomial distribution with an expected count and dispersion
 parameter. The expected count has a log-linear predictor:</p>
-<p><span class="math display">\[\log(\lambda_{st}) = \kappa_{s} +
-\alpha_s + \epsilon_{s} \log[\text{Effort}_{st}] + \tau_{s}
-\text{Year}_{st}\]</span></p>
-<p>where the natural log of expected count, <span class="math inline">\(\log(\lambda_{st})\)</span>, at site <span class="math inline">\(s\)</span> during year <span class="math inline">\(t\)</span>, is modeled with a zero-centered,
-normally distributed intercept per site, <span class="math inline">\(\kappa_s\)</span>, a spatially varying intercept,
-<span class="math inline">\(\alpha_s\)</span>, a spatially varying
-effect of the log of count effort in hours, <span class="math inline">\(\epsilon_s\)</span>, and a spatially varying
-linear effect of year, <span class="math inline">\(\tau_s\)</span>. The
-spatially structured effects are modeled as Gaussian random fields with
-Matérn covariance functions with range and variance parameters.</p>
-<p>Model parameters <span class="math inline">\(\kappa_s\)</span>, <span class="math inline">\(\alpha_s\)</span>, <span class="math inline">\(\epsilon_s\)</span> and <span class="math inline">\(\tau_s\)</span> are analogous to those in Meehan
-et al. (2019). For example, <span class="math inline">\(\kappa_s\)</span> is included to account for
-site-level differences in counts, possibly due to habitat availability
-or observer experience. <span class="math inline">\(\alpha_s\)</span>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mrow><mi>s</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>κ</mi><mi>s</mi></msub><mo>+</mo><msub><mi>α</mi><mi>s</mi></msub><mo>+</mo><msub><mi>ϵ</mi><mi>s</mi></msub><mo>log</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mtext mathvariant="normal">Effort</mtext><mrow><mi>s</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>τ</mi><mi>s</mi></msub><msub><mtext mathvariant="normal">Year</mtext><mrow><mi>s</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log(\lambda_{st}) = \kappa_{s} + \alpha_s + \epsilon_{s} \log[\text{Effort}_{st}] + \tau_{s} \text{Year}_{st}</annotation></semantics></math></p>
+<p>where the natural log of expected count,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mrow><mi>s</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(\lambda_{st})</annotation></semantics></math>,
+at site
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+during year
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+is modeled with a zero-centered, normally distributed intercept per
+site,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>,
+a spatially varying intercept,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>,
+a spatially varying effect of the log of count effort in hours,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>,
+and a spatially varying linear effect of year,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>.
+The spatially structured effects are modeled as Gaussian random fields
+with Matérn covariance functions with range and variance parameters.</p>
+<p>Model parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+are analogous to those in Meehan et al. (2019). For example,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>
+is included to account for site-level differences in counts, possibly
+due to habitat availability or observer experience.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>
 can be interpreted as an effort-corrected abundance index at year zero.
-<span class="math inline">\(\epsilon_s\)</span> is the exponent for a
-power-law effort-correction function. And <span class="math inline">\(\tau_s\)</span> is the long-term temporal trend at
-a given site.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>
+is the exponent for a power-law effort-correction function. And
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+is the long-term temporal trend at a given site.</p>
 </div>
 <div class="section level2">
 <h2 id="environment">Environment<a class="anchor" aria-label="anchor" href="#environment"></a>
@@ -421,13 +419,18 @@ multiplying the spatial random fields with the spatial covariates in the
 model formula expression, or by specifying the <code>weights</code>
 argument for each model component specification. We will here use the
 latter approach, since it is the easiest.</p>
-<p>In our model, <span class="math inline">\(\epsilon_s\)</span> is a
-spatially varying effect of the log of count effort. Similarly, <span class="math inline">\(\tau_s\)</span> is a spatially varying effect of
-year, so standardized year (with 1987 = 0) is also specified in the
-<code>weights</code> argument. <span class="math inline">\(\alpha_s\)</span> is also an SVC, but it is a
-spatially varying intercept. For intercepts it is not necessary to
-specify a constant weight of 1. The model component <span class="math inline">\(\kappa_{s}\)</span> is linked to each observation
-site and is not modeled on the mesh.</p>
+<p>In our model,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>
+is a spatially varying effect of the log of count effort. Similarly,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+is a spatially varying effect of year, so standardized year (with 1987 =
+0) is also specified in the <code>weights</code> argument.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>
+is also an SVC, but it is a spatially varying intercept. For intercepts
+it is not necessary to specify a constant weight of 1. The model
+component
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_{s}</annotation></semantics></math>
+is linked to each observation site and is not modeled on the mesh.</p>
 <p>Note that the current use of the term ‘weights’ is different from
 that often encountered when defining mixed effect models in
 <code>R</code>. Here it is used to define covariate value
@@ -447,17 +450,20 @@ done automatically, so we skip that step.</p>
 </h2>
 <p>The last required input for the analysis is the model formula, which
 includes information on the prior for explained variation for the
-unstructured random intercept. We define the prior for <span class="math inline">\(\kappa_s\)</span> as a penalized complexity prior
-(Simpson et al. 2017), set such that the probability of the standard
-deviation associated with the random effect exceeding 1 is 0.01.</p>
+unstructured random intercept. We define the prior for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>
+as a penalized complexity prior (Simpson et al. 2017), set such that the
+probability of the standard deviation associated with the random effect
+exceeding 1 is 0.01.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># iid prior</span></span>
 <span><span class="va">pc_prec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prior <span class="op">=</span> <span class="st">"pcprec"</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Notice that if one wants to constrain a spatial spde effect to
 integrate to zero, it should be added <code>constr=TRUE</code> in the
 SPDE model definition rather than in the component definition. As we
-want to constrain <span class="math inline">\(\kappa_s\)</span> and it
-is a non-spatial term we <strong>can</strong> use
+want to constrain
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>
+and it is a non-spatial term we <strong>can</strong> use
 <code>constr=TRUE</code> in its corresponding <code>label()</code>
 component definition below, which imposes a sum-to-zero constraint.</p>
 <p>The model described above is translated to <code>inlabru</code>
@@ -483,23 +489,29 @@ CRS-free information explicitly as input, with
 <p>Here, we define the response as <code>count</code>, remove the
 automatic global intercept with a <code>-1</code>, and then specify the
 other terms in the model with <code>label()</code> statements. The first
-<code><a href="https://rdrr.io/r/base/kappa.html" class="external-link">kappa()</a></code> statement defines <span class="math inline">\(\kappa_s\)</span>, the site effect, as a normally
-distributed and independent (<code>model="iid"</code>), globally
-zero-centred (sum to zero <code>constr=TRUE</code>), deviation from
-<span class="math inline">\(\alpha_s\)</span>. The second
-<code><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha()</a></code> statement defines <span class="math inline">\(\alpha_s\)</span> as a spatially varying intercept
-with spatial structure described by the SPDE object called ‘spde’.
-Remember that if one wants to constrain this kind of spatial effect to
-integrate to zero, <code>constr=TRUE</code> should be added in the SPDE
-model definition rather than in the <code>label()</code> arguments. The
-third <code>eps()</code> statement defines <span class="math inline">\(\epsilon_s\)</span> as an SVC for the effect of
-count effort, with spatial structure also described by the SPDE object.
-The weights for this spatially structured random slope are specified
-with the <code>weights=log_hrs</code> argument. The fourth
-<code>tau()</code> statement defines <span class="math inline">\(\tau_s\)</span> as an SVC for the year effect,
-with spatial structure described in the SPDE object. The weights for
-this spatially structured random slope are specified with the
-<code>weights=std_yr</code> argument.</p>
+<code><a href="https://rdrr.io/r/base/kappa.html" class="external-link">kappa()</a></code> statement defines
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>κ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\kappa_s</annotation></semantics></math>,
+the site effect, as a normally distributed and independent
+(<code>model="iid"</code>), globally zero-centred (sum to zero
+<code>constr=TRUE</code>), deviation from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>.
+The second <code><a href="https://scales.r-lib.org/reference/alpha.html" class="external-link">alpha()</a></code> statement defines
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>
+as a spatially varying intercept with spatial structure described by the
+SPDE object called ‘spde’. Remember that if one wants to constrain this
+kind of spatial effect to integrate to zero, <code>constr=TRUE</code>
+should be added in the SPDE model definition rather than in the
+<code>label()</code> arguments. The third <code>eps()</code> statement
+defines
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>
+as an SVC for the effect of count effort, with spatial structure also
+described by the SPDE object. The weights for this spatially structured
+random slope are specified with the <code>weights=log_hrs</code>
+argument. The fourth <code>tau()</code> statement defines
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+as an SVC for the year effect, with spatial structure described in the
+SPDE object. The weights for this spatially structured random slope are
+specified with the <code>weights=std_yr</code> argument.</p>
 </div>
 <div class="section level2">
 <h2 id="run-model">Run model<a class="anchor" aria-label="anchor" href="#run-model"></a>
@@ -547,46 +559,54 @@ spatial ranges of the spatially structured parameters.</p>
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                              mean            sd</span></span>
-<span><span class="co">#&gt; Precision for kappa    2.34252172    0.46637022</span></span>
-<span><span class="co">#&gt; Range for alpha      942.11307144  277.06991505</span></span>
-<span><span class="co">#&gt; Stdev for alpha        2.01230853    0.38862297</span></span>
-<span><span class="co">#&gt; Range for eps       3814.44854207 2903.98949467</span></span>
-<span><span class="co">#&gt; Stdev for eps          0.32717891    0.21200208</span></span>
-<span><span class="co">#&gt; Range for tau        696.34978922  257.76920279</span></span>
-<span><span class="co">#&gt; Stdev for tau          0.06256584    0.01151083</span></span></code></pre></div>
+<span><span class="co">#&gt; Precision for kappa    2.33648086    0.46054399</span></span>
+<span><span class="co">#&gt; Range for alpha      946.94886598  302.17257884</span></span>
+<span><span class="co">#&gt; Stdev for alpha        2.01268004    0.42214339</span></span>
+<span><span class="co">#&gt; Range for eps       6196.15855764 4790.05097508</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.51229167    0.31822085</span></span>
+<span><span class="co">#&gt; Range for tau        723.63204972  293.83832288</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06405199    0.01269333</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
-starting with <span class="math inline">\(\exp(\alpha_s)\)</span>, which
-is effort-corrected relative abundance at year = 0 (1987), given 1 hour
-of count effort (i.e., log[1]=0).</p>
+starting with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp(\alpha_s)</annotation></semantics></math>,
+which is effort-corrected relative abundance at year = 0 (1987), given 1
+hour of count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.04621  1.02511  3.11613  6.61055  8.22997 51.88082</span></span></code></pre></div>
-<p>Note that to avoid issues due to <span class="math inline">\(E[\exp(x)|y]\neq\exp[E(x|y)]\)</span>, we use the
-posterior median instead of the posterior mean.</p>
-<p>The summary for <span class="math inline">\(\epsilon_s\)</span> shows
-variation in the exponent for the effort correction function across
-space.</p>
+<span><span class="co">#&gt;  0.04193  0.96634  3.03673  6.65986  8.16650 54.77014</span></span></code></pre></div>
+<p>Note that to avoid issues due to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">[</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">|</mo><mi>y</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>≠</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">[</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="prefix">|</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">E[\exp(x)|y]\neq\exp[E(x|y)]</annotation></semantics></math>,
+we use the posterior median instead of the posterior mean.</p>
+<p>The summary for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>
+shows variation in the exponent for the effort correction function
+across space.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.7628  0.8911  0.9883  0.9788  1.0575  1.2010</span></span></code></pre></div>
-<p>The <span class="math inline">\(\tau_s\)</span> summary shows how
-long-term, log-linear trends of robin relative abundance have varied
-across space, from annual decreases of around 10% to annual increases of
-around 10%.</p>
+<span><span class="co">#&gt;  0.7260  0.8852  0.9927  0.9819  1.0606  1.2555</span></span></code></pre></div>
+<p>The
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+summary shows how long-term, log-linear trends of robin relative
+abundance have varied across space, from annual decreases of around 10%
+to annual increases of around 10%.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -13.024  -4.894  -1.696  -1.087   2.574  11.192</span></span></code></pre></div>
+<span><span class="co">#&gt; -13.146  -4.983  -1.737  -1.122   2.565  11.301</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
 </h2>
-<p>Next we create maps of <span class="math inline">\(\alpha_s\)</span>,
-<span class="math inline">\(\epsilon_s\)</span>, and <span class="math inline">\(\tau_s\)</span> to inspect the spatial structure
-of these parameter estimates. We start by creating a 25-km mapping grid,
-and then projecting this mapping grid to the modeling mesh.</p>
+<p>Next we create maps of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\alpha_s</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+to inspect the spatial structure of these parameter estimates. We start
+by creating a 25-km mapping grid, and then projecting this mapping grid
+to the modeling mesh.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get easting and northing limits</span></span>
 <span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_bbox.html" class="external-link">fm_bbox</a></span><span class="op">(</span><span class="va">hull</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -651,9 +671,15 @@ the raster stack to the study area.</p>
 <span>  <span class="va">out_stk</span>,</span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="va">states</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  updatevalue <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  touches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>  touches <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Finally, we plot the SVCs with the following code. We plot the
-posterior median and 95% uncertainty width (“range95”) for <span class="math inline">\(\exp(\kappa_s)\)</span>, <span class="math inline">\(\exp(\alpha_s)\)</span>, <span class="math inline">\(\epsilon_s\)</span>, and <span class="math inline">\(100(\exp(\tau_s)-1)\)</span>.</p>
+posterior median and 95% uncertainty width (“range95”) for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>κ</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp(\kappa_s)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>α</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp(\alpha_s)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϵ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\epsilon_s</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mrow><mo stretchy="true" form="prefix">(</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>τ</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">100(\exp(\tau_s)-1)</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">make_plot_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_stk</span>, <span class="va">scale_label</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">states</span><span class="op">)</span> <span class="op">+</span></span>
@@ -721,10 +747,12 @@ posterior median and 95% uncertainty width (“range95”) for <span class="math
 <code class="sourceCode R"><span><span class="co"># plot together</span></span>
 <span><span class="fu"><a href="../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">ps</span>, <span class="va">pa</span>, <span class="va">pe</span>, <span class="va">pt</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="svc_files/figure-html/svc_plots-1.png" width="768" style="display: block; margin: auto;">
-The map for the posterior mean of <span class="math inline">\(\tau_s\)</span> shows that robins have decreased
-in the southern part of the study area and increased in the northern
-part. This demonstrates how the wintering range of robins is shifting
-northward as winters become warmer due to climate change.</p>
+The map for the posterior mean of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\tau_s</annotation></semantics></math>
+shows that robins have decreased in the southern part of the study area
+and increased in the northern part. This demonstrates how the wintering
+range of robins is shifting northward as winters become warmer due to
+climate change.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot together</span></span>
 <span><span class="fu"><a href="../reference/multiplot.html">multiplot</a></span><span class="op">(</span><span class="va">ps_range95</span>, <span class="va">pa_range95</span>, <span class="va">pe_range95</span>, <span class="va">pt_range95</span>, cols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
@@ -805,7 +833,7 @@ review.</p>
 <p>Van Niekerk, J. and Krainski, E. T. and Rustand, D. and Rue, H.,
 2022. A new avenue for Bayesian inference with INLA. Submitted.</p>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -816,15 +844,15 @@ review.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Residual Analysis of spatial point process models using Bayesian methods • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Residual Analysis of spatial point process models using Bayesian methods">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Residual Analysis of spatial point process models using Bayesian methods">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,13 +94,14 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Residual Analysis of spatial point process models using Bayesian methods</h1>
+
+      <h1>Residual Analysis of spatial point process models using Bayesian methods</h1>
                         <h4 data-toc-skip class="author">Niharika Reddy
 Peddinenikalva</h4>
             
-            <h4 data-toc-skip class="date">2024-07-02</h4>
+            <h4 data-toc-skip class="date">2024-07-08</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_residuals.Rmd</code></div>
     </div>
 
@@ -147,108 +129,151 @@ for spatial point processes” (Baddeley et al).</p>
 <div class="section level2">
 <h2 id="theory-of-residuals-for-spatial-point-process-models">Theory of Residuals for Spatial point process models<a class="anchor" aria-label="anchor" href="#theory-of-residuals-for-spatial-point-process-models"></a>
 </h2>
-<p>Consider a spatial point pattern <span class="math inline">\(\mathbf{x} = \{x_1, \dots, x_n \}\)</span> of
-<span class="math inline">\(n\)</span> points in a bounded region <span class="math inline">\(W\)</span> of <span class="math inline">\(\mathbb{R}^2\)</span>. For a model of a spatial
-point process <span class="math inline">\(\mathbf{X}\)</span> with
-probability density <span class="math inline">\(f_{\theta}\)</span> and
-parameter <span class="math inline">\(\theta\)</span>, the innovation
-process of the model is defined by <span class="math display">\[\begin{equation}\label{eq:innovations}
-    I_{\theta}(B) = n(\mathbf{X} \cap B) - \int_B \lambda_{\theta} (u)
-\, du
-\end{equation}\]</span> Here, <span class="math inline">\(\int_B
-\lambda_{\theta}(u) \, du\)</span> is the expected number of points of
-the fitted model in the bounded subset of <span class="math inline">\(B\)</span>. Innovations satisfy <span class="math inline">\(\mathbb{E}_{\theta} \left[ I_{\theta}(B)\right] =
-0\)</span> .</p>
-<p>Given data <span class="math inline">\(\mathbf{x}\)</span> of the
-model and that the parameter estimate is <span class="math inline">\(\hat{\theta}\)</span>, the raw residuals are given
-by <span class="math display">\[\begin{equation}\label{eq:raw residuals}
-    R_{\hat{\theta}}(B) = n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u)
-\,du
-\end{equation}\]</span></p>
-<p>Increments of the innovation process <span class="math inline">\(I\)</span> and raw residuals of the Poisson
-processes <span class="math inline">\(R\)</span> are analogous to errors
-and raw residuals of linear models respectively.</p>
+<p>Consider a spatial point pattern
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐱</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\mathbf{x} = \{x_1, \dots, x_n \}</annotation></semantics></math>
+of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+points in a bounded region
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ℝ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\mathbb{R}^2</annotation></semantics></math>.
+For a model of a spatial point process
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐗</mi><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math>
+with probability density
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>θ</mi></msub><annotation encoding="application/x-tex">f_{\theta}</annotation></semantics></math>
+and parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
+the innovation process of the model is defined by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mi>θ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐗</mi><mo>∩</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><msub><mi>λ</mi><mi>θ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq:innovations}
+    I_{\theta}(B) = n(\mathbf{X} \cap B) - \int_B \lambda_{\theta} (u) \, du
+\end{equation}</annotation></semantics></math> Here,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∫</mo><mi>B</mi></msub><msub><mi>λ</mi><mi>θ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mrow><annotation encoding="application/x-tex">\int_B \lambda_{\theta}(u) \, du</annotation></semantics></math>
+is the expected number of points of the fitted model in the bounded
+subset of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>.
+Innovations satisfy
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝔼</mi><mi>θ</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>I</mi><mi>θ</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\mathbb{E}_{\theta} \left[ I_{\theta}(B)\right] = 0</annotation></semantics></math>
+.</p>
+<p>Given data
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐱</mi><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>
+of the model and that the parameter estimate is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>θ</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{\theta}</annotation></semantics></math>,
+the raw residuals are given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mover><mi>θ</mi><mo accent="true">̂</mo></mover></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq:raw residuals}
+    R_{\hat{\theta}}(B) = n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u) \,du
+\end{equation}</annotation></semantics></math></p>
+<p>Increments of the innovation process
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
+and raw residuals of the Poisson processes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
+are analogous to errors and raw residuals of linear models
+respectively.</p>
 <div class="section level3">
 <h3 id="types-of-residuals">Types of Residuals<a class="anchor" aria-label="anchor" href="#types-of-residuals"></a>
 </h3>
-<p>We can scale the raw residual by scaling the increments of <span class="math inline">\(R_{\hat{\theta}}\)</span>. \ The <span class="math inline">\(h\)</span>-weighted innovations are given by <span class="math display">\[\begin{equation}\label{eq:h innovations}
-    I(B, h, \lambda) = \sum_{x_i \in \mathbf{X} \cap B} h(x_i) -
+<p>We can scale the raw residual by scaling the increments of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>R</mi><mover><mi>θ</mi><mo accent="true">̂</mo></mover></msub><annotation encoding="application/x-tex">R_{\hat{\theta}}</annotation></semantics></math>.
+\ The
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>-weighted
+innovations are given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mi>h</mi><mo>,</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐗</mi><mo>∩</mo><mi>B</mi></mrow></munder><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq:h innovations}
+    I(B, h, \lambda) = \sum_{x_i \in \mathbf{X} \cap B} h(x_i) - 
     \int_B h(u) \lambda(u) \,du
-\end{equation}\]</span> This leads to the <span class="math inline">\(h\)</span>-weighted residuals <span class="math display">\[\begin{equation}
+\end{equation}</annotation></semantics></math> This leads to the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>-weighted
+residuals
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
 \label{eq:h residuals}
-    R(B, \hat{h}, \hat{\theta}) = I(B, \hat{h}, \hat{\lambda}) =
-    \sum_{x_i \in \mathbf{x} \cap B} h(x_i) - \int_B \hat{h}(u)
-\hat{\lambda}(u)\,du
-\end{equation}\]</span> Since the innovation has mean 0, a true model
-would yield <span class="math display">\[
+    R(B, \hat{h}, \hat{\theta}) = I(B, \hat{h}, \hat{\lambda}) = 
+    \sum_{x_i \in \mathbf{x} \cap B} h(x_i) - \int_B \hat{h}(u) \hat{\lambda}(u)\,du
+\end{equation}</annotation></semantics></math> Since the innovation has
+mean 0, a true model would yield
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>≈</mo><mn>0</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
 \mathbb{E}\left[R(B, \hat{h}, \hat{\theta})\right] \approx 0.
-\]</span> Changing the choice of the weight function <span class="math inline">\(h\)</span>, yields different types of
-residuals.</p>
+</annotation></semantics></math> Changing the choice of the weight
+function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>,
+yields different types of residuals.</p>
 <div class="section level4">
 <h4 id="scaling-residuals">Scaling Residuals<a class="anchor" aria-label="anchor" href="#scaling-residuals"></a>
 </h4>
-By taking <span class="math inline">\(h(u) = \mathbf{1} \{ u \in
-B\}\)</span>, we get the raw residuals:
-<span class="math display">\[\begin{aligned}
-    R(B, \hat{h}, \hat{\theta}) &amp; = I(B, \hat{h}, \hat{\lambda}) =
-    \sum_{x_i \in \mathbf{x} \cap B}h(x_i) - \int_B
-\hat{h}(u)\hat{\lambda}(u)\,du\\
+By taking
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>𝟏</mn><mo stretchy="false" form="prefix">{</mo><mi>u</mi><mo>∈</mo><mi>B</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">h(u) = \mathbf{1} \{ u \in B\}</annotation></semantics></math>,
+we get the raw residuals:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+    R(B, \hat{h}, \hat{\theta}) &amp; = I(B, \hat{h}, \hat{\lambda}) = 
+    \sum_{x_i \in \mathbf{x} \cap B}h(x_i) - \int_B \hat{h}(u)\hat{\lambda}(u)\,du\\
     &amp; = n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u) \,du
-\end{aligned}\]</span>
+\end{aligned}</annotation></semantics></math>
 </div>
 <div class="section level4">
 <h4 id="inverse-residuals">Inverse Residuals<a class="anchor" aria-label="anchor" href="#inverse-residuals"></a>
 </h4>
-By taking <span class="math inline">\(h(u) = \frac{1}{\lambda
-(u)}\)</span>, we may encounter the case where <span class="math inline">\(\lambda(u) = 0\)</span>. The GNZ-formula <span class="math display">\[\begin{equation}
-\mathbb{E}\left[ \sum_{x_i \in \mathbf{X}} h(x_i)\right] =
+By taking
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mrow><annotation encoding="application/x-tex">h(u) = \frac{1}{\lambda (u)}</annotation></semantics></math>,
+we may encounter the case where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda(u) = 0</annotation></semantics></math>.
+The GNZ-formula
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐗</mi></mrow></munder><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>𝔼</mi><mrow><mo stretchy="true" form="prefix">[</mo><msub><mo>∫</mo><mi>W</mi></msub><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+\mathbb{E}\left[ \sum_{x_i \in \mathbf{X}} h(x_i)\right] = 
 \mathbb{E}\left[ \int_W h(u) \lambda(u) \,du \right],
-\end{equation}\]</span> would still hold for the first terms of the
-<span class="math inline">\(h\)</span>-weighted residuals to exist. If
-we define <span class="math inline">\(h(u) \lambda(u) = 0\)</span> for
-all <span class="math inline">\(u\)</span> such that <span class="math inline">\(\lambda(u) = 0\)</span>, then the second term of
-<span class="math inline">\(h\)</span>-weighted residuals will also
-exist and the inverse residual is given by
-<span class="math display">\[\begin{aligned}
-    R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) &amp; =
-    \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) -
+\end{equation}</annotation></semantics></math> would still hold for the
+first terms of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>-weighted
+residuals to exist. If we define
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h(u) \lambda(u) = 0</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>
+such that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda(u) = 0</annotation></semantics></math>,
+then the second term of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>-weighted
+residuals will also exist and the inverse residual is given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mfrac><mn>1</mn><mover><mi>λ</mi><mo accent="true">̂</mo></mover></mfrac><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mfrac><mn>1</mn><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mn>𝟏</mn><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo stretchy="false" form="postfix">}</mo><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+    R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) &amp; = 
+    \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) - 
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
-    &amp; = \sum_{x_i \in \mathbf{x} \cap B}
-\frac{1}{\hat{\lambda}(x_i)} -
-    \int_B \mathbf{1} \{ x_i \in \mathbf{x} \} \,du
-\end{aligned}\]</span>
+    &amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
+    \int_B \mathbf{1} \{ x_i \in \mathbf{x} \} \,du 
+\end{aligned}</annotation></semantics></math>
 </div>
 <div class="section level4">
 <h4 id="pearson-residuals">Pearson Residuals<a class="anchor" aria-label="anchor" href="#pearson-residuals"></a>
 </h4>
-By using <span class="math inline">\(h(u) =
-\frac{1}{\sqrt{\lambda(u)}}\)</span>, the Pearson residual is given by
-<span class="math display">\[\begin{aligned}
-    R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right)
-    &amp; = \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) -
+By using
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">h(u) = \frac{1}{\sqrt{\lambda(u)}}</annotation></semantics></math>,
+the Pearson residual is given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mfrac><mn>1</mn><msqrt><mover><mi>λ</mi><mo accent="true">̂</mo></mover></msqrt></mfrac><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mfrac><mn>1</mn><msqrt><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><msqrt><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
+    R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right) 
+    &amp; = \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) - 
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
-    &amp; = \sum_{x_i \in \mathbf{x} \cap B}
-\frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
-    \int_B \sqrt{\hat{\lambda}(u)} \,du
-\end{aligned}\]</span>
-<p>Here, zero values of <span class="math inline">\(\hat{\lambda}(u)\)</span> do not cause any issues
-with calculating residuals as we set <span class="math inline">\(\hat{h}(u) \hat{\lambda}(u) =
-\sqrt{\hat{\lambda}(u)}\)</span> for all <span class="math inline">\(u\)</span>.</p>
-<p>So the three types of residuals are: <span class="math display">\[\begin{eqnarray}
-\text{Scaled:} \qquad &amp; R(B, \hat{h}, \hat{\theta}) &amp; =
-n(\mathbf{x} \cap B) -
+    &amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
+    \int_B \sqrt{\hat{\lambda}(u)} \,du 
+\end{aligned}</annotation></semantics></math><p>Here, zero values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{\lambda}(u)</annotation></semantics></math>
+do not cause any issues with calculating residuals as we set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msqrt><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mrow><annotation encoding="application/x-tex">\hat{h}(u) \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)}</annotation></semantics></math>
+for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>.</p>
+<p>So the three types of residuals are:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">Scaled:</mtext><mspace width="2.0em"></mspace></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mover><mi>h</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">Inverse:</mtext><mspace width="2.0em"></mspace></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mfrac><mn>1</mn><mover><mi>λ</mi><mo accent="true">̂</mo></mover></mfrac><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mfrac><mn>1</mn><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><mn>𝟏</mn><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo stretchy="false" form="postfix">}</mo><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">Pearson:</mtext><mspace width="2.0em"></mspace></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mo>,</mo><mfrac><mn>1</mn><msqrt><mover><mi>λ</mi><mo accent="true">̂</mo></mover></msqrt></mfrac><mo>,</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>𝐱</mi><mo>∩</mo><mi>B</mi></mrow></munder><mfrac><mn>1</mn><msqrt><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac><mo>−</mo><msub><mo>∫</mo><mi>B</mi></msub><msqrt><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mspace width="0.167em"></mspace><mi>d</mi><mi>u</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{eqnarray}
+\text{Scaled:} \qquad &amp; R(B, \hat{h}, \hat{\theta}) &amp; = n(\mathbf{x} \cap B) - 
 \int_B \hat{\lambda}(u) \,du \\
-\text{Inverse:} \qquad &amp; R\left(B, \frac{1}{\hat{\lambda}},
-\hat{\theta}\right)
-&amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} -
+\text{Inverse:} \qquad &amp; R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) 
+&amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
 \int_B \mathbf{1} \{ x_i \in \mathbf{x} \} \,du \\
-\text{Pearson:} \qquad &amp;  R\left( B,
-\frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta} \right) &amp; = \sum_{x_i
-\in \mathbf{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
-\int_B \sqrt{\hat{\lambda}(u)} \,du
-\end{eqnarray}\]</span></p>
-<p>Note that <span class="math inline">\(\hat{\lambda}(u)\)</span> and
-<span class="math inline">\(\hat{h}(u)\)</span> are estimates of <span class="math inline">\(\lambda (u)\)</span> and <span class="math inline">\(h(u)\)</span> respectively</p>
+\text{Pearson:} \qquad &amp;  R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta} \right) &amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - 
+\int_B \sqrt{\hat{\lambda}(u)} \,du 
+\end{eqnarray}</annotation></semantics></math></p>
+<p>Note that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{\lambda}(u)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>h</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{h}(u)</annotation></semantics></math>
+are estimates of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda (u)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h(u)</annotation></semantics></math>
+respectively</p>
 </div>
 </div>
 <div class="section level3">
@@ -256,24 +281,29 @@ n(\mathbf{x} \cap B) -
 </h3>
 <p>The scaling residuals are nothing but the raw residuals and hence
 depict the residual data as is. However, the Pearson residuals use a
-weighted function <span class="math inline">\(h(u) =
-\frac{1}{\lambda(u)}\)</span> so this helps to obtain normalised
-residuals since the denominator accounts for variance of the residuals
-and hence makes it reliable for any sample size.</p>
+weighted function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mrow><annotation encoding="application/x-tex">h(u) = \frac{1}{\lambda(u)}</annotation></semantics></math>
+so this helps to obtain normalised residuals since the denominator
+accounts for variance of the residuals and hence makes it reliable for
+any sample size.</p>
 <p>The use of the inverse residual in this project is less clear.
 However, we do know that it is easier to compute this residual since we
 have the GNZ formula to estimate the value of $h(u) = for any value
-<span class="math inline">\(\lambda(u)\)</span>.</p>
-<p>For notation’s sake in this discussion, let <span class="math inline">\(h_{s}(u), h_{i}(u), h_p(u)\)</span> indicate the
-weight function for scaling, inverse and Pearson residuals respectively.
-Then, <span class="math inline">\(h_s(u) = \mathbf{1}\{u \in B\}, h_i(u)
-= \frac{1}{\lambda(u)}, h_p(u) = \frac{1}{\sqrt{\lambda(u)}}\)</span>.
-We can also see that <span class="math inline">\(h_s(u) =
-\left(h_i(u)\right)^0\)</span> and <span class="math inline">\(h_p(u) =
-\left(h_i(u)\right)^{1/2}\)</span>, so the values of the Pearson
-residuals would lie somewhere between the other two residuals. So, in
-our case, the inverse residuals would not be very useful, but we do find
-that they are easier to compute by hand in terms of estimates.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda(u)</annotation></semantics></math>.</p>
+<p>For notation’s sake in this discussion, let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>h</mi><mi>p</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">h_{s}(u), h_{i}(u), h_p(u)</annotation></semantics></math>
+indicate the weight function for scaling, inverse and Pearson residuals
+respectively. Then,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>𝟏</mn><mo stretchy="false" form="prefix">{</mo><mi>u</mi><mo>∈</mo><mi>B</mi><mo stretchy="false" form="postfix">}</mo><mo>,</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>,</mo><msub><mi>h</mi><mi>p</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">h_s(u) = \mathbf{1}\{u \in B\}, h_i(u) = \frac{1}{\lambda(u)}, h_p(u) = \frac{1}{\sqrt{\lambda(u)}}</annotation></semantics></math>.
+We can also see that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mn>0</mn></msup></mrow><annotation encoding="application/x-tex">h_s(u) = \left(h_i(u)\right)^0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>p</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup></mrow><annotation encoding="application/x-tex">h_p(u) =
+\left(h_i(u)\right)^{1/2}</annotation></semantics></math>, so the values
+of the Pearson residuals would lie somewhere between the other two
+residuals. So, in our case, the inverse residuals would not be very
+useful, but we do find that they are easier to compute by hand in terms
+of estimates.</p>
 </div>
 </div>
 <div class="section level2">
@@ -309,15 +339,26 @@ data using different model definitions.</p>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span>
 <span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span></span></code></pre></div>
-<p>Initially, the set <span class="math inline">\(B\)</span> is defines
-as <span class="math inline">\(B=W\)</span>, where <span class="math inline">\(W\)</span> is the object <code>boundary</code>.
-The function <code>prepare_residual_calculations()</code> is defined to
-compute a data frame of observations <span class="math inline">\(x_i\)</span> and sample points <span class="math inline">\(u \in W\)</span> to compute the residual, a matrix
-<code>A_sum</code> that helps to calculate the summation term of the
-residual and a matrix <code>A_integrate</code> that helps to calculate
-the integral term of the residual.</p>
+<p>Initially, the set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+is defines as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B=W</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+is the object <code>boundary</code>. The function
+<code>prepare_residual_calculations()</code> is defined to compute a
+data frame of observations
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>i</mi></msub><annotation encoding="application/x-tex">x_i</annotation></semantics></math>
+and sample points
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>∈</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">u \in W</annotation></semantics></math>
+to compute the residual, a matrix <code>A_sum</code> that helps to
+calculate the summation term of the residual and a matrix
+<code>A_integrate</code> that helps to calculate the integral term of
+the residual.</p>
 <p>The function <code>residual_df</code> is defined to compute all three
-types of residuals for a given model and choice of <span class="math inline">\(B\)</span> given a set of observations.</p>
+types of residuals for a given model and choice of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+given a set of observations.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the subset B</span></span>
 <span><span class="va">B</span> <span class="op">&lt;-</span> <span class="va">boundary</span></span>
@@ -339,7 +380,8 @@ types of residuals for a given model and choice of <span class="math inline">\(B
 as a fixed covariate.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
-The residuals of the model are also computed where <span class="math inline">\(B = W\)</span>.</p>
+The residuals of the model are also computed where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the vegetation model</span></span>
 <span><span class="va">comp1</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span></span>
@@ -387,27 +429,27 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">1.7470893</td>
-<td align="right">27.469215</td>
-<td align="right">-49.370058</td>
-<td align="right">2.6782401</td>
-<td align="right">50.456704</td>
+<td align="right">3.2749964</td>
+<td align="right">24.531382</td>
+<td align="right">-37.887241</td>
+<td align="right">3.5864869</td>
+<td align="right">44.231230</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.4437345</td>
-<td align="right">1.489027</td>
-<td align="right">-1.914350</td>
-<td align="right">0.3039025</td>
-<td align="right">3.816116</td>
+<td align="right">0.4761746</td>
+<td align="right">1.462984</td>
+<td align="right">-2.261000</td>
+<td align="right">0.4527806</td>
+<td align="right">3.576752</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">0.9477720</td>
-<td align="right">4.732901</td>
-<td align="right">-7.476473</td>
-<td align="right">0.9618921</td>
-<td align="right">9.195154</td>
+<td align="right">1.1356692</td>
+<td align="right">4.324308</td>
+<td align="right">-7.871558</td>
+<td align="right">1.3983420</td>
+<td align="right">8.428396</td>
 </tr>
 </tbody>
 </table>
@@ -449,8 +491,9 @@ plot.</p>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/elev-mod-1.png" width="700"></p>
-<p>The residuals of the model when <span class="math inline">\(B =
-W\)</span> are given below:</p>
+<p>The residuals of the model when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>
+are given below:</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -471,27 +514,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-25.779132</td>
-<td align="right">26.607878</td>
-<td align="right">-81.39301</td>
-<td align="right">-25.759643</td>
-<td align="right">21.006636</td>
+<td align="right">-21.711827</td>
+<td align="right">27.377163</td>
+<td align="right">-70.11917</td>
+<td align="right">-23.937009</td>
+<td align="right">26.132787</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.530673</td>
-<td align="right">1.735520</td>
-<td align="right">-10.74909</td>
-<td align="right">-8.806655</td>
-<td align="right">-4.364470</td>
+<td align="right">-8.365109</td>
+<td align="right">1.303012</td>
+<td align="right">-10.46880</td>
+<td align="right">-8.475364</td>
+<td align="right">-5.696091</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.354942</td>
-<td align="right">4.093972</td>
-<td align="right">-19.91453</td>
-<td align="right">-11.281306</td>
-<td align="right">-3.671537</td>
+<td align="right">-10.781559</td>
+<td align="right">3.350646</td>
+<td align="right">-17.26182</td>
+<td align="right">-10.601815</td>
+<td align="right">-4.863790</td>
 </tr>
 </tbody>
 </table>
@@ -504,7 +547,8 @@ W\)</span> are given below:</p>
 effect.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
-The residuals of the model are also computed where <span class="math inline">\(B = W\)</span>.</p>
+The residuals of the model are also computed where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Intercept model</span></span>
 <span><span class="va">comp3</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -524,16 +568,17 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/int-mod-1.png" width="700"></p>
-<p>The residuals of the model when <span class="math inline">\(B =
-W\)</span> are given below:</p>
+<p>The residuals of the model when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>
+are given below:</p>
 <table class="table">
 <colgroup>
 <col width="25%">
 <col width="15%">
-<col width="14%">
 <col width="15%">
 <col width="15%">
-<col width="14%">
+<col width="15%">
+<col width="13%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
@@ -546,27 +591,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-1.6220503</td>
-<td align="right">26.872003</td>
-<td align="right">-55.952553</td>
-<td align="right">-0.0184747</td>
-<td align="right">50.955993</td>
+<td align="right">-2.4042530</td>
+<td align="right">25.9982039</td>
+<td align="right">-53.959119</td>
+<td align="right">-2.7082185</td>
+<td align="right">43.635121</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-0.0157780</td>
-<td align="right">0.828726</td>
-<td align="right">-1.581846</td>
-<td align="right">-0.0005671</td>
-<td align="right">1.699017</td>
+<td align="right">-0.0421609</td>
+<td align="right">0.7934851</td>
+<td align="right">-1.529695</td>
+<td align="right">-0.0828373</td>
+<td align="right">1.437879</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-0.1872109</td>
-<td align="right">4.713260</td>
-<td align="right">-9.407885</td>
-<td align="right">-0.0032369</td>
-<td align="right">9.304574</td>
+<td align="right">-0.3307568</td>
+<td align="right">4.5387028</td>
+<td align="right">-9.085198</td>
+<td align="right">-0.4736469</td>
+<td align="right">7.920957</td>
 </tr>
 </tbody>
 </table>
@@ -579,7 +624,8 @@ W\)</span> are given below:</p>
 type smooth function.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
-The residuals of the model are also computed where <span class="math inline">\(B = W\)</span>.</p>
+The residuals of the model are also computed where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Smooth model</span></span>
 <span><span class="va">comp4</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
@@ -600,8 +646,9 @@ The residuals of the model are also computed where <span class="math inline">\(B
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/smooth-mod-1.png" width="700"></p>
-<p>The residuals of the model when <span class="math inline">\(B =
-W\)</span> are given below:</p>
+<p>The residuals of the model when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">B = W</annotation></semantics></math>
+are given below:</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -622,27 +669,27 @@ W\)</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-23.052704</td>
-<td align="right">29.851472</td>
-<td align="right">-76.95999</td>
-<td align="right">-22.626254</td>
-<td align="right">32.425233</td>
+<td align="right">-29.177920</td>
+<td align="right">23.796093</td>
+<td align="right">-71.56292</td>
+<td align="right">-32.026299</td>
+<td align="right">14.100257</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-8.514006</td>
-<td align="right">1.945187</td>
-<td align="right">-10.75300</td>
-<td align="right">-8.756148</td>
-<td align="right">-5.051763</td>
+<td align="right">-8.972453</td>
+<td align="right">1.385496</td>
+<td align="right">-11.20881</td>
+<td align="right">-9.153036</td>
+<td align="right">-5.225156</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-11.441368</td>
-<td align="right">4.097801</td>
-<td align="right">-18.48039</td>
-<td align="right">-11.199803</td>
-<td align="right">-3.540758</td>
+<td align="right">-12.370019</td>
+<td align="right">3.388802</td>
+<td align="right">-19.40134</td>
+<td align="right">-12.618388</td>
+<td align="right">-6.252916</td>
 </tr>
 </tbody>
 </table>
@@ -659,12 +706,14 @@ residuals.</p>
 <div class="section level3">
 <h3 id="redefining-the-set-b">Redefining the set B<a class="anchor" aria-label="anchor" href="#redefining-the-set-b"></a>
 </h3>
-<p>Consider defining a new type of set <span class="math inline">\(B\)</span> which consists of two subpolygons
-within the boundary. This is done by the <code>partition()</code>
-function which divides a polygon into grids based on number of rows and
-columns or by a desired resolution. The code chunk below demonstrates a
-use of the function for dividing the polygon and calculating the
-residuals for this choice of <span class="math inline">\(B\)</span>.</p>
+<p>Consider defining a new type of set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+which consists of two subpolygons within the boundary. This is done by
+the <code>partition()</code> function which divides a polygon into grids
+based on number of rows and columns or by a desired resolution. The code
+chunk below demonstrates a use of the function for dividing the polygon
+and calculating the residuals for this choice of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a grid for B partitioned into two</span></span>
 <span><span class="va">B1</span> <span class="op">&lt;-</span> <span class="fu">partition</span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">boundary</span>, nrows <span class="op">=</span> <span class="fl">1</span>, ncols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -704,51 +753,51 @@ residuals for this choice of <span class="math inline">\(B\)</span>.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">44.886513</td>
-<td align="right">15.8447180</td>
-<td align="right">16.735516</td>
-<td align="right">45.834055</td>
-<td align="right">76.615521</td>
+<td align="right">40.884231</td>
+<td align="right">15.7012586</td>
+<td align="right">6.811998</td>
+<td align="right">40.389509</td>
+<td align="right">67.151501</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-42.780836</td>
-<td align="right">9.9447237</td>
-<td align="right">-63.616533</td>
-<td align="right">-42.298235</td>
-<td align="right">-23.025871</td>
+<td align="right">-43.260949</td>
+<td align="right">9.8305027</td>
+<td align="right">-59.903264</td>
+<td align="right">-42.818303</td>
+<td align="right">-26.830564</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">5.249979</td>
-<td align="right">0.9819770</td>
-<td align="right">3.536319</td>
-<td align="right">5.231047</td>
-<td align="right">7.058079</td>
+<td align="right">5.343822</td>
+<td align="right">1.1139476</td>
+<td align="right">3.545633</td>
+<td align="right">5.316476</td>
+<td align="right">7.445179</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">-4.883413</td>
-<td align="right">0.4304645</td>
-<td align="right">-5.469842</td>
-<td align="right">-4.972522</td>
-<td align="right">-3.801821</td>
+<td align="right">-4.886044</td>
+<td align="right">0.3997705</td>
+<td align="right">-5.593838</td>
+<td align="right">-4.888147</td>
+<td align="right">-4.041434</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">15.595949</td>
-<td align="right">2.5960121</td>
-<td align="right">11.420435</td>
-<td align="right">15.653444</td>
-<td align="right">20.360476</td>
+<td align="right">15.452417</td>
+<td align="right">2.7611360</td>
+<td align="right">9.752545</td>
+<td align="right">15.358609</td>
+<td align="right">20.052841</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">-14.837056</td>
-<td align="right">1.5716945</td>
-<td align="right">-17.665947</td>
-<td align="right">-14.741333</td>
-<td align="right">-11.752605</td>
+<td align="right">-14.824083</td>
+<td align="right">1.6967069</td>
+<td align="right">-18.336233</td>
+<td align="right">-14.735659</td>
+<td align="right">-11.961541</td>
 </tr>
 </tbody>
 </table>
@@ -763,12 +812,12 @@ region and its residuals are as displayed below:
 <img src="2d_lgcp_residuals_files/figure-html/partitioning-B-three-1.png" width="700"></p>
 <table class="table">
 <colgroup>
-<col width="26%">
+<col width="25%">
 <col width="14%">
 <col width="14%">
 <col width="15%">
 <col width="14%">
-<col width="14%">
+<col width="15%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
@@ -781,75 +830,75 @@ region and its residuals are as displayed below:
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">70.520243</td>
-<td align="right">7.9387073</td>
-<td align="right">54.4704318</td>
-<td align="right">70.672996</td>
-<td align="right">83.727535</td>
+<td align="right">68.357042</td>
+<td align="right">7.5748682</td>
+<td align="right">54.2505409</td>
+<td align="right">68.170554</td>
+<td align="right">82.2898631</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-21.336268</td>
-<td align="right">17.5973301</td>
-<td align="right">-56.4319241</td>
-<td align="right">-19.158134</td>
-<td align="right">5.691383</td>
+<td align="right">-26.151112</td>
+<td align="right">15.8826937</td>
+<td align="right">-56.2885700</td>
+<td align="right">-25.851619</td>
+<td align="right">-0.4615718</td>
 </tr>
 <tr class="odd">
 <td align="left">Scaling_Residuals.3</td>
-<td align="right">-46.631442</td>
-<td align="right">3.4004182</td>
-<td align="right">-53.4250598</td>
-<td align="right">-46.568562</td>
-<td align="right">-40.298262</td>
+<td align="right">-46.899498</td>
+<td align="right">4.5059720</td>
+<td align="right">-56.4296681</td>
+<td align="right">-46.520350</td>
+<td align="right">-38.7165116</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">2.866911</td>
-<td align="right">0.5233474</td>
-<td align="right">1.9782340</td>
-<td align="right">2.791901</td>
-<td align="right">3.969668</td>
+<td align="right">2.812336</td>
+<td align="right">0.6684852</td>
+<td align="right">1.5366179</td>
+<td align="right">2.767520</td>
+<td align="right">4.1047540</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">2.921748</td>
-<td align="right">0.5292444</td>
-<td align="right">1.9685623</td>
-<td align="right">2.894343</td>
-<td align="right">3.999767</td>
+<td align="right">2.892473</td>
+<td align="right">0.6848559</td>
+<td align="right">1.5350474</td>
+<td align="right">2.873123</td>
+<td align="right">4.2815530</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.3</td>
-<td align="right">-5.456688</td>
-<td align="right">0.0382426</td>
-<td align="right">-5.5276561</td>
-<td align="right">-5.458953</td>
-<td align="right">-5.376265</td>
+<td align="right">-5.461917</td>
+<td align="right">0.0463072</td>
+<td align="right">-5.5457062</td>
+<td align="right">-5.463509</td>
+<td align="right">-5.3603858</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">11.628717</td>
-<td align="right">1.4293665</td>
-<td align="right">8.6902535</td>
-<td align="right">11.571957</td>
-<td align="right">14.307455</td>
+<td align="right">11.321155</td>
+<td align="right">1.7129063</td>
+<td align="right">8.0423161</td>
+<td align="right">11.217957</td>
+<td align="right">14.6444972</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">4.540849</td>
-<td align="right">1.9712190</td>
-<td align="right">0.2860214</td>
-<td align="right">4.772497</td>
-<td align="right">8.215971</td>
+<td align="right">4.052021</td>
+<td align="right">2.0448642</td>
+<td align="right">0.3281362</td>
+<td align="right">3.697581</td>
+<td align="right">7.8853272</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.3</td>
-<td align="right">-15.330292</td>
-<td align="right">0.6451192</td>
-<td align="right">-16.5422531</td>
-<td align="right">-15.368111</td>
-<td align="right">-14.021993</td>
+<td align="right">-15.378185</td>
+<td align="right">0.8363766</td>
+<td align="right">-17.1006157</td>
+<td align="right">-15.280917</td>
+<td align="right">-13.8185169</td>
 </tr>
 </tbody>
 </table>
@@ -857,21 +906,27 @@ region and its residuals are as displayed below:
 <div class="section level3">
 <h3 id="residuals-of-models-at-different-resolutions">Residuals of models at different resolutions<a class="anchor" aria-label="anchor" href="#residuals-of-models-at-different-resolutions"></a>
 </h3>
-<p>Consider two more resolutions of <span class="math inline">\(B\)</span>, given in the plots below. Here we use
-the <code>resolution</code> argument instead of <code>nrow</code> and
-<code>ncol</code>. Due to the way <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> interprets
-the arguments, using <code>resolution</code> doesn’t guarantee complete
-coverage of the <code>samplers</code> polygon.
+<p>Consider two more resolutions of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>,
+given in the plots below. Here we use the <code>resolution</code>
+argument instead of <code>nrow</code> and <code>ncol</code>. Due to the
+way <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> interprets the arguments, using
+<code>resolution</code> doesn’t guarantee complete coverage of the
+<code>samplers</code> polygon.
 <img src="2d_lgcp_residuals_files/figure-html/more-resolutions-1.png" width="700"><img src="2d_lgcp_residuals_files/figure-html/more-resolutions-2.png" width="700"></p>
-<p>Using these two new choices of <span class="math inline">\(B\)</span>, the residuals are calculated for all
-four models at both resolutions using <code>residual_df()</code>.</p>
+<p>Using these two new choices of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>,
+the residuals are calculated for all four models at both resolutions
+using <code>residual_df()</code>.</p>
 <p>The functions <code>set_csc()</code> and <code>residual_plot()</code>
 are defined to plot the three types of residuals for the model for each
-partition in <span class="math inline">\(B\)</span>. The code chunk
-below demonstrates how this plotting is done for the vegetation model at
-resolution <span class="math inline">\(B = B_3\)</span>. Here, it is
-useful for each type of residual to have the same colour scale at both
-resolutions.</p>
+partition in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>.
+The code chunk below demonstrates how this plotting is done for the
+vegetation model at resolution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><msub><mi>B</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">B = B_3</annotation></semantics></math>.
+Here, it is useful for each type of residual to have the same colour
+scale at both resolutions.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Residuals of Vegetation model</span></span>
 <span><span class="va">Residual_fit1_B3</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
@@ -903,8 +958,9 @@ resolutions.</p>
 <h4 id="comparing-different-types-of-residuals-for-each-model">Comparing different types of residuals for each model<a class="anchor" aria-label="anchor" href="#comparing-different-types-of-residuals-for-each-model"></a>
 </h4>
 <p>Now, the plots below help to compare the residuals for each model at
-two resolutions of <span class="math inline">\(B\)</span> for each type
-of residual.</p>
+two resolutions of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+for each type of residual.</p>
 <p><img src="2d_lgcp_residuals_files/figure-html/plot-all-1-1.png" width="864"><img src="2d_lgcp_residuals_files/figure-html/plot-all-1-2.png" width="864"><img src="2d_lgcp_residuals_files/figure-html/plot-all-1-3.png" width="864"><img src="2d_lgcp_residuals_files/figure-html/plot-all-1-4.png" width="864"></p>
 <div class="section level5">
 <h5 id="discussion">Discussion<a class="anchor" aria-label="anchor" href="#discussion"></a>
@@ -924,11 +980,14 @@ interpretations of residuals for all models. Also, the Pearson residuals
 seem to take values between the scaling and inverse residuals for both
 resolutions of all four models. However, for almost all types of
 residuals for each model, the positive and negative residual values are
-not very extreme for the <span class="math inline">\(B_3\)</span>
+not very extreme for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>3</mn></msub><annotation encoding="application/x-tex">B_3</annotation></semantics></math>
 resolution but these corresponding residual values are more extreme at
-the <span class="math inline">\(B_4\)</span> resolution for each type of
-residual. This could be because of the bias in the ``experimental” mode
-of which is explored at other points in this project.</p>
+the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>4</mn></msub><annotation encoding="application/x-tex">B_4</annotation></semantics></math>
+resolution for each type of residual. This could be because of the bias
+in the ``experimental” mode of which is explored at other points in this
+project.</p>
 <p>For the vegetation and intercept model, the regions which have
 negative and positive residuals remain the same for all residuals at
 different levels for each type of residual. Also, it seems that the
@@ -954,10 +1013,13 @@ regions).</p>
 <p>Another way to compare residuals, is to consider each type of
 residual separately and plot the residuals for all four models at each
 resolution. This helps to compare the models for a given type of
-residual and choice of <span class="math inline">\(B\)</span>. Here, it
-is useful to have the same colour scale for all the 4 models.</p>
+residual and choice of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>.
+Here, it is useful to have the same colour scale for all the 4
+models.</p>
 <p>The code chunk below demonstrates the code for plotting the “Pearson”
-residuals when <span class="math inline">\(B = B_4\)</span>.</p>
+residuals when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><msub><mi>B</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">B = B_4</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for all models at B4</span></span>
 <span><span class="va">Residual_fit1_B4</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
@@ -1004,8 +1066,9 @@ residuals when <span class="math inline">\(B = B_4\)</span>.</p>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
 <p>Now, the plots below help to compare all 4 models at a particular
-choice of <span class="math inline">\(B\)</span> and for a chosen
-residual type.</p>
+choice of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+and for a chosen residual type.</p>
 <p><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-1.png" width="672"><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-2.png" width="672"><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-3.png" width="672"><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-4.png" width="672"><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-5.png" width="672"><img src="2d_lgcp_residuals_files/figure-html/plot-all-2-6.png" width="672"></p>
 <div class="section level5">
 <h5 id="discussion-1">Discussion<a class="anchor" aria-label="anchor" href="#discussion-1"></a>
@@ -1014,31 +1077,40 @@ residual type.</p>
 residual plots for the vegetation and intercept models are relatively
 similar and those of the elevation and smooth models are relatively
 similar as well for both resolutions for any type of residual. Also, for
-a fixed type of residual and a chosen model, the <span class="math inline">\(B_3\)</span> residuals are less extreme compared
-to the <span class="math inline">\(B_4\)</span> residuals, plausibly
-owing to the bias in the ``experimental” mode in . Another feature in
-all three types of residuals is that the elevation and intercept model
-have less extreme residual values compared to the vegetation and
-intercept models for a given type of residual. This could suggest that
-the former two are better models for gorilla nesting in the given
-region. The residual values have a wider range when <span class="math inline">\(B=B_4\)</span> than when <span class="math inline">\(B = B_3\)</span>.</p>
+a fixed type of residual and a chosen model, the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>3</mn></msub><annotation encoding="application/x-tex">B_3</annotation></semantics></math>
+residuals are less extreme compared to the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>4</mn></msub><annotation encoding="application/x-tex">B_4</annotation></semantics></math>
+residuals, plausibly owing to the bias in the ``experimental” mode in .
+Another feature in all three types of residuals is that the elevation
+and intercept model have less extreme residual values compared to the
+vegetation and intercept models for a given type of residual. This could
+suggest that the former two are better models for gorilla nesting in the
+given region. The residual values have a wider range when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><msub><mi>B</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">B=B_4</annotation></semantics></math>
+than when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><msub><mi>B</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">B = B_3</annotation></semantics></math>.</p>
 <p>For the scaling residuals and the Pearson residuals, the elevation
 and smooth models have less extreme values of residuals relative the
 vegetation and intercept models. This suggests that the elevation and
 smooth models are more suited to estimating the gorilla nesting
-locations in <span class="math inline">\(W\)</span>. Also, there is a
-significant underestimation in the north-west areas by the vegetation
-and intercept models while the same areas are not underestimated by the
-other two models. However, as explored in , these residuals are
-calculated in the ``experimental” mode of which produces some
-overestimates in these two models, so this must be kept in mind while
-reaching to conclusions about a suitable model for nesting
+locations in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>.
+Also, there is a significant underestimation in the north-west areas by
+the vegetation and intercept models while the same areas are not
+underestimated by the other two models. However, as explored in , these
+residuals are calculated in the ``experimental” mode of which produces
+some overestimates in these two models, so this must be kept in mind
+while reaching to conclusions about a suitable model for nesting
 locations.</p>
 <p>For the inverse residuals, the same observations hold, except the
 residuals for the elevation and smooth models have residuals that are
 not significantly less extreme relative to the vegetation and intercept
 models as seen in the case of the Pearson and scaling residuals for both
-resolutions <span class="math inline">\(B_3\)</span> and <span class="math inline">\(B_4\)</span>.</p>
+resolutions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>3</mn></msub><annotation encoding="application/x-tex">B_3</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>4</mn></msub><annotation encoding="application/x-tex">B_4</annotation></semantics></math>.</p>
 </div>
 </div>
 </div>
@@ -1362,7 +1434,7 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -1373,15 +1445,15 @@ resolutions <span class="math inline">\(B_3\)</span> and <span class="math inlin
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

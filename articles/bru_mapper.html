@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Devel: Customised model components with the bru_mapper system • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Devel: Customised model components with the bru_mapper system">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Devel: Customised model components with the bru_mapper system">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
-</li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,10 +94,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Devel: Customised model components with the bru_mapper system</h1>
+
+      <h1>Devel: Customised model components with the bru_mapper system</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/bru_mapper.Rmd" class="external-link"><code>vignettes/bru_mapper.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/bru_mapper.Rmd" class="external-link"><code>vignettes/bru_mapper.Rmd</code></a></small>
       <div class="d-none name"><code>bru_mapper.Rmd</code></div>
     </div>
 
@@ -129,16 +111,21 @@
 <p>Each inlabru latent model component generates an <em>effect</em>,
 given the latent <em>state</em> vector. The purpose of the mapper system
 is to define the link from state vectors to effect vectors. For an
-ordinary model component, named <span class="math inline">\(c\)</span>,
-this link can be represented as a matrix-vector product <span class="math display">\[
+ordinary model component, named
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
+this link can be represented as a matrix-vector product
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>c</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mi>c</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>A</mi><mi>c</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">input</mtext><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>u</mi><mi>c</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \eta_c(u_c) = A_c(\text{input}) u_c,
-\]</span> where <span class="math inline">\(u_c\)</span> is the latent
-state vector, <span class="math inline">\(\eta_c(u_c)\)</span> is the
-resulting component effect vector, and <span class="math inline">\(A_c(\text{input})\)</span> is a <em>component
-model matrix</em>. This matrix depends on the component inputs
-(covariates, index information, etc) from <code>main</code>,
-<code>group</code>, <code>replicate</code>, and <code>weights</code> in
-the component definition.</p>
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mi>c</mi></msub><annotation encoding="application/x-tex">u_c</annotation></semantics></math>
+is the latent state vector,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>c</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mi>c</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\eta_c(u_c)</annotation></semantics></math>
+is the resulting component effect vector, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mi>c</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">input</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A_c(\text{input})</annotation></semantics></math>
+is a <em>component model matrix</em>. This matrix depends on the
+component inputs (covariates, index information, etc) from
+<code>main</code>, <code>group</code>, <code>replicate</code>, and
+<code>weights</code> in the component definition.</p>
 <p>The wider scope of component definitions is discussed in the <a href="https://inlabru-org.github.io/inlabru/articles/component.html">component
 vignette</a>. Here, we will focus on the mapper system itself, how the
 basic building blocks are used to construct the built-in mappers, and
@@ -187,22 +174,38 @@ vectors as state.</p>
 <h4 id="const">const<a class="anchor" aria-label="anchor" href="#const"></a>
 </h4>
 <p>The <code>const</code> mapper defines a mapping from an empty state
-vector. This is used to define offset components, <span class="math inline">\(\eta(u)_j = z_j\)</span>, where <span class="math inline">\(z\)</span> is a fixed input vector, indexed by
-<span class="math inline">\(j\)</span>.</p>
+vector. This is used to define offset components,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>j</mi></msub><mo>=</mo><msub><mi>z</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\eta(u)_j = z_j</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>
+is a fixed input vector, indexed by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</p>
 </div>
 <div class="section level4">
 <h4 id="linear">linear<a class="anchor" aria-label="anchor" href="#linear"></a>
 </h4>
 <p>The <code>linear</code> mapper defines a mapper from a length 1 state
 vector. This is used to define ordinary “fixed” covariate effects,
-linear in both the covariate and in the state variable; <span class="math inline">\(\eta(u)_j = z_j u\)</span>, where <span class="math inline">\(u\)</span> is the state, and <span class="math inline">\(z\)</span> is the input covariate vector.</p>
+linear in both the covariate and in the state variable;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>j</mi></msub><mo>=</mo><msub><mi>z</mi><mi>j</mi></msub><mi>u</mi></mrow><annotation encoding="application/x-tex">\eta(u)_j = z_j u</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>
+is the state, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>
+is the input covariate vector.</p>
 </div>
 <div class="section level4">
 <h4 id="index">index<a class="anchor" aria-label="anchor" href="#index"></a>
 </h4>
 <p>The <code>index(n)</code> mapper defines a direct mapping from a
 length <code>n</code> state variable. This is used for structured and
-unstructured “random effect” component effects; <span class="math inline">\(\eta(u)_j = u_{z_j}\)</span>, where <span class="math inline">\(u\)</span> is the state vector, and <span class="math inline">\(z\)</span> is the input index vector.</p>
+unstructured “random effect” component effects;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>j</mi></msub><mo>=</mo><msub><mi>u</mi><msub><mi>z</mi><mi>j</mi></msub></msub></mrow><annotation encoding="application/x-tex">\eta(u)_j = u_{z_j}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>
+is the state vector, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math>
+is the input index vector.</p>
 </div>
 <div class="section level4">
 <h4 id="factor">factor<a class="anchor" aria-label="anchor" href="#factor"></a>
@@ -213,33 +216,50 @@ factor levels of <code>values</code> (for
 <code>factor_mapping = "full"</code>), or one less (for
 <code>factor_mapping = "contrast"</code>). Each factor level is
 represented as a dummy 0/1 variable, or equivalently, the input is used
-as a label index into the state vector; <span class="math inline">\(\eta(u)_j = u_{z_j}\)</span>. In the
-<code>"contrast"</code> case, the first factor level is removed from the
-model, and the corresponding effect defined to be zero.</p>
+as a label index into the state vector;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>j</mi></msub><mo>=</mo><msub><mi>u</mi><msub><mi>z</mi><mi>j</mi></msub></msub></mrow><annotation encoding="application/x-tex">\eta(u)_j = u_{z_j}</annotation></semantics></math>.
+In the <code>"contrast"</code> case, the first factor level is removed
+from the model, and the corresponding effect defined to be zero.</p>
 </div>
 <div class="section level4">
 <h4 id="matrix">matrix<a class="anchor" aria-label="anchor" href="#matrix"></a>
 </h4>
 <p>The <code>matrix</code> mapper defines a direct matrix multiplication
-between a pre-computed model matrix <span class="math inline">\(A_\text{input}\)</span> with the state vector;
-<span class="math inline">\(\eta(u) = A_\text{input} u\)</span>. This is
-used e.g. for linear model formula input, that is converted to a
+between a pre-computed model matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>A</mi><mtext mathvariant="normal">input</mtext></msub><annotation encoding="application/x-tex">A_\text{input}</annotation></semantics></math>
+with the state vector;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>A</mi><mtext mathvariant="normal">input</mtext></msub><mi>u</mi></mrow><annotation encoding="application/x-tex">\eta(u) = A_\text{input} u</annotation></semantics></math>.
+This is used e.g. for linear model formula input, that is converted to a
 component model matrix before handing it over to the mapper system.</p>
 </div>
 <div class="section level4">
 <h4 id="harmonics">harmonics<a class="anchor" aria-label="anchor" href="#harmonics"></a>
 </h4>
 <p>The <code>harmonics(order, scaling, intercept, interval)</code>
-mapper defines a sum of weighted harmonics on a real interval <span class="math inline">\((L, U)\)</span>, each frequency additionally
-scaled by factors determined by <code>scale</code>; <span class="math inline">\(\eta(u_j) = \sum_{k=1}^{1+2p} A_{j,k}
-u_k\)</span>, where <span class="math inline">\(A_{j,k}=s_k\)</span> for
-<span class="math inline">\(k=1\)</span>, <span class="math inline">\(A_{j,2k}=s_{k+1}\cos[2\pi k (z_j -
-L)/(U-L)]\)</span> for <span class="math inline">\(k=1,2,\dots,p\)</span>, and <span class="math inline">\(A_{j,2k+1}=s_{k+1}\sin[2\pi k (z_j -
-L)/(U-L)]\)</span> for <span class="math inline">\(k=1,2,\dots,p\)</span>, where <span class="math inline">\(p=\)</span><code>order</code>. When
-<code>intercept</code> is <code>TRUE</code>, the state vector has length
-<span class="math inline">\(1+2p\)</span>. When <code>intercept</code>
-is <code>FALSE</code>, the first, constant, column is removed, and the
-state vector has length <span class="math inline">\(2p\)</span>.</p>
+mapper defines a sum of weighted harmonics on a real interval
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>L</mi><mo>,</mo><mi>U</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(L, U)</annotation></semantics></math>,
+each frequency additionally scaled by factors determined by
+<code>scale</code>;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mrow><mn>1</mn><mo>+</mo><mn>2</mn><mi>p</mi></mrow></msubsup><msub><mi>A</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><msub><mi>u</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\eta(u_j) = \sum_{k=1}^{1+2p} A_{j,k} u_k</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>s</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">A_{j,k}=s_k</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k=1</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn><mi>k</mi></mrow></msub><mo>=</mo><msub><mi>s</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>cos</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>2</mn><mi>π</mi><mi>k</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mi>j</mi></msub><mo>−</mo><mi>L</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>U</mi><mo>−</mo><mi>L</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">A_{j,2k}=s_{k+1}\cos[2\pi k (z_j - L)/(U-L)]</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">k=1,2,\dots,p</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mrow><mi>j</mi><mo>,</mo><mn>2</mn><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>s</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>sin</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>2</mn><mi>π</mi><mi>k</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mi>j</mi></msub><mo>−</mo><mi>L</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>U</mi><mo>−</mo><mi>L</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">A_{j,2k+1}=s_{k+1}\sin[2\pi k (z_j - L)/(U-L)]</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">k=1,2,\dots,p</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo></mrow><annotation encoding="application/x-tex">p=</annotation></semantics></math><code>order</code>.
+When <code>intercept</code> is <code>TRUE</code>, the state vector has
+length
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mn>2</mn><mi>p</mi></mrow><annotation encoding="application/x-tex">1+2p</annotation></semantics></math>.
+When <code>intercept</code> is <code>FALSE</code>, the first, constant,
+column is removed, and the state vector has length
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>p</mi></mrow><annotation encoding="application/x-tex">2p</annotation></semantics></math>.</p>
 </div>
 </div>
 <div class="section level3">
@@ -487,39 +507,33 @@ values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="exte
 <span>  hidden <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 1 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -527,25 +541,22 @@ values needed by <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="exte
 <span><span class="co">#&gt; [1] 1 2</span></span></code></pre></div>
 <p>For the <code>bru_mapper_multi</code> class, the <code>multi</code>
 argument provides access to the inner layers of the multi-mapper:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_multi.html">bru_mapper_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="../reference/bru_mapper_index.html">bru_mapper_index</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   a b</span></span>
 <span><span class="co">#&gt; 1 1 1</span></span>
 <span><span class="co">#&gt; 2 2 1</span></span>
@@ -553,21 +564,18 @@ argument provides access to the inner layers of the multi-mapper:</p>
 <span><span class="co">#&gt; 4 1 2</span></span>
 <span><span class="co">#&gt; 5 2 2</span></span>
 <span><span class="co">#&gt; 6 3 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $a</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $b</span></span>
-<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span>
+<span><span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_values</a></span><span class="op">(</span><span class="va">mapper</span>, multi <span class="op">=</span> <span class="cn">TRUE</span>, inla_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   a b</span></span>
 <span><span class="co">#&gt; 1 1 1</span></span>
 <span><span class="co">#&gt; 2 2 1</span></span>
@@ -594,11 +602,11 @@ default <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link
 mappers can be constructed by the pre-defined <code>bru_mapper</code> S3
 methods. For 2d meshes (<code>fm_mesh_2d</code>,
 <code>inla.mesh</code>),</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <p>For 1d meshes (<code>fm_mesh_1d</code>,
 <code>inla.mesh.1d</code>),</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If ibm_values() should return mesh$loc (e.g. for "rw2" models</span></span>
 <span><span class="co"># with degree=1 meshes)</span></span>
 <span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper</a></span><span class="op">(</span><span class="va">mesh</span>, indexed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -619,13 +627,13 @@ implementations. More commonly, one would instead start with a basic
 object, and then add methods that know how to use that information. In
 all these cases, the <code><a href="../reference/bru_mapper.html">bru_mapper_define()</a></code> method should be
 used to properly set the class information:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, <span class="va">new_class</span><span class="op">)</span></span></code></pre></div>
 <p>Implementations can avoid having to define <code>ibm_n</code> and
 <code>ibm_values</code> methods, by instead computing and storing
 <code>n</code>, <code>n_inla</code>, <code>values</code>, and
 <code>values_inla</code> in the mapper object during construction:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span></span>
 <span>  mapper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
 <span>  new_class <span class="op">=</span> <span class="st">"my_bru_mapper_class_name"</span></span>
@@ -646,24 +654,32 @@ it may be removed in a future version.</p>
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>Let’s build a mapper class <code>bru_mapper_p_quadratic</code> for a
-model component that takes input covariates with values <span class="math inline">\(a_{ij}\)</span>, <span class="math inline">\(i=1,\dots,m\)</span> and <span class="math inline">\(j=1,\dots,p\)</span>, in a <code>matrix</code> or
-<code>data.frame</code> and evaluates a full quadratic expression <span class="math display">\[
+model component that takes input covariates with values
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">a_{ij}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">i=1,\dots,m</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">j=1,\dots,p</annotation></semantics></math>,
+in a <code>matrix</code> or <code>data.frame</code> and evaluates a full
+quadratic expression
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>x</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>p</mi></munderover><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>x</mi><mi>j</mi></msub><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>p</mi></munderover><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>j</mi></munderover><msub><mi>γ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>a</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>x</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \eta_i = x_0 + \sum_{j=1}^p a_{ij} x_j +
   \frac{1}{2}\sum_{j=1}^p\sum_{k=1}^j \gamma_{j,k} a_{ij}a_{ik} x_{j,k},
-\]</span> where the latent component vector is <span class="math inline">\(\boldsymbol{x}=[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]\)</span>,
-and <span class="math display">\[
+</annotation></semantics></math> where the latent component vector is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐱</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>x</mi><mn>0</mn></msub><mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mi>p</mi></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mrow><mi>p</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mo>,</mo><mn>2</mn></mrow></msub><mi>…</mi><mo>,</mo><msub><mi>x</mi><mrow><mi>p</mi><mo>,</mo><mi>p</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{x}=[x_0,x_1,\dots,x_p,x_{1,1},\dots,x_{p,1},x_{2,2}\dots,x_{p,p}]</annotation></semantics></math>,
+and
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>γ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>1</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mi>j</mi><mo>=</mo><mi>k</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>2</mn><mo>,</mo></mtd><mtd columnalign="left" style="text-align: left"><mi>j</mi><mo>&gt;</mo><mi>k</mi><mi>.</mi></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">
 \gamma_{j,k} = \begin{cases}
 1, &amp; j = k,\\
 2, &amp; j &gt; k.
 \end{cases}
-\]</span></p>
+</annotation></semantics></math></p>
 <p>We start with the constructor method. Like the
 <code>bru_mapper_matrix</code>, we require the user to supply a vector
 of covariate labels, and store them as a character vector. We also
 include a <code>min_degree</code> parameter to control if an intercept
 (<code>min_degree &lt;= 0</code>) and linear terms
 (<code>min_degree &lt;= 1</code>) should be included in the model.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">is.factor</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -678,20 +694,26 @@ include a <code>min_degree</code> parameter to control if an intercept
 <span>  <span class="op">}</span></span>
 <span>  <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>The <code>ibm_n</code> method can compute the value of <span class="math inline">\(n\)</span> from <span class="math inline">\(n=1+p+\frac{p(p+1)}{2}\)</span>:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<p>The <code>ibm_n</code> method can compute the value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1</mn><mo>+</mo><mi>p</mi><mo>+</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">n=1+p+\frac{p(p+1)}{2}</annotation></semantics></math>:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_n.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">min_degree</span> <span class="op">&lt;=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="va">p</span> <span class="op">+</span> <span class="va">p</span> <span class="op">*</span> <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For <code>ibm_values</code>, the default method is sufficient,
-returning the vector <span class="math inline">\([1,\dots,n]\)</span>
-with <span class="math inline">\(n\)</span> obtained by
-<code>ibm_n(mapper)</code>. However, for clearer result naming, we can
-use a character vector, at least for INLA <code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> models that
-allow it (we could have an option argument to the
-<code>bru_mapper_p_quadratic</code> constructor to control this):</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+returning the vector
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>n</mi><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[1,\dots,n]</annotation></semantics></math>
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+obtained by <code>ibm_n(mapper)</code>. However, for clearer result
+naming, we can use a character vector, at least for INLA
+<code><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f()</a></code> models that allow it (we could have an option argument
+to the <code>bru_mapper_p_quadratic</code> constructor to control
+this):</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_values.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span></span>
 <span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span></span>
@@ -711,7 +733,7 @@ are stored in the mapper object, and then return them. If we change the
 <code>.</code> in the method definitions to <code>_</code>, we can end
 the constructor method like this, making subsequent method calls
 faster:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">labels</span>, <span class="va">min_degree</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">...</span></span>
 <span>  <span class="va">mapper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_mapper.html">bru_mapper_define</a></span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="st">"bru_mapper_p_quadratic"</span><span class="op">)</span></span>
@@ -724,8 +746,10 @@ faster:</p>
 <code>ibm_n(mapper)</code>.</p>
 <p>We can now define the main part of the mapper interface that computes
 the model matrix linking the latent variables to the component effect.
-It’s required that <code>NULL</code> input should return a <span class="math inline">\(0\)</span>-by-<span class="math inline">\(n\)</span> matrix.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+It’s required that <code>NULL</code> input should return a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>-by-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+matrix.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ibm_jacobian.bru_mapper_p_quadratic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapper</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">input</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fu"><a href="../reference/bru_mapper_generics.html">ibm_n</a></span><span class="op">(</span><span class="va">mapper</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -758,7 +782,7 @@ It’s required that <code>NULL</code> input should return a <span class="math i
 <code>ibm_n_output(mapper, input, ...)</code> method to return the
 output size for a given input.</p>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -769,15 +793,15 @@ output size for a given input.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

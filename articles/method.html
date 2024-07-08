@@ -5,106 +5,87 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="inlabru">
 <title>Iterative linearised INLA method • inlabru</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Iterative linearised INLA method">
-<meta property="og:description" content="inlabru">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Iterative linearised INLA method">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-general-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">General examples</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-general-examples">
+<li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
+    <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/component.html">Defining a model component</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a></li>
+    <li><a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a></li>
+    <li><a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/articles.html">Full articles list</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-general-examples">General examples</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-general-examples">
-    <h6 class="dropdown-header" data-toc-skip>Basic examples</h6>
-    <a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a>
-    <a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a>
-    <a class="dropdown-item" href="../articles/publications.html">Publications</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Concepts</h6>
-    <a class="dropdown-item" href="../articles/component.html">Defining a model component</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Special models and techniques</h6>
-    <a class="dropdown-item" href="../articles/svc.html">Spatially varying coefficient models</a>
-    <a class="dropdown-item" href="../articles/zip_zap_models.html">ZIP and ZAP count models (zero-inflation)</a>
-    <a class="dropdown-item" href="../articles/prediction_scores.html">Computing posterior prediction scores</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../articles/articles.html">Full articles list</a>
-  </div>
-</li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-point-processes">Point processes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-point-processes">
-    <h6 class="dropdown-header" data-toc-skip>Point process examples</h6>
-    <a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a>
-    <a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-point-processes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Point processes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-point-processes">
+<li><h6 class="dropdown-header" data-toc-skip>Point process examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/1d_lgcp.html">LGCPs - An example in one dimension</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp.html">LGCPs - An example in two dimensions (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_sp.html">LGCPs - An example in two dimensions (sp version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars.html">LGCPs - Spatial covariates</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_distancesampling.html">LGCPs - Distance sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+  </ul>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-technical-articles">Technical articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
-    <h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6>
-    <a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a>
-    <a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6>
-    <a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    <a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a>
-    <a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a>
-    <a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-technical-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Technical articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-technical-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Mapper techniques</h6></li>
+    <li><a class="dropdown-item" href="../articles/bru_mapper.html">Customised model component with the bru_mapper system</a></li>
+    <li><a class="dropdown-item" href="../articles/mesh_mapping.html">Converting inla.spde.make.A calls to the bru_mapper system</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Theory and technical documentation</h6></li>
+    <li><a class="dropdown-item" href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a></li>
+    <li><a class="dropdown-item" href="../articles/method.html">The iterative linearised inlabru method</a></li>
+    <li><a class="dropdown-item" href="../articles/linearapprox.html">A nonlinear model approximation example</a></li>
+    <li><a class="dropdown-item" href="../articles/devel_flow.html">Code internal flow diagrams for model evaluation</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -113,12 +94,13 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Iterative linearised INLA method</h1>
+
+      <h1>Iterative linearised INLA method</h1>
                         <h4 data-toc-skip class="author">Finn Lindgren
 and Man Ho Suen</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/method.Rmd" class="external-link"><code>vignettes/method.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/method.Rmd" class="external-link"><code>vignettes/method.Rmd</code></a></small>
       <div class="d-none name"><code>method.Rmd</code></div>
     </div>
 
@@ -129,23 +111,34 @@ and Man Ho Suen</h4>
 </h2>
 <p>The INLA method is used to compute fast approximative posterior
 distribution for Bayesian generalised additive models. The hierarchical
-structure of such a model with latent Gaussian components <span class="math inline">\(\boldsymbol{u}\)</span>, covariance parameters
-<span class="math inline">\(\boldsymbol{\theta}\)</span>, and measured
-response variables <span class="math inline">\(\boldsymbol{y}\)</span>,
-can be written as <span class="math display">\[
+structure of such a model with latent Gaussian components
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+covariance parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>,
+and measured response variables
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐲</mi><annotation encoding="application/x-tex">\boldsymbol{y}</annotation></semantics></math>,
+can be written as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>𝛉</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>𝒩</mi><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝛍</mi><mi>u</mi></msub><mo>,</mo><mi>𝐐</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝛈</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>𝐀</mi><mi>𝐮</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \boldsymbol{\theta} &amp;\sim p(\boldsymbol{\theta}) \\
-\boldsymbol{u}|\boldsymbol{\theta} &amp;\sim
-\mathcal{N}\!\left(\boldsymbol{\mu}_u,
-\boldsymbol{Q}(\boldsymbol{\theta})^{-1}\right) \\
+\boldsymbol{u}|\boldsymbol{\theta} &amp;\sim \mathcal{N}\!\left(\boldsymbol{\mu}_u, \boldsymbol{Q}(\boldsymbol{\theta})^{-1}\right) \\
 \boldsymbol{\eta}(\boldsymbol{u}) &amp;= \boldsymbol{A}\boldsymbol{u} \\
-\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta} &amp; \sim
-p(\boldsymbol{y}|\boldsymbol{\eta}(\boldsymbol{u}),\boldsymbol{\theta})
+\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta} &amp; \sim p(\boldsymbol{y}|\boldsymbol{\eta}(\boldsymbol{u}),\boldsymbol{\theta})
 \end{aligned}
-\]</span> where typically each linear predictor element, <span class="math inline">\(\eta_i(\boldsymbol{u})\)</span>, is linked to a
-location parameter of the distribution for observation <span class="math inline">\(y_i\)</span>, for each <span class="math inline">\(i\)</span>, via a (non-linear) link function <span class="math inline">\(g^{-1}(\cdot)\)</span>. In the R-INLA
-implementation, the observations are assumed to be conditionally
-independent, given <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
+</annotation></semantics></math> where typically each linear predictor
+element,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\eta_i(\boldsymbol{u})</annotation></semantics></math>,
+is linked to a location parameter of the distribution for observation
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>,
+for each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+via a (non-linear) link function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">g^{-1}(\cdot)</annotation></semantics></math>.
+In the R-INLA implementation, the observations are assumed to be
+conditionally independent, given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛈</mi><annotation encoding="application/x-tex">\boldsymbol{\eta}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>.</p>
 </div>
 <div class="section level2">
 <h2 id="approximate-inla-for-non-linear-predictors">Approximate INLA for non-linear predictors<a class="anchor" aria-label="anchor" href="#approximate-inla-for-non-linear-predictors"></a>
@@ -154,30 +147,35 @@ independent, given <span class="math inline">\(\boldsymbol{\eta}\)</span> and <s
 build on the existing implementation, and only add a linearisation step.
 The properties of the resulting approximation will depend on the nature
 of the non-linearity.</p>
-<p>Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>
-be a non-linear predictor, i.e. a deterministic function of <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math display">\[ \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}) =
-\textsf{fcn} (\boldsymbol{u}), \]</span> and let <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>
-be the 1st order Taylor approximation at <span class="math inline">\(\boldsymbol{u}_0\)</span>, <span class="math display">\[
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})</annotation></semantics></math>
+be a non-linear predictor, i.e. a deterministic function of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mtext mathvariant="sans-serif">𝖿𝖼𝗇</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex"> \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}) = \textsf{fcn} (\boldsymbol{u}), </annotation></semantics></math>
+and let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{\boldsymbol{\eta}}(\boldsymbol{u})</annotation></semantics></math>
+be the 1st order Taylor approximation at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝐁</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>𝐁</mi><msub><mi>𝐮</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mi>𝐁</mi><mi>𝐮</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \overline{\boldsymbol{\eta}}(\boldsymbol{u})
-= \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) +
-\boldsymbol{B}(\boldsymbol{u} - \boldsymbol{u}_0)
-= \left[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) -
-\boldsymbol{B}\boldsymbol{u}_0\right] + \boldsymbol{B}\boldsymbol{u}
+= \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) + \boldsymbol{B}(\boldsymbol{u} - \boldsymbol{u}_0)
+= \left[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0) - \boldsymbol{B}\boldsymbol{u}_0\right] + \boldsymbol{B}\boldsymbol{u}
 ,
-\]</span> where <span class="math inline">\(\boldsymbol{B}\)</span> is
-the derivative matrix for the non-linear predictor, evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span>. Hence, we define <span class="math display">\[
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐁</mi><annotation encoding="application/x-tex">\boldsymbol{B}</annotation></semantics></math>
+is the derivative matrix for the non-linear predictor, evaluated at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>.
+Hence, we define
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi></mtd><mtd columnalign="left" style="text-align: left"><mover><mo>=</mo><mi>d</mi></mover><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>𝛉</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\boldsymbol{y} | \boldsymbol{u}, {\boldsymbol{\theta}}
-&amp;\overset{d}{=} \boldsymbol{y} |
-\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}), {\boldsymbol{\theta}} \\
-&amp;\sim p (\boldsymbol{y} |
-g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],
-{\boldsymbol{\theta}})\\
+\boldsymbol{y} | \boldsymbol{u}, {\boldsymbol{\theta}} &amp;\overset{d}{=} \boldsymbol{y} | \widetilde{\boldsymbol{\eta}}(\boldsymbol{u}), {\boldsymbol{\theta}} \\
+&amp;\sim p (\boldsymbol{y} | g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})], {\boldsymbol{\theta}})\\
 \end{aligned}
-\]</span> The non-linear observation model <span class="math inline">\(p(\boldsymbol{y}|g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],\boldsymbol{\theta})\)</span>
+</annotation></semantics></math> The non-linear observation model
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\boldsymbol{y}|g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],\boldsymbol{\theta})</annotation></semantics></math>
 is approximated by replacing the non-linear predictor with its
 linearisation, so that the linearised model is defined by</p>
-<p><span class="math display">\[
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" form="prefix">[</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
 =
 p(\boldsymbol{y}|\overline{\boldsymbol{\eta}}(\boldsymbol{u}),\boldsymbol{\theta})
@@ -189,153 +187,192 @@ p(\boldsymbol{y}|g^{-1}[\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})],\boldsymb
 p(\boldsymbol{y}|\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}),\boldsymbol{\theta})
 =
 \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
-\]</span> The non-linear model posterior is factorised as <span class="math display">\[
-\widetilde{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) =
-\widetilde{p}(\boldsymbol{\theta}|\boldsymbol{y})\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}),
-\]</span> and the linear model approximation is factorised as <span class="math display">\[
-\overline{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) =
-\overline{p}(\boldsymbol{\theta}|\boldsymbol{y})\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}).
-\]</span></p>
+</annotation></semantics></math> The non-linear model posterior is
+factorised as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo>,</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\widetilde{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) = \widetilde{p}(\boldsymbol{\theta}|\boldsymbol{y})\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}),
+</annotation></semantics></math> and the linear model approximation is
+factorised as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo>,</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\overline{p}(\boldsymbol{\theta},\boldsymbol{u}|\boldsymbol{y}) = \overline{p}(\boldsymbol{\theta}|\boldsymbol{y})\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}).
+</annotation></semantics></math></p>
 <div class="section level3">
 <h3 id="fixed-point-iteration">Fixed point iteration<a class="anchor" aria-label="anchor" href="#fixed-point-iteration"></a>
 </h3>
 <p>The remaining step of the approximation is how to choose the
-linearisation point <span class="math inline">\(\boldsymbol{u}_*\)</span>. For a given
-linearisation point <span class="math inline">\(\boldsymbol{v}\)</span>,
-INLA will compute the posterior mode for <span class="math inline">\(\boldsymbol{\theta}\)</span>, <span class="math display">\[
-\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} =
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}}
-\overline{p}_\boldsymbol{v} ( {\boldsymbol{\theta}} | \boldsymbol{y} ),
-\]</span> and the joint conditional posterior mode for <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math display">\[
-\widehat{\boldsymbol{u}}_{\boldsymbol{v}} =
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_\boldsymbol{v}
-( \boldsymbol{u} | \boldsymbol{y},
-\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} ) .
-\]</span></p>
-<p>Define the Bayesian estimation functional<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt; Potential other choices for &lt;span class="math inline"&gt;\(f(\cdot)\)&lt;/span&gt; include the posterior
-expectation &lt;span class="math inline"&gt;\(\overline{E}(\boldsymbol{u}|\boldsymbol{y})\)&lt;/span&gt;
-and the marginal conditional modes, &lt;span class="math display"&gt;\[
-\left\{\mathop{\mathrm{arg\,max}}_{u_i}
-\overline{p}_{\boldsymbol{v}}(u_i|\boldsymbol{y}),\,i=1,\dots,n\right\},
-\]&lt;/span&gt; which was used in &lt;code&gt;inlabru&lt;/code&gt; up to version 2.1.15,
-which caused problems for some nonlinear models. From version 2.2.3, the
-joint conditional mode is used, &lt;span class="math display"&gt;\[
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}}
-\overline{p}_{\boldsymbol{v}}(\boldsymbol{u}|\boldsymbol{y},\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}}),
-\]&lt;/span&gt; where &lt;span class="math inline"&gt;\(\widehat{\boldsymbol{\theta}}=\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}}
-\overline{p}_{\boldsymbol{v}}(\boldsymbol{\theta}|\boldsymbol{y})\)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> <span class="math display">\[
-f(\overline{p}_{\boldsymbol{v}}) =
-(\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}},\widehat{\boldsymbol{u}}_{\boldsymbol{v}})
-\]</span> and let <span class="math inline">\(f(p)=(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span>
+linearisation point
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mo>*</mo></msub><annotation encoding="application/x-tex">\boldsymbol{u}_*</annotation></semantics></math>.
+For a given linearisation point
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\boldsymbol{v}</annotation></semantics></math>,
+INLA will compute the posterior mode for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>𝐯</mi></msub><mo>=</mo><msub><mo>arg max</mo><mi>𝛉</mi></msub><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><mi>𝐯</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} = \mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} \overline{p}_\boldsymbol{v} ( {\boldsymbol{\theta}} | \boldsymbol{y} ),
+</annotation></semantics></math> and the joint conditional posterior
+mode for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover><mi>𝐯</mi></msub><mo>=</mo><msub><mo>arg max</mo><mi>𝐮</mi></msub><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><mi>𝐯</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>𝐯</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\widehat{\boldsymbol{u}}_{\boldsymbol{v}} = \mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_\boldsymbol{v} ( \boldsymbol{u} | \boldsymbol{y}, \widehat{\boldsymbol{\theta}}_{\boldsymbol{v}} ) .
+</annotation></semantics></math></p>
+<p>Define the Bayesian estimation functional<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt; Potential other choices for
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;f(\cdot)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+include the posterior expectation
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mover&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;𝐮&lt;/mi&gt;&lt;mo stretchy="false" form="prefix"&gt;|&lt;/mo&gt;&lt;mi&gt;𝐲&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\overline{E}(\boldsymbol{u}|\boldsymbol{y})&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+and the marginal conditional modes,
+&lt;math display="block" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;{&lt;/mo&gt;&lt;msub&gt;&lt;mo&gt;arg max&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;/msub&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mi&gt;𝐯&lt;/mi&gt;&lt;/msub&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;mo stretchy="false" form="prefix"&gt;|&lt;/mo&gt;&lt;mi&gt;𝐲&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mspace width="0.167em"&gt;&lt;/mspace&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;…&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;}&lt;/mo&gt;&lt;/mrow&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;
+\left\{\mathop{\mathrm{arg\,max}}_{u_i} \overline{p}_{\boldsymbol{v}}(u_i|\boldsymbol{y}),\,i=1,\dots,n\right\},
+&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt; which was used in &lt;code&gt;inlabru&lt;/code&gt;
+up to version 2.1.15, which caused problems for some nonlinear models.
+From version 2.2.3, the joint conditional mode is used,
+&lt;math display="block" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mo&gt;arg max&lt;/mo&gt;&lt;mi&gt;𝐮&lt;/mi&gt;&lt;/msub&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mi&gt;𝐯&lt;/mi&gt;&lt;/msub&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;𝐮&lt;/mi&gt;&lt;mo stretchy="false" form="prefix"&gt;|&lt;/mo&gt;&lt;mi&gt;𝐲&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;𝛉&lt;/mi&gt;&lt;mo accent="true"&gt;̂&lt;/mo&gt;&lt;/mover&gt;&lt;mi&gt;𝐯&lt;/mi&gt;&lt;/msub&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;
+\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{u}|\boldsymbol{y},\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}}),
+&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt; where
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mover&gt;&lt;mi&gt;𝛉&lt;/mi&gt;&lt;mo accent="true"&gt;̂&lt;/mo&gt;&lt;/mover&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mo&gt;arg max&lt;/mo&gt;&lt;mi&gt;𝛉&lt;/mi&gt;&lt;/msub&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mi&gt;𝐯&lt;/mi&gt;&lt;/msub&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;𝛉&lt;/mi&gt;&lt;mo stretchy="false" form="prefix"&gt;|&lt;/mo&gt;&lt;mi&gt;𝐲&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\widehat{\boldsymbol{\theta}}=\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} \overline{p}_{\boldsymbol{v}}(\boldsymbol{\theta}|\boldsymbol{y})&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.&lt;/p&gt;'><sup>1</sup></a>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><mi>𝐯</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>𝐯</mi></msub><mo>,</mo><msub><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover><mi>𝐯</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+f(\overline{p}_{\boldsymbol{v}}) = (\widehat{\boldsymbol{\theta}}_{\boldsymbol{v}},\widehat{\boldsymbol{u}}_{\boldsymbol{v}})
+</annotation></semantics></math> and let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(p)=(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})</annotation></semantics></math>
 denote the corresponding posterior modes for the true posterior
-distribution, <span class="math display">\[
+distribution,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mo>arg max</mo><mi>𝛉</mi></msub><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mo>arg max</mo><mi>𝐮</mi></msub><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-    \widehat{{\boldsymbol{\theta}}} &amp;=
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} p (
-{\boldsymbol{\theta}} | \boldsymbol{y} ), \\
-    \widehat{\boldsymbol{u}} &amp;=
-\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} |
-\boldsymbol{y}, \widehat{{\boldsymbol{\theta}}}).
+    \widehat{{\boldsymbol{\theta}}} &amp;= \mathop{\mathrm{arg\,max}}_{\boldsymbol{\theta}} p ( {\boldsymbol{\theta}} | \boldsymbol{y} ), \\
+    \widehat{\boldsymbol{u}} &amp;= \mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} | \boldsymbol{y}, \widehat{{\boldsymbol{\theta}}}).
 \end{aligned}
-\]</span></p>
-<p>The fixed point <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span>
-should ideally be close to <span class="math inline">\((\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})\)</span>,
+</annotation></semantics></math></p>
+<p>The fixed point
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝛉</mi><mo>*</mo></msub><mo>,</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})</annotation></semantics></math>
+should ideally be close to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mo>,</mo><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})</annotation></semantics></math>,
 i.e. close to the true marginal/conditional posterior mode. We can
-achieve this for the conditional latent mode, so that <span class="math inline">\(\boldsymbol{u}_*=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}}
-p (\boldsymbol{u} | \boldsymbol{y},
-\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*})\)</span>.</p>
-<p>We therefore seek the latent vector <span class="math inline">\(\boldsymbol{u}_*\)</span> that generates the fixed
-point of the functional, so that <span class="math inline">\((\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})\)</span>.</p>
+achieve this for the conditional latent mode, so that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐮</mi><mo>*</mo></msub><mo>=</mo><msub><mo>arg max</mo><mi>𝐮</mi></msub><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{u}_*=\mathop{\mathrm{arg\,max}}_{\boldsymbol{u}} p (\boldsymbol{u} | \boldsymbol{y}, \widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*})</annotation></semantics></math>.</p>
+<p>We therefore seek the latent vector
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mo>*</mo></msub><annotation encoding="application/x-tex">\boldsymbol{u}_*</annotation></semantics></math>
+that generates the fixed point of the functional, so that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝛉</mi><mo>*</mo></msub><mo>,</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(\boldsymbol{\theta}_*,\boldsymbol{u}_*)=f(\overline{p}_{\boldsymbol{u}_*})</annotation></semantics></math>.</p>
 <p>One key to the fixed point iteration is that the observation model is
-linked to <span class="math inline">\(\boldsymbol{u}\)</span> only
-through the non-linear predictor <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})\)</span>,
+linked to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>
+only through the non-linear predictor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}(\boldsymbol{u})</annotation></semantics></math>,
 since this leads to a simplified line search method below.</p>
 <ol start="0" style="list-style-type: decimal">
-<li>Let <span class="math inline">\(\boldsymbol{u}_0\)</span> be an
-initial linearisation point for the latent variables obtained from the
-initial INLA call. Iterate the following steps for <span class="math inline">\(k=0,1,2,...\)</span>
+<li>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>
+be an initial linearisation point for the latent variables obtained from
+the initial INLA call. Iterate the following steps for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">k=0,1,2,...</annotation></semantics></math>
 </li>
-<li>Compute the predictor linearisation at <span class="math inline">\(\boldsymbol{u}_0\)</span>.</li>
-<li>Compute the linearised INLA posterior <span class="math inline">\(\overline{p}_{\boldsymbol{u}_0}(\boldsymbol{\theta}|\boldsymbol{y})\)</span>.</li>
-<li>Let <span class="math inline">\((\boldsymbol{\theta}_1,\boldsymbol{u}_1)=(\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_0},\widehat{\boldsymbol{u}}_{\boldsymbol{u}_0})=f(\overline{p}_{\boldsymbol{u}_0})\)</span>
+<li>Compute the predictor linearisation at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>.</li>
+<li>Compute the linearised INLA posterior
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><msub><mi>𝐮</mi><mn>0</mn></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{p}_{\boldsymbol{u}_0}(\boldsymbol{\theta}|\boldsymbol{y})</annotation></semantics></math>.</li>
+<li>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝛉</mi><mn>1</mn></msub><mo>,</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><msub><mi>𝐮</mi><mn>0</mn></msub></msub><mo>,</mo><msub><mover><mi>𝐮</mi><mo accent="true">̂</mo></mover><msub><mi>𝐮</mi><mn>0</mn></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">¯</mo></mover><msub><mi>𝐮</mi><mn>0</mn></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(\boldsymbol{\theta}_1,\boldsymbol{u}_1)=(\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_0},\widehat{\boldsymbol{u}}_{\boldsymbol{u}_0})=f(\overline{p}_{\boldsymbol{u}_0})</annotation></semantics></math>
 be the initial candidate for new linearisation point.</li>
-<li>Let <span class="math inline">\(\boldsymbol{v}_\alpha=(1-\alpha)\boldsymbol{u}_1+\alpha\boldsymbol{u}_0\)</span>,
-and find the value <span class="math inline">\(\alpha\)</span> minimises
-<span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>.</li>
-<li>Set the new linearisation point <span class="math inline">\(\boldsymbol{u}_0\)</span> equal to <span class="math inline">\(\boldsymbol{v}_\alpha\)</span> and repeat from
-step 1, unless the iteration has converged to a given tolerance.</li>
+<li>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mi>α</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>𝐮</mi><mn>1</mn></msub><mo>+</mo><mi>α</mi><msub><mi>𝐮</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\boldsymbol{v}_\alpha=(1-\alpha)\boldsymbol{u}_1+\alpha\boldsymbol{u}_0</annotation></semantics></math>,
+and find the value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+minimises
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><mover><mi>η</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>η</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">∥</mo></mrow><annotation encoding="application/x-tex">\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|</annotation></semantics></math>.</li>
+<li>Set the new linearisation point
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>
+equal to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐯</mi><mi>α</mi></msub><annotation encoding="application/x-tex">\boldsymbol{v}_\alpha</annotation></semantics></math>
+and repeat from step 1, unless the iteration has converged to a given
+tolerance.</li>
 </ol>
 <p>A potential improvement of step 4 might be to also take into account
-the prior distribution for <span class="math inline">\(\boldsymbol{u}\)</span> as a minimisation penalty,
-to avoid moving further than would be indicated by a full likelihood
-optimisation.</p>
+the prior distribution for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>
+as a minimisation penalty, to avoid moving further than would be
+indicated by a full likelihood optimisation.</p>
 <div class="section level4">
 <h4 id="line-search">Line search<a class="anchor" aria-label="anchor" href="#line-search"></a>
 </h4>
-<p>In step 4, we would ideally want <span class="math inline">\(\alpha\)</span> to be<br><span class="math display">\[
-\mathop{\mathrm{arg\,max}}_{\alpha} \left[\ln
-p(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)\right]_{\boldsymbol{u}=\boldsymbol{v}_\alpha}.
-\]</span> However, since this requires access to the internal likelihood
-and prior density evaluation code, we instead use a simpler alternative.
-We consider norms of the form <span class="math inline">\(\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|\)</span>
+<p>In step 4, we would ideally want
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+to be<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>arg max</mo><mi>α</mi></msub><msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><msub><mi>𝛉</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mi>𝐮</mi><mo>=</mo><msub><mi>𝐯</mi><mi>α</mi></msub></mrow></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\mathop{\mathrm{arg\,max}}_{\alpha} \left[\ln p(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)\right]_{\boldsymbol{u}=\boldsymbol{v}_\alpha}.
+</annotation></semantics></math> However, since this requires access to
+the internal likelihood and prior density evaluation code, we instead
+use a simpler alternative. We consider norms of the form
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><mover><mi>η</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>η</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">∥</mo></mrow><annotation encoding="application/x-tex">\|\widetilde{\eta}(\boldsymbol{v}_\alpha)-\overline{\eta}(\boldsymbol{u}_1)\|</annotation></semantics></math>
 that only depend on the nonlinear and linearised predictor expressions,
-and other known quantities, given <span class="math inline">\(\boldsymbol{u}_0\)</span>, such as the current
-INLA estimate of the component wise predictor variances.</p>
-<p>Let <span class="math inline">\(\sigma_i^2 =
-\mathrm{Var}_{\boldsymbol{u}\sim
-\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))\)</span>
+and other known quantities, given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>,
+such as the current INLA estimate of the component wise predictor
+variances.</p>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><msub><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi></mrow><mrow><mi>𝐮</mi><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><msub><mi>𝛉</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma_i^2 = \mathrm{Var}_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta}_1)}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))</annotation></semantics></math>
 be the current estimate of the posterior variance for each predictor
-element <span class="math inline">\(i\)</span>. We then define an inner
-product on the space of predictor vectors as <span class="math display">\[
+element
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+We then define an inner product on the space of predictor vectors as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><mi>𝐚</mi><mo>,</mo><mi>𝐛</mi><msub><mo stretchy="false" form="postfix">⟩</mo><mi>V</mi></msub><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mrow><msub><mi>a</mi><mi>i</mi></msub><msub><mi>b</mi><mi>i</mi></msub></mrow><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
 \langle \boldsymbol{a},\boldsymbol{b} \rangle_V
 =
 \sum_i \frac{a_i b_i}{\sigma_i^2} .
-\]</span> The squared norm for the difference between the predictor
-vectors <span class="math inline">\(\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span>
-and <span class="math inline">\(\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>,with
-respect to this inner product, is defined as <span class="math display">\[
-\| \widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha) -
-\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\|^2_V
+</annotation></semantics></math> The squared norm for the difference
+between the predictor vectors
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)</annotation></semantics></math>,with
+respect to this inner product, is defined as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><msubsup><mo stretchy="false" form="postfix">∥</mo><mi>V</mi><mn>2</mn></msubsup><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mfrac><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><mn>2</mn></msup><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\| \widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha) - \overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\|^2_V
 =
-\sum_i
-\frac{|\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{v}_\alpha)-\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}_1)|^2}{\sigma_i^2}
-.
-\]</span> Using this norm as the target loss function for the line
-search avoids many potentially expensive evaluations of the true
-posterior conditional log-density. We evaluate <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_1=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>
-and make use of the linearised predictor information. Let <span class="math inline">\(\widetilde{\boldsymbol{\eta}}_\alpha=\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)\)</span>
-and <span class="math inline">\(\overline{\boldsymbol{\eta}}_\alpha=\overline{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)=(1-\alpha)\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0)+\alpha\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)\)</span>.
-In other words, <span class="math inline">\(\alpha=0\)</span>
-corresponds to the previous linear predictor, and <span class="math inline">\(\alpha=1\)</span> is the current estimate from
-INLA. An exact line search would minimise <span class="math inline">\(\|\widetilde{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|\)</span>.
+\sum_i \frac{|\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{v}_\alpha)-\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}_1)|^2}{\sigma_i^2} .
+</annotation></semantics></math> Using this norm as the target loss
+function for the line search avoids many potentially expensive
+evaluations of the true posterior conditional log-density. We evaluate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mn>1</mn></msub><mo>=</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}_1=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_1)</annotation></semantics></math>
+and make use of the linearised predictor information. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mi>α</mi></msub><mo>=</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}_\alpha=\widetilde{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>α</mi></msub><mo>=</mo><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐯</mi><mi>α</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>α</mi><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{\boldsymbol{\eta}}_\alpha=\overline{\boldsymbol{\eta}}(\boldsymbol{v}_\alpha)=(1-\alpha)\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_0)+\alpha\overline{\boldsymbol{\eta}}(\boldsymbol{u}_1)</annotation></semantics></math>.
+In other words,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha=0</annotation></semantics></math>
+corresponds to the previous linear predictor, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha=1</annotation></semantics></math>
+is the current estimate from INLA. An exact line search would minimise
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mi>α</mi></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo stretchy="false" form="postfix">∥</mo></mrow><annotation encoding="application/x-tex">\|\widetilde{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|</annotation></semantics></math>.
 Instead, we define a quadratic approximation to the non-linear predictor
-as a function of <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
+as a function of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝛈</mi><mo accent="true">̆</mo></mover><mi>α</mi></msub><mo>=</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>α</mi></msub><mo>+</mo><msup><mi>α</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mn>1</mn></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
 \breve{\boldsymbol{\eta}}_\alpha =
-\overline{\boldsymbol{\eta}}_\alpha + \alpha^2
-(\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1)
-\]</span> and minimise the quartic polynomial in <span class="math inline">\(\alpha\)</span>, <span class="math display">\[
+\overline{\boldsymbol{\eta}}_\alpha + \alpha^2 (\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1)
+</annotation></semantics></math> and minimise the quartic polynomial in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo stretchy="false" form="postfix">∥</mo><msub><mover><mi>𝛈</mi><mo accent="true">̆</mo></mover><mi>α</mi></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="postfix">∥</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msup><mi>α</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mn>1</mn></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \|\breve{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|^2
 &amp;=
-\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 -
-\overline{\boldsymbol{\eta}}_0) + \alpha^2
-(\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1) \|^2
+\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_0) + \alpha^2 (\widetilde{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_1) \|^2
 .
 \end{aligned}
-\]</span> If initial expansion and contraction steps are carried out,
-leading to an initial guess of <span class="math inline">\(\alpha=\gamma^k\)</span>, where <span class="math inline">\(\gamma&gt;1\)</span> is a scaling factor (see
-<code><a href="../reference/bru_options.html">?bru_options</a></code>, <code>bru_method$factor</code>) and <span class="math inline">\(k\)</span> is the (signed) number of expansions
-and contractions, the quadratic expression is replaced by <span class="math display">\[
+</annotation></semantics></math> If initial expansion and contraction
+steps are carried out, leading to an initial guess of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><msup><mi>γ</mi><mi>k</mi></msup></mrow><annotation encoding="application/x-tex">\alpha=\gamma^k</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\gamma&gt;1</annotation></semantics></math>
+is a scaling factor (see <code><a href="../reference/bru_options.html">?bru_options</a></code>,
+<code>bru_method$factor</code>) and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+is the (signed) number of expansions and contractions, the quadratic
+expression is replaced by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo stretchy="false" form="postfix">∥</mo><msub><mover><mi>𝛈</mi><mo accent="true">̆</mo></mover><mi>α</mi></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo stretchy="false" form="postfix">∥</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><msup><mi>α</mi><mn>2</mn></msup><msup><mi>γ</mi><mrow><mn>2</mn><mi>k</mi></mrow></msup></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><msup><mi>γ</mi><mi>k</mi></msup></msub><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><msup><mi>γ</mi><mi>k</mi></msup></msub><mo stretchy="true" form="postfix">)</mo></mrow><msup><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msup><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \|\breve{\boldsymbol{\eta}}_\alpha-\overline{\boldsymbol{\eta}}_1\|^2
 &amp;=
-\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 -
-\overline{\boldsymbol{\eta}}_0) + \frac{\alpha^2}{\gamma^{2k}}
-(\widetilde{\boldsymbol{\eta}}_{\gamma^k} -
-\overline{\boldsymbol{\eta}}_{\gamma^k}) \|^2
+\| (\alpha-1)(\overline{\boldsymbol{\eta}}_1 - \overline{\boldsymbol{\eta}}_0) + \frac{\alpha^2}{\gamma^{2k}} (\widetilde{\boldsymbol{\eta}}_{\gamma^k} - \overline{\boldsymbol{\eta}}_{\gamma^k}) \|^2
 ,
 \end{aligned}
-\]</span> which is minimised on the interval <span class="math inline">\(\alpha\in[\gamma^{k-1},\gamma^{k+1}]\)</span>.</p>
+</annotation></semantics></math> which is minimised on the interval
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>γ</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>,</mo><msup><mi>γ</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha\in[\gamma^{k-1},\gamma^{k+1}]</annotation></semantics></math>.</p>
 </div>
 </div>
 </div>
@@ -343,180 +380,184 @@ and contractions, the quadratic expression is replaced by <span class="math disp
 <h2 id="posterior-non-linearity-checks">Posterior non-linearity checks<a class="anchor" aria-label="anchor" href="#posterior-non-linearity-checks"></a>
 </h2>
 <p>Whereas the inlabru optimisation method leads to an estimate where
-<span class="math inline">\(\| \widetilde{\boldsymbol{\eta}}
-(\boldsymbol{u}_*) -
-\overline{\boldsymbol{\eta}}(\boldsymbol{u}_*)\|=0\)</span> for a
-specific <span class="math inline">\(\boldsymbol{u}_*\)</span>, the
-overall posterior approximation accuracy depends on the degree of
-nonlinearity in the vicinity of <span class="math inline">\(\boldsymbol{u}_*\)</span>. There are two main
-options for evaluating this nonlinearity, using sampling from the
-approximate posterior distribution. The first option is <span class="math display">\[
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">∥</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\| \widetilde{\boldsymbol{\eta}} (\boldsymbol{u}_*) - \overline{\boldsymbol{\eta}}(\boldsymbol{u}_*)\|=0</annotation></semantics></math>
+for a specific
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mo>*</mo></msub><annotation encoding="application/x-tex">\boldsymbol{u}_*</annotation></semantics></math>,
+the overall posterior approximation accuracy depends on the degree of
+nonlinearity in the vicinity of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mo>*</mo></msub><annotation encoding="application/x-tex">\boldsymbol{u}_*</annotation></semantics></math>.
+There are two main options for evaluating this nonlinearity, using
+sampling from the approximate posterior distribution. The first option
+is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><munder><mo>∑</mo><mi>i</mi></munder><mfrac><mrow><msub><mi>E</mi><mrow><mi>𝐮</mi><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mrow><mo stretchy="true" form="prefix">|</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><mrow><msub><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi></mrow><mrow><mi>𝐮</mi><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛈</mi><mo accent="true">¯</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\sum_i \frac{E_{\boldsymbol{u}\sim
-\overline{p}(\boldsymbol{u}|\boldsymbol{y})}\left[
-|\overline{\boldsymbol{\eta}}_i(\boldsymbol{u})-\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{u})|^2\right]}{\mathrm{Var}_{\boldsymbol{u}\sim
-\overline{p}(\boldsymbol{u}|\boldsymbol{y})}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))}
-,
+\sum_i \frac{E_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y})}\left[
+|\overline{\boldsymbol{\eta}}_i(\boldsymbol{u})-\widetilde{\boldsymbol{\eta}}_i(\boldsymbol{u})|^2\right]}{\mathrm{Var}_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y})}(\overline{\boldsymbol{\eta}}_i(\boldsymbol{u}))} ,
 \end{aligned}
-\]</span> which is the posterior expectation of the component-wise
-variance-normalised squared deviation between the non-linear and
-linearised predictor. Note that the normalising variance includes the
-variability induced by the posterior uncertainty for <span class="math inline">\(\boldsymbol{\theta}\)</span>, whereas the <span class="math inline">\(\|\cdot\|_V\)</span> norm used for the line search
-used only the posterior mode. Another option is <span class="math display">\[
-E_{(\boldsymbol{u},\boldsymbol{\theta})\sim
-\overline{p}(\boldsymbol{u},\boldsymbol{\theta}|\boldsymbol{y})}
-\left[\ln \frac{\overline{p}(\boldsymbol{u}
-|\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
+</annotation></semantics></math> which is the posterior expectation of
+the component-wise variance-normalised squared deviation between the
+non-linear and linearised predictor. Note that the normalising variance
+includes the variability induced by the posterior uncertainty for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>,
+whereas the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="postfix">∥</mo><mo>⋅</mo><msub><mo stretchy="false" form="postfix">∥</mo><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">\|\cdot\|_V</annotation></semantics></math>
+norm used for the line search used only the posterior mode. Another
+option is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>E</mi><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mfrac><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><msub><mi>E</mi><mrow><mi>𝛉</mi><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝛉</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">{</mo><msub><mi>E</mi><mrow><mi>𝐮</mi><mo>∼</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mfrac><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow></mrow><annotation encoding="application/x-tex">
+E_{(\boldsymbol{u},\boldsymbol{\theta})\sim \overline{p}(\boldsymbol{u},\boldsymbol{\theta}|\boldsymbol{y})} \left[\ln \frac{\overline{p}(\boldsymbol{u} |\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
 =
-E_{\boldsymbol{\theta}\sim
-\overline{p}(\boldsymbol{\theta}|\boldsymbol{y})} \left\{
-E_{\boldsymbol{u}\sim
-\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}
-\left[\ln \frac{\overline{p}(\boldsymbol{u}
-|\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
+E_{\boldsymbol{\theta}\sim \overline{p}(\boldsymbol{\theta}|\boldsymbol{y})} \left\{
+E_{\boldsymbol{u}\sim \overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}
+\left[\ln \frac{\overline{p}(\boldsymbol{u} |\boldsymbol{y},{\boldsymbol{\theta}})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}})}\right]
 \right\}
-\]</span> which is the Kullback–Leibler divergence for the conditional
-posterior densities, <span class="math inline">\(\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)\)</span>,
-integrated over the approximate posterior distribution for <span class="math inline">\(\boldsymbol{\theta}\)</span>. Implementing this
-would require access to the likelihood and prior distribution details.
-The next section explores this in more detail.</p>
+</annotation></semantics></math> which is the Kullback–Leibler
+divergence for the conditional posterior densities,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝖪</mi><mi>𝖫</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mspace width="0.167em"></mspace><mo stretchy="true" form="infix">∥</mo><mspace width="0.167em"></mspace><mover><mi>p</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)</annotation></semantics></math>,
+integrated over the approximate posterior distribution for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>.
+Implementing this would require access to the likelihood and prior
+distribution details. The next section explores this in more detail.</p>
 <div class="section level4">
 <h4 id="accuracy">Accuracy<a class="anchor" aria-label="anchor" href="#accuracy"></a>
 </h4>
 <p>We wish to assess how accurate the approximation is. Thus, we compare
-<span class="math inline">\(\widetilde{p}(\boldsymbol{u} |
-\boldsymbol{y}, \boldsymbol{\theta} )\)</span> and <span class="math inline">\(\overline{p}(\boldsymbol{u}
-|\boldsymbol{y},\boldsymbol{\theta})\)</span>. With Bayes’ theorem,
-<span class="math display">\[
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{p}(\boldsymbol{u} | \boldsymbol{y}, \boldsymbol{\theta} )</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{p}(\boldsymbol{u} |\boldsymbol{y},\boldsymbol{\theta})</annotation></semantics></math>.
+With Bayes’ theorem,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>,</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-    p(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}}) &amp;=
-\frac{p(\boldsymbol{u},\boldsymbol{y}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})}
-\\
-    &amp;= \frac{p(\boldsymbol{y}|\boldsymbol{u},{\boldsymbol{\theta}})
-p(\boldsymbol{u}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})},
+    p(\boldsymbol{u}|\boldsymbol{y},{\boldsymbol{\theta}}) &amp;= \frac{p(\boldsymbol{u},\boldsymbol{y}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})} \\
+    &amp;= \frac{p(\boldsymbol{y}|\boldsymbol{u},{\boldsymbol{\theta}}) p(\boldsymbol{u}|{\boldsymbol{\theta}})}{p(\boldsymbol{y}|{\boldsymbol{\theta}})},
 \end{aligned}
-\]</span> where <span class="math inline">\(p(\boldsymbol{u}|\boldsymbol{\theta})\)</span> is
-a Gaussian density and <span class="math inline">\(p(\boldsymbol{y}|\boldsymbol{\theta})\)</span> is
-a scaling factor that doesn’t depend on <span class="math inline">\(\boldsymbol{u}\)</span>. We can therefore focus on
-the behaviour of <span class="math inline">\(\ln
-p(\boldsymbol{y}|\boldsymbol{\theta},\boldsymbol{u})\)</span> for the
-exact and linearised observation models.</p>
-<p>Recall that the observation likelihood only depends on <span class="math inline">\(\boldsymbol{u}\)</span> through <span class="math inline">\(\boldsymbol{\eta}\)</span>. Using a Taylor
-expansion with respect to <span class="math inline">\(\boldsymbol{\eta}\)</span> and <span class="math inline">\(\boldsymbol{\eta}^*=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_*)\)</span>,
-<span class="math display">\[
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\boldsymbol{u}|\boldsymbol{\theta})</annotation></semantics></math>
+is a Gaussian density and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\boldsymbol{y}|\boldsymbol{\theta})</annotation></semantics></math>
+is a scaling factor that doesn’t depend on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>.
+We can therefore focus on the behaviour of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ln p(\boldsymbol{y}|\boldsymbol{\theta},\boldsymbol{u})</annotation></semantics></math>
+for the exact and linearised observation models.</p>
+<p>Recall that the observation likelihood only depends on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>
+through
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛈</mi><annotation encoding="application/x-tex">\boldsymbol{\eta}</annotation></semantics></math>.
+Using a Taylor expansion with respect to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛈</mi><annotation encoding="application/x-tex">\boldsymbol{\eta}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝛈</mi><mo>*</mo></msup><mo>=</mo><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{\eta}^*=\widetilde{\boldsymbol{\eta}}(\boldsymbol{u}_*)</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛈</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><msup><mi>𝛈</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mspace width="2.0em"></mspace><mo>+</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mrow><mfrac><mi>∂</mi><mrow><mi>∂</mi><msub><mi>η</mi><mi>i</mi></msub></mrow></mfrac><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><mi>𝛈</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msup><mi>𝛈</mi><mo>*</mo></msup></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>η</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>η</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mspace width="2.0em"></mspace><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></munder><msub><mrow><mfrac><msup><mi>∂</mi><mn>2</mn></msup><mrow><mi>∂</mi><msub><mi>η</mi><mi>i</mi></msub><mi>∂</mi><msub><mi>η</mi><mi>j</mi></msub></mrow></mfrac><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><mi>𝛈</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msup><mi>𝛈</mi><mo>*</mo></msup></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>η</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>η</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>η</mi><mi>j</mi></msub><mo>−</mo><msubsup><mi>η</mi><mi>j</mi><mo>*</mo></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝛈</mi><mo>−</mo><msup><mi>𝛈</mi><mo>*</mo></msup><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
     \ln p(\boldsymbol{y}|\boldsymbol{\eta},\boldsymbol{\theta}) &amp;=
-    \ln p
-(\boldsymbol{y}|{\boldsymbol{\theta}},\boldsymbol{\eta}^*))  \\
-    &amp;\qquad + \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p
-(\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta})
-\right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) \\
-    &amp;\qquad + \frac{1}{2}\sum_{i,j}
-\left.\frac{\partial^2}{\partial\eta_i\partial\eta_j} \ln p
-(\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta})
-\right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) (\eta_j -
-\eta^*_j) + \mathcal{O}(\|\boldsymbol{\eta}-\boldsymbol{\eta}^*\|^3),
+    \ln p (\boldsymbol{y}|{\boldsymbol{\theta}},\boldsymbol{\eta}^*))  \\ 
+    &amp;\qquad + \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) \\
+    &amp;\qquad + \frac{1}{2}\sum_{i,j} \left.\frac{\partial^2}{\partial\eta_i\partial\eta_j} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot (\eta_i - \eta^*_i) (\eta_j - \eta^*_j) + \mathcal{O}(\|\boldsymbol{\eta}-\boldsymbol{\eta}^*\|^3),
 \end{aligned}
-\]</span> Similarly, for each component of <span class="math inline">\(\widetilde{\boldsymbol{\eta}}\)</span>, <span class="math display">\[
+</annotation></semantics></math> Similarly, for each component of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝛈</mi><mo accent="true">̃</mo></mover><annotation encoding="application/x-tex">\widetilde{\boldsymbol{\eta}}</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mover><mi>η</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>η</mi><mi>i</mi><mo>*</mo></msubsup><mo>+</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mrow><msub><mi>∇</mi><mi>u</mi></msub><msub><mover><mi>η</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mo stretchy="true" form="postfix">]</mo></mrow><mi>⊤</mi></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mspace width="1.0em"></mspace><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mrow><msub><mi>∇</mi><mi>u</mi></msub><msubsup><mi>∇</mi><mi>u</mi><mi>⊤</mi></msubsup><msub><mover><mi>η</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msup><mi>𝐮</mi><mo>*</mo></msup><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>η</mi><mi>i</mi><mo>*</mo></msubsup><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mover><mi>η</mi><mo accent="true">¯</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\widetilde{\eta}_i(\boldsymbol{u}) &amp;= \eta^*_i
-+\left[\left.\nabla_{u}\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]^\top
-(\boldsymbol{u} - \boldsymbol{u}_*)
+\widetilde{\eta}_i(\boldsymbol{u}) &amp;= \eta^*_i 
++\left[\left.\nabla_{u}\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]^\top (\boldsymbol{u} - \boldsymbol{u}_*)
 \\&amp;\quad
-+\frac{1}{2}(\boldsymbol{u} -
-\boldsymbol{u}_*)^\top\left[\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right]
-(\boldsymbol{u} - \boldsymbol{u}_*) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}^*\|^3)
-\\&amp;= \eta_i^* + b_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
-\\&amp;= \overline{\eta}_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
++\frac{1}{2}(\boldsymbol{u} - \boldsymbol{u}_*)^\top\left[\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}\right] (\boldsymbol{u} - \boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}^*\|^3)
+\\&amp;= \eta_i^* + b_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+\\&amp;= \overline{\eta}_i(\boldsymbol{u}) + h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
 \end{aligned}
-\]</span></p>
-<p>where <span class="math inline">\(\nabla_u\nabla_u^\top\)</span> is
-the Hessian with respect to <span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math inline">\(b_i\)</span> are linear in <span class="math inline">\(\boldsymbol{u}\)</span>, and <span class="math inline">\(h_i\)</span> are quadratic in <span class="math inline">\(\boldsymbol{u}\)</span>. Combining the two
-expansions and taking the difference between the full and linearised
-log-likelihoods, we get <span class="math display">\[
+</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>∇</mi><mi>u</mi></msub><msubsup><mi>∇</mi><mi>u</mi><mi>⊤</mi></msubsup></mrow><annotation encoding="application/x-tex">\nabla_u\nabla_u^\top</annotation></semantics></math>
+is the Hessian with respect to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mi>i</mi></msub><annotation encoding="application/x-tex">b_i</annotation></semantics></math>
+are linear in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>h</mi><mi>i</mi></msub><annotation encoding="application/x-tex">h_i</annotation></semantics></math>
+are quadratic in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>.
+Combining the two expansions and taking the difference between the full
+and linearised log-likelihoods, we get
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo>ln</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mrow><mfrac><mi>∂</mi><mrow><mi>∂</mi><msub><mi>η</mi><mi>i</mi></msub></mrow></mfrac><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><mi>𝛈</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msup><mi>𝛈</mi><mo>*</mo></msup></msub><mo>⋅</mo><msub><mi>h</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
--
+    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
     \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
     &amp;=
-    \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} |
-{\boldsymbol{\theta}}, \boldsymbol{\eta})
-\right|_{\boldsymbol{\eta}^*}\cdot h_i(\boldsymbol{u}) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+    \sum_i \left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}\cdot h_i(\boldsymbol{u}) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
 \end{aligned}
-\]</span> Note that the log-likelihood Hessian difference contribution
-only involves third order <span class="math inline">\(\boldsymbol{u}\)</span> terms and higher, so the
-expression above includes all terms up to second order.</p>
-<p>Let <span class="math display">\[
-g_i^*=\left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} |
-{\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}
-\]</span> and <span class="math display">\[
-\boldsymbol{H}^*_i =
-\left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*}
-.
-\]</span> and form the sum of their products, <span class="math inline">\(\boldsymbol{G}=\sum_i
-g_i^*\boldsymbol{H}_i^*\)</span>. Then <span class="math display">\[
+</annotation></semantics></math> Note that the log-likelihood Hessian
+difference contribution only involves third order
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>
+terms and higher, so the expression above includes all terms up to
+second order.</p>
+<p>Let
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>g</mi><mi>i</mi><mo>*</mo></msubsup><mo>=</mo><msub><mrow><mfrac><mi>∂</mi><mrow><mi>∂</mi><msub><mi>η</mi><mi>i</mi></msub></mrow></mfrac><mo>ln</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo>,</mo><mi>𝛈</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msup><mi>𝛈</mi><mo>*</mo></msup></msub></mrow><annotation encoding="application/x-tex">
+g_i^*=\left.\frac{\partial}{\partial\eta_i} \ln p (\boldsymbol{y} | {\boldsymbol{\theta}}, \boldsymbol{\eta}) \right|_{\boldsymbol{\eta}^*}
+</annotation></semantics></math> and
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>𝐇</mi><mi>i</mi><mo>*</mo></msubsup><mo>=</mo><msub><mrow><msub><mi>∇</mi><mi>u</mi></msub><msubsup><mi>∇</mi><mi>u</mi><mi>⊤</mi></msubsup><msub><mover><mi>η</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msub><mi>𝐮</mi><mo>*</mo></msub></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\boldsymbol{H}^*_i = \left.\nabla_{u}\nabla_{u}^\top\widetilde{\eta}_i(\boldsymbol{u})\right|_{\boldsymbol{u}_*} .
+</annotation></semantics></math> and form the sum of their products,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐆</mi><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msubsup><mi>g</mi><mi>i</mi><mo>*</mo></msubsup><msubsup><mi>𝐇</mi><mi>i</mi><mo>*</mo></msubsup></mrow><annotation encoding="application/x-tex">\boldsymbol{G}=\sum_i g_i^*\boldsymbol{H}_i^*</annotation></semantics></math>.
+Then
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo>ln</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><munder><mo>∑</mo><mi>i</mi></munder><msubsup><mi>g</mi><mi>i</mi><mo>*</mo></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><msubsup><mi>𝐇</mi><mi>i</mi><mo>*</mo></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mi>𝐆</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>𝒪</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="postfix">∥</mo><mi>𝐮</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><msup><mo stretchy="false" form="postfix">∥</mo><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
--
+    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
     \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})
     &amp;=
     \frac{1}{2}
-    \sum_i g_i^* (\boldsymbol{u}-\boldsymbol{u}_*)^\top
-\boldsymbol{H}_i^* (\boldsymbol{u}-\boldsymbol{u}_*) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
+    \sum_i g_i^* (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{H}_i^* (\boldsymbol{u}-\boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3)
     \\&amp;=
     \frac{1}{2}
-    (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{G}
-(\boldsymbol{u}-\boldsymbol{u}_*) +
-\mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3).
+    (\boldsymbol{u}-\boldsymbol{u}_*)^\top \boldsymbol{G} (\boldsymbol{u}-\boldsymbol{u}_*) + \mathcal{O}(\|\boldsymbol{u}-\boldsymbol{u}_*\|^3).
 \end{aligned}
-\]</span> With <span class="math inline">\(\boldsymbol{m}=\mathsf{E}_\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span>
-and <span class="math inline">\(\boldsymbol{Q}^{-1}=\mathsf{Cov}_\overline{p}(\boldsymbol{u},\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})\)</span>,
-we obtain <span class="math display">\[
+</annotation></semantics></math> With
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐦</mi><mo>=</mo><msub><mi>𝖤</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{m}=\mathsf{E}_\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msub><mrow><mi>𝖢</mi><mi>𝗈</mi><mi>𝗏</mi></mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo>,</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{Q}^{-1}=\mathsf{Cov}_\overline{p}(\boldsymbol{u},\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})</annotation></semantics></math>,
+we obtain
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝖤</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>∇</mi><mi>𝐮</mi></msub><mrow><mo stretchy="true" form="prefix">{</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>≈</mo><mi>𝐆</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝖤</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>∇</mi><mi>𝐮</mi></msub><msubsup><mi>∇</mi><mi>𝐮</mi><mi>⊤</mi></msubsup><mrow><mo stretchy="true" form="prefix">{</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">}</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>≈</mo><mi>𝐆</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝖤</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>≈</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>tr</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐆</mi><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>𝐆</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}  \left\{\ln
-\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln
-\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
-&amp;\approx
+\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}  \left\{\ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
+ &amp;\approx
     \boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*) ,
     \\
-\mathsf{E}_{\overline{p}}\left[
-\nabla_{\boldsymbol{u}}\nabla_{\boldsymbol{u}}^\top  \left\{\ln
-\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln
-\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
-&amp;\approx
+\mathsf{E}_{\overline{p}}\left[ \nabla_{\boldsymbol{u}}\nabla_{\boldsymbol{u}}^\top  \left\{\ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right\}\right]
+ &amp;\approx
     \boldsymbol{G} ,
     \\
-\mathsf{E}_{\overline{p}}\left[    \ln
-\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
-    \ln
-\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right]
-&amp;\approx
+\mathsf{E}_{\overline{p}}\left[    \ln \widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta}) -
+    \ln \overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})\right]
+ &amp;\approx
     \frac{1}{2}
-    \mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1}) +
-\frac{1}{2}
-(\boldsymbol{m}-\boldsymbol{u}_*)\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)^\top
-.
+    \mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1}) + \frac{1}{2} (\boldsymbol{m}-\boldsymbol{u}_*)\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)^\top .
 \end{aligned}
-\]</span> For each <span class="math inline">\(\boldsymbol{\theta}\)</span> configuration in the
-INLA output, we can extract both <span class="math inline">\(\boldsymbol{m}\)</span> and the sparse precision
-matrix <span class="math inline">\(\boldsymbol{Q}\)</span> for the
-Gaussian approximation. The non-sparsity structure of <span class="math inline">\(\boldsymbol{G}\)</span> is contained in the
-non-sparsity of <span class="math inline">\(\boldsymbol{Q}\)</span>,
+</annotation></semantics></math> For each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>
+configuration in the INLA output, we can extract both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐦</mi><annotation encoding="application/x-tex">\boldsymbol{m}</annotation></semantics></math>
+and the sparse precision matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐐</mi><annotation encoding="application/x-tex">\boldsymbol{Q}</annotation></semantics></math>
+for the Gaussian approximation. The non-sparsity structure of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐆</mi><annotation encoding="application/x-tex">\boldsymbol{G}</annotation></semantics></math>
+is contained in the non-sparsity of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐐</mi><annotation encoding="application/x-tex">\boldsymbol{Q}</annotation></semantics></math>,
 which allows the use of Takahashi recursion (<code>inla.qinv(Q)</code>)
-to compute the corresponding <span class="math inline">\(\boldsymbol{Q}^{-1}\)</span> values needed to
-evaluate the trace <span class="math inline">\(\mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1})\)</span>.
+to compute the corresponding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><annotation encoding="application/x-tex">\boldsymbol{Q}^{-1}</annotation></semantics></math>
+values needed to evaluate the trace
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>tr</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐆</mi><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathop{\mathrm{tr}}(\boldsymbol{G}\boldsymbol{Q}^{-1})</annotation></semantics></math>.
 Thus, to implement a numerical approximation of this error analysis only
-needs special access to the log-likelihood derivatives <span class="math inline">\(g_i^*\)</span>, as <span class="math inline">\(H_i^*\)</span> can in principle be evaluated
-numerically.</p>
-<p>For a given <span class="math inline">\(\boldsymbol{\theta}\)</span>,
-<span class="math display">\[
+needs special access to the log-likelihood derivatives
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>g</mi><mi>i</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">g_i^*</annotation></semantics></math>,
+as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>H</mi><mi>i</mi><mo>*</mo></msubsup><annotation encoding="application/x-tex">H_i^*</annotation></semantics></math>
+can in principle be evaluated numerically.</p>
+<p>For a given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol{\theta}</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mrow><mi>𝖪</mi><mi>𝖫</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mspace width="0.167em"></mspace><mo stretchy="true" form="infix">∥</mo><mspace width="0.167em"></mspace><mover><mi>p</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>E</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mfrac><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐮</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐲</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>E</mi><mover><mi>p</mi><mo accent="true">¯</mo></mover></msub><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mfrac><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝐮</mi><mo>,</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><mo>ln</mo><mfrac><mrow><mover><mi>p</mi><mo accent="true">¯</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mover><mi>p</mi><mo accent="true">̃</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo stretchy="false" form="prefix">|</mo><mi>𝛉</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
 \mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right) &amp;=
 E_{\overline{p}}\left[\ln\frac{\overline{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{u}|\boldsymbol{y},\boldsymbol{\theta})}\right]
@@ -525,21 +566,24 @@ E_{\overline{p}}\left[
 \ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{u},\boldsymbol{\theta})}
 \right]
 -
-\ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{\theta})}
-.
+\ln\frac{\overline{p}(\boldsymbol{y}|\boldsymbol{\theta})}{\widetilde{p}(\boldsymbol{y}|\boldsymbol{\theta})} .
 \end{aligned}
-\]</span> The first term was approximated above. The second term can
-also be approximated using the derived quantities (to be
-continued…).</p>
+</annotation></semantics></math> The first term was approximated above.
+The second term can also be approximated using the derived quantities
+(to be continued…).</p>
 <p>Summary: The form of the observation likelihood discrepancy shows
-that, given a linearised posterior <span class="math inline">\(\mathsf{N}(\boldsymbol{m},\boldsymbol{Q}^{-1})\)</span>,
-a Gaussian approximation to the nonlinear model posterior, <span class="math inline">\(\mathsf{N}(\widetilde{\boldsymbol{m}},\widetilde{\boldsymbol{Q}}^{-1})\)</span>,
-can be obtained from <span class="math inline">\(\widetilde{\boldsymbol{Q}}=\boldsymbol{Q}-\boldsymbol{G}\)</span>
-and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\widetilde{\boldsymbol{m}}=\boldsymbol{Q}\boldsymbol{m}-\boldsymbol{G}\boldsymbol{u}_*\)</span>.
-The K-L divergence becomes <span class="math display">\[
+that, given a linearised posterior
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝖭</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>,</mo><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathsf{N}(\boldsymbol{m},\boldsymbol{Q}^{-1})</annotation></semantics></math>,
+a Gaussian approximation to the nonlinear model posterior,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝖭</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝐦</mi><mo accent="true">̃</mo></mover><mo>,</mo><msup><mover><mi>𝐐</mi><mo accent="true">̃</mo></mover><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathsf{N}(\widetilde{\boldsymbol{m}},\widetilde{\boldsymbol{Q}}^{-1})</annotation></semantics></math>,
+can be obtained from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝐐</mi><mo accent="true">̃</mo></mover><mo>=</mo><mi>𝐐</mi><mo>−</mo><mi>𝐆</mi></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{Q}}=\boldsymbol{Q}-\boldsymbol{G}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝐐</mi><mo accent="true">̃</mo></mover><mover><mi>𝐦</mi><mo accent="true">̃</mo></mover><mo>=</mo><mi>𝐐</mi><mi>𝐦</mi><mo>−</mo><mi>𝐆</mi><msub><mi>𝐮</mi><mo>*</mo></msub></mrow><annotation encoding="application/x-tex">\widetilde{\boldsymbol{Q}}\widetilde{\boldsymbol{m}}=\boldsymbol{Q}\boldsymbol{m}-\boldsymbol{G}\boldsymbol{u}_*</annotation></semantics></math>.
+The K-L divergence becomes
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mrow><mi>𝖪</mi><mi>𝖫</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>p</mi><mo accent="true">¯</mo></mover><mspace width="0.167em"></mspace><mo stretchy="true" form="infix">∥</mo><mspace width="0.167em"></mspace><mover><mi>p</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>≈</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">[</mo><mo>ln</mo><mo>det</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐐</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>ln</mo><mo>det</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐐</mi><mo>−</mo><mi>𝐆</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mo>tr</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐆</mi><msup><mi>𝐐</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>⊤</mi></msup><mi>𝐆</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐐</mi><mo>−</mo><mi>𝐆</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐆</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐦</mi><mo>−</mo><msub><mi>𝐮</mi><mo>*</mo></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{aligned}
-\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right)
-&amp;\approx
+\mathsf{KL}\left(\overline{p}\,\middle\|\,\widetilde{p}\right) &amp;\approx
 \frac{1}{2}
 \left[
 \ln\det(\boldsymbol{Q})-
@@ -549,11 +593,16 @@ The K-L divergence becomes <span class="math display">\[
 (\boldsymbol{m}-\boldsymbol{u}_*)^\top\boldsymbol{G}(\boldsymbol{Q}-\boldsymbol{G})^{-1}\boldsymbol{G}(\boldsymbol{m}-\boldsymbol{u}_*)
 \right] .
 \end{aligned}
-\]</span> When the INLA posterior has mean <span class="math inline">\(\boldsymbol{m}=\boldsymbol{u}_*\)</span>, e.g. for
-models with additive Gaussian observation noise, and <span class="math inline">\(\boldsymbol{\theta}=\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*}\)</span>,
+</annotation></semantics></math> When the INLA posterior has mean
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐦</mi><mo>=</mo><msub><mi>𝐮</mi><mo>*</mo></msub></mrow><annotation encoding="application/x-tex">\boldsymbol{m}=\boldsymbol{u}_*</annotation></semantics></math>,
+e.g. for models with additive Gaussian observation noise, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛉</mi><mo>=</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><msub><mi>𝐮</mi><mo>*</mo></msub></msub></mrow><annotation encoding="application/x-tex">\boldsymbol{\theta}=\widehat{\boldsymbol{\theta}}_{\boldsymbol{u}_*}</annotation></semantics></math>,
 the last term vanishes.</p>
 <p>Note: by implementing the K-L divergence accuracy metric, a
-by-product would be improved posterior estimates based on <span class="math inline">\(\widetilde{\boldsymbol{m}}\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{Q}}\)</span>.</p>
+by-product would be improved posterior estimates based on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝐦</mi><mo accent="true">̃</mo></mover><annotation encoding="application/x-tex">\widetilde{\boldsymbol{m}}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝐐</mi><mo accent="true">̃</mo></mover><annotation encoding="application/x-tex">\widetilde{\boldsymbol{Q}}</annotation></semantics></math>.</p>
 </div>
 <div class="section level3">
 <h3 id="well-posedness-and-initialisation">Well-posedness and initialisation<a class="anchor" aria-label="anchor" href="#well-posedness-and-initialisation"></a>
@@ -561,38 +610,56 @@ by-product would be improved posterior estimates based on <span class="math inli
 <p>On a side note, one might be concerned about initialisation at, or
 convergence to, a saddle point. Although it is not implemented in
 inlabru, we want to talk about the technicality how we define the
-initial linearisation point <span class="math inline">\(u_0\)</span>.</p>
-<p>Generally speaking, any values of <span class="math inline">\(\boldsymbol{u}_0\)</span> work except the case
-that the gradient evaluated at <span class="math inline">\(\boldsymbol{u}_0\)</span> is <span class="math inline">\(\boldsymbol{0}\)</span> because the linearisation
-point will never move away if the prior mean is also <span class="math inline">\(\boldsymbol{0}\)</span>. In general, this tends to
-be a saddle point problem. In some cases the problem can be handled by
-changing the predictor parameterisation or just changing the
-initialisation point using the <code>bru_initial</code> option. However,
-for true saddle point problems, it indicates that the predictor
-parameterisation may lead to a multimodal posterior distribution or is
-ill-posed in some other way. This is a more fundamental problem that
-cannot be fixed by changing the initialisation point.</p>
-<p>In these examples, where <span class="math inline">\(\beta\)</span>
-and <span class="math inline">\(\boldsymbol{u}\)</span> are latent
-Gaussian components, the predictors 1, 3, and 4 would typically be safe,
-but predictor 2 is fundamentally non-identifiable. <span class="math display">\[
+initial linearisation point
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mn>0</mn></msub><annotation encoding="application/x-tex">u_0</annotation></semantics></math>.</p>
+<p>Generally speaking, any values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>
+work except the case that the gradient evaluated at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐮</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\boldsymbol{u}_0</annotation></semantics></math>
+is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\boldsymbol{0}</annotation></semantics></math>
+because the linearisation point will never move away if the prior mean
+is also
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\boldsymbol{0}</annotation></semantics></math>.
+In general, this tends to be a saddle point problem. In some cases the
+problem can be handled by changing the predictor parameterisation or
+just changing the initialisation point using the
+<code>bru_initial</code> option. However, for true saddle point
+problems, it indicates that the predictor parameterisation may lead to a
+multimodal posterior distribution or is ill-posed in some other way.
+This is a more fundamental problem that cannot be fixed by changing the
+initialisation point.</p>
+<p>In these examples, where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>
+are latent Gaussian components, the predictors 1, 3, and 4 would
+typically be safe, but predictor 2 is fundamentally non-identifiable.
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝛈</mi><mn>1</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>𝐮</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝛈</mi><mn>2</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>β</mi><mi>𝐮</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝛈</mi><mn>3</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mi>e</mi><mi>β</mi></msup><mi>𝐮</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝛈</mi><mn>4</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>F</mi><mi>β</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>Φ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mi>β</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>𝐮</mi><mo>,</mo><mspace width="1.0em"></mspace><msub><mi>z</mi><mi>β</mi></msub><mo>∼</mo><mi>𝖭</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex"> 
 \begin{aligned}
 \boldsymbol{\eta}_1 &amp;= \boldsymbol{u}, \\
 \boldsymbol{\eta}_2 &amp;= \beta \boldsymbol{u}, \\
 \boldsymbol{\eta}_3 &amp;= e^\beta \boldsymbol{u}, \\
-\boldsymbol{\eta}_4 &amp;= F_\beta^{-1} ( \Phi(z_\beta)) \boldsymbol{u},
-\quad z_{\beta} \sim \mathsf{N}(0,1) .
+\boldsymbol{\eta}_4 &amp;= F_\beta^{-1} ( \Phi(z_\beta)) \boldsymbol{u}, \quad z_{\beta} \sim \mathsf{N}(0,1) .
 \end{aligned}
-\]</span> Note that for <span class="math inline">\(\boldsymbol{\eta}_3\)</span> and <span class="math inline">\(\boldsymbol{\eta}_4\)</span>, the partial
-derivatives with respect to <span class="math inline">\(\beta\)</span>
-are zero for <span class="math inline">\(\boldsymbol{u}=\boldsymbol{0}\)</span>. However,
-the first inlabru iteration will give a non-zero estimate of <span class="math inline">\(\boldsymbol{u}\)</span>, so that subsequent
-iteration will involve both <span class="math inline">\(\beta\)</span>
-and <span class="math inline">\(\boldsymbol{u}\)</span>.</p>
+</annotation></semantics></math> Note that for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝛈</mi><mn>3</mn></msub><annotation encoding="application/x-tex">\boldsymbol{\eta}_3</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝛈</mi><mn>4</mn></msub><annotation encoding="application/x-tex">\boldsymbol{\eta}_4</annotation></semantics></math>,
+the partial derivatives with respect to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+are zero for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐮</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\boldsymbol{u}=\boldsymbol{0}</annotation></semantics></math>.
+However, the first inlabru iteration will give a non-zero estimate of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>,
+so that subsequent iteration will involve both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐮</mi><annotation encoding="application/x-tex">\boldsymbol{u}</annotation></semantics></math>.</p>
 </div>
 </div>
 
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -603,15 +670,15 @@ and <span class="math inline">\(\boldsymbol{u}\)</span>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
