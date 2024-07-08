@@ -33,7 +33,7 @@ This geom serves to visualize \code{prediction} objects which usually results fr
 \code{\link[=predict.bru]{predict.bru()}}. Predictions objects provide summary statistics (mean, median, sd, ...) for
 one or more random variables. For single variables (or if requested so by setting \code{bar = TRUE}),
 a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
-mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
+mean of each variable (y-axis) is plotted against the row number of the variable in the prediction
 data frame (x-axis) using \code{geom_line}. In addition, a \code{geom_ribbon} is used to show
 the confidence interval.
 

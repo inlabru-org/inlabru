@@ -186,7 +186,7 @@ gg.data.frame <- function(...) {
 #' [predict.bru()]. Predictions objects provide summary statistics (mean, median, sd, ...) for
 #' one or more random variables. For single variables (or if requested so by setting `bar = TRUE`),
 #' a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
-#' mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
+#' mean of each variable (y-axis) is plotted against the row number of the variable in the prediction
 #' data frame (x-axis) using `geom_line`. In addition, a `geom_ribbon` is used to show
 #' the confidence interval.
 #'
@@ -220,6 +220,18 @@ gg.bru_prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = NULL,
     alpha <- 0.3
   }
 
+  if (is.list(data) && !is.data.frame(data)) {
+    data <- lapply(names(data), function(x) {
+      if (NROW(data[[x]]) == 1) {
+        rownames(data[[x]]) <- x
+      } else {
+        rownames(data[[x]]) <- paste0(x, ".", seq_len(NROW(data[[x]])))
+      }
+      data[[x]]
+    })
+    data <- dplyr::bind_rows(data)
+  }
+
   requireNamespace("ggplot2")
   # Convert from old and inla style names
   if (("median" %in% names(data)) &&
@@ -232,7 +244,6 @@ gg.bru_prediction <- function(data, mapping = NULL, ribbon = TRUE, alpha = NULL,
     q0.5 = "0.5quant",
     q0.975 = "0.975quant"
   )
-
   for (quant_name in names(new_quant_names[new_quant_names %in% names(data)])) {
     names(data)[names(data) == new_quant_names[[quant_name]]] <- quant_name
   }
