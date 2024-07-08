@@ -300,7 +300,8 @@ summary.bru_like <- function(object, verbose = TRUE, ...) {
       family = object[["family"]],
       data_class = class(object[["data"]]),
       response_class = class(object[["response_data"]][[object[["response"]]]]),
-      predictor = deparse(object[["formula"]])
+      predictor = deparse(object[["formula"]]),
+      used = object[["used"]]
     ),
     class = "summary_bru_like"
   )
@@ -339,7 +340,11 @@ print.summary_bru_info <- function(x, ...) {
 print.summary_bru_like <- function(x, ...) {
   lh <- x
   cat(sprintf(
-    "  Family: '%s'\n    Data class: %s\n    Response class: %s\n    Predictor: %s\n",
+    paste0("  Family: '%s'\n",
+           "    Data class: %s\n",
+           "    Response class: %s\n",
+           "    Predictor: %s\n",
+           "    Used components: %s\n"),
     lh$family,
     paste0("'", lh$data_class, "'", collapse = ", "),
     paste0("'", lh$response_class, "'", collapse = ", "),
@@ -353,7 +358,8 @@ print.summary_bru_like <- function(x, ...) {
       )
     } else {
       lh$predictor
-    }
+    },
+    format(lh$used)
   ))
   invisible(x)
 }
@@ -811,14 +817,28 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 }
 
 
+#' @describeIn bru_used Text formatting method for `bru_used` objects.
+#' @export
+format.bru_used <- function(x, ...) {
+  s <- paste0("effects[", paste0(x$effect, collapse = ", "), "]")
+  s <- paste0(s, ", latent[", paste0(x$latent, collapse = ", "), "]")
+  if (!is.null(x$effect_exclude)) {
+    s <- paste0(s, ", exclude[", paste0(x$effect_exclude, collapse = ", "), "]")
+  }
+  s
+}
+
+#' @describeIn bru_used Summary method for `bru_used` objects.
+#' @export
+#' @method summary bru_used
+summary.bru_used <- function(object, ...) {
+  object
+}
+
 #' @describeIn bru_used Print method for `bru_used` objects.
 #' @export
 print.bru_used <- function(x, ...) {
-  cat("Used effects : ", paste0(x$effect, collapse = ", "), "\n", sep = "")
-  cat("Used latent  : ", paste0(x$latent, collapse = ", "), "\n", sep = "")
-  if (!is.null(x$effect_exclude)) {
-    cat("Excluded     : ", paste0(x$effect_exclude, collapse = ", "), "\n", sep = "")
-  }
+  cat("Used ", format(x), "\n", sep = "")
   invisible(x)
 }
 
