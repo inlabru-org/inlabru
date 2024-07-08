@@ -101,11 +101,13 @@ bru_model <- function(components, lhoods) {
 #' @param \dots Arguments passed on to other methods
 #' @rdname bru_model
 summary.bru_model <- function(object, ...) {
-  result <- list(
-    components =
-      summary(object[["effects"]], ...)
+  result <- structure(
+    list(
+      components =
+        summary(object[["effects"]], ...)
+    ),
+    class = "summary_bru_model"
   )
-  class(result) <- c("summary_bru_model", "list")
   result
 }
 

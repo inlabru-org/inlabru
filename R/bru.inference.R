@@ -277,27 +277,48 @@ bru_info_upgrade <- function(object,
 #' @param verbose logical; If `TRUE`, include more details of the
 #' component definitions. If `FALSE`, only show basic component
 #' definition information. Default: `TRUE`
-#' @param \dots Arguments passed on to other methods
+#' @param \dots Arguments passed on to other `summary` methods
 #' @rdname bru_info
 summary.bru_info <- function(object, verbose = TRUE, ...) {
-  result <- list(
-    inlabru_version = object[["inlabru_version"]],
-    INLA_version = object[["INLA_version"]],
-    components = summary(object[["model"]], verbose = verbose, ...),
-    lhoods =
-      lapply(
-        object[["lhoods"]],
-        function(x) {
-          list(
-            family = x[["family"]],
-            data_class = class(x[["data"]]),
-            predictor = deparse(x[["formula"]])
-          )
-        }
-      )
+  structure(
+    list(
+      inlabru_version = object[["inlabru_version"]],
+      INLA_version = object[["INLA_version"]],
+      components = summary(object[["model"]], verbose = verbose, ...),
+      lhoods = summary(object[["lhoods"]], verbose = verbose, ...)
+    ),
+    class = "summary_bru_info"
   )
-  class(result) <- c("summary_bru_info", "list")
-  result
+}
+
+#' @rdname bru_info
+#' @method summary bru_like
+#' @export
+summary.bru_like <- function(object, verbose = TRUE, ...) {
+  structure(
+    list(
+      family = object[["family"]],
+      data_class = class(object[["data"]]),
+      response_class = class(object[["response_data"]][[object[["response"]]]]),
+      predictor = deparse(object[["formula"]])
+    ),
+    class = "summary_bru_like"
+  )
+}
+
+#' @rdname bru_info
+#' @method summary bru_like_list
+#' @export
+summary.bru_like_list <- function(object, verbose = TRUE, ...) {
+  structure(
+    lapply(
+      object,
+      function(x) {
+        summary(x, verbose = verbose, ...)
+      }
+    ),
+    class = "summary_bru_like_list"
+  )
 }
 
 #' @export
@@ -309,23 +330,39 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("Components:\n"))
   print(x$components)
   cat(paste0("Likelihoods:\n"))
-  for (lh in x$lhoods) {
-    cat(sprintf(
-      "  Family: '%s'\n    Data class: %s\n    Predictor: %s\n",
-      lh$family,
-      paste0("'", lh$data_class, "'", collapse = ", "),
-      if (length(lh$predictor) > 1) {
+  print(x$lhoods)
+  invisible(x)
+}
+
+#' @rdname bru_info
+#' @export
+print.summary_bru_like <- function(x, ...) {
+  lh <- x
+  cat(sprintf(
+    "  Family: '%s'\n    Data class: %s\n    Response class: %s\n    Predictor: %s\n",
+    lh$family,
+    paste0("'", lh$data_class, "'", collapse = ", "),
+    paste0("'", lh$response_class, "'", collapse = ", "),
+    if (length(lh$predictor) > 1) {
+      paste0(
+        "\n        ",
         paste0(
-          "\n        ",
-          paste0(
-            lh$predictor,
-            collapse = "\n        "
-          )
+          lh$predictor,
+          collapse = "\n        "
         )
-      } else {
-        lh$predictor
-      }
-    ))
+      )
+    } else {
+      lh$predictor
+    }
+  ))
+  invisible(x)
+}
+
+#' @rdname bru_info
+#' @export
+print.summary_bru_like_list <- function(x, ...) {
+  for (lh in x) {
+    print(lh)
   }
   invisible(x)
 }
@@ -4018,7 +4055,7 @@ summary.bru <- function(object, verbose = FALSE, ...) {
     result[["inla"]][["call"]] <- NULL
   }
 
-  class(result) <- c("summary_bru", "list")
+  class(result) <- "summary_bru"
   return(result)
 }
 

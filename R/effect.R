@@ -1651,7 +1651,7 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
     )
     result$Summary <- Summary
   }
-  class(result) <- c("summary_component", "list")
+  class(result) <- "summary_component"
   result
 }
 

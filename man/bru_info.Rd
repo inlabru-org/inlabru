@@ -2,7 +2,11 @@
 % Please edit documentation in R/bru.inference.R
 \name{summary.bru_info}
 \alias{summary.bru_info}
+\alias{summary.bru_like}
+\alias{summary.bru_like_list}
 \alias{print.summary_bru_info}
+\alias{print.summary_bru_like}
+\alias{print.summary_bru_like_list}
 \alias{bru_info}
 \alias{bru_info.character}
 \alias{bru_info.bru}
@@ -10,7 +14,15 @@
 \usage{
 \method{summary}{bru_info}(object, verbose = TRUE, ...)
 
+\method{summary}{bru_like}(object, verbose = TRUE, ...)
+
+\method{summary}{bru_like_list}(object, verbose = TRUE, ...)
+
 \method{print}{summary_bru_info}(x, ...)
+
+\method{print}{summary_bru_like}(x, ...)
+
+\method{print}{summary_bru_like_list}(x, ...)
 
 bru_info(...)
 
@@ -25,7 +37,7 @@ bru_info(...)
 component definitions. If \code{FALSE}, only show basic component
 definition information. Default: \code{TRUE}}
 
-\item{\dots}{Arguments passed on to other methods}
+\item{\dots}{Arguments passed on to other \code{summary} methods}
 
 \item{x}{A \code{summary_bru_info} object to be printed}
 

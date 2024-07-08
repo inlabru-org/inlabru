@@ -1024,11 +1024,13 @@ summary.bru_options <- function(object,
   } else {
     legend <- NULL
   }
-  result <- list(
-    legend = legend,
-    value = traverse(combined, default, global, object)
+  result <- structure(
+    list(
+      legend = legend,
+      value = traverse(combined, default, global, object)
+    ),
+    class = "summary_bru_options"
   )
-  class(result) <- c("summary_bru_options", "list")
   result
 }
 
