@@ -14,7 +14,7 @@
 
 \item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_line}.}
 
-\item{ribbon}{If TRUE, plot a ribbon around the line based on the smalles and largest
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the smallest and largest
 quantiles present in the data, found by matching names starting with \code{q} and
 followed by a numerical value.  \code{inla()}-style \code{numeric+"quant"} names are converted
 to inlabru style before matching.}

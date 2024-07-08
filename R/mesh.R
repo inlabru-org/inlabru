@@ -62,7 +62,7 @@ vertices.inla.mesh <- function(...) {
 
 #' @describeIn inlabru-deprecated
 #' Generate `SpatialPixels` covering an `inla.mesh`.
-#'`r lifecycle::badge("deprecated")` in favour of [fmesher::fm_pixels()]
+#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_pixels()]
 #'
 #' @param mesh An `inla.mesh` object
 #' @param nx Number of pixels in x direction

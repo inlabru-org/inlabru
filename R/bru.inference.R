@@ -50,7 +50,7 @@ bru_info_upgrade <- function(object,
   }
   if (!inherits(object, "bru_info")) {
     old <- TRUE
-    class(object) <- c("bru_info", "list")
+    class(object) <- "bru_info"
     object_full[["bru_info"]] <- object
   }
   if (is.null(object[["inlabru_version"]])) {
@@ -369,13 +369,15 @@ bru_info.character <- function(method,
         }
       )
   }
-  object <- list(
-    method = method,
-    ...,
-    inlabru_version = inlabru_version,
-    INLA_version = INLA_version
+  object <- structure(
+    list(
+      method = method,
+      ...,
+      inlabru_version = inlabru_version,
+      INLA_version = INLA_version
+    ),
+    class = "bru_info"
   )
-  class(object) <- c("bru_info", "list")
   object
 }
 
@@ -1617,27 +1619,28 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
   # The likelihood object that will be returned
 
-  lh <- list(
-    family = family,
-    formula = formula,
-    response_data = response_data, # agg
-    data = data,
-    E = E,
-    Ntrials = Ntrials,
-    weights = weights,
-    scale = scale,
-    samplers = samplers,
-    linear = linear,
-    expr = expr,
-    response = response,
-    inla.family = inla.family,
-    domain = domain,
-    used = used,
-    allow_combine = allow_combine,
-    control.family = control.family
+  lh <- structure(
+    list(
+      family = family,
+      formula = formula,
+      response_data = response_data, # agg
+      data = data,
+      E = E,
+      Ntrials = Ntrials,
+      weights = weights,
+      scale = scale,
+      samplers = samplers,
+      linear = linear,
+      expr = expr,
+      response = response,
+      inla.family = inla.family,
+      domain = domain,
+      used = used,
+      allow_combine = allow_combine,
+      control.family = control.family
+    ),
+    class = "bru_like"
   )
-
-  class(lh) <- c("bru_like", "list")
 
   # Return likelihood
   lh
@@ -3682,8 +3685,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )
       if (is.null(old.result)) {
         old.result <- list()
-        class(old.result) <- c("iinla", "list")
-      } else if (!inherits(old.result, "iinla")) {
+      }
+      if (!inherits(old.result, "iinla")) {
         class(old.result) <- c("iinla", class(old.result))
       }
 

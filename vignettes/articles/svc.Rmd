@@ -559,7 +559,8 @@ out_stk <- terra::mask(
   out_stk,
   terra::vect(sf::st_union(states)),
   updatevalue = NA,
-  touches = FALSE)
+  touches = FALSE
+)
 ```
 
 Finally, we plot the SVCs with the following code. We plot the posterior median and 95% uncertainty width ("range95")

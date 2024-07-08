@@ -87,8 +87,10 @@ bru_model <- function(components, lhoods) {
   environment(formula) <- env
 
   # Make model
-  mdl <- list(effects = components, formula = formula)
-  class(mdl) <- c("bru_model", "list")
+  mdl <- structure(
+    list(effects = components, formula = formula),
+    class = "bru_model"
+  )
   return(mdl)
 }
 

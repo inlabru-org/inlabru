@@ -569,7 +569,7 @@ component.character <- function(object,
     component$fcall <- fcall
   }
 
-  class(component) <- c("component", "list")
+  class(component) <- "component"
   component
 }
 
@@ -902,13 +902,15 @@ add_mappers.component_list <- function(components, lhoods, ...) {
 }
 
 bru_input <- function(input, label = NULL, layer = NULL, selector = NULL) {
-  inp <- list(
-    input = input,
-    label = label,
-    layer = layer,
-    selector = selector
+  inp <- structure(
+    list(
+      input = input,
+      label = label,
+      layer = layer,
+      selector = selector
+    ),
+    class = "bru_input"
   )
-  class(inp) <- c("bru_input", "list")
   inp
 }
 
@@ -976,17 +978,19 @@ bru_subcomponent <- function(input = NULL,
     }
   }
   subcomponent <-
-    list(
-      input = input,
-      mapper = mapper,
-      model = model,
-      type = type,
-      n = n,
-      values = values,
-      season.length = season.length,
-      factor_mapping = factor_mapping
+    structure(
+      list(
+        input = input,
+        mapper = mapper,
+        model = model,
+        type = type,
+        n = n,
+        values = values,
+        season.length = season.length,
+        factor_mapping = factor_mapping
+      ),
+      class = "bru_subcomponent"
     )
-  class(subcomponent) <- c("bru_subcomponent", "list")
 
   subcomponent
 }

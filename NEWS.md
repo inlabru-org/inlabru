@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Remove unneeded `"list"` class inheritance from solitary classes
+
 # inlabru 2.11.1
 
 ## Bug fixes

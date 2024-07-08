@@ -200,7 +200,7 @@ gg.data.frame <- function(...) {
 #' @importFrom utils modifyList
 #' @param data A prediction object, usually the result of a [predict.bru()] call.
 #' @param mapping a set of aesthetic mappings created by `aes`. These are passed on to `geom_line`.
-#' @param ribbon If TRUE, plot a ribbon around the line based on the smalles and largest
+#' @param ribbon If TRUE, plot a ribbon around the line based on the smallest and largest
 #'   quantiles present in the data, found by matching names starting with `q` and
 #'   followed by a numerical value.  `inla()`-style `numeric+"quant"` names are converted
 #'   to inlabru style before matching.
