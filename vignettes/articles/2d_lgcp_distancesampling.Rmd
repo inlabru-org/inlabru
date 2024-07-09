@@ -94,13 +94,11 @@ hn <- function(distance, sigma) {
   exp(-0.5 * (distance / sigma)^2)
 }
 ```
-To control the prior distribution for the `sigma` parameter, we define a transformation function
+To control the prior distribution for the `sigma` parameter, we use a transformation mapper
 that converts a $N(0, 1)$ latent variable into an exponentially distributed variable with
-expectation 8 (this is a somewhat arbitrary value, but motivated by the maximum observation distance `W`):
-```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
-sigma <- function(x) {
-  bru_forward_transformation(qexp, x, rate = 1 / 8)
-}
+expectation 8 (this is a somewhat arbitrary value, but motivated by the maximum observation distance `W`): 
+```{r results="hide",warning=FALSE,message=FALSE, eval = FALSE}
+bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ```
 
 
@@ -115,36 +113,41 @@ matern <- inla.spde2.pcmatern(mexdolphin$mesh,
 ```
 
 We need to now separately define the components of the model 
-(the SPDE, the Intercept and the detection function parameter `sigma_theta`)
+(the SPDE, the Intercept and the detection function parameter `sigma`)
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 cmp <- ~ mySPDE(main = geometry, model = matern) +
-  sigma_theta(1, prec.linear = 1) + Intercept(1)
+  sigma(1,
+    prec.linear = 1,
+    marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  ) +
+  Intercept(1)
 ```
+The `marginal` argument in the `sigma` component specifies the transformation function
+taking N(0,1) to Exponential(1/8).
 
-... and the formula, which describes how these components are combined to 
+The formula, which describes how these components are combined to 
 form the linear predictor (remembering that we need an offset due to the unknown
 direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 form <- geometry + distance ~ mySPDE +
-  log(hn(distance, sigma(sigma_theta))) +
+  log(hn(distance, sigma)) +
   Intercept + log(2)
 ```
 
-From version `2.9.0.9004`, a more compact option is available, by allowing the
-component itself do the transformation between N(0,1) and Exponential(1/8):
+Before version `2.9.0.9004`, a less compact approach had to be used, by applying the transformation
+between N(0,1) and Exponential(1/8) directly in the predictor expression, requiring
+corresponding adjustments to the later `predict()` calls, etc:
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
-# # An alternative approach available from 2.9.0.9004; requires matching
-# # adjustments to the later predict() calls, etc.
+# sigma_transf <- function(x) {
+#   bru_forward_transformation(qexp, x, rate = 1 / 8)
+# }
 # cmp <- ~ mySPDE(main = geometry, model = matern) +
-#   sigma(1,
-#     prec.linear = 1,
-#     marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
-#   ) +
+#   sigma_theta(1, prec.linear = 1) +
 #   Intercept(1)
 # form <- geometry + distance ~ mySPDE +
-#   log(hn(distance, sigma)) +
+#   log(hn(distance, sigma_transf(sigma_theta))) +
 #   Intercept + log(2)
 ```
 
@@ -200,7 +203,7 @@ See `?predict.bru` for more information.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
-dfun <- predict(fit, distdf, ~ hn(distance, sigma(sigma_theta)))
+dfun <- predict(fit, distdf, ~ hn(distance, sigma))
 plot(dfun)
 ```
 The average detection probability within the maximum detection distance is estimated to be
@@ -238,12 +241,12 @@ ggplot(data = Nest) +
     aes(
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
-      ymax = mean + 2 * mean.mc_std_err,
-      colour = NULL, fill = "Posterior"
+      ymax = mean + 2 * mean.mc_std_err
     ),
+    fill = "blue",
     alpha = 0.2
   ) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
 ```
 
 Hazard-rate Detection Function
@@ -263,7 +266,7 @@ Solution:
 
 ```{r, results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 formula1 <- geometry + distance ~ mySPDE +
-  log(hr(distance, sigma(sigma_theta))) +
+  log(hr(distance, sigma)) +
   Intercept + log(2)
 
 fit1 <- lgcp(
@@ -295,7 +298,7 @@ ggplot() +
   theme(legend.text = element_text(size = 6))
 
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
-dfun1 <- predict(fit1, distdf, ~ hr(distance, sigma(sigma_theta)))
+dfun1 <- predict(fit1, distdf, ~ hr(distance, sigma))
 plot(dfun1)
 
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
@@ -322,12 +325,12 @@ ggplot(data = Nest1) +
     aes(
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
-      ymax = mean + 2 * mean.mc_std_err,
-      colour = NULL, fill = "Posterior"
+      ymax = mean + 2 * mean.mc_std_err
     ),
+    fill = "blue",
     alpha = 0.2
   ) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin", fill = "Plugin"))
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
 ```
 
 Comparing the models
@@ -340,7 +343,7 @@ bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
   breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
-  predictor = distance ~ hn(distance, sigma(sigma_theta))
+  predictor = distance ~ hn(distance, sigma)
 )
 attributes(bc)$ggp
 
@@ -348,7 +351,7 @@ bc1 <- bincount(
   result = fit1,
   observations = mexdolphin$points$distance,
   breaks = seq(0, max(mexdolphin$points$distance), length.out = 9),
-  predictor = distance ~ hn(distance, sigma(sigma_theta))
+  predictor = distance ~ hn(distance, sigma)
 )
 attributes(bc1)$ggp
 ```
@@ -358,30 +361,38 @@ Fit Models only to the distance sampling data
 Half-normal first
 
 ```{r,results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula <- distance ~ log(hn(distance, sigma(sigma_theta))) + Intercept
-cmp <- ~ sigma_theta(1, prec.linear = 1) + Intercept(1)
+formula <- distance ~ log(hn(distance, sigma)) + Intercept
+cmp <- ~ sigma(1,
+  prec.linear = 1,
+  marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+) +
+  Intercept(1)
 dfit <- lgcp(
   components = cmp,
   mexdolphin$points,
   domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula,
-  options = list(bru_initial = list(sigma_theta = 1, Intercept = 3))
+  options = list(bru_initial = list(sigma = 1, Intercept = 3))
 )
-detfun <- predict(dfit, distdf, ~ hn(distance, sigma(sigma_theta)))
+detfun <- predict(dfit, distdf, ~ hn(distance, sigma))
 ```
 
 Hazard-rate next
 
 ```{r,results="hide", warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-formula1 <- distance ~ log(hr(distance, sigma(sigma_theta))) + Intercept
-cmp <- ~ sigma_theta(1, prec.linear = 1) + Intercept(1)
+formula1 <- distance ~ log(hr(distance, sigma)) + Intercept
+cmp <- ~ sigma(1,
+  prec.linear = 1,
+  marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+) +
+  Intercept(1)
 dfit1 <- lgcp(
   components = cmp,
   mexdolphin$points,
   domain = list(distance = fm_mesh_1d(seq(0, 8, length.out = 30))),
   formula = formula1
 )
-detfun1 <- predict(dfit1, distdf, ~ hr(distance, sigma(sigma_theta)))
+detfun1 <- predict(dfit1, distdf, ~ hr(distance, sigma))
 ```
 
 
