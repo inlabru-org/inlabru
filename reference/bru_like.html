@@ -89,9 +89,9 @@
 <span>  Ntrials <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ips <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_latent <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -184,50 +184,59 @@ interpreted with great care.</p></dd>
 models, such as Gaussian and student-t response models.</p></dd>
 
 
-<dt id="arg-samplers">samplers<a class="anchor" aria-label="anchor" href="#arg-samplers"></a></dt>
-<dd><p>Integration domain for 'cp' family.</p></dd>
-
-
-<dt id="arg-ips">ips<a class="anchor" aria-label="anchor" href="#arg-ips"></a></dt>
-<dd><p>Integration points for 'cp' family. Overrides <code>samplers</code>.</p></dd>
-
-
-<dt id="arg-domain">domain<a class="anchor" aria-label="anchor" href="#arg-domain"></a></dt>
+<dt id="arg-domain-samplers-ips">domain, samplers, ips<a class="anchor" aria-label="anchor" href="#arg-domain-samplers-ips"></a></dt>
+<dd><p>Arguments used for <code>family="cp"</code>.</p><dl><dt><code>domain</code></dt>
 <dd><p>Named list of domain definitions.</p></dd>
 
+<dt><code>samplers</code></dt>
+<dd><p>Integration subdomain for 'cp' family.</p></dd>
 
-<dt id="arg-include">include<a class="anchor" aria-label="anchor" href="#arg-include"></a></dt>
+<dt><code>ips</code></dt>
+<dd><p>Integration points for 'cp' family. Defaults
+to <code>fmesher::fm_int(domain, samplers)</code>. If explicitly given, overrides <code>domain</code>
+and <code>samplers</code>.</p></dd>
+
+
+</dl></dd>
+
+
+<dt id="arg-include-exclude-include-latent">include, exclude, include_latent<a class="anchor" aria-label="anchor" href="#arg-include-exclude-include-latent"></a></dt>
+<dd><p>Arguments controlling what components and effects are available for use
+in the predictor expression.</p><dl><dt><code>include</code></dt>
 <dd><p>Character vector of component labels that are used as effects
-by the
-predictor expression; Default: the result of <code>[all.vars()]</code> on the
-predictor expression, unless the expression is not ".", in which case
-<code>include=NULL</code>, to include all components that are not
-explicitly excluded. The <code><a href="bru_used.html">bru_used()</a></code> methods are used
-to extract the variable names, followed by removal of non-component names
-when the components are available.</p></dd>
+by the predictor expression; If <code>NULL</code> (default), the <code><a href="bru_used.html">bru_used()</a></code> method is used
+to extract the variable names from the formula.</p></dd>
 
+<dt><code>exclude</code></dt>
+<dd><p>Character vector of component labels to be excluded from the effect list
+determined by the <code>include</code> argument. Default is <code>NULL</code>; do not remove
+any components from the inclusion list.</p></dd>
 
-<dt id="arg-exclude">exclude<a class="anchor" aria-label="anchor" href="#arg-exclude"></a></dt>
-<dd><p>Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the <code>include</code> parameter; Default: NULL (do not remove
-any components from the inclusion list)</p></dd>
-
-
-<dt id="arg-include-latent">include_latent<a class="anchor" aria-label="anchor" href="#arg-include-latent"></a></dt>
-<dd><p>character vector.
-Specifies which the latent state variables are
+<dt><code>include_latent</code></dt>
+<dd><p>Character vector.
+Specifies which latent state variables are
 directly available to the predictor expression, with a <code>_latent</code> suffix.
 This also makes evaluator functions with suffix <code>_eval</code> available, taking
 parameters <code>main</code>, <code>group</code>, and <code>replicate</code>, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). Default <code>NULL</code>
-auto-detects use of <code>_latent</code> and <code>_eval</code> in the predictor expression.</p></dd>
+component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). If <code>NULL</code>, the <code><a href="bru_used.html">bru_used()</a></code>
+method auto-detects use of <code>_latent</code> and <code>_eval</code> in the predictor expression.</p></dd>
+
+
+</dl></dd>
 
 
 <dt id="arg-used">used<a class="anchor" aria-label="anchor" href="#arg-used"></a></dt>
-<dd><p>Either <code>NULL</code> or a <code><a href="bru_used.html">bru_used()</a></code> object, overriding <code>include</code>,
-<code>exclude</code>, and <code>include_latent</code>.</p></dd>
+<dd><p>Wither <code>NULL</code> (default) or a <code><a href="bru_used.html">bru_used()</a></code> object, that overrides
+the <code>include</code>, <code>exclude</code>, <code>include_latent</code> arguments.
+When <code>used</code> is <code>NULL</code> (default), the information about what effects and latent vectors
+are made available to the predictor evaluation is defined by</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">used</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_used.html">bru_used</a></span><span class="op">(</span></span>
+<span>  <span class="va">formula</span>,</span>
+<span>  effect <span class="op">=</span> <span class="va">include</span>,</span>
+<span>  effect_exclude <span class="op">=</span> <span class="va">exclude</span>,</span>
+<span>  latent <span class="op">=</span> <span class="va">include_latent</span></span>
+<span><span class="op">)</span></span></code></pre><p></p></div></dd>
 
 
 <dt id="arg-allow-latent">allow_latent<a class="anchor" aria-label="anchor" href="#arg-allow-latent"></a></dt>

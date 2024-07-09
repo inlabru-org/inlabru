@@ -127,8 +127,8 @@ assumed that all of the LGCP's dimensions have been observed completely.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lgcp</span><span class="op">(</span></span>
 <span>  <span class="va">components</span>,</span>
 <span>  <span class="va">data</span>,</span>
-<span>  samplers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  samplers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ips <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">.</span> <span class="op">~</span> <span class="va">.</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -142,32 +142,36 @@ assumed that all of the LGCP's dimensions have been observed completely.</p>
 
 
 <dl><dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
-<dd><p>A formula describing the latent components</p></dd>
+<dd><p>A <code>formula</code>-like specification of latent components.
+Also used to define a default linear additive predictor.  See
+<code><a href="component.html">component()</a></code> for details.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>A data frame or <code>SpatialPoints(DataFrame)</code> object</p></dd>
+<dd><p>Likelihood-specific data, as a <code>data.frame</code> or
+<code>SpatialPoints[DataFrame]</code>
+object.</p></dd>
 
 
-<dt id="arg-samplers">samplers<a class="anchor" aria-label="anchor" href="#arg-samplers"></a></dt>
-<dd><p>A data frame or <code>Spatial[Points/Lines/Polygons]DataFrame</code>
-objects</p></dd>
+<dt id="arg-domain-samplers-ips">domain, samplers, ips<a class="anchor" aria-label="anchor" href="#arg-domain-samplers-ips"></a></dt>
+<dd><p>Arguments used for <code>family="cp"</code>.</p><dl><dt><code>domain</code></dt>
+<dd><p>Named list of domain definitions.</p></dd>
+
+<dt><code>samplers</code></dt>
+<dd><p>Integration subdomain for 'cp' family.</p></dd>
+
+<dt><code>ips</code></dt>
+<dd><p>Integration points for 'cp' family. Defaults
+to <code>fmesher::fm_int(domain, samplers)</code>. If explicitly given, overrides <code>domain</code>
+and <code>samplers</code>.</p></dd>
 
 
-<dt id="arg-domain">domain<a class="anchor" aria-label="anchor" href="#arg-domain"></a></dt>
-<dd><p>Named list of domain definitions</p></dd>
-
-
-<dt id="arg-ips">ips<a class="anchor" aria-label="anchor" href="#arg-ips"></a></dt>
-<dd><p>Integration points (overrides <code>samplers</code>)</p></dd>
+</dl></dd>
 
 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
-<dd><p>If NULL, the linear combination implied by the <code>components</code> is
-used as a predictor for the point location intensity. If a (possibly
-non-linear) expression is provided the respective Taylor approximation is
-used as a predictor. Multiple runs of INLA are then required for a better
-approximation of the posterior.</p></dd>
+<dd><p>a <code>formula</code> where the right hand side is a general R
+expression defines the predictor used in the model.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -177,12 +181,13 @@ factor.</p></dd>
 
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
-<dd><p>See <code><a href="bru_options.html">bru_options_set()</a></code></p></dd>
+<dd><p>A <a href="bru_options.html">bru_options</a> options object or a list of options passed
+on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
 
 
 <dt id="arg--envir">.envir<a class="anchor" aria-label="anchor" href="#arg--envir"></a></dt>
-<dd><p>The evaluation environment to use for special arguments
-(<code>E</code>, <code>Ntrials</code>, <code>weights</code>, <code>scale</code>) if not found in response_data or data.
+<dd><p>The evaluation environment to use for special arguments (<code>E</code>,
+<code>Ntrials</code>, <code>weights</code>, and <code>scale</code>) if not found in <code>response_data</code> or <code>data</code>.
 Defaults to the calling environment.</p></dd>
 
 </dl></div>
