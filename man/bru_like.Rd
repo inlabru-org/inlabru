@@ -22,9 +22,9 @@ like(
   Ntrials = NULL,
   weights = NULL,
   scale = NULL,
+  domain = NULL,
   samplers = NULL,
   ips = NULL,
-  domain = NULL,
   include = NULL,
   exclude = NULL,
   include_latent = NULL,
@@ -90,11 +90,14 @@ interpreted with great care.}
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}
 
-\item{samplers}{Integration domain for 'cp' family.}
-
-\item{ips}{Integration points for 'cp' family. Overrides \code{samplers}.}
-
-\item{domain}{Named list of domain definitions.}
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\describe{
+\item{\code{domain}}{Named list of domain definitions.}
+\item{\code{samplers}}{Integration subdomain for 'cp' family.}
+\item{\code{ips}}{Integration points for 'cp' family. Defaults
+to \code{fmesher::fm_int(domain, samplers)}. If explicitly given, overrides \code{domain}
+and \code{samplers}.}
+}}
 
 \item{include, exclude, include_latent}{Arguments controlling what components and effects are available for use
 in the predictor expression.

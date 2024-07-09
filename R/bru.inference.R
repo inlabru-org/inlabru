@@ -1243,9 +1243,14 @@ extended_bind_rows <- function(...) {
 #' interpreted with great care.
 #' @param scale Fixed (optional) scale parameters of the precision for several
 #'  models, such as Gaussian and student-t response models.
-#' @param samplers Integration domain for 'cp' family.
-#' @param ips Integration points for 'cp' family. Overrides `samplers`.
-#' @param domain Named list of domain definitions.
+#' @param domain,samplers,ips Arguments used for `family="cp"`.
+#' \describe{
+#' \item{`domain`}{Named list of domain definitions.}
+#' \item{`samplers`}{Integration subdomain for 'cp' family.}
+#' \item{`ips`}{Integration points for 'cp' family. Defaults
+#'   to `fmesher::fm_int(domain, samplers)`. If explicitly given, overrides `domain`
+#'   and `samplers`.}
+#' }
 #' @param include,exclude,include_latent
 #'   Arguments controlling what components and effects are available for use
 #'   in the predictor expression.
@@ -1306,7 +1311,9 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  Ntrials = NULL,
                  weights = NULL,
                  scale = NULL,
-                 samplers = NULL, ips = NULL, domain = NULL,
+                 domain = NULL,
+                 samplers = NULL,
+                 ips = NULL,
                  include = NULL,
                  exclude = NULL,
                  include_latent = NULL,
@@ -1992,24 +1999,11 @@ bru_like_expr <- function(lhood, components) {
 #'
 #' @aliases lgcp
 #' @export
-#' @param components A formula describing the latent components
-#' @param data A data frame or `SpatialPoints(DataFrame)` object
-#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame`
-#'   objects
-#' @param domain Named list of domain definitions
-#' @param ips Integration points (overrides `samplers`)
-#' @param formula If NULL, the linear combination implied by the `components` is
-#'   used as a predictor for the point location intensity. If a (possibly
-#'   non-linear) expression is provided the respective Taylor approximation is
-#'   used as a predictor. Multiple runs of INLA are then required for a better
-#'   approximation of the posterior.
+#' @inheritParams like
+#' @inheritParams bru
 #' @param \dots Further arguments passed on to [like()]. In particular,
 #' optional `E`, a single numeric used rescale all integration weights by a fixed
 #'   factor.
-#' @param options See [bru_options_set()]
-#' @param .envir The evaluation environment to use for special arguments
-#' (`E`, `Ntrials`, `weights`, `scale`) if not found in response_data or data.
-#' Defaults to the calling environment.
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
@@ -2060,8 +2054,8 @@ bru_like_expr <- function(lhood, components) {
 #'
 lgcp <- function(components,
                  data,
-                 samplers = NULL,
                  domain = NULL,
+                 samplers = NULL,
                  ips = NULL,
                  formula = . ~ .,
                  ...,
@@ -2074,8 +2068,8 @@ lgcp <- function(components,
   }
   lik <- like(
     family = "cp",
-    formula = formula, data = data, samplers = samplers,
-    ips = ips, domain = domain,
+    formula = formula, data = data,
+    domain = domain, samplers = samplers, ips = ips,
     ...,
     options = options,
     .envir = .envir
