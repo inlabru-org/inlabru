@@ -43,7 +43,9 @@
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_info.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mexpand.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_inla.stack.mjoin.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_like.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_like_methods.html</loc></url>
+<url><loc>https://inlabru-org.github.io/inlabru/reference/bru_like_print.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_bookmark.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/bru_log_message.html</loc></url>
@@ -133,7 +135,6 @@
 <url><loc>https://inlabru-org.github.io/inlabru/reference/inlabru-package.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/input_eval.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/lgcp.html</loc></url>
-<url><loc>https://inlabru-org.github.io/inlabru/reference/like.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/local_testthat.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/materncov.bands.html</loc></url>
 <url><loc>https://inlabru-org.github.io/inlabru/reference/mexdolphin.html</loc></url>

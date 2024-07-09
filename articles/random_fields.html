@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Finn
 Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-07-08</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-07-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/random_fields.Rmd" class="external-link"><code>vignettes/articles/random_fields.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields.Rmd</code></div>
@@ -252,7 +252,7 @@ the output to the left of the <code>~</code> in the component
 specification, and “.” on the right hand side, which will cause it to
 add all components (unless a subset is selected via the
 <code>include</code>/<code>exclude</code> arguments to
-<code><a href="../reference/like.html">like()</a></code>).</p>
+<code><a href="../reference/bru_like.html">like()</a></code>).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">the_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span><span class="va">mesh1D</span>,</span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span>,</span>
@@ -263,7 +263,7 @@ add all components (unless a subset is selected via the
 <span></span>
 <span><span class="va">fit2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
 <span>  <span class="va">comp</span>,</span>
-<span>  <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">.</span>,</span>
+<span>  <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">.</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">cd</span>,</span>
 <span>    family <span class="op">=</span> <span class="st">"poisson"</span>,</span>
 <span>    E <span class="op">=</span> <span class="va">exposure</span></span>
@@ -281,8 +281,9 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt;     Data class: 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'integer'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
+<span><span class="co">#&gt;     Used components: effects[field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.536, Running = 0.211, Post = 0.115, Total = 0.863 </span></span>
+<span><span class="co">#&gt;     Pre = 0.715, Running = 0.211, Post = 0.118, Total = 1.04 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span></span>
 <span><span class="co">#&gt; Intercept 0.978 0.702     -0.008    0.857      3.166 0.812 0.004</span></span>
@@ -293,7 +294,7 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span></span>
-<span><span class="co">#&gt; Range for field 35.194 25.649      8.854   28.298    103.365 19.028</span></span>
+<span><span class="co">#&gt; Range for field 35.194 25.649      8.854   28.298    103.364 19.028</span></span>
 <span><span class="co">#&gt; Stdev for field  0.519  0.163      0.271    0.496      0.905  0.452</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.06</span></span>

@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Andy
 Seaton</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-07-08</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-07-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/component.Rmd" class="external-link"><code>vignettes/component.Rmd</code></a></small>
       <div class="d-none name"><code>component.Rmd</code></div>
@@ -273,7 +273,7 @@ data. This avoids the need to pre-process everything into a single
 <code>data.frame</code>.</p>
 <p>The functionality of allowing general <code>R</code> expressions can
 be used to extend the types of data that can be passed to the
-<code><a href="../reference/bru.html">bru()</a></code>, <code><a href="../reference/like.html">like()</a></code> and <code><a href="../reference/lgcp.html">lgcp()</a></code>
+<code><a href="../reference/bru.html">bru()</a></code>, <code><a href="../reference/bru_like.html">like()</a></code> and <code><a href="../reference/lgcp.html">lgcp()</a></code>
 functions. It is the basis for the support of spatial data structures
 such as <code>sp</code> objects, and there is also experimental support
 to allow users to pass data as a list. <code>inlabru</code> is thus
@@ -343,7 +343,7 @@ is the name of an <code>sf</code>, <code>SpatRaster</code>, or
 <code>Spatial*</code> object stored in the global <code>R</code>
 environment, then <code>inlabru</code> attempts to do something
 intelligent by extracting the covariate information at the locations of
-the data passed to <code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/like.html">like()</a></code>. This
+the data passed to <code><a href="../reference/bru.html">bru()</a></code> or <code><a href="../reference/bru_like.html">like()</a></code>. This
 <strong>requires that this data is a <code>sf</code> or
 <code>SpatialPoints*</code> object</strong>. <code>inlabru</code> does
 this by calling the <code><a href="../reference/eval_spatial.html">inlabru::eval_spatial()</a></code> method, which

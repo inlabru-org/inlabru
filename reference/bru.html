@@ -113,7 +113,7 @@ projection matrices for (spatial) SPDE models. This feature is
 accessible via the <code>components</code> parameter. Practical examples on how to
 use spatial data by means of the components parameter can also be found
 by looking at the <a href="lgcp.html">lgcp</a> function's documentation.</p></li>
-<li><p>Constructing multiple likelihoods is straight forward. See <a href="like.html">like</a> for
+<li><p>Constructing multiple likelihoods is straight forward. See <a href="bru_like.html">like</a> for
 more information on how to provide additional likelihoods to <code>bru</code>
 using the <code>...</code> parameter list.</p></li>
 <li><p>Support for non-linear predictors. See example below.</p></li>
@@ -126,7 +126,10 @@ available by using the <code>cp</code> family or (even easier) by using the
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru</span><span class="op">(</span>components <span class="op">=</span> <span class="op">~</span><span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="va">...</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, .envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_rerun</span><span class="op">(</span><span class="va">result</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_rerun</span><span class="op">(</span><span class="va">result</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'bru'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -140,13 +143,13 @@ Also used to define a default linear additive predictor.  See
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Likelihoods, each constructed by a calling <code><a href="like.html">like()</a></code>, or named
-parameters that can be passed to a single <code><a href="like.html">like()</a></code> call. Note that
-all the arguments will be evaluated before calling <code><a href="like.html">like()</a></code> in order
+<dd><p>Likelihoods, each constructed by a calling <code><a href="bru_like.html">like()</a></code>, or named
+parameters that can be passed to a single <code><a href="bru_like.html">like()</a></code> call. Note that
+all the arguments will be evaluated before calling <code><a href="bru_like.html">like()</a></code> in order
 to detect if they are <code>like</code> objects. This means that
 special arguments that need to be evaluated in the context of
 <code>response_data</code> or <code>data</code> (such as Ntrials) may will only work that
-way in direct calls to <code><a href="like.html">like()</a></code>.</p></dd>
+way in direct calls to <code><a href="bru_like.html">like()</a></code>.</p></dd>
 
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
@@ -162,6 +165,10 @@ specification is used)</p></dd>
 <dt id="arg-result">result<a class="anchor" aria-label="anchor" href="#arg-result"></a></dt>
 <dd><p>A previous estimation object of class <code>bru</code></p></dd>
 
+
+<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>A <code>bru</code> object to be printed</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -170,9 +177,16 @@ from <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link
 adds additional information stored in the <code>bru_info</code> field.</p>
     </div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
-<ul><li><p><code>bru_rerun</code> Continue the optimisation from a previously computed estimate.</p></li>
+<ul><li><p><code>print(bru)</code>: Print a summary of a <code>bru</code> object.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+
+<ul><li><p><code>bru_rerun()</code>: Continue the optimisation from a previously computed estimate.
+The estimation <code>options</code> list can be given new values to override the original
+settings.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -206,7 +220,7 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Alternatively, we can use the like() function to construct the likelihood:</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="like.html">like</a></span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span>, data <span class="op">=</span> <span class="va">input.df</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span>, data <span class="op">=</span> <span class="va">input.df</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">bru</span><span class="op">(</span><span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="va">lik</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
@@ -226,7 +240,7 @@ adds additional information stored in the <code>bru_info</code> field.</p>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>multicore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="like.html">like</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
 <span class="r-in"><span>    formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>

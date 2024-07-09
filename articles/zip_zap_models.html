@@ -215,7 +215,7 @@ vegetation type and elevation.</p>
 <span></span>
 <span><span class="va">fit_poi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
 <span>  <span class="va">comps</span>,</span>
-<span>  <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span></span>
 <span>    family <span class="op">=</span> <span class="st">"poisson"</span>, data <span class="op">=</span> <span class="va">counts_df</span>,</span>
 <span>    formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span></span>
 <span>      <span class="va">veg_disturbed</span> <span class="op">+</span> <span class="va">veg_grassland</span> <span class="op">+</span></span>
@@ -237,11 +237,12 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
+<span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.346, Running = 2.66, Post = 0.526, Total = 3.53 </span></span>
+<span><span class="co">#&gt;     Pre = 0.352, Running = 2.77, Post = 0.573, Total = 3.7 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
 <span><span class="co">#&gt; Intercept     -6.173 3.464    -13.001   -6.167      0.637 -6.157   0</span></span>
@@ -331,7 +332,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span></span>
 <span>  <span class="va">comps</span>,</span>
-<span>  <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span></span>
 <span>    family <span class="op">=</span> <span class="st">"zeroinflatedpoisson1"</span>, data <span class="op">=</span> <span class="va">counts_df</span>,</span>
 <span>    formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span></span>
 <span>      <span class="va">veg_disturbed</span> <span class="op">+</span> <span class="va">veg_grassland</span> <span class="op">+</span></span>
@@ -354,8 +355,9 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
+<span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.349, Running = 1.59, Post = 0.124, Total = 2.06 </span></span>
+<span><span class="co">#&gt;     Pre = 0.366, Running = 1.64, Post = 0.128, Total = 2.14 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -499,7 +501,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span></span>
 <span><span class="va">truncated_poisson_like</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">package_version</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"23.10.19-1"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span></span>
 <span>      family <span class="op">=</span> <span class="st">"zeroinflatedpoisson0"</span>,</span>
 <span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
 <span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
@@ -509,7 +511,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span>      <span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span></span>
 <span>      family <span class="op">=</span> <span class="st">"nzpoisson"</span>,</span>
 <span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
 <span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
@@ -517,7 +519,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
-<span><span class="va">present_like</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span></span>
+<span><span class="va">present_like</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span></span>
 <span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">counts_df</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">present</span> <span class="op">~</span> <span class="co"># vegetation +</span></span>
@@ -538,21 +540,21 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.494e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.638e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 1.413e-15</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.662e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -1.834e-15</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.812e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04561, norm1 = 7.217e-12, norm01 = 0.04561)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04561</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.879e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.217e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04545, norm1 = 6.969e-12, norm01 = 0.04545)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04545</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.823e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 6.969e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
-<span><span class="co">#&gt; iinla: Max deviation from previous: 0.724% of SD, and line search is inactive</span></span>
+<span><span class="co">#&gt; iinla: Max deviation from previous: 0.717% of SD, and line search is inactive</span></span>
 <span><span class="co">#&gt;        [stop if: &lt;10% and line search inactive]</span></span>
 <span><span class="co">#&gt; iinla: Convergence criterion met.</span></span>
 <span><span class="co">#&gt;        Running final INLA integration step with known theta mode.</span></span>
@@ -577,17 +579,19 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt;     Predictor: </span></span>
 <span><span class="co">#&gt;         present ~ veg_disturbed + veg_grassland + elevation_present + </span></span>
 <span><span class="co">#&gt;             field_present + Intercept_present</span></span>
+<span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, field_present, Intercept_present, elevation_present], latent[]</span></span>
 <span><span class="co">#&gt;   Family: 'nzpoisson'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
+<span><span class="co">#&gt;     Used components: effects[Intercept_count, elevation, field_count], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.538, Running = 3.87, Post = 0.245, Total = 4.65 </span></span>
+<span><span class="co">#&gt;     Pre = 0.517, Running = 3.93, Post = 0.272, Total = 4.72 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
 <span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.460   -1.442     -0.431  -1.442   0</span></span>
-<span><span class="co">#&gt; Intercept_present -10.561 4.192    -19.045  -10.484     -2.498 -10.480   0</span></span>
+<span><span class="co">#&gt; Intercept_present -10.561 4.192    -19.044  -10.484     -2.498 -10.480   0</span></span>
 <span><span class="co">#&gt; elevation_present   0.004 0.002     -0.001    0.004      0.008   0.004   0</span></span>
 <span><span class="co">#&gt; Intercept_count     2.328 1.441     -0.721    2.371      5.114   2.364   0</span></span>
 <span><span class="co">#&gt; elevation           0.001 0.001      0.000    0.001      0.003   0.001   0</span></span>
@@ -864,24 +868,24 @@ respectively. The (negated) Log score is a strictly proper score <span class="ci
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2422391</td>
-<td align="right">0.5606600</td>
-<td align="right">-2.556911</td>
-<td align="right">0.3927696</td>
+<td align="right">0.2424674</td>
+<td align="right">0.5615371</td>
+<td align="right">-2.608154</td>
+<td align="right">0.3926706</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2545535</td>
-<td align="right">0.6001540</td>
-<td align="right">-2.667262</td>
-<td align="right">0.4025019</td>
+<td align="right">0.2542782</td>
+<td align="right">0.6005921</td>
+<td align="right">-2.674451</td>
+<td align="right">0.4023019</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2799037</td>
-<td align="right">0.6538698</td>
-<td align="right">-2.294989</td>
-<td align="right">0.3999967</td>
+<td align="right">0.2800890</td>
+<td align="right">0.6538824</td>
+<td align="right">-2.307012</td>
+<td align="right">0.4000896</td>
 </tr>
 </tbody>
 </table>

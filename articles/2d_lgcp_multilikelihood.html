@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-07-08</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-07-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -165,7 +165,7 @@ smoothers, one for each nest group.</p>
 <span>    <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>Given these components we define the linear predictor for each of the
 likelihoods. (Using “.” indicates a pure additive model, and one can use
-include/exclude options for <code><a href="../reference/like.html">like()</a></code> to indicate which
+include/exclude options for <code><a href="../reference/bru_like.html">like()</a></code> to indicate which
 components are actively involved in each model.)</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fml.major</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="va">Difference</span> <span class="op">/</span> <span class="fl">2</span></span>
@@ -173,13 +173,13 @@ components are actively involved in each model.)</p>
 <p>Setting up the Cox process likelihoods is easy in this example. Both
 nest types were observed within the same window:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lik_minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<code class="sourceCode R"><span><span class="va">lik_minor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">fml.major</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"major"</span>, <span class="op">]</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span>,</span>
 <span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">lik_major</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<span><span class="va">lik_major</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">fml.minor</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">[</span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"minor"</span>, <span class="op">]</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span>,</span>
@@ -247,15 +247,17 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common - Difference/2</span></span>
+<span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt;   Family: 'cp'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common + Difference/2</span></span>
+<span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.649, Running = 21.5, Post = 0.153, Total = 22.3 </span></span>
+<span><span class="co">#&gt;     Pre = 0.67, Running = 19.4, Post = 0.166, Total = 20.2 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.344 1.327     -2.944   -0.344      2.256 -0.344   0</span></span>
+<span><span class="co">#&gt; Intercept -0.369 1.382     -3.077   -0.369       2.34 -0.369   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -264,19 +266,19 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.938 0.576      2.024    2.865      4.279 2.694</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.048 0.331      1.503    2.013      2.802 1.926</span></span>
-<span><span class="co">#&gt; Range for Difference 1.904 2.696      0.124    1.091      8.693 0.328</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.156 0.097      0.033    0.134      0.398 0.089</span></span>
+<span><span class="co">#&gt; Range for Common     2.927 0.572      1.986    2.865      4.227 2.735</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.052 0.333      1.483    2.023      2.791 1.960</span></span>
+<span><span class="co">#&gt; Range for Difference 2.195 3.152      0.134    1.243     10.116 0.353</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.159 0.093      0.036    0.139      0.389 0.097</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 592.35</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 590.70</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -772.39</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 593.05</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 591.40</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -771.77</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.79</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 105.86</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.97</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.94</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.02 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.01 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -293,15 +295,17 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common - Difference/2</span></span>
+<span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt;   Family: 'cp'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
 <span><span class="co">#&gt;     Response class: 'numeric'</span></span>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common + Difference/2</span></span>
+<span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.506, Running = 8.76, Post = 0.141, Total = 9.41 </span></span>
+<span><span class="co">#&gt;     Pre = 0.519, Running = 8.67, Post = 0.127, Total = 9.31 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.355 1.367     -3.035   -0.355      2.325 -0.355   0</span></span>
+<span><span class="co">#&gt; Intercept -0.353 1.364     -3.027   -0.353      2.322 -0.353   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -310,19 +314,19 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.935 0.573      1.999    2.871      4.244 2.733</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.047 0.332      1.486    2.015      2.791 1.945</span></span>
-<span><span class="co">#&gt; Range for Difference 1.987 2.678      0.144    1.178      8.804 0.383</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.158 0.092      0.036    0.139      0.382 0.097</span></span>
+<span><span class="co">#&gt; Range for Common     2.936 0.573      2.002    2.872      4.247 2.732</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.046 0.332      1.487    2.014      2.791 1.943</span></span>
+<span><span class="co">#&gt; Range for Difference 2.055 2.799      0.143    1.208      9.169 0.380</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.159 0.092      0.036    0.139      0.386 0.097</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.59</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 589.95</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -772.88</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.97</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 589.32</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.33</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.11</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 105.53</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1629.53</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.21</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.08 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.06 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -340,7 +344,7 @@ the predictor expression:</p>
 <code class="sourceCode R"><span><span class="va">fml.joint</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">+</span> <span class="va">group_major</span> <span class="op">~</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">Common</span> <span class="op">+</span> <span class="op">(</span><span class="va">group_major</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="va">Difference</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group_major</span> <span class="op">&lt;-</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"major"</span></span>
-<span><span class="va">lik_joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
+<span><span class="va">lik_joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_like.html">like</a></span><span class="op">(</span><span class="st">"cp"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="va">fml.joint</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span>,</span>
