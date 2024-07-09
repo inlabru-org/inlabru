@@ -1246,28 +1246,42 @@ extended_bind_rows <- function(...) {
 #' @param samplers Integration domain for 'cp' family.
 #' @param ips Integration points for 'cp' family. Overrides `samplers`.
 #' @param domain Named list of domain definitions.
-#' @param include Character vector of component labels that are used as effects
-#'   by the
-#'   predictor expression; Default: the result of `[all.vars()]` on the
-#'   predictor expression, unless the expression is not ".", in which case
-#'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The [bru_used()] methods are used
-#'   to extract the variable names, followed by removal of non-component names
-#'   when the components are available.
-#' @param exclude Character vector of component labels that are not used by the
-#'   predictor expression. The exclusion list is applied to the list
-#'   as determined by the `include` parameter; Default: NULL (do not remove
-#'   any components from the inclusion list)
-#' @param include_latent character vector.
-#' Specifies which the latent state variables are
-#' directly available to the predictor expression, with a `_latent` suffix.
-#' This also makes evaluator functions with suffix `_eval` available, taking
-#' parameters `main`, `group`, and `replicate`, taking values for where to
-#' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]). Default `NULL`
-#' auto-detects use of `_latent` and `_eval` in the predictor expression.
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include`,
-#'   `exclude`, and `include_latent`.
+#' @param include,exclude,include_latent
+#'   Arguments controlling what components and effects are available for use
+#'   in the predictor expression.
+#' \describe{
+#'   \item{`include`}{
+#'   Character vector of component labels that are used as effects
+#'   by the predictor expression; If `NULL` (default), the [bru_used()] method is used
+#'   to extract the variable names from the formula.
+#'   }
+#'   \item{`exclude`}{
+#'   Character vector of component labels to be excluded from the effect list
+#'   determined by the `include` argument. Default is `NULL`; do not remove
+#'   any components from the inclusion list.
+#'   }
+#'   \item{`include_latent`}{Character vector.
+#'   Specifies which latent state variables are
+#'   directly available to the predictor expression, with a `_latent` suffix.
+#'   This also makes evaluator functions with suffix `_eval` available, taking
+#'   parameters `main`, `group`, and `replicate`, taking values for where to
+#'   evaluate the component effect that are different than those defined in the
+#'   component definition itself (see [component_eval()]). If `NULL`, the [bru_used()]
+#'   method auto-detects use of `_latent` and `_eval` in the predictor expression.
+#'   }
+#' }
+#' @param used Wither `NULL` (default) or a [bru_used()] object, that overrides
+#' the `include`, `exclude`, `include_latent` arguments.
+#' When `used` is `NULL` (default), the information about what effects and latent vectors
+#' are made available to the predictor evaluation is defined by
+#' ```{r, eval=FALSE}
+#' used <- bru_used(
+#'   formula,
+#'   effect = include,
+#'   effect_exclude = exclude,
+#'   latent = include_latent
+#' )
+#' ```
 #' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated.
 #'   Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve

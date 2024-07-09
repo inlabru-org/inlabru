@@ -96,31 +96,42 @@ models, such as Gaussian and student-t response models.}
 
 \item{domain}{Named list of domain definitions.}
 
-\item{include}{Character vector of component labels that are used as effects
-by the
-predictor expression; Default: the result of \verb{[all.vars()]} on the
-predictor expression, unless the expression is not ".", in which case
-\code{include=NULL}, to include all components that are not
-explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
-to extract the variable names, followed by removal of non-component names
-when the components are available.}
-
-\item{exclude}{Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)}
-
-\item{include_latent}{character vector.
-Specifies which the latent state variables are
+\item{include, exclude, include_latent}{Arguments controlling what components and effects are available for use
+in the predictor expression.
+\describe{
+\item{\code{include}}{
+Character vector of component labels that are used as effects
+by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}} method is used
+to extract the variable names from the formula.
+}
+\item{\code{exclude}}{
+Character vector of component labels to be excluded from the effect list
+determined by the \code{include} argument. Default is \code{NULL}; do not remove
+any components from the inclusion list.
+}
+\item{\code{include_latent}}{Character vector.
+Specifies which latent state variables are
 directly available to the predictor expression, with a \verb{_latent} suffix.
 This also makes evaluator functions with suffix \verb{_eval} available, taking
 parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
 evaluate the component effect that are different than those defined in the
-component definition itself (see \code{\link[=component_eval]{component_eval()}}). Default \code{NULL}
-auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.}
+component definition itself (see \code{\link[=component_eval]{component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}}
+method auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
+}
+}}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include},
-\code{exclude}, and \code{include_latent}.}
+\item{used}{Wither \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
+the \code{include}, \code{exclude}, \code{include_latent} arguments.
+When \code{used} is \code{NULL} (default), the information about what effects and latent vectors
+are made available to the predictor evaluation is defined by
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{used <- bru_used(
+  formula,
+  effect = include,
+  effect_exclude = exclude,
+  latent = include_latent
+)
+}\if{html}{\out{</div>}}}
 
 \item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated.
 Use \code{include_latent} instead.}
