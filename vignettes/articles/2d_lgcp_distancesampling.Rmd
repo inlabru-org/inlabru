@@ -67,7 +67,8 @@ ggplot() +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
-  theme(legend.text = element_text(size = 6))
+  theme(legend.text = element_text(size = 6)) +
+  coord_sf(datum = fm_crs(mexdolphin$ppoly))
 ```
 
 Spatial model with a half-normal detection function
@@ -103,7 +104,7 @@ bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
 
 
 Specify and fit an SPDE model to these data using a half-normal detection function form.
-We need to define a (Matérn) covariance function for the SPDE
+We need to define a (Matérn) covariance function for the SPDE:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 matern <- inla.spde2.pcmatern(mexdolphin$mesh,
@@ -111,6 +112,7 @@ matern <- inla.spde2.pcmatern(mexdolphin$mesh,
   prior.range = c(50, 0.01)
 )
 ```
+Here, the range is probabilistically limited by $P(\text{range}\leq 50)=0.01$ and the standard deviation of the spatial field is limited by $P(\text{sd}\leq 2)=0.01$.
 
 We need to now separately define the components of the model 
 (the SPDE, the Intercept and the detection function parameter `sigma`)
