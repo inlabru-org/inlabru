@@ -19,7 +19,7 @@ definition information. Default: \code{FALSE}}
 \item{\dots}{arguments passed on to component summary functions, see
 \code{\link[=summary.component]{summary.component()}}.}
 
-\item{x}{A \code{summary_bru} object}
+\item{x}{An object to be printed}
 }
 \description{
 Takes a fitted \code{bru} object produced by \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} and creates

@@ -7,6 +7,9 @@
 \alias{print.summary_bru_info}
 \alias{print.summary_bru_like}
 \alias{print.summary_bru_like_list}
+\alias{print.bru_info}
+\alias{print.bru_like}
+\alias{print.bru_like_list}
 \alias{bru_info}
 \alias{bru_info.character}
 \alias{bru_info.bru}
@@ -24,6 +27,12 @@
 
 \method{print}{summary_bru_like_list}(x, ...)
 
+\method{print}{bru_info}(x, ...)
+
+\method{print}{bru_like}(x, ...)
+
+\method{print}{bru_like_list}(x, ...)
+
 bru_info(...)
 
 \method{bru_info}{character}(method, ..., inlabru_version = NULL, INLA_version = NULL)
@@ -39,7 +48,7 @@ definition information. Default: \code{TRUE}}
 
 \item{\dots}{Arguments passed on to other \code{summary} methods}
 
-\item{x}{A \code{summary_bru_info} object to be printed}
+\item{x}{An  object to be printed}
 
 \item{method}{character; The type of estimation method used}
 
@@ -52,3 +61,10 @@ automatically detecting the version}
 \description{
 Methods for bru_info objects
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bru_info(bru)}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
+result object. The default print method show information about model components
+and observation models.
+
+}}

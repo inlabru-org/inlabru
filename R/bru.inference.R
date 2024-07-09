@@ -323,7 +323,7 @@ summary.bru_like_list <- function(object, verbose = TRUE, ...) {
 }
 
 #' @export
-#' @param x A `summary_bru_info` object to be printed
+#' @param x An  object to be printed
 #' @rdname bru_info
 print.summary_bru_info <- function(x, ...) {
   cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
@@ -370,6 +370,27 @@ print.summary_bru_like_list <- function(x, ...) {
   for (lh in x) {
     print(lh)
   }
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_info
+print.bru_info <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_info
+print.bru_like <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_info
+print.bru_like_list <- function(x, ...) {
+  print(summary(x))
   invisible(x)
 }
 
@@ -425,7 +446,9 @@ bru_info.character <- function(method,
 }
 
 #' @export
-#' @rdname bru_info
+#' @describeIn bru_info Extract the `bru_info` object from an estimated [bru()]
+#' result object. The default print method show information about model components
+#' and observation models.
 bru_info.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
   object[["bru_info"]]
@@ -1017,11 +1040,12 @@ bru <- function(components = ~ Intercept(1),
 }
 
 
-#' @details
-#' * `bru_rerun` Continue the optimisation from a previously computed estimate.
+#' @describeIn bru
+#' Continue the optimisation from a previously computed estimate.
+#' The estimation `options` list can be given new values to override the original
+#' settings.
 #' @param result A previous estimation object of class `bru`
 #'
-#' @rdname bru
 #' @export
 bru_rerun <- function(result, options = list()) {
   result <- bru_check_object_bru(result)
@@ -4081,11 +4105,20 @@ summary.bru <- function(object, verbose = FALSE, ...) {
 
 
 #' @export
-#' @param x A `summary_bru` object
+#' @param x An object to be printed
 #' @rdname summary.bru
 
 print.summary_bru <- function(x, ...) {
   print(x$bru_info, ...)
   print(x$inla, ...)
+  invisible(x)
+}
+
+#' @export
+#' @param x A `bru` object to be printed
+#' @describeIn bru Print a summary of a `bru` object.
+
+print.bru <- function(x, ...) {
+  print(summary(x, ...), ...)
   invisible(x)
 }

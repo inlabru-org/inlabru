@@ -3,11 +3,14 @@
 \name{bru}
 \alias{bru}
 \alias{bru_rerun}
+\alias{print.bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
 bru(components = ~Intercept(1), ..., options = list(), .envir = parent.frame())
 
 bru_rerun(result, options = list())
+
+\method{print}{bru}(x, ...)
 }
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
@@ -29,6 +32,8 @@ on to \code{\link[=bru_options]{bru_options()}}}
 specification is used)}
 
 \item{result}{A previous estimation object of class \code{bru}}
+
+\item{x}{A \code{bru} object to be printed}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
@@ -58,11 +63,18 @@ available by using the \code{cp} family or (even easier) by using the
 \link{lgcp} function.
 }
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item \code{bru_rerun} Continue the optimisation from a previously computed estimate.
-}
-}
+\item \code{print(bru)}: Print a summary of a \code{bru} object.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate.
+The estimation \code{options} list can be given new values to override the original
+settings.
+
+}}
 \examples{
 \donttest{
 if (bru_safe_inla(quietly = TRUE)) {
