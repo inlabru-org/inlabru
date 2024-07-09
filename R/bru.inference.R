@@ -271,129 +271,9 @@ bru_info_upgrade <- function(object,
 
 
 #' Methods for bru_info objects
-#' @export
-#' @method summary bru_info
-#' @param object Object to operate on
-#' @param verbose logical; If `TRUE`, include more details of the
-#' component definitions. If `FALSE`, only show basic component
-#' definition information. Default: `TRUE`
-#' @param \dots Arguments passed on to other `summary` methods
-#' @rdname bru_info
-summary.bru_info <- function(object, verbose = TRUE, ...) {
-  structure(
-    list(
-      inlabru_version = object[["inlabru_version"]],
-      INLA_version = object[["INLA_version"]],
-      components = summary(object[["model"]], verbose = verbose, ...),
-      lhoods = summary(object[["lhoods"]], verbose = verbose, ...)
-    ),
-    class = "summary_bru_info"
-  )
-}
-
-#' @rdname bru_info
-#' @method summary bru_like
-#' @export
-summary.bru_like <- function(object, verbose = TRUE, ...) {
-  structure(
-    list(
-      family = object[["family"]],
-      data_class = class(object[["data"]]),
-      response_class = class(object[["response_data"]][[object[["response"]]]]),
-      predictor = deparse(object[["formula"]]),
-      used = object[["used"]]
-    ),
-    class = "summary_bru_like"
-  )
-}
-
-#' @rdname bru_info
-#' @method summary bru_like_list
-#' @export
-summary.bru_like_list <- function(object, verbose = TRUE, ...) {
-  structure(
-    lapply(
-      object,
-      function(x) {
-        summary(x, verbose = verbose, ...)
-      }
-    ),
-    class = "summary_bru_like_list"
-  )
-}
-
-#' @export
-#' @param x An  object to be printed
-#' @rdname bru_info
-print.summary_bru_info <- function(x, ...) {
-  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
-  cat(paste0("INLA version: ", x$INLA_version, "\n"))
-  cat(paste0("Components:\n"))
-  print(x$components)
-  cat(paste0("Likelihoods:\n"))
-  print(x$lhoods)
-  invisible(x)
-}
-
-#' @rdname bru_info
-#' @export
-print.summary_bru_like <- function(x, ...) {
-  lh <- x
-  cat(sprintf(
-    paste0("  Family: '%s'\n",
-           "    Data class: %s\n",
-           "    Response class: %s\n",
-           "    Predictor: %s\n",
-           "    Used components: %s\n"),
-    lh$family,
-    paste0("'", lh$data_class, "'", collapse = ", "),
-    paste0("'", lh$response_class, "'", collapse = ", "),
-    if (length(lh$predictor) > 1) {
-      paste0(
-        "\n        ",
-        paste0(
-          lh$predictor,
-          collapse = "\n        "
-        )
-      )
-    } else {
-      lh$predictor
-    },
-    format(lh$used)
-  ))
-  invisible(x)
-}
-
-#' @rdname bru_info
-#' @export
-print.summary_bru_like_list <- function(x, ...) {
-  for (lh in x) {
-    print(lh)
-  }
-  invisible(x)
-}
-
-#' @export
-#' @rdname bru_info
-print.bru_info <- function(x, ...) {
-  print(summary(x))
-  invisible(x)
-}
-
-#' @export
-#' @rdname bru_info
-print.bru_like <- function(x, ...) {
-  print(summary(x))
-  invisible(x)
-}
-
-#' @export
-#' @rdname bru_info
-print.bru_like_list <- function(x, ...) {
-  print(summary(x))
-  invisible(x)
-}
-
+#'
+#' The `bru_info` class is used to store metadata about `bru` models.
+#'
 #' @export
 #' @rdname bru_info
 bru_info <- function(...) {
@@ -402,11 +282,13 @@ bru_info <- function(...) {
 
 #' @export
 #' @param method character; The type of estimation method used
+#' @param \dots Additional arguments to be stored in the `bru_info` object. For
+#' `summary` and `print` methods, arguments passed on to submethods.
 #' @param inlabru_version character; inlabru package version. Default: NULL, for
 #' automatically detecting the version
 #' @param INLA_version character; INLA package version. Default: NULL, for
 #' automatically detecting the version
-#' @rdname bru_info
+#' @describeIn bru_info Create a `bru_info` object
 bru_info.character <- function(method,
                                ...,
                                inlabru_version = NULL,
@@ -453,6 +335,49 @@ bru_info.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
   object[["bru_info"]]
 }
+
+
+#' @export
+#' @method summary bru_info
+#' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
+#' @param \dots Arguments passed on to other `summary` methods
+#' @rdname bru_info
+summary.bru_info <- function(object, verbose = TRUE, ...) {
+  structure(
+    list(
+      inlabru_version = object[["inlabru_version"]],
+      INLA_version = object[["INLA_version"]],
+      components = summary(object[["model"]], verbose = verbose, ...),
+      lhoods = summary(object[["lhoods"]], verbose = verbose, ...)
+    ),
+    class = "summary_bru_info"
+  )
+}
+
+#' @export
+#' @param x An  object to be printed
+#' @rdname bru_info
+print.summary_bru_info <- function(x, ...) {
+  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
+  cat(paste0("INLA version: ", x$INLA_version, "\n"))
+  cat(paste0("Components:\n"))
+  print(x$components)
+  cat(paste0("Likelihoods:\n"))
+  print(x$lhoods)
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_info
+print.bru_info <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+
 
 
 #' @title Extract timing information from fitted [bru] object
@@ -1279,7 +1204,8 @@ extended_bind_rows <- function(...) {
 
 #' Observation model construction for usage with [bru()]
 #'
-#' @aliases like
+#' @rdname bru_like
+#' @aliases bru_like bru_like_list like_list
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -1728,13 +1654,13 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 }
 
 # Placeholder for future modularised version of like()
-## @describeIn like
+## @describeIn bru_like
 ## Alias for `like()`, with `obs` standing for "observation model"
 ## @export
 # bru_obs <- like
 
 
-#' @describeIn like
+#' @describeIn bru_like
 #' Combine `bru_like` likelihoods into a `bru_like_list` object
 #' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
 #' @export
@@ -1742,7 +1668,7 @@ like_list <- function(...) {
   UseMethod("like_list")
 }
 
-#' @describeIn like
+#' @describeIn bru_like
 #' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @param object A list of `bru_like` objects
@@ -1767,7 +1693,7 @@ like_list.list <- function(object, envir = NULL, ...) {
   object
 }
 
-#' @describeIn like
+#' @describeIn bru_like
 #' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
@@ -1775,7 +1701,7 @@ like_list.bru_like <- function(..., envir = NULL) {
   do.call(c, list(..., envir = envir))
 }
 
-#' @describeIn like
+#' @describeIn bru_like
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1793,7 +1719,7 @@ c.bru_like <- function(..., envir = NULL) {
   like_list(lst, envir = envir)
 }
 
-#' @describeIn like
+#' @describeIn bru_like
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1826,7 +1752,8 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' @export
 #' @param x `bru_like_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
-#' @rdname like
+#' @rdname bru_like
+#' @seealso [summary.bru_like()]
 `[.bru_like_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()
@@ -1836,12 +1763,111 @@ c.bru_like_list <- function(..., envir = NULL) {
 }
 
 
+#' Summary and print methods for observation models
+#'
+#' @rdname bru_like_print
+#' @seealso [like()]
+#' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
+#' @param \dots Arguments passed on to other `summary` methods
+#' @param x Object to be printed
+#' @method summary bru_like
+#' @export
+#' @examples
+#' obs <- like(y ~ ., data = data.frame(y = rnorm(10)))
+#' summary(obs)
+#' print(obs)
+#'
+summary.bru_like <- function(object, verbose = TRUE, ...) {
+  structure(
+    list(
+      family = object[["family"]],
+      data_class = class(object[["data"]]),
+      response_class = class(object[["response_data"]][[object[["response"]]]]),
+      predictor = deparse(object[["formula"]]),
+      used = object[["used"]]
+    ),
+    class = "summary_bru_like"
+  )
+}
+
+#' @rdname bru_like_print
+#' @method summary bru_like_list
+#' @export
+summary.bru_like_list <- function(object, verbose = TRUE, ...) {
+  structure(
+    lapply(
+      object,
+      function(x) {
+        summary(x, verbose = verbose, ...)
+      }
+    ),
+    class = "summary_bru_like_list"
+  )
+}
+
+#' @rdname bru_like_print
+#' @export
+print.summary_bru_like <- function(x, ...) {
+  lh <- x
+  cat(sprintf(
+    paste0("  Family: '%s'\n",
+           "    Data class: %s\n",
+           "    Response class: %s\n",
+           "    Predictor: %s\n",
+           "    Used components: %s\n"),
+    lh$family,
+    paste0("'", lh$data_class, "'", collapse = ", "),
+    paste0("'", lh$response_class, "'", collapse = ", "),
+    if (length(lh$predictor) > 1) {
+      paste0(
+        "\n        ",
+        paste0(
+          lh$predictor,
+          collapse = "\n        "
+        )
+      )
+    } else {
+      lh$predictor
+    },
+    format(lh$used)
+  ))
+  invisible(x)
+}
+
+#' @rdname bru_like_print
+#' @export
+print.summary_bru_like_list <- function(x, ...) {
+  for (lh in x) {
+    print(lh)
+  }
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_like_print
+print.bru_like <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_like_print
+print.bru_like_list <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+
 #' Utility functions for bru likelihood objects
 #' @param x Object of `bru_like` or `bru_like_list` type
 #' @export
 #' @keywords internal
 #' @returns * `bru_like_inla_family()` returns a string or vector of strings
 #' @rdname bru_like_methods
+#' @seealso [summary.bru_like()]
 bru_like_inla_family <- function(x, ...) {
   UseMethod("bru_like_inla_family")
 }

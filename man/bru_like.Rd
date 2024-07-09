@@ -2,6 +2,8 @@
 % Please edit documentation in R/bru.inference.R
 \name{like}
 \alias{like}
+\alias{bru_like}
+\alias{bru_like_list}
 \alias{like_list}
 \alias{like_list.list}
 \alias{like_list.bru_like}
@@ -153,18 +155,21 @@ A likelihood configuration which can be used to parameterise \code{\link[=bru]{b
 \description{
 Observation model construction for usage with \code{\link[=bru]{bru()}}
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{like_list(bru_like)}: Combine several \code{bru_like} likelihoods
+into a \code{bru_like_list} object
+
+\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
+objects into a \code{bru_like_list} object
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
 
 \item \code{like_list(list)}: Combine a list of \code{bru_like} likelihoods
 into a \code{bru_like_list} object
-
-\item \code{like_list(bru_like)}: Combine several \code{bru_like} likelihoods
-into a \code{bru_like_list} object
-
-\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
-objects into a \code{bru_like_list} object
 
 \item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
 objects into a \code{bru_like_list} object
@@ -234,6 +239,9 @@ if (bru_safe_inla() &&
   multiplot(p1, p2, pj)
 }
 }
+}
+\seealso{
+\code{\link[=summary.bru_like]{summary.bru_like()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

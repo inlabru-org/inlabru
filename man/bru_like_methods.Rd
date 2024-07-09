@@ -39,4 +39,7 @@ or a list of such lists, with one element per observation model
 \description{
 Utility functions for bru likelihood objects
 }
+\seealso{
+\code{\link[=summary.bru_like]{summary.bru_like()}}
+}
 \keyword{internal}
