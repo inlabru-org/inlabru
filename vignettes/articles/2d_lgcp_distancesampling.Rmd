@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
   dev = "png",
   dev.args = list(type = "cairo-png"),
   fig.width = 7,
-  fig.height = 5
+  fig.height = 5,
+  cache = TRUE
 )
 ```
 
