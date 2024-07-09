@@ -1813,11 +1813,13 @@ summary.bru_like_list <- function(object, verbose = TRUE, ...) {
 print.summary_bru_like <- function(x, ...) {
   lh <- x
   cat(sprintf(
-    paste0("  Family: '%s'\n",
-           "    Data class: %s\n",
-           "    Response class: %s\n",
-           "    Predictor: %s\n",
-           "    Used components: %s\n"),
+    paste0(
+      "  Family: '%s'\n",
+      "    Data class: %s\n",
+      "    Response class: %s\n",
+      "    Predictor: %s\n",
+      "    Used components: %s\n"
+    ),
     lh$family,
     paste0("'", lh$data_class, "'", collapse = ", "),
     paste0("'", lh$response_class, "'", collapse = ", "),
