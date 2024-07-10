@@ -292,12 +292,15 @@ fit1 <- lgcp(
 )
 ```
 Plots:
-```{r, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+```{r spde.range.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
+```
+```{r spde.logvar.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
 plot(spde.logvar)
-
+```
+```{r lambda.field.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -307,15 +310,18 @@ ggplot() +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
   theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6))
-
+```
+```{r detection.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, sigma))
 plot(dfun1)
-
+```
+```{r lambda.total, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
-
+```
+```{r count.pmf, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Ns <- seq(50, 650, by = 1)
 Nest1 <- predict(
   fit1,
@@ -337,6 +343,7 @@ Nest1 <- dplyr::bind_rows(
              mean.mc_std_err = 0,
              Method = "Plugin")
 )
+
 ggplot(data = Nest1) +
   geom_line(aes(x = N, y = mean, colour = Method)) +
   geom_ribbon(
@@ -344,7 +351,7 @@ ggplot(data = Nest1) +
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
       ymax = mean + 2 * mean.mc_std_err,
-      fill = Method,
+      fill = Method
     ),
     alpha = 0.2
   ) +

@@ -2646,12 +2646,16 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Add Monte Carlo standard errors
-    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(N)
     # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
     # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
     smy[["sd.mc_std_err"]] <-
       sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
         smy[["sd"]] / sqrt(4 * N)
+    # Include sd MC error in estimate of mean MC error:
+    smy[["mean.mc_std_err"]] <- (
+      smy[["sd"]] +
+        smy[["sd.mc_std_err"]] * 2
+      ) / sqrt(N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
