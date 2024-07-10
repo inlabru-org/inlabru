@@ -127,17 +127,17 @@ Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">bru_summarise</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span>, <span class="fl">10</span>, <span class="fl">1000</span><span class="op">)</span>, max_moment <span class="op">=</span> <span class="fl">4</span>, probs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         mean        sd     skew ekurtosis mean.mc_std_err sd.mc_std_err</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9995932 1.0149492 2.189996  7.361487      0.03209551    0.04910584</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9540890 0.9201174 1.585627  2.643641      0.02909667    0.03135712</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.9980144 0.9979156 2.020478  6.243391      0.03155686    0.04530744</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.0114649 0.9645428 1.703108  3.602452      0.03050152    0.03610424</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.9753642 0.9624584 1.673127  3.036774      0.03043561    0.03415974</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0063036 1.0566728 2.312000  7.835825      0.03341493    0.05240348</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9588076 0.9443360 1.985021  5.565812      0.02986253    0.04107540</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  1.0644205 1.0493831 1.865895  4.795969      0.03318441    0.04326072</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  1.0545010 1.1236405 2.329021  8.144608      0.03553263    0.05659237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.0302886 0.9924727 1.619795  2.774872      0.03138474    0.03429734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mean        sd     skew ekurtosis sd.mc_std_err mean.mc_std_err</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9995932 1.0149492 2.189996  7.361487    0.04910584      0.03520124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.9540890 0.9201174 1.585627  2.643641    0.03135712      0.03107987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.9980144 0.9979156 2.020478  6.243391    0.04530744      0.03442236</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1.0114649 0.9645428 1.703108  3.602452    0.03610424      0.03278495</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.9753642 0.9624584 1.673127  3.036774    0.03415974      0.03259606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.0063036 1.0566728 2.312000  7.835825    0.05240348      0.03672921</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.9588076 0.9443360 1.985021  5.565812    0.04107540      0.03246036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  1.0644205 1.0493831 1.865895  4.795969    0.04326072      0.03592046</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  1.0545010 1.1236405 2.329021  8.144608    0.05659237      0.03911185</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.0302886 0.9924727 1.619795  2.774872    0.03429734      0.03355390</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

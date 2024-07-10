@@ -187,184 +187,184 @@ determines the maximum verbosity level of the messages to extract.</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">bru_log</span><span class="op">(</span>verbosity <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:35.537865: inlabru loaded</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:35.538384: Clear override options</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.544825: iinla: Iteration 1 [max:1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.289239: iinla: Iteration 1 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.733768: iinla: Iteration 2 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.41663: iinla: Max deviation from previous: 0.139% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:31.63545: inlabru loaded</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:31.635992: Clear override options</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.651214: iinla: Iteration 1 [max:1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.38786: iinla: Iteration 1 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.83592: iinla: Iteration 2 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.540324: iinla: Max deviation from previous: 0.139% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.417061: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.540748: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.417966: iinla: Iteration 3 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.981193: iinla: Iteration 1 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.340849: iinla: Step rescaling: 27.2% (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.370846: iinla: Iteration 2 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.738503: iinla: Step rescaling: 99.6% (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.768511: iinla: Max deviation from previous: 52900% of SD, and line search is active</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.541695: iinla: Iteration 3 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.103688: iinla: Iteration 1 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.471429: iinla: Step rescaling: 27.2% (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.501614: iinla: Iteration 2 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.871531: iinla: Step rescaling: 99.6% (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.900884: iinla: Max deviation from previous: 52900% of SD, and line search is active</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.769521: iinla: Iteration 3 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.139552: iinla: Step rescaling: 102% (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.175165: iinla: Max deviation from previous: 598% of SD, and line search is active</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.901855: iinla: Iteration 3 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.270493: iinla: Step rescaling: 102% (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.305888: iinla: Max deviation from previous: 598% of SD, and line search is active</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.176125: iinla: Iteration 4 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.567001: iinla: Max deviation from previous: 10.1% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.306854: iinla: Iteration 4 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.699177: iinla: Max deviation from previous: 10.1% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.567969: iinla: Iteration 5 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.964471: iinla: Max deviation from previous: 0.0579% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.70022: iinla: Iteration 5 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.098337: iinla: Max deviation from previous: 0.0579% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.964952: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.098781: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.965868: iinla: Iteration 6 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.927668: iinla: Iteration 1 [max:1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.497159: iinla: Iteration 1 [max:1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.148384: iinla: Iteration 1 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.616601: iinla: Iteration 2 [max:10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.083714: iinla: Max deviation from previous: 0.146% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.099693: iinla: Iteration 6 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.218656: iinla: Iteration 1 [max:1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.789187: iinla: Iteration 1 [max:1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.450377: iinla: Iteration 1 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.918789: iinla: Iteration 2 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.389917: iinla: Max deviation from previous: 0.146% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.08419: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.390373: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.085161: iinla: Iteration 3 [max:10]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.391323: iinla: Iteration 3 [max:10]</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">bru_log</span><span class="op">(</span><span class="op">)</span>, timestamp <span class="op">=</span> <span class="cn">TRUE</span>, verbosity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:35.537865: inlabru loaded (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:35.538384: Clear override options (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.441294: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.464444: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.49476: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.510255: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.522594: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.544255: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:40.544825: iinla: Iteration 1 [max:1] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.214155: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.237684: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.25388: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.269094: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.277386: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.288777: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.289239: iinla: Iteration 1 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.702311: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 343.3, norm1 = 0, norm01 = 343.3) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.702777: iinla: Optimisation did not improve on previous solution. (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.703204: iinla: |lin1-lin0| = 343.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:31.63545: inlabru loaded (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:31.635992: Clear override options (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.545997: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.570364: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.601324: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.616652: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.628857: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.650728: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:36.651214: iinla: Iteration 1 [max:1] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.31279: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.336611: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.352766: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.367727: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.375903: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.387387: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.38786: iinla: Iteration 1 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.804951: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 343.3, norm1 = 0, norm01 = 343.3) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.805414: iinla: Optimisation did not improve on previous solution. (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.80584: iinla: |lin1-lin0| = 343.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.433e-14 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.704062: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.71961: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:41.733768: iinla: Iteration 2 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.387348: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 2.859e-07, norm1 = 3.292e-14, norm01 = 2.859e-07) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.387899: iinla: |lin1-lin0| = 2.859e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.8067: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.822044: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:37.83592: iinla: Iteration 2 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.510656: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 2.859e-07, norm1 = 3.292e-14, norm01 = 2.859e-07) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.511235: iinla: |lin1-lin0| = 2.859e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 3.737e-15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.271e-14 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.388767: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.403509: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.41663: iinla: Max deviation from previous: 0.139% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.512179: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.527255: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.540324: iinla: Max deviation from previous: 0.139% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.417061: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.540748: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode. (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.417966: iinla: Iteration 3 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.905284: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.929484: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.950033: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.964679: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.969709: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.980753: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:42.981193: iinla: Iteration 1 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.337355: iinla: Step rescaling: 61.8%, Contract (norm0 = 2293, norm1 = 2107, norm01 = 395.2) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.338445: iinla: Step rescaling: 38.2%, Contract (norm0 = 460.2, norm1 = 339.4, norm01 = 395.2) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.340012: iinla: Step rescaling: 27.2%, Approx Optimisation (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.340457: iinla: |lin1-lin0| = 395.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:38.541695: iinla: Iteration 3 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.027305: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.051401: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.072505: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.087105: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.092133: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.103253: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.103688: iinla: Iteration 1 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.467788: iinla: Step rescaling: 61.8%, Contract (norm0 = 2293, norm1 = 2107, norm01 = 395.2) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.468818: iinla: Step rescaling: 38.2%, Contract (norm0 = 460.2, norm1 = 339.4, norm01 = 395.2) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.470568: iinla: Step rescaling: 27.2%, Approx Optimisation (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.471028: iinla: |lin1-lin0| = 395.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -225.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 121.3 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.340849: iinla: Step rescaling: 27.2% (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2) (level 2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.341686: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.356372: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.370846: iinla: Iteration 2 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.737542: iinla: Step rescaling: 99.6%, Approx Optimisation (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.73804: iinla: |lin1-lin0| = 256.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.471429: iinla: Step rescaling: 27.2% (norm0 = 208.4, norm1 = 256.3, norm01 = 395.2) (level 2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.47227: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.487463: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.501614: iinla: Iteration 2 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.870635: iinla: Step rescaling: 99.6%, Approx Optimisation (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.871131: iinla: |lin1-lin0| = 256.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -1.292</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 12.82 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.738503: iinla: Step rescaling: 99.6% (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3) (level 2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.739363: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.754432: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.768511: iinla: Max deviation from previous: 52900% of SD, and line search is active</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.871531: iinla: Step rescaling: 99.6% (norm0 = 255.3, norm1 = 12.89, norm01 = 256.3) (level 2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.872374: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.887475: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.900884: iinla: Max deviation from previous: 52900% of SD, and line search is active</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:43.769521: iinla: Iteration 3 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.136029: iinla: Step rescaling: 162%, Expand (norm0 = 20.28, norm1 = 7.397, norm01 = 12.89) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.137064: iinla: Step rescaling: 100%, Overstep (norm0 = 12.67, norm1 = 0.2191, norm01 = 12.89) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.13869: iinla: Step rescaling: 101.8%, Approx Optimisation (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.139149: iinla: |lin1-lin0| = 12.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:39.901855: iinla: Iteration 3 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.266931: iinla: Step rescaling: 162%, Expand (norm0 = 20.28, norm1 = 7.397, norm01 = 12.89) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.267976: iinla: Step rescaling: 100%, Overstep (norm0 = 12.67, norm1 = 0.2191, norm01 = 12.89) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.269619: iinla: Step rescaling: 101.8%, Approx Optimisation (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.270082: iinla: |lin1-lin0| = 12.89</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -2.964e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 0.01798 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.139552: iinla: Step rescaling: 102% (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89) (level 2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.140397: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.160616: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.175165: iinla: Max deviation from previous: 598% of SD, and line search is active</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.270493: iinla: Step rescaling: 102% (norm0 = 12.89, norm1 = 0.01798, norm01 = 12.89) (level 2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.27134: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.291955: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.305888: iinla: Max deviation from previous: 598% of SD, and line search is active</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.176125: iinla: Iteration 4 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.534549: iinla: Step rescaling: 162%, Expand (norm0 = 0.02909, norm1 = 0.01111, norm01 = 0.01798) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.535594: iinla: Step rescaling: 100%, Overstep (norm0 = 0.01798, norm1 = 1.149e-07, norm01 = 0.01798) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.537172: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.01798, norm1 = 1.146e-07, norm01 = 0.01798) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.537625: iinla: |lin1-lin0| = 0.01798</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.306854: iinla: Iteration 4 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.666098: iinla: Step rescaling: 162%, Expand (norm0 = 0.02909, norm1 = 0.01111, norm01 = 0.01798) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.667162: iinla: Step rescaling: 100%, Overstep (norm0 = 0.01798, norm1 = 1.149e-07, norm01 = 0.01798) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.668752: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.01798, norm1 = 1.146e-07, norm01 = 0.01798) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.669257: iinla: |lin1-lin0| = 0.01798</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 1.965e-10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.146e-07 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.538515: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.553329: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.567001: iinla: Max deviation from previous: 10.1% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.670133: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.684931: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.699177: iinla: Max deviation from previous: 10.1% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.567969: iinla: Iteration 5 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.931091: iinla: Step rescaling: 162%, Expand (norm0 = 2.298e-07, norm1 = 8.778e-08, norm01 = 1.42e-07) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.932121: iinla: Step rescaling: 100%, Overstep (norm0 = 1.42e-07, norm1 = 6.789e-13, norm01 = 1.42e-07) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.933745: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 1.42e-07, norm1 = 4.682e-13, norm01 = 1.42e-07) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.934269: iinla: |lin1-lin0| = 1.42e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:40.70022: iinla: Iteration 5 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.065606: iinla: Step rescaling: 162%, Expand (norm0 = 2.298e-07, norm1 = 8.778e-08, norm01 = 1.42e-07) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.066646: iinla: Step rescaling: 100%, Overstep (norm0 = 1.42e-07, norm1 = 6.789e-13, norm01 = 1.42e-07) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.068243: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 1.42e-07, norm1 = 4.682e-13, norm01 = 1.42e-07) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.068697: iinla: |lin1-lin0| = 1.42e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = -2.069e-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 4.678e-13 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.935149: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.950541: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.964471: iinla: Max deviation from previous: 0.0579% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.069686: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.084548: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.098337: iinla: Max deviation from previous: 0.0579% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.964952: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.098781: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode. (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:44.965868: iinla: Iteration 6 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.847883: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.874156: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.890246: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.905644: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.908916: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.92711: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:47.927668: iinla: Iteration 1 [max:1] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.389953: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.427806: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.451092: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.47973: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.483745: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.496695: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.497159: iinla: Iteration 1 [max:1] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:48.963154: iinla: Evaluate component inputs (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.025717: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.079361: iinla: Evaluate component simplifications (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.117172: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.128241: iinla: Construct inla stack (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.147894: iinla: Model initialisation completed (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.148384: iinla: Iteration 1 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.549962: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 1073, norm1 = 2.645e-14, norm01 = 1073) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.550513: iinla: Optimisation did not improve on previous solution. (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.550975: iinla: |lin1-lin0| = 1073</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:41.099693: iinla: Iteration 6 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.139992: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.166202: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.182315: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.197811: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.20088: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.218207: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.218656: iinla: Iteration 1 [max:1] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.681951: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.719995: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.74969: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.771985: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.775913: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.788712: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:44.789187: iinla: Iteration 1 [max:1] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.257435: iinla: Evaluate component inputs (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.344218: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.382312: iinla: Evaluate component simplifications (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.419493: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.430418: iinla: Construct inla stack (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.449911: iinla: Model initialisation completed (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.450377: iinla: Iteration 1 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.853294: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 1073, norm1 = 2.645e-14, norm01 = 1073) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.853773: iinla: Optimisation did not improve on previous solution. (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.854218: iinla: |lin1-lin0| = 1073</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 1.212e-15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 4.556e-14 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.551867: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.589681: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:49.616601: iinla: Iteration 2 [max:10] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.017941: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.0008452, norm1 = 1.457e-13, norm01 = 0.0008452) (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.018455: iinla: Optimisation did not improve on previous solution. (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.018916: iinla: |lin1-lin0| = 0.0008452</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.855091: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.892345: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:45.918789: iinla: Iteration 2 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.324481: iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.0008452, norm1 = 1.457e-13, norm01 = 0.0008452) (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.324984: iinla: Optimisation did not improve on previous solution. (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.325446: iinla: |lin1-lin0| = 0.0008452</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;eta-lin1,delta&gt;/|delta| = 3.363e-16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.457e-13 (level 4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.019787: iinla: Evaluate component linearisations (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.057403: iinla: Evaluate predictor linearisation (level 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.083714: iinla: Max deviation from previous: 0.146% of SD, and line search is inactive</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.326312: iinla: Evaluate component linearisations (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.363954: iinla: Evaluate predictor linearisation (level 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.389917: iinla: Max deviation from previous: 0.146% of SD, and line search is inactive</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        [stop if: &lt;10% and line search inactive] (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.08419: iinla: Convergence criterion met.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.390373: iinla: Convergence criterion met.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Running final INLA integration step with known theta mode. (level 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 07:50:50.085161: iinla: Iteration 3 [max:10] (level 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2024-07-10 12:14:46.391323: iinla: Iteration 3 [max:10] (level 1)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

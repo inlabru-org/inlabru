@@ -247,16 +247,16 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  All <span class="op">=</span> <span class="va">Lambda.all</span>,</span>
 <span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots    657.4390 54.90847 561.6983 650.5826 752.6015 650.5826        5.490847</span></span>
-<span><span class="co">#&gt; PlotsEmp 644.5911 34.87692 572.1637 646.8556 706.1805 646.8556        3.487692</span></span>
-<span><span class="co">#&gt; All      675.0341 28.87683 619.7887 675.3181 729.2812 675.3181        2.887683</span></span>
-<span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA</span></span>
-<span><span class="co">#&gt;          sd.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots         3.985221</span></span>
-<span><span class="co">#&gt; PlotsEmp      2.376255</span></span>
-<span><span class="co">#&gt; All           1.828528</span></span>
-<span><span class="co">#&gt; AllEmp              NA</span></span></code></pre></div>
+<span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
+<span><span class="co">#&gt; Plots    649.4019 46.42130 565.2330 652.5340 738.6084 652.5340      2.973346</span></span>
+<span><span class="co">#&gt; PlotsEmp 644.5539 39.89670 571.7449 639.5558 735.0481 639.5558      2.676115</span></span>
+<span><span class="co">#&gt; All      672.3022 25.48801 624.7923 674.2116 717.4238 674.2116      1.752796</span></span>
+<span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA            NA</span></span>
+<span><span class="co">#&gt;          mean.mc_std_err</span></span>
+<span><span class="co">#&gt; Plots           5.236799</span></span>
+<span><span class="co">#&gt; PlotsEmp        4.524894</span></span>
+<span><span class="co">#&gt; All             2.899360</span></span>
+<span><span class="co">#&gt; AllEmp                NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
