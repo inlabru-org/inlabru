@@ -230,26 +230,34 @@ Ns <- seq(50, 450, by = 1)
 Nest <- predict(fit, predpts,
   ~ data.frame(
     N = Ns,
-    density = dpois(Ns,
+    density = dpois(
+      Ns,
       lambda = sum(weight * exp(mySPDE + Intercept))
     )
   ),
   n.samples = 2000
 )
 
-Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
+Nest <- dplyr::bind_rows(
+  cbind(Nest, Method = "Posterior"),
+  data.frame(N = Nest$N,
+             mean = dpois(Nest$N, lambda = Lambda$mean),
+             mean.mc_std_err = 0,
+             Method = "Plugin")
+)
 ggplot(data = Nest) +
-  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_line(aes(x = N, y = mean, colour = Method)) +
   geom_ribbon(
     aes(
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
-      ymax = mean + 2 * mean.mc_std_err
+      ymax = mean + 2 * mean.mc_std_err,
+      fill = Method,
     ),
-    fill = "blue",
     alpha = 0.2
   ) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+  geom_line(aes(x = N, y = mean, colour = Method)) +
+  ylab("Probability mass function")
 ```
 
 Hazard-rate Detection Function
@@ -314,26 +322,34 @@ Nest1 <- predict(
   predpts,
   ~ data.frame(
     N = Ns,
-    density = dpois(Ns,
+    density = dpois(
+      Ns,
       lambda = sum(weight * exp(mySPDE + Intercept))
     )
   ),
   n.samples = 2000
 )
 
-Nest1$plugin_estimate <- dpois(Nest1$N, lambda = Lambda1$mean)
+Nest1 <- dplyr::bind_rows(
+  cbind(Nest1, Method = "Posterior"),
+  data.frame(N = Nest1$N,
+             mean = dpois(Nest1$N, lambda = Lambda1$mean),
+             mean.mc_std_err = 0,
+             Method = "Plugin")
+)
 ggplot(data = Nest1) +
-  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_line(aes(x = N, y = mean, colour = Method)) +
   geom_ribbon(
     aes(
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
-      ymax = mean + 2 * mean.mc_std_err
+      ymax = mean + 2 * mean.mc_std_err,
+      fill = Method,
     ),
-    fill = "blue",
     alpha = 0.2
   ) +
-  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+  geom_line(aes(x = N, y = mean, colour = Method)) +
+  ylab("Probability mass function")
 ```
 
 Comparing the models
