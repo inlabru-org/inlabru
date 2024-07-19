@@ -1588,12 +1588,17 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
       unlist(lapply(
         c("main", "group", "replicate", "weights"),
         function(x) {
-          if (is.null(object[[x]][["input"]][["input"]])) {
+          if (identical(x, "weights")) {
+            inp <- object[[x]][["input"]]
+          } else {
+            inp <- object[[x]][["input"]][["input"]]
+          }
+          if (is.null(inp)) {
             NULL
           } else {
             paste0(
               x, " = ",
-              deparse(object[[x]][["input"]][["input"]])
+              deparse(inp)
             )
           }
         }
@@ -1634,13 +1639,20 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
         unlist(lapply(
           c("main", "group", "replicate", "weights"),
           function(x) {
-            if (is.null(object[[x]][["input"]][["input"]])) {
+            if (identical(x, "weights")) {
+              inp <- object[[x]][["input"]]
+              tp <- "weights"
+            } else {
+              inp <- object[[x]][["input"]][["input"]]
+              tp <- object[[x]][["type"]]
+            }
+            if (is.null(inp)) {
               NULL
             } else {
               paste0(
-                x, " = ", object[[x]][["type"]],
+                x, " = ", tp,
                 "(",
-                deparse(object[[x]][["input"]][["input"]]),
+                deparse(inp),
                 ")"
               )
             }
