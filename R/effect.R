@@ -1556,8 +1556,8 @@ code.components <- function(components, add = "") {
 #' @export
 #' @method summary component
 #' @keywords internal
-#' @param object A `component` or `component_list`.
-#' @param ... ignored.
+#' @param object Object to be summarised.
+#' @param ... Passed on to other summary methods.
 #' @param depth The depth of which to expand the component mapper.
 #' Default `Inf`, to traverse the entire mapper tree.
 #' @param verbose logical; If `TRUE`, includes more details of the
@@ -1589,18 +1589,14 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
         c("main", "group", "replicate", "weights"),
         function(x) {
           if (identical(x, "weights")) {
-            inp <- object[[x]][["input"]]
+            obj <- object[[x]]
           } else {
-            inp <- object[[x]][["input"]][["input"]]
+            obj <- object[[x]][["input"]]
           }
-          if (is.null(inp)) {
-            NULL
-          } else {
-            paste0(
-              x, " = ",
-              deparse(inp)
-            )
-          }
+          format(obj,
+                 verbose = verbose,
+                 ...,
+                 label.override = x)
         }
       )),
       collapse = ", "
@@ -1640,21 +1636,15 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
           c("main", "group", "replicate", "weights"),
           function(x) {
             if (identical(x, "weights")) {
-              inp <- object[[x]][["input"]]
-              tp <- "weights"
+              format(object[[x]],
+                     verbose = verbose,
+                     ...,
+                     label.override = x)
             } else {
-              inp <- object[[x]][["input"]][["input"]]
-              tp <- object[[x]][["type"]]
-            }
-            if (is.null(inp)) {
-              NULL
-            } else {
-              paste0(
-                x, " = ", tp,
-                "(",
-                deparse(inp),
-                ")"
-              )
+              format(object[[x]],
+                     verbose = verbose,
+                     ...,
+                     label.override = x)
             }
           }
         )),
@@ -1669,7 +1659,6 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
 
 #' @export
 #' @method summary component_list
-#' @param ... passed on to other summary methods
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @rdname summary.component
 
@@ -1687,8 +1676,91 @@ summary.component_list <- function(object, verbose = TRUE, ...) {
   result
 }
 
+
 #' @export
-#' @param x A 'summary_component' object.
+#' @method format bru_subcomponent
+#' @param label.override character; If not `NULL`, use this label instead of
+#' the object's label.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+format.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL) {
+  text <- format(x[["input"]],
+                 verbose = verbose,
+                 ...,
+                 label.override = label.override,
+                 type = if (verbose) NULL else x[["type"]])
+  text
+}
+
+#' @export
+#' @method summary bru_subcomponent
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+summary.bru_subcomponent <- function(object, verbose = TRUE, ..., label.override = NULL) {
+  text <- format(object, verbose = verbose, ..., label.override = label.override)
+  res <- structure(
+    list(
+      text = text
+    ),
+    class = "summary_bru_subcomponent"
+  )
+  res
+}
+
+#' @export
+#' @method format bru_input
+#' @param type character; if non-NULL, added to the output'; `label = type(input)`.
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
+                             type = NULL) {
+  inp <- x[["input"]]
+  if (!is.null(label.override)) {
+    lab <- label.override
+  } else {
+    lab <- x[["label"]]
+  }
+  if (is.null(inp)) {
+    text <- ""
+  } else if (is.null(type)) {
+    text <-
+      paste0(
+        lab, " = ",
+        deparse(inp)
+      )
+  } else {
+    text <-
+      paste0(
+        lab, " = ",
+        type, "(",
+        deparse(inp),
+        ")"
+      )
+  }
+  text
+}
+
+#' @export
+#' @method summary bru_input
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+summary.bru_input <- function(object, verbose = TRUE, ..., label.override = NULL) {
+  res <- structure(
+    list(
+      text = format(object,
+                    verbose = verbose,
+                    ...,
+                    label.override = label.override)
+    ),
+    class = "summary_bru_input"
+  )
+  return(res)
+}
+
+
+
+#' @export
+#' @param x Object to be printed.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
 
@@ -1718,6 +1790,26 @@ print.summary_component <- function(x, ...) {
 
 print.summary_component_list <- function(x, ...) {
   lapply(x, print)
+  invisible(x)
+}
+
+#' @export
+#' @rdname summary.component
+
+print.summary_bru_subcomponent <- function(x, ...) {
+  if (!is.null(x[["text"]])) {
+    cat(x[["text"]], "\n", sep = "")
+  }
+  invisible(x)
+}
+
+#' @export
+#' @rdname summary.component
+
+print.summary_bru_input <- function(x, ...) {
+  if (!is.null(x[["text"]])) {
+    cat(x[["text"]], "\n", sep = "")
+  }
   invisible(x)
 }
 
