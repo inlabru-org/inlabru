@@ -119,7 +119,7 @@ gm <- function(...) {
     with = "gg()",
     details = "ggmap isn't supported anymore."
   )
-  gg(..., crs = sp::CRS("+proj=longlat"))
+  gg(..., crs = fm_CRS("+proj=longlat"))
 }
 
 
@@ -402,6 +402,7 @@ gg.prediction <- function(data, ...) {
 #' @example inst/examples/gg.sp.R
 
 gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
+  bru_safe_sp(force = TRUE)
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
     data <- fm_transform(data, crs)
@@ -520,6 +521,7 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
 #' @example inst/examples/gg.sp.R
 
 gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
+  bru_safe_sp(force = TRUE)
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
     data <- fm_transform(data, crs)
@@ -602,6 +604,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @example inst/examples/gg.sp.R
 
 gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
+  bru_safe_sp(force = TRUE)
   data <- sf::st_as_sf(data)
   if (!is.null(crs)) {
     data <- fm_transform(data, crs, passthrough = TRUE)
@@ -630,6 +633,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
 #' @example inst/examples/gg.sp.R
 
 gg.SpatialGridDataFrame <- function(data, ...) {
+  bru_safe_sp(force = TRUE)
   data <- as(data, "SpatialPixelsDataFrame")
   gg(data, ...)
 }
@@ -657,6 +661,7 @@ gg.SpatialPixelsDataFrame <- function(data,
                                       mapping = NULL,
                                       crs = NULL,
                                       mask = NULL, ...) {
+  bru_safe_sp(force = TRUE)
   if (!is.null(crs)) {
     data <- fm_transform(data, crs)
   }
@@ -715,6 +720,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'     gg(pxl, size = 0.1)
 #' }
 gg.SpatialPixels <- function(data, ...) {
+  bru_safe_sp(force = TRUE)
   gg(sp::SpatialPoints(data), ...)
 }
 

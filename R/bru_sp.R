@@ -10,6 +10,7 @@
 
 sfill <- function(data, where = NULL) {
   check_spatstat("spatstat.geom")
+  bru_safe_sp(force = TRUE)
 
   if (is.null(where)) {
     where <- data
@@ -88,6 +89,8 @@ sfill <- function(data, where = NULL) {
 #' }
 #'
 sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), to.crs = NULL) {
+  bru_safe_sp(force = TRUE)
+
   sp <- as.data.frame(data[, start.cols])
   ep <- as.data.frame(data[, end.cols])
 
@@ -132,7 +135,7 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #' @param to.crs Coordinate reference system for the SpatialLines ouput.
 #' @return SpatialPolygonsDataFrame
 #'
-#' @examples
+#' @examplesIf bru_safe_sp(quietly = TRUE)
 #' \donttest{
 #' # Create data frame of boundary points (anti clockwise!)
 #' pts <- data.frame(
@@ -151,6 +154,8 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #' }
 #'
 spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL) {
+  bru_safe_sp(force = TRUE)
+
   po <- sp::Polygon(data[, cols], hole = FALSE)
   pos <- sp::Polygons(list(po), ID = "tmp")
   predpoly <- sp::SpatialPolygons(list(pos), proj4string = crs)

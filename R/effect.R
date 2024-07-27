@@ -1008,6 +1008,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
   is_list <- vapply(inp, function(x) is.list(x), TRUE) &
     !is_data_frame
   if (any(is_spatial)) {
+    bru_safe_sp(force = TRUE)
     if (!all(is_spatial)) {
       stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
     }

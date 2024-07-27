@@ -30,6 +30,7 @@ paraemter. Posterior conversion to a different CRS is supported using the
 \code{to.crs} parameter.
 }
 \examples{
+\dontshow{if (bru_safe_sp(quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
 # Create data frame of boundary points (anti clockwise!)
 pts <- data.frame(
@@ -46,6 +47,6 @@ if (require(ggplot2, quietly = TRUE)) {
     gg(pol)
 }
 }
-
+\dontshow{\}) # examplesIf}
 }
 \keyword{internal}

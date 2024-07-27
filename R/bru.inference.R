@@ -1466,6 +1466,7 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # TODO!!! ####
     ips_is_Spatial <- inherits(ips, "Spatial")
     if (ips_is_Spatial) {
+      bru_safe_sp(force = TRUE)
       ips_coordnames <- sp::coordnames(ips)
       ips_crs <- fm_CRS(ips)
       # For backwards compatibility:
@@ -2088,24 +2089,27 @@ expand_to_dataframe <- function(x, data = NULL) {
   if (length(only_x) < length(names(x))) {
     x <- x[!(names(x) %in% names(data))]
   }
-  if (inherits(x, "SpatialPixels") &&
-    !inherits(x, "SpatialPixelsDataFrame")) {
-    result <- sp::SpatialPixelsDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialGrid") &&
-    !inherits(x, "SpatialGridDataFrame")) {
-    result <- sp::SpatialGridDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialLines") &&
-    !inherits(x, "SpatialLinesDataFrame")) {
-    result <- sp::SpatialLinesDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialPolygons") &&
-    !inherits(x, "SpatialPolygonsDataFrame")) {
-    result <- sp::SpatialPolygonsDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialPoints") &&
-    !inherits(x, "SpatialPointsDataFrame")) {
-    # Other classes inherit from SpatialPoints, so need to be handled first
-    result <- sp::SpatialPointsDataFrame(x, data = data)
-  } else if (inherits(x, "Spatial")) {
-    result <- sp::cbind.Spatial(x, data)
+  if (inherits(x, "Spatial")) {
+    bru_safe_sp(force = TRUE)
+    if (inherits(x, "SpatialPixels") &&
+        !inherits(x, "SpatialPixelsDataFrame")) {
+      result <- sp::SpatialPixelsDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialGrid") &&
+               !inherits(x, "SpatialGridDataFrame")) {
+      result <- sp::SpatialGridDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialLines") &&
+               !inherits(x, "SpatialLinesDataFrame")) {
+      result <- sp::SpatialLinesDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialPolygons") &&
+               !inherits(x, "SpatialPolygonsDataFrame")) {
+      result <- sp::SpatialPolygonsDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialPoints") &&
+               !inherits(x, "SpatialPointsDataFrame")) {
+      # Other classes inherit from SpatialPoints, so need to be handled first
+      result <- sp::SpatialPointsDataFrame(x, data = data)
+    } else {
+      result <- sp::cbind.Spatial(x, data)
+    }
   } else if (is.data.frame(x)) {
     result <- cbind(x, data)
   } else {

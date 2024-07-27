@@ -158,6 +158,10 @@ bru_safe_sp <- function(quietly = FALSE,
     return(invisible(FALSE))
   }
 
+  if (sp_version >= "2.1.4") {
+    return(invisible(TRUE))
+  }
+
   if (sp_version >= "1.6-0") {
     # Default to 2L to allow future sp to stop supporting
     # get_evolution_status; assume everything is fine if it fails.
