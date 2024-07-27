@@ -285,7 +285,7 @@ information.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-15-1.png" width="960">
 The average detection probability within the maximum detection distance
-is estimated to be 0.699136.</p>
+is estimated to be 0.7002008.</p>
 <p>We can look at the posterior for expected number of dolphins as
 usual:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -293,9 +293,9 @@ usual:</p>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 244.1839 48.14055 160.8279 237.7613 327.2643 237.7613      3.784545</span></span>
+<span><span class="co">#&gt; 1 250.5366 55.08229 162.9797 245.8377 367.2454 245.8377      5.228431</span></span>
 <span><span class="co">#&gt;   mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1        5.570964</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        6.553915</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -392,9 +392,9 @@ this example it’s a reasonable choice):</p>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 298.1266 79.23142 168.6245 286.4781 456.8596 286.4781      6.149981</span></span>
+<span><span class="co">#&gt; 1 308.3578 97.93408 168.6988 294.0319 514.5098 294.0319      7.726897</span></span>
 <span><span class="co">#&gt;   mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1        9.153138</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        11.33879</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
