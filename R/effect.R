@@ -1594,9 +1594,10 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
             obj <- object[[x]][["input"]]
           }
           format(obj,
-                 verbose = verbose,
-                 ...,
-                 label.override = x)
+            verbose = verbose,
+            ...,
+            label.override = x
+          )
         }
       )),
       collapse = ", "
@@ -1637,14 +1638,16 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
           function(x) {
             if (identical(x, "weights")) {
               format(object[[x]],
-                     verbose = verbose,
-                     ...,
-                     label.override = x)
+                verbose = verbose,
+                ...,
+                label.override = x
+              )
             } else {
               format(object[[x]],
-                     verbose = verbose,
-                     ...,
-                     label.override = x)
+                verbose = verbose,
+                ...,
+                label.override = x
+              )
             }
           }
         )),
@@ -1703,10 +1706,11 @@ print.component_list <- function(x, ...) {
 #' @rdname summary.component
 format.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL) {
   text <- format(x[["input"]],
-                 verbose = verbose,
-                 ...,
-                 label.override = label.override,
-                 type = if (verbose) NULL else x[["type"]])
+    verbose = verbose,
+    ...,
+    label.override = label.override,
+    type = if (verbose) NULL else x[["type"]]
+  )
   text
 }
 
@@ -1776,9 +1780,10 @@ summary.bru_input <- function(object, verbose = TRUE, ..., label.override = NULL
   res <- structure(
     list(
       text = format(object,
-                    verbose = verbose,
-                    ...,
-                    label.override = label.override)
+        verbose = verbose,
+        ...,
+        label.override = label.override
+      )
     ),
     class = "summary_bru_input"
   )
@@ -1792,9 +1797,10 @@ summary.bru_input <- function(object, verbose = TRUE, ..., label.override = NULL
 print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
   cat(
     format(x,
-           verbose = verbose,
-           ...,
-           label.override = label.override),
+      verbose = verbose,
+      ...,
+      label.override = label.override
+    ),
     "\n",
     sep = ""
   )

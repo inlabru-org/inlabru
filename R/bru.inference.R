@@ -2655,7 +2655,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     smy[["mean.mc_std_err"]] <- (
       smy[["sd"]] +
         smy[["sd.mc_std_err"]] * 2
-      ) / sqrt(N)
+    ) / sqrt(N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
