@@ -103,7 +103,6 @@ if (bru_safe_inla() &&
 Other geomes for inla and inlabru predictions: 
 \code{\link{gg}()},
 \code{\link{gg.bru_prediction}()},
-\code{\link{gg.matrix}()},
-\code{\link{gm}()}
+\code{\link{gg.matrix}()}
 }
 \concept{geomes for inla and inlabru predictions}

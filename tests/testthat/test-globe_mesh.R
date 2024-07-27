@@ -22,8 +22,8 @@ test_that("2D modelling on the globe", {
       y <- rpois(nrow(data), exp(1 + sin(Lat / 180 * pi) * 2))
     }
   )
-  coordinates(data) <- c("Long", "Lat")
-  proj4string(data) <- fm_CRS("longlat_globe")
+  sp::coordinates(data) <- c("Long", "Lat")
+  sp::proj4string(data) <- fm_CRS("longlat_globe")
   data <- fm_transform(data, crs = fm_CRS("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
@@ -74,8 +74,8 @@ test_that("2D LGCP modelling on the globe", {
     Long = seq(-179, 179, length.out = 100),
     Lat = seq(-89, 89, length.out = 100)
   )
-  coordinates(data) <- c("Long", "Lat")
-  proj4string(data) <- fm_CRS("longlat_globe")
+  sp::coordinates(data) <- c("Long", "Lat")
+  sp::proj4string(data) <- fm_CRS("longlat_globe")
   data <- fm_transform(data, crs = fm_CRS("sphere"))
   data <- sf::st_as_sf(data)
 

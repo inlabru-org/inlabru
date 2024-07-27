@@ -30,7 +30,7 @@ test_that("basic intercept model, spatial data", {
   mydata <- local_basic_intercept_testdata()
   mydata$coord1 <- 11
   mydata$coord2 <- 12
-  coordinates(mydata) <- c("coord1", "coord2")
+  sp::coordinates(mydata) <- c("coord1", "coord2")
 
   fit <- bru(mycomp,
     family = "normal",

@@ -26,7 +26,6 @@
 #' as well, e.g. [Poisson1_1D], [Poisson2_1D], [Poisson2_1D] and [toygroups].
 #'
 #' @aliases inlabru
-#' @import sp
 #' @import stats
 #' @import methods
 #' @importFrom Matrix diag

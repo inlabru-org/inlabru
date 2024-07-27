@@ -37,8 +37,8 @@ if (bru_safe_sp() &&
     gg(plotpts$dets) +
     gg(gorillas$boundary)
   countdata <- point2count(plotpts$plots, plotpts$dets)
-  x <- coordinates(countdata)[, 1]
-  y <- coordinates(countdata)[, 2]
+  x <- sp::coordinates(countdata)[, 1]
+  y <- sp::coordinates(countdata)[, 2]
   count <- countdata@data$n
   p2 <- ggplot() +
     gg(gorillas$boundary) +

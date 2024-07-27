@@ -76,8 +76,8 @@ import.mrsea <- function() {
   # Detections
   pts <- subset(dset$effort, !is.na(det))
   class(pts) <- "data.frame"
-  coordinates(pts) <- c("x", "y")
-  proj4string(pts) <- crs
+  sp::coordinates(pts) <- c("x", "y")
+  sp::proj4string(pts) <- crs
 
   # Mesh
   mesh <- dset$mesh

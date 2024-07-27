@@ -102,7 +102,7 @@ if (require(fmesher, quietly = TRUE) &&
     require(ggplot2, quietly = TRUE)) {
 
   # Load Gorilla data
-  data("gorillas", package = "inlabru")
+  gorillas <- inlabru::gorillas_sf
 
   # Plot mesh using default edge colors
 
@@ -129,14 +129,13 @@ if (require(fmesher, quietly = TRUE) &&
   xcoord <- gorillas$mesh$loc[, 1]
   ggplot() +
     gg(gorillas$mesh, color = (xcoord - 580), mask = gorillas$boundary) +
-    gg(gorillas$boundary)
+    gg(gorillas$boundary, alpha = 0)
 }
 }
 }
 \seealso{
 Other geomes for meshes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_1d}()},
-\code{\link{gm}()}
+\code{\link{gg.fm_mesh_1d}()}
 }
 \concept{geomes for meshes}

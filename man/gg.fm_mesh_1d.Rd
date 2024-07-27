@@ -70,7 +70,6 @@ if (require("fmesher", quietly = TRUE) &&
 \seealso{
 Other geomes for meshes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_2d}()},
-\code{\link{gm}()}
+\code{\link{gg.fm_mesh_2d}()}
 }
 \concept{geomes for meshes}

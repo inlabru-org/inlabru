@@ -46,8 +46,8 @@ if (family == "apc") {
       )
       ips_coordnames[seq_along(new_coordnames)] <- new_coordnames
       data_coordnames[seq_along(new_coordnames)] <- new_coordnames
-      coordnames(ips) <- ips_coordnames
-      coordnames(data) <- data_coordnames
+      sp::coordnames(ips) <- ips_coordnames
+      sp::coordnames(data) <- data_coordnames
 
       # TODO: check that the crs info is the same
     }

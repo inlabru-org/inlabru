@@ -1,6 +1,9 @@
 # inlabru (development version)
 
-* Remove unneeded `"list"` class inheritance from solitary classes
+* Remove unneeded `"list"` class inheritance from solitary classes (version `2.11.1.9001`)
+* Expand the `summary` and `print` method class coverage (version `2.11.1.9002`)
+* Remove `ggmap` support (version `2.11.1.9002`)
+* Move `sp` from `Imports` to `Suggests` (version `2.11.1.9003`)
 
 # inlabru 2.11.1
 

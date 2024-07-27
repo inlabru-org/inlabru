@@ -4,7 +4,7 @@
       require("sp")) {
     # Load Gorilla data
 
-    data("gorillas", package = "inlabru")
+    gorillas <- inlabru::gorillas
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
@@ -21,7 +21,7 @@
 
     # Load pantropical dolphin data
 
-    data("mexdolphin", package = "inlabru")
+    mexdolphin <- inlabru::mexdolphin
 
     # Plot the pantropical survey boundary, ship transects and dolphin sightings
 

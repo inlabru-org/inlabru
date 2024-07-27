@@ -9,7 +9,7 @@ test_that("Georeferenced data with sp", {
     KEEP.OUT.ATTRS = FALSE
   )
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
-  coordinates(mydata) <- c("Easting", "Northing")
+  sp::coordinates(mydata) <- c("Easting", "Northing")
 
   mesh <- fm_mesh_2d_inla(
     loc = mydata,
@@ -59,7 +59,7 @@ test_that("Georeferenced data with sp", {
 
 
   # Check that explicit access to the data object works
-  cmp <- obs ~ Intercept(1) + field(coordinates(.data.), model = matern)
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates(.data.), model = matern)
 
   fit <- bru(
     cmp,
@@ -120,7 +120,7 @@ test_that("Georeferenced data with sp", {
   )
 
   pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sp")
-  coordnames(pred_df) <- coordnames(mydata)
+  sp::coordnames(pred_df) <- sp::coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
 
   skip_if_not_installed("sn")

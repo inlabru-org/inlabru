@@ -20,8 +20,8 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   #' Turn seal data into spatial object
 
-  coordinates(seals) <- c("longitude", "latitude")
-  proj4string(seals) <- CRS("+proj=longlat")
+  sp::coordinates(seals) <- c("longitude", "latitude")
+  sp::proj4string(seals) <- sp::CRS("+proj=longlat")
 
   #' To avoid confusion I remove the x-y coordinates created by Martin
 
@@ -31,15 +31,15 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   target.p4s <- "+proj=utm +zone=27 +units=km"
   seals <- fm_transform(seals, fm_crs(target.p4s))
-  coordnames(seals) <- c("x", "y")
+  sp::coordnames(seals) <- c("x", "y")
 
   #' Select a strip
 
-  seals <- seals[(coordinates(seals)[, 2] > 7947) & (coordinates(seals)[, 2] < 7954), ] # strip 9
-  # seals = seals[(coordinates(seals)[,2]>7931) & (coordinates(seals)[,2]<7938.5), ] # strip 12
-  # seals = seals[(coordinates(seals)[,2]>7925) & (coordinates(seals)[,2]<7930), ] # strip 13
-  # seals = seals[(coordinates(seals)[,2]>7920) & (coordinates(seals)[,2]<7924), ] # strip 14
-  # seals = seals[(coordinates(seals)[,2]>7910) & (coordinates(seals)[,2]<7920), ] # strip 15
+  seals <- seals[(sp::coordinates(seals)[, 2] > 7947) & (sp::coordinates(seals)[, 2] < 7954), ] # strip 9
+  # seals = seals[(sp::coordinates(seals)[,2]>7931) & (sp::coordinates(seals)[,2]<7938.5), ] # strip 12
+  # seals = seals[(sp::coordinates(seals)[,2]>7925) & (sp::coordinates(seals)[,2]<7930), ] # strip 13
+  # seals = seals[(sp::coordinates(seals)[,2]>7920) & (sp::coordinates(seals)[,2]<7924), ] # strip 14
+  # seals = seals[(sp::coordinates(seals)[,2]>7910) & (sp::coordinates(seals)[,2]<7920), ] # strip 15
 
   #' Add total number of seals
 
@@ -48,11 +48,11 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   #' Build a mesh. This mesh will be fine at the photo locations but coarse elsewhere
 
-  bnd <- fm_extensions(coordinates(seals), convex = c(0.5, 0.7))
+  bnd <- fm_extensions(sp::coordinates(seals), convex = c(0.5, 0.7))
   mesh <- fm_mesh_2d_inla(
     boundary = bnd,
     max.edge = c(0.2, 3),
-    crs = fm_CRS(projargs = CRS(target.p4s))
+    crs = fm_CRS(projargs = sp::CRS(target.p4s))
   )
   # ggplot() + gg(mesh) + gg(seals) + coord_equal()
   # mesh$n
@@ -74,7 +74,7 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   stop("Old internal methods needed by import.seals have been removed.")
   # TODO: replace old code in misc/ with modern code
-  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
+  #  icecv <- sp::covariate(ice, predictor = "band1", mesh = mesh)
   icecv <- NULL
   #  plot(icecv)
 
@@ -85,7 +85,7 @@ import.seals <- function(sealfile = "WestIce2012.csv",
   ice.band1 <- function(x, y) {
     NULL
   }
-  seals$ice <- ice.band1(x = coordinates(seals)[, 1], y = coordinates(seals)[, 2])
+  seals$ice <- ice.band1(x = sp::coordinates(seals)[, 1], y = sp::coordinates(seals)[, 2])
 
   #' Plot seal count and ice together
   #

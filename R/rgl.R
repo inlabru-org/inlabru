@@ -77,16 +77,16 @@ glplot <- function(object, ...) {
 
 
 glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
-  if (length(coordnames(object)) < 3) {
+  if (length(sp::coordnames(object)) < 3) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
-    coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- fm_CRS(object)
+    sp::coordinates(ll) <- c(sp::coordnames(object), "TMP.ZCOORD")
+    sp::proj4string(ll) <- fm_CRS(object)
     object <- ll
   }
 
   object <- fm_transform(object, crs = fm_crs("sphere"))
-  cc <- coordinates(object)
+  cc <- sp::coordinates(object)
   requireNamespace("rgl")
   rgl::points3d(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
 }
@@ -99,22 +99,22 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
 #' @family inlabru RGL tools
 
 glplot.SpatialLines <- function(object, add = TRUE, ...) {
-  qq <- coordinates(object)
+  qq <- sp::coordinates(object)
   sp <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))))
   ep <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))))
   sp <- data.frame(x = sp[, 1], y = sp[, 2], z = 0)
   ep <- data.frame(x = ep[, 1], y = ep[, 2], z = 0)
 
-  coordinates(sp) <- c("x", "y", "z")
-  coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- fm_CRS(object)
-  proj4string(ep) <- fm_CRS(object)
+  sp::coordinates(sp) <- c("x", "y", "z")
+  sp::coordinates(ep) <- c("x", "y", "z")
+  sp::proj4string(sp) <- fm_CRS(object)
+  sp::proj4string(ep) <- fm_CRS(object)
 
   sp <- fm_transform(sp, crs = fm_crs("sphere"))
   ep <- fm_transform(ep, crs = fm_crs("sphere"))
 
-  cs <- coordinates(sp)
-  ce <- coordinates(ep)
+  cs <- sp::coordinates(sp)
+  ce <- sp::coordinates(ep)
   na <- matrix(NA, ncol = 3, nrow = nrow(cs))
 
   mm <- matrix(t(cbind(cs, ce, na)), ncol = 3, nrow = 3 * nrow(ce), byrow = TRUE)

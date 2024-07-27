@@ -52,19 +52,6 @@
 #'     coord_equal()
 #' }
 #' }
-#' \dontrun{
-#' if (requireNamespace("ggmap", quietly = TRUE) &&
-#'   require("ggplot2", quietly = TRUE)) {
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$ppoly, color = "blue") +
-#'     gm(mexdolphin$samplers) +
-#'     gm(mexdolphin$points, aes(size = size), color = "red")
-#'
-#'   gmap(mexdolphin$depth) +
-#'     gm(mexdolphin$depth, aes(col = depth)) +
-#'     gm(mexdolphin$ppoly)
-#' }
-#' }
 "mexdolphin"
 
 #' @name mexdolphin_sf

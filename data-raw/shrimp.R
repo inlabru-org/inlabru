@@ -20,8 +20,8 @@ import.shrimp <- function() {
   colnames(gamba) <- c("catch", "landing", "depth", "lat", "lon")
 
   # Turn into spatial object
-  coordinates(gamba) <- c("lon", "lat")
-  proj4string(gamba) <- CRS("+proj=longlat")
+  sp::coordinates(gamba) <- c("lon", "lat")
+  sp::proj4string(gamba) <- CRS("+proj=longlat")
 
   # Make a mesh
   mesh <- fm_mesh_2d_inla(

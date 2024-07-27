@@ -195,7 +195,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       if (use.crs) {
         internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
       } else {
-        internal.crs <- CRS(as.character(NA))
+        internal.crs <- fm_CRS(NA_character_)
         mesh$crs <- NULL
       }
     }
@@ -265,7 +265,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         } else if (use.crs) {
           target.crs <- fm_CRS(input.crs)
         } else {
-          target.crs <- CRS(as.character(NA))
+          target.crs <- fm_CRS(NA_character_)
         }
         if (sum(Npoints) > 0) {
           points <- sp::SpatialPoints(points, proj4string = target.crs)
@@ -294,7 +294,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         Npoints <- rpois(1, lambda = area * exp(lambda_max))
 
         if (Npoints == 0) {
-          ret <- SpatialPoints(matrix(0, 1, 2), proj4string = internal.crs)[-1]
+          ret <- sp::SpatialPoints(matrix(0, 1, 2), proj4string = internal.crs)[-1]
           waste_ratio <- 0
         } else {
           # Simulate uniform points on the bounding rectangle
@@ -323,7 +323,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         }
 
         if (Npoints == 0) {
-          ret <- SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
+          ret <- sp::SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
           waste_ratio <- 0
         } else {
           # Choose z uniformly distributed in [-1,1].
@@ -335,8 +335,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           y <- r * sin(t)
 
           points <- data.frame(x, y, z)
-          coordinates(points) <- c("x", "y", "z")
-          proj4string(points) <- internal.crs
+          sp::coordinates(points) <- c("x", "y", "z")
+          sp::proj4string(points) <- internal.crs
 
           proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
@@ -387,8 +387,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           y <- r * sin(angle)
 
           points <- data.frame(x, y, z)
-          coordinates(points) <- c("x", "y", "z")
-          proj4string(points) <- internal.crs
+          sp::coordinates(points) <- c("x", "y", "z")
+          sp::proj4string(points) <- internal.crs
 
           proj <- fm_evaluator(mesh, points)$proj
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
@@ -429,9 +429,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
       }
       if (use.crs) {
-        proj4string(ret) <- fm_CRS(input.crs)
+        sp::proj4string(ret) <- fm_CRS(input.crs)
       } else {
-        proj4string(ret) <- CRS(as.character(NA))
+        sp::proj4string(ret) <- fm_CRS(NA_character_)
       }
     } else {
       if (use.crs) {
@@ -439,13 +439,13 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
           ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
-          proj4string(ret) <- fm_CRS(input.crs)
+          sp::proj4string(ret) <- fm_CRS(input.crs)
         } else {
           ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
-          proj4string(ret) <- fm_CRS(input.crs)
+          sp::proj4string(ret) <- fm_CRS(input.crs)
         }
       } else {
-        proj4string(ret) <- sp::CRS(NA_character_)
+        sp::proj4string(ret) <- fm_CRS(NA_character_)
       }
     }
 

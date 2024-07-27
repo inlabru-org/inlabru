@@ -33,7 +33,6 @@ if (require("ggplot2", quietly = TRUE)) {
 Other geomes for inla and inlabru predictions: 
 \code{\link{gg}()},
 \code{\link{gg.bru_prediction}()},
-\code{\link{gg.data.frame}()},
-\code{\link{gm}()}
+\code{\link{gg.data.frame}()}
 }
 \concept{geomes for inla and inlabru predictions}

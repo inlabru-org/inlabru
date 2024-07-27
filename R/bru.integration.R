@@ -41,7 +41,6 @@
 #' @return `ipoints()`: A `data.frame`, `tibble`, `sf`, or `SpatialPointsDataFrame` of 1D and
 #' 2D integration points, including a `weight` column and `.block` column.
 #'
-#' @importFrom sp coordnames coordinates
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
                     project = deprecated()) {

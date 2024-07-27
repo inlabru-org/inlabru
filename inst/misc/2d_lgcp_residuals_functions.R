@@ -64,8 +64,8 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
-  df <- SpatialPointsDataFrame(
-    coords = rbind(domain$loc[, 1:2], coordinates(observations)),
+  df <- sp::SpatialPointsDataFrame(
+    coords = rbind(domain$loc[, 1:2], sp::coordinates(observations)),
     data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
     proj4string = fm_CRS(domain)
   )
@@ -270,15 +270,15 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- rast(terra::ext(samplers),
-      crs = proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       nrows = nrows, ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- rast(terra::ext(samplers),
-      crs = proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       resolution = resolution
     )
   }

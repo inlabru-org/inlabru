@@ -2,6 +2,7 @@
 #
 #
 # @aliases sfill
+# @keywords internal
 # @export
 # @param data A SpatialGridDataFrame or SpatialPixelDataFrame
 # @param where Spatial*DataFrame of locations for which to fill in values from \code{data}. If NULL, use \code{data} to determine the locations.
@@ -15,7 +16,7 @@ sfill <- function(data, where = NULL) {
   }
   vallist <- list()
   for (k in seq_len(ncol(data@data))) {
-    dpoints <- SpatialPoints(data)
+    dpoints <- sp::SpatialPoints(data)
     vals <- data@data[, k]
     dpoints <- dpoints[!is.na(vals), ]
     vals <- vals[!is.na(vals)]
@@ -37,12 +38,13 @@ sfill <- function(data, where = NULL) {
   ret <- data.frame(do.call(data.frame, vallist))
   colnames(ret) <- colnames(data@data)
   ret <- sp::SpatialPixelsDataFrame(where, data = ret)
+  ret
 }
 
 
 #' Convert data frame to SpatialLinesDataFrame
 #'
-#' A line in 2D space is defined by a start and an and point, each associated with 2D coordinates.
+#' A line in 2D space is defined by a start and an end point, each associated with 2D coordinates.
 #' This function takes a `data.frame` as input and assumes that each row defines a line in space.
 #' In order to do so, the data frame must have at least four columns and the `start.cols` and
 #' `end.cols` parameters must be used to point out the names of the columns that define
@@ -60,9 +62,10 @@ sfill <- function(data, where = NULL) {
 #' @param end.cols Character array poitning out the columns of `data` that hold the end points of the lines
 #' @param crs Coordinate reference system of the original `data`
 #' @param to.crs Coordinate reference system for the SpatialLines ouput.
-#' @return SpatialLinesDataFrame
+#' @return [sp::SpatialLinesDataFrame]
+#' @keywords internal
 #'
-#' @examples
+#' @examplesIf bru_safe_sp(quietly = TRUE)
 #' \donttest{
 #' # Create a data frame defining three lines
 #' lns <- data.frame(
@@ -84,7 +87,7 @@ sfill <- function(data, where = NULL) {
 #' }
 #' }
 #'
-sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.crs = NULL) {
+sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), to.crs = NULL) {
   sp <- as.data.frame(data[, start.cols])
   ep <- as.data.frame(data[, end.cols])
 
@@ -92,14 +95,14 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
   colnames(ep) <- c("x", "y")
 
   lilist <- lapply(seq_len(nrow(sp)), function(k) {
-    Lines(list(Line(rbind(sp[k, ], ep[k, ]))), ID = k)
+    sp::Lines(list(sp::Line(rbind(sp[k, ], ep[k, ]))), ID = k)
   })
-  spl <- SpatialLines(lilist, proj4string = crs)
+  spl <- sp::SpatialLines(lilist, proj4string = crs)
 
   df <- data[, setdiff(names(data), c(start.cols, end.cols))]
   rownames(df) <- seq_len(nrow(df))
 
-  slines <- SpatialLinesDataFrame(spl, data = df)
+  slines <- sp::SpatialLinesDataFrame(spl, data = df)
 
   # If requested, change CRS
   if (!is.null(to.crs)) slines <- fm_transform(slines, to.crs)
@@ -121,6 +124,7 @@ sline <- function(data, start.cols, end.cols, crs = CRS(as.character(NA)), to.cr
 #' `to.crs` parameter.
 #'
 #' @aliases spoly
+#' @keywords internal
 #' @export
 #' @param data A data.frame of points describing the boundary of the polygon
 #' @param cols Column names of the x and y coordinates within the data

@@ -146,7 +146,7 @@ import.mexdolphin <- function() {
   # Set mesh crs
   mexdolphin$mesh$crs <- fm_crs(target_crs)
 
-  coordnames(mexdolphin$samplers) <- coordnames(mexdolphin$points)
+  sp::coordnames(mexdolphin$samplers) <- sp::coordnames(mexdolphin$points)
 
   # Remove all-NA columns such as "distance" from samplers, since they may
   # interfere with normal usage.
@@ -212,7 +212,7 @@ import.mexdolphin <- function() {
     loglambda = llambda,
     samplers = mexdolphin$ppoly
   )
-  coordnames(pts) <- c("x", "y", "z")
+  sp::coordnames(pts) <- c("x", "y", "z")
 
   mexdolphin$simulated <- sp::SpatialPointsDataFrame(
     coords = pts,

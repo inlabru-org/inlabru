@@ -15,6 +15,6 @@ shapefile.to.covariate <- function(shapefile, coords = c("x", "y")) {
   }
 
   fun <- function(loc) {
-    sp::over(SpatialPoints(as.data.frame(loc[, coords])), shapefile, fn = NULL)[, 1]
+    sp::over(sp::SpatialPoints(as.data.frame(loc[, coords])), shapefile, fn = NULL)[, 1]
   }
 }

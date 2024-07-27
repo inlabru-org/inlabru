@@ -66,7 +66,8 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
-  loc <- SpatialPoints(gorillas$mesh$loc[, c(1, 2)],
+  loc <- sp::SpatialPoints(
+    gorillas$mesh$loc[, c(1, 2)],
     proj4string = fm_CRS(gorillas$nests)
   )
   set.seed(123L)

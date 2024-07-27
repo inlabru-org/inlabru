@@ -23,7 +23,7 @@ makepoly <- function(start, width, height) {
     ),
     ncol = 2, byrow = TRUE
   )
-  return(Polygon(poly))
+  return(sp::Polygon(poly))
 }
 
 #' @title Create a plot sample.
@@ -101,9 +101,9 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 
   polys <- vector("list", nplots)
   for (i in 1:nplots) {
-    polys[[i]] <- Polygons(list(makepoly(as.numeric(starts[i, ]), width, height)), i)
+    polys[[i]] <- sp::Polygons(list(makepoly(as.numeric(starts[i, ]), width, height)), i)
   }
-  plots <- SpatialPolygons(polys, proj4string = fm_CRS(spdf))
+  plots <- sp::SpatialPolygons(polys, proj4string = fm_CRS(spdf))
   plots <- raster::intersect(boundary, plots) # remove bits of plot outside boundary
   dets <- spdf[plots, ] # extract only those nests inside the polygons (neat!)
 
@@ -142,8 +142,8 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #'     gg(plotpts$dets) +
 #'     gg(gorillas$boundary)
 #'   countdata <- point2count(plotpts$plots, plotpts$dets)
-#'   x <- coordinates(countdata)[, 1]
-#'   y <- coordinates(countdata)[, 2]
+#'   x <- sp::coordinates(countdata)[, 1]
+#'   y <- sp::coordinates(countdata)[, 2]
 #'   count <- countdata@data$n
 #'   p2 <- ggplot() +
 #'     gg(gorillas$boundary) +
@@ -159,8 +159,8 @@ point2count <- function(plots, dets) {
   np <- length(plots)
   x <- y <- plotarea <- count <- numeric(length = np)
   for (i in 1:np) {
-    polylist <- list(Polygons(list(plots@polygons[[i]]@Polygons[[1]]), 1))
-    spoly <- SpatialPolygons(polylist, proj4string = CRS(as.character(proj4string(plots))))
+    polylist <- list(sp::Polygons(list(plots@polygons[[i]]@Polygons[[1]]), 1))
+    spoly <- sp::SpatialPolygons(polylist, proj4string = sp::CRS(as.character(sp::proj4string(plots))))
     count[i] <- dim(dets[spoly, ])[1]
 
     plotarea[i] <- plots@polygons[[i]]@area
@@ -173,9 +173,9 @@ point2count <- function(plots, dets) {
   # make a data frame of it
   countdf <- data.frame(n = count, area = plotarea, x = x, y = y)
   # make SpatialPointsDataFrame of it
-  plotcounts <- SpatialPointsDataFrame(
+  plotcounts <- sp::SpatialPointsDataFrame(
     coords = data.frame(x = x, y = y), data = data.frame(n = count, area = plotarea),
-    proj4string = CRS(as.character(proj4string(plots)))
+    proj4string = sp::CRS(as.character(sp::proj4string(plots)))
   )
   return(plotcounts)
 }

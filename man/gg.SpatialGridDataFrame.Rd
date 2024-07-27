@@ -26,7 +26,7 @@ Requires the \code{ggplot2} package.
       require("sp")) {
     # Load Gorilla data
 
-    data("gorillas", package = "inlabru")
+    gorillas <- inlabru::gorillas
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
@@ -43,7 +43,7 @@ Requires the \code{ggplot2} package.
 
     # Load pantropical dolphin data
 
-    data("mexdolphin", package = "inlabru")
+    mexdolphin <- inlabru::mexdolphin
 
     # Plot the pantropical survey boundary, ship transects and dolphin sightings
 
@@ -83,7 +83,6 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
-\code{\link{gg.sf}()},
-\code{\link{gm}()}
+\code{\link{gg.sf}()}
 }
 \concept{geomes for spatial data}

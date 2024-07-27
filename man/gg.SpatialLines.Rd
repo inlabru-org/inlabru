@@ -12,7 +12,7 @@
 \item{mapping}{Aesthetic mappings created by \code{ggplot2::aes} or \code{ggplot2::aes_}
 used to update the default
 mapping. The default mapping is
-\code{ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]], xend = .data[[paste0("end.", coordnames(data)[1])]], yend = .data[[paste0("end.", coordnames(data)[2])]])}.}
+\code{ggplot2::aes(x = .data[[sp::coordnames(data)[1]]], y = .data[[sp::coordnames(data)[2]]], xend = .data[[paste0("end.", sp::coordnames(data)[1])]], yend = .data[[paste0("end.", sp::coordnames(data)[2])]])}.}
 
 \item{crs}{A \code{CRS} object defining the coordinate system to project the data
 to before plotting.}
@@ -33,7 +33,7 @@ lines between them. Requires the \code{ggplot2} package.
       require("sp")) {
     # Load Gorilla data
 
-    data("gorillas", package = "inlabru")
+    gorillas <- inlabru::gorillas
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
@@ -50,7 +50,7 @@ lines between them. Requires the \code{ggplot2} package.
 
     # Load pantropical dolphin data
 
-    data("mexdolphin", package = "inlabru")
+    mexdolphin <- inlabru::mexdolphin
 
     # Plot the pantropical survey boundary, ship transects and dolphin sightings
 
@@ -90,7 +90,6 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
-\code{\link{gg.sf}()},
-\code{\link{gm}()}
+\code{\link{gg.sf}()}
 }
 \concept{geomes for spatial data}

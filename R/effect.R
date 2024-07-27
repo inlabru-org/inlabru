@@ -1025,7 +1025,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       rbind,
       lapply(
         inp,
-        function(x) coordinates(x)
+        function(x) sp::coordinates(x)
       )
     ))
     n_values <- nrow(inp_values)
@@ -1676,6 +1676,24 @@ summary.component_list <- function(object, verbose = TRUE, ...) {
   result
 }
 
+#' @export
+#' @method print component
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+print.component <- function(x, ...) {
+  print(summary(x, ...))
+  invisible(x)
+}
+
+#' @export
+#' @method print component_list
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+print.component_list <- function(x, ...) {
+  print(summary(x, ...))
+  invisible(x)
+}
+
 
 #' @export
 #' @method format bru_subcomponent
@@ -1705,6 +1723,16 @@ summary.bru_subcomponent <- function(object, verbose = TRUE, ..., label.override
     class = "summary_bru_subcomponent"
   )
   res
+}
+
+#' @export
+#' @method print bru_subcomponent
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+print.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL) {
+  text <- format(x, verbose = verbose, ..., label.override = label.override)
+  cat(text, "\n", sep = "")
+  invisible(x)
 }
 
 #' @export
@@ -1755,6 +1783,22 @@ summary.bru_input <- function(object, verbose = TRUE, ..., label.override = NULL
     class = "summary_bru_input"
   )
   return(res)
+}
+
+#' @export
+#' @method print bru_input
+#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname summary.component
+print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
+  cat(
+    format(x,
+           verbose = verbose,
+           ...,
+           label.override = label.override),
+    "\n",
+    sep = ""
+  )
+  return(invisible(x))
 }
 
 
@@ -2149,14 +2193,14 @@ input_eval.bru_input <- function(input, data, env = NULL,
         expr = {
           # Return SpatialPoints instead of a matrix
           val <- as.data.frame(val)
-          coordinates(val) <- seq_len(ncol(val))
+          sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_CRS(data),
             error = function(e) {
             }
           )
           if (!fm_crs_is_null(data_crs)) {
-            proj4string(val) <- data_crs
+            sp::proj4string(val) <- data_crs
           }
           val
         },
