@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -224,14 +224,14 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9002</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'poisson'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
@@ -239,7 +239,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.347, Running = 2.73, Post = 0.565, Total = 3.64 </span></span>
+<span><span class="co">#&gt;     Pre = 0.344, Running = 2.59, Post = 0.536, Total = 3.47 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
@@ -342,14 +342,14 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9002</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; field: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'zeroinflatedpoisson1'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
@@ -357,7 +357,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.362, Running = 1.64, Post = 0.127, Total = 2.13 </span></span>
+<span><span class="co">#&gt;     Pre = 0.358, Running = 1.61, Post = 0.126, Total = 2.09 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -540,18 +540,18 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.504e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.586e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -2.352e-17</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.651e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -9.851e-17</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.8e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04578, norm1 = 7.235e-12, norm01 = 0.04578)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04578</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.655e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.235e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04577, norm1 = 7.425e-12, norm01 = 0.04577)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04577</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.701e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.424e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Max deviation from previous: 0.727% of SD, and line search is inactive</span></span>
@@ -561,17 +561,17 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Iteration 3 [max:10]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9001</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9002</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
-<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field_present: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; Intercept_present: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation_present: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; Intercept_count: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">#&gt; field_count: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; field_present: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; Intercept_present: main = linear(1), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; elevation_present: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; Intercept_count: main = linear(1), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; elevation: main = linear(gcov$elevation), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">#&gt; field_count: main = spde(geometry), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
 <span><span class="co">#&gt; Likelihoods:</span></span>
 <span><span class="co">#&gt;   Family: 'binomial'</span></span>
 <span><span class="co">#&gt;     Data class: 'sf', 'data.frame'</span></span>
@@ -586,7 +586,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt;     Used components: effects[Intercept_count, elevation, field_count], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.526, Running = 3.93, Post = 0.269, Total = 4.72 </span></span>
+<span><span class="co">#&gt;     Pre = 0.519, Running = 3.87, Post = 0.258, Total = 4.64 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
@@ -868,24 +868,24 @@ respectively. The (negated) Log score is a strictly proper score <span class="ci
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2422380</td>
-<td align="right">0.5605907</td>
-<td align="right">-2.602006</td>
-<td align="right">0.3927699</td>
+<td align="right">0.2424319</td>
+<td align="right">0.5607617</td>
+<td align="right">-2.604949</td>
+<td align="right">0.3926388</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2545593</td>
-<td align="right">0.6006892</td>
-<td align="right">-2.687138</td>
-<td align="right">0.4024563</td>
+<td align="right">0.2546118</td>
+<td align="right">0.6008079</td>
+<td align="right">-2.685073</td>
+<td align="right">0.4025253</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2797896</td>
-<td align="right">0.6529122</td>
-<td align="right">-2.300034</td>
-<td align="right">0.4000241</td>
+<td align="right">0.2802448</td>
+<td align="right">0.6543352</td>
+<td align="right">-2.308651</td>
+<td align="right">0.4002015</td>
 </tr>
 </tbody>
 </table>

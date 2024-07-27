@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-07-19</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-07-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -247,15 +247,15 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  All <span class="op">=</span> <span class="va">Lambda.all</span>,</span>
 <span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots    655.8772 56.59623 565.0301 651.5876 768.0011 651.5876      3.806766</span></span>
-<span><span class="co">#&gt; PlotsEmp 640.1962 44.66762 563.6700 635.8130 722.2222 635.8130      3.235756</span></span>
-<span><span class="co">#&gt; All      672.7760 26.22525 627.4369 672.2540 720.2366 672.2540      1.872094</span></span>
-<span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA            NA</span></span>
+<span><span class="co">#&gt;              mean       sd   q0.025     q0.5  q0.975   median sd.mc_std_err</span></span>
+<span><span class="co">#&gt; Plots    650.7735 52.52992 554.0048 652.3110 754.573 652.3110      4.389469</span></span>
+<span><span class="co">#&gt; PlotsEmp 637.3141 37.65749 564.9600 635.6630 713.375 635.6630      2.707424</span></span>
+<span><span class="co">#&gt; All      672.7202 30.38625 621.5920 671.5062 738.397 671.5062      2.410679</span></span>
+<span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.000       NA            NA</span></span>
 <span><span class="co">#&gt;          mean.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots           6.420976</span></span>
-<span><span class="co">#&gt; PlotsEmp        5.113913</span></span>
-<span><span class="co">#&gt; All             2.996944</span></span>
+<span><span class="co">#&gt; Plots           6.130886</span></span>
+<span><span class="co">#&gt; PlotsEmp        4.307233</span></span>
+<span><span class="co">#&gt; All             3.520761</span></span>
 <span><span class="co">#&gt; AllEmp                NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">

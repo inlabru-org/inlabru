@@ -9,7 +9,7 @@ lines between them. Requires the ggplot2 package."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,7 @@ lines between them. Requires the <code>ggplot2</code> package.</p>
 <dd><p>Aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">ggplot2::aes</a></code> or <code><a href="https://ggplot2.tidyverse.org/reference/aes_.html" class="external-link">ggplot2::aes_</a></code>
 used to update the default
 mapping. The default mapping is
-<code>ggplot2::aes(x = .data[[coordnames(data)[1]]], y = .data[[coordnames(data)[2]]], xend = .data[[paste0("end.", coordnames(data)[1])]], yend = .data[[paste0("end.", coordnames(data)[2])]])</code>.</p></dd>
+<code>ggplot2::aes(x = .data[[sp::coordnames(data)[1]]], y = .data[[sp::coordnames(data)[2]]], xend = .data[[paste0("end.", sp::coordnames(data)[1])]], yend = .data[[paste0("end.", sp::coordnames(data)[2])]])</code>.</p></dd>
 
 
 <dt id="arg-crs">crs<a class="anchor" aria-label="anchor" href="#arg-crs"></a></dt>
@@ -124,8 +124,7 @@ to before plotting.</p></dd>
 <code><a href="gg.SpatialPixelsDataFrame.html">gg.SpatialPixelsDataFrame</a>()</code>,
 <code><a href="gg.SpatialPoints.html">gg.SpatialPoints</a>()</code>,
 <code><a href="gg.SpatialPolygons.html">gg.SpatialPolygons</a>()</code>,
-<code><a href="gg.sf.html">gg.sf</a>()</code>,
-<code><a href="gm.html">gm</a>()</code></p></div>
+<code><a href="gg.sf.html">gg.sf</a>()</code></p></div>
     </div>
 
     <div class="section level2">
@@ -136,7 +135,7 @@ to before plotting.</p></dd>
 <span class="r-in"><span>      <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/edzer/sp/" class="external-link">"sp"</a></span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="co"># Load Gorilla data</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"gorillas"</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">gorillas</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">::</span><span class="va"><a href="gorillas.html">gorillas</a></span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.</span></span></span>
 <span class="r-in"><span>    <span class="co"># The same syntax applies to SpatialGridDataFrame objects.</span></span></span>
@@ -153,7 +152,7 @@ to before plotting.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Load pantropical dolphin data</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mexdolphin"</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">mexdolphin</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">::</span><span class="va"><a href="mexdolphin.html">mexdolphin</a></span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="co"># Plot the pantropical survey boundary, ship transects and dolphin sightings</span></span></span>
 <span class="r-in"><span></span></span>
