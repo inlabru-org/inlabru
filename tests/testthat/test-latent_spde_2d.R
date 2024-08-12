@@ -1,6 +1,7 @@
 test_that("Georeferenced data with sp", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   set.seed(123)
   mydata <- expand.grid(
@@ -25,13 +26,13 @@ test_that("Georeferenced data with sp", {
   )
 
   # Check that mistaken empty or unnamed arguments are detected
-  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern, )
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern, )
   expect_error(
     component_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
   )
 
-  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern)
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern)
 
   fit <- bru(
     cmp,

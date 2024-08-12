@@ -1,6 +1,7 @@
 test_that("2D LGCP fitting and prediction: Plot sampling", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   options <- list(
     control.inla = list(

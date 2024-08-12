@@ -1,6 +1,7 @@
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   data(gorillas, package = "inlabru", envir = environment())

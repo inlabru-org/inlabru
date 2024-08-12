@@ -2092,19 +2092,19 @@ expand_to_dataframe <- function(x, data = NULL) {
   if (inherits(x, "Spatial")) {
     bru_safe_sp(force = TRUE)
     if (inherits(x, "SpatialPixels") &&
-        !inherits(x, "SpatialPixelsDataFrame")) {
+      !inherits(x, "SpatialPixelsDataFrame")) {
       result <- sp::SpatialPixelsDataFrame(x, data = data)
     } else if (inherits(x, "SpatialGrid") &&
-               !inherits(x, "SpatialGridDataFrame")) {
+      !inherits(x, "SpatialGridDataFrame")) {
       result <- sp::SpatialGridDataFrame(x, data = data)
     } else if (inherits(x, "SpatialLines") &&
-               !inherits(x, "SpatialLinesDataFrame")) {
+      !inherits(x, "SpatialLinesDataFrame")) {
       result <- sp::SpatialLinesDataFrame(x, data = data)
     } else if (inherits(x, "SpatialPolygons") &&
-               !inherits(x, "SpatialPolygonsDataFrame")) {
+      !inherits(x, "SpatialPolygonsDataFrame")) {
       result <- sp::SpatialPolygonsDataFrame(x, data = data)
     } else if (inherits(x, "SpatialPoints") &&
-               !inherits(x, "SpatialPointsDataFrame")) {
+      !inherits(x, "SpatialPointsDataFrame")) {
       # Other classes inherit from SpatialPoints, so need to be handled first
       result <- sp::SpatialPointsDataFrame(x, data = data)
     } else {

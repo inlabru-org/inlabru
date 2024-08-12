@@ -1,6 +1,7 @@
 test_that("Missing data infilling", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   points <-
     sp::SpatialPointsDataFrame(
