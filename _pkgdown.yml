@@ -6,7 +6,7 @@ template:
 navbar:
   structure:
     left: [home, intro, reference, general-articles, lgcp-articles, technical-articles, news]
-    right: [github]
+    right: [search, github]
   components:
     general-articles:
       text: General examples
