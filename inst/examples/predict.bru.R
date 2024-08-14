@@ -1,5 +1,5 @@
 \donttest{
-if (bru_safe_inla(multicore = FALSE) &&
+if (bru_safe_inla() &&
     bru_safe_sp() &&
     require("sp") &&
     require("sn", quietly = TRUE) &&

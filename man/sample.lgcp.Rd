@@ -72,7 +72,7 @@ or \code{R}, if specified. Output given in the same CRS as the mesh.
 \examples{
 \donttest{
 # The INLA package is required
-if (bru_safe_inla(quietly = TRUE) &&
+if (bru_safe_inla() &&
   bru_safe_sp() &&
   require("sp")) {
   vertices <- seq(0, 3, by = 0.1)
@@ -87,7 +87,7 @@ if (bru_safe_inla(quietly = TRUE) &&
 
 \donttest{
 # The INLA package is required
-if (bru_safe_inla(quietly = TRUE) &&
+if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   bru_safe_sp() &&
   require("sp")) {

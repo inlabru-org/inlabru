@@ -230,7 +230,7 @@ component <- function(...) {
 #'
 #' @examples
 #' \donttest{
-#' if (bru_safe_inla(quietly = TRUE)) {
+#' if (bru_safe_inla()) {
 #'   # As an example, let us create a linear component. Here, the component is
 #'   # called "myEffectOfX" while the covariate the component acts on is called "x":
 #'
@@ -1296,7 +1296,7 @@ make_submapper <- function(subcomp_n,
 #' @family mappers
 #' @export
 #' @examples
-#' if (bru_safe_inla(quietly = TRUE)) {
+#' if (bru_safe_inla()) {
 #'   library(INLA)
 #'   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
 #'   spde <- inla.spde2.pcmatern(mesh,

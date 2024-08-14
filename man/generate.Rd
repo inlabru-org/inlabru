@@ -91,7 +91,7 @@ generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE) &&
+if (bru_safe_inla() &&
     require("sn", quietly = TRUE)) {
 
   # Generate data for a simple linear model

@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \donttest{
-#' if (bru_safe_inla(multicore = FALSE)) {
+#' if (bru_safe_inla()) {
 #'   # Generate some data
 #'   input.df <- data.frame(idx = 1:10, x = cos(1:10))
 #'   input.df <- within(

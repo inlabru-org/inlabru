@@ -103,7 +103,7 @@ generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE) &&
+if (bru_safe_inla() &&
     bru_safe_sp() &&
     require("sp") &&
     require("sn", quietly = TRUE) &&
