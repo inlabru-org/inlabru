@@ -81,6 +81,9 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/inlabru-org/inlabru/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
@@ -99,7 +102,7 @@
                         <h4 data-toc-skip class="author">Fabian E.
 Bachl</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-08-12</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-08-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_multilikelihood.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_multilikelihood.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_multilikelihood.Rmd</code></div>
@@ -254,10 +257,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.675, Running = 20.4, Post = 0.18, Total = 21.2 </span></span>
+<span><span class="co">#&gt;     Pre = 0.69, Running = 21.9, Post = 0.176, Total = 22.7 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.353 1.362     -3.022   -0.353      2.316 -0.353   0</span></span>
+<span><span class="co">#&gt;             mean   sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
+<span><span class="co">#&gt; Intercept -0.357 1.38     -3.062   -0.357      2.348 -0.357   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -266,19 +269,19 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.937 0.573      2.003    2.872      4.249 2.730</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.046 0.332      1.488    2.014      2.792 1.942</span></span>
-<span><span class="co">#&gt; Range for Difference 2.029 2.564      0.174    1.256      8.628 0.464</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.159 0.084      0.038    0.144      0.355 0.106</span></span>
+<span><span class="co">#&gt; Range for Common     2.936 0.573      1.991    2.875       4.24 2.746</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.046 0.333      1.480    2.015       2.79 1.950</span></span>
+<span><span class="co">#&gt; Range for Difference 2.252 3.109      0.150    1.310      10.14 0.397</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.161 0.090      0.038    0.143       0.38 0.102</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 593.20</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 591.55</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -771.67</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 590.65</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 589.00</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -773.51</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1631.55</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 106.35</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1629.14</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.24 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.08 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -302,10 +305,10 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt;     Predictor: geometry ~ Intercept + Common + Difference/2</span></span>
 <span><span class="co">#&gt;     Used components: effects[Common, Difference, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.517, Running = 9.82, Post = 0.151, Total = 10.5 </span></span>
+<span><span class="co">#&gt;     Pre = 0.533, Running = 9.65, Post = 0.145, Total = 10.3 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; Intercept -0.355 1.368     -3.036   -0.355      2.326 -0.355   0</span></span>
+<span><span class="co">#&gt; Intercept -0.357 1.361     -3.024   -0.357      2.309 -0.357   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -314,19 +317,19 @@ improves the accuracy of the posterior distribution estimation.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                       mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for Common     2.935 0.573      1.998    2.871      4.244 2.734</span></span>
-<span><span class="co">#&gt; Stdev for Common     2.047 0.332      1.486    2.016      2.791 1.946</span></span>
-<span><span class="co">#&gt; Range for Difference 2.071 2.851      0.139    1.208      9.303 0.370</span></span>
-<span><span class="co">#&gt; Stdev for Difference 0.159 0.093      0.036    0.139      0.389 0.096</span></span>
+<span><span class="co">#&gt; Range for Common     2.932 0.573      2.001     2.87      4.247 2.722</span></span>
+<span><span class="co">#&gt; Stdev for Common     2.049 0.332      1.490     2.02      2.794 1.946</span></span>
+<span><span class="co">#&gt; Range for Difference 2.086 2.852      0.143     1.22      9.330 0.379</span></span>
+<span><span class="co">#&gt; Stdev for Difference 0.159 0.092      0.036     0.14      0.385 0.098</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 591.04</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 589.40</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: -773.27</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 592.61</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 590.96</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: -772.11</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1629.54</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 105.21</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1630.76</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 105.85</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.04 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -1204.06 </span></span>
 <span><span class="co">#&gt;  is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
