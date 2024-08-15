@@ -371,7 +371,7 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ~ . + f(myLinearEffectOfX, model =</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       BRU_myLinearEffectOfX_main_model)</span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># As an example, let us create a linear component. Here, the component is</span></span></span>
 <span class="r-in"><span>  <span class="co"># called "myEffectOfX" while the covariate the component acts on is called "x":</span></span></span>
 <span class="r-in"><span></span></span>
@@ -389,6 +389,8 @@ Finn Lindgren <a href="mailto:Finn.Lindgren@gmail.com">Finn.Lindgren@gmail.com</
 <span class="r-in"><span>  <span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu">component</span><span class="op">(</span><span class="st">"eff"</span>, <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span>, model <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Label:	eff</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Type:	main = fixed, group = exchangeable, replicate = iid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Input:	main = ~-1 + x:z, group = 1L, replicate = 1L, NULL</span>

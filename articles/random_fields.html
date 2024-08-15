@@ -102,7 +102,7 @@
                         <h4 data-toc-skip class="author">Finn
 Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-08-14</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-08-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/random_fields.Rmd" class="external-link"><code>vignettes/articles/random_fields.Rmd</code></a></small>
       <div class="d-none name"><code>random_fields.Rmd</code></div>
@@ -272,6 +272,8 @@ add all components (unless a subset is selected via the
 <span>    E <span class="op">=</span> <span class="va">exposure</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Current num.threads is '4:1'.</span></span>
+<span><span class="co">#&gt; Setting INLA option num.threads to '1:1'. Previous value '4:1'.</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2.bru</span><span class="op">)</span></span>
 <span><span class="co">#&gt; inlabru version: 2.11.1.9002</span></span>
@@ -286,25 +288,25 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
 <span><span class="co">#&gt;     Used components: effects[field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.745, Running = 0.213, Post = 0.124, Total = 1.08 </span></span>
+<span><span class="co">#&gt;     Pre = 0.726, Running = 0.193, Post = 0.119, Total = 1.04 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
-<span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span></span>
-<span><span class="co">#&gt; Intercept 0.978 0.702     -0.008    0.857      3.166 0.812 0.004</span></span>
+<span><span class="co">#&gt;            mean  sd 0.025quant 0.5quant 0.975quant  mode   kld</span></span>
+<span><span class="co">#&gt; Intercept 0.978 0.7     -0.008    0.857      3.144 0.812 0.004</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
 <span><span class="co">#&gt;     field SPDE2 model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
-<span><span class="co">#&gt;                   mean     sd 0.025quant 0.5quant 0.975quant   mode</span></span>
-<span><span class="co">#&gt; Range for field 35.194 25.649      8.854   28.298    103.364 19.028</span></span>
-<span><span class="co">#&gt; Stdev for field  0.519  0.163      0.271    0.496      0.905  0.452</span></span>
+<span><span class="co">#&gt;                  mean     sd 0.025quant 0.5quant 0.975quant   mode</span></span>
+<span><span class="co">#&gt; Range for field 35.26 25.779      8.800   28.320    103.769 18.995</span></span>
+<span><span class="co">#&gt; Stdev for field  0.52  0.163      0.271    0.496      0.905  0.452</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.06</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 60.05</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 14.41</span></span>
 <span><span class="co">#&gt; Effective number of parameters .....................: 5.49</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.21</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 58.20</span></span>
 <span><span class="co">#&gt; Effective number of parameters .................: 2.84</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -36.79 </span></span>

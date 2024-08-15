@@ -198,7 +198,7 @@ settings.</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Simulate some covariates x and observations y</span></span></span>
 <span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -210,15 +210,19 @@ settings.</p></li>
 <span class="r-in"><span>  <span class="co"># Obtain summary</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '4:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting INLA option num.threads to '1:1'. Previous value '4:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05209855   1.923596 2.027703   2.131803 2.027703</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03683400   4.886179 4.959785   5.033383 4.959784</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05210915   1.923574 2.027703   2.131825 2.027703</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03684149   4.886164 4.959785   5.033398 4.959784</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         5.786139e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.786341e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         5.770443e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.770645e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Alternatively, we can use the like() function to construct the likelihood:</span></span></span>
 <span class="r-in"><span></span></span>
@@ -226,12 +230,16 @@ settings.</p></li>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">bru</span><span class="op">(</span><span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="va">lik</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05210723   1.923578 2.027703   2.131821 2.027703</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03684014   4.886167 4.959785   5.033396 4.959784</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05211308   1.923566 2.027703   2.131833 2.027703</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03684427   4.886158 4.959785   5.033404 4.959784</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    kld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x         5.775261e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.775465e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x         5.766616e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.766819e-06</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># An important addition to the INLA methodology is bru's ability to use</span></span></span>
 <span class="r-in"><span><span class="co"># non-linear predictors. Such a predictor can be formulated via like()'s</span></span></span>
@@ -239,7 +247,7 @@ settings.</p></li>
 <span class="r-in"><span><span class="co"># the z component should be interpreted as single latent variable and not</span></span></span>
 <span class="r-in"><span><span class="co"># a covariate:</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span>multicore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span></span></span>
@@ -251,6 +259,10 @@ settings.</p></li>
 <span class="r-in"><span>  <span class="co"># Check the result (z posterior should be around 2)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean          sd 0.025quant 0.5quant 0.975quant     mode</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> z         2.000938 0.006940266   1.987069 2.000938   2.014806 2.000938</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.019976 0.036290839   4.947456 5.019976   5.092490 5.019976</span>
