@@ -17,6 +17,8 @@ status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg
 status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
+[![Codecov test
+coverage](https://codecov.io/gh/inlabru-org/inlabru/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
@@ -96,14 +98,8 @@ library(INLA)
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - List available models/likelihoods/etc with inla.list.models()
 #>  - Use inla.doc(<NAME>) to access documentation
-```
-
-``` r
 library(inlabru)
 #> Loading required package: fmesher
-```
-
-``` r
 library(fmesher)
 library(ggplot2)
 
@@ -127,6 +123,8 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
+#> Current num.threads is '16:1'.
+#> Setting INLA option num.threads to '1:1'. Previous value '16:1'.
 
 # Predict Gorilla nest intensity
 lambda <- predict(
