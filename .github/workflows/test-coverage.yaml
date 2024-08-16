@@ -80,4 +80,5 @@ jobs:
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
-          token: ${{ secrets.CODECOV_TOKEN }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
