@@ -139,12 +139,10 @@
 <span><span class="co">#&gt; This is INLA_24.06.27 built 2024-06-27 02:36:04 UTC.</span></span>
 <span><span class="co">#&gt;  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">#&gt;  - List available models/likelihoods/etc with inla.list.models()</span></span>
-<span><span class="co">#&gt;  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: fmesher</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">fmesher</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt;  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: fmesher</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">fmesher</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Construct latent model components</span></span>
@@ -167,6 +165,8 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Current num.threads is '16:1'.</span></span>
+<span><span class="co">#&gt; Setting INLA option num.threads to '1:1'. Previous value '16:1'.</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
 <span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -228,6 +228,7 @@
 <li><a href="https://github.com/inlabru-org/inlabru/actions" class="external-link"><img src="https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg" alt="R code coverage status"></a></li>
 <li><a href="https://github.com/inlabru-org/inlabru/actions" class="external-link"><img src="https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg" alt="lintr status"></a></li>
 <li><a href="https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel" class="external-link"><img src="https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://app.codecov.io/gh/inlabru-org/inlabru" class="external-link"><img src="https://codecov.io/gh/inlabru-org/inlabru/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
