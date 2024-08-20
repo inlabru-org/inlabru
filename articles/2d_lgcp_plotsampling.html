@@ -102,7 +102,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-08-16</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-08-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -251,14 +251,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots    659.4743 43.79991 583.6457 657.6052 751.6195 657.6052      3.700740</span></span>
-<span><span class="co">#&gt; PlotsEmp 638.1148 37.15670 566.6946 642.5671 705.5461 642.5671      2.521722</span></span>
-<span><span class="co">#&gt; All      669.5615 30.21518 623.8689 663.9586 741.1891 663.9586      2.176635</span></span>
+<span><span class="co">#&gt; Plots    664.3698 53.87740 572.3280 661.4171 770.4624 661.4171      3.747468</span></span>
+<span><span class="co">#&gt; PlotsEmp 641.7471 42.56267 570.8771 638.6126 718.6938 638.6126      3.518249</span></span>
+<span><span class="co">#&gt; All      674.3252 27.39083 625.4851 672.6561 734.8329 672.6561      2.185331</span></span>
 <span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA            NA</span></span>
 <span><span class="co">#&gt;          mean.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots           5.120139</span></span>
-<span><span class="co">#&gt; PlotsEmp        4.220014</span></span>
-<span><span class="co">#&gt; All             3.456845</span></span>
+<span><span class="co">#&gt; Plots           6.137234</span></span>
+<span><span class="co">#&gt; PlotsEmp        4.959917</span></span>
+<span><span class="co">#&gt; All             3.176149</span></span>
 <span><span class="co">#&gt; AllEmp                NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
