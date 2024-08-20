@@ -16,8 +16,6 @@ status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg
 [![lintr
 status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
-[![Codecov test
 coverage](https://codecov.io/gh/inlabru-org/inlabru/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru)
 <!-- badges: end -->
 
