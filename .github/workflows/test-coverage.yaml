@@ -63,6 +63,7 @@ jobs:
           plugin: noop
           disable_search: true
           version: v0.6.0
+          token: ${{ secrets.CODECOV_TOKEN }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
