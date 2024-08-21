@@ -43,7 +43,7 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          extra-repositories: "https://inla.r-inla-download.org/R/testing", "https://inlabru-org.r-universe.dev"
+          extra-repositories: "https://inla.r-inla-download.org/R/testing" "https://inlabru-org.r-universe.dev"
 
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
