@@ -30,7 +30,7 @@ jobs:
         with:
           use-public-rspm: true
           r-version: "release"
-          extra-repositories: "https://inla.r-inla-download.org/R/testing", "https://inlabru-org.r-universe.dev"
+          extra-repositories: c("https://inla.r-inla-download.org/R/testing", "https://inlabru-org.r-universe.dev")
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
