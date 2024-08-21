@@ -210,7 +210,7 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, me
 
 
     wips <- fm_int(mesh, samplers)
-    A <- fm_evaluator(mesh, loc = wips)$proj$A
+    A <- fm_basis(mesh, loc = wips)
 
     weights <- wips$weight
     weights <- weights / sum(weights)

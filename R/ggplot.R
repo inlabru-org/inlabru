@@ -825,7 +825,7 @@ gg.fm_mesh_2d <- function(data,
       # For backwards compatibility with old plotting code, use Spatial
       # format, and mask only in the gg.Spatial* method.
       px <- fm_pixels(data, dims = c(nx, ny), format = "sp")
-      A <- fm_evaluator(data, px)$proj$A
+      A <- fm_basis(data, px)
       px$color <- as.vector(A %*% color)
       if (!is.null(alpha)) {
         px$alpha <- as.vector(A %*% alpha)

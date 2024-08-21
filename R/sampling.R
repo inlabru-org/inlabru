@@ -119,7 +119,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
       Npoints <- rpois(1, lambda = area * exp(wmax))
       if (Npoints > 0) {
         points <- runif(n = Npoints, min = xmin, max = xmax)
-        proj <- fm_evaluator(mesh, points)$proj
+        proj <- fm_basis(mesh, points, full = TRUE)
         if (length(loglambda) == 1) {
           lambda_ratio <- exp(as.vector(Matrix::rowSums(proj$A) * loglambda) - wmax)
         } else {
@@ -270,7 +270,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (sum(Npoints) > 0) {
           points <- sp::SpatialPoints(points, proj4string = target.crs)
 
-          A <- fm_evaluator(mesh, points)$proj$A
+          A <- fm_basis(mesh, points)
           lambda_ratio <- exp(as.vector(A %*% loglambda) - loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
@@ -307,7 +307,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           )
 
           # Do some thinning
-          proj <- fm_evaluator(mesh, points)$proj
+          proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -338,7 +338,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           sp::coordinates(points) <- c("x", "y", "z")
           sp::proj4string(points) <- internal.crs
 
-          proj <- fm_evaluator(mesh, points)$proj
+          proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep]
@@ -390,7 +390,7 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           sp::coordinates(points) <- c("x", "y", "z")
           sp::proj4string(points) <- internal.crs
 
-          proj <- fm_evaluator(mesh, points)$proj
+          proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           sampled.points[[k]] <- points[keep]
@@ -452,8 +452,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     # Only retain points within the samplers
     if (!is.null(samplers) && (length(ret) > 0)) {
       if (inherits(samplers, "fm_mesh_2d")) {
-        proj <- fm_evaluator(samplers, ret)
-        ret <- ret[proj$proj$ok]
+        proj <- fm_basis(samplers, ret, full = TRUE)
+        ret <- ret[proj$ok]
       } else if (inherits(samplers, "Spatial")) {
         ret <- ret[!is.na(sp::over(ret, samplers))]
       } else {
