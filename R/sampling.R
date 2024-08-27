@@ -90,7 +90,7 @@
 #'
 sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
                         ignore.CRS = FALSE) {
-  stopifnot(bru_safe_inla())
+  stopifnot(bru_safe_inla(multicore = TRUE))
   mesh <- fm_as_fm(mesh)
   if (inherits(mesh, "fm_mesh_1d")) {
     xmin <- mesh$interval[1]

@@ -844,7 +844,7 @@ bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list(),
                 .envir = parent.frame()) {
-  stopifnot(bru_safe_inla())
+  stopifnot(bru_safe_inla(multicore = TRUE))
 
   timing_convert <- function(x) {
     if (!is.na(x[4])) {
