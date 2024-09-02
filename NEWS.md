@@ -6,6 +6,7 @@
 * Move `sp` from `Imports` to `Suggests`. Component definitions using `coordinates`
   as input require either `sp::coordinates` or `sp` having been already loaded
   with e.g. `library(sp)` (version `2.11.1.9003`)
+* Use `bru_safe_inla(multicore=TRUE)` in `bru()` to allow multicore in non-interactive mode. Fixes regression bug that disabled multicore for non-interactive sessions. (version `2.11.1.9004`)
 
 # inlabru 2.11.1
 
