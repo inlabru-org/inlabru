@@ -84,7 +84,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
+        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'devel' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: false
