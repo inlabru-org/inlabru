@@ -44,12 +44,48 @@ found at <https://inlabru-org.github.io/inlabru/articles/>
 
 ## Installation
 
-You can install the current [CRAN](https://CRAN.R-project.org) version
-of inlabru:
+You can install the current [CRAN
+version](https://cran.r-project.org/package=inlabru) version of inlabru:
 
 ``` r
+options(repos = c(
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  getOption("repos")
+))
 install.packages("inlabru")
 ```
+
+### Installation using [pak](https://pak.r-lib.org/)
+
+You can install the latest bugfix release of inlabru from
+[GitHub](https://github.com/inlabru-org/inlabru) with:
+
+``` r
+# install.packages("pak")
+pak::repo_add(INLA = "https://inla.r-inla-download.org/R/testing")
+pak::pkg_install("inlabru-org/inlabru@stable")
+```
+
+You can install the development version of inlabru from
+[GitHub](https://github.com/inlabru-org/inlabru) with
+
+``` r
+pak::pkg_install("inlabru-org/inlabru@devel")
+```
+
+or track the development version builds via
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
+
+``` r
+# Enable universe(s) by inlabru-org
+pak::repo_add(inlabruorg = "https://inlabru-org.r-universe.dev")
+pak::pkg_install("inlabru")
+```
+
+This will pick the r-universe version if it is more recent than the CRAN
+version.
+
+### Installation using `remotes`
 
 You can install the latest bugfix release of inlabru from
 [GitHub](https://github.com/inlabru-org/inlabru) with:
@@ -63,7 +99,6 @@ You can install the development version of inlabru from
 [GitHub](https://github.com/inlabru-org/inlabru) with
 
 ``` r
-# install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 
@@ -121,8 +156,6 @@ fit <- bru(
   ),
   options = list(control.inla = list(int.strategy = "eb"))
 )
-#> Current num.threads is '16:1'.
-#> Setting INLA option num.threads to '1:1'. Previous value '16:1'.
 
 # Predict Gorilla nest intensity
 lambda <- predict(

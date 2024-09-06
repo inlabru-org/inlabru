@@ -45,24 +45,50 @@ For later versions, updated versions of these tutorials, as well as new examples
 
 ## Installation
 
-You can install the current [CRAN](https://CRAN.R-project.org) version of inlabru:
+You can install the current [CRAN version](https://cran.r-project.org/package=inlabru) version of inlabru:
 ```{r cran-installation, eval = FALSE}
+options(repos = c(
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  getOption("repos")
+))
 install.packages("inlabru")
 ```
 
+### Installation using [pak](https://pak.r-lib.org/)
+
 You can install the latest bugfix release of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with:
-```{r gh-bugfix-installation, eval = FALSE}
+```{r gh-bugfix-installation-pak, eval = FALSE}
+# install.packages("pak")
+pak::repo_add(INLA = "https://inla.r-inla-download.org/R/testing")
+pak::pkg_install("inlabru-org/inlabru@stable")
+```
+
+You can install the development version of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with
+```{r gh-installation-pak, eval = FALSE}
+pak::pkg_install("inlabru-org/inlabru@devel")
+```
+or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
+```{r universe-installation-pak, eval = FALSE}
+# Enable universe(s) by inlabru-org
+pak::repo_add(inlabruorg = "https://inlabru-org.r-universe.dev")
+pak::pkg_install("inlabru")
+```
+This will pick the r-universe version if it is more recent than the CRAN version.
+
+### Installation using `remotes`
+
+You can install the latest bugfix release of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with:
+```{r gh-bugfix-installation-remotes, eval = FALSE}
 # install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref = "stable")
 ```
 
 You can install the development version of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with
-```{r gh-installation, eval = FALSE}
-# install.packages("remotes")
+```{r gh-installation-remotes, eval = FALSE}
 remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
-```{r universe-installation, eval = FALSE}
+```{r universe-installation-remotes, eval = FALSE}
 # Enable universe(s) by inlabru-org
 options(repos = c(
   inlabruorg = "https://inlabru-org.r-universe.dev",
