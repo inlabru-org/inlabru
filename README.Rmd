@@ -65,7 +65,7 @@ pak::pkg_install("inlabru-org/inlabru@stable")
 
 You can install the development version of inlabru from [GitHub](https://github.com/inlabru-org/inlabru) with
 ```{r gh-installation-pak, eval = FALSE}
-pak::pkg_install("inlabru-org/inlabru@devel")
+pak::pkg_install("inlabru-org/inlabru")
 ```
 or track the development version builds via [inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
 ```{r universe-installation-pak, eval = FALSE}
