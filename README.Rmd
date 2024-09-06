@@ -138,7 +138,8 @@ lambda <- predict(
   fm_pixels(gorillas_sf$mesh, mask = gorillas_sf$boundary),
   ~ exp(mySmooth + Intercept)
 )
-
+```
+```{r plot,fig.cap="Nest intensity per km squared"}
 # Plot the result
 ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
