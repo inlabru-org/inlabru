@@ -32,11 +32,20 @@ library("data.table")
 bru_safe_sp(force = TRUE)
 ```
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE, cache=FALSE}
 # Determine function location
-code_location <- "2d_lgcp_residuals_functions.R"
-if (!file.exists(code_location)) {
-  code_location <- system.file(file.path("misc", code_location), package = "inlabru")
+msg <- paste(getwd())
+code_file <- "2d_lgcp_residuals_functions.R"
+msg <- paste(msg, "\n", code_file, file.exists(code_file))
+if (file.exists(code_file)) {
+  code_location <- code_file
+} else {
+  code_location <- system.file(file.path("misc", code_file), package = "inlabru")
+  msg <- paste(msg, "\n", code_location, file.exists(code_location))
+  if (!file.exists(code_location)) {
+    code_location <- file.path("..", "..", "inst", "misc", code_file)
+    msg <- paste(msg, "\n", code_location, file.exists(code_location))
+  }
 }
 ```
 
