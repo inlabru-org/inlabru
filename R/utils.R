@@ -8,7 +8,10 @@
 #' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
-#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
+#' @param quietly logical; if `FALSE` and `multicore` is `FALSE`,
+#' prints a message if the `num.threads` option
+#' isn't already "1.1" to alert the user to the change.
+#' Default: FALSE.
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 23.1.31 (should always match the requirement in the package
 #' DESCRIPTION)
@@ -65,21 +68,13 @@ bru_safe_inla <- function(multicore = NULL,
       }
       return(FALSE)
     }
-    if (!quietly) {
-      message(paste0("Current num.threads is '", n.t, "'."))
-    }
     if (!identical(n.t, "1:1")) {
       if (!quietly) {
         message(paste0(
-          "Setting INLA option num.threads to '1:1'.",
-          " Previous value '", n.t, "'."
+          "Changing INLA option num.threads from '", n.t, "' to '1:1'."
         ))
       }
       INLA::inla.setOption(num.threads = "1:1")
-    } else {
-      if (!quietly) {
-        message("No num.threads change needed.")
-      }
     }
   }
   return(TRUE)

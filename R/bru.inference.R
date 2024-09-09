@@ -826,7 +826,7 @@ print.bru_used <- function(x, ...) {
 #'   all the arguments will be evaluated before calling [like()] in order
 #'   to detect if they are `like` objects. This means that
 #'   special arguments that need to be evaluated in the context of
-#'   `response_data` or `data` (such as Ntrials) may will only work that
+#'   `response_data` or `data` (such as `Ntrials`) may will only work that
 #'   way in direct calls to [like()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
