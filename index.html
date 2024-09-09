@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,19 +104,45 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the current <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> version of inlabru:</p>
+<p>You can install the current <a href="https://cran.r-project.org/package=inlabru" class="external-link">CRAN version</a> version of inlabru:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  INLA <span class="op">=</span> <span class="st">"https://inla.r-inla-download.org/R/testing"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="installation-using-pak">Installation using <a href="https://pak.r-lib.org/" class="external-link">pak</a>
+<a class="anchor" aria-label="anchor" href="#installation-using-pak"></a>
+</h3>
 <p>You can install the latest bugfix release of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/repo_add.html" class="external-link">repo_add</a></span><span class="op">(</span>INLA <span class="op">=</span> <span class="st">"https://inla.r-inla-download.org/R/testing"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru@stable"</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span><span class="op">)</span></span></code></pre></div>
+<p>or track the development version builds via <a href="https://inlabru-org.r-universe.dev/builds" class="external-link">inlabru-org.r-universe.dev</a>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Enable universe(s) by inlabru-org</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/repo_add.html" class="external-link">repo_add</a></span><span class="op">(</span>inlabruorg <span class="op">=</span> <span class="st">"https://inlabru-org.r-universe.dev"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
+<p>This will pick the r-universe version if it is more recent than the CRAN version.</p>
+</div>
+<div class="section level3">
+<h3 id="installation-using-remotes">Installation using <code>remotes</code>
+<a class="anchor" aria-label="anchor" href="#installation-using-remotes"></a>
+</h3>
+<p>You can install the latest bugfix release of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref <span class="op">=</span> <span class="st">"stable"</span><span class="op">)</span></span></code></pre></div>
 <p>You can install the development version of inlabru from <a href="https://github.com/inlabru-org/inlabru" class="external-link">GitHub</a> with</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref <span class="op">=</span> <span class="st">"devel"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"inlabru-org/inlabru"</span>, ref <span class="op">=</span> <span class="st">"devel"</span><span class="op">)</span></span></code></pre></div>
 <p>or track the development version builds via <a href="https://inlabru-org.r-universe.dev/builds" class="external-link">inlabru-org.r-universe.dev</a>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Enable universe(s) by inlabru-org</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  inlabruorg <span class="op">=</span> <span class="st">"https://inlabru-org.r-universe.dev"</span>,</span>
@@ -127,11 +153,12 @@
 <span><span class="co"># Install some packages</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"inlabru"</span><span class="op">)</span></span></code></pre></div>
 </div>
+</div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>This is a basic example which shows how fit a simple spatial Log Gaussian Cox Process (LGCP) and predicts its intensity:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
@@ -165,17 +192,15 @@
 <span>  <span class="op">)</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Current num.threads is '16:1'.</span></span>
-<span><span class="co">#&gt; Setting INLA option num.threads to '1:1'. Previous value '16:1'.</span></span>
 <span></span>
 <span><span class="co"># Predict Gorilla nest intensity</span></span>
 <span><span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">gorillas_sf</span><span class="op">$</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">boundary</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Plot the result</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot the result</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gorillas_sf</span><span class="op">$</span><span class="va">mesh</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/gg.html">gg</a></span><span class="op">(</span><span class="va">lambda</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -183,7 +208,11 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Nest intensity per km squared"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-1.png" width="100%"></p>
+<div class="figure">
+<img src="reference/figures/README-plot-1.png" alt="Nest intensity per km squared" width="100%"><p class="caption">
+Nest intensity per km squared
+</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

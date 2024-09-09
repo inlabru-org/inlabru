@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,7 +144,7 @@ area.</p>
 <span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gorillas_sf.html">gorillas_sf_gcov</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">counts_rstr</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rasterize.html" class="external-link">rasterize</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">nests</span><span class="op">)</span>, <span class="va">gcov</span>, fun <span class="op">=</span> <span class="va">sum</span>, background <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span>fact <span class="op">=</span> <span class="fl">4</span>, fun <span class="op">=</span> <span class="va">sum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">counts_rstr</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="zip_zap_models_files/figure-html/fig-count-raster-1.png" alt="Counts of gorilla nests" width="80%"><p class="caption">
@@ -197,7 +197,12 @@ Proportion of vegetation cover by class
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/geom_fm.html" class="external-link">geom_fm</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">px_mesh</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="co"># geom_sf(data=counts_df, aes(color=count), size=1, pch=4)+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">count</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">count</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    pch <span class="op">=</span> <span class="fl">4</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="zip_zap_models_files/figure-html/fig-count-mesh-1.png" alt="Mesh over the count locations" width="80%"><p class="caption">
@@ -227,7 +232,7 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9004</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9005</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -242,7 +247,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.351, Running = 2.61, Post = 0.546, Total = 3.51 </span></span>
+<span><span class="co">#&gt;     Pre = 0.357, Running = 2.69, Post = 0.569, Total = 3.61 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
@@ -345,7 +350,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9004</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9005</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -360,7 +365,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.368, Running = 1.62, Post = 0.127, Total = 2.11 </span></span>
+<span><span class="co">#&gt;     Pre = 0.388, Running = 1.62, Post = 0.128, Total = 2.14 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -387,11 +392,11 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; Stdev for field                                        2.632</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1553.47</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.35</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 125.16</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.36</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 125.17</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.24</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 109.70</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 109.71</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -845.29 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
@@ -543,28 +548,28 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.696e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.521e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 1.003e-15</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.766e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -8.897e-16</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.699e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.07739, norm1 = 1.245e-11, norm01 = 0.07739)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.07739</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -9.286e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 1.245e-11</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.0457, norm1 = 7.14e-12, norm01 = 0.0457)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.0457</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -3.685e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.14e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
-<span><span class="co">#&gt; iinla: Max deviation from previous: 1.48% of SD, and line search is inactive</span></span>
+<span><span class="co">#&gt; iinla: Max deviation from previous: 0.727% of SD, and line search is inactive</span></span>
 <span><span class="co">#&gt;        [stop if: &lt;10% and line search inactive]</span></span>
 <span><span class="co">#&gt; iinla: Convergence criterion met.</span></span>
 <span><span class="co">#&gt;        Running final INLA integration step with known theta mode.</span></span>
 <span><span class="co">#&gt; iinla: Iteration 3 [max:10]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9004</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9005</span></span>
 <span><span class="co">#&gt; INLA version: 24.06.27</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -589,14 +594,14 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt;     Used components: effects[Intercept_count, elevation, field_count], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.531, Running = 3.88, Post = 0.265, Total = 4.68 </span></span>
+<span><span class="co">#&gt;     Pre = 0.523, Running = 3.88, Post = 0.275, Total = 4.67 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.335   -1.266     -0.179  -1.266   0</span></span>
-<span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.459   -1.442     -0.431  -1.442   0</span></span>
-<span><span class="co">#&gt; Intercept_present -10.560 4.192    -19.044  -10.483     -2.497 -10.479   0</span></span>
+<span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
+<span><span class="co">#&gt; veg_grassland      -1.443 0.517     -2.460   -1.442     -0.431  -1.442   0</span></span>
+<span><span class="co">#&gt; Intercept_present -10.561 4.192    -19.045  -10.484     -2.498 -10.480   0</span></span>
 <span><span class="co">#&gt; elevation_present   0.004 0.002     -0.001    0.004      0.008   0.004   0</span></span>
-<span><span class="co">#&gt; Intercept_count     2.328 1.441     -0.720    2.371      5.113   2.364   0</span></span>
+<span><span class="co">#&gt; Intercept_count     2.328 1.441     -0.721    2.371      5.114   2.364   0</span></span>
 <span><span class="co">#&gt; elevation           0.001 0.001      0.000    0.001      0.003   0.001   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
@@ -606,19 +611,19 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                          mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field_present 2.358 0.729      1.298    2.236      4.136 1.996</span></span>
-<span><span class="co">#&gt; Stdev for field_present 2.935 0.677      1.869    2.847      4.517 2.660</span></span>
+<span><span class="co">#&gt; Range for field_present 2.357 0.729      1.299    2.236      4.136 1.995</span></span>
+<span><span class="co">#&gt; Stdev for field_present 2.935 0.676      1.870    2.847      4.517 2.660</span></span>
 <span><span class="co">#&gt; Range for field_count   0.489 0.229      0.202    0.439      1.077 0.355</span></span>
-<span><span class="co">#&gt; Stdev for field_count   0.703 0.126      0.492    0.691      0.985 0.665</span></span>
+<span><span class="co">#&gt; Stdev for field_count   0.703 0.126      0.492    0.691      0.985 0.666</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1605.84</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1161.20</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 160.54</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 1161.21</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 160.56</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1602.26</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 131.88</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 131.89</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -872.56 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -872.57 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -871,24 +876,24 @@ respectively. The (negated) Log score is a strictly proper score <span class="ci
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2426317</td>
-<td align="right">0.5612686</td>
-<td align="right">-2.623731</td>
-<td align="right">0.3925568</td>
+<td align="right">0.2424880</td>
+<td align="right">0.5615823</td>
+<td align="right">-2.555269</td>
+<td align="right">0.3928019</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2544719</td>
-<td align="right">0.6007924</td>
-<td align="right">-2.673968</td>
-<td align="right">0.4024560</td>
+<td align="right">0.2542506</td>
+<td align="right">0.5999296</td>
+<td align="right">-2.659997</td>
+<td align="right">0.4024878</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2801591</td>
-<td align="right">0.6535476</td>
-<td align="right">-2.310645</td>
-<td align="right">0.4000599</td>
+<td align="right">0.2798776</td>
+<td align="right">0.6533353</td>
+<td align="right">-2.299918</td>
+<td align="right">0.4000016</td>
 </tr>
 </tbody>
 </table>

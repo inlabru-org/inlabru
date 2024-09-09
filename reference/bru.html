@@ -39,7 +39,7 @@ lgcp function.
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,7 +150,7 @@ parameters that can be passed to a single <code><a href="bru_like.html">like()</
 all the arguments will be evaluated before calling <code><a href="bru_like.html">like()</a></code> in order
 to detect if they are <code>like</code> objects. This means that
 special arguments that need to be evaluated in the context of
-<code>response_data</code> or <code>data</code> (such as Ntrials) may will only work that
+<code>response_data</code> or <code>data</code> (such as <code>Ntrials</code>) may will only work that
 way in direct calls to <code><a href="bru_like.html">like()</a></code>.</p></dd>
 
 
@@ -199,10 +199,11 @@ settings.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Simulate some covariates x and observations y</span></span></span>
 <span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Fit a Gaussian likelihood model</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">bru</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">input.df</span><span class="op">)</span></span></span>
@@ -210,8 +211,7 @@ settings.</p></li>
 <span class="r-in"><span>  <span class="co"># Obtain summary</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '4:1'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting INLA option num.threads to '1:1'. Previous value '4:1'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Changing INLA option num.threads from '4:1' to '1:1'.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05210915   1.923574 2.027703   2.131825 2.027703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03684149   4.886164 4.959785   5.033398 4.959784</span>
@@ -221,15 +221,14 @@ settings.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Alternatively, we can use the like() function to construct the likelihood:</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span>, data <span class="op">=</span> <span class="va">input.df</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
+<span class="r-in"><span>              formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span>,</span></span>
+<span class="r-in"><span>              data <span class="op">=</span> <span class="va">input.df</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">bru</span><span class="op">(</span><span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="va">lik</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean         sd 0.025quant 0.5quant 0.975quant     mode</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> x         2.027702 0.05211308   1.923566 2.027703   2.131833 2.027703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 4.959784 0.03684427   4.886158 4.959785   5.033404 4.959784</span>
@@ -245,7 +244,9 @@ settings.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="bru_safe_inla.html">bru_safe_inla</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">input.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">input.df</span>, <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">lik</span> <span class="op">&lt;-</span> <span class="fu"><a href="bru_like.html">like</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">input.df</span>,</span></span>
 <span class="r-in"><span>    formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="va">Intercept</span></span></span>
@@ -255,8 +256,6 @@ settings.</p></li>
 <span class="r-in"><span>  <span class="co"># Check the result (z posterior should be around 2)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span><span class="op">$</span><span class="va">summary.fixed</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Current num.threads is '1:1'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> No num.threads change needed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mean          sd 0.025quant 0.5quant 0.975quant     mode</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> z         2.000938 0.006940266   1.987069 2.000938   2.014806 2.000938</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 5.019976 0.036290839   4.947456 5.019976   5.092490 5.019976</span>

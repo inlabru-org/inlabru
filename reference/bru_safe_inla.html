@@ -9,7 +9,7 @@ optionally checks and sets the multicore num.threads INLA option.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,10 @@ if running in testthat or non-interactively, in which case sets
 
 
 <dt id="arg-quietly">quietly<a class="anchor" aria-label="anchor" href="#arg-quietly"></a></dt>
-<dd><p>logical; if <code>TRUE</code>, prints diagnostic messages. Default: FALSE.</p></dd>
+<dd><p>logical; if <code>FALSE</code> and <code>multicore</code> is <code>FALSE</code>,
+prints a message if the <code>num.threads</code> option
+isn't already "1.1" to alert the user to the change.
+Default: FALSE.</p></dd>
 
 
 <dt id="arg-minimum-version">minimum_version<a class="anchor" aria-label="anchor" href="#arg-minimum-version"></a></dt>
