@@ -53,7 +53,7 @@ boundary <- gorillas_sf$boundary
 gcov <- gorillas_sf_gcov()
 counts_rstr <- terra::rasterize(vect(nests), gcov, fun = sum, background = 0) %>%
   terra::aggregate(fact = 4, fun = sum) %>%
-  mask(vect(boundary))
+  mask(vect(sf::st_geometry(boundary)))
 plot(counts_rstr)
 counts_rstr <- counts_rstr %>%
   cellSize(unit = "km") %>%
@@ -97,7 +97,12 @@ px_matern <- INLA::inla.spde2.pcmatern(px_mesh,
 
 ggplot() +
   geom_fm(data = px_mesh) +
-  # geom_sf(data=counts_df, aes(color=count), size=1, pch=4)+
+  geom_sf(
+    data = counts_df[counts_df$count > 0, ],
+    aes(color = count),
+    size = 1,
+    pch = 4
+  ) +
   theme_minimal()
 ```
 

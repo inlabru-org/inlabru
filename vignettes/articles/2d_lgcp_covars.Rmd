@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-.cache_dir <- file.path("cache", "2d_lgcp_covars")
+.cache_dir <- file.path("2d_lgcp_covars_cache")
 .cache_recompute <- !file.exists(.cache_dir)
 if (.cache_recompute) {
   dir.create(.cache_dir, recursive = TRUE)
