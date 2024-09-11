@@ -25,6 +25,7 @@
 #' }
 #' }
 #'
+#' @keywords internal
 bru_safe_inla <- function(multicore = NULL,
                           quietly = FALSE,
                           minimum_version = "23.1.31") {
@@ -139,6 +140,7 @@ check_package_version_and_load <-
 #' }
 #' }
 #'
+#' @keywords internal
 bru_safe_sp <- function(quietly = FALSE,
                         force = FALSE,
                         minimum_version = "1.4-5") {
@@ -199,6 +201,7 @@ bru_safe_sp <- function(quietly = FALSE,
 #' @param expand character vector; subset of labels to expand
 #' @param suffix character; the suffix to add to the labels selected by `expand`
 #' @return a vector of labels with suffix appended to the selected labels
+#' @keywords internal
 expand_labels <- function(labels, expand, suffix) {
   labels[labels %in% expand] <- paste0(labels[labels %in% expand], suffix)
   labels

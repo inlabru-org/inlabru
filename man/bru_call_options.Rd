@@ -29,3 +29,4 @@ opts
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
+\keyword{internal}

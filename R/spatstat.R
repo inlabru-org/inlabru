@@ -60,6 +60,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #' }
 #' }
 #'
+#' @keywords internal
 spatial.to.ppp <- function(points, samplers) {
   check_spatstat("spatstat.geom")
 

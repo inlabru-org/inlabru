@@ -2582,6 +2582,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #' @examples
 #' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
 #'
+#' @keywords internal
 bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
                           x = NULL, cbind.only = FALSE,
                           max_moment = 2) {

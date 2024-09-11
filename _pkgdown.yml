@@ -167,17 +167,17 @@ reference:
 - title: "Internal helper functions"
   desc: "Helper functions for more low level operations."
   contents:
-  - starts_with("evaluate_")
-  - starts_with("expand_labels")
-  - starts_with("bru_inla.stack.mjoin")
-  - starts_with("spatial.to.ppp")
-  - starts_with("bru_make_stack")
-  - starts_with("bru_summarise")
-  - starts_with("bru_standardise_names")
-  - starts_with("bru_safe_inla")
-  - starts_with("bru_safe_sp")
-  - starts_with("bru_call_options")
-  - starts_with("bru_compute_linearisation")
+  - starts_with("evaluate_", internal = TRUE)
+  - starts_with("expand_labels", internal = TRUE)
+  - starts_with("bru_inla.stack.mjoin", internal = TRUE)
+  - starts_with("spatial.to.ppp", internal = TRUE)
+  - starts_with("bru_make_stack", internal = TRUE)
+  - starts_with("bru_summarise", internal = TRUE)
+  - starts_with("bru_standardise_names", internal = TRUE)
+  - starts_with("bru_safe_inla", internal = TRUE)
+  - starts_with("bru_safe_sp", internal = TRUE)
+  - starts_with("bru_call_options", internal = TRUE)
+  - starts_with("bru_compute_linearisation", internal = TRUE)
 - title: "Re-exported fmesher functions"
   desc: "Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility."
   contents:

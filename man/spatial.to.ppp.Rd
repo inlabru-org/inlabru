@@ -40,3 +40,4 @@ if (require("spatstat.geom") &&
 }
 
 }
+\keyword{internal}

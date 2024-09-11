@@ -9,6 +9,7 @@
 #' @examples
 #' bru_standardise_names("Precision for the Gaussian observations")
 #' @export
+#' @keywords internal
 bru_standardise_names <- function(x) {
   new_names <- vapply(
     x,

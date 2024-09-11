@@ -24,3 +24,4 @@ one for each included component
 Computes individual \code{bru_mapper_taylor} objects for included components
 for each model likelihood
 }
+\keyword{internal}

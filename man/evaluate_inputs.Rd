@@ -17,3 +17,4 @@ evaluate_inputs(model, lhoods, inla_f)
 Computes the component inputs for included components
 for each model likelihood
 }
+\keyword{internal}

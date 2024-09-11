@@ -37,3 +37,4 @@ if (bru_safe_inla()) {
 }
 
 }
+\keyword{internal}

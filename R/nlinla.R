@@ -5,6 +5,7 @@
 #' @param \dots Parameters passed on to other methods
 #' @export
 #' @rdname bru_compute_linearisation
+#' @keywords internal
 bru_compute_linearisation <- function(...) {
   UseMethod("bru_compute_linearisation")
 }

@@ -222,6 +222,7 @@ evaluate_model <- function(model,
 #' Default is `FALSE`.
 #' @export
 #' @rdname evaluate_model
+#' @keywords internal
 evaluate_state <- function(model,
                            result,
                            property = "mode",
@@ -289,6 +290,7 @@ evaluate_effect_multi_state <- function(...) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname evaluate_effect
+#' @keywords internal
 
 evaluate_effect_single_state.bru_mapper <- function(component, input, state,
                                                     ...,
@@ -676,6 +678,7 @@ component_eval <- function(main,
 #' of `bru_mapper_taylor` objects,
 #' one for each included component
 #' @rdname evaluate_comp_lin
+#' @keywords internal
 evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
   stopifnot(inherits(model, "bru_model"))
   mappers <-
@@ -789,6 +792,7 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
 #' @param lhoods A `bru_like_list` object
 #' @param inla_f logical
 #' @rdname evaluate_inputs
+#' @keywords internal
 evaluate_inputs <- function(model, lhoods, inla_f) {
   stopifnot(inherits(model, "bru_model"))
   lapply(
@@ -816,6 +820,7 @@ evaluate_inputs <- function(model, lhoods, inla_f) {
 #' a named list of logical subset specifications for extracting the `INLA::f()`
 #' compatible index subsets.
 #' @rdname evaluate_index
+#' @keywords internal
 evaluate_index <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
   included <- bru_used(lhoods)

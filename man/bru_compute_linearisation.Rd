@@ -98,3 +98,4 @@ involve several rows of the input data to influence the same row.}
 \description{
 Compute inlabru model linearisation information
 }
+\keyword{internal}

@@ -784,6 +784,7 @@ bru_options_deprecated <- function(args) {
 #' opts
 #' }
 #'
+#' @keywords internal
 bru_call_options <- function(...) {
   opt <- as.bru_options(...)
   opt <- bru_options_deprecated(opt)

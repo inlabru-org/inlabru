@@ -19,3 +19,4 @@ a vector of labels with suffix appended to the selected labels
 \description{
 Expand labels
 }
+\keyword{internal}
