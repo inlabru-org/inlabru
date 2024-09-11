@@ -1,6 +1,5 @@
 # Create covariate data set (covdata)
 #
-# @aliases make.covdata
 # @name make.covdata
 # @export
 # @param mesh
@@ -20,7 +19,6 @@ make.covdata <- function(mesh, values, mesh.coords, time.coords) {
 #
 # Note: documentation does not match code
 #
-# @aliases covdata.import
 # @name covdata.import
 # @export
 # @param mesh
@@ -64,8 +62,6 @@ covdata.import <- function(dframe, colname, data) {
 #
 # Note: documentation does not match code
 #
-# @aliases make.covariate
-# @name make.covariate
 # @export
 # @param covdata A covariate data set
 # @return A function intended to act as a covariate for a distance sampling model
@@ -92,7 +88,6 @@ make.covariate <- function(cdata, method = NULL, ...) {
 
 # Get covariate value at given location/time
 #
-# @aliases get.value
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain the covariate value at
@@ -125,7 +120,6 @@ get.value <- function(covariate, loc) {
 
 # Get maximum value of covariate
 #
-# @aliases get.max
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
@@ -144,7 +138,6 @@ get.max <- function(covariate, loc = NULL) {
 
 # Get minimum value of covariate
 #
-# @aliases get.min
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain the maximal covariate value at. If not provided, return overall maximum.
@@ -164,7 +157,6 @@ get.min <- function(covariate, loc = NULL) {
 
 # Get temporal mean
 #
-# @aliases get.tmean
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain temporal mean covariate value at. If not provided, return overall maximum.
@@ -189,7 +181,6 @@ get.tmean <- function(covariate, loc = NULL) {
 # WARNING: This is an approximation!
 #
 #
-# @aliases get.smean
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain the spatial mean covariate value at.
@@ -229,7 +220,6 @@ get.smean <- function(covariate, loc = NULL, weights = NULL) {
 
 # Get mean
 #
-# @aliases get.mean
 # @export
 # @param covariate A covariate data set
 # @param loc Locations (spatial/temporal) to obtain mean covariate value at. If not provided, return overall maximum.

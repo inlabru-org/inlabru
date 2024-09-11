@@ -2,8 +2,6 @@
 % Please edit documentation in R/bru.inference.R
 \name{like}
 \alias{like}
-\alias{bru_like}
-\alias{bru_like_list}
 \alias{like_list}
 \alias{like_list.list}
 \alias{like_list.bru_like}

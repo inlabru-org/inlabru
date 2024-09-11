@@ -813,7 +813,6 @@ print.bru_used <- function(x, ...) {
 #'       available by using the `cp` family or (even easier) by using the
 #'       [lgcp] function.
 #'   }
-#' @aliases bru
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -1205,7 +1204,6 @@ extended_bind_rows <- function(...) {
 #' Observation model construction for usage with [bru()]
 #'
 #' @rdname bru_like
-#' @aliases bru_like bru_like_list like_list
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -1998,7 +1996,6 @@ bru_like_expr <- function(lhood, components) {
 #' and can be provided via the respective parameter. If samplers is NULL it is
 #' assumed that all of the LGCP's dimensions have been observed completely.
 #'
-#' @aliases lgcp
 #' @export
 #' @inheritParams like
 #' @inheritParams bru
@@ -2137,7 +2134,6 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' Internally, this method calls [generate.bru()] in order to draw samples from
 #' the model.
 #'
-#' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru()] or [lgcp()].
 #' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates
@@ -2333,7 +2329,6 @@ predict.bru <- function(object,
 #' that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
-#' @aliases generate.bru
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
@@ -2466,7 +2461,6 @@ generate.bru <- function(object,
 
 # Monte Carlo method for estimating posterior
 #
-# @aliases montecarlo.posterior
 # @export
 # @param dfun A function returning a density for given x
 # @param sfun A function providing samples from a posterior
@@ -3349,7 +3343,6 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' `bru_compute_linearisation`, with a line search method between each
 #' iteration. The `INLA::inla.stack` information is setup by [bru_make_stack()].
 #'
-#' @aliases iinla
 #' @export
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [like()]

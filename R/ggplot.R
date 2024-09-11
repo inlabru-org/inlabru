@@ -1,4 +1,3 @@
-#' @aliases gmap
 #' @describeIn inlabru-deprecated
 #' Plot a map using extent of a spatial object
 #'
@@ -386,8 +385,6 @@ gg.prediction <- function(data, ...) {
 #' This function coerces the `SpatialPoints` into a `data.frame` and uses `geom_point`
 #' to plot the points. Requires the `ggplot2` package.
 #'
-#' @aliases gg.SpatialPoints
-#' @name gg.SpatialPoints
 #' @export
 #' @param data A SpatialPoints object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
@@ -502,8 +499,6 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
 #' Extracts start and end points of the lines and calls `geom_segment` to plot
 #' lines between them. Requires the `ggplot2` package.
 #'
-#' @aliases gg.SpatialLines
-#' @name gg.SpatialLines
 #' @export
 #' @param data A `SpatialLines` or `SpatialLinesDataFrame` object.
 #' @param mapping Aesthetic mappings created by `ggplot2::aes` or `ggplot2::aes_`
@@ -583,8 +578,6 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #' calls `geom_polygon` to plot the polygons. Requires the `ggplot2` package.
 #'
 #'
-#' @aliases gg.SpatialPolygons
-#' @name gg.SpatialPolygons
 #' @export
 #' @param data A `SpatialPolygons` or `SpatialPolygonsDataFrame` object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
@@ -623,8 +616,6 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
 #' [gg.SpatialPixelsDataFrame()] to plot it.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.SpatialGridDataFrame
-#' @name gg.SpatialGridDataFrame
 #' @export
 #' @param data A SpatialGridDataFrame object.
 #' @param ... Arguments passed on to [gg.SpatialPixelsDataFrame()].
@@ -643,8 +634,6 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #' Coerces input SpatialPixelsDataFrame to data.frame and uses `geom_tile` to plot it.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.SpatialPixelsDataFrame
-#' @name gg.SpatialPixelsDataFrame
 #' @export
 #' @param data A SpatialPixelsDataFrame object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
@@ -698,8 +687,6 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' Uses `geom_point` to plot the pixel centers.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.SpatialPixels
-#' @name gg.SpatialPixels
 #' @export
 #' @param data A [sp::SpatialPixels] object.
 #' @param ... Arguments passed on to `geom_tile`.
@@ -730,8 +717,6 @@ gg.SpatialPixels <- function(data, ...) {
 #' Convenience wrapper function for `tidyterra::geom_spatraster()`.
 #' Requires the `ggplot2` and `tidyterra` packages.
 #'
-#' @aliases gg.SpatRaster
-#' @name gg.SpatRaster
 #' @export
 #' @param data A SpatRaster object.
 #' @param ... Arguments passed on to `geom_spatraster`.
@@ -772,8 +757,6 @@ gg.SpatRaster <- function(data, ...) {
 #' to plot the interpolation.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.fm_mesh_2d
-#' @name gg.fm_mesh_2d
 #' @export
 
 #' @param data An `fm_mesh_2d` object.
@@ -915,8 +898,6 @@ gg.fm_mesh_2d <- function(data,
 #' of a 1D mesh.
 #' Requires the `ggplot2` package.
 #'
-#' @aliases gg.fm_mesh_1d gg.inla.mesh.1d
-#' @name gg.fm_mesh_1d
 #' @export
 #' @param data An inla.mesh.1d object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_point`.
@@ -971,8 +952,6 @@ gg.inla.mesh.1d <- gg.fm_mesh_1d
 #'
 #' This function requires the `raster` and `ggplot2` packages.
 #'
-#' @aliases gg.RasterLayer
-#' @name gg.RasterLayer
 #' @export
 #' @param data A RasterLayer object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_tile`.
@@ -1153,8 +1132,6 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
 
 # Default color palette for plots using \link{gg}
 #
-# @aliases bru.pal
-# @name bru.pal
 # @export
 # @param
 # @return Color values as returned by \code{RColorBrewer::brewer.pal(9, "YlOrRd")}

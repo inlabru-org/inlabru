@@ -36,7 +36,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 
   # Extract detection pointers from effort data
   #
-  # @aliases as.detection.effort
   # @export
   # @param effort Effort data set
   # @return sighting sightings
@@ -52,7 +51,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 
   # Convert dsdata into Spatial* objects
   #
-  # @aliases as.spatial.dsdata
   # @export
   # @param dsdata dsdata object
   # @param cnames Column names of the coordinates, e.g. c("lon","lat")
@@ -102,7 +100,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 #'
 #' Load `mexdolphins` survey data from `dsm` package and convert to spatial formats defined by the `sp` package.
 #'
-#' @aliases import.mexdolphin
 #' @keywords internal
 #' @return The [mexdolphin] data set
 #' @examples

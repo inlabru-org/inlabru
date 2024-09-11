@@ -34,7 +34,6 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #' function uses a SpatialPoints object and a SpatialPolygon object to generate the points
 #' and the window. Lastly, the ppp() function is called to create the `ppp` object.
 #'
-#' @aliases spatial.to.ppp
 #' @export
 #' @param points A `SpatialPoints[DataFrame]` object describing the point pattern.
 #' @param samplers A `SpatialPolygons[DataFrame]` object describing the observation window.

@@ -11,7 +11,7 @@
 #' @return * For `bru_forward_transformation`, a numeric vector
 #' @export
 #' @rdname bru_transformation
-#' @aliases bru_transformation
+#' @name bru_transformation
 #' @examples
 #' u <- rnorm(5, 0, 1)
 #' y <- bru_forward_transformation(qexp, u, rate = 2)

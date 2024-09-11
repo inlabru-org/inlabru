@@ -11,7 +11,6 @@
 #' testing problem which the function does not solve for you.
 #'
 #'
-#' @aliases bincount
 #' @export
 #' @importFrom graphics hist
 #' @param result A result object from a [bru()] or [lgcp()] call
@@ -173,7 +172,6 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 #'
 #' Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
 #'
-#' @aliases devel.cvmeasure
 #' @export
 #' @param joint A joint `prediction` of two latent model components.
 #' @param prediction1 A `prediction` of the first component.

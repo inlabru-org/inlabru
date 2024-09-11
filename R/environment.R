@@ -769,7 +769,6 @@ bru_options_deprecated <- function(args) {
 #'
 #' @param \dots Options passed on to [as.bru_options()]
 #'
-#' @aliases bru_call_options
 #' @export
 #' @returns A `bru_options` object
 #'

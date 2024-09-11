@@ -1,7 +1,6 @@
 # Convert data frame to SpatialLinesDataFrame
 #
 #
-# @aliases sfill
 # @keywords internal
 # @export
 # @param data A SpatialGridDataFrame or SpatialPixelDataFrame
@@ -55,8 +54,6 @@ sfill <- function(data, where = NULL) {
 #' is transfromed accordingly. Additional columns of the input data, e.g. covariates,
 #' are retained and attached to `DF`.
 #'
-#'
-#' @aliases sline
 #' @export
 #' @param data A data.frame
 #' @param start.cols Character array poitning out the columns of `data` that hold the start points of the lines
@@ -126,7 +123,6 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #' paraemter. Posterior conversion to a different CRS is supported using the
 #' `to.crs` parameter.
 #'
-#' @aliases spoly
 #' @keywords internal
 #' @export
 #' @param data A data.frame of points describing the boundary of the polygon

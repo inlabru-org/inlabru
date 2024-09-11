@@ -6,7 +6,6 @@
 # "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
 # "twosided-gaussian": Experimental
 #
-# @aliases int.quadrature
 # @export
 # @param sp Start points of lines
 # @param ep End points of lines

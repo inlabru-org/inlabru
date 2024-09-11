@@ -3,7 +3,6 @@
 #'
 #' Load `shrimp` data stored as file `gamba.Rdata` and construct spatial object
 #'
-#' @aliases import.shrimp
 #' @keywords internal
 #' @return The [shrimp] data set
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}

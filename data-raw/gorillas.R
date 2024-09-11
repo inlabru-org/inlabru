@@ -1,6 +1,5 @@
 #' Gorilla data import
 #'
-#' @aliases import.gorillas
 #' @keywords internal
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, David L. Borchers \email{dlb@@st-andrews.ac.uk}
 #' @return gorilla data

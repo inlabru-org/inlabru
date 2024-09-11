@@ -8,7 +8,6 @@
 #' the mesh. If the intensity is very high the standard `strategy` "spherical" can cause memory issues.
 #' Using the "sliced-spherical" strategy can help in this case.
 #'
-#' @aliases sample.lgcp
 #' @export
 #'
 #' @param mesh An `INLA::inla.mesh` object

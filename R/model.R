@@ -624,7 +624,6 @@ evaluate_predictor <- function(model,
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
-#' @aliases component_eval
 #' @examples
 #' \dontrun{
 #' if (bru_safe_inla()) {

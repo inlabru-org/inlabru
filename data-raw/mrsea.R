@@ -8,7 +8,6 @@ source(here::here("data-raw", "dsmdata.R"))
 #' is normally only run by the package maintainer. For regular inlabru use of the data,
 #' use `data("MRSea", package = "inlabru")`, which does not require the MRSea package.
 #'
-#' @aliases import.mrsea
 #' @keywords internal
 #' @return The [mrsea] data set
 #' @examples

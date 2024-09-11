@@ -2,7 +2,6 @@
 #
 # Converts a dsm style data set into a \link{dsdata} object.
 #
-# @aliases import.dsmdata
 # @export
 # @param covar.col Column of the original data set to extract covariate information from
 # @return a \link{dsdata} object
