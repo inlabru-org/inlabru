@@ -33,6 +33,7 @@ input_comb(["combined inputs:
   list(mapper = list(main, group, replicate),
   scale = weights)"])
 multi_mapper(["mapper_multi<br/>list(main, group, replicate)"])
+marginal_mapper([mapper_marginal])
 scale_mapper([mapper_scale])
 pipe_mapper([mapper_pipe])
 state([state])
@@ -58,6 +59,7 @@ state --> ibm_eval_lin
 lin --> ibm_eval_lin
 state --> ibm_eval
 mapper --> multi_mapper --> pipe_mapper
+marginal_mapper --> pipe_mapper
 scale_mapper --> pipe_mapper
 ibm_eval --> effect
 ibm_eval_lin --> effect
@@ -96,9 +98,9 @@ ibm_eval --> off
 ibm_jac --> jac
 ibm_jac --- ibm_A
 ibm_lin --> lin
-%%off-->lin
-%%jac-->lin
-%%state-->lin
+%% off-->lin
+%% jac-->lin
+%% state-->lin
 ',
   width = 600,
   height = 400
@@ -116,10 +118,13 @@ Red nodes indicate deprecated behaviour retained for backwards compatibility.
 ```{r, eval=TRUE,echo=FALSE}
 DiagrammeR::mermaid('
 flowchart TD
-expr([`label`_expr])
+
+mapper([mapper])
+input([input])
+expr(["<i>label</i>_expr"])
 data([data])
-_envir([.envir])
-input(["`label`_input"])
+_envir([".envir"])
+input(["<i>label</i>_input"])
 input0([input = NULL])
 input1([input = 1])
 style input1 color:#f00
@@ -164,8 +169,8 @@ res -->|"spatial<br/>covariate"| eval_spatial
 eval_spatial --> input
 
 %% spatial covariate layer input
-layer_expr(["`label`_layer_expr"])
-layer(["`label`_layer"])
+layer_expr(["<i>label</i>_layer_expr"])
+layer(["<i>label</i>_layer"])
 layer_eval["eval"]
 data --> layer_eval
 _envir --> layer_eval
