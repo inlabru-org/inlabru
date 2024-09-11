@@ -119,8 +119,6 @@ Red nodes indicate deprecated behaviour retained for backwards compatibility.
 DiagrammeR::mermaid('
 flowchart TD
 
-mapper([mapper])
-input([input])
 expr(["<i>label</i>_expr"])
 data([data])
 _envir([".envir"])
@@ -185,9 +183,9 @@ layer_expr --> layer_eval --> layer --> eval_spatial
 
 ## Intergration point construction
 
-Classic integration structure
-
 ```{r, eval=FALSE,echo=FALSE}
+# Classic integration structure
+
 DiagrammeR::mermaid('
 %%{init: {"securityLevel": "loose", "theme":"base"}}%%
 classDiagram
