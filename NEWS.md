@@ -8,6 +8,8 @@
   with e.g. `library(sp)` (version `2.11.1.9003`)
 * Use `bru_safe_inla(multicore=TRUE)` in `bru()` to allow multicore in non-interactive mode. Fixes regression bug that disabled multicore for non-interactive sessions. (version `2.11.1.9004`)
 * Reduced the amount of diagnostic messages in `bru_safe_inla()` (version `2.11.1.9005`)
+* Add `sf` version `mrsea_sf` data set (version `2.11.1.9006`)
+* Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 
 # inlabru 2.11.1
 

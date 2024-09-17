@@ -8,8 +8,9 @@ sline(
   data,
   start.cols,
   end.cols,
-  crs = sp::CRS(as.character(NA)),
-  to.crs = NULL
+  crs = fm_crs(),
+  to.crs = NULL,
+  format = c("sp", "sf")
 )
 }
 \arguments{
@@ -22,9 +23,11 @@ sline(
 \item{crs}{Coordinate reference system of the original \code{data}}
 
 \item{to.crs}{Coordinate reference system for the SpatialLines ouput.}
+
+\item{format}{Format of the output object. Either "sp" (default) or "sf"}
 }
 \value{
-\link[sp:SpatialLines]{sp::SpatialLinesDataFrame}
+\link[sp:SpatialLines]{sp::SpatialLinesDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
 A line in 2D space is defined by a start and an end point, each associated with 2D coordinates.
@@ -38,7 +41,6 @@ is transfromed accordingly. Additional columns of the input data, e.g. covariate
 are retained and attached to \code{DF}.
 }
 \examples{
-\dontshow{if (bru_safe_sp(quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
 # Create a data frame defining three lines
 lns <- data.frame(
@@ -47,10 +49,11 @@ lns <- data.frame(
 ) # end points
 
 
-# Conversion to SpatialLinesDataFrame without CRS
+# Conversion to sf without CRS
 spl <- sline(lns,
   start.cols = c("xs", "ys"),
-  end.cols = c("xe", "ye")
+  end.cols = c("xe", "ye"),
+  format = "sf"
 )
 
 if (require(ggplot2, quietly = TRUE)) {
@@ -59,6 +62,6 @@ if (require(ggplot2, quietly = TRUE)) {
     gg(spl)
 }
 }
-\dontshow{\}) # examplesIf}
+
 }
 \keyword{internal}

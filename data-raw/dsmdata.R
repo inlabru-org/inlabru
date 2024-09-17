@@ -71,11 +71,11 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   ok <- rowSums(is.na(loc)) == 0
   loc <- loc[ok, , drop = FALSE]
-  inner <- fm_nonconvex_hull(
+  inner <- fm_nonconvex_hull_inla(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
   )
-  outer <- fm_nonconvex_hull(
+  outer <- fm_nonconvex_hull_inla(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
   )

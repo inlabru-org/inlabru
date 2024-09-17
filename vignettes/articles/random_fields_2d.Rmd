@@ -29,7 +29,6 @@ library(inlabru)
 library(fmesher)
 library(mgcv)
 library(ggplot2)
-library(sp)
 ```
 
 Make a shortcut to a nicer colour scale:
@@ -53,7 +52,8 @@ Tomorrow, we will look into more general mesh constructions that adapt to irregu
 First, we build a high resolution mesh for the true field, using low level INLA functions
 
 ```{r }
-bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
+bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)),
+             format = "sf")
 mesh_fine <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.2)
 ggplot() +
   geom_fm(data = mesh_fine)

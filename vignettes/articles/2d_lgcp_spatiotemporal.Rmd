@@ -41,14 +41,14 @@ Get the data
 Load the dataset, that has coordinates in UTM in kilometres:
 
 ```{r }
-data(mrsea, package = "inlabru")
+mrsea <- inlabru::mrsea_sf
 ```
 
 The points (representing animals) and the sampling regions of this dataset are associated with a season. Let's have a look at the observed points and sampling regions for all seasons:
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 ggplot() +
-  gg(mrsea$mesh) +
+  geom_fm(data = mrsea$mesh) +
   gg(mrsea$boundary) +
   gg(mrsea$samplers) +
   gg(mrsea$points, size = 0.5) +
@@ -68,14 +68,14 @@ this step would simply aggregate all sampling regions over time.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ips <- fm_int(
-  domain = list(coordinates = mrsea$mesh, season = 1:4),
+  domain = list(geometry = mrsea$mesh, season = 1:4),
   samplers = mrsea$samplers
 )
 ```
 Plot the integration points:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ggplot() +
-  gg(mrsea$mesh) +
+  geom_fm(data = mrsea$mesh) +
   gg(ips, aes(size = weight)) +
   scale_size_area(max_size = 1) +
   facet_wrap(~season)
@@ -92,9 +92,9 @@ matern <- inla.spde2.pcmatern(mrsea$mesh,
   prior.range = c(10, 0.01)
 )
 
-cmp <- coordinates + season ~ Intercept(1) +
+cmp <- geometry + season ~ Intercept(1) +
   mySmooth(
-    coordinates,
+    geometry,
     model = matern,
     group = season,
     ngroup = 4
@@ -104,7 +104,7 @@ fit <- lgcp(cmp,
   data = mrsea$points,
   samplers = mrsea$samplers,
   domain = list(
-    coordinates = mrsea$mesh,
+    geometry = mrsea$mesh,
     season = seq_len(4)
   )
 )
@@ -113,7 +113,7 @@ fit <- lgcp(cmp,
 Predict and plot the intensity for all seasons:
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ppxl <- fm_pixels(mrsea$mesh, mask = mrsea$boundary, format = "sp")
+ppxl <- fm_pixels(mrsea$mesh, mask = mrsea$boundary, format = "sf")
 ppxl_all <- fm_cprod(ppxl, data.frame(season = seq_len(4)))
 
 lambda1 <- predict(
@@ -124,9 +124,9 @@ lambda1 <- predict(
 ```
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 pl1 <- ggplot() +
-  gg(as(lambda1, "SpatialPixelsDataFrame"), aes(fill = q0.5)) +
+  gg(lambda1, geom = "tile", aes(fill = q0.5)) +
   gg(mrsea$points, size = 0.3) +
   facet_wrap(~season) +
-  coord_equal()
+  coord_sf()
 pl1
 ```

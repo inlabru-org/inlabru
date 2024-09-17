@@ -60,10 +60,11 @@ sfill <- function(data, where = NULL) {
 #' @param end.cols Character array poitning out the columns of `data` that hold the end points of the lines
 #' @param crs Coordinate reference system of the original `data`
 #' @param to.crs Coordinate reference system for the SpatialLines ouput.
-#' @return [sp::SpatialLinesDataFrame]
+#' @param format Format of the output object. Either "sp" (default) or "sf"
+#' @return [sp::SpatialLinesDataFrame] or [sf::sf]
 #' @keywords internal
 #'
-#' @examplesIf bru_safe_sp(quietly = TRUE)
+#' @examples
 #' \donttest{
 #' # Create a data frame defining three lines
 #' lns <- data.frame(
@@ -72,10 +73,11 @@ sfill <- function(data, where = NULL) {
 #' ) # end points
 #'
 #'
-#' # Conversion to SpatialLinesDataFrame without CRS
+#' # Conversion to sf without CRS
 #' spl <- sline(lns,
 #'   start.cols = c("xs", "ys"),
-#'   end.cols = c("xe", "ye")
+#'   end.cols = c("xe", "ye"),
+#'   format = "sf"
 #' )
 #'
 #' if (require(ggplot2, quietly = TRUE)) {
@@ -85,8 +87,9 @@ sfill <- function(data, where = NULL) {
 #' }
 #' }
 #'
-sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), to.crs = NULL) {
-  bru_safe_sp(force = TRUE)
+sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
+                  format = c("sp", "sf")) {
+  format <- match.arg(format)
 
   sp <- as.data.frame(data[, start.cols])
   ep <- as.data.frame(data[, end.cols])
@@ -94,15 +97,30 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
   colnames(sp) <- c("x", "y")
   colnames(ep) <- c("x", "y")
 
-  lilist <- lapply(seq_len(nrow(sp)), function(k) {
-    sp::Lines(list(sp::Line(rbind(sp[k, ], ep[k, ]))), ID = k)
-  })
-  spl <- sp::SpatialLines(lilist, proj4string = crs)
+  if (identical(format, "sp")) {
+    bru_safe_sp(force = TRUE)
 
-  df <- data[, setdiff(names(data), c(start.cols, end.cols))]
-  rownames(df) <- seq_len(nrow(df))
+    lilist <- lapply(seq_len(nrow(sp)), function(k) {
+      sp::Lines(list(sp::Line(rbind(sp[k, ], ep[k, ]))), ID = k)
+    })
+    spl <- sp::SpatialLines(lilist, proj4string = fm_CRS(crs))
 
-  slines <- sp::SpatialLinesDataFrame(spl, data = df)
+    df <- data[, setdiff(names(data), c(start.cols, end.cols))]
+    rownames(df) <- seq_len(nrow(df))
+
+    slines <- sp::SpatialLinesDataFrame(spl, data = df)
+  } else {
+    lin <- lapply(seq_len(nrow(sp)), function(k) {
+      sf::st_linestring(as.matrix(rbind(
+        sp[k, , drop = FALSE],
+        ep[k, , drop = FALSE]
+      )))
+    })
+    lin <- sf::st_sfc(lin, crs = fm_crs(crs))
+    df <- data[, setdiff(names(data), c(start.cols, end.cols))]
+    rownames(df) <- seq_len(nrow(df))
+    slines <- sf::st_sf(geometry = lin, df)
+  }
 
   # If requested, change CRS
   if (!is.null(to.crs)) slines <- fm_transform(slines, to.crs)
@@ -115,23 +133,25 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #'
 #' A polygon can be described as a sequence of points defining the polygon's boundary.
 #' When given such a sequence (anti clockwise!) this function creates a
-#' SpatialPolygonsDataFrame holding the polygon decribed. By default, the
+#' `SpatialPolygonsDataFrame` or `sf` holding the polygon decribed. By default, the
 #' first two columns of `data` are assumed to define the x and y coordinates
-#' of the points. This behavior can ba changed using the `cols` parameter, which
+#' of the points. This behaviour can be changed using the `cols` parameter, which
 #' points out the names of the columns holding the coordinates. The coordinate
 #' reference system of the resulting spatial polygon can be set via the `crs`
-#' paraemter. Posterior conversion to a different CRS is supported using the
+#' parameter. Posterior conversion to a different CRS is supported using the
 #' `to.crs` parameter.
 #'
 #' @keywords internal
 #' @export
 #' @param data A data.frame of points describing the boundary of the polygon
+#' (unique points, no holes)
 #' @param cols Column names of the x and y coordinates within the data
 #' @param crs Coordinate reference system of the points
-#' @param to.crs Coordinate reference system for the SpatialLines ouput.
-#' @return SpatialPolygonsDataFrame
+#' @param to.crs Coordinate reference system for the `SpatialLines`/`sf` ouput.
+#' @param format Format of the output object. Either "sp" (default) or "sf"
+#' @return [sp::SpatialPolygonsDataFrame] or [sf::sf]
 #'
-#' @examplesIf bru_safe_sp(quietly = TRUE)
+#' @examples
 #' \donttest{
 #' # Create data frame of boundary points (anti clockwise!)
 #' pts <- data.frame(
@@ -139,8 +159,8 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #'   y = c(1, 1, 2, 2)
 #' )
 #'
-#' # Convert to SpatialPolygonsDataFrame
-#' pol <- spoly(pts)
+#' # Convert to sf
+#' pol <- spoly(pts, format = "sf")
 #'
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   # Plot it!
@@ -149,17 +169,25 @@ sline <- function(data, start.cols, end.cols, crs = sp::CRS(as.character(NA)), t
 #' }
 #' }
 #'
-spoly <- function(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL) {
-  bru_safe_sp(force = TRUE)
+spoly <- function(data, cols = colnames(data)[1:2], crs = fm_crs(), to.crs = NULL,
+                  format = c("sp", "sf")) {
+  format <- match.arg(format)
+  if (identical(format, "sp")) {
+    bru_safe_sp(force = TRUE)
 
-  po <- sp::Polygon(data[, cols], hole = FALSE)
-  pos <- sp::Polygons(list(po), ID = "tmp")
-  predpoly <- sp::SpatialPolygons(list(pos), proj4string = crs)
-  df <- data.frame(weight = 1)
-  rownames(df) <- "tmp"
-  spoly <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
+    po <- sp::Polygon(data[, cols], hole = FALSE)
+    pos <- sp::Polygons(list(po), ID = "tmp")
+    predpoly <- sp::SpatialPolygons(list(pos), proj4string = fm_CRS(crs))
+    df <- data.frame(weight = 1)
+    rownames(df) <- "tmp"
+    pol <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
+  } else {
+    po <- sf::st_polygon(list(as.matrix(data[c(seq_len(NROW(data)), 1L), cols])))
+    po <- sf::st_sfc(po, crs = fm_crs(crs))
+    pol <- sf::st_sf(geometry = po, weight = 1, check_ring_dir = FALSE)
+  }
 
   # If requested, change CRS
-  if (!is.null(to.crs)) spoly <- fm_transform(spoly, to.crs)
-  spoly
+  if (!is.null(to.crs)) pol <- fm_transform(pol, to.crs)
+  pol
 }

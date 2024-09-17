@@ -4,33 +4,41 @@
 \alias{spoly}
 \title{Convert a data.frame of boundary points into a SpatialPolgonsDataFrame}
 \usage{
-spoly(data, cols = colnames(data)[1:2], crs = fm_CRS(), to.crs = NULL)
+spoly(
+  data,
+  cols = colnames(data)[1:2],
+  crs = fm_crs(),
+  to.crs = NULL,
+  format = c("sp", "sf")
+)
 }
 \arguments{
-\item{data}{A data.frame of points describing the boundary of the polygon}
+\item{data}{A data.frame of points describing the boundary of the polygon
+(unique points, no holes)}
 
 \item{cols}{Column names of the x and y coordinates within the data}
 
 \item{crs}{Coordinate reference system of the points}
 
-\item{to.crs}{Coordinate reference system for the SpatialLines ouput.}
+\item{to.crs}{Coordinate reference system for the \code{SpatialLines}/\code{sf} ouput.}
+
+\item{format}{Format of the output object. Either "sp" (default) or "sf"}
 }
 \value{
-SpatialPolygonsDataFrame
+\link[sp:SpatialPolygons]{sp::SpatialPolygonsDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
 A polygon can be described as a sequence of points defining the polygon's boundary.
 When given such a sequence (anti clockwise!) this function creates a
-SpatialPolygonsDataFrame holding the polygon decribed. By default, the
+\code{SpatialPolygonsDataFrame} or \code{sf} holding the polygon decribed. By default, the
 first two columns of \code{data} are assumed to define the x and y coordinates
-of the points. This behavior can ba changed using the \code{cols} parameter, which
+of the points. This behaviour can be changed using the \code{cols} parameter, which
 points out the names of the columns holding the coordinates. The coordinate
 reference system of the resulting spatial polygon can be set via the \code{crs}
-paraemter. Posterior conversion to a different CRS is supported using the
+parameter. Posterior conversion to a different CRS is supported using the
 \code{to.crs} parameter.
 }
 \examples{
-\dontshow{if (bru_safe_sp(quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
 # Create data frame of boundary points (anti clockwise!)
 pts <- data.frame(
@@ -38,8 +46,8 @@ pts <- data.frame(
   y = c(1, 1, 2, 2)
 )
 
-# Convert to SpatialPolygonsDataFrame
-pol <- spoly(pts)
+# Convert to sf
+pol <- spoly(pts, format = "sf")
 
 if (require(ggplot2, quietly = TRUE)) {
   # Plot it!
@@ -47,6 +55,6 @@ if (require(ggplot2, quietly = TRUE)) {
     gg(pol)
 }
 }
-\dontshow{\}) # examplesIf}
+
 }
 \keyword{internal}

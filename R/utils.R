@@ -677,7 +677,7 @@ resave_package_data <- function() {
   name_list <- c(
     "gorillas", "mexdolphin",
     "gorillas_sf", "mexdolphin_sf",
-    "mrsea",
+    "mrsea", "mrsea_sf",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
     "seals_sp", "shrimp", "toygroups",
     "robins_subset",
@@ -735,12 +735,19 @@ resave_package_data <- function() {
 
     do_compress(env, smallest_compress, the_path)
 
-    new_info <- rbind(new_info, file.info(the_path))
+    new_info <- rbind(
+      new_info,
+      cbind(
+        file.info(the_path),
+        method = smallest_compress
+      )
+    )
   }
   df <- data.frame(
     path = rownames(old_info),
     size_old = old_info$size,
-    size_new = new_info$size
+    size_new = new_info$size,
+    method = new_info$method
   )
   df$"new/old" <- round(df$size_new / df$size_old * 1000) / 10
   df

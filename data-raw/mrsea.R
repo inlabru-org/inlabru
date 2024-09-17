@@ -17,7 +17,8 @@ source(here::here("data-raw", "dsmdata.R"))
 #' @author Lindesay Scott-Hayward \email{lass@@st-andrews.ac.uk}
 #'
 
-import.mrsea <- function() {
+import.mrsea <- function(format = c("sp", "sf")) {
+  format <- match.arg(format)
   pkg <- "MRSea"
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop("This package development function require the MRSea package from https://github.com/lindesaysh/MRSea")
@@ -62,41 +63,76 @@ import.mrsea <- function() {
 
   depth <- makecovardata(predict.data.re)
 
-  ############ NEW FORMAT USING sp objects ##############
+  if (format == "sp") {
+    ############ FORMAT USING sp objects ##############
 
-  crs <- CRS("+proj=utm +zone=32 +units=km")
+    crs <- fm_CRS("+proj=utm +zone=32 +units=km")
 
-  # Transects lines
-  lns <- subset(dset$effort, is.na(det))
-  class(lns) <- "data.frame"
-  lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = crs)
-  lns$weight <- lns$Effort
+    # Transects lines
+    lns <- subset(dset$effort, is.na(det))
+    class(lns) <- "data.frame"
+    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = crs)
+    lns$weight <- lns$Effort
 
-  # Detections
-  pts <- subset(dset$effort, !is.na(det))
-  class(pts) <- "data.frame"
-  sp::coordinates(pts) <- c("x", "y")
-  sp::proj4string(pts) <- crs
+    # Detections
+    pts <- subset(dset$effort, !is.na(det))
+    class(pts) <- "data.frame"
+    sp::coordinates(pts) <- c("x", "y")
+    sp::proj4string(pts) <- crs
 
-  # Mesh
-  mesh <- dset$mesh
-  mesh$crs <- fm_crs(crs)
+    # Mesh
+    mesh <- dset$mesh
+    mesh$crs <- fm_crs(crs)
 
 
-  # Boundary
-  boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
-    cols = c(1, 2),
-    crs = crs
-  )
+    # Boundary
+    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+                      cols = c(1, 2),
+                      crs = crs
+    )
 
-  # Covariates
-  covar <- SpatialPointsDataFrame(depth[, 1:2],
-    data = depth[, 3, drop = FALSE],
-    proj4string = crs
-  )
+    # Covariates
+    covar <- sp::SpatialPointsDataFrame(depth[, c("x", "y")],
+                                        data = depth[, "depth", drop = FALSE],
+                                        proj4string = crs
+    )
 
-  # Remove `distance` column from transects
-  lns$distance <- NULL
+    # Remove `distance` column from transects
+    lns$distance <- NULL
+  } else {
+    ############ FORMAT USING sf objects ##############
+
+    crs <- fm_crs("+proj=utm +zone=32 +units=km")
+
+    # Transects lines
+    lns <- subset(dset$effort, is.na(det))
+    class(lns) <- "data.frame"
+    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = crs,
+                 format = "sf")
+    lns$weight <- lns$Effort
+
+    # Detections
+    pts <- subset(dset$effort, !is.na(det))
+    class(pts) <- "data.frame"
+    pts <- sf::st_as_sf(pts, coords = c("x", "y"), crs = crs)
+
+    # Mesh
+    mesh <- dset$mesh
+    mesh$crs <- crs
+
+    # Boundary
+    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+                      cols = c(1, 2),
+                      crs = crs,
+                      format = "sf"
+    )
+
+    # Covariates
+    covar <- sf::st_as_sf(depth, coords = c("x", "y"), crs = crs)
+
+    # Remove `distance` column from transects
+    lns$distance <- NULL
+  }
 
   mrsea <- list(
     points = pts,
@@ -107,8 +143,10 @@ import.mrsea <- function() {
   )
 }
 
-# mrsea <- import.mrsea()
-# use_data(mrsea)
+# mrsea <- import.mrsea(format = "sp")
+# use_data(mrsea, compress = "xz")
+# mrsea_sf <- import.mrsea(format = "sf")
+# use_data(mrsea_sf, compress = "xz")
 
 mrseanames2dsmnames <- function(data) {
   nam <- names(data)
@@ -140,9 +178,9 @@ makecovardata <- function(data) {
     c("x.pos", "y.pos", "depth")
   ]
   colnames(depth) <- c("x", "y", "depth")
-  data$x <- data$x / 1000
-  data$y <- data$y / 1000
-  data
+  depth$x <- depth$x / 1000
+  depth$y <- depth$y / 1000
+  depth
 }
 # ---------------------------------------------------------------------
 makedistdata <- function(data) {
