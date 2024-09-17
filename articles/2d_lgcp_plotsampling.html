@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,7 +102,7 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2024-09-11</h4>
+            <h4 data-toc-skip class="date">Generated on 2024-09-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/devel/vignettes/articles/2d_lgcp_plotsampling.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_plotsampling.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_plotsampling.Rmd</code></div>
@@ -251,14 +251,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots    651.1947 51.47280 569.3600 642.9570 754.1248 642.9570      3.368526</span></span>
-<span><span class="co">#&gt; PlotsEmp 646.7730 43.14383 575.6745 646.2516 748.7081 646.2516      3.923010</span></span>
-<span><span class="co">#&gt; All      671.4832 28.52722 619.4402 670.9163 720.6061 670.9163      1.780160</span></span>
+<span><span class="co">#&gt; Plots    656.9948 45.81339 570.9424 652.4103 746.7464 652.4103      2.901301</span></span>
+<span><span class="co">#&gt; PlotsEmp 644.8644 32.29195 591.4739 643.7663 698.4528 643.7663      1.837748</span></span>
+<span><span class="co">#&gt; All      675.8757 26.33922 626.1650 676.6564 730.8193 676.6564      2.049617</span></span>
 <span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA            NA</span></span>
 <span><span class="co">#&gt;          mean.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots           5.820985</span></span>
-<span><span class="co">#&gt; PlotsEmp        5.098985</span></span>
-<span><span class="co">#&gt; All             3.208754</span></span>
+<span><span class="co">#&gt; Plots           5.161599</span></span>
+<span><span class="co">#&gt; PlotsEmp        3.596744</span></span>
+<span><span class="co">#&gt; All             3.043845</span></span>
 <span><span class="co">#&gt; AllEmp                NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
