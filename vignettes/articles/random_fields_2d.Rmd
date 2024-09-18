@@ -53,7 +53,8 @@ First, we build a high resolution mesh for the true field, using low level INLA 
 
 ```{r }
 bnd <- spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)),
-             format = "sf")
+  format = "sf"
+)
 mesh_fine <- fm_mesh_2d_inla(boundary = bnd, max.edge = 0.2)
 ggplot() +
   geom_fm(data = mesh_fine)

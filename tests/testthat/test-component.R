@@ -429,7 +429,8 @@ test_that("Component inputs: non-numeric input detection", {
   local_bru_safe_inla()
 
   bnd <- spoly(data.frame(x = c(-15, 15, 15, -15), y = c(25, 25, 50, 50)),
-               format = "sf")
+    format = "sf"
+  )
   mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
   matern <-
     INLA::inla.spde2.pcmatern(mesh,
