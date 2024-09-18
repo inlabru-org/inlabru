@@ -11,11 +11,13 @@ import.shrimp <- function() {
   load(file = file.path(system.file("extdata", package = "inlabru"), "gamba.Rdata"))
 
   # Use lat/lon which is actually in a utm system
-  gamba <- gamba[, c("Peso.Capturado..Kg.",
-                     "Peso.Retenido..Kg.",
-                     "Prof.Media",
-                     "lat",
-                     "lon")]
+  gamba <- gamba[, c(
+    "Peso.Capturado..Kg.",
+    "Peso.Retenido..Kg.",
+    "Prof.Media",
+    "lat",
+    "lon"
+  )]
 
   # Rename columns
   colnames(gamba) <- c("catch", "landing", "depth", "northing", "easting")

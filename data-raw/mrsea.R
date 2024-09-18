@@ -87,14 +87,14 @@ import.mrsea <- function(format = c("sp", "sf")) {
 
     # Boundary
     boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
-                      cols = c(1, 2),
-                      crs = crs
+      cols = c(1, 2),
+      crs = crs
     )
 
     # Covariates
     covar <- sp::SpatialPointsDataFrame(depth[, c("x", "y")],
-                                        data = depth[, "depth", drop = FALSE],
-                                        proj4string = crs
+      data = depth[, "depth", drop = FALSE],
+      proj4string = crs
     )
 
     # Remove `distance` column from transects
@@ -107,8 +107,10 @@ import.mrsea <- function(format = c("sp", "sf")) {
     # Transects lines
     lns <- subset(dset$effort, is.na(det))
     class(lns) <- "data.frame"
-    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"), crs = crs,
-                 format = "sf")
+    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"),
+      crs = crs,
+      format = "sf"
+    )
     lns$weight <- lns$Effort
 
     # Detections
@@ -122,9 +124,9 @@ import.mrsea <- function(format = c("sp", "sf")) {
 
     # Boundary
     boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
-                      cols = c(1, 2),
-                      crs = crs,
-                      format = "sf"
+      cols = c(1, 2),
+      crs = crs,
+      format = "sf"
     )
 
     # Covariates
