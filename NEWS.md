@@ -10,6 +10,7 @@
 * Reduced the amount of diagnostic messages in `bru_safe_inla()` (version `2.11.1.9005`)
 * Add `sf` version `mrsea_sf` data set (version `2.11.1.9006`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
+* Convert the `shrimp` data set to `sf` format (version `2.11.1.9007`)
 
 # inlabru 2.11.1
 

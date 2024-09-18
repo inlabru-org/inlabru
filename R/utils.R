@@ -687,26 +687,24 @@ resave_package_data <- function() {
 
   do_compress <- function(env, compress, the_path) {
     if (length(names(env)) == 1) {
-      eval(
-        parse(text = paste0(
-          "usethis::use_data(",
-          paste0(names(env), collapse = ", "),
-          ", compress = '", compress, "', overwrite = TRUE)"
-        )),
-        envir = env
+      thetext <- paste0(
+        "usethis::use_data(",
+        paste0(names(env), collapse = ", "),
+        ", compress = '", compress, "', overwrite = TRUE)"
       )
     } else {
-      eval(
-        parse(text = paste0(
-          "save(",
-          paste0(names(env), collapse = ", "),
-          ", file = '",
-          the_path,
-          "', compress = '", compress, "')"
-        )),
-        envir = env
+      thetext <- paste0(
+        "save(",
+        paste0(names(env), collapse = ", "),
+        ", file = '",
+        the_path,
+        "', compress = '", compress, "')"
       )
     }
+    eval(
+      parse(text = thetext),
+      envir = env
+    )
   }
 
   new_info <- NULL

@@ -7,13 +7,13 @@
 #'
 #' @format A list of objects:
 #'  \describe{
-#'    \item{`haul`:}{ A `SpatialPointsDataFrame` object containing haul locations}
-#'    \item{`mesh`:}{ An `inla.mesh` object containing a Delaunay triangulation
+#'    \item{`hauls`:}{ An `sf` object containing haul locations}
+#'    \item{`mesh`:}{ An `fm_mesh_2d` object containing a Delaunay triangulation
 #'    mesh (a type of discretization of continuous space) covering the haul locations.}
 #'    \describe{
 #'       \item{`catch`}{Catch in Kg.}
 #'       \item{`landing`}{Landing in Kg.}
-#'       \item{`depth`}{Mean depth of the fishery haul.}
+#'       \item{`depth`}{Mean depth (in metres) of the fishery haul.}
 #'     }
 #'  }
 #' @source
@@ -26,11 +26,12 @@
 #' @examples
 #' \donttest{
 #' if (require(ggplot2, quietly = TRUE)) {
-#'   data(shrimp, package = "inlabru")
+#'   data(shrimp_sf, package = "inlabru")
 #'   ggplot() +
-#'     gg(shrimp$mesh) +
-#'     gg(shrimp$hauls) +
-#'     coord_equal()
+#'     geom_fm(data = shrimp_sf$mesh) +
+#'     gg(shrimp_sf$hauls, aes(col = catch)) +
+#'     coord_sf(datum = fm_crs(shrimp_sf$hauls))
 #' }
 #' }
 "shrimp"
+
