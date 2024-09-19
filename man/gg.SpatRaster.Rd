@@ -18,6 +18,18 @@ The output from `geom_spatraster.
 Convenience wrapper function for \code{tidyterra::geom_spatraster()}.
 Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
+\examples{
+if (require("ggplot2", quietly = TRUE) &&
+  require("tidyterra", quietly = TRUE)) {
+  # Load Gorilla covariates
+
+  gcov <- gorillas_sf_gcov()
+
+  # Plot the pixel centers
+  ggplot() +
+    gg(gcov$elevation)
+}
+}
 \seealso{
 Other geomes for spatial data: 
 \code{\link{gg}()},

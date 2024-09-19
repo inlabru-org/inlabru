@@ -3,14 +3,13 @@
 \docType{data}
 \name{seals}
 \alias{seals}
-\alias{seals_sp}
 \title{Seal pups}
 \format{
 The data contain these objects:
 \describe{
-\item{\code{points}:}{ A \code{SpatialPointsDataFrame} Center locations of the photos}
+\item{\code{points}:}{ An \code{sf} object with center locations of the photos}
 \item{\code{mesh}:}{ An \code{fm_mesh_2d} enclosing the plane's transect}
-\item{\code{ice.data}:}{ An \code{SpatialPointsDataFrame} with MODIS ice concentration estimates}
+\item{\code{ice.data}:}{ An \code{sf} with MODIS ice concentration estimates}
 \item{\code{ice.cv}:}{ An \code{covdata} object with interpolated ice coverage data}
 }
 }
@@ -18,7 +17,7 @@ The data contain these objects:
 Martin Jullum \email{Martin.Jullum@nr.no}
 }
 \usage{
-data(seals_sp)
+data(seals)
 }
 \description{
 This is a single transect of an aereal photo seal pup survey in the Greenland Sea
@@ -26,8 +25,8 @@ This is a single transect of an aereal photo seal pup survey in the Greenland Se
 \examples{
 if (require(ggplot2, quietly = TRUE)) {
   ggplot() +
-    geom_fm(data = seals_sp$mesh) +
-    gg(seals_sp$points)
+    geom_fm(data = seals$mesh) +
+    gg(seals$points)
 }
 }
 \references{

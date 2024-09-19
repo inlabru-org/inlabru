@@ -3,13 +3,13 @@
 #' @docType data
 #' @description This is a single transect of an aereal photo seal pup survey in the Greenland Sea
 #'
-#' @usage data(seals_sp)
+#' @usage data(seals)
 #'
 #' @format The data contain these objects:
 #'  \describe{
-#'    \item{`points`:}{ A `SpatialPointsDataFrame` Center locations of the photos}
+#'    \item{`points`:}{ An `sf` object with center locations of the photos}
 #'    \item{`mesh`:}{ An `fm_mesh_2d` enclosing the plane's transect}
-#'    \item{`ice.data`:}{ An `SpatialPointsDataFrame` with MODIS ice concentration estimates}
+#'    \item{`ice.data`:}{ An `sf` with MODIS ice concentration estimates}
 #'    \item{`ice.cv`:}{ An `covdata` object with interpolated ice coverage data}
 #'  }
 #' @source
@@ -25,7 +25,7 @@
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   ggplot() +
-#'     geom_fm(data = seals_sp$mesh) +
-#'     gg(seals_sp$points)
+#'     geom_fm(data = seals$mesh) +
+#'     gg(seals$points)
 #' }
-"seals_sp"
+"seals"

@@ -220,33 +220,6 @@ Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}}
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_pixels]{fmesher::fm_pixels()}}
 
 }}
-\examples{
-\dontrun{
-# if (requireNamespace("ggmap", quietly = TRUE) &&
-#   require("ggplot2", quietly = TRUE)) {
-#  # Load the Gorilla data
-#  data(gorillas, package = "inlabru")
-#
-#   # Create a base map centred around the nests and plot the boundary as well
-#   # as the nests
-#   gmap(gorillas$nests, maptype = "satellite") +
-#     gm(gorillas$boundary) +
-#     gm(gorillas$nests, color = "white", size = 0.5)
-# }
-}
-\dontrun{
-# if (require("ggplot2", quietly = TRUE)) {
-#   # Load the Gorilla data
-#   data(gorillas, package = "inlabru")
-#
-#   # Create a base map centered around the nests and plot the boundary as well as the nests
-#   gmap(gorillas$nests, maptype = "satellite") +
-#     gm(gorillas$boundary) +
-#     gm(gorillas$nests, color = "white", size = 0.5)
-# }
-}
-
-}
 \seealso{
 \code{\link[=fm_cprod]{fm_cprod()}}
 

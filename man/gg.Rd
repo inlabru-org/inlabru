@@ -23,7 +23,7 @@ on the \link{class} of the first argument.
 if (require("ggplot2", quietly = TRUE)) {
   # Load Gorilla data
 
-  data(gorillas, package = "inlabru")
+  gorillas <- inlabru::gorillas_sf
 
   # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
 

@@ -73,7 +73,7 @@ import.seals <- function(sealfile = "WestIce2012.csv",
 
   stop("Old internal methods needed by import.seals have been removed.")
   # TODO: replace old code in misc/ with modern code
-  #  icecv <- sp::covariate(ice, predictor = "band1", mesh = mesh)
+  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
   icecv <- NULL
   #  plot(icecv)
 
@@ -97,6 +97,21 @@ import.seals <- function(sealfile = "WestIce2012.csv",
   #' Create a data set
   seals <- list(mesh = mesh, points = seals, ice.data = ice, ice.cv = icecv)
 }
+
+import.seals_sf <- function() {
+  seals <- inlabru::seals_sp
+
+  seals$points <- sf::st_as_sf(seals$points)
+  seals$mesh <- fm_as_fm(seals$mesh)
+  seals$ice.data <- sf::st_as_sf(seals$ice.data)
+  seals$ice.cv$mesh <- fm_as_fm(seals$ice.cv$mesh)
+
+  seals
+}
+
+
+# seals <- import.seals_sf()
+# usethis::use_data(seals, overwrite = TRUE, compress = "xz")
 
 # save.seals <- function(...) {
 #  # save.seals("/home/fbachl/devel/r/seals/WestIce2012.csv",

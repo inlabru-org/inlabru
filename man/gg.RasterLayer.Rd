@@ -34,7 +34,7 @@ if (require("spatstat.data", quietly = TRUE) &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   # Load Gorilla data
-  data("gorillas", package = "spatstat.data")
+  data("gorillas", package = "spatstat.data", envir = environment())
 
   # Convert elevation covariate to RasterLayer
 

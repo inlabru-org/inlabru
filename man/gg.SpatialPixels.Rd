@@ -20,13 +20,16 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
+  require("terra", quietly = TRUE) &&
   bru_safe_sp()) {
   # Load Gorilla data
 
-  data(gorillas, package = "inlabru")
+  gcov <- gorillas_sf_gcov()
+  elev <- terra::as.data.frame(gcov$elevation, xy = TRUE)
+  pxl <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
 
   # Turn elevation covariate into SpatialPixels
-  pxl <- sp::SpatialPixels(sp::SpatialPoints(gorillas$gcov$elevation))
+  pxl <- sp::SpatialPixels(pxl)
 
   # Plot the pixel centers
   ggplot() +

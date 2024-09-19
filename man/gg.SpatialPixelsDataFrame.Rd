@@ -27,24 +27,32 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-  if (require(ggplot2, quietly = TRUE) &&
+  if (require("ggplot2", quietly = TRUE) &&
+      require("terra", quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data
 
-    gorillas <- inlabru::gorillas
+    gorillas <- inlabru::gorillas_sf
+
+    gcov <- gorillas_sf_gcov()
+    elev <- terra::as.data.frame(gcov$elevation, xy = TRUE)
+    elev <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
+
+    # Turn elevation covariate into SpatialGridDataFrame
+    elev <- sp::SpatialPixelsDataFrame(pxl, data = as.data.frame(pxl))
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
 
     ggplot() +
-      gg(gorillas$gcov$elevation)
+      gg(elev)
 
     # Add Gorilla survey boundary and nest sightings
 
     ggplot() +
-      gg(gorillas$gcov$elevation) +
-      gg(gorillas$boundary) +
+      gg(elev) +
+      gg(gorillas$boundary, alpha = 0.0, col = "red") +
       gg(gorillas$nests)
 
     # Load pantropical dolphin data
