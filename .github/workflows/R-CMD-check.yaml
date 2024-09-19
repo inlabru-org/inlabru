@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-12, r: 'release'}
+          - {os: macOS-latest, r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest, r: 'release'}
@@ -51,7 +51,7 @@ jobs:
           brew install --cask xquartz
           brew install pkg-config
           brew install proj@9
-          brew install gdal
+          #          brew install gdal
 
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
