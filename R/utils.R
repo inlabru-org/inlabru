@@ -679,7 +679,7 @@ resave_package_data <- function() {
     "gorillas_sf", "mexdolphin_sf",
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-    "seals_sf", "shrimp", "toygroups",
+    "shrimp", "toygroups",
     "robins_subset",
     "toypoints"
   )

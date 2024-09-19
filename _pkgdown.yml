@@ -160,7 +160,6 @@ reference:
   - matches("mexdolphin")
   - matches("mrsea")
   - matches("robins_subset")
-  - matches("seals_sf")
   - matches("shrimp")
   - matches("toygroups")
   - matches("toypoints")
