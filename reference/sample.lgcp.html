@@ -11,7 +11,7 @@ fm_mesh_2d object. In between mesh nodes the log intensity is assumed to be line
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -182,7 +182,7 @@ Finn Lindgren <a href="mailto:finn.lindgren@gmail.com">finn.lindgren@gmail.com</
 <span class="r-in"><span>  <span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu">sample.lgcp</span><span class="op">(</span><span class="va">mesh</span>, <span class="va">loglambda</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">pts</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vertices</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">loglambda</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">150</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">pts</span>, pch <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">points</a></span><span class="op">(</span><span class="va">pts</span>, pch <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="sample.lgcp-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

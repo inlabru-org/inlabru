@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,17 +76,24 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="inlabru-development-version">inlabru (development version)<a class="anchor" aria-label="anchor" href="#inlabru-development-version"></a></h2>
+<div class="section level3">
+<h3 id="general-changes-development-version">General changes<a class="anchor" aria-label="anchor" href="#general-changes-development-version"></a></h3>
 <ul><li>Remove unneeded <code>"list"</code> class inheritance from solitary classes (version <code>2.11.1.9001</code>)</li>
 <li>Expand the <code>summary</code> and <code>print</code> method class coverage (version <code>2.11.1.9002</code>)</li>
 <li>Remove <code>ggmap</code> support (version <code>2.11.1.9002</code>)</li>
 <li>Move <code>sp</code> from <code>Imports</code> to <code>Suggests</code>. Component definitions using <code>coordinates</code> as input require either <code><a href="https://edzer.github.io/sp/reference/coordinates.html" class="external-link">sp::coordinates</a></code> or <code>sp</code> having been already loaded with e.g. <code><a href="https://github.com/edzer/sp/" class="external-link">library(sp)</a></code> (version <code>2.11.1.9003</code>)</li>
 <li>Use <code>bru_safe_inla(multicore=TRUE)</code> in <code><a href="../reference/bru.html">bru()</a></code> to allow multicore in non-interactive mode. Fixes regression bug that disabled multicore for non-interactive sessions. (version <code>2.11.1.9004</code>)</li>
 <li>Reduced the amount of diagnostic messages in <code><a href="../reference/bru_safe_inla.html">bru_safe_inla()</a></code> (version <code>2.11.1.9005</code>)</li>
-<li>Add <code>sf</code> version <code>mrsea_sf</code> data set (version <code>2.11.1.9006</code>)</li>
 <li>Add <code>sf</code> output format support for <code>sline</code> and <code>spoly</code> (version <code>2.11.1.9006</code>)</li>
-<li>Convert the <code>shrimp</code> data set to <code>sf</code> format (version <code>2.11.1.9007</code>)</li>
 <li>Remove unnecessary INLA namespace loading in <code>ggplot</code> methods (version <code>2.11.1.9008</code>)</li>
 </ul></div>
+<div class="section level3">
+<h3 id="data-set-updates-development-version">Data set updates<a class="anchor" aria-label="anchor" href="#data-set-updates-development-version"></a></h3>
+<ul><li>Convert <code>mrsea</code> to <code>sf</code> format (version <code>2.11.1.9009</code>)</li>
+<li>Convert the <code>shrimp</code> data set to <code>sf</code> format (version <code>2.11.1.9007</code>)</li>
+<li>Remove <code>seals_sp</code> data set due to excessive size (version <code>2.11.1.9010</code>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.11.1" id="inlabru-2111">inlabru 2.11.1<a class="anchor" aria-label="anchor" href="#inlabru-2111"></a></h2><p class="text-muted">CRAN release: 2024-07-01</p>
 <div class="section level3">

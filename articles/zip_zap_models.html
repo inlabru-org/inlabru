@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -232,7 +232,7 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9008</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9010</span></span>
 <span><span class="co">#&gt; INLA version: 24.09.14</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -247,10 +247,10 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.339, Running = 2.74, Post = 0.567, Total = 3.64 </span></span>
+<span><span class="co">#&gt;     Pre = 0.339, Running = 2.62, Post = 0.563, Total = 3.52 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
 <span><span class="co">#&gt; Intercept     -6.173 3.464    -13.001   -6.167      0.637 -6.157   0</span></span>
@@ -350,7 +350,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9008</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9010</span></span>
 <span><span class="co">#&gt; INLA version: 24.09.14</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -365,7 +365,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.355, Running = 1.65, Post = 0.129, Total = 2.13 </span></span>
+<span><span class="co">#&gt;     Pre = 0.333, Running = 1.61, Post = 0.163, Total = 2.1 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
@@ -548,18 +548,18 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.409e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.499e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -9.296e-16</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.563e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -1.697e-16</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.609e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.0458, norm1 = 7.556e-12, norm01 = 0.0458)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.0458</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -4.661e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.556e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04581, norm1 = 7.671e-12, norm01 = 0.04581)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04581</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.702e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.67e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; iinla: Evaluate predictor linearisation</span></span>
 <span><span class="co">#&gt; iinla: Max deviation from previous: 0.727% of SD, and line search is inactive</span></span>
@@ -569,7 +569,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt; iinla: Iteration 3 [max:10]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.11.1.9008</span></span>
+<span><span class="co">#&gt; inlabru version: 2.11.1.9010</span></span>
 <span><span class="co">#&gt; INLA version: 24.09.14</span></span>
 <span><span class="co">#&gt; Components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
@@ -594,7 +594,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt;     Used components: effects[Intercept_count, elevation, field_count], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.519, Running = 3.99, Post = 0.281, Total = 4.79 </span></span>
+<span><span class="co">#&gt;     Pre = 0.501, Running = 3.97, Post = 0.302, Total = 4.77 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
@@ -876,24 +876,24 @@ respectively. The (negated) Log score is a strictly proper score <span class="ci
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2424511</td>
-<td align="right">0.5622920</td>
-<td align="right">-2.505994</td>
-<td align="right">0.3928667</td>
+<td align="right">0.2422075</td>
+<td align="right">0.5615672</td>
+<td align="right">-2.629167</td>
+<td align="right">0.3926373</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2543634</td>
-<td align="right">0.6001914</td>
-<td align="right">-2.672175</td>
-<td align="right">0.4023062</td>
+<td align="right">0.2544448</td>
+<td align="right">0.6003571</td>
+<td align="right">-2.693157</td>
+<td align="right">0.4022931</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2798546</td>
-<td align="right">0.6538012</td>
-<td align="right">-2.309717</td>
-<td align="right">0.4002077</td>
+<td align="right">0.2800567</td>
+<td align="right">0.6535421</td>
+<td align="right">-2.322713</td>
+<td align="right">0.3999739</td>
 </tr>
 </tbody>
 </table>

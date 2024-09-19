@@ -25,7 +25,7 @@ Requires the ggplot2 package."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -175,7 +175,7 @@ to inlabru style before matching.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Predict posterior statistics of 'x'</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">xpost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="cn">NULL</span>, formula <span class="op">=</span> <span class="op">~</span><span class="va">x_latent</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">xpost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="cn">NULL</span>, formula <span class="op">=</span> <span class="op">~</span><span class="va">x_latent</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># The statistics include mean, standard deviation, the 2.5% quantile, the median,</span></span></span>
 <span class="r-in"><span>  <span class="co"># the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as</span></span></span>
@@ -192,7 +192,7 @@ to inlabru style before matching.</p></dd>
 <span class="r-in"><span>  <span class="co"># The predict function can also be used to simultaneously estimate posteriors</span></span></span>
 <span class="r-in"><span>  <span class="co"># of multiple variables:</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="va">xipost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span></span>
+<span class="r-in"><span>  <span class="va">xipost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>,</span></span>
 <span class="r-in"><span>    newdata <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>    formula <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      Intercept <span class="op">=</span> <span class="va">Intercept_latent</span>,</span></span>
@@ -222,7 +222,7 @@ to inlabru style before matching.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># For ease of use we can also type</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xipost</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">xipost</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># This type of plot will show a ribbon around the mean, which viszualizes the upper and lower</span></span></span>
 <span class="r-in"><span>  <span class="co"># quantiles mentioned above (2.5 and 97.5%). Plotting the ribbon can be turned of using the</span></span></span>
