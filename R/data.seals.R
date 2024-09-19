@@ -1,9 +1,9 @@
-#' @name seals
+#' @name seals_sf
 #' @title Seal pups
 #' @docType data
 #' @description This is a single transect of an aereal photo seal pup survey in the Greenland Sea
 #'
-#' @usage data(seals)
+#' @usage data(seals_sf)
 #'
 #' @format The data contain these objects:
 #'  \describe{
@@ -25,7 +25,7 @@
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   ggplot() +
-#'     geom_fm(data = seals$mesh) +
-#'     gg(seals$points)
+#'     geom_fm(data = seals_sf$mesh) +
+#'     gg(seals_sf$points)
 #' }
-"seals"
+"seals_sf"

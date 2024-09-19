@@ -110,8 +110,8 @@ import.seals_sf <- function() {
 }
 
 
-# seals <- import.seals_sf()
-# usethis::use_data(seals, overwrite = TRUE, compress = "xz")
+# seals_sf <- import.seals_sf()
+# usethis::use_data(seals_sf, overwrite = TRUE, compress = "xz")
 
 # save.seals <- function(...) {
 #  # save.seals("/home/fbachl/devel/r/seals/WestIce2012.csv",

@@ -49,7 +49,7 @@ deprecated the intenrally used \code{ggplot2::fortify()} method for
     elev <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
 
     # Turn elevation covariate into SpatialGridDataFrame
-    elev <- sp::SpatialPixelsDataFrame(pxl, data = as.data.frame(pxl))
+    elev <- sp::SpatialPixelsDataFrame(elev, data = as.data.frame(elev))
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
