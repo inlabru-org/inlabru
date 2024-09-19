@@ -159,7 +159,6 @@ reference:
   - matches("gorillas_sf")
   - matches("mexdolphin")
   - matches("mrsea")
-  - matches("mrsea_sf")
   - matches("robins_subset")
   - matches("seals")
   - matches("shrimp")

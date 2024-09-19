@@ -677,7 +677,7 @@ resave_package_data <- function() {
   name_list <- c(
     "gorillas", "mexdolphin",
     "gorillas_sf", "mexdolphin_sf",
-    "mrsea", "mrsea_sf",
+    "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
     "seals_sp", "shrimp", "toygroups",
     "robins_subset",

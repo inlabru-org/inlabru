@@ -7,15 +7,15 @@
 \format{
 A list of objects:
 \describe{
-\item{\code{points}:}{ A \code{SpatialPointsDataFrame} object containing the locations of
+\item{\code{points}:}{ A \code{sf} object containing the locations of
 XXXXX.}
-\item{\code{samplers}:}{ A \code{SpatialLinesDataFrame} object containing the transect lines
+\item{\code{samplers}:}{ A \code{sf} object containing the transect lines
 that were surveyed.}
 \item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a Delaunay triangulation
 mesh (a type of discretization of continuous space) covering the survey region.}
-\item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary of the
+\item{\code{boundary}:}{ An \code{sf} object defining the boundary polygon of the
 survey region.}
-\item{\code{covar}:}{ An \code{SpatialPointsDataFrame} containing sea depth estimates.}
+\item{\code{covar}:}{ An \code{sf} containing sea depth estimates.}
 }
 }
 \source{
@@ -38,8 +38,5 @@ if (require(ggplot2, quietly = TRUE)) {
 }
 \references{
 NONE YET
-}
-\seealso{
-\code{sf} version: \link{mrsea_sf}
 }
 \keyword{datasets}

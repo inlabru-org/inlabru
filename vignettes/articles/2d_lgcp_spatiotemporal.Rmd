@@ -41,7 +41,7 @@ Get the data
 Load the dataset, that has coordinates in UTM in kilometres:
 
 ```{r }
-mrsea <- inlabru::mrsea_sf
+mrsea <- inlabru::mrsea
 ```
 
 The points (representing animals) and the sampling regions of this dataset are associated with a season. Let's have a look at the observed points and sampling regions for all seasons:

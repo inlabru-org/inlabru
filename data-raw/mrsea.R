@@ -17,7 +17,7 @@ source(here::here("data-raw", "dsmdata.R"))
 #' @author Lindesay Scott-Hayward \email{lass@@st-andrews.ac.uk}
 #'
 
-import.mrsea <- function(format = c("sp", "sf")) {
+import.mrsea <- function(format = c("sf", "sp")) {
   format <- match.arg(format)
   pkg <- "MRSea"
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -145,10 +145,8 @@ import.mrsea <- function(format = c("sp", "sf")) {
   )
 }
 
-# mrsea <- import.mrsea(format = "sp")
-# use_data(mrsea, compress = "xz")
-# mrsea_sf <- import.mrsea(format = "sf")
-# use_data(mrsea_sf, compress = "xz")
+# mrsea <- import.mrsea(format = "sf")
+# use_data(mrsea, compress = "xz", overwrite = TRUE)
 
 mrseanames2dsmnames <- function(data) {
   nam <- names(data)
