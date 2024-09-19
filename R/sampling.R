@@ -1,8 +1,8 @@
 #' Sample from an inhomogeneous Poisson process
 #'
 #' This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
-#' log intensity has to be provided via its values at the nodes of an `inla.mesh.1d` or
-#' `inla.mesh` object. In between mesh nodes the log intensity is assumed to be linear.
+#' log intensity has to be provided via its values at the nodes of an `fm_mesh_1d` or
+#' `fm_mesh_2d` object. In between mesh nodes the log intensity is assumed to be linear.
 #'
 #' For 2D processes on a sphere the `R` parameter can be used to adjust to sphere's radius implied by
 #' the mesh. If the intensity is very high the standard `strategy` "spherical" can cause memory issues.
@@ -10,10 +10,10 @@
 #'
 #' @export
 #'
-#' @param mesh An `INLA::inla.mesh` object
+#' @param mesh An [fmesher::fm_mesh_1d] or [fmesher::fm_mesh_2d] object
 #' @param loglambda vector or matrix; A vector of log intensities at the mesh vertices
 #'   (for higher order basis functions, e.g.
-#'   for `inla.mesh.1d` meshes, `loglambda` should be given as `mesh$m` basis
+#'   for `fm_mesh_1d` meshes, `loglambda` should be given as `mesh$m` basis
 #'   function weights rather than the values at the `mesh$n` vertices)
 #'   A single scalar is expanded to a vector of the appropriate length.
 #'   If a matrix is supplied, one process sample for each column is produced.
@@ -27,7 +27,7 @@
 #' @param R Numerical value only applicable to spherical and geographical meshes. It is interpreted as
 #'   `R` is the equivalent Earth radius, in km, used to scale the lambda intensity.
 #'     For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.
-#' @param samplers A `SpatialPolygonsDataFrame` or `inla.mesh` object.
+#' @param samplers A `SpatialPolygonsDataFrame` or `fm_mesh_2d` object.
 #'   Simulated points that fall outside these polygons are discarded.
 #' @param ignore.CRS logical; if `TRUE`, ignore any CRS information in the mesh. Default `FALSE`.
 #'   This affects `R` and the permitted values for `strategy`.
@@ -89,7 +89,6 @@
 #'
 sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
                         ignore.CRS = FALSE) {
-  stopifnot(bru_safe_inla(multicore = TRUE))
   mesh <- fm_as_fm(mesh)
   if (inherits(mesh, "fm_mesh_1d")) {
     xmin <- mesh$interval[1]

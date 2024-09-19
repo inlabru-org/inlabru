@@ -756,7 +756,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 ## fm_mesh_2d ####
 
 #' @title Mapper for `fm_mesh_2d`
-#' @param mesh An `fm_mesh_2d` or `inla.mesh.2d` object to use as a mapper
+#' @param mesh An `fm_mesh_2d` object to use as a mapper
 #' @export
 #' @description Creates a mapper for 2D `fm_mesh_2d` objects
 #' @rdname bru_mapper_fm_mesh_2d
@@ -831,7 +831,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' Default: `NULL`, to force user specification of this parameter
 #' @export
 #' @description Create mapper for an `fm_mesh_1d` object
-#' @param mesh An `fm_mesh_1d` or `inla.mesh.1d` object to use as a mapper
+#' @param mesh An `fm_mesh_1d` object to use as a mapper
 #' @rdname bru_mapper_fm_mesh_1d
 #' @inheritParams bru_mapper_generics
 #' @inheritParams bru_mapper_fm_mesh_2d
@@ -847,7 +847,7 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #'
 bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
   if (is.null(indexed)) {
-    stop("indexed=TRUE/FALSE needs to be specified to convert inla.mesh.1d to a bru_mapper")
+    stop("indexed=TRUE/FALSE needs to be specified to convert fm_mesh_1d to a bru_mapper")
   }
   mapper <- list(
     mesh = mesh,

@@ -29,11 +29,11 @@ Blue and red shrimp in the Western Mediterranean Sea.
 \examples{
 \donttest{
 if (require(ggplot2, quietly = TRUE)) {
-  data(shrimp_sf, package = "inlabru")
+  data(shrimp, package = "inlabru", envir = environment())
   ggplot() +
-    geom_fm(data = shrimp_sf$mesh) +
-    gg(shrimp_sf$hauls, aes(col = catch)) +
-    coord_sf(datum = fm_crs(shrimp_sf$hauls))
+    geom_fm(data = shrimp$mesh) +
+    gg(shrimp$hauls, aes(col = catch)) +
+    coord_sf(datum = fm_crs(shrimp$hauls))
 }
 }
 }

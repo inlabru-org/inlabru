@@ -28,7 +28,7 @@
 \method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 }
 \arguments{
-\item{mesh}{An \code{fm_mesh_2d} or \code{inla.mesh.2d} object to use as a mapper}
+\item{mesh}{An \code{fm_mesh_2d} object to use as a mapper}
 
 \item{...}{Arguments passed on to other methods}
 

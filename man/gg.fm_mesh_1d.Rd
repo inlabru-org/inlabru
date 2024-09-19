@@ -22,7 +22,7 @@
 )
 }
 \arguments{
-\item{data}{An inla.mesh.1d object.}
+\item{data}{An \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d} object.}
 
 \item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to \code{geom_point}.}
 

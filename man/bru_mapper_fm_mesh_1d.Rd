@@ -28,7 +28,7 @@
 \method{ibm_jacobian}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
 }
 \arguments{
-\item{mesh}{An \code{fm_mesh_1d} or \code{inla.mesh.1d} object to use as a mapper}
+\item{mesh}{An \code{fm_mesh_1d} object to use as a mapper}
 
 \item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
 integer indexing sequence for the latent variables (needed for \code{spde} models).

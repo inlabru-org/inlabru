@@ -15,7 +15,7 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 
 \item{samplers}{A SpatialPolygon object describing the area for which to compute the cumulative variance measure.}
 
-\item{mesh}{The \code{inla.mesh} for which the prediction was performed (required for cumulative Vmeasure).}
+\item{mesh}{The \link[fmesher:fm_mesh_2d]{fmesher::fm_mesh_2d} for which the prediction was performed (required for cumulative Vmeasure).}
 }
 \value{
 Variance and correlations measures.

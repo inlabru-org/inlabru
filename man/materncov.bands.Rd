@@ -17,8 +17,8 @@ materncov.bands(
 }
 \arguments{
 \item{manifold}{Either "R1", "S1", "R2", or "S2", from
-\code{mesh$manifold}, or a full \code{inla.mesh} or
-\code{inla.mesh.1d} object.}
+\code{fm_manifold(mesh)}, or a full \code{fm_mesh_2d} or
+\code{fm_mesh_1d} object.}
 
 \item{dist}{A vector of distances at which to calculate the
 covariances/correlations}

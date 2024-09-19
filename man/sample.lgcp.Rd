@@ -14,11 +14,11 @@ sample.lgcp(
 )
 }
 \arguments{
-\item{mesh}{An \code{INLA::inla.mesh} object}
+\item{mesh}{An \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d} or \link[fmesher:fm_mesh_2d]{fmesher::fm_mesh_2d} object}
 
 \item{loglambda}{vector or matrix; A vector of log intensities at the mesh vertices
 (for higher order basis functions, e.g.
-for \code{inla.mesh.1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
+for \code{fm_mesh_1d} meshes, \code{loglambda} should be given as \code{mesh$m} basis
 function weights rather than the values at the \code{mesh$n} vertices)
 A single scalar is expanded to a vector of the appropriate length.
 If a matrix is supplied, one process sample for each column is produced.}
@@ -35,7 +35,7 @@ If \code{NULL} or \code{'auto'}, the the likely fastest method is chosen;
 \code{R} is the equivalent Earth radius, in km, used to scale the lambda intensity.
 For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.}
 
-\item{samplers}{A \code{SpatialPolygonsDataFrame} or \code{inla.mesh} object.
+\item{samplers}{A \code{SpatialPolygonsDataFrame} or \code{fm_mesh_2d} object.
 Simulated points that fall outside these polygons are discarded.}
 
 \item{ignore.CRS}{logical; if \code{TRUE}, ignore any CRS information in the mesh. Default \code{FALSE}.
@@ -51,8 +51,8 @@ object of point locations.
 }
 \description{
 This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
-log intensity has to be provided via its values at the nodes of an \code{inla.mesh.1d} or
-\code{inla.mesh} object. In between mesh nodes the log intensity is assumed to be linear.
+log intensity has to be provided via its values at the nodes of an \code{fm_mesh_1d} or
+\code{fm_mesh_2d} object. In between mesh nodes the log intensity is assumed to be linear.
 }
 \details{
 For 2D processes on a sphere the \code{R} parameter can be used to adjust to sphere's radius implied by

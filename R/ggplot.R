@@ -747,15 +747,17 @@ gg.SpatRaster <- function(data, ...) {
 
 
 
-#' Geom for inla.mesh objects
+#' Geom for fm_mesh_2d objects
 #'
 #' @description
 #'
-#' This function extracts the graph of an inla.mesh object and uses `geom_line` to visualize
+#' This function extracts the graph of an [fmesher::fm_mesh_2d] object and uses `geom_line` to visualize
 #' the graph's edges. Alternatively, if the `color` argument is provided, interpolates the colors
 #' across for a set of SpatialPixels covering the mesh area and calls [gg.SpatialPixelsDataFrame()]
 #' to plot the interpolation.
 #' Requires the `ggplot2` package.
+#'
+#' Also see the [fmesher::geom_fm()] method.
 #'
 #' @export
 
@@ -776,12 +778,12 @@ gg.SpatRaster <- function(data, ...) {
 #' system to project the mesh to before plotting.
 #' @param nx Number of pixels in x direction (when plotting using the color parameter).
 #' @param ny Number of pixels in y direction (when plotting using the color parameter).
-#' @param mask A SpatialPolygon defining the region that is plotted.
+#' @param mask A `SpatialPolygon` or `sf` polygon defining the region that is plotted.
 #' @param ... ignored arguments (S3 generic compatibility).
 #' @return `geom_line` return values or, if the color argument is used, the
 #'   values of [gg.SpatialPixelsDataFrame()].
 #' @family geomes for meshes
-#' @example inst/examples/gg.inla.mesh.R
+#' @example inst/examples/gg.fm_mesh_2d.R
 
 gg.fm_mesh_2d <- function(data,
                           color = NULL,
@@ -798,7 +800,6 @@ gg.fm_mesh_2d <- function(data,
                           mask = NULL,
                           nx = 500, ny = 500,
                           ...) {
-  requireNamespace("INLA")
   requireNamespace("ggplot2")
   if (is.null(color) && ("colour" %in% names(list(...)))) {
     color <- list(...)[["colour"]]
@@ -899,7 +900,7 @@ gg.fm_mesh_2d <- function(data,
 #' Requires the `ggplot2` package.
 #'
 #' @export
-#' @param data An inla.mesh.1d object.
+#' @param data An [fmesher::fm_mesh_1d] object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to `geom_point`.
 #' @param y Single or vector numeric defining the y-coordinates of the mesh knots to plot.
 #' @param shape Shape of the knot markers.

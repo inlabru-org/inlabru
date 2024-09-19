@@ -11,6 +11,7 @@
 * Add `sf` version `mrsea_sf` data set (version `2.11.1.9006`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 * Convert the `shrimp` data set to `sf` format (version `2.11.1.9007`)
+* Remove unnecessary INLA namespace loading in `ggplot` methods (version `2.11.1.9008`)
 
 # inlabru 2.11.1
 

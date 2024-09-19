@@ -11,7 +11,7 @@ The data are a list that contains these elements:
 the gorilla nests.}
 \item{\code{boundary}:}{ An \code{SpatialPolygonsDataFrame} object defining the boundary
 of the region that was searched for the nests.}
-\item{\code{mesh}:}{ An \code{inla.mesh} object containing a mesh that can be used
+\item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a mesh that can be used
 with function \code{lgcp} to fit a LGCP to the nest data.}
 \item{\code{gcov}:}{ A list of SpatialGridDataFrame objects, one for each of these spatial covariates:
 \describe{

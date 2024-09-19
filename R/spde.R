@@ -9,8 +9,8 @@
 #' @keywords internal
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
-#'     `mesh$manifold`, or a full `inla.mesh` or
-#'     `inla.mesh.1d` object.
+#'     `fm_manifold(mesh)`, or a full `fm_mesh_2d` or
+#'     `fm_mesh_1d` object.
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by
@@ -39,6 +39,7 @@
 materncov.bands <- function(manifold, dist, log.range,
                             log.variance = NULL, alpha = 2,
                             quantile = 0.95, n = 64, S1.L = NULL) {
+  stopifnot(bru_safe_inla(multicore = TRUE))
   calc.cov.R <- function(dist, kappa, var) {
     INLA::inla.matern.cov(nu = nu, kappa, x = dist, d = d, corr = TRUE) * var
   }
@@ -79,12 +80,11 @@ materncov.bands <- function(manifold, dist, log.range,
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (inherits(manifold, "inla.mesh") ||
-      inherits(manifold, "inla.mesh.1d")) {
-      if ((manifold$manifold == "S1") && is.null(S1.L)) {
+    if (inherits(manifold, c("fm_mesh_2d", "inla.mesh", "fm_mesh_1d", "inla.mesh.1d"))) {
+      if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
         S1.L <- diff(manifold$interval)
       }
-      manifold <- manifold$manifold
+      manifold <- fm_manifold(manifold)
     }
   }
   if (manifold == "R1") {
@@ -179,6 +179,8 @@ materncov.bands <- function(manifold, dist, log.range,
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 spde.posterior <- function(result, name, what = "range") {
+  stopifnot(bru_safe_inla(multicore = TRUE))
+
   spdespec <- result$bru_info$model$effects[[name]]$main$model
   spderesult <- INLA::inla.spde.result(result, name, spdespec)
 
