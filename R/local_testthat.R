@@ -91,43 +91,6 @@ local_basic_fixed_effect_testdata <- function() {
 }
 
 
-
-
-#' @export
-#' @rdname local_testthat
-local_mrsea_convert <- function(x, use_km = FALSE) {
-  # The estimation is numerically unreliable when the spatial
-  # domain is represented in metres, and has been seen to produce
-  # different results on different systems (e.g. Travis CI).
-
-  # The data is stored in km scale
-  if (!use_km) {
-    # Transform km to m:
-    crs_m <- fm_crs_set_lengthunit(x$mesh$crs, "m")
-    x$mesh <- fm_transform(x$mesh, crs_m)
-    x$samplers <- fm_transform(x$samplers, crs_m)
-    x$samplers$weight <- x$samplers$weight * 1000
-    x$points <- fm_transform(x$points, crs_m)
-    x$boundary <- fm_transform(x$boundary, crs_m)
-    x$covar <- fm_transform(x$covar, crs_m)
-    x$points$Effort <- x$points$Effort * 1000
-    x$points$mid.x <- x$points$mid.x * 1000
-    x$points$mid.y <- x$points$mid.y * 1000
-    x$points$start.x <- x$points$start.x * 1000
-    x$points$start.y <- x$points$start.y * 1000
-    x$points$end.x <- x$points$end.x * 1000
-    x$points$end.y <- x$points$end.y * 1000
-    x$points$distance <- x$points$distance * 1000
-    x$samplers$Effort <- x$samplers$Effort * 1000
-    x$samplers$mid.x <- x$samplers$mid.x * 1000
-    x$samplers$mid.y <- x$samplers$mid.y * 1000
-  }
-  x
-}
-
-
-
-
 #' @describeIn local_testthat Tests should set num.threads = "1:1" to ensure
 #' within-system repeatability by calling `local_bru_safe_inla()`;
 #' see also [bru_safe_inla()]
