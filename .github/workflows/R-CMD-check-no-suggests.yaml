@@ -51,7 +51,7 @@ jobs:
           brew install --cask xquartz
           brew install pkg-config
           brew install proj@9
-          brew install gdal
+#          brew install gdal
 
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
