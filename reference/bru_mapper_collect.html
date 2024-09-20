@@ -217,9 +217,9 @@ of sub-mappers in the mapper</p></dd>
 sub-mappers list</p></li>
 </ul></div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
-<ul><li><p><code>ibm_jacobian</code> for <code>bru_mapper_collect</code> accepts a list with
+<ul><li><p><code>ibm_jacobian(bru_mapper_collect)</code>: Accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see <code>ibm_names.bru_mapper_collect()</code>.
 Each list element should take a format accepted by the corresponding
@@ -228,7 +228,7 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns. When <code>inla_f=TRUE</code> and <code>hidden=TRUE</code> in
 the mapper definition, the input format should instead match that of
 the first, non-hidden, sub-mapper.</p></li>
-</ul><ul><li><p><code>ibm_invalid_output</code> for <code>bru_mapper_collect</code> accepts a list with
+<li><p><code>ibm_invalid_output(bru_mapper_collect)</code>: Accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see <code>ibm_names.bru_mapper_collect()</code>.
 Each list element should take a format accepted by the corresponding

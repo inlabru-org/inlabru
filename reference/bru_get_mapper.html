@@ -118,20 +118,24 @@ for the given latent model.</p>
     <p>A <a href="bru_mapper.html">bru_mapper</a> object defined by the model component</p>
     </div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2 id="methods-by-class-">Methods (by class)<a class="anchor" aria-label="anchor" href="#methods-by-class-"></a></h2>
 
-<ul><li><p><code>bru_get_mapper.inla.spde</code> extract an indexed mapper for
+<ul><li><p><code>bru_get_mapper(inla.spde)</code>: Extract an indexed mapper for
 the <code>model$mesh</code> object contained in the model object.
 It returns <code>NULL</code> gives a warning
 if no known mesh type is found in the model object.</p></li>
-</ul><ul><li><p><code>bru_get_mapper.inla.rgeneric</code> returns the mapper given by a call to
+<li><p><code>bru_get_mapper(inla.rgeneric)</code>: Returns the mapper given by a call to
 <code>model$f$rgeneric$definition("mapper")</code>. To support this for your own
-<code>inla.rgeneric</code> models, add a <code>"mapper"</code> option to the <code>cmd</code> argument
-of your rgeneric definition function. You will need to store the mapper
-in your object as well.  Alternative, define your model using a subclass
-and define a corresponding <code>bru_get_mapper.subclass</code> method that should return
+<code>inla.rgeneric</code> models, add a <code>"mapper"</code> option to the <code>cmd</code> argument of
+your rgeneric definition function. You will need to store the mapper in
+your object as well.  Alternative, define your model using a subclass and
+define a corresponding <code>bru_get_mapper.subclass</code> method that should return
 the corresponding <code>bru_mapper</code> object.</p></li>
-</ul><ul><li><p><code>bru_get_mapper_safely</code> tries to call the <code>bru_get_mapper</code>,
+</ul></div>
+    <div class="section level2">
+    <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+
+<ul><li><p><code>bru_get_mapper_safely()</code>: Tries to call the <code>bru_get_mapper</code>,
 and returns <code>NULL</code> if it fails (e.g. due to no available class method).
 If the call succeeds and returns non-<code>NULL</code>, it checks that the object
 inherits from the <code>bru_mapper</code> class, and gives an error if it does not.</p></li>

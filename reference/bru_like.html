@@ -152,8 +152,7 @@ object.</p></dd>
 <dt id="arg-response-data">response_data<a class="anchor" aria-label="anchor" href="#arg-response-data"></a></dt>
 <dd><p>Likelihood-specific data for models that need different
 size/format for inputs and response variables, as a <code>data.frame</code> or
-<code>SpatialPoints[DataFrame]</code>
-object.</p></dd>
+<code>SpatialPoints[DataFrame]</code> object.</p></dd>
 
 
 <dt id="arg-mesh">mesh<a class="anchor" aria-label="anchor" href="#arg-mesh"></a></dt>
@@ -161,11 +160,11 @@ object.</p></dd>
 
 
 <dt id="arg-e">E<a class="anchor" aria-label="anchor" href="#arg-e"></a></dt>
-<dd><p>Exposure parameter for family = 'poisson' passed on to
-<code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code>. Special case if family is 'cp': rescale all integration
-weights by a scalar E. For sampler specific reweighting/effort, use a <code>weight</code>
-column in the <code>samplers</code> object, see <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fmesher::fm_int()</a></code>.
-Default taken from <code>options$E</code>, normally <code>1</code>.</p></dd>
+<dd><p>Exposure parameter for family = 'poisson' passed on to <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">INLA::inla</a></code>.
+Special case if family is 'cp': rescale all integration weights by a scalar
+E. For sampler specific reweighting/effort, use a <code>weight</code> column in the
+<code>samplers</code> object, see <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fmesher::fm_int()</a></code>. Default taken from <code>options$E</code>,
+normally <code>1</code>.</p></dd>
 
 
 <dt id="arg-ntrials">Ntrials<a class="anchor" aria-label="anchor" href="#arg-ntrials"></a></dt>
@@ -174,8 +173,8 @@ likelihood. Default taken from <code>options$Ntrials</code>, normally <code>1</c
 
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
-<dd><p>Fixed (optional) weights parameters of the likelihood,
-so the log-likelihood<code>[i]</code> is changed into <code>weights[i] * log_likelihood[i]</code>.
+<dd><p>Fixed (optional) weights parameters of the likelihood, so the
+log-likelihood<code>[i]</code> is changed into <code>weights[i] * log_likelihood[i]</code>.
 Default value is <code>1</code>. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 interpreted with great care.</p></dd>
@@ -195,19 +194,19 @@ models, such as Gaussian and student-t response models.</p></dd>
 
 <dt><code>ips</code></dt>
 <dd><p>Integration points for 'cp' family. Defaults
-to <code>fmesher::fm_int(domain, samplers)</code>. If explicitly given, overrides <code>domain</code>
-and <code>samplers</code>.</p></dd>
+to <code>fmesher::fm_int(domain, samplers)</code>. If explicitly given,
+overrides <code>domain</code> and <code>samplers</code>.</p></dd>
 
 
 </dl></dd>
 
 
 <dt id="arg-include-exclude-include-latent">include, exclude, include_latent<a class="anchor" aria-label="anchor" href="#arg-include-exclude-include-latent"></a></dt>
-<dd><p>Arguments controlling what components and effects are available for use
-in the predictor expression.</p><dl><dt><code>include</code></dt>
+<dd><p>Arguments controlling what components
+and effects are available for use in the predictor expression.</p><dl><dt><code>include</code></dt>
 <dd><p>Character vector of component labels that are used as effects
-by the predictor expression; If <code>NULL</code> (default), the <code><a href="bru_used.html">bru_used()</a></code> method is used
-to extract the variable names from the formula.</p></dd>
+by the predictor expression; If <code>NULL</code> (default), the <code><a href="bru_used.html">bru_used()</a></code>
+method is used to extract the variable names from the formula.</p></dd>
 
 <dt><code>exclude</code></dt>
 <dd><p>Character vector of component labels to be excluded from the effect list
@@ -216,13 +215,13 @@ any components from the inclusion list.</p></dd>
 
 <dt><code>include_latent</code></dt>
 <dd><p>Character vector.
-Specifies which latent state variables are
-directly available to the predictor expression, with a <code>_latent</code> suffix.
-This also makes evaluator functions with suffix <code>_eval</code> available, taking
-parameters <code>main</code>, <code>group</code>, and <code>replicate</code>, taking values for where to
-evaluate the component effect that are different than those defined in the
-component definition itself (see <code><a href="component_eval.html">component_eval()</a></code>). If <code>NULL</code>, the <code><a href="bru_used.html">bru_used()</a></code>
-method auto-detects use of <code>_latent</code> and <code>_eval</code> in the predictor expression.</p></dd>
+Specifies which latent state variables are directly available to the
+predictor expression, with a <code>_latent</code> suffix. This also makes evaluator
+functions with suffix <code>_eval</code> available, taking parameters <code>main</code>, <code>group</code>,
+and <code>replicate</code>, taking values for where to evaluate the component effect
+that are different than those defined in the component definition itself
+(see <code><a href="component_eval.html">component_eval()</a></code>). If <code>NULL</code>, the <code><a href="bru_used.html">bru_used()</a></code> method auto-detects
+use of <code>_latent</code> and <code>_eval</code> in the predictor expression.</p></dd>
 
 
 </dl></dd>
@@ -231,8 +230,8 @@ method auto-detects use of <code>_latent</code> and <code>_eval</code> in the pr
 <dt id="arg-used">used<a class="anchor" aria-label="anchor" href="#arg-used"></a></dt>
 <dd><p>Wither <code>NULL</code> (default) or a <code><a href="bru_used.html">bru_used()</a></code> object, that overrides
 the <code>include</code>, <code>exclude</code>, <code>include_latent</code> arguments.
-When <code>used</code> is <code>NULL</code> (default), the information about what effects and latent vectors
-are made available to the predictor evaluation is defined by</p>
+When <code>used</code> is <code>NULL</code> (default), the information about what effects and
+latent vectors are made available to the predictor evaluation is defined by</p>
 <p></p><div class="sourceCode r"><pre><code><span><span class="va">used</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_used.html">bru_used</a></span><span class="op">(</span></span>
 <span>  <span class="va">formula</span>,</span>
 <span>  effect <span class="op">=</span> <span class="va">include</span>,</span>
@@ -264,8 +263,8 @@ on to <code><a href="bru_options.html">bru_options()</a></code></p></dd>
 
 <dt id="arg--envir">.envir<a class="anchor" aria-label="anchor" href="#arg--envir"></a></dt>
 <dd><p>The evaluation environment to use for special arguments (<code>E</code>,
-<code>Ntrials</code>, <code>weights</code>, and <code>scale</code>) if not found in <code>response_data</code> or <code>data</code>.
-Defaults to the calling environment.</p></dd>
+<code>Ntrials</code>, <code>weights</code>, and <code>scale</code>) if not found in <code>response_data</code> or
+<code>data</code>. Defaults to the calling environment.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

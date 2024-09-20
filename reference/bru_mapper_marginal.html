@@ -179,14 +179,11 @@ mappers.</p></dd>
 
 </dl></div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For <code>bru_mapper_marginal</code>, non-NULL <code>input</code> values are interpreted
-as a parameter list for <code>qfun</code>, overriding that of the mapper itself.</p>
-    </div>
-    <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
-<ul><li><p><code>ibm_eval(bru_mapper_marginal)</code>: When <code>xor(mapper[["inverse"]], reverse)</code> is
+<ul><li><p><code>ibm_jacobian(bru_mapper_marginal)</code>: Non-NULL <code>input</code> values are interpreted
+as a parameter list for <code>qfun</code>, overriding that of the mapper itself.</p></li>
+<li><p><code>ibm_eval(bru_mapper_marginal)</code>: When <code>xor(mapper[["inverse"]], reverse)</code> is
 <code>FALSE</code>, <code><a href="bru_mapper_generics.html">ibm_eval()</a></code>
 for <code>marginal</code> returns <code>qfun(pnorm(x), param)</code>, evaluated in a numerically
 stable way. Otherwise, evaluates the inverse <code>qnorm(pfun(x, param))</code> instead.</p></li>

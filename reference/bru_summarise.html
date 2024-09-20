@@ -104,11 +104,13 @@ passed to <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>data.frame</code> of data columns that should be added to the summary data frame</p></dd>
+<dd><p>A <code>data.frame</code> of data columns that should be added to the summary
+data frame</p></dd>
 
 
 <dt id="arg-cbind-only">cbind.only<a class="anchor" aria-label="anchor" href="#arg-cbind-only"></a></dt>
-<dd><p>If TRUE, only <code>cbind</code> the samples and return a matrix where each column is a sample</p></dd>
+<dd><p>If TRUE, only <code>cbind</code> the samples and return a matrix where
+each column is a sample</p></dd>
 
 
 <dt id="arg-max-moment">max_moment<a class="anchor" aria-label="anchor" href="#arg-max-moment"></a></dt>
@@ -117,13 +119,15 @@ order information to include in the output. If <code>max_moment &gt; 2</code>,
 includes "skew" (skewness, <code>E[(x-m)^3/s^3]</code>), and
 if <code>max_moment &gt; 3</code>, includes
 "ekurtosis" (excess kurtosis, <code>E[(x-m)^4/s^4] - 3</code>). Default 2.
-Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may be large.</p></dd>
+Note that the Monte Carlo variability of the <code>ekurtois</code> estimate may be
+large.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>data.frame</code> or <code>Spatial[Points/Pixels]DataFrame</code> with summary statistics,
-"mean", "sd", <code>paste0("q", probs)</code>, "mean.mc_std_err", "sd.mc_std_err"</p>
+    <p>A <code>data.frame</code> or <code>Spatial[Points/Pixels]DataFrame</code> with summary
+statistics, "mean", "sd", <code>paste0("q", probs)</code>, "mean.mc_std_err",
+"sd.mc_std_err"</p>
     </div>
 
     <div class="section level2">

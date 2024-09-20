@@ -122,14 +122,13 @@ future version.</p>
 
 
 <dl><dt id="arg-samplers">samplers<a class="anchor" aria-label="anchor" href="#arg-samplers"></a></dt>
-<dd><p>Description of the integration region boundary.
-In 1D, a length 2 vector or two-column matrix where each row describes an interval,
-or <code>NULL</code>
-In 2D either a <code>SpatialPolygon</code> or a <code>SpatialLinesDataFrame</code> with a <code>weight</code> column
-defining the width of the a transect line, and optionally further columns used by the
-<code>group</code> argument, or <code>NULL</code>.  When <code>domain</code> is <code>NULL</code>, <code>samplers</code> may also
-be an <code>inla.mesh.1d</code> or <code>inla.mesh</code> object, that is then treated as a <code>domain</code>
-argument instead.</p></dd>
+<dd><p>Description of the integration region boundary. In 1D, a
+length 2 vector or two-column matrix where each row describes an interval,
+or <code>NULL</code> In 2D either a <code>SpatialPolygon</code> or a <code>SpatialLinesDataFrame</code> with
+a <code>weight</code> column defining the width of the a transect line, and optionally
+further columns used by the <code>group</code> argument, or <code>NULL</code>.  When <code>domain</code> is
+<code>NULL</code>, <code>samplers</code> may also be an <code>inla.mesh.1d</code> or <code>inla.mesh</code> object,
+that is then treated as a <code>domain</code> argument instead.</p></dd>
 
 
 <dt id="arg-domain">domain<a class="anchor" aria-label="anchor" href="#arg-domain"></a></dt>
@@ -137,8 +136,8 @@ argument instead.</p></dd>
 a single integer for the number of integration points to place in each 1D
 interval, overriding <code>int.args[["nsub1"]]</code>, and otherwise</p></li>
 <li><p>when <code>samplers</code> is <code>NULL</code>, <code>domain</code> can be a numeric vector of points,
-each given integration weight 1 (and no additional points are added
-in between),</p></li>
+each given integration weight 1 (and no additional points are added in
+between),</p></li>
 <li><p>an <code>inla.mesh.1d</code> object for continuous 1D integration, or</p></li>
 <li><p>an <code>inla.mesh.2d</code> object for continuous 2D integration.</p></li>
 </ul></dd>
@@ -164,15 +163,16 @@ without aggregating onto mesh nodes)</p></li>
 <li><p><code>nsub1</code>, <code>nsub2</code>: integers controlling the number of internal integration
 points before aggregation. Points per triangle: <code>(nsub2+1)^2</code>.
 Points per knot segment: <code>nsub1</code></p></li>
-<li><p><code>poly_method</code>: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. No longer supported, and will generate an error.</p></li>
+<li><p><code>poly_method</code>: if set to "legacy", selects an old polygon integration
+method that doesn't handle holes. No longer supported, and will generate an
+error.</p></li>
 </ul></dd>
 
 
 <dt id="arg-project">project<a class="anchor" aria-label="anchor" href="#arg-project"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Deprecated in favour of <code>int.args(method=...)</code>.
-If TRUE, aggregate the integration points to mesh vertices. Default:
-<code>project = (identical(int.args$method, "stable"))</code></p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Deprecated in favour of
+<code>int.args(method=...)</code>. If TRUE, aggregate the integration points to mesh
+vertices. Default: <code>project = (identical(int.args$method, "stable"))</code></p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -181,15 +181,15 @@ If TRUE, aggregate the integration points to mesh vertices. Default:
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
 <dd><p>logical; if <code>TRUE</code>, the rows with weight <code>NA</code> from the
-non-overlapping full_join will be removed; if <code>FALSE</code>, set the undefined weights to <code>NA</code>.
-If <code>NULL</code> (default), act as <code>TRUE</code>, but warn if any elements needed removing.</p></dd>
+non-overlapping full_join will be removed; if <code>FALSE</code>, set the undefined
+weights to <code>NA</code>. If <code>NULL</code> (default), act as <code>TRUE</code>, but warn if any
+elements needed removing.</p></dd>
 
 
 <dt id="arg--blockwise">.blockwise<a class="anchor" aria-label="anchor" href="#arg--blockwise"></a></dt>
-<dd><p>logical; if <code>FALSE</code>, computes full tensor product integration.
-If <code>TRUE</code>, computes within-block tensor product integration (used internally
-by <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code>).
-Default <code>FALSE</code></p></dd>
+<dd><p>logical; if <code>FALSE</code>, computes full tensor product
+integration. If <code>TRUE</code>, computes within-block tensor product integration
+(used internally by <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int()</a></code>). Default <code>FALSE</code></p></dd>
 
 
 <dt id="arg-mesh">mesh<a class="anchor" aria-label="anchor" href="#arg-mesh"></a></dt>
@@ -240,8 +240,9 @@ If <code>mask</code> is a <code>Spatial</code> object, only return pixels covere
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>ipoints()</code>: A <code>data.frame</code>, <code>tibble</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> of 1D and
-2D integration points, including a <code>weight</code> column and <code>.block</code> column.</p>
+    <p><code>ipoints()</code>: A <code>data.frame</code>, <code>tibble</code>, <code>sf</code>, or
+<code>SpatialPointsDataFrame</code> of 1D and 2D integration points, including a
+<code>weight</code> column and <code>.block</code> column.</p>
 <p>A <code>data.frame</code>, <code>sf</code>, or <code>SpatialPointsDataFrame</code> of multidimensional
 integration points and their weights</p>
 <ul><li><p><code>mesh_triangle_integration</code> returns a <code>list</code> with elements <code>loc</code>

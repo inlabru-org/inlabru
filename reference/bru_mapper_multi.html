@@ -215,27 +215,23 @@ of mappers in the multi-mapper x</p></dd>
 (for drop <code>TRUE</code>, and <code>i</code> identifies a single element)</p></li>
 </ul></div>
     <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-
-<ul><li><p><code>ibm_jacobian</code> for <code>bru_mapper_multi</code> accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.</p></li>
-</ul><ul><li><p><code>ibm_invalid_output</code> for <code>bru_mapper_multi</code> accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.</p></li>
-</ul></div>
-    <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
-<ul><li><p><code>ibm_names(bru_mapper_multi)</code>: Returns the names from the sub-mappers list</p></li>
+<ul><li><p><code>ibm_jacobian(bru_mapper_multi)</code>: Accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.</p></li>
+<li><p><code>ibm_invalid_output(bru_mapper_multi)</code>: Accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see <code>ibm_names.bru_mapper_multi()</code>.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.</p></li>
+<li><p><code>ibm_names(bru_mapper_multi)</code>: Returns the names from the sub-mappers list</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
