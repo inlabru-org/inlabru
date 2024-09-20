@@ -32,8 +32,9 @@ bru_like_control_family(x, control.family = NULL, ...)
 }
 
 \itemize{
-\item \code{bru_like_control_family()} returns a list with \code{INLA::control.family} options,
-or a list of such lists, with one element per observation model
+\item \code{bru_like_control_family()} returns a list with
+\code{INLA::control.family} options, or a list of such lists, with one element
+per observation model
 }
 }
 \description{

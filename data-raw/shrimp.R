@@ -8,7 +8,10 @@
 #'
 import.shrimp <- function() {
   # Load the raw data
-  load(file = file.path(system.file("extdata", package = "inlabru"), "gamba.Rdata"))
+  load(file = file.path(
+    system.file("extdata", package = "inlabru"),
+    "gamba.Rdata"
+  ))
 
   # Use lat/lon which is actually in a utm system
   gamba <- gamba[, c(

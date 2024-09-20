@@ -49,14 +49,13 @@ vertices.inla.mesh(...)
 pixels(mesh, nx = 150, ny = 150, mask = TRUE)
 }
 \arguments{
-\item{samplers}{Description of the integration region boundary.
-In 1D, a length 2 vector or two-column matrix where each row describes an interval,
-or \code{NULL}
-In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with a \code{weight} column
-defining the width of the a transect line, and optionally further columns used by the
-\code{group} argument, or \code{NULL}.  When \code{domain} is \code{NULL}, \code{samplers} may also
-be an \code{inla.mesh.1d} or \code{inla.mesh} object, that is then treated as a \code{domain}
-argument instead.}
+\item{samplers}{Description of the integration region boundary. In 1D, a
+length 2 vector or two-column matrix where each row describes an interval,
+or \code{NULL} In 2D either a \code{SpatialPolygon} or a \code{SpatialLinesDataFrame} with
+a \code{weight} column defining the width of the a transect line, and optionally
+further columns used by the \code{group} argument, or \code{NULL}.  When \code{domain} is
+\code{NULL}, \code{samplers} may also be an \code{inla.mesh.1d} or \code{inla.mesh} object,
+that is then treated as a \code{domain} argument instead.}
 
 \item{domain}{Either
 \itemize{
@@ -64,8 +63,8 @@ argument instead.}
 a single integer for the number of integration points to place in each 1D
 interval, overriding \code{int.args[["nsub1"]]}, and otherwise
 \item when \code{samplers} is \code{NULL}, \code{domain} can be a numeric vector of points,
-each given integration weight 1 (and no additional points are added
-in between),
+each given integration weight 1 (and no additional points are added in
+between),
 \item an \code{inla.mesh.1d} object for continuous 1D integration, or
 \item an \code{inla.mesh.2d} object for continuous 2D integration.
 }}
@@ -87,24 +86,25 @@ without aggregating onto mesh nodes)
 \item \code{nsub1}, \code{nsub2}: integers controlling the number of internal integration
 points before aggregation. Points per triangle: \code{(nsub2+1)^2}.
 Points per knot segment: \code{nsub1}
-\item \code{poly_method}: if set to "legacy", selects an old polygon integration method
-that doesn't handle holes. No longer supported, and will generate an error.
+\item \code{poly_method}: if set to "legacy", selects an old polygon integration
+method that doesn't handle holes. No longer supported, and will generate an
+error.
 }}
 
-\item{project}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of \code{int.args(method=...)}.
-If TRUE, aggregate the integration points to mesh vertices. Default:
-\code{project = (identical(int.args$method, "stable"))}}
+\item{project}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of
+\code{int.args(method=...)}. If TRUE, aggregate the integration points to mesh
+vertices. Default: \code{project = (identical(int.args$method, "stable"))}}
 
 \item{\dots}{Usually passed on to other methods}
 
 \item{na.rm}{logical; if \code{TRUE}, the rows with weight \code{NA} from the
-non-overlapping full_join will be removed; if \code{FALSE}, set the undefined weights to \code{NA}.
-If \code{NULL} (default), act as \code{TRUE}, but warn if any elements needed removing.}
+non-overlapping full_join will be removed; if \code{FALSE}, set the undefined
+weights to \code{NA}. If \code{NULL} (default), act as \code{TRUE}, but warn if any
+elements needed removing.}
 
-\item{.blockwise}{logical; if \code{FALSE}, computes full tensor product integration.
-If \code{TRUE}, computes within-block tensor product integration (used internally
-by \code{\link[=fm_int]{fm_int()}}).
-Default \code{FALSE}}
+\item{.blockwise}{logical; if \code{FALSE}, computes full tensor product
+integration. If \code{TRUE}, computes within-block tensor product integration
+(used internally by \code{\link[=fm_int]{fm_int()}}). Default \code{FALSE}}
 
 \item{mesh}{An \code{inla.mesh} object}
 
@@ -135,8 +135,9 @@ data.frame with respective column names.}
 If \code{mask} is a \code{Spatial} object, only return pixels covered by this object.}
 }
 \value{
-\code{ipoints()}: A \code{data.frame}, \code{tibble}, \code{sf}, or \code{SpatialPointsDataFrame} of 1D and
-2D integration points, including a \code{weight} column and \code{.block} column.
+\code{ipoints()}: A \code{data.frame}, \code{tibble}, \code{sf}, or
+\code{SpatialPointsDataFrame} of 1D and 2D integration points, including a
+\code{weight} column and \code{.block} column.
 
 A \code{data.frame}, \code{sf}, or \code{SpatialPointsDataFrame} of multidimensional
 integration points and their weights

@@ -70,9 +70,8 @@ available by using the \code{cp} family or (even easier) by using the
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate.
-The estimation \code{options} list can be given new values to override the original
-settings.
+\item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate. The estimation
+\code{options} list can be given new values to override the original settings.
 
 }}
 \examples{

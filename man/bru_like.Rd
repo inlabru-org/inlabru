@@ -65,22 +65,21 @@ object.}
 
 \item{response_data}{Likelihood-specific data for models that need different
 size/format for inputs and response variables, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]}
-object.}
+\code{SpatialPoints[DataFrame]} object.}
 
 \item{mesh}{Deprecated.}
 
-\item{E}{Exposure parameter for family = 'poisson' passed on to
-\code{INLA::inla}. Special case if family is 'cp': rescale all integration
-weights by a scalar E. For sampler specific reweighting/effort, use a \code{weight}
-column in the \code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
-Default taken from \code{options$E}, normally \code{1}.}
+\item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
+Special case if family is 'cp': rescale all integration weights by a scalar
+E. For sampler specific reweighting/effort, use a \code{weight} column in the
+\code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}. Default taken from \code{options$E},
+normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
 
-\item{weights}{Fixed (optional) weights parameters of the likelihood,
-so the log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
+\item{weights}{Fixed (optional) weights parameters of the likelihood, so the
+log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
 Default value is \code{1}. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 interpreted with great care.}
@@ -93,17 +92,17 @@ models, such as Gaussian and student-t response models.}
 \item{\code{domain}}{Named list of domain definitions.}
 \item{\code{samplers}}{Integration subdomain for 'cp' family.}
 \item{\code{ips}}{Integration points for 'cp' family. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given, overrides \code{domain}
-and \code{samplers}.}
+to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}.}
 }}
 
-\item{include, exclude, include_latent}{Arguments controlling what components and effects are available for use
-in the predictor expression.
+\item{include, exclude, include_latent}{Arguments controlling what components
+and effects are available for use in the predictor expression.
 \describe{
 \item{\code{include}}{
 Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}} method is used
-to extract the variable names from the formula.
+by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
+method is used to extract the variable names from the formula.
 }
 \item{\code{exclude}}{
 Character vector of component labels to be excluded from the effect list
@@ -111,20 +110,20 @@ determined by the \code{include} argument. Default is \code{NULL}; do not remove
 any components from the inclusion list.
 }
 \item{\code{include_latent}}{Character vector.
-Specifies which latent state variables are
-directly available to the predictor expression, with a \verb{_latent} suffix.
-This also makes evaluator functions with suffix \verb{_eval} available, taking
-parameters \code{main}, \code{group}, and \code{replicate}, taking values for where to
-evaluate the component effect that are different than those defined in the
-component definition itself (see \code{\link[=component_eval]{component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}}
-method auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
+Specifies which latent state variables are directly available to the
+predictor expression, with a \verb{_latent} suffix. This also makes evaluator
+functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
+and \code{replicate}, taking values for where to evaluate the component effect
+that are different than those defined in the component definition itself
+(see \code{\link[=component_eval]{component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method auto-detects
+use of \verb{_latent} and \verb{_eval} in the predictor expression.
 }
 }}
 
 \item{used}{Wither \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
 the \code{include}, \code{exclude}, \code{include_latent} arguments.
-When \code{used} is \code{NULL} (default), the information about what effects and latent vectors
-are made available to the predictor evaluation is defined by
+When \code{used} is \code{NULL} (default), the information about what effects and
+latent vectors are made available to the predictor evaluation is defined by
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{used <- bru_used(
   formula,
@@ -148,8 +147,8 @@ or the likelihood construction requires it.}
 on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{.envir}{The evaluation environment to use for special arguments (\code{E},
-\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or \code{data}.
-Defaults to the calling environment.}
+\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
+\code{data}. Defaults to the calling environment.}
 
 \item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
 

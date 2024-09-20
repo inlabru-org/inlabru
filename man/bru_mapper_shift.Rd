@@ -43,9 +43,11 @@ If \code{mapper} is non-null, the \code{bru_mapper_shift()} constructor
 returns
 \code{bru_mapper_pipe(list(mapper = mapper, shift = bru_mapper_shift()))}
 }
-\details{
-For \code{bru_mapper_shift}, \code{input} NULL values are interpreted as no shift.
-}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{ibm_jacobian(bru_mapper_shift)}: \code{input} NULL values are interpreted as no shift.
+
+}}
 \examples{
 m <- bru_mapper_shift()
 ibm_eval2(m, c(1, 2, 1, 2), 1:4)

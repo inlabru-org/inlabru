@@ -4,7 +4,8 @@
 # @keywords internal
 # @export
 # @param data A SpatialGridDataFrame or SpatialPixelDataFrame
-# @param where Spatial*DataFrame of locations for which to fill in values from \code{data}. If NULL, use \code{data} to determine the locations.
+# @param where Spatial*DataFrame of locations for which to fill in values from
+# \code{data}. If NULL, use \code{data} to determine the locations.
 # @return Spatial object
 
 sfill <- function(data, where = NULL) {
@@ -44,20 +45,23 @@ sfill <- function(data, where = NULL) {
 
 #' Convert data frame to SpatialLinesDataFrame
 #'
-#' A line in 2D space is defined by a start and an end point, each associated with 2D coordinates.
-#' This function takes a `data.frame` as input and assumes that each row defines a line in space.
-#' In order to do so, the data frame must have at least four columns and the `start.cols` and
-#' `end.cols` parameters must be used to point out the names of the columns that define
-#' the start and end coordinates of the line. The data is then converted to a
-#' `SpatialLinesDataFrame` `DF`. If a coordinate reference system `crs` is provided
-#' it is attached to `DF`. If also `to.crs` is provided, the coordinate system of `DF`
-#' is transfromed accordingly. Additional columns of the input data, e.g. covariates,
-#' are retained and attached to `DF`.
+#' A line in 2D space is defined by a start and an end point, each associated
+#' with 2D coordinates. This function takes a `data.frame` as input and assumes
+#' that each row defines a line in space. In order to do so, the data frame must
+#' have at least four columns and the `start.cols` and `end.cols` parameters
+#' must be used to point out the names of the columns that define the start and
+#' end coordinates of the line. The data is then converted to a
+#' `SpatialLinesDataFrame` `DF`. If a coordinate reference system `crs` is
+#' provided it is attached to `DF`. If also `to.crs` is provided, the coordinate
+#' system of `DF` is transfromed accordingly. Additional columns of the input
+#' data, e.g. covariates, are retained and attached to `DF`.
 #'
 #' @export
 #' @param data A data.frame
-#' @param start.cols Character array poitning out the columns of `data` that hold the start points of the lines
-#' @param end.cols Character array poitning out the columns of `data` that hold the end points of the lines
+#' @param start.cols Character array poitning out the columns of `data` that
+#'   hold the start points of the lines
+#' @param end.cols Character array poitning out the columns of `data` that hold
+#'   the end points of the lines
 #' @param crs Coordinate reference system of the original `data`
 #' @param to.crs Coordinate reference system for the SpatialLines ouput.
 #' @param format Format of the output object. Either "sp" (default) or "sf"
@@ -131,15 +135,15 @@ sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
 
 #' Convert a data.frame of boundary points into a SpatialPolgonsDataFrame
 #'
-#' A polygon can be described as a sequence of points defining the polygon's boundary.
-#' When given such a sequence (anti clockwise!) this function creates a
-#' `SpatialPolygonsDataFrame` or `sf` holding the polygon decribed. By default, the
-#' first two columns of `data` are assumed to define the x and y coordinates
-#' of the points. This behaviour can be changed using the `cols` parameter, which
-#' points out the names of the columns holding the coordinates. The coordinate
-#' reference system of the resulting spatial polygon can be set via the `crs`
-#' parameter. Posterior conversion to a different CRS is supported using the
-#' `to.crs` parameter.
+#' A polygon can be described as a sequence of points defining the polygon's
+#' boundary. When given such a sequence (anti clockwise!) this function creates
+#' a `SpatialPolygonsDataFrame` or `sf` holding the polygon decribed. By
+#' default, the first two columns of `data` are assumed to define the x and y
+#' coordinates of the points. This behaviour can be changed using the `cols`
+#' parameter, which points out the names of the columns holding the coordinates.
+#' The coordinate reference system of the resulting spatial polygon can be set
+#' via the `crs` parameter. Posterior conversion to a different CRS is supported
+#' using the `to.crs` parameter.
 #'
 #' @keywords internal
 #' @export
@@ -169,7 +173,10 @@ sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
 #' }
 #' }
 #'
-spoly <- function(data, cols = colnames(data)[1:2], crs = fm_crs(), to.crs = NULL,
+spoly <- function(data,
+                  cols = colnames(data)[1:2],
+                  crs = fm_crs(),
+                  to.crs = NULL,
                   format = c("sp", "sf")) {
   format <- match.arg(format)
   if (identical(format, "sp")) {
@@ -182,7 +189,9 @@ spoly <- function(data, cols = colnames(data)[1:2], crs = fm_crs(), to.crs = NUL
     rownames(df) <- "tmp"
     pol <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
   } else {
-    po <- sf::st_polygon(list(as.matrix(data[c(seq_len(NROW(data)), 1L), cols])))
+    po <- sf::st_polygon(
+      list(as.matrix(data[c(seq_len(NROW(data)), 1L), cols]))
+    )
     po <- sf::st_sfc(po, crs = fm_crs(crs))
     pol <- sf::st_sf(geometry = po, weight = 1, check_ring_dir = FALSE)
   }

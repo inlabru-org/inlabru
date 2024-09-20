@@ -13,15 +13,18 @@ devel.cvmeasure(joint, prediction1, prediction2, samplers = NULL, mesh = NULL)
 
 \item{prediction2}{A \code{prediction} of the second component.}
 
-\item{samplers}{A SpatialPolygon object describing the area for which to compute the cumulative variance measure.}
+\item{samplers}{A SpatialPolygon object describing the area for which to
+compute the cumulative variance measure.}
 
-\item{mesh}{The \link[fmesher:fm_mesh_2d]{fmesher::fm_mesh_2d} for which the prediction was performed (required for cumulative Vmeasure).}
+\item{mesh}{The \link[fmesher:fm_mesh_2d]{fmesher::fm_mesh_2d} for which the prediction was performed
+(required for cumulative Vmeasure).}
 }
 \value{
 Variance and correlations measures.
 }
 \description{
-Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
+Calculates local and integrated variance and correlation measures as
+introduced by Yuan et al. (2017).
 }
 \examples{
 \donttest{
@@ -156,7 +159,8 @@ if (bru_safe_inla() &&
 }
 }
 \references{
-Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
-Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
-\url{https://arxiv.org/abs/1604.06013}
+Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T.
+Buckland, H. Rue, T. Gerrodette. 2017. Point process models for
+spatio-temporal distance sampling data from a large-scale survey of blue
+whales. \url{https://arxiv.org/abs/1604.06013}
 }

@@ -3,9 +3,14 @@
 # Converts a dsm style data set into a \link{dsdata} object.
 #
 # @export
-# @param covar.col Column of the original data set to extract covariate information from
+# @param covar.col Column of the original data set to extract covariate
+# information from
 # @return a \link{dsdata} object
-# @examples \dontrun{ library(dsm) ; data(mexdolphins); dset = import.dsdata(mexdolphins, covar.col = 8) }
+# @examples \dontrun{
+#   library(dsm)
+#   data(mexdolphins)
+#   dset = import.dsdata(mexdolphins, covar.col = 8)
+# }
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 import.dsmdata <- function(dsmdata, covar.col = NA) {
@@ -19,7 +24,11 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # Take account of depth in defining blocks - Block.Label is identifier
   # More than one covariate can be listed
   # If no covariates, then covar.col=NA and transects are used (to be done)
-  segdata <- define.blocks.f(seg = segdata, covar.col = covar.col, geometry = "euc")
+  segdata <- define.blocks.f(
+    seg = segdata,
+    covar.col = covar.col,
+    geometry = "euc"
+  )
   # segdata[1:2, ]
 
   # 2. GET THE ANGLE OF DIRECTION FOR EACH SEGMENT
@@ -27,8 +36,13 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # segdata[1:2, ]
 
   # 3. GET THE START AND END POINTS OF ALL SEGMENTS
-  # NOTE: x and y get renamed to mid.x and mid.y to avoid confusion with detection coordinates
-  segdata <- start_end_points_segments_f(seg = segdata, use.tran = FALSE, geometry = "euc")
+  # NOTE: x and y get renamed to mid.x and mid.y to avoid confusion with
+  # detection coordinates
+  segdata <- start_end_points_segments_f(
+    seg = segdata,
+    use.tran = FALSE,
+    geometry = "euc"
+  )
   # segdata[1:2, ]
 
   # 4. AMALGAMATE SEGMENTS INTO NEW BLOCKS
@@ -37,7 +51,11 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
 
   # 5. ADD SEGMENT AND BLOCK LABELS TO DETECTIONS
   # so that detections and blocks data can be combined
-  distdata <- add.labels.to.obs.f(dists = distdata, obs = obsdata, seg = segdata)
+  distdata <- add.labels.to.obs.f(
+    dists = distdata,
+    obs = obsdata,
+    seg = segdata
+  )
   # distdata[1:2, ]
 
 

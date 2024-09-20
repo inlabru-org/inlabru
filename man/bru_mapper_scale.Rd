@@ -43,10 +43,12 @@ If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
 returns
 \code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
 }
-\details{
-For \code{bru_mapper_scale}, \code{input} NULL values
+\section{Methods (by generic)}{
+\itemize{
+\item \code{ibm_jacobian(bru_mapper_scale)}: \code{input} NULL values
 are interpreted as no scaling.
-}
+
+}}
 \examples{
 m <- bru_mapper_scale()
 ibm_eval2(m, c(1, 2, 1, 2), 1:4)

@@ -29,31 +29,30 @@ information from any model object by calling the generic \code{bru_get_mapper}.
 Any class method implementation should return a \link{bru_mapper} object suitable
 for the given latent model.
 }
-\details{
+\section{Methods (by class)}{
 \itemize{
-\item \code{bru_get_mapper.inla.spde} extract an indexed mapper for
+\item \code{bru_get_mapper(inla.spde)}: Extract an indexed mapper for
 the \code{model$mesh} object contained in the model object.
 It returns \code{NULL} gives a warning
 if no known mesh type is found in the model object.
-}
 
-\itemize{
-\item \code{bru_get_mapper.inla.rgeneric} returns the mapper given by a call to
+\item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a call to
 \code{model$f$rgeneric$definition("mapper")}. To support this for your own
-\code{inla.rgeneric} models, add a \code{"mapper"} option to the \code{cmd} argument
-of your rgeneric definition function. You will need to store the mapper
-in your object as well.  Alternative, define your model using a subclass
-and define a corresponding \code{bru_get_mapper.subclass} method that should return
+\code{inla.rgeneric} models, add a \code{"mapper"} option to the \code{cmd} argument of
+your rgeneric definition function. You will need to store the mapper in
+your object as well.  Alternative, define your model using a subclass and
+define a corresponding \code{bru_get_mapper.subclass} method that should return
 the corresponding \code{bru_mapper} object.
-}
 
+}}
+\section{Functions}{
 \itemize{
-\item \code{bru_get_mapper_safely} tries to call the \code{bru_get_mapper},
+\item \code{bru_get_mapper_safely()}: Tries to call the \code{bru_get_mapper},
 and returns \code{NULL} if it fails (e.g. due to no available class method).
 If the call succeeds and returns non-\code{NULL}, it checks that the object
 inherits from the \code{bru_mapper} class, and gives an error if it does not.
-}
-}
+
+}}
 \examples{
 if (bru_safe_inla()) {
   library(INLA)

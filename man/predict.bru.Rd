@@ -69,8 +69,8 @@ output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 \item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 }
 \value{
-a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values and
-other summary statistics attached. Non-S4 object outputs have the class
+a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values
+and other summary statistics attached. Non-S4 object outputs have the class
 "bru_prediction" added at the front of the class list.
 }
 \description{

@@ -10,12 +10,13 @@ deltaIC(..., criterion = "DIC")
 \item{...}{Comma-separated objects inheriting from class \code{inla} and obtained
 from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
 
-\item{criterion}{character vector. If it includes 'DIC', computes DIC differences;
+\item{criterion}{character vector.
+If it includes 'DIC', computes DIC differences;
 If it contains 'WAIC', computes WAIC differences. Default: 'DIC'}
 }
 \value{
-A data frame with each row containing the Model name, DIC and Delta.DIC,
-and/or WAIC and Delta.WAIC.
+A data frame with each row containing the Model name,
+DIC and Delta.DIC, and/or WAIC and Delta.WAIC.
 }
 \description{
 Calculates DIC and/or WAIC differences and produces an ordered summary.

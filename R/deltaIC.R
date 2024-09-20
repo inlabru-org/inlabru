@@ -5,11 +5,12 @@
 #'
 #' @param ... Comma-separated objects inheriting from class `inla` and obtained
 #' from a run of `INLA::inla()`, [bru()] or [lgcp()]
-#' @param criterion character vector. If it includes 'DIC', computes DIC differences;
+#' @param criterion character vector.
+#' If it includes 'DIC', computes DIC differences;
 #' If it contains 'WAIC', computes WAIC differences. Default: 'DIC'
 #'
-#' @return A data frame with each row containing the Model name, DIC and Delta.DIC,
-#' and/or WAIC and Delta.WAIC.
+#' @return A data frame with each row containing the Model name,
+#' DIC and Delta.DIC, and/or WAIC and Delta.WAIC.
 #'
 #' @export
 #'

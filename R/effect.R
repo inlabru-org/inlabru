@@ -52,8 +52,8 @@ add_mappers <- function(...) {
 #'
 #' @description
 #'
-#' Similar to `glm()`, `gam()` and `inla()`, [bru()] models can be constructed via
-#' a formula-like syntax, where each latent effect is specified. However, in
+#' Similar to `glm()`, `gam()` and `inla()`, [bru()] models can be constructed
+#' via a formula-like syntax, where each latent effect is specified. However, in
 #' addition to the parts of the syntax compatible with `INLA::inla`, `bru`
 #' components offer additional functionality which facilitates modelling, and
 #' the predictor expression can be specified separately, allowing more complex
@@ -70,12 +70,12 @@ add_mappers <- function(...) {
 #'
 #' @details
 #'
-#' As shorthand, [bru()] will understand basic additive formulae describing fixed effect
-#' models. For instance, the
-#' components specification `y ~ x` will define the linear combination of an
-#' effect named `x` and an intercept to
-#' the response `y` with respect to the likelihood family stated when calling [bru()]. Mathematically,
-#' the linear predictor \eqn{\eta} would be written down as
+#' As shorthand, [bru()] will understand basic additive formulae describing
+#' fixed effect models. For instance, the components specification `y ~ x` will
+#' define the linear combination of an effect named `x` and an intercept to the
+#' response `y` with respect to the likelihood family stated when calling
+#' [bru()]. Mathematically, the linear predictor \eqn{\eta} would be written
+#' down as
 #'
 #' \deqn{\eta = \beta * x + c,}
 #'
@@ -103,29 +103,34 @@ add_mappers <- function(...) {
 #'
 #' \itemize{\item{`formula = y ~ f(x, model = "linear")`,}}
 #'
-#' where `f()` is the inla specific function to set up random effects of all kinds. The underlying
-#' predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-#' `x` as the random effect's name. bru allows rewriting this formula in order to explicitly state
-#' the name of the random effect and the name of the associated covariate. This is achieved by replacing `f`
-#' with an arbitrary name that we wish to assign to the effect, e.g.
+#' where `f()` is the inla specific function to set up random effects of all
+#' kinds. The underlying predictor would again be \eqn{\eta = \beta * x + c} but
+#' the result of fitting the model would state `x` as the random effect's name.
+#' bru allows rewriting this formula in order to explicitly state the name of
+#' the random effect and the name of the associated covariate. This is achieved
+#' by replacing `f` with an arbitrary name that we wish to assign to the effect,
+#' e.g.
 #'
 #' \itemize{\item{`components = y ~ psi(x, model = "linear")`.}}
 #'
-#' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-#' bru offers. The formula parameters of both [bru()] and the prediction method [predict.bru]
-#' are interpreted in the mathematical sense. For instance, `predict` may be used to analyze the
-#' analytical combination of the covariate \eqn{x} and the intercept using
+#' Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because
+#' of two functionalities bru offers. The formula parameters of both [bru()] and
+#' the prediction method [predict.bru] are interpreted in the mathematical
+#' sense. For instance, `predict` may be used to analyze the analytical
+#' combination of the covariate \eqn{x} and the intercept using
 #'
 #' \itemize{\item{`predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)`.}}
 #'
-#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e
+#' <sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
 #'
 #' On the other hand, predict may be used to only look at a transformation of
 #' the latent variable \eqn{\beta_\psi}
 #'
 #' \itemize{\item{`predict(fit, NULL, ~ exp(psi_latent))`.}}
 #'
-#' which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
+#' which corresponds to the mathematical expression \ifelse{html}{\out{e
+#' <sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
 #'
 #' @param \dots Parameters passed on to other methods
 #'
@@ -232,7 +237,8 @@ component <- function(...) {
 #' \donttest{
 #' if (bru_safe_inla()) {
 #'   # As an example, let us create a linear component. Here, the component is
-#'   # called "myEffectOfX" while the covariate the component acts on is called "x":
+#'   # called "myEffectOfX" while the covariate the component acts on is called
+#'   # "x":
 #'
 #'   cmp <- component("myEffectOfX", main = x, model = "linear")
 #'   summary(cmp)
@@ -286,13 +292,15 @@ component.character <- function(object,
                                 .envir = parent.frame(),
                                 envir_extra = NULL) {
   # INLA models:
-  # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag, besag2, bym, bym2, besagproper,
-  #            besagproper2, fgn, fgn2, ar1, ar1c, ar, ou, generic, generic0, generic1, generic2, generic3, spde,
-  #            spde2, spde3, iid1d, iid2d, iid3d, iid4d, iid5d, 2diid, z, rw2d, rw2diid, slm, matern2d, copy,
-  #            clinear, sigm, revsigm, log1exp, logdist)
+  # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag,
+  # besag2, bym, bym2, besagproper, besagproper2, fgn, fgn2, ar1, ar1c, ar, ou,
+  # generic, generic0, generic1, generic2, generic3, spde, spde2, spde3, iid1d,
+  # iid2d, iid3d, iid4d, iid5d, 2diid, z, rw2d, rw2diid, slm, matern2d, copy,
+  # clinear, sigm, revsigm, log1exp, logdist)
   #
   # Supported:
-  # btypes = c("const", "offset", "factor_full", "factor_contrast", "linear", "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
+  # btypes = c("const", "offset", "factor_full", "factor_contrast", "linear",
+  # "clinear", "iid", "seasonal", "rw1", "rw2", "ar", "ar1", "ou", "spde")
 
   # The label
   label <- object
@@ -320,7 +328,8 @@ component.character <- function(object,
     #    if (!is.null(substitute(map))) {
     if (is.null(substitute(main))) {
       main <- sys.call()[["map"]]
-      warning("Use of 'map' is deprecated and may be disabled; use 'main' instead.",
+      warning(
+        "Use of 'map' is deprecated and may be disabled; use 'main' instead.",
         immediate. = TRUE
       )
     } else {
@@ -333,7 +342,9 @@ component.character <- function(object,
   if ("mesh" %in% names(sys.call())) {
     if (is.null(mapper)) {
       mapper <- list(...)[["mesh"]]
-      warning("Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead.")
+      warning(
+        "Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead."
+      )
     } else {
       warning("Deprecated 'mesh' overridden by 'mapper'.")
     }
@@ -417,7 +428,8 @@ component.character <- function(object,
 
   # Main bit
   # Construct a call to the f function from the parameters provided
-  # Ultimately, this call will be converted to the model formula presented to INLA
+  # Ultimately, this call will be converted to the model formula presented to
+  # INLA
   fcall <- sys.call()
   fcall[[1]] <- "f"
   fcall[[2]] <- as.symbol(label)
@@ -595,15 +607,13 @@ component_list <- function(object,
   UseMethod("component_list")
 }
 
-#' @details
-#' * `component_list.formula`: Convert a component formula
+#' @describeIn component_list Convert a component formula
 #' into a `component_list` object
 #'
 #' @export
 #' @family component constructors
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname component_list
 #'
 #' @examples
 #' # As an example, let us create a linear component. Here, the component is
@@ -646,11 +656,9 @@ component_list.formula <- function(object,
 
 
 
-#' @details
-#' * `component_list.list`: Combine a list of components and/or component formulas
-#' into a `component_list` object
+#' @describeIn component_list Combine a list of components and/or component
+#'   formulas into a `component_list` object
 #' @export
-#' @rdname component_list
 component_list.list <- function(object,
                                 lhoods = NULL,
                                 .envir = parent.frame(),
@@ -706,10 +714,9 @@ component_list.list <- function(object,
 
 
 #' @export
-#' @details * `c.component_list`: The `...` arguments should be `component_list`
+#' @describeIn component_list The `...` arguments should be `component_list`
 #' objects. The environment from the first argument will be applied to the
 #' resulting `component_list`.
-#' @rdname component_list
 `c.component_list` <- function(...) {
   stopifnot(all(vapply(
     list(...),
@@ -1311,8 +1318,7 @@ bru_get_mapper <- function(model, ...) {
 }
 
 
-#' @rdname bru_get_mapper
-#' @details * `bru_get_mapper.inla.spde` extract an indexed mapper for
+#' @describeIn bru_get_mapper Extract an indexed mapper for
 #' the `model$mesh` object contained in the model object.
 #' It returns `NULL` gives a warning
 #' if no known mesh type is found in the model object.
@@ -1336,14 +1342,13 @@ bru_get_mapper.inla.spde <- function(model, ...) {
   mapper
 }
 
-#' @rdname bru_get_mapper
-#' @details * `bru_get_mapper.inla.rgeneric` returns the mapper given by a call to
-#' `model$f$rgeneric$definition("mapper")`. To support this for your own
-#' `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument
-#' of your rgeneric definition function. You will need to store the mapper
-#' in your object as well.  Alternative, define your model using a subclass
-#' and define a corresponding `bru_get_mapper.subclass` method that should return
-#' the corresponding `bru_mapper` object.
+#' @describeIn bru_get_mapper Returns the mapper given by a call to
+#'   `model$f$rgeneric$definition("mapper")`. To support this for your own
+#'   `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument of
+#'   your rgeneric definition function. You will need to store the mapper in
+#'   your object as well.  Alternative, define your model using a subclass and
+#'   define a corresponding `bru_get_mapper.subclass` method that should return
+#'   the corresponding `bru_mapper` object.
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
   if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
@@ -1353,8 +1358,7 @@ bru_get_mapper.inla.rgeneric <- function(model, ...) {
   }
 }
 
-#' @rdname bru_get_mapper
-#' @details * `bru_get_mapper_safely` tries to call the `bru_get_mapper`,
+#' @describeIn bru_get_mapper Tries to call the `bru_get_mapper`,
 #' and returns `NULL` if it fails (e.g. due to no available class method).
 #' If the call succeeds and returns non-`NULL`, it checks that the object
 #' inherits from the `bru_mapper` class, and gives an error if it does not.

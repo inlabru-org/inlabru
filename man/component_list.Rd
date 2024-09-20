@@ -41,27 +41,27 @@ Constructor methods for inlabru component lists. Syntax details are given in
 }
 \details{
 \itemize{
-\item \code{component_list.formula}: Convert a component formula
-into a \code{component_list} object
-}
-
-\itemize{
-\item \code{component_list.list}: Combine a list of components and/or component formulas
-into a \code{component_list} object
-}
-
-\itemize{
-\item \code{c.component_list}: The \code{...} arguments should be \code{component_list}
-objects. The environment from the first argument will be applied to the
-resulting \code{component_list}.
-}
-
-\itemize{
 \item \code{c.component}: The \code{...} arguments should be \code{component}
 objects. The environment from the first argument will be applied to the
 resulting ``component_list`.
 }
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{component_list(formula)}: Convert a component formula
+into a \code{component_list} object
+
+\item \code{component_list(list)}: Combine a list of components and/or component
+formulas into a \code{component_list} object
+
+}}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{c(component_list)}: The \code{...} arguments should be \code{component_list}
+objects. The environment from the first argument will be applied to the
+resulting \code{component_list}.
+
+}}
 \examples{
 # As an example, let us create a linear component. Here, the component is
 # called "myLinearEffectOfX" while the covariate the component acts on is

@@ -1143,8 +1143,8 @@ ibm_jacobian.bru_mapper_taylor <- function(mapper, ..., multi = FALSE) {
 }
 
 
-#' @details
-#' * The `ibm_eval.bru_mapper_taylor()` evaluates linearised
+#' @describeIn bru_mapper_taylor
+#' Evaluates linearised
 #' mapper information at the given `state`. The `input` argument is ignored,
 #' so that the usual argument order
 #' `ibm_eval(mapper, input, state)` syntax can be used, but also
@@ -1152,7 +1152,6 @@ ibm_jacobian.bru_mapper_taylor <- function(mapper, ..., multi = FALSE) {
 #' the `state` argument must also be a named list.  If `state` is `NULL`,
 #' all-zero is assumed.
 #' @export
-#' @rdname bru_mapper_taylor
 ibm_eval.bru_mapper_taylor <- function(mapper, input = NULL, state = NULL, ...) {
   if (is.null(mapper[["jacobian"]]) ||
     (mapper[["n"]] == 0) ||
@@ -1564,8 +1563,7 @@ ibm_values.bru_mapper_shift <- function(mapper, ...,
 
 #' @export
 #' @param sub_lin Internal, optional pre-computed sub-mapper information
-#' @details For `bru_mapper_shift`, `input` NULL values are interpreted as no shift.
-#' @rdname bru_mapper_shift
+#' @describeIn bru_mapper_shift `input` NULL values are interpreted as no shift.
 ibm_jacobian.bru_mapper_shift <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
   stopifnot(!is.null(state))
@@ -1660,9 +1658,8 @@ ibm_values.bru_mapper_scale <- function(mapper, ...,
 
 #' @export
 #' @param sub_lin Internal, optional pre-computed sub-mapper information
-#' @details For `bru_mapper_scale`, `input` NULL values
+#' @describeIn bru_mapper_scale `input` NULL values
 #' are interpreted as no scaling.
-#' @rdname bru_mapper_scale
 ibm_jacobian.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
   stopifnot(!is.null(state))
@@ -1804,13 +1801,12 @@ ibm_values.bru_mapper_aggregate <- function(mapper, ...,
 
 
 #' @export
-#' @details
-#' * For `bru_mapper_aggregate`, `input` should be a list with elements `block`
+#' @describeIn bru_mapper_aggregate
+#' `input` should be a list with elements `block`
 #' and `weights`. `block`
 #' should be a vector of the same length as the `state`, or `NULL`, with `NULL`
 #' equivalent to all-1.
 #' If `weights` is `NULL`, it's interpreted as all-1.
-#' @rdname bru_mapper_aggregate
 ibm_jacobian.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...) {
   fm_block(
     block = input[["block"]],
@@ -1886,13 +1882,11 @@ bru_mapper_logsumexp <- function(rescale = FALSE,
 
 
 #' @export
-#' @details
-#' * For `bru_mapper_logsumexp`, `input` should be a list with elements `block`
+#' @describeIn bru_mapper_logsumexp `input` should be a list with elements `block`
 #' and `weights`. `block`
 #' should be a vector of the same length as the `state`, or `NULL`, with `NULL`
 #' equivalent to all-1.
 #' If `weights` is `NULL`, it's interpreted as all-1.
-#' @rdname bru_mapper_logsumexp
 ibm_jacobian.bru_mapper_logsumexp <- function(mapper, input, state = NULL, ...) {
   input <- fm_block_prep(
     block = input[["block"]],
@@ -2092,9 +2086,8 @@ ibm_values.bru_mapper_marginal <- function(mapper, ...,
 #' @param reverse logical; control `bru_mapper_marginal` evaluation. Default `FALSE`.
 #' When `TRUE`, reverses the direction of the mapping, see details for `marginal`
 #' mappers.
-#' @details For `bru_mapper_marginal`, non-NULL `input` values are interpreted
+#' @describeIn bru_mapper_marginal Non-NULL `input` values are interpreted
 #' as a parameter list for `qfun`, overriding that of the mapper itself.
-#' @rdname bru_mapper_marginal
 ibm_jacobian.bru_mapper_marginal <- function(mapper, input, state = NULL,
                                              ...,
                                              reverse = FALSE) {
@@ -2565,8 +2558,8 @@ bru_mapper_multi_prepare_input <- function(mapper, input) {
   input
 }
 
-#' @details
-#' * `ibm_jacobian` for `bru_mapper_multi` accepts a list with
+#' @describeIn bru_mapper_multi
+#' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_multi()].
 #' Each list element should take a format accepted by the corresponding
@@ -2575,7 +2568,6 @@ bru_mapper_multi_prepare_input <- function(mapper, input) {
 #' with unnamed but ordered columns.
 #' @param sub_A Internal; precomputed Jacobian matrices.
 #' @export
-#' @rdname bru_mapper_multi
 ibm_jacobian.bru_mapper_multi <- function(mapper,
                                           input,
                                           state = NULL,
@@ -2690,8 +2682,8 @@ bm_multi_indexing <- function(mapper, input) {
 }
 
 
-#' @details
-#' * `ibm_invalid_output` for `bru_mapper_multi` accepts a list with
+#' @describeIn bru_mapper_multi
+#' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_multi()].
 #' Each list element should take a format accepted by the corresponding
@@ -2699,7 +2691,6 @@ bm_multi_indexing <- function(mapper, input) {
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
 #' @export
-#' @rdname bru_mapper_multi
 ibm_invalid_output.bru_mapper_multi <- function(mapper,
                                                 input,
                                                 state,
@@ -2985,8 +2976,8 @@ bm_collect_sub_lin <- function(mapper, input, state,
 
 
 
-#' @details
-#' * `ibm_jacobian` for `bru_mapper_collect` accepts a list with
+#' @describeIn bru_mapper_collect
+#' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_collect()].
 #' Each list element should take a format accepted by the corresponding
@@ -2996,7 +2987,6 @@ bm_collect_sub_lin <- function(mapper, input, state,
 #' the mapper definition, the input format should instead match that of
 #' the first, non-hidden, sub-mapper.
 #' @export
-#' @rdname bru_mapper_collect
 ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
                                             inla_f = FALSE, multi = FALSE,
                                             ...,
@@ -3067,8 +3057,8 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
 
 
 
-#' @details
-#' * `ibm_invalid_output` for `bru_mapper_collect` accepts a list with
+#' @describeIn bru_mapper_collect
+#' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
 #' The names must match the sub-mappers, see [ibm_names.bru_mapper_collect()].
 #' Each list element should take a format accepted by the corresponding
@@ -3076,7 +3066,6 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
 #' @export
-#' @rdname bru_mapper_collect
 ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
                                                   inla_f = FALSE,
                                                   multi = FALSE, ...) {

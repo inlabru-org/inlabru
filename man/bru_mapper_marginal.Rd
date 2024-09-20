@@ -72,12 +72,11 @@ Constructs a mapper that transforms the marginal distribution \code{state} from
 quantile function. The \code{...} arguments are used as parameter arguments to
 \code{qfun}, \code{pfun}, \code{dfun}, and \code{dqfun}.
 }
-\details{
-For \code{bru_mapper_marginal}, non-NULL \code{input} values are interpreted
-as a parameter list for \code{qfun}, overriding that of the mapper itself.
-}
 \section{Methods (by generic)}{
 \itemize{
+\item \code{ibm_jacobian(bru_mapper_marginal)}: Non-NULL \code{input} values are interpreted
+as a parameter list for \code{qfun}, overriding that of the mapper itself.
+
 \item \code{ibm_eval(bru_mapper_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
 \code{FALSE}, \code{ibm_eval()}
 for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically

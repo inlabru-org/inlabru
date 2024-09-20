@@ -50,7 +50,11 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
-  idx <- sf::st_within(sf::st_as_sf(observations), sf::st_as_sf(samplers), sparse = TRUE)
+  idx <- sf::st_within(
+    sf::st_as_sf(observations),
+    sf::st_as_sf(samplers),
+    sparse = TRUE
+  )
   A_sum <- sparseMatrix(
     i = unlist(idx),
     j = rep(
@@ -183,7 +187,9 @@ set_csc <- function(residuals, col_theme) {
           c(-1, 1)
     )
 
-  list("Scaling" = scaling_csc, "Inverse" = inverse_csc, "Pearson" = pearson_csc)
+  list("Scaling" = scaling_csc,
+       "Inverse" = inverse_csc,
+       "Pearson" = pearson_csc)
 }
 
 
@@ -286,7 +292,14 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   gridPolygon <- terra::as.polygons(grid)
 
   # Extract the boundary with subpolygons only
-  sf::as_Spatial(sf::st_as_sf(terra::intersect(gridPolygon, terra::vect(samplers))))
+  sf::as_Spatial(
+    sf::st_as_sf(
+      terra::intersect(
+        gridPolygon,
+        terra::vect(samplers)
+      )
+    )
+  )
 }
 
 

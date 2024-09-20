@@ -30,23 +30,23 @@ object.}
 \item{\code{domain}}{Named list of domain definitions.}
 \item{\code{samplers}}{Integration subdomain for 'cp' family.}
 \item{\code{ips}}{Integration points for 'cp' family. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given, overrides \code{domain}
-and \code{samplers}.}
+to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}.}
 }}
 
 \item{formula}{a \code{formula} where the right hand side is a general R
 expression defines the predictor used in the model.}
 
-\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular,
-optional \code{E}, a single numeric used rescale all integration weights by a fixed
+\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular, optional
+\code{E}, a single numeric used rescale all integration weights by a fixed
 factor.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{.envir}{The evaluation environment to use for special arguments (\code{E},
-\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or \code{data}.
-Defaults to the calling environment.}
+\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
+\code{data}. Defaults to the calling environment.}
 }
 \value{
 An \code{\link[=bru]{bru()}} object

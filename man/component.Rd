@@ -111,8 +111,8 @@ that is applied before scaling by \code{weights}.}
 \item{envir_extra}{TODO: check/fix this parameter.}
 }
 \description{
-Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed via
-a formula-like syntax, where each latent effect is specified. However, in
+Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed
+via a formula-like syntax, where each latent effect is specified. However, in
 addition to the parts of the syntax compatible with \code{INLA::inla}, \code{bru}
 components offer additional functionality which facilitates modelling, and
 the predictor expression can be specified separately, allowing more complex
@@ -128,12 +128,12 @@ formula expression that can be interpreted by the \code{\link[=component_list.fo
 method, called inside \code{\link[=bru]{bru()}}.
 }
 \details{
-As shorthand, \code{\link[=bru]{bru()}} will understand basic additive formulae describing fixed effect
-models. For instance, the
-components specification \code{y ~ x} will define the linear combination of an
-effect named \code{x} and an intercept to
-the response \code{y} with respect to the likelihood family stated when calling \code{\link[=bru]{bru()}}. Mathematically,
-the linear predictor \eqn{\eta} would be written down as
+As shorthand, \code{\link[=bru]{bru()}} will understand basic additive formulae describing
+fixed effect models. For instance, the components specification \code{y ~ x} will
+define the linear combination of an effect named \code{x} and an intercept to the
+response \code{y} with respect to the likelihood family stated when calling
+\code{\link[=bru]{bru()}}. Mathematically, the linear predictor \eqn{\eta} would be written
+down as
 
 \deqn{\eta = \beta * x + c,}
 
@@ -171,29 +171,34 @@ a simple linear effect model can also be expressed as
 
 \itemize{\item{\code{formula = y ~ f(x, model = "linear")},}}
 
-where \code{f()} is the inla specific function to set up random effects of all kinds. The underlying
-predictor would again be \eqn{\eta = \beta * x + c} but the result of fitting the model would state
-\code{x} as the random effect's name. bru allows rewriting this formula in order to explicitly state
-the name of the random effect and the name of the associated covariate. This is achieved by replacing \code{f}
-with an arbitrary name that we wish to assign to the effect, e.g.
+where \code{f()} is the inla specific function to set up random effects of all
+kinds. The underlying predictor would again be \eqn{\eta = \beta * x + c} but
+the result of fitting the model would state \code{x} as the random effect's name.
+bru allows rewriting this formula in order to explicitly state the name of
+the random effect and the name of the associated covariate. This is achieved
+by replacing \code{f} with an arbitrary name that we wish to assign to the effect,
+e.g.
 
 \itemize{\item{\code{components = y ~ psi(x, model = "linear")}.}}
 
-Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because of two functionalities
-bru offers. The formula parameters of both \code{\link[=bru]{bru()}} and the prediction method \link{predict.bru}
-are interpreted in the mathematical sense. For instance, \code{predict} may be used to analyze the
-analytical combination of the covariate \eqn{x} and the intercept using
+Being able to discriminate between \eqn{x} and \eqn{\psi} is relevant because
+of two functionalities bru offers. The formula parameters of both \code{\link[=bru]{bru()}} and
+the prediction method \link{predict.bru} are interpreted in the mathematical
+sense. For instance, \code{predict} may be used to analyze the analytical
+combination of the covariate \eqn{x} and the intercept using
 
 \itemize{\item{\verb{predict(fit, data.frame(x=2)), ~ exp(psi + Intercept)}.}}
 
-which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
+which corresponds to the mathematical expression \ifelse{html}{\out{e
+<sup>&#946; + c</sup>}}{\eqn{e^{x \beta + c}}}.
 
 On the other hand, predict may be used to only look at a transformation of
 the latent variable \eqn{\beta_\psi}
 
 \itemize{\item{\code{predict(fit, NULL, ~ exp(psi_latent))}.}}
 
-which corresponds to the mathematical expression \ifelse{html}{\out{e <sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
+which corresponds to the mathematical expression \ifelse{html}{\out{e
+<sup>&#946;</sup>}}{\eqn{e^{\beta}}}.
 }
 
 \examples{
@@ -213,7 +218,8 @@ summary(cmp)
 \donttest{
 if (bru_safe_inla()) {
   # As an example, let us create a linear component. Here, the component is
-  # called "myEffectOfX" while the covariate the component acts on is called "x":
+  # called "myEffectOfX" while the covariate the component acts on is called
+  # "x":
 
   cmp <- component("myEffectOfX", main = x, model = "linear")
   summary(cmp)

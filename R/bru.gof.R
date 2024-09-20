@@ -95,7 +95,12 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 
   # Integrate per bin
   smp <- ip$wl * smp
-  qq <- aggregate(smp, by = list(rep(1:nbins, each = nint)), FUN = sum, drop = TRUE)[, 2:(ncol(smp) + 1)]
+  qq <- aggregate(
+    smp,
+    by = list(rep(1:nbins, each = nint)),
+    FUN = sum,
+    drop = TRUE
+  )[, 2:(ncol(smp) + 1)]
 
   # Normalize bin probabilities
   for (s in seq_len(ncol(smp))) {
@@ -128,7 +133,9 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
     ),
     pint
   )
-  pint$inside <- (pint$counts >= pint[[miname]]) & (pint$counts <= pint[[mxname]])
+  pint$inside <-
+    (pint$counts >= pint[[miname]]) &
+      (pint$counts <= pint[[mxname]])
 
   ggp <- ggplot2::ggplot() +
     ggplot2::geom_crossbar(
@@ -170,26 +177,32 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 
 #' Variance and correlations measures for prediction components
 #'
-#' Calculates local and integrated variance and correlation measures as introduced by Yuan et al. (2017).
+#' Calculates local and integrated variance and correlation measures as
+#' introduced by Yuan et al. (2017).
 #'
 #' @export
 #' @param joint A joint `prediction` of two latent model components.
 #' @param prediction1 A `prediction` of the first component.
 #' @param prediction2 A `prediction` of the second component.
-#' @param samplers A SpatialPolygon object describing the area for which to compute the cumulative variance measure.
-#' @param mesh The [fmesher::fm_mesh_2d] for which the prediction was performed (required for cumulative Vmeasure).
+#' @param samplers A SpatialPolygon object describing the area for which to
+#'   compute the cumulative variance measure.
+#' @param mesh The [fmesher::fm_mesh_2d] for which the prediction was performed
+#'   (required for cumulative Vmeasure).
 #' @return Variance and correlations measures.
 #'
 #' @references
-#' Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T. Buckland, H. Rue, T. Gerrodette. 2017.
-#' Point process models for spatio-temporal distance sampling data from a large-scale survey of blue whales.
-#' <https://arxiv.org/abs/1604.06013>
+#' Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T.
+#' Buckland, H. Rue, T. Gerrodette. 2017. Point process models for
+#' spatio-temporal distance sampling data from a large-scale survey of blue
+#' whales. <https://arxiv.org/abs/1604.06013>
 #'
 #' @example inst/examples/devel.cvmeasure.R
 
-devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL, mesh = NULL) {
+devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL,
+                            mesh = NULL) {
   # Covariance
-  joint$cov <- (joint[["sd"]]^2 - prediction1[["sd"]]^2 - prediction2[["sd"]]^2) / 2
+  joint$cov <- (joint[["sd"]]^2 - prediction1[["sd"]]^2 -
+    prediction2[["sd"]]^2) / 2
 
   # Correlation
   corr <- function(joint, a, b) {

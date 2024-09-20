@@ -61,9 +61,10 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   # as.spatial.dsdata = function(dset, cnames, crs)
 
   # Extract detections and convert to SpatialPointsDataFrame
+  not_cnames <- setdiff(names(detdata(dset)), cnames)
   points <- SpatialPointsDataFrame(
     coords = as.data.frame(detdata(dset))[, cnames],
-    data = as.data.frame(detdata(dset))[, setdiff(names(detdata(dset)), cnames)],
+    data = as.data.frame(detdata(dset))[, not_cnames],
     proj4string = crs
   )
 
@@ -77,7 +78,14 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   })
 
   spl <- SpatialLines(lilist, proj4string = crs)
-  df <- as.data.frame(segdata(dset))[, setdiff(names(segdata(dset)), c(paste0("start.", cnames), paste0("end.", cnames)))]
+  tmp_names <- setdiff(
+    names(segdata(dset)),
+    c(
+      paste0("start.", cnames),
+      paste0("end.", cnames)
+    )
+  )
+  df <- as.data.frame(segdata(dset))[, tmp_names]
   rownames(df) <- seq_len(nrow(df))
   samplers <- SpatialLinesDataFrame(spl, data = df)
 
@@ -98,7 +106,8 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 #' Mexdolphin data import
 #'
 #'
-#' Load `mexdolphins` survey data from `dsm` package and convert to spatial formats defined by the `sp` package.
+#' Load `mexdolphins` survey data from `dsm` package and convert to spatial
+#' formats defined by the `sp` package.
 #'
 #' @keywords internal
 #' @return The [mexdolphin] data set
@@ -114,14 +123,20 @@ import.mexdolphin <- function() {
   envir <- new.env()
   data("mexdolphins", package = "dsm", envir = envir)
   mexdolphins <- as.list(envir)
-  data.p4s <- "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+  data.p4s <- paste0(
+    "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 ",
+    "+x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+  )
   data_crs <- sp::CRS(data.p4s)
 
   dset <- import.dsmdata(mexdolphins, covar.col = 8)
   mexdolphin <- as.spatial.dsdata(dset, cnames = c("x", "y"), crs = data_crs)
 
   # Target CRS
-  target.p4s <- "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
+  target.p4s <- paste0(
+    "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 ",
+    "+x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
+  )
   target_crs <- sp::CRS(target.p4s)
 
   # Units to km
@@ -182,7 +197,8 @@ import.mexdolphin <- function() {
     Intercept(1) +
     df.lsigma(1) +
     spat(coordinates, model = matern)
-  pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) + spat + Intercept + log(2)
+  pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) +
+    spat + Intercept + log(2)
   r <- lgcp(
     data = mexdolphin$points,
     samplers = cbind(mexdolphin$samplers, data.frame(weight = 1)),
@@ -234,17 +250,27 @@ import.mexdolphin.sf <- function() {
   envir <- new.env()
   data("mexdolphins", package = "dsm", envir = envir)
   mexdolphins <- as.list(envir)
-  data.p4s <- "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+  data.p4s <- paste0(
+    "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 ",
+    "+ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+  )
   data_crs <- fm_crs(data.p4s)
 
   dset <- import.dsmdata(mexdolphins, covar.col = 8)
   dset$mesh$crs <- fm_CRS(data_crs)
-  mexdolphin <- as.spatial.dsdata(dset, cnames = c("x", "y"), crs = fm_CRS(data_crs))
+  mexdolphin <- as.spatial.dsdata(
+    dset,
+    cnames = c("x", "y"),
+    crs = fm_CRS(data_crs)
+  )
   mexdolphin$points <- sf::st_as_sf(mexdolphin$points)
   mexdolphin$samplers <- sf::st_as_sf(mexdolphin$samplers)
 
   # Target CRS
-  target.p4s <- "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
+  target.p4s <- paste0(
+    "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 ",
+    "+ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
+  )
   target_crs <- fm_crs(target.p4s)
 
   # Units to km
@@ -301,7 +327,8 @@ import.mexdolphin.sf <- function() {
     Intercept(1) +
     df.lsigma(1) +
     spat(geometry, model = matern)
-  pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) + spat + Intercept + log(2)
+  pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) +
+    spat + Intercept + log(2)
   r <- lgcp(
     data = mexdolphin$points,
     samplers = cbind(mexdolphin$samplers, data.frame(weight = 1)),

@@ -1,21 +1,20 @@
 #' @describeIn inlabru-deprecated
 #' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_int()]
 #'
-#' @param samplers Description of the integration region boundary.
-#' In 1D, a length 2 vector or two-column matrix where each row describes an interval,
-#' or `NULL`
-#' In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with a `weight` column
-#' defining the width of the a transect line, and optionally further columns used by the
-#' `group` argument, or `NULL`.  When `domain` is `NULL`, `samplers` may also
-#' be an `inla.mesh.1d` or `inla.mesh` object, that is then treated as a `domain`
-#' argument instead.
+#' @param samplers Description of the integration region boundary. In 1D, a
+#'   length 2 vector or two-column matrix where each row describes an interval,
+#'   or `NULL` In 2D either a `SpatialPolygon` or a `SpatialLinesDataFrame` with
+#'   a `weight` column defining the width of the a transect line, and optionally
+#'   further columns used by the `group` argument, or `NULL`.  When `domain` is
+#'   `NULL`, `samplers` may also be an `inla.mesh.1d` or `inla.mesh` object,
+#'   that is then treated as a `domain` argument instead.
 #' @param domain Either
 #' * when `samplers` is a 1D interval(s) definition only, `domain` can be
 #'   a single integer for the number of integration points to place in each 1D
 #'   interval, overriding `int.args[["nsub1"]]`, and otherwise
 #' * when `samplers` is `NULL`, `domain` can be a numeric vector of points,
-#'   each given integration weight 1 (and no additional points are added
-#'   in between),
+#'   each given integration weight 1 (and no additional points are added in
+#'   between),
 #' * an `inla.mesh.1d` object for continuous 1D integration, or
 #' * an `inla.mesh.2d` object for continuous 2D integration.
 #' @param name Character array stating the name of the domains dimension(s).
@@ -32,14 +31,16 @@
 #' * `nsub1`, `nsub2`: integers controlling the number of internal integration
 #'   points before aggregation. Points per triangle: `(nsub2+1)^2`.
 #'   Points per knot segment: `nsub1`
-#' * `poly_method`: if set to "legacy", selects an old polygon integration method
-#'   that doesn't handle holes. No longer supported, and will generate an error.
-#' @param project `r lifecycle::badge("deprecated")` Deprecated in favour of `int.args(method=...)`.
-#' If TRUE, aggregate the integration points to mesh vertices. Default:
-#' `project = (identical(int.args$method, "stable"))`
+#' * `poly_method`: if set to "legacy", selects an old polygon integration
+#'   method that doesn't handle holes. No longer supported, and will generate an
+#'   error.
+#' @param project `r lifecycle::badge("deprecated")` Deprecated in favour of
+#'   `int.args(method=...)`. If TRUE, aggregate the integration points to mesh
+#'   vertices. Default: `project = (identical(int.args$method, "stable"))`
 #'
-#' @return `ipoints()`: A `data.frame`, `tibble`, `sf`, or `SpatialPointsDataFrame` of 1D and
-#' 2D integration points, including a `weight` column and `.block` column.
+#' @return `ipoints()`: A `data.frame`, `tibble`, `sf`, or
+#'   `SpatialPointsDataFrame` of 1D and 2D integration points, including a
+#'   `weight` column and `.block` column.
 #'
 ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
                     int.args = NULL,
@@ -48,8 +49,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
     "2.8.0.9004",
     "ipoints()",
     "fmesher::fm_int()",
-    details = c(
-      "`ipoints(samplers, domain)` has been replaced by more versatile `fm_int(domain, samplers, ...)` methods."
+    details = paste0(
+      "`ipoints(samplers, domain)` has been replaced by more versatile ",
+      "`fm_int(domain, samplers, ...)` methods."
     )
   )
 }
@@ -72,12 +74,12 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'
 #'
 #' @param na.rm logical; if `TRUE`, the rows with weight `NA` from the
-#' non-overlapping full_join will be removed; if `FALSE`, set the undefined weights to `NA`.
-#' If `NULL` (default), act as `TRUE`, but warn if any elements needed removing.
-#' @param .blockwise logical; if `FALSE`, computes full tensor product integration.
-#' If `TRUE`, computes within-block tensor product integration (used internally
-#' by [fm_int()]).
-#' Default `FALSE`
+#'   non-overlapping full_join will be removed; if `FALSE`, set the undefined
+#'   weights to `NA`. If `NULL` (default), act as `TRUE`, but warn if any
+#'   elements needed removing.
+#' @param .blockwise logical; if `FALSE`, computes full tensor product
+#'   integration. If `TRUE`, computes within-block tensor product integration
+#'   (used internally by [fm_int()]). Default `FALSE`
 #' @return A `data.frame`, `sf`, or `SpatialPointsDataFrame` of multidimensional
 #' integration points and their weights
 cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {

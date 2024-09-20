@@ -54,17 +54,14 @@ shifting the state blockwise;
 \eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
 where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item For \code{bru_mapper_logsumexp}, \code{input} should be a list with elements \code{block}
+\item \code{ibm_jacobian(bru_mapper_logsumexp)}: \code{input} should be a list with elements \code{block}
 and \code{weights}. \code{block}
 should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
 equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
-}
-}
-\section{Methods (by generic)}{
-\itemize{
+
 \item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
 the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
 

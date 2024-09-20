@@ -16,9 +16,11 @@ sline(
 \arguments{
 \item{data}{A data.frame}
 
-\item{start.cols}{Character array poitning out the columns of \code{data} that hold the start points of the lines}
+\item{start.cols}{Character array poitning out the columns of \code{data} that
+hold the start points of the lines}
 
-\item{end.cols}{Character array poitning out the columns of \code{data} that hold the end points of the lines}
+\item{end.cols}{Character array poitning out the columns of \code{data} that hold
+the end points of the lines}
 
 \item{crs}{Coordinate reference system of the original \code{data}}
 
@@ -30,15 +32,16 @@ sline(
 \link[sp:SpatialLines]{sp::SpatialLinesDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
-A line in 2D space is defined by a start and an end point, each associated with 2D coordinates.
-This function takes a \code{data.frame} as input and assumes that each row defines a line in space.
-In order to do so, the data frame must have at least four columns and the \code{start.cols} and
-\code{end.cols} parameters must be used to point out the names of the columns that define
-the start and end coordinates of the line. The data is then converted to a
-\code{SpatialLinesDataFrame} \code{DF}. If a coordinate reference system \code{crs} is provided
-it is attached to \code{DF}. If also \code{to.crs} is provided, the coordinate system of \code{DF}
-is transfromed accordingly. Additional columns of the input data, e.g. covariates,
-are retained and attached to \code{DF}.
+A line in 2D space is defined by a start and an end point, each associated
+with 2D coordinates. This function takes a \code{data.frame} as input and assumes
+that each row defines a line in space. In order to do so, the data frame must
+have at least four columns and the \code{start.cols} and \code{end.cols} parameters
+must be used to point out the names of the columns that define the start and
+end coordinates of the line. The data is then converted to a
+\code{SpatialLinesDataFrame} \code{DF}. If a coordinate reference system \code{crs} is
+provided it is attached to \code{DF}. If also \code{to.crs} is provided, the coordinate
+system of \code{DF} is transfromed accordingly. Additional columns of the input
+data, e.g. covariates, are retained and attached to \code{DF}.
 }
 \examples{
 \donttest{

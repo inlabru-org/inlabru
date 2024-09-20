@@ -48,7 +48,7 @@ The \code{bru_info} class is used to store metadata about \code{bru} models.
 \item \code{bru_info(character)}: Create a \code{bru_info} object
 
 \item \code{bru_info(bru)}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
-result object. The default print method show information about model components
-and observation models.
+result object. The default print method show information about model
+components and observation models.
 
 }}

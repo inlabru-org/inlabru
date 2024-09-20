@@ -25,7 +25,11 @@ make.toygroups <- function() {
   # breaks = seq(-10,10,length.out = 16)
   # groups$bin = findInterval(groups$x, breaks)
   # hst = hist(groups$x, breaks = breaks, plot = FALSE)
-  # hst = data.frame(bin = 1:(length(breaks)-1), nanimals = 0, ngroups = hst$counts)
+  # hst = data.frame(
+  #   bin = 1:(length(breaks)-1),
+  #   nanimals = 0,
+  #   ngroups = hst$counts
+  # )
   # agg = aggregate(groups$size, by = list(bin = groups$bin), sum)
   # hst$nanimals[agg$bin] = agg$x
   # hst$x = breaks[1:(length(breaks)-1)]

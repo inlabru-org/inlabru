@@ -3,12 +3,15 @@
 
 gap.in.segments.f <- function(seg = NULL, geometry = "euc") {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues
   #
-  # Identify where there is a gap in the effort along a transect (so the segments do not join together)
+  # Identify where there is a gap in the effort along a transect (so the
+  # segments do not join together)
   # Create an indicator, gap=0 can join to previous segment, gap=1 cannot join
-  # To get distance between points, if geometry='geo' uses columns latitude/longitude and great circle distances,
-  #    if geometry='euc' uses x/y and trig
+  # To get distance between points, if geometry='geo' uses columns
+  # latitude/longitude and great circle distances, if geometry='euc' uses x/y
+  # and trig
 
   # Segments
   num.seg <- dim(seg)[1]
@@ -19,8 +22,17 @@ gap.in.segments.f <- function(seg = NULL, geometry = "euc") {
     # Only need to check segments if the same transect
     if (seg$Transect.Label[i] == seg$Transect.Label[i + 1]) {
       # Check distance between segments
-      if (geometry == "euc") dist <- euc.distance.f(seg$x[i], seg$y[i], seg$x[i + 1], seg$y[i + 1])
-      if (geometry == "geo") dist <- geo.distance.f(seg$longitude[i], seg$latitude[i], seg$longitude[i + 1], seg$latitude[i + 1])
+      if (geometry == "euc") {
+        dist <- euc.distance.f(seg$x[i], seg$y[i], seg$x[i + 1], seg$y[i + 1])
+      }
+      if (geometry == "geo") {
+        dist <- geo.distance.f(
+          seg$longitude[i],
+          seg$latitude[i],
+          seg$longitude[i + 1],
+          seg$latitude[i + 1]
+        )
+      }
       # Check the length of the effort (half of one segment + half of the other)
       effort.dist <- (seg$Effort[i] / 2) + (seg$Effort[i + 1] / 2)
       if (dist > effort.dist) gap[i + 1] <- 1

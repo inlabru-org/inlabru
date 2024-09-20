@@ -1,7 +1,8 @@
 #' Gorilla data import
 #'
 #' @keywords internal
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, David L. Borchers \email{dlb@@st-andrews.ac.uk}
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
+#' David L. Borchers \email{dlb@@st-andrews.ac.uk}
 #' @return gorilla data
 
 import.gorillas <- function() {
@@ -13,7 +14,8 @@ import.gorillas <- function() {
   requireNamespace("spatstat.geom")
   nests <- as.data.frame(gorillas)
   sp::coordinates(nests) <- c("x", "y")
-  crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84") # from the Gorillas help file
+  # from the Gorillas help file:
+  crs <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84")
   crs_km <- sp::CRS("+proj=utm +zone=32 N +datum=WGS84 +units=km")
   sp::proj4string(nests) <- crs
 

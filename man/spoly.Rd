@@ -28,15 +28,15 @@ spoly(
 \link[sp:SpatialPolygons]{sp::SpatialPolygonsDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
-A polygon can be described as a sequence of points defining the polygon's boundary.
-When given such a sequence (anti clockwise!) this function creates a
-\code{SpatialPolygonsDataFrame} or \code{sf} holding the polygon decribed. By default, the
-first two columns of \code{data} are assumed to define the x and y coordinates
-of the points. This behaviour can be changed using the \code{cols} parameter, which
-points out the names of the columns holding the coordinates. The coordinate
-reference system of the resulting spatial polygon can be set via the \code{crs}
-parameter. Posterior conversion to a different CRS is supported using the
-\code{to.crs} parameter.
+A polygon can be described as a sequence of points defining the polygon's
+boundary. When given such a sequence (anti clockwise!) this function creates
+a \code{SpatialPolygonsDataFrame} or \code{sf} holding the polygon decribed. By
+default, the first two columns of \code{data} are assumed to define the x and y
+coordinates of the points. This behaviour can be changed using the \code{cols}
+parameter, which points out the names of the columns holding the coordinates.
+The coordinate reference system of the resulting spatial polygon can be set
+via the \code{crs} parameter. Posterior conversion to a different CRS is supported
+using the \code{to.crs} parameter.
 }
 \examples{
 \donttest{

@@ -14,22 +14,29 @@ the gorilla nests.}
 of the region that was searched for the nests.}
 \item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a mesh that can be used
 with function \code{lgcp} to fit a LGCP to the nest data.}
-\item{\code{gcov_file}:}{ The in-package filename of a \code{terra::SpatRaster} object,
-with one layer for each of these spatial covariates:
+\item{\code{gcov_file}:}{ The in-package filename of a \code{terra::SpatRaster}
+object, with one layer for each of these spatial covariates:
 \describe{
-\item{\code{aspect}}{ Compass direction of the terrain slope. Categorical, with levels
+\item{\code{aspect}}{ Compass direction of the terrain slope. Categorical,
+with levels
 N, NE, E, SE, S, SW, W and NW, which are coded as integers 1 to 8.}
 \item{\code{elevation}}{ Digital elevation of terrain, in metres.}
-\item{\code{heat}}{ Heat Load Index at each point on the surface (Beer's aspect),
-discretised. Categorical with values Warmest (Beer's aspect between 0 and 0.999),
-Moderate (Beer's aspect between 1 and 1.999), Coolest (Beer's aspect equals 2). These are
+\item{\code{heat}}{ Heat Load Index at each point on the surface
+(Beer's aspect),
+discretised. Categorical with values Warmest (Beer's aspect between
+0 and 0.999),
+Moderate (Beer's aspect between 1 and 1.999), Coolest (Beer's aspect
+equals 2). These are
 coded as integers 1, 2 and 3, in that order.}
 \item{\code{slopangle}}{ Terrain slope, in degrees.}
-\item{\code{slopetype}}{ Type of slope. Categorical, with values Valley, Toe (toe slope),
+\item{\code{slopetype}}{ Type of slope. Categorical, with values Valley,
+Toe (toe slope),
 Flat, Midslope, Upper and Ridge. These are coded as integers 1 to 6.}
-\item{\code{vegetation}}{ Vegetation type: a categorical variable with 6 levels coded as
+\item{\code{vegetation}}{ Vegetation type: a categorical variable with 6
+levels coded as
 integers 1 to 6 (in order of increasing expected habitat suitability)}
-\item{\code{waterdist}}{ Euclidean distance from nearest water body, in metres.}
+\item{\code{waterdist}}{ Euclidean distance from nearest water body, in
+metres.}
 }
 Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
 
@@ -39,13 +46,17 @@ Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
 }\if{html}{\out{</div>}}
 
 }
-\item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\\% coverage. Components:
+\item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the
+region, with 60\\% coverage. Components:
 \describe{
-\item{\code{counts}}{ A SpatialPointsDataFrame frame with elements \code{x}, \code{y}, \code{count},
-\code{exposure}, being the x- and y-coordinates of the centre of each plot, the count in each
+\item{\code{counts}}{ A SpatialPointsDataFrame frame with elements
+\code{x}, \code{y}, \code{count}, \code{exposure}, being the x- and y-coordinates of
+the centre of each plot, the count in each
 plot and the area of each plot.}
-\item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual plot boundaries.}
-\item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
+\item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual
+plot boundaries.}
+\item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of
+each detected nest.}
 }
 }
 }
@@ -60,8 +71,8 @@ data(gorillas_sf, package = "inlabru")
 gorillas_sf_gcov()
 }
 \description{
-This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
-as point process data for use with \code{inlabru}.
+This is the \code{gorillas} dataset from the package \code{spatstat.data},
+reformatted as point process data for use with \code{inlabru}.
 }
 \section{Functions}{
 \itemize{
