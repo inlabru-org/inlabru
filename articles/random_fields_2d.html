@@ -157,7 +157,8 @@ level INLA functions</p>
 <span>  <span class="op">)</span></span>
 <span><span class="va">true_range</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">true_sigma</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">true_Q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.precision.html" class="external-link">inla.spde.precision</a></span><span class="op">(</span><span class="va">matern_fine</span>, theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">true_range</span>, <span class="va">true_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">true_Q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.precision.html" class="external-link">inla.spde.precision</a></span><span class="op">(</span><span class="va">matern_fine</span>,</span>
+<span>                              theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">true_range</span>, <span class="va">true_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>What is the pointwise standard deviation of the field? Along straight
 boundaries, the variance is twice the target variance. At corners the
 variance is 4 times as large.</p>

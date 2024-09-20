@@ -83,7 +83,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bru_mapper</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, methods <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">bru_mapper_define</span><span class="op">(</span><span class="va">mapper</span>, new_class <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -91,21 +91,18 @@
 
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Arguments passed on to sub-methods, or used for special purposes,
-see details for each function below.</p></dd>
+<dd><p>Arguments passed on to sub-methods, or used for special
+purposes, see details for each function below.</p></dd>
 
 
 <dt id="arg-mapper">mapper<a class="anchor" aria-label="anchor" href="#arg-mapper"></a></dt>
-<dd><p>For <code>bru_mapper_define</code>, a prototype mapper object, see Details.
-For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
+<dd><p>For <code>bru_mapper_define</code>, a prototype mapper object, see
+Details. For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 
 
 <dt id="arg-new-class">new_class<a class="anchor" aria-label="anchor" href="#arg-new-class"></a></dt>
-<dd><p>If non-<code>NULL</code>, this is added at the front of the class definition</p></dd>
-
-
-<dt id="arg-methods">methods<a class="anchor" aria-label="anchor" href="#arg-methods"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Deprecated.</p></dd>
+<dd><p>If non-<code>NULL</code>, this is added at the front of the class
+definition</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -120,8 +117,8 @@ For <code>bru_mapper_scale</code>, a mapper to be scaled.</p></dd>
 mappers for special objects. See below for details of the
 default constructor <code>bru_mapper_define()</code> that can be used to define
 new mappers in user code.</p></li>
-<li><p><code>bru_mapper_define()</code>: Adds the <code>new_class</code> and "bru_mapper" class
-names to the inheritance list for the input <code>mapper</code> object, unless the object
+<li><p><code>bru_mapper_define()</code>: Adds the <code>new_class</code> and "bru_mapper" class names to
+the inheritance list for the input <code>mapper</code> object, unless the object
 already inherits from these.</p>
 <p>To register mapper classes and methods in scripts, use <code><a href="https://rdrr.io/r/base/S3method.html" class="external-link">.S3method()</a></code>
 to register the methods, e.g.

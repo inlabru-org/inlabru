@@ -98,14 +98,16 @@ predictor model</p></dd>
 
 <dt id="arg-from-to">from, to<a class="anchor" aria-label="anchor" href="#arg-from-to"></a></dt>
 <dd><p>integer values for the range of iterations to plot.
-Default <code>from = 1</code> (start from the first iteration) and <code>to = NULL</code> (end at the last iteration).
+Default <code>from = 1</code> (start from the first iteration) and <code>to = NULL</code> (end at
+the last iteration).
 Set <code>from = 0</code> to include the initial linearisation point in the track plot.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A ggplot object with four panels of convergence diagnostics:</p><ul><li><p><code>Tracks</code>: Mode and linearisation values for each effect</p></li>
-<li><p><code>Mode - Lin</code>: Difference between mode and linearisation values for each effect</p></li>
+<li><p><code>Mode - Lin</code>: Difference between mode and linearisation values for each
+effect</p></li>
 <li><p><code>|Change| / sd</code>: Absolute change in mode and linearisation values
 divided by the standard deviation for each effect</p></li>
 <li><p><code>Change &amp; sd</code>: Absolute change in mode and linearisation values

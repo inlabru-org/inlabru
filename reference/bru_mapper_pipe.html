@@ -167,11 +167,13 @@ as "bym2", which can be handled by <code>bru_mapper_collect</code>.</p></dd>
     <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
-<ul><li><p><code>ibm_simplify(bru_mapper_pipe)</code>: Constructs a simplified <code>pipe</code> mapper. For fully linear pipes, calls <code><a href="bru_mapper_generics.html">ibm_linear()</a></code>.
-For partially non-linear pipes, replaces each sequence of linear mappers with a single
-<code><a href="bru_mapper_taylor.html">bru_mapper_taylor()</a></code> mapper, while keeping the full list of original mapper
-names, allowing the original <code>input</code> structure to be used also with the simplified
-mappers, since the <code>taylor</code> mappers are not dependent on inputs.</p></li>
+<ul><li><p><code>ibm_simplify(bru_mapper_pipe)</code>: Constructs a simplified <code>pipe</code> mapper. For fully linear pipes, calls
+<code><a href="bru_mapper_generics.html">ibm_linear()</a></code>.
+For partially non-linear pipes, replaces each sequence of linear mappers with
+a single <code><a href="bru_mapper_taylor.html">bru_mapper_taylor()</a></code> mapper, while keeping the full list of
+original mapper names, allowing the original <code>input</code> structure to be used
+also with the simplified mappers, since the <code>taylor</code> mappers are not
+dependent on inputs.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

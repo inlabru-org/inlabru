@@ -125,15 +125,15 @@ override options list should be emptied before setting the new option(s).</p></d
 
 
 <dt id="arg-multicore">multicore<a class="anchor" aria-label="anchor" href="#arg-multicore"></a></dt>
-<dd><p>logical; if <code>TRUE</code>, multiple cores are allowed, and the
-INLA <code>num.threads</code> option is not checked or altered. Default: <code>FALSE</code>, multicore
+<dd><p>logical; if <code>TRUE</code>, multiple cores are allowed, and the INLA
+<code>num.threads</code> option is not checked or altered. Default: <code>FALSE</code>, multicore
 not allowed (used for examples and unit tests).</p></dd>
 
 
 <dt id="arg-quietly">quietly<a class="anchor" aria-label="anchor" href="#arg-quietly"></a></dt>
 <dd><p>logical; if <code>TRUE</code>, prints diagnostic messages. A message is
-always printed if the INLA <code>num.threads</code> option is altered, regardless of the
-<code>quietly</code> argument. Default: TRUE.</p></dd>
+always printed if the INLA <code>num.threads</code> option is altered, regardless of
+the <code>quietly</code> argument. Default: TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -157,8 +157,8 @@ of global workspace with <code><a href="https://withr.r-lib.org/reference/defer.
 interactively.</p></li>
 <li><p><code>local_bru_options_set()</code>: Calls <code><a href="bru_options.html">bru_options_set()</a></code> in a reversible way</p></li>
 <li><p><code>local_bru_safe_inla()</code>: Tests should set num.threads = "1:1" to ensure
-within-system repeatability by calling <code>local_bru_safe_inla()</code>;
-see also <code><a href="bru_safe_inla.html">bru_safe_inla()</a></code></p></li>
+within-system repeatability by calling <code>local_bru_safe_inla()</code>; see also
+<code><a href="bru_safe_inla.html">bru_safe_inla()</a></code></p></li>
 <li><p><code>local_bru_testthat_setup()</code>: Initialise environment for tests.
 Assigns tolerance variables.
 To be called either at the top of a testfile, or inside tests.

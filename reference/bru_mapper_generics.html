@@ -223,9 +223,10 @@ only affect the allowed type of input format.</p></li>
 The linearisation information includes <code>offset</code>, <code>jacobian</code>, and <code>state0</code>.
 The state information indicates for which state the <code>offset</code> was evaluated,
 with <code>NULL</code> meaning all-zero.
-The linearised mapper output is defined as
-<code>effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)</code>.
-The default method calls <code>ibm_eval()</code> and <code>ibm_jacobian()</code> to generate
+The linearised mapper output is defined as</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">effect</span>(input, state) <span class="ot">=</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="fu">offset</span>(input, state0) <span class="sc">+</span> <span class="fu">jacobian</span>(input, state0) <span class="sc">%*%</span> (state <span class="sc">-</span> state0)</span></code></pre><p></p></div>
+<p>The default method calls <code>ibm_eval()</code> and <code>ibm_jacobian()</code> to generate
 the needed information.</p></li>
 <li><p><code>ibm_simplify()</code>: Implementations must return a <a href="bru_mapper.html">bru_mapper</a> object.
 The default method returns <code>ibm_linear(...)</code> for linear mappers, and the
@@ -238,8 +239,9 @@ for the mapper.</p></li>
 The <code>input</code> contents must
 be in a format accepted by <code>ibm_jacobian(...)</code>
 for the mapper.</p></li>
-<li><p><code>ibm_names()</code>: Implementations must return a character vector of sub-mapper names, or <code>NULL</code>.
-Intended for providing information about multi-mappers and mapper collections.</p></li>
+<li><p><code>ibm_names()</code>: Implementations must return a character vector of sub-mapper names, or
+<code>NULL</code>. Intended for providing information about multi-mappers and mapper
+collections.</p></li>
 <li><p><code>ibm_names(mapper) &lt;- value</code>: Set mapper names.</p></li>
 <li><p><code>ibm_inla_subset()</code>: Implementations must return a logical vector of <code>TRUE/FALSE</code> for
 the subset such that, given the full A matrix and values output,
@@ -265,8 +267,9 @@ it doesn't exist.</p></li>
 <li><p><code>ibm_linear(default)</code>: Calls <code>ibm_eval()</code> and <code>ibm_jacobian()</code>
 and returns a <code>bru_mapper_taylor</code> object.
 The <code>state0</code> information in the affine mapper indicates for which state
-the <code>offset</code> was evaluated; The affine mapper output is defined as
-<code>effect(input, state) = offset(input, state0) + jacobian(input, state0) %*% (state - state0)</code></p></li>
+the <code>offset</code> was evaluated; The affine mapper output is defined as</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">effect</span>(input, state) <span class="ot">=</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="fu">offset</span>(input, state0) <span class="sc">+</span> <span class="fu">jacobian</span>(input, state0) <span class="sc">%*%</span> (state <span class="sc">-</span> state0)</span></code></pre><p></p></div></li>
 <li><p><code>ibm_simplify(default)</code>: Calls <code>ibm_linear()</code> for linear mappers, and returns the original mapper
 for non-linear mappers.</p></li>
 <li><p><code>ibm_eval(default)</code>: Verifies that the mapper is linear
@@ -275,8 +278,8 @@ as <code>ibm_jacobian(...) %*% state</code>.  When <code>state</code> is <code>N
 a zero vector of length <code>ibm_n_output(...)</code> is returned.</p></li>
 <li><p><code>ibm_eval2(default)</code>: Calls <code>jacobian &lt;- ibm_jacobian(...)</code> and
 <code>offset &lt;- ibm_eval(..., jacobian = jacobian)</code>
-and returns a list with elements <code>offset</code> and <code>jacobian</code>, as needed
-by <code>ibm_linear.default()</code> and similar methods. Mapper classes can implement
+and returns a list with elements <code>offset</code> and <code>jacobian</code>, as needed by
+<code>ibm_linear.default()</code> and similar methods. Mapper classes can implement
 their own <code>ibm_eval2</code> method if joint construction of evaluation and Jacobian
 is more efficient than separate or sequential construction.</p></li>
 <li><p><code>ibm_names(default)</code>: Returns <code>NULL</code></p></li>

@@ -84,22 +84,25 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>inlabru</code> facilitates Bayesian spatial modelling using integrated nested
 Laplace approximations. It is heavily based on R-inla
-(<a href="https://www.r-inla.org" class="external-link">https://www.r-inla.org</a>) but adds additional modelling abilities and simplified
-syntax for (in particular) spatial models.
+(<a href="https://www.r-inla.org" class="external-link">https://www.r-inla.org</a>) but adds additional modelling abilities and
+simplified syntax for (in particular) spatial models.
 Tutorials and more information can be found at
 <a href="https://inlabru-org.github.io/inlabru/">https://inlabru-org.github.io/inlabru/</a> and <a href="http://www.inlabru.org/" class="external-link">http://www.inlabru.org/</a>.
 The iterative method used for non-linear predictors is documented in the
 <code>method</code> vignette.</p>
 <p>The main function for inference using inlabru is <code><a href="bru.html">bru()</a></code>.
-The general model specification details is documented in <code><a href="component.html">component()</a></code> and <code><a href="bru_like.html">like()</a></code>.
+The general model specification details is documented in <code><a href="component.html">component()</a></code> and
+<code><a href="bru_like.html">like()</a></code>.
 Posterior quantities beyond the basic summaries can be calculated with
 a <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict()</a></code> method, documented in <code><a href="predict.bru.html">predict.bru()</a></code>.
-For point process inference <code><a href="lgcp.html">lgcp()</a></code> can be used as a shortcut to <code>bru(..., like(model="cp", ...))</code>.</p>
+For point process inference <code><a href="lgcp.html">lgcp()</a></code> can be used as a shortcut to
+<code>bru(..., like(model="cp", ...))</code>.</p>
 <p>The package comes with multiple real world data sets, namely <a href="gorillas.html">gorillas</a>,
 <a href="mexdolphin.html">mexdolphin</a>, <a href="gorillas_sf.html">gorillas_sf</a>, <a href="mexdolphin_sf.html">mexdolphin_sf</a>. Plotting these data
 sets is straight forward using inlabru's extensions
-to <code>ggplot2</code>, e.g. the <code><a href="gg.html">gg()</a></code> function. For educational purposes some simulated data sets are available
-as well, e.g. <a href="Poisson1_1D.html">Poisson1_1D</a>, <a href="Poisson2_1D.html">Poisson2_1D</a>, <a href="Poisson2_1D.html">Poisson2_1D</a> and <a href="toygroups.html">toygroups</a>.</p>
+to <code>ggplot2</code>, e.g. the <code><a href="gg.html">gg()</a></code> function. For educational purposes some
+simulated data sets are available as well, e.g. <a href="Poisson1_1D.html">Poisson1_1D</a>,
+<a href="Poisson2_1D.html">Poisson2_1D</a>, <a href="Poisson2_1D.html">Poisson2_1D</a> and <a href="toygroups.html">toygroups</a>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

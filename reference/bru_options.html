@@ -114,7 +114,8 @@ specific calls to <code><a href="bru.html">bru()</a></code> is recommended inste
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>A collection of named options, optionally including one or more
-<code>bru_options</code> objects. Options specified later override the previous options.</p></dd>
+<code>bru_options</code> objects. Options specified later override the previous
+options.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
@@ -141,8 +142,8 @@ together with the global override options. Default: <code>TRUE</code></p></dd>
 
 
 <dt id="arg--reset">.reset<a class="anchor" aria-label="anchor" href="#arg--reset"></a></dt>
-<dd><p>For <code>bru_options_set</code>, logical indicating if the global override
-options list should be emptied before setting the new option(s).</p></dd>
+<dd><p>For <code>bru_options_set</code>, logical indicating if the global
+override options list should be emptied before setting the new option(s).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -189,11 +190,12 @@ Default: 0, to not print any messages</p></dd>
 <dt>bru_verbose_store</dt>
 <dd><p>logical or numeric; if <code>TRUE</code>, log messages of
 <code>verbosity</code> \(\le 1\) are stored by <code><a href="bru_log_message.html">bru_log_message()</a></code>. If numeric,
-log messages of verbosity \(\le\) are stored. Default: Inf, to store all messages.</p></dd>
+log messages of verbosity \(\le\) are stored. Default: Inf, to store all
+messages.</p></dd>
 
 <dt>bru_run</dt>
-<dd><p>If TRUE, run inference. Otherwise only return configuration needed
-to run inference.</p></dd>
+<dd><p>If TRUE, run inference. Otherwise only return configuration
+needed to run inference.</p></dd>
 
 <dt>bru_max_iter</dt>
 <dd><p>maximum number of inla iterations, default 10.
@@ -212,13 +214,16 @@ integration method <code>ipoints</code> and <code>int.polygon</code> for 'cp' fa
 are aggregated to mesh vertices.</p></dd>
 
 <dt>nsub1</dt>
-<dd><p>Number of integration points per knot interval in 1D. Default 30.</p></dd>
+<dd><p>Number of integration points per knot interval in 1D.
+Default 30.</p></dd>
 
 <dt>nsub2</dt>
-<dd><p>Number of integration points along a triangle edge for 2D. Default 9.</p></dd>
+<dd><p>Number of integration points along a triangle edge for 2D.
+Default 9.</p></dd>
 
 <dt>nsub</dt>
-<dd><p>Deprecated parameter that overrides <code>nsub1</code> and <code>nsub2</code> if set. Default <code>NULL</code>.</p></dd>
+<dd><p>Deprecated parameter that overrides <code>nsub1</code> and <code>nsub2</code> if set.
+Default <code>NULL</code>.</p></dd>
 
 
 </dl></dd>
@@ -251,7 +256,8 @@ available for <code>taylor="legacy"</code>.</p></dd>
 multiplier. Default \((1 + \sqrt{5})/2\).</p></dd>
 
 <dt>rel_tol</dt>
-<dd><p>Stop the iterations when the largest change in linearisation point
+<dd><p>Stop the iterations when the largest change in linearisation
+point
 (the conditional latent state mode) in relation to the estimated posterior
 standard deviation is less than <code>rel_tol</code>. Default 0.1 (ten percent).</p></dd>
 
@@ -260,7 +266,8 @@ standard deviation is less than <code>rel_tol</code>. Default 0.1 (ten percent).
 full INLA step. Default is 2.</p></dd>
 
 <dt>line_opt_method</dt>
-<dd><p>Which method to use for the line search optimisation step.
+<dd><p>Which method to use for the line search optimisation
+step.
 Default "onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.
 The method "full" does line optimisation on the full nonlinear predictor;
@@ -272,8 +279,8 @@ this is slow and intended for debugging purposes only.</p></dd>
 <dt>bru_compress_cp</dt>
 <dd><p>logical; when <code>TRUE</code>, compress the
 \(\sum_{i=1}^n \eta_i\)
-part of the Poisson process likelihood (<code>family="cp"</code>) into a single term, with \(y=n\),
-and predictor <code>mean(eta)</code>. Default: <code>TRUE</code></p></dd>
+part of the Poisson process likelihood (<code>family="cp"</code>) into a single term,
+with \(y=n\), and predictor <code>mean(eta)</code>. Default: <code>TRUE</code></p></dd>
 
 <dt>bru_debug</dt>
 <dd><p>logical; when <code>TRUE</code>, activate temporary debug features for
