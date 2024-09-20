@@ -238,7 +238,7 @@ evaluate_state <- function(model,
                            ...) {
   # Evaluate random states, or a single property
   if (property == "sample") {
-    state <- inla.posterior.sample.structured(result,
+    state <- post.sample.structured(result,
       n = n, seed = seed,
       num.threads = num.threads,
       ...

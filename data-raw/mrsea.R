@@ -25,7 +25,7 @@ import.mrsea <- function(format = c("sf", "sp")) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(paste0(
       "This package development function require the MRSea package ",
-     "from https://github.com/lindesaysh/MRSea"
+      "from https://github.com/lindesaysh/MRSea"
     ))
   }
 

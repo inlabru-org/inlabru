@@ -166,7 +166,7 @@ extract_property <- function(result, property,
 ##          in the first sample
 ##
 
-inla.posterior.sample.structured <- function(result, n, seed = NULL,
+post.sample.structured <- function(result, n, seed = NULL,
                                              num.threads = NULL, ...) {
   if (!is.null(seed) && (seed != 0L)) {
     num.threads <- "1:1"

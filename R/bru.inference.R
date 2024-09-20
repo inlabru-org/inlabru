@@ -2800,11 +2800,11 @@ scale_state <- function(state0, state1, scaling_factor) {
   new_state
 }
 
-line_search_optimisation_target <- function(x, param) {
+line_search_opt_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
-line_search_optimisation_target_exact <- function(x, param, nonlin_param) {
+line_search_opt_target_exact <- function(x, param, nonlin_param) {
   state <- scale_state(param$state0, param$state1, x)
   nonlin <- nonlin_predictor(
     param = nonlin_param,
@@ -3061,7 +3061,7 @@ bru_line_search <- function(model,
     delta_nonlin <- (nonlin_pred - lin_pred) / step_scaling^2
     alpha <-
       optimise(
-        line_search_optimisation_target,
+        line_search_opt_target,
         step_scaling * c(1 / fact^2, fact),
         param = c(
           pred_norm2(delta_lin),
@@ -3113,7 +3113,7 @@ bru_line_search <- function(model,
       identical(options$bru_method$line_opt_method, "full")) {
       alpha <-
         optimise(
-          line_search_optimisation_target_exact,
+          line_search_opt_target_exact,
           step_scaling * c(0, fact),
           param = list(
             lin = lin_pred1,
@@ -3384,7 +3384,7 @@ bru_line_search <- function(model,
         nonlin_pred_ - lin_pred0 - delta * along[iii] / delta_norm
       )
       distance[iii] <-
-        line_search_optimisation_target_exact(
+        line_search_opt_target_exact(
           step_scaling_,
           param = list(
             lin = lin_pred1,
