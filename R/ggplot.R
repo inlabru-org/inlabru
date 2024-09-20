@@ -705,7 +705,6 @@ gg.SpatialPixels <- function(data, ...) {
 #'   ggplot() +
 #'     gg(gcov$elevation)
 #' }
-
 gg.SpatRaster <- function(data, ...) {
   if (!requireNamespace("tidyterra", quietly = TRUE)) {
     stop(paste0(

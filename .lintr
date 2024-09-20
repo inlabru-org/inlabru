@@ -139,21 +139,5 @@ exclusions: list(
     "man/tsplit.inla.mesh.Rd",
     "man/vertices.inla.mesh.Rd",
     "man/vertices.Rd",
-    "man/wkt_tree.Rd",
-    "vignettes/linearapprox.Rmd",
-    "vignettes/method.Rmd",
-    "vignettes/web/1d_lgcp.Rmd",
-    "vignettes/web/2d_lgcp_covars.Rmd",
-    "vignettes/web/2d_lgcp_distancesampling.Rmd",
-    "vignettes/web/2d_lgcp_multilikelihood.Rmd",
-    "vignettes/web/2d_lgcp_plotsampling.Rmd",
-    "vignettes/web/2d_lgcp_spatiotemporal.Rmd",
-    "vignettes/web/2d_lgcp.Rmd",
-    "vignettes/web/cache/2d_lgcp_covars/efit.rds",
-    "vignettes/web/cache/2d_lgcp_covars/fit1.rds",
-    "vignettes/web/cache/2d_lgcp_covars/fit2.rds",
-    "vignettes/web/cache/2d_lgcp_covars/fit3.rds",
-    "vignettes/web/publications.Rmd",
-    "vignettes/web/random_fields_2d.Rmd",
-    "vignettes/web/random_fields.Rmd"
+    "man/wkt_tree.Rd"
   )
