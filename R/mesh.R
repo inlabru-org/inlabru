@@ -12,11 +12,11 @@
 #' @export
 #' @param mesh an inla.mesh object.
 #' @param loc Points in space stored either as data.frame, a two-column matrix
-#'   of x and y coordinates or a SpatialPoints object.
+#'   of x and y coordinates or a `SpatialPoints` object.
 #' @param mesh.coords Coordinate names of the mesh. Use only if loc is a
 #'   data.frame with respective column names.
-#' @return `is.inside()`: Single column matrix of Boolean values indicating if a point is
-#'   inside the mesh.
+#' @return `is.inside()`: Single column matrix of Boolean values indicating if a
+#'   point is inside the mesh.
 #'
 is.inside <- function(mesh, loc, mesh.coords = NULL) {
   lifecycle::deprecate_stop(
@@ -37,8 +37,8 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 
 
 #' @describeIn inlabru-deprecated Extract vertex locations from an `inla.mesh`.
-#' Converts the vertices of an `inla.mesh` object into a `SpatialPointsDataFrame`.
-#' Deprecated in favour of [fm_vertices()]
+#'   Converts the vertices of an `inla.mesh` object into a
+#'   `SpatialPointsDataFrame`. Deprecated in favour of [fm_vertices()]
 #'
 #' @export vertices.inla.mesh
 vertices.inla.mesh <- function(...) {
@@ -49,7 +49,8 @@ vertices.inla.mesh <- function(...) {
     details =
       c(
         "!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
-        "!" = "fm_vertices() includes a '.vertex' column instead of a 'vertex' column."
+        "!" = paste0("fm_vertices() includes a '.vertex' column instead of a ",
+                     "'vertex' column.")
       )
   )
 
@@ -75,7 +76,9 @@ pixels <- function(mesh, nx = 150, ny = 150, mask = TRUE) {
     "2.8.0",
     "pixels()",
     "fmesher::fm_pixels(format = 'sp')",
-    details = "The `fm_pixels()` function can generate `sf`, `terra`, and `sp` output."
+    details = paste0(
+      "The `fm_pixels()` function can generate `sf`, `terra`, and `sp` output."
+    )
   )
   fm_pixels(mesh, dims = c(nx, ny), mask = mask, format = "sp", minimal = FALSE)
 }

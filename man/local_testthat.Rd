@@ -40,13 +40,13 @@ local_bru_testthat_setup(envir = parent.frame())
 \item{.reset}{For \code{local_bru_options_set}, logical indicating if the global
 override options list should be emptied before setting the new option(s).}
 
-\item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
-INLA \code{num.threads} option is not checked or altered. Default: \code{FALSE}, multicore
+\item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the INLA
+\code{num.threads} option is not checked or altered. Default: \code{FALSE}, multicore
 not allowed (used for examples and unit tests).}
 
 \item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. A message is
-always printed if the INLA \code{num.threads} option is altered, regardless of the
-\code{quietly} argument. Default: TRUE.}
+always printed if the INLA \code{num.threads} option is altered, regardless of
+the \code{quietly} argument. Default: TRUE.}
 }
 \value{
 \code{local_bru_options_set()} returns a copy of the global override
@@ -72,8 +72,8 @@ interactively.
 \item \code{local_bru_options_set()}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
 
 \item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
-within-system repeatability by calling \code{local_bru_safe_inla()};
-see also \code{\link[=bru_safe_inla]{bru_safe_inla()}}
+within-system repeatability by calling \code{local_bru_safe_inla()}; see also
+\code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
 \item \code{local_bru_testthat_setup()}: Initialise environment for tests.
 Assigns tolerance variables.

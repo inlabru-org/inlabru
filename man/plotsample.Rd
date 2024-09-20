@@ -7,15 +7,17 @@
 plotsample(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 5)
 }
 \arguments{
-\item{spdf}{A \code{SpatialPointsDataFrame} defining the points that are to be sampled
-by the plot sample.}
+\item{spdf}{A \code{SpatialPointsDataFrame} defining the points that are to be
+sampled by the plot sample.}
 
-\item{boundary}{A \code{SpatialPolygonsDataFrame} defining the survey boundary within which
-the  points occur.}
+\item{boundary}{A \code{SpatialPolygonsDataFrame} defining the survey boundary
+within which the  points occur.}
 
-\item{x.ppn}{The proportion of the x=axis that is to be included in the plots.}
+\item{x.ppn}{The proportion of the x=axis that is to be included in the
+plots.}
 
-\item{y.ppn}{The proportion of the y=axis that is to be included in the plots.}
+\item{y.ppn}{The proportion of the y=axis that is to be included in the
+plots.}
 
 \item{nx}{The number of plots in the x-dimension.}
 
@@ -24,16 +26,18 @@ the  points occur.}
 \value{
 A list with three components:
 \describe{
-\item{\code{plots}:}{ A \code{SpatialPolygonsDataFrame} object containing the plots that were
-sampled.}
-\item{\code{dets}:}{ A \code{SpatialPointsDataFrame} object containing the locations of the
-points within the plots.}
-\item{\code{counts}:}{ A \code{dataframe} containing the following columns
+\item{\code{plots}}{A \code{SpatialPolygonsDataFrame} object containing the plots
+that were sampled.}
+\item{\code{dets}}{A \code{SpatialPointsDataFrame} object containing the locations
+of the points within the plots.}
+\item{\code{counts}}{A \code{dataframe} containing the following columns
 \describe{
-\item{\code{x}:}{The x-coordinates of the centres of the plots within the boundary.}
-\item{\code{y}:}{The y-coordinates of the centres of the plots within the boundary.}
-\item{\code{n}:}{The numbers of points in each plot.}
-\item{\code{area}:}{The areas of the plots within the boundary}
+\item{\code{x}}{The x-coordinates of the centres of the plots within the
+boundary.}
+\item{\code{y}}{The y-coordinates of the centres of the plots within the
+boundary.}
+\item{\code{n}}{The numbers of points in each plot.}
+\item{\code{area}}{The areas of the plots within the boundary}
 }}
 }.
 }

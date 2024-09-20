@@ -20,12 +20,12 @@ evaluate_comp_simple(...)
 \item{model}{A \code{bru_model} object}
 }
 \value{
-A list (class 'comp_simple_list_list') of named lists (class 'comp_simple_list')
-of \code{bru_mapper} objects,
-one for each included component
+A list (class 'comp_simple_list_list') of named lists (class
+'comp_simple_list') of \code{bru_mapper} objects, one for each included
+component
 }
 \description{
-Computes individual \code{bru_mapper_taylor} objects for included linear components
-for each model likelihood, and keeps non-linear mappers intact.
+Computes individual \code{bru_mapper_taylor} objects for included linear
+components for each model likelihood, and keeps non-linear mappers intact.
 }
 \keyword{internal}

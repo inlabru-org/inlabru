@@ -67,16 +67,18 @@ ggplot() +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.key.width = unit(x = 0.2, "cm"),
+        legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6)) +
   coord_sf(datum = fm_crs(mexdolphin$ppoly))
 ```
 
 Spatial model with a half-normal detection function
 -----------------------------------------------------------------
-The `samplers` in this dataset are lines, not polygons, so we need to tell `inlabru` about the
-strip half-width, `W`, which in the case of these data is 8.
-We start by plotting the distances and histogram of frequencies in distance intervals:
+The `samplers` in this dataset are lines, not polygons, so we need to tell
+`inlabru` about the strip half-width, `W`, which in the case of these data is 8.
+We start by plotting the distances and histogram of frequencies in distance
+intervals:
 
 ```{r fig.width=10, fig.heigth=4}
 W <- 8
@@ -88,23 +90,26 @@ ggplot(mexdolphin$points) +
   geom_point(aes(x = distance), y = 0, pch = "|", cex = 4)
 ```
 
-We need to define a half-normal detection probability function. This must take distance as its first
-argument and the linear predictor of the sigma parameter as its second:
+We need to define a half-normal detection probability function. This must take
+distance as its first argument and the linear predictor of the sigma parameter
+as its second:
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval = TRUE}
 hn <- function(distance, sigma) {
   exp(-0.5 * (distance / sigma)^2)
 }
 ```
-To control the prior distribution for the `sigma` parameter, we use a transformation mapper
-that converts a $N(0, 1)$ latent variable into an exponentially distributed variable with
-expectation 8 (this is a somewhat arbitrary value, but motivated by the maximum observation distance `W`): 
+To control the prior distribution for the `sigma` parameter, we use a
+transformation mapper that converts a $N(0, 1)$ latent variable into an
+exponentially distributed variable with expectation 8 (this is a somewhat
+arbitrary value, but motivated by the maximum observation distance `W`):
 ```{r results="hide",warning=FALSE,message=FALSE, eval = FALSE}
 bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ```
 
 
-Specify and fit an SPDE model to these data using a half-normal detection function form.
+Specify and fit an SPDE model to these data using a half-normal detection
+function form.
 We need to define a (Matérn) covariance function for the SPDE:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
@@ -113,7 +118,9 @@ matern <- inla.spde2.pcmatern(mexdolphin$mesh,
   prior.range = c(50, 0.01)
 )
 ```
-Here, the range is probabilistically limited by $P(\text{range}\leq 50)=0.01$ and the standard deviation of the spatial field is limited by $P(\text{sd}\leq 2)=0.01$.
+Here, the range is probabilistically limited by $P(\text{range}\leq 50)=0.01$
+and the standard deviation of the spatial field is limited by $P(\text{sd}\leq
+2)=0.01$.
 
 We need to now separately define the components of the model 
 (the SPDE, the Intercept and the detection function parameter `sigma`)
@@ -126,11 +133,11 @@ cmp <- ~ mySPDE(main = geometry, model = matern) +
   ) +
   Intercept(1)
 ```
-The `marginal` argument in the `sigma` component specifies the transformation function
-taking N(0,1) to Exponential(1/8).
+The `marginal` argument in the `sigma` component specifies the transformation
+function taking N(0,1) to Exponential(1/8).
 
-The formula, which describes how these components are combined to 
-form the linear predictor (remembering that we need an offset due to the unknown
+The formula, which describes how these components are combined to form the
+linear predictor (remembering that we need an offset due to the unknown
 direction of the detections!):
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
@@ -139,9 +146,10 @@ form <- geometry + distance ~ mySPDE +
   Intercept + log(2)
 ```
 
-Before version `2.9.0.9004`, a less compact approach had to be used, by applying the transformation
-between N(0,1) and Exponential(1/8) directly in the predictor expression, requiring
-corresponding adjustments to the later `predict()` calls, etc:
+Before version `2.9.0.9004`, a less compact approach had to be used, by applying
+the transformation between N(0,1) and Exponential(1/8) directly in the predictor
+expression, requiring corresponding adjustments to the later `predict()` calls,
+etc:
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=FALSE}
 # sigma_transf <- function(x) {
 #   bru_forward_transformation(qexp, x, rate = 1 / 8)
@@ -194,14 +202,16 @@ ggplot() +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.key.width = unit(x = 0.2, "cm"),
+        legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6))
 ```
 
-Predict the detection function and plot it, to generate a plot like the one below.
+Predict the detection function and plot it, to generate a plot like the one
+below.
 Here, we should make sure that it doesn't try to evaluate the effects of
-components that can't be evaluated using the given input data. From version 2.8.0,
-`inlabru` automatically detects which components are involved.
+components that can't be evaluated using the given input data. From version
+2.8.0, `inlabru` automatically detects which components are involved.
 See `?predict.bru` for more information.
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE, eval=TRUE, fig.width=10, fig.heigth=4}
@@ -209,9 +219,8 @@ distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, sigma))
 plot(dfun)
 ```
-The average detection probability within the maximum detection distance is estimated to be
-`r mean(dfun$mean)`.
-
+The average detection probability within the maximum detection distance is
+estimated to be `r mean(dfun$mean)`.
 
 We can look at the posterior for expected number of dolphins as usual:
 
@@ -222,8 +231,8 @@ Lambda
 ```
 
 and including the randomness about the expected number. In this case, it turns
-out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte Carlo
-error in the posterior, and this takes a little while to compute:
+out that you need lots of posterior samples, e.g. 2,000 to smooth out the Monte
+Carlo error in the posterior, and this takes a little while to compute:
 
 ```{r results="hide",warning=FALSE,message=FALSE, echo=TRUE}
 Ns <- seq(50, 450, by = 1)
@@ -310,7 +319,8 @@ ggplot() +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"), legend.key.height = unit(x = 0.3, "cm")) +
+  theme(legend.key.width = unit(x = 0.2, "cm"),
+        legend.key.height = unit(x = 0.3, "cm")) +
   theme(legend.text = element_text(size = 6))
 ```
 ```{r detection.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
@@ -432,7 +442,12 @@ First scale lines to have same area as that of histogram.
 Half-normal:
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-hnline <- data.frame(distance = detfun$distance, p = detfun$mean, lower = detfun$q0.025, upper = detfun$q0.975)
+hnline <- data.frame(
+  distance = detfun$distance,
+  p = detfun$mean,
+  lower = detfun$q0.025,
+  upper = detfun$q0.975
+)
 wts <- diff(hnline$distance)
 wts[1] <- wts[1] / 2
 wts <- c(wts, wts[1])
@@ -447,7 +462,12 @@ hnline$En.upper <- hnline$upper * scale
 Hazard-rate:
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
-hrline <- data.frame(distance = detfun1$distance, p = detfun1$mean, lower = detfun1$q0.025, upper = detfun1$q0.975)
+hrline <- data.frame(
+  distance = detfun1$distance,
+  p = detfun1$mean,
+  lower = detfun1$q0.025,
+  upper = detfun1$q0.975
+)
 wts <- diff(hrline$distance)
 wts[1] <- wts[1] / 2
 wts <- c(wts, wts[1])
@@ -472,19 +492,32 @@ Plot without the 95% credible intervals
 
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
-  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
+  geom_histogram(aes(x = distance),
+                 breaks = seq(0, 8, length.out = 9),
+                 alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
-  geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model))
+  geom_line(data = dlines,
+            aes(x = distance, y = En, group = model, col = model))
 ```
 
-Plot with the 95% credible intervals (without taking the count rescaling into account)
+Plot with the 95% credible intervals (without taking the count rescaling into
+account)
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
-  geom_histogram(aes(x = distance), breaks = seq(0, 8, length.out = 9), alpha = 0.3) +
+  geom_histogram(aes(x = distance),
+                 breaks = seq(0, 8, length.out = 9),
+                 alpha = 0.3) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
-  geom_line(data = dlines, aes(x = distance, y = En, group = model, col = model)) +
+  geom_line(data = dlines,
+            aes(x = distance, y = En, group = model, col = model)) +
   geom_ribbon(
-    data = dlines, aes(x = distance, ymin = En.lower, ymax = En.upper, group = model, col = model, fill = model),
+    data = dlines,
+    aes(x = distance,
+        ymin = En.lower,
+        ymax = En.upper,
+        group = model,
+        col = model,
+        fill = model),
     alpha = 0.2, lty = 2
   )
 ```

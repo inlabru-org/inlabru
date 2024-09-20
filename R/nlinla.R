@@ -135,12 +135,16 @@ bru_compute_linearisation.component <- function(cmp,
                 effects_eps[[2]][[label_loop]] <-
                   rep(effects[[label_loop]], length(row_subset))
               } else {
-                effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
-                effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
+                effects_eps[[1]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
+                effects_eps[[2]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
               }
             }
-            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
-            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
+            effects_eps[[1]][[label]] <-
+              effects_eps[[1]][[label]] - Ak[row_subset] * eps
+            effects_eps[[2]][[label]] <-
+              effects_eps[[2]][[label]] + Ak[row_subset] * eps
           } else {
             for (label_loop in names(effects)) {
               if (NROW(effects[[label_loop]]) == 1) {
@@ -211,7 +215,8 @@ bru_compute_linearisation.component <- function(cmp,
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
         warning(
-          "Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
+          "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
+          "derivatives for '",
           label,
           "'; treated as 0.0.\n",
           immediate. = TRUE
@@ -340,8 +345,9 @@ bru_compute_linearisation.bru_like_list <- function(lhoods,
                                                     input,
                                                     state,
                                                     comp_simple,
-                                                    eps = 1e-5, # TODO: set more intelligently
+                                                    eps = 1e-5,
                                                     ...) {
+  # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
     bru_compute_linearisation(

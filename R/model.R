@@ -2,9 +2,11 @@
 #'
 #' The [inlabru] syntax for model formulae is different from what
 #' `INLA::inla` considers a valid.
-#' In inla most of the effects are defined by adding an `f(...)` expression to the formula.
-#' In [inlabru] the `f` is replaced by an arbitrary (exceptions: `const` and `offset`)
-#' string that will determine the label of the effect. See Details for further information.
+#' In inla most of the effects are defined by adding an `f(...)` expression to
+#' the formula.
+#' In [inlabru] the `f` is replaced by an arbitrary (exceptions: `const` and
+#' `offset`) string that will determine the label of the effect. See Details for
+#' further information.
 #'
 #' @details
 #' For instance
@@ -17,11 +19,13 @@
 #'
 #' in inlabru.
 #'
-#' A disadvantage of the inla way is that there is no clear separation between the name of the covariate
-#' and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
-#' use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-#' [inlabru] provides the `main` argument. For convenience, the `main` argument can be used
-#' like the first argument of the f function, e.g., and is the first argument of the component definition.
+#' A disadvantage of the inla way is that there is no clear separation between
+#' the name of the covariate and the label of the effect. Furthermore, for some
+#' models like SPDE it is much more natural to use spatial coordinates as
+#' covariates rather than an index into the SPDE vertices. For this purpose
+#' [inlabru] provides the `main` argument. For convenience, the `main` argument
+#' can be used like the first argument of the f function, e.g., and is the first
+#' argument of the component definition.
 #' The `INLA` model formula
 #'
 #' `y ~ f(temperature, model = 'linear')`
@@ -35,18 +39,19 @@
 #' `y ~ temperature(model = 'linear')`
 #' which sets `main = temperature`.
 #'
-#' On the other hand, `main` can also be a function mapping, e.g the [sp::coordinates()] function:
+#' On the other hand, `main` can also be a function mapping, e.g the
+#' [sp::coordinates()] function:
 #'
 #' `y ~ mySPDE(coordinates, ...)`
 #'
 #' This extracts the coordinates from the data object, and maps it to the latent
 #' field via the information given in the `mapper`, which by default is
-#' extracted from the `model` object, in the case of `spde` model
-#' objects.
+#' extracted from the `model` object, in the case of `spde` model objects.
 #'
-#' Morevover, `main` can be any expression that evaluates within your data as an environment.
-#' For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'sin(a+b)' by
-#' setting `map` in the following way:
+#' Morevover, `main` can be any expression that evaluates within your data as an
+#' environment.
+#' For instance, if your data has columns 'a' and 'b', you can create a fixed
+#' effect of 'sin(a+b)' by setting `map` in the following way:
 #'
 #' `y ~ myEffect(sin(a+b))`
 #'
@@ -277,11 +282,13 @@ evaluate_effect_multi_state <- function(...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component A `bru_mapper`, `bru_component`, `comp_simple`, or `comp_simple_list`.
+#' @param component A `bru_mapper`, `bru_component`, `comp_simple`, or
+#'   `comp_simple_list`.
 #' @param input Pre-evaluated component input
-#' @param state Specification of one (for `evaluate_effect_single_state`) or several
-#' (for `evaluate_effect_multi_State`) latent variable states:
-#' * `evaluate_effect_single_state.bru_mapper`: A vector of the latent component state.
+#' @param state Specification of one (for `evaluate_effect_single_state`) or
+#'   several (for `evaluate_effect_multi_State`) latent variable states:
+#' * `evaluate_effect_single_state.bru_mapper`:
+#'   A vector of the latent component state.
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
 #' * `evaluate_effect_multi_state.*_list`: list of lists of named state vectors.
 #' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
@@ -344,7 +351,10 @@ evaluate_effect_single_state.comp_simple_list <- function(components,
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_multi_state.comp_simple_list <- function(components, input, state, ...) {
+evaluate_effect_multi_state.comp_simple_list <- function(components,
+                                                         input,
+                                                         state,
+                                                         ...) {
   lapply(
     state,
     function(x) {
@@ -361,14 +371,20 @@ evaluate_effect_multi_state.comp_simple_list <- function(components, input, stat
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_single_state.component_list <- function(components, input, state, ...) {
+evaluate_effect_single_state.component_list <- function(components,
+                                                        input,
+                                                        state,
+                                                        ...) {
   comp_simple <- evaluate_comp_simple(components, input = input, ...)
   evaluate_effect_single_state(comp_simple, input = input, state = state, ...)
 }
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_multi_state.component_list <- function(components, input, state, ...) {
+evaluate_effect_multi_state.component_list <- function(components,
+                                                       input,
+                                                       state,
+                                                       ...) {
   comp_simple <- evaluate_comp_simple(components, input = input, ...)
   evaluate_effect_multi_state(comp_simple, input = input, state = state, ...)
 }
@@ -400,8 +416,8 @@ evaluate_effect_multi_state.component_list <- function(components, input, state,
 #'
 #' Default: "auto"
 #' @details For each component, e.g. "name", the state values are available as
-#' `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`, see
-#' [component_eval()].
+#'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
+#'   see [component_eval()].
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -416,7 +432,9 @@ evaluate_predictor <- function(model,
   format <- match.arg(format, c("auto", "matrix", "list"))
   pred.envir <- environment(predictor)
   if (inherits(predictor, "formula")) {
-    predictor <- parse(text = as.character(predictor)[length(as.character(predictor))])
+    predictor <- parse(
+      text = as.character(predictor)[length(as.character(predictor))]
+    )
   }
   formula.envir <- environment(model$formula)
   enclos <-
@@ -509,7 +527,9 @@ evaluate_predictor <- function(model,
             state = .state
           )
           if (any(not_ok)) {
-            warning("Inputs for `ibm_eval()` for '", .comp[["label"]], '" give some invalid outputs.')
+            warning("Inputs for `ibm_eval()` for '",
+                    .comp[["label"]],
+                    '" give some invalid outputs.')
           }
         } else { # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the
@@ -611,16 +631,16 @@ evaluate_predictor <- function(model,
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
 #' the effect of a component called "name".
 #'
-#' @param main,group,replicate,weights Specification of where to evaluate a component.
-#'   The four inputs are passed on to the joint `bru_mapper` for the component,
-#'   as
+#' @param main,group,replicate,weights Specification of where to evaluate a
+#'   component. The four inputs are passed on to the joint `bru_mapper` for the
+#'   component, as
 #'  ```
 #'  list(mapper = list(
 #'         main = main,
 #'         group = group,
 #'         replicate = replicate),
 #'       scale = weights)
-#' ````
+#'  ```
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
@@ -673,9 +693,9 @@ component_eval <- function(main,
 #' @param input A list of named lists of component inputs
 #' @param state A named list of component states
 #' @param inla_f Controls the input data interpretations
-#' @return A list (class 'comp_simple') of named lists (class 'comp_simple_list')
-#' of `bru_mapper_taylor` objects,
-#' one for each included component
+#' @return A list (class 'comp_simple') of named lists (class
+#'   'comp_simple_list') of `bru_mapper_taylor` objects, one for each included
+#'   component
 #' @rdname evaluate_comp_lin
 #' @keywords internal
 evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
@@ -708,15 +728,15 @@ evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
 
 #' Compute simplified component mappings
 #'
-#' Computes individual `bru_mapper_taylor` objects for included linear components
-#' for each model likelihood, and keeps non-linear mappers intact.
+#' Computes individual `bru_mapper_taylor` objects for included linear
+#' components for each model likelihood, and keeps non-linear mappers intact.
 #'
 #' @param model A `bru_model` object
 #' @param input A list of named lists of component inputs
 #' @param inla_f Controls the input data interpretations
-#' @return A list (class 'comp_simple_list_list') of named lists (class 'comp_simple_list')
-#' of `bru_mapper` objects,
-#' one for each included component
+#' @return A list (class 'comp_simple_list_list') of named lists (class
+#'   'comp_simple_list') of `bru_mapper` objects, one for each included
+#'   component
 #' @export
 #' @keywords internal
 #' @rdname evaluate_comp_simple

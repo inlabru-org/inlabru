@@ -13,19 +13,20 @@ bru_inla.stack.mjoin(
 )
 }
 \arguments{
-\item{...}{List of stacks that contain vector observations
-(existing multi-likelihood observation matrices are also permitted)}
+\item{\dots}{List of stacks that contain vector observations (existing
+multi-likelihood observation matrices are also permitted)}
 
 \item{compress}{If \code{TRUE}, compress the model by removing duplicated rows of
 effects, replacing the corresponding A-matrix columns with a single column
 containing the sum.}
 
 \item{remove.unused}{If \code{TRUE}, compress the model by removing rows of
-effects corresponding to all-zero columns in the A matrix (and removing those columns).}
+effects corresponding to all-zero columns in the A matrix (and removing
+those columns).}
 
 \item{old.names}{A vector of strings with the names of the observation
-vector/matrix for each stack.
-If a single string, this is assumed for all the stacks. (default "BRU.response")}
+vector/matrix for each stack. If a single string, this is assumed for all
+the stacks. (default "BRU.response")}
 
 \item{new.name}{The name to be used for the expanded observation matrix,
 possibly the same as an old name. (default "BRU.response")}

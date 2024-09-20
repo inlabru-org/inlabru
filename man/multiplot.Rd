@@ -12,13 +12,15 @@ multiplot(..., plotlist = NULL, cols = 1, layout = NULL)
 \arguments{
 \item{...}{Comma-separated \code{ggplot} objects.}
 
-\item{plotlist}{A list of \code{ggplot} objects - an alternative to the comma-separated argument above.}
+\item{plotlist}{A list of \code{ggplot} objects - an alternative to the
+comma-separated argument above.}
 
 \item{cols}{Number of columns of plots on the page.}
 
-\item{layout}{A matrix specifying the layout. If present, 'cols' is ignored. If the layout is
-something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE), then plot 1 will go in the upper left,
-2 will go in the upper right, and 3 will go all the way across the bottom.}
+\item{layout}{A matrix specifying the layout. If present, \code{cols} is ignored.
+If the layout is something like \code{matrix(c(1,2,3,3), nrow=2, byrow=TRUE)},
+then plot 1 will go in the upper left, 2 will go in the upper right, and 3
+will go all the way across the bottom.}
 }
 \description{
 Renders multiple ggplots on a single page.

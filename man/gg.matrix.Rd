@@ -9,7 +9,8 @@
 \arguments{
 \item{data}{A \code{matrix} object.}
 
-\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed
+on to \code{geom_tile}.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }

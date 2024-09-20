@@ -51,7 +51,8 @@ nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
 gcov <- gorillas_sf_gcov()
-counts_rstr <- terra::rasterize(vect(nests), gcov, fun = sum, background = 0) %>%
+counts_rstr <-
+  terra::rasterize(vect(nests), gcov, fun = sum, background = 0) %>%
   terra::aggregate(fact = 4, fun = sum) %>%
   mask(vect(sf::st_geometry(boundary)))
 plot(counts_rstr)
@@ -60,7 +61,9 @@ counts_rstr <- counts_rstr %>%
   c(counts_rstr)
 ```
 
-We now need to extract the coordinates for these pixels. The plot below illustrates the pixel locations for all pixels with non-zero counts. We create a mesh over the study area and define a prior for it.
+We now need to extract the coordinates for these pixels. The plot below
+illustrates the pixel locations for all pixels with non-zero counts. We create a
+mesh over the study area and define a prior for it.
 
 ```{r}
 counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
@@ -70,7 +73,10 @@ counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) %>%
   st_as_sf(coords = c("x", "y"), crs = st_crs(nests))
 ```
 
-We can also aggregate the relevant spatial covariates to the same level of granularity as the nest counts. The vegetation classes are quite unbalances, so it might make sense to split them by class and use proportion of land cover for some classes, say classes 2, and 3 (Disturbed, and Grassland, respectively).
+We can also aggregate the relevant spatial covariates to the same level of
+granularity as the nest counts. The vegetation classes are quite unbalances, so
+it might make sense to split them by class and use proportion of land cover for
+some classes, say classes 2, and 3 (Disturbed, and Grassland, respectively).
 
 ```{r fig-vegetation-raster, fig.cap="Proportion of vegetation cover by class", out.width="80%", fig.align='center'}
 gcov_lvls <- gcov$vegetation %>% levels()
@@ -108,7 +114,9 @@ ggplot() +
 
 ## Poisson GLM
 
-Next, we can define the Poisson model that links the species count per observation plot (raster cell) to the spatial covariates, such as vegetation type and elevation.
+Next, we can define the Poisson model that links the species count per
+observation plot (raster cell) to the spatial covariates, such as vegetation
+type and elevation.
 
 ```{r fig-predict-poi, out.width="80%", fig.align='center'}
 comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
@@ -158,9 +166,17 @@ ggplot() +
 
 ## True zeroes and false zeroes
 
-In the Poisson GLM model, zeros can occur in some locations. These are referred to as "true zeros" because they can be explained by the model and the associated covariates. On the other hand, "false zeros" do not align with the covariates. They can arise due to issues such as sampling at the wrong time or place, observer errors, unsuitable environmental conditions, and so on.
+In the Poisson GLM model, zeros can occur in some locations. These are referred
+to as "true zeros" because they can be explained by the model and the associated
+covariates. On the other hand, "false zeros" do not align with the covariates.
+They can arise due to issues such as sampling at the wrong time or place,
+observer errors, unsuitable environmental conditions, and so on.
 
-In our dataset, the number of zeros is quite substantial, and our model may struggle to account for them adequately. To address this, we should select a model capable of handling an "inflated" number of zeros, exceeding what a standard Poisson model would imply. For this purpose, we opt for a "zero-inflated Poisson model," commonly abbreviated as ZIP.
+In our dataset, the number of zeros is quite substantial, and our model may
+struggle to account for them adequately. To address this, we should select a
+model capable of handling an "inflated" number of zeros, exceeding what a
+standard Poisson model would imply. For this purpose, we opt for a
+"zero-inflated Poisson model," commonly abbreviated as ZIP.
 
 ## ZIP model
 
@@ -206,12 +222,14 @@ pred_zip <- predict(
     )
     expect_param <- lambda * area
     expect <- scaling_prob * expect_param
-    variance <- scaling_prob * expect_param * (1 + (1 - scaling_prob) * expect_param)
+    variance <- scaling_prob * expect_param *
+      (1 + (1 - scaling_prob) * expect_param)
     list(
       lambda = lambda,
       expect = expect,
       variance = variance,
-      obs_prob = (1 - scaling_prob) * (count == 0) + scaling_prob * dpois(count, expect_param)
+      obs_prob = (1 - scaling_prob) * (count == 0) +
+        scaling_prob * dpois(count, expect_param)
     )
   },
   n.samples = 2500
@@ -232,31 +250,49 @@ We will compare the performance of the models in the diagnostic section below.
 
 ## ZAP model
 
-Based on the distribution of nests in relation to the [spatial covariates](2d_lgcp_covars.Rmd), it appears that gorillas tend to avoid setting their nests in certain types of vegetation. While the type of vegetation may not directly influence nest density, it does play a significant role in determining their presence or absence. In such cases, the `vegetation` covariate should be included in the binomial part of the model but not in the Poisson part.
+Based on the distribution of nests in relation to the [spatial
+covariates](2d_lgcp_covars.Rmd), it appears that gorillas tend to avoid setting
+their nests in certain types of vegetation. While the type of vegetation may not
+directly influence nest density, it does play a significant role in determining
+their presence or absence. In such cases, the `vegetation` covariate should be
+included in the binomial part of the model but not in the Poisson part.
 
-When the process driving the presence or absence of a species substantially differs from the process governing its abundance, it is advisable to switch to the Zero-Adjusted Poisson (ZAP) model, which consists of both a binomial and a truncated Poisson component.
+When the process driving the presence or absence of a species substantially
+differs from the process governing its abundance, it is advisable to switch to
+the Zero-Adjusted Poisson (ZAP) model, which consists of both a binomial and a
+truncated Poisson component.
 
-In the `zeroinflatedpoisson0` model, which is defined by the [following observation probability model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
+In the `zeroinflatedpoisson0` model, which is defined by the [following
+observation probability
+model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/zeroinflated.pdf)
 
 $$
 \text{Prob}(y\vert\dots)=p\times 1_{y=0}+(1-p)\times \text{Poisson}(y\vert y>0)
 $$
 
-where $p=\text{logit}^{-1}(\theta)$.  In order to allow $p$ to be controlled by a full latent model and not just a single hyperparameter, we set want to set $p=0$, and handle the zero-probability
-modelling with a separate binary observation model modelling presence/absence.
-Before INLA version `23.10.19-1`, this could be done by fixing the hyperparameter
-to a small value.
-The [`nzpossion` model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf), available from INLA version `23.10.19-1` implements the
-$\text{Poisson}(y\vert y>0)$ model exactly.
+where $p=\text{logit}^{-1}(\theta)$.  In order to allow $p$ to be controlled by
+a full latent model and not just a single hyperparameter, we set want to set
+$p=0$, and handle the zero-probability modelling with a separate binary
+observation model modelling presence/absence. Before INLA version `23.10.19-1`,
+this could be done by fixing the hyperparameter to a small value.
+The [`nzpossion`
+model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf),
+available from INLA version `23.10.19-1` implements the $\text{Poisson}(y\vert
+y>0)$ model exactly.
 
-In the resulting model, the truncated Poisson distribution governs only the positive counts, while the absences are addressed by a separate binomial model that can have its own covariates. It's worth noting that we exclude observations with absent nests from the truncated Poisson part of the model by subsetting the data to include only instances where `present` is `TRUE`.
+In the resulting model, the truncated Poisson distribution governs only the
+positive counts, while the absences are addressed by a separate binomial model
+that can have its own covariates. It's worth noting that we exclude observations
+with absent nests from the truncated Poisson part of the model by subsetting the
+data to include only instances where `present` is `TRUE`.
 
 The expectation and variance are computed as follows:
 
 $$
 \begin{aligned}
 E(count)&=\frac{1}{1-\exp(-\lambda)}p\lambda \\
-Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-\left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 \\
+Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
+\left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 \\
 &= E(count) (1+p\lambda) - E(count)^2 \\
 &= E(count) (1+p\lambda-E(count)) \\
 &= E(count) \left(1+p\lambda\left(1-\frac{1}{1-\exp(-\lambda)}\right)\right) \\
@@ -319,10 +355,17 @@ fit_zap <- bru(
 summary(fit_zap)
 ```
 
-Note that in this model, there is no direct link between the parameters of the two observation parts, and we could estimate them separately.
-However, if for example the `field_count` component could be used for both predictors, it would be possible to use the `copy` argument to share the same component between the two parts, with `field_present(geometry, copy = "field_count", fixed = TRUE)`, where `fixed = TRUE` tells `bru()` to estimate a scaling parameter instead of using the same linear effect parameter for both
-version of the field.  In the results above, we see that the estimated covariance parameters for the two fields
-are very different, so it is not sensible to share the same component between the two parts.
+Note that in this model, there is no direct link between the parameters of the
+two observation parts, and we could estimate them separately.
+However, if for example the `field_count` component could be used for both
+predictors, it would be possible to use the `copy` argument to share the same
+component between the two parts, with
+`field_present(geometry, copy = "field_count", fixed = TRUE)`,
+where `fixed = TRUE` tells `bru()` to estimate a
+scaling parameter instead of using the same linear effect parameter for both
+version of the field.  In the results above, we see that the estimated
+covariance parameters for the two fields are very different, so it is not
+sensible to share the same component between the two parts.
 
 # Predict intensity on the original raster locations
 
@@ -347,7 +390,8 @@ pred_zap <- predict(
       expect = expect,
       variance = variance,
       obs_prob = (1 - presence_prob) * (count == 0) +
-        (count > 0) * presence_prob * dpois(count, expect_param) / (1 - dpois(0, expect_param))
+        (count > 0) * presence_prob * dpois(count, expect_param) /
+        (1 - dpois(0, expect_param))
     )
   },
   n.samples = 2500
@@ -371,11 +415,18 @@ p2 <- ggplot() +
 patchwork::wrap_plots(p1, p2, nrow = 1)
 ```
 
-To ensure proper truncation of the Poisson distribution, we have included the `control.family` argument with the parameter `theta` fixed to a large negative value. This choice ensures that when transformed by $\text{logit}^{-1}(\theta)$ to obtain the probability $p$, it approaches zero.
+To ensure proper truncation of the Poisson distribution, we have included the
+`control.family` argument with the parameter `theta` fixed to a large negative
+value. This choice ensures that when transformed by $\text{logit}^{-1}(\theta)$
+to obtain the probability $p$, it approaches zero.
 
 ## Model Comparison
 
-The variance in count predictions can be obtained from the posterior predictions of expectations and variances that were previously computed for each grid box. Let's denote the count expectation in each grid box as $m_i$, and the count variance as $s_i^2$, both conditioned on the model predictor $\eta_i$. Then, the posterior predictive variance of the count $X_i$ is given by:
+The variance in count predictions can be obtained from the posterior predictions
+of expectations and variances that were previously computed for each grid box.
+Let's denote the count expectation in each grid box as $m_i$, and the count
+variance as $s_i^2$, both conditioned on the model predictor $\eta_i$. Then, the
+posterior predictive variance of the count $X_i$ is given by:
 
 $$
 \begin{aligned}
@@ -384,23 +435,48 @@ V(X_i) &= E(V(X_i|\eta_i)) + V(E(X_i|\eta_i)) \\
 \end{aligned}
 $$
 
-This equation provides the posterior predictive variance of the count $X_i$ based on the expectations and variances of the model predictions $m_i$ and $s_i^2$ for each grid box, conditioned on the model predictor $\eta_i$.
+This equation provides the posterior predictive variance of the count $X_i$
+based on the expectations and variances of the model predictions $m_i$ and
+$s_i^2$ for each grid box, conditioned on the model predictor $\eta_i$.
 
-Predictive Integral Transform (PIT) [@marshall2003ApproximateCrossvalidatoryPredictive;@gelman1996PosteriorPredictiveAssessment;@held2010PosteriorCrossvalidatoryPredictive] is calculated as the cumulative distribution function (CDF) of the observed data at each predicted value from the model. Mathematically, for each observation $y_i$ and its corresponding predicted value $\hat{y}_i$ from the model, the PIT is calculated as follows:
+Predictive Integral Transform (PIT)
+[@marshall2003ApproximateCrossvalidatoryPredictive;@gelman1996PosteriorPredictiveAssessment;@held2010PosteriorCrossvalidatoryPredictive]
+is calculated as the cumulative distribution function (CDF) of the observed data
+at each predicted value from the model. Mathematically, for each observation
+$y_i$ and its corresponding predicted value $\hat{y}_i$ from the model, the PIT
+is calculated as follows:
 
 $$PIT_i=P(Y_i\leq \hat y_i \vert data)$$
 
-where $Y_i$ is a random variable representing the observed data for the $i$th observation.
+where $Y_i$ is a random variable representing the observed data for the $i$th
+observation.
 
-The PIT measures how well the model's predicted values align with the distribution of the observed data. Ideally, if the model's predictions are perfect, the PIT values should follow a uniform distribution between 0 and 1. Deviations from this uniform distribution may indicate issues with model calibration or overfitting. It's often used to assess the reliability of model predictions and can be visualized through PIT histograms or quantile-quantile (Q-Q) plots.
+The PIT measures how well the model's predicted values align with the
+distribution of the observed data. Ideally, if the model's predictions are
+perfect, the PIT values should follow a uniform distribution between 0 and 1.
+Deviations from this uniform distribution may indicate issues with model
+calibration or overfitting. It's often used to assess the reliability of model
+predictions and can be visualized through PIT histograms or quantile-quantile
+(Q-Q) plots.
 
-The Conditional Predictive Ordinate (CPO) [@pettit1990ConditionalPredictiveOrdinate] is calculated as the posterior probability of the observed data at each observation point, conditional on the rest of the data and the model. For each observation $y_i$, it is computed as:
+The Conditional Predictive Ordinate (CPO)
+[@pettit1990ConditionalPredictiveOrdinate] is calculated as the posterior
+probability of the observed data at each observation point, conditional on the
+rest of the data and the model. For each observation $y_i$, it is computed as:
 
 $$CPO_i=P(y_i\vert data \setminus y_i, model)$$
  
-where $\setminus$ means "other than", so that $P(y_i | \text{data}\setminus y_i, \text{model})$ represents the conditional probability given all other observed data and the model. 
+where $\setminus$ means "other than", so that $P(y_i | \text{data}\setminus y_i,
+\text{model})$ represents the conditional probability given all other observed
+data and the model.
 
-CPO provides a measure of how well the model predicts each individual observation while taking into account the rest of the data and the model. A low CPO value suggests that the model has difficulty explaining that particular data point, whereas a high CPO value indicates a good fit for that observation. In practice, CPO values are often used to identify influential observations, potential outliers, or model misspecification. When comparing models, the following summary of the CPO is often used:
+CPO provides a measure of how well the model predicts each individual
+observation while taking into account the rest of the data and the model. A low
+CPO value suggests that the model has difficulty explaining that particular data
+point, whereas a high CPO value indicates a good fit for that observation. In
+practice, CPO values are often used to identify influential observations,
+potential outliers, or model misspecification. When comparing models, the
+following summary of the CPO is often used:
 
 $$-\sum_{i=1}^n\log(CPO_i)$$
 where smaller values indicate a better model fit.
@@ -459,12 +535,15 @@ $$
 \begin{aligned}
 \text{AE}_i&=|y_i-\text{median}_i|,\\
 \text{SE}_i&=[y_i-E(X_i|\text{data})]^2, \text{ and}\\
-\text{DS}_i&=\frac{[y_i-E(X_i|\text{data})]^2}{V(X_i|\text{data})} + \log[V(X_i|\text{data})], \\
+\text{DS}_i&=\frac{[y_i-E(X_i|\text{data})]^2}{V(X_i|\text{data})} +
+  \log[V(X_i|\text{data})], \\
 \text{LG}_i&=-\log[P(X_i = y_i|\text{data})].
 \end{aligned}
 $$
-The Dawid-Sebastiani score is a proper scoring rule for the
-predictive mean $E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for the median and expectation, respectively. The (negated) Log score is a strictly proper score [@gneiting2007StrictlyProperScoring]
+The Dawid-Sebastiani score is a proper scoring rule for the predictive mean
+$E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for the median and
+expectation, respectively. The (negated) Log score is a strictly proper score
+[@gneiting2007StrictlyProperScoring]
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
@@ -501,7 +580,9 @@ We see that the average scores are very similar between all three models
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
   tibble::as_tibble() %>%
-  cbind(geometry = c(counts_df$geometry, counts_df$geometry, counts_df$geometry))
+  cbind(geometry = c(counts_df$geometry,
+                     counts_df$geometry,
+                     counts_df$geometry))
 df_ <- df %>%
   left_join(
     df %>%
@@ -538,14 +619,16 @@ p1 <- ggplot() +
   guides(fill = guide_legend("DS"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_ %>% filter(Model == "ZIP"), aes(fill = DS - DS_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZIP"),
+     aes(fill = DS - DS_Poisson), geom = "tile") +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
   guides(fill = guide_legend("DS-DS_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_ %>% filter(Model == "ZAP"), aes(fill = DS - DS_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZAP"),
+     aes(fill = DS - DS_Poisson), geom = "tile") +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
@@ -575,14 +658,16 @@ p1 <- ggplot() +
   guides(fill = guide_legend("LG"))
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_ %>% filter(Model == "ZIP"), aes(fill = LG - LG_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZIP"),
+     aes(fill = LG - LG_Poisson), geom = "tile") +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP LG score difference") +
   guides(fill = guide_legend("LG-LG_poi"))
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
-  gg(df_ %>% filter(Model == "ZAP"), aes(fill = LG - LG_Poisson), geom = "tile") +
+  gg(df_ %>% filter(Model == "ZAP"),
+     aes(fill = LG - LG_Poisson), geom = "tile") +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP LG score difference") +

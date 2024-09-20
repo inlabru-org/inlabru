@@ -12,12 +12,15 @@ gg(data, ...)
 \item{...}{Arguments passed on to the geom method.}
 }
 \value{
-The form of the value returned by gg depends on the class of its argument. See the documentation of the particular methods for details of what is produced by that method.
+The form of the value returned by gg depends on the class of its
+argument. See the documentation of the particular methods for details of
+what is produced by that method.
 }
 \description{
-gg is a generic function for generating geomes from various kinds of spatial objects, e.g. Spatial* data,
-meshes, Raster objects and inla/inlabru predictions. The function invokes particular methods which depend
-on the \link{class} of the first argument.
+gg is a generic function for generating geomes from various kinds of spatial
+objects, e.g. Spatial* data, meshes, Raster objects and inla/inlabru
+predictions. The function invokes particular methods which depend on the
+\link{class} of the first argument.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE)) {
@@ -25,7 +28,8 @@ if (require("ggplot2", quietly = TRUE)) {
 
   gorillas <- inlabru::gorillas_sf
 
-  # Invoke ggplot and add geomes for the Gorilla nests and the survey boundary
+  # Invoke ggplot and add geomes for the Gorilla nests and the survey
+  # boundary
 
   ggplot() +
     gg(gorillas$boundary) +

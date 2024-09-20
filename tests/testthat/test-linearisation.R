@@ -13,10 +13,13 @@ test_that("Linearisation", {
   lhoods <-
     like_list(
       like(
-        formula = y ~ exp(x) + Int_y_latent, data = data
+        formula = y ~ exp(x) + Int_y_latent,
+        data = data
       ),
       like(
-        formula = z ~ log(exp(x) + exp(Int_z_latent)), data = data, family = "poisson"
+        formula = z ~ log(exp(x) + exp(Int_z_latent)),
+        data = data,
+        family = "poisson"
       )
     )
   lhoods <- bru_used_update(lhoods, names(component_list(cmp)))

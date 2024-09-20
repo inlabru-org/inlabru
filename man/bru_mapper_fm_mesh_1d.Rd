@@ -31,10 +31,9 @@
 \item{mesh}{An \code{fm_mesh_1d} object to use as a mapper}
 
 \item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde} models).
-If \code{FALSE}, the knot
-locations are returned (useful as an interpolator for \code{rw2} models
-and similar).
+integer indexing sequence for the latent variables (needed for \code{spde}
+models). If \code{FALSE}, the knot locations are returned (useful as an
+interpolator for \code{rw2} models and similar).
 Default: \code{NULL}, to force user specification of this parameter}
 
 \item{...}{Arguments passed on to other methods}
@@ -48,8 +47,8 @@ Create mapper for an \code{fm_mesh_1d} object
 }
 \section{Functions}{
 \itemize{
-\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object; converts
-the mesh fo \code{fm_mesh_1d} first.
+\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object;
+converts the mesh fo \code{fm_mesh_1d} first.
 
 }}
 \examples{

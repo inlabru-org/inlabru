@@ -158,13 +158,13 @@
 #'
 #'
 #' @references
-#' Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the Kagwene Gorilla
-#' Sanctuary, Cameroon. M.Sc. thesis, Geology and Environmental Science, University of Buea,
-#' Cameroon.
+#' Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the
+#' Kagwene Gorilla Sanctuary, Cameroon. M.Sc. thesis, Geology and Environmental
+#' Science, University of Buea, Cameroon.
 #'
-#' Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial behaviour of gorillas
-#' in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk Assessment
-#' 26 (6), 793-811.
+#' Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial
+#' behaviour of gorillas in the Kagwene Sanctuary, Cameroon. Stochastic
+#' Environmental Research and Risk Assessment 26 (6), 793-811.
 #'
 #' @examples
 #' if (interactive() &&

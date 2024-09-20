@@ -193,7 +193,8 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = "elevation"),
+  cmp <- component_list(
+    ~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
@@ -443,7 +444,8 @@ test_that("Component inputs: non-numeric input detection", {
     coords = c("x", "y")
   )
 
-  # No model specified (argument unnamed), geometry invalid for bru_mapper_linear:
+  # No model specified (argument unnamed), geometry invalid for
+  # bru_mapper_linear:
   cmp <- component_list(~ Intercept(1) + field(geometry, matern))
   lk <- like(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
@@ -454,7 +456,9 @@ test_that("Component inputs: non-numeric input detection", {
     "The input to a bru_mapper_linear evaluation must be numeric or logical."
   )
 
-  cmp <- component_list(~ Intercept(1) + field(geometry, matern, model = matern))
+  cmp <- component_list(
+    ~ Intercept(1) + field(geometry, matern, model = matern)
+  )
   lk <- like(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))

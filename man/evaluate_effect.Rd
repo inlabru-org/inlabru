@@ -27,14 +27,16 @@ evaluate_effect_multi_state(...)
 \arguments{
 \item{...}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
 
-\item{component}{A \code{bru_mapper}, \code{bru_component}, \code{comp_simple}, or \code{comp_simple_list}.}
+\item{component}{A \code{bru_mapper}, \code{bru_component}, \code{comp_simple}, or
+\code{comp_simple_list}.}
 
 \item{input}{Pre-evaluated component input}
 
-\item{state}{Specification of one (for \code{evaluate_effect_single_state}) or several
-(for \code{evaluate_effect_multi_State}) latent variable states:
+\item{state}{Specification of one (for \code{evaluate_effect_single_state}) or
+several (for \code{evaluate_effect_multi_State}) latent variable states:
 \itemize{
-\item \code{evaluate_effect_single_state.bru_mapper}: A vector of the latent component state.
+\item \code{evaluate_effect_single_state.bru_mapper}:
+A vector of the latent component state.
 \item \verb{evaluate_effect_single_state.*_list}: list of named state vectors.
 \item \verb{evaluate_effect_multi_state.*_list}: list of lists of named state vectors.
 }}

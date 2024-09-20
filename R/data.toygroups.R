@@ -3,8 +3,8 @@
 #' @docType data
 #' @description
 #'
-#' This data set serves to teach the concept of modelling species that gather in groups and where
-#' the grouping behaviour depends on space.
+#' This data set serves to teach the concept of modelling species that gather in
+#' groups and where the grouping behaviour depends on space.
 #'
 #' @usage data(toygroups)
 #'
@@ -14,8 +14,9 @@
 #'    \item{`df.size`:}{ IGNORE THIS }
 #'    \item{`df.intensity`:}{ A `data.frame` with Poisson process
 #'      intensity `d.lambda` at locations `x`}
-#'    \item{`df.rate`:}{ A `data.frame` the locations `x` and associated `rate` which
-#'      parameterized the exponential distribution from which the group sizes were drawn.}
+#'    \item{`df.rate`:}{ A `data.frame` the locations `x` and associated `rate`
+#'      which parameterized the exponential distribution from which the group
+#'      sizes were drawn.}
 #'  }
 #'
 #'

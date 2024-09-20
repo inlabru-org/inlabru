@@ -1,5 +1,5 @@
 linters: linters_with_defaults(
-    line_length_linter = NULL, # 866
+    # line_length_linter = NULL, # 866
     object_name_linter = NULL, # 618
     commented_code_linter = NULL, # 121
     object_usage_linter = NULL, # 54

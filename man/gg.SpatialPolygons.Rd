@@ -12,7 +12,8 @@
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
 mapping.}
 
-\item{crs}{A \code{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \code{CRS} object defining the coordinate system to project the data
+to before plotting.}
 
 \item{...}{Arguments passed on to \code{geom_sf}.
 Unless specified by the user,
@@ -22,17 +23,17 @@ the argument \code{alpha = 0.2} (alpha level for polygon filling) is added.}
 A \code{geom_sf} object.
 }
 \description{
-Uses the \code{ggplot2::fortify()} function to turn the \code{SpatialPolygons} objects into a
-\code{data.frame}. Then
-calls \code{geom_polygon} to plot the polygons. Requires the \code{ggplot2} package.
+Uses the \code{ggplot2::fortify()} function to turn the \code{SpatialPolygons} objects
+into a \code{data.frame}. Then calls \code{geom_polygon} to plot the polygons. Requires
+the \code{ggplot2} package.
 }
 \details{
 Up to version \verb{2.10.0}, the \code{ggpolypath} package was used to ensure
 proper plotting, since the \code{ggplot2::geom_polygon} function doesn't always
-handle geometries with holes properly. After \verb{2.10.0}, the object is converted
-to \code{sf} format and passed on to \code{\link[=gg.sf]{gg.sf()}} instead, as \code{ggplot2} version \verb{3.4.4}
-deprecated the intenrally used \code{ggplot2::fortify()} method for
-\code{SpatialPolygons/DataFrame} objects.
+handle geometries with holes properly. After \verb{2.10.0}, the object is
+converted to \code{sf} format and passed on to \code{\link[=gg.sf]{gg.sf()}} instead, as \code{ggplot2}
+version \verb{3.4.4} deprecated the intenrally used \code{ggplot2::fortify()} method
+for \code{SpatialPolygons/DataFrame} objects.
 }
 \examples{
 \donttest{

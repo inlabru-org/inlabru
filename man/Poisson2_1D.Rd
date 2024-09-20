@@ -18,8 +18,10 @@ the interval (0,55).}
 \item{\code{cov2_1D}:}{ A function that gives what we will call a
 'habitat suitability' covariate in 1D space.}
 \item{\code{E_nc2}}{ The expected counts of the gridded data.}
-\item{\code{pts2}}{ The locations of the observed points (a data frame with one column, named \code{x}).}
-\item{\code{countdata2}}{ A data frame with three columns, containing the count data:}
+\item{\code{pts2}}{ The locations of the observed points (a data frame with
+one column, named \code{x}).}
+\item{\code{countdata2}}{ A data frame with three columns, containing the
+count data:}
 \describe{
 \item{\code{x}}{ The grid cell midpoint.}
 \item{\code{count}}{ The number of detections in the cell.}
@@ -31,8 +33,9 @@ the interval (0,55).}
 data(Poisson2_1D)
 }
 \description{
-Point data and count data, together with intensity function and expected counts for
-a unimodal nonhomogeneous 1-dimensional Poisson process example.
+Point data and count data, together with intensity function and
+expected counts for a unimodal nonhomogeneous 1-dimensional Poisson process
+example.
 }
 \examples{
 \donttest{

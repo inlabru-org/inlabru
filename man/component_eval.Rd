@@ -13,9 +13,9 @@ component_eval(
 )
 }
 \arguments{
-\item{main, group, replicate, weights}{Specification of where to evaluate a component.
-The four inputs are passed on to the joint \code{bru_mapper} for the component,
-as
+\item{main, group, replicate, weights}{Specification of where to evaluate a
+component. The four inputs are passed on to the joint \code{bru_mapper} for the
+component, as
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{list(mapper = list(
        main = main,

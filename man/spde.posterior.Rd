@@ -2,24 +2,27 @@
 % Please edit documentation in R/spde.R
 \name{spde.posterior}
 \alias{spde.posterior}
-\title{Posteriors of SPDE hyper parameters and Matern correlation or covariance function.}
+\title{Posteriors of SPDE hyper parameters and Matern correlation or
+covariance function.}
 \usage{
 spde.posterior(result, name, what = "range")
 }
 \arguments{
 \item{result}{An object inheriting from \code{inla}.}
 
-\item{name}{Character stating the name of the SPDE effect, see \code{names(result$summary.random)}.}
+\item{name}{Character stating the name of the SPDE effect, see
+\code{names(result$summary.random)}.}
 
-\item{what}{One of "range", "log.range", "variance", "log.variance", "matern.correlation" or "matern.covariance".}
+\item{what}{One of "range", "log.range", "variance", "log.variance",
+"matern.correlation" or "matern.covariance".}
 }
 \value{
 A \code{prediction} object.
 }
 \description{
-Calculate posterior distribution of the range, log(range), variance, or log(variance)
-parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
-\code{inla.spde.result}.
+Calculate posterior distribution of the range, log(range), variance, or
+log(variance) parameter of a model's SPDE component. Can also plot Matern
+correlation or covariance function. \code{inla.spde.result}.
 }
 \examples{
 \donttest{

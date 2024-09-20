@@ -19,7 +19,8 @@ from tail of the log. When \code{bookmark} is non-NULL, the \code{offset} applie
 shift (forwards or backwards) to the bookmark list.}
 }
 \value{
-Returns (invisibly) the modified \code{bru_log} object, or \code{NULL} (when \code{x} is \code{NULL})
+Returns (invisibly) the modified \code{bru_log} object, or \code{NULL} (when
+\code{x} is \code{NULL})
 }
 \description{
 Clears the log contents up to

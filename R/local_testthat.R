@@ -92,14 +92,14 @@ local_basic_fixed_effect_testdata <- function() {
 
 
 #' @describeIn local_testthat Tests should set num.threads = "1:1" to ensure
-#' within-system repeatability by calling `local_bru_safe_inla()`;
-#' see also [bru_safe_inla()]
-#' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
-#' INLA `num.threads` option is not checked or altered. Default: `FALSE`, multicore
-#' not allowed (used for examples and unit tests).
+#'   within-system repeatability by calling `local_bru_safe_inla()`; see also
+#'   [bru_safe_inla()]
+#' @param multicore logical; if `TRUE`, multiple cores are allowed, and the INLA
+#'   `num.threads` option is not checked or altered. Default: `FALSE`, multicore
+#'   not allowed (used for examples and unit tests).
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. A message is
-#' always printed if the INLA `num.threads` option is altered, regardless of the
-#' `quietly` argument. Default: TRUE.
+#'   always printed if the INLA `num.threads` option is altered, regardless of
+#'   the `quietly` argument. Default: TRUE.
 #' @export
 local_bru_safe_inla <- function(multicore = FALSE,
                                 quietly = TRUE,
@@ -112,7 +112,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
       }
     )
     if (inherits(inla.call, "simpleError")) {
-      return(testthat::skip("inla.getOption('inla.call') failed, skip INLA tests."))
+      return(testthat::skip(
+        "inla.getOption('inla.call') failed, skip INLA tests."
+      ))
     }
 
     # Save the num.threads option so it can be restored
@@ -150,9 +152,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
     if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
       # Save the fmesher.evolution.warn option so it can be restored
-      old_fmesher_evolution_warn <- INLA::inla.getOption("fmesher.evolution.warn")
+      old_fmesher_evolution_warn <-
+        INLA::inla.getOption("fmesher.evolution.warn")
       withr::defer(
-        INLA::inla.setOption(fmesher.evolution.warn = old_fmesher_evolution_warn),
+        INLA::inla.setOption(
+          fmesher.evolution.warn = old_fmesher_evolution_warn
+        ),
         envir
       )
       INLA::inla.setOption(fmesher.evolution.warn = TRUE)
@@ -160,9 +165,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
     if ("fmesher.evolution.verbosity" %in% names(INLA::inla.getOption())) {
       # Save the fmesher.evolution.verbosity option so it can be restored
-      old_fmesher_evolution_verbosity <- INLA::inla.getOption("fmesher.evolution.verbosity")
+      old_fmesher_evolution_verbosity <-
+        INLA::inla.getOption("fmesher.evolution.verbosity")
       withr::defer(
-        INLA::inla.setOption(fmesher.evolution.verbosity = old_fmesher_evolution_verbosity),
+        INLA::inla.setOption(
+          fmesher.evolution.verbosity = old_fmesher_evolution_verbosity
+        ),
         envir
       )
       INLA::inla.setOption(fmesher.evolution.verbosity = "stop")

@@ -9,10 +9,15 @@
 \arguments{
 \item{data}{A \code{SpatialLines} or \code{SpatialLinesDataFrame} object.}
 
-\item{mapping}{Aesthetic mappings created by \code{ggplot2::aes} or \code{ggplot2::aes_}
-used to update the default
-mapping. The default mapping is
-\code{ggplot2::aes(x = .data[[sp::coordnames(data)[1]]], y = .data[[sp::coordnames(data)[2]]], xend = .data[[paste0("end.", sp::coordnames(data)[1])]], yend = .data[[paste0("end.", sp::coordnames(data)[2])]])}.}
+\item{mapping}{Aesthetic mappings created by \code{ggplot2::aes} or
+\code{ggplot2::aes_} used to update the default mapping. The default mapping is
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{ggplot2::aes(
+  x = .data[[sp::coordnames(data)[1]]],
+  y = .data[[sp::coordnames(data)[2]]],
+  xend = .data[[paste0("end.", sp::coordnames(data)[1])]],
+  yend = .data[[paste0("end.", sp::coordnames(data)[2])]])
+}\if{html}{\out{</div>}}}
 
 \item{crs}{A \code{CRS} object defining the coordinate system to project the data
 to before plotting.}

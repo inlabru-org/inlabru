@@ -10,11 +10,20 @@
 \item{data}{A SpatialPixelsDataFrame object.}
 
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
-mapping. The default mapping is \code{ggplot2::aes(x = .data[[sp::coordnames(data)[1]]], y = .data[[sp::coordnames(data)[2]]], fill = .data[[names(data)[[1]]]])}.}
+mapping. The default mapping is
 
-\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the data to before plotting.}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{ggplot2::aes(
+  x = .data[[sp::coordnames(data)[1]]],
+  y = .data[[sp::coordnames(data)[2]]],
+  fill = .data[[names(data)[[1]]]]
+)
+}\if{html}{\out{</div>}}}
 
-\item{mask}{A \link[sp:SpatialPolygons]{sp::SpatialPolygons} object defining the region that is plotted.}
+\item{crs}{A \code{\link[sp:CRS-class]{sp::CRS}} object defining the coordinate system to project the
+data to before plotting.}
+
+\item{mask}{A \code{\link[sp:SpatialPolygons]{sp::SpatialPolygons}} object defining the region that is
+plotted.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }
@@ -22,7 +31,8 @@ mapping. The default mapping is \code{ggplot2::aes(x = .data[[sp::coordnames(dat
 A \code{geom_tile} return value.
 }
 \description{
-Coerces input SpatialPixelsDataFrame to data.frame and uses \code{geom_tile} to plot it.
+Coerces input SpatialPixelsDataFrame to data.frame and uses \code{geom_tile} to
+plot it.
 Requires the \code{ggplot2} package.
 }
 \examples{

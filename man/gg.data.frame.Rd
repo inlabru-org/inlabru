@@ -10,10 +10,12 @@
 \item{...}{Arguments passed on to \code{\link[=gg.bru_prediction]{gg.bru_prediction()}}.}
 }
 \value{
-Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon} value.
+Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon}
+value.
 }
 \description{
-This geom constructor will simply call \code{\link[=gg.bru_prediction]{gg.bru_prediction()}} for the data provided.
+This geom constructor will simply call \code{\link[=gg.bru_prediction]{gg.bru_prediction()}} for the data
+provided.
 }
 \details{
 Requires the \code{ggplot2} package.

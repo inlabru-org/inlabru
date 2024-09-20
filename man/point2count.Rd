@@ -7,8 +7,8 @@
 point2count(plots, dets)
 }
 \arguments{
-\item{plots}{A \code{SpatialPolygonsDataFrame} object containing the plots that were
-sampled.}
+\item{plots}{A \code{SpatialPolygonsDataFrame} object containing the plots that
+were sampled.}
 
 \item{dets}{A \code{SpatialPointsDataFrame} object containing the locations of the
 points within the plots.}
@@ -18,8 +18,8 @@ A \code{SpatialPolygonsDataFrame} with counts in each plot contained in
 slot \verb{@data$n}.
 }
 \description{
-Converts a plot sample with locations of each point within each plot, into a plot
-sample with only the count within each plot.
+Converts a plot sample with locations of each point within each plot, into a
+plot sample with only the count within each plot.
 }
 \examples{
 \donttest{

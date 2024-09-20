@@ -66,11 +66,13 @@ a list of inputs, one for each mapper.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls \code{\link[=ibm_linear]{ibm_linear()}}.
-For partially non-linear pipes, replaces each sequence of linear mappers with a single
-\code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of original mapper
-names, allowing the original \code{input} structure to be used also with the simplified
-mappers, since the \code{taylor} mappers are not dependent on inputs.
+\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls
+\code{\link[=ibm_linear]{ibm_linear()}}.
+For partially non-linear pipes, replaces each sequence of linear mappers with
+a single \code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of
+original mapper names, allowing the original \code{input} structure to be used
+also with the simplified mappers, since the \code{taylor} mappers are not
+dependent on inputs.
 
 }}
 \examples{

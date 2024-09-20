@@ -7,17 +7,20 @@
 spatial.to.ppp(points, samplers)
 }
 \arguments{
-\item{points}{A \code{SpatialPoints[DataFrame]} object describing the point pattern.}
+\item{points}{A \code{SpatialPoints[DataFrame]} object describing the point
+pattern.}
 
-\item{samplers}{A \code{SpatialPolygons[DataFrame]} object describing the observation window.}
+\item{samplers}{A \code{SpatialPolygons[DataFrame]} object describing the
+observation window.}
 }
 \value{
 A spatstat \code{spatstat} \code{ppp} object
 }
 \description{
-Spatstat point pattern objects consist of points and an observation windows. This
-function uses a SpatialPoints object and a SpatialPolygon object to generate the points
-and the window. Lastly, the ppp() function is called to create the \code{ppp} object.
+Spatstat point pattern objects consist of points and an observation windows.
+This function uses a \code{SpatialPoints} object and a \code{SpatialPolygon} object to
+generate the points and the window. Lastly, the \code{ppp()} function is called to
+create the \code{ppp} object.
 }
 \examples{
 \donttest{

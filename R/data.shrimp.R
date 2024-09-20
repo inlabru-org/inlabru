@@ -9,7 +9,8 @@
 #'  \describe{
 #'    \item{`hauls`:}{ An `sf` object containing haul locations}
 #'    \item{`mesh`:}{ An `fm_mesh_2d` object containing a Delaunay triangulation
-#'    mesh (a type of discretization of continuous space) covering the haul locations.}
+#'      mesh (a type of discretization of continuous space) covering the haul
+#'      locations.}
 #'    \describe{
 #'       \item{`catch`}{Catch in Kg.}
 #'       \item{`landing`}{Landing in Kg.}
@@ -20,8 +21,9 @@
 #' Pennino, Maria Grazia. Personal communication.
 #'
 #' @references
-#' Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A., Bellido, J.M., Conesa,
-#' D. Accounting for preferential sampling in species distribution models. Ecology and Evolution,  In Press.
+#' Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A.,
+#' Bellido, J.M., Conesa, D. Accounting for preferential sampling in species
+#' distribution models. Ecology and Evolution,  In Press.
 #'
 #' @examples
 #' \donttest{

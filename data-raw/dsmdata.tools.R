@@ -46,15 +46,18 @@ gap.in.segments.f <- function(seg = NULL, geometry = "euc") {
 
 define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
-  # samoe for: covar.col=covariate.columns
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues. Same for: covar.col=covariate.columns
   #
-  # Define blocks - adjoining segments which can be combined because the covariates are the same
+  # Define blocks - adjoining segments which can be combined because the
+  #   covariates are the same
   # covar.cols = number of the column in the dataframe containing covariates
-  #              thius can be a list of columns (i.e. c(2,6,7))
+  #              this can be a list of columns (i.e. c(2,6,7))
 
   num.covar <- length(covar.col)
-  if (is.na(covar.col)) print("No covariates used to combined segments - using transects")
+  if (is.na(covar.col)) {
+    print("No covariates used to combined segments - using transects")
+  }
 
   # Number of segments
   num.seg <- dim(seg)[1]
@@ -95,11 +98,13 @@ define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
 
 get.blocks.f <- function(seg = NULL, geometry = "euc") {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues
   #
   # Create a dataset for the blocks
   # Segments must contain column called Block.Label, Effort
-  # geometry defines how the geometry is measured, either euclidean space (x, y) or geometic coords (lon, lat)
+  # geometry defines how the geometry is measured, either euclidean space (x, y)
+  # or geometic coords (lon, lat)
 
   name.blocks <- unique(seg$Block.Label)
   num.blocks <- length(name.blocks)
@@ -126,7 +131,13 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
   } # End of blocks
 
   # Tidy up - get rid of unnecessary columns
-  exc.labels <- c("quadrant", "angle", "what.angle", "x", "y", "latitude", "longitude")
+  exc.labels <- c("quadrant",
+                  "angle",
+                  "what.angle",
+                  "x",
+                  "y",
+                  "latitude",
+                  "longitude")
   col.names <- names(blocks)
   col.names <- !is.element(col.names, exc.labels)
   # print(col.names)
@@ -139,15 +150,17 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
 
 add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
-  # same for: dists=distances,obs=obsservations
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues. Same for: dists=distances,obs=obsservations
   #
   # Add segment and block labels to observations
   # distance data and observation data MUST be in the same order
 
   # Check same number of observations in each dataframe
   num.dists <- dim(dists)[1]
-  if (num.dists != dim(obs)[1]) print("Perp distance data and observation data different number of records")
+  if (num.dists != dim(obs)[1]) {
+    print("Perp distance data and observation data different number of records")
+  }
 
   dists$Sample.Label <- obs$Sample.Label
   dists$Block.Label <- rep(NA, num.dists)
@@ -156,7 +169,10 @@ add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
   for (i in 1:num.dists) {
     temp <- seg[seg$Sample.Label == dists$Sample.Label[i], ]
     # Should only have one record - check
-    if (dim(temp)[1] > 1) print(paste("More than one segment chosen for observation, object=", dists$object[i]))
+    if (dim(temp)[1] > 1) {
+      print(paste("More than one segment chosen for observation, object=",
+                  dists$object[i]))
+    }
     dists$Block.Label[i] <- temp$Block.Label[1]
   } # End of observations
 
@@ -228,7 +244,8 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
                                  geometry = "euc") {
   # NOTE: old param: data=data
 
-  # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or transects (is.block=F)
+  # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or
+  # transects (is.block=F)
   # NEED TO CHECK THAT THIS IS CORRECT FOR UNITS IN QUADRANT = 7
 
   if (is.blocks) {
@@ -256,7 +273,12 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
     temp <- data[data$Unit == name.unit[i], ]
     num.temp <- dim(temp)[1]
     unit$Unit[i] <- as.character(name.unit[i])
-    quad <- get.quadrant.f(temp$new.x[1], temp$new.y[1], temp$new.x[num.temp], temp$new.y[num.temp])
+    quad <- get.quadrant.f(
+      temp$new.x[1],
+      temp$new.y[1],
+      temp$new.x[num.temp],
+      temp$new.y[num.temp]
+    )
     unit$quadrant[i] <- quad
     diff.x <- temp$new.x[num.temp] - temp$new.x[1]
     diff.y <- temp$new.y[num.temp] - temp$new.y[1]
@@ -287,7 +309,8 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o clockwise) for each segment
-  # Last segment in transect is assumed to be in same direction as penultimate segment.
+  # Last segment in transect is assumed to be in same direction as penultimate
+  # segment.
   # Quadrant=Direction of travel; 1=N, 2=E, 3=S, 4=W, 5=NE, 6=SE, 7=SW, 8=NW
 
   if (geometry == "euc") {
@@ -305,7 +328,8 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
   data$quadrant <- rep(NA, num.unit)
   data$angle <- rep(NA, num.unit)
   # data$what.angle <- rep(NA,num.unit)
-  # Direction in reverse - this will be used to refine start and end points (not done at present)
+  # Direction in reverse - this will be used to refine start and end points (not
+  # done at present)
   data$quadrant.r <- rep(NA, num.unit)
   data$angle.r <- rep(NA, num.unit)
 
@@ -314,15 +338,22 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
     j <- i + 1
     temp <- data[i:j, ]
     # Get quadrant on a compass
-    quad <- get.quadrant.f(temp$new.x[1], temp$new.y[1], temp$new.x[2], temp$new.y[2])
+    quad <- get.quadrant.f(
+      temp$new.x[1],
+      temp$new.y[1],
+      temp$new.x[2],
+      temp$new.y[2]
+    )
     data$quadrant[i] <- quad
     diff.x <- temp$new.x[2] - temp$new.x[1]
     diff.y <- temp$new.y[2] - temp$new.y[1]
     data$angle[i] <- what.angle.f(dy = diff.y, dx = diff.x, quad = quad)
     # Check if points are on the same transect
     if (temp$Transect.Label[1] != temp$Transect.Label[2]) {
-      # If not the same transect, then check if point is on the same transect as the previous point
-      # If so, must be the last point on the transect so set values to be the same as last but one point on transect
+      # If not the same transect, then check if point is on the same transect as
+      # the previous point
+      # If so, must be the last point on the transect so set values to be the
+      # same as last but one point on transect
       if (data$Transect.Label[i] == data$Transect.Label[i - 1]) {
         data$quadrant[i] <- data$quadrant[i - 1]
         data$angle[i] <- data$angle[i - 1]
@@ -339,7 +370,9 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
     data$angle[num.unit] <- data$angle[num.unit - 1]
     #  data$what.angle[num.unit] <- data$what.angle[num.unit-1]
   }
-  if (data$Transect.Label[num.unit] != data$Transect.Label[num.unit - 1]) print("Last segment on its own")
+  if (data$Transect.Label[num.unit] != data$Transect.Label[num.unit - 1]) {
+    print("Last segment on its own")
+  }
 
   # Now do the same again only for points going in reverse
   # THIS BIT NEEDS TO BE CHECKED!
@@ -348,7 +381,12 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
     j <- i - 1
     temp <- rbind(data[i, ], data[j, ])
     # Get quadrant on a compass
-    quad <- get.quadrant.f(temp$new.x[1], temp$new.y[1], temp$new.x[2], temp$new.y[2])
+    quad <- get.quadrant.f(
+      temp$new.x[1],
+      temp$new.y[1],
+      temp$new.x[2],
+      temp$new.y[2]
+    )
     data$quadrant.r[i] <- quad
     diff.x <- temp$new.x[2] - temp$new.x[1]
     diff.y <- temp$new.y[2] - temp$new.y[1]
@@ -385,21 +423,28 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 
 
 
-start_end_points_segments_f <- function(seg = NULL, use.tran = FALSE, tran = NULL, geometry = "euc") {
+start_end_points_segments_f <- function(seg = NULL,
+                                        use.tran = FALSE,
+                                        tran = NULL,
+                                        geometry = "euc") {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
-  # same for: tran=transect.quadrant
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues
+  # Same for: tran=transect.quadrant
   #
   # Calculate the start and end points of a block of segments
-  # Start and end points based on half the length of the first and last segments in a block
-  # Direction is given by direction of segment (use.tran=FALSE) or transect (use.tran=TRUE)
+  # Start and end points based on half the length of the first and last segments
+  # in a block
+  # Direction is given by direction of segment (use.tran=FALSE) or transect
+  # (use.tran=TRUE)
   #   If use.tran=TRUE must supply dataframe containing direction of transects
   #   If use.tran=FALSE, segments must contain angle and quadrant of travel
 
   num.seg <- dim(seg)[1]
 
   for (i in 1:num.seg) {
-    # Get the angle and quadrant for segment from transects, otherwise info already in segments
+    # Get the angle and quadrant for segment from transects, otherwise info
+    # already in segments
     if (use.tran) {
       temp <- tran[tran$Transect.Label == seg$Transect.Label[i], ]
       seg$quadrant[i] <- temp$quadrant[1]
@@ -488,7 +533,9 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
   x.diff <- (start.x - end.x)
   y.diff <- (start.y - end.y)
 
-  if (abs(x.diff) < tol && abs(y.diff) < tol) print("Segments on top of each other!")
+  if (abs(x.diff) < tol && abs(y.diff) < tol) {
+    print("Segments on top of each other!")
+  }
 
   quad <- NA
 
@@ -548,7 +595,8 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
     rlat2 <- lat2 * rad
 
     rlon <- (lon2 - lon1) * rad
-    posdist <- 60 * (1 / rad) * acos(sin(rlat1) * sin(rlat2) + cos(rlat1) * cos(rlat2) * cos(rlon))
+    posdist <- 60 * (1 / rad) * acos(sin(rlat1) * sin(rlat2) +
+                                       cos(rlat1) * cos(rlat2) * cos(rlon))
   }
 
   # Convert to km
@@ -561,7 +609,8 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
 get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
   # NOTE: old parameterization: seg.len=half.segment.length,angle=angle
 
-  # Calculate the height and length of triangle given length of hypotenuse and angle
+  # Calculate the height and length of triangle given length of hypotenuse and
+  # angle
 
   deg2rad <- pi / 180
 
@@ -578,13 +627,16 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
                                     do.plot = FALSE) {
   #
-  # NOTE the parameter seg used to be "seg=segments", which caused CRAN compatibility issues
-  # same for dists=distance.data
+  # NOTE the parameter seg used to be "seg=segments", which caused CRAN
+  # compatibility issues
+  # Same for dists=distance.data
   #
   # Generate coords for an observation if not contained in observations
-  # Location is randomly generated along segment and random side of segment at perp distance of sighting
+  # Location is randomly generated along segment and random side of segment at
+  # perp distance of sighting
   # Side of line; 1=above and -1=below segment
-  # Plots segment, position along segment (green dot) and at perp distance (red dot) from line
+  # Plots segment, position along segment (green dot) and at perp distance (red
+  # dot) from line
 
   deg2rad <- pi / 180
 
@@ -601,14 +653,28 @@ generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
   for (i in 1:num.sgt) {
     temp <- seg[seg$Sample.Label == dists$Sample.Label[i], ]
     # Randomly choose location along line
-    new.coords <- get.point.along.segment.f(temp$start.x[1], temp$start.y[1], temp$end.x[1], temp$end.y[1], quad = temp$quadrant[1], seg.angle = temp$angle[1])
+    new.coords <- get.point.along.segment.f(
+      temp$start.x[1],
+      temp$start.y[1],
+      temp$end.x[1],
+      temp$end.y[1],
+      quad = temp$quadrant[1],
+      seg.angle = temp$angle[1]
+    )
     new.x <- new.coords[1]
     new.y <- new.coords[2]
     # Choose side of line at random
     what.side <- sample(c(-1, 1), 1)
     # Sort out coords of sighting
     pd <- dists$distance[i]
-    sgt.coords <- get.coords.f(quad = temp$quadrant[1], alpha = temp$angle[1], new.x = new.x, new.y = new.y, pd = pd, side = what.side)
+    sgt.coords <- get.coords.f(
+      quad = temp$quadrant[1],
+      alpha = temp$angle[1],
+      new.x = new.x,
+      new.y = new.y,
+      pd = pd,
+      side = what.side
+    )
     # Save coordinates of sighting
     new.sgt$x[i] <- sgt.coords[1]
     new.sgt$y[i] <- sgt.coords[2]
@@ -711,9 +777,15 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 
 
 
-get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, pd = NULL, side = NULL) {
+get.coords.f <- function(quad = NULL,
+                         alpha = NULL,
+                         new.x = NULL,
+                         new.y = NULL,
+                         pd = NULL,
+                         side = NULL) {
   # NOTE old parameterization:
-  # quad=quadrant,alpha=angle,new.x=x.reference,new.y=y.reference,pd=perp.dist,side=side.of.segment
+  # quad=quadrant, alpha=angle, new.x=x.reference, new.y=y.reference,
+  # pd=perp.dist, side=side.of.segment
 
   # Get the coordinates of the sighting based on
   # 1. the reference point (new.x,new.y)
@@ -800,7 +872,8 @@ get.coords.f <- function(quad = NULL, alpha = NULL, new.x = NULL, new.y = NULL, 
 
 
 get.hypot.f <- function(side1, side2) {
-  # Get the length of the hypotenuse of triangle with sides of length side1 and side2
+  # Get the length of the hypotenuse of triangle with sides of length side1 and
+  # side2
   hyp <- sqrt(side1^2 + side2^2)
   hyp
 }
@@ -826,7 +899,8 @@ get.hypot.f <- function(side1, side2) {
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
   # NOTE old parameterization: dy=diff.y,dx=diff.x,quad=quadrant
 
-  # Get the angle between two points (from 0 to 360) using trig and the direction (quadrant)
+  # Get the angle between two points (from 0 to 360) using trig and the
+  # direction (quadrant)
 
   what.angle <- atan(dy / dx) * (180 / pi)
   if (quad == 1) angle <- 0

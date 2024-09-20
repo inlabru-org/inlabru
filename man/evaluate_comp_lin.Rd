@@ -16,9 +16,9 @@ evaluate_comp_lin(model, input, state, inla_f = FALSE)
 \item{inla_f}{Controls the input data interpretations}
 }
 \value{
-A list (class 'comp_simple') of named lists (class 'comp_simple_list')
-of \code{bru_mapper_taylor} objects,
-one for each included component
+A list (class 'comp_simple') of named lists (class
+'comp_simple_list') of \code{bru_mapper_taylor} objects, one for each included
+component
 }
 \description{
 Computes individual \code{bru_mapper_taylor} objects for included components

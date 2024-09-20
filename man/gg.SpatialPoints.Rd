@@ -11,9 +11,15 @@
 
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
 mapping. The default mapping is
-\code{ggplot2::aes(x = .data[[sp::coordnames(data)[1]]], y = .data[[sp::coordnames(data)[2]]])}.}
 
-\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the data to before plotting.}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{ggplot2::aes(
+  x = .data[[sp::coordnames(data)[1]]],
+  y = .data[[sp::coordnames(data)[2]]]
+)
+}\if{html}{\out{</div>}}}
+
+\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the
+data to before plotting.}
 
 \item{...}{Arguments passed on to \code{geom_point}.}
 }
@@ -21,8 +27,8 @@ mapping. The default mapping is
 A \code{geom_point} return value
 }
 \description{
-This function coerces the \code{SpatialPoints} into a \code{data.frame} and uses \code{geom_point}
-to plot the points. Requires the \code{ggplot2} package.
+This function coerces the \code{SpatialPoints} into a \code{data.frame} and uses
+\code{geom_point} to plot the points. Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{

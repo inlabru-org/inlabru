@@ -39,13 +39,6 @@ component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 Constructor methods for inlabru component lists. Syntax details are given in
 \code{\link[=component]{component()}}.
 }
-\details{
-\itemize{
-\item \code{c.component}: The \code{...} arguments should be \code{component}
-objects. The environment from the first argument will be applied to the
-resulting ``component_list`.
-}
-}
 \section{Methods (by class)}{
 \itemize{
 \item \code{component_list(formula)}: Convert a component formula
@@ -60,6 +53,13 @@ formulas into a \code{component_list} object
 \item \code{c(component_list)}: The \code{...} arguments should be \code{component_list}
 objects. The environment from the first argument will be applied to the
 resulting \code{component_list}.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{c(component)}: The \code{...} arguments should be \code{component}
+objects. The environment from the first argument will be applied to the
+resulting ``component_list`.
 
 }}
 \examples{

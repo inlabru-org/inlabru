@@ -30,8 +30,8 @@
 
 \item{initial}{character prefix for the first line. Default \code{initial=prefix}.}
 
-\item{depth}{The recursion depth for multi/collection/pipe mappers.
-Default 1, to only show the collection, and not the contents of the sub-mappers.}
+\item{depth}{The recursion depth for multi/collection/pipe mappers. Default
+1, to only show the collection, and not the contents of the sub-mappers.}
 
 \item{x}{Object to be printed}
 }

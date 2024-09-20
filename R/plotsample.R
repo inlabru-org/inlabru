@@ -1,8 +1,8 @@
 # @title Make rectangular \code{SpatialPolygonsDataFrame}.
 #
 # @description
-# Makes a rectangular \code{SpatialPolygonsDataFrame} using its bottom left coordinates,
-# its width and its height.
+# Makes a rectangular \code{SpatialPolygonsDataFrame} using its bottom left
+# coordinates, its width and its height.
 #
 # @param start Bottom left coordinates (x,y).
 # @param width Width of base of the rectangle.
@@ -31,27 +31,31 @@ makepoly <- function(start, width, height) {
 #' @description
 #' Creates a plot sample on a regular grid with a random start location.
 #'
-#' @param spdf A `SpatialPointsDataFrame` defining the points that are to be sampled
-#' by the plot sample.
-#' @param boundary A `SpatialPolygonsDataFrame` defining the survey boundary within which
-#' the  points occur.
-#' @param x.ppn The proportion of the x=axis that is to be included in the plots.
-#' @param y.ppn The proportion of the y=axis that is to be included in the plots.
+#' @param spdf A `SpatialPointsDataFrame` defining the points that are to be
+#'   sampled by the plot sample.
+#' @param boundary A `SpatialPolygonsDataFrame` defining the survey boundary
+#'   within which the  points occur.
+#' @param x.ppn The proportion of the x=axis that is to be included in the
+#'   plots.
+#' @param y.ppn The proportion of the y=axis that is to be included in the
+#'   plots.
 #' @param nx The number of plots in the x-dimension.
 #' @param ny The number of plots in the y-dimension.
 #'
 #' @return A list with three components:
 #'  \describe{
-#'    \item{`plots`:}{ A `SpatialPolygonsDataFrame` object containing the plots that were
-#'    sampled.}
-#'    \item{`dets`:}{ A `SpatialPointsDataFrame` object containing the locations of the
-#'    points within the plots.}
-#'    \item{`counts`:}{ A `dataframe` containing the following columns
+#'    \item{`plots`}{A `SpatialPolygonsDataFrame` object containing the plots
+#'      that were sampled.}
+#'    \item{`dets`}{A `SpatialPointsDataFrame` object containing the locations
+#'      of the points within the plots.}
+#'    \item{`counts`}{A `dataframe` containing the following columns
 #'    \describe{
-#'    \item{`x`:}{The x-coordinates of the centres of the plots within the boundary.}
-#'    \item{`y`:}{The y-coordinates of the centres of the plots within the boundary.}
-#'    \item{`n`:}{The numbers of points in each plot.}
-#'    \item{`area`:}{The areas of the plots within the boundary}
+#'    \item{`x`}{The x-coordinates of the centres of the plots within the
+#'      boundary.}
+#'    \item{`y`}{The y-coordinates of the centres of the plots within the
+#'      boundary.}
+#'    \item{`n`}{The numbers of points in each plot.}
+#'    \item{`area`}{The areas of the plots within the boundary}
 #'    }}
 #'  }.
 #'
@@ -75,10 +79,20 @@ makepoly <- function(start, width, height) {
 #'
 #' @export
 #'
-plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 5) {
-  if (x.ppn <= 0 || x.ppn >= 1) stop("'x.ppn' must greater than 0 and less than 1")
-  if (y.ppn <= 0 || y.ppn >= 1) stop("'y.ppn' must greater than 0 and less than 1")
-
+plotsample <- function(spdf,
+                       boundary,
+                       x.ppn = 0.25,
+                       y.ppn = 0.25,
+                       nx = 5,
+                       ny = 5) {
+  if (x.ppn <= 0 ||
+      x.ppn >= 1) {
+    stop("'x.ppn' must greater than 0 and less than 1")
+  }
+  if (y.ppn <= 0 ||
+      y.ppn >= 1) {
+    stop("'y.ppn' must greater than 0 and less than 1")
+  }
 
   srange <- raster::extent(boundary)
   xrange <- srange[1:2]
@@ -89,8 +103,16 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
   height <- diff(yrange) / nytot
   dx <- diff(xrange) / nx
   dy <- diff(yrange) / ny
-  startx <- runif(1, xrange[1] - 0.99999 * width, xrange[1] + dx - 0.99999 * width)
-  starty <- runif(1, yrange[1] - 0.99999 * height, yrange[1] + dy - 0.99999 * height)
+  startx <- runif(
+    1,
+    xrange[1] - 0.99999 * width,
+    xrange[1] + dx - 0.99999 * width
+  )
+  starty <- runif(
+    1,
+    yrange[1] - 0.99999 * height,
+    yrange[1] + dy - 0.99999 * height
+  )
   xs <- startx + (0:nx) * dx
   ys <- starty + (0:ny) * dy
 
@@ -101,11 +123,16 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 
   polys <- vector("list", nplots)
   for (i in 1:nplots) {
-    polys[[i]] <- sp::Polygons(list(makepoly(as.numeric(starts[i, ]), width, height)), i)
+    polys[[i]] <- sp::Polygons(list(makepoly(as.numeric(starts[i, ]),
+                                             width,
+                                             height)),
+                               i)
   }
   plots <- sp::SpatialPolygons(polys, proj4string = fm_CRS(spdf))
-  plots <- raster::intersect(boundary, plots) # remove bits of plot outside boundary
-  dets <- spdf[plots, ] # extract only those nests inside the polygons (neat!)
+  # remove bits of plot outside boundary
+  plots <- raster::intersect(boundary, plots)
+  # extract only those nests inside the polygons (neat!)
+  dets <- spdf[plots, ]
 
   return(list(plots = plots, dets = dets))
 }
@@ -115,13 +142,13 @@ plotsample <- function(spdf, boundary, x.ppn = 0.25, y.ppn = 0.25, nx = 5, ny = 
 #' @title Convert a plot sample of points into one of counts.
 #'
 #' @description
-#' Converts a plot sample with locations of each point within each plot, into a plot
-#' sample with only the count within each plot.
+#' Converts a plot sample with locations of each point within each plot, into a
+#' plot sample with only the count within each plot.
 #'
-#' @param plots A `SpatialPolygonsDataFrame` object containing the plots that were
-#'    sampled.
+#' @param plots A `SpatialPolygonsDataFrame` object containing the plots that
+#'   were sampled.
 #' @param dets A `SpatialPointsDataFrame` object containing the locations of the
-#'    points within the plots.
+#'   points within the plots.
 #'
 #' @return A `SpatialPolygonsDataFrame` with counts in each plot contained in
 #'   slot `@data$n`.
@@ -160,7 +187,10 @@ point2count <- function(plots, dets) {
   x <- y <- plotarea <- count <- numeric(length = np)
   for (i in 1:np) {
     polylist <- list(sp::Polygons(list(plots@polygons[[i]]@Polygons[[1]]), 1))
-    spoly <- sp::SpatialPolygons(polylist, proj4string = sp::CRS(as.character(sp::proj4string(plots))))
+    spoly <- sp::SpatialPolygons(
+      polylist,
+      proj4string = sp::CRS(as.character(sp::proj4string(plots)))
+    )
     count[i] <- dim(dets[spoly, ])[1]
 
     plotarea[i] <- plots@polygons[[i]]@area
@@ -174,7 +204,8 @@ point2count <- function(plots, dets) {
   countdf <- data.frame(n = count, area = plotarea, x = x, y = y)
   # make SpatialPointsDataFrame of it
   plotcounts <- sp::SpatialPointsDataFrame(
-    coords = data.frame(x = x, y = y), data = data.frame(n = count, area = plotarea),
+    coords = data.frame(x = x, y = y),
+    data = data.frame(n = count, area = plotarea),
     proj4string = sp::CRS(as.character(sp::proj4string(plots)))
   )
   return(plotcounts)

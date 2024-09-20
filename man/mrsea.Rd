@@ -7,15 +7,16 @@
 \format{
 A list of objects:
 \describe{
-\item{\code{points}:}{ A \code{sf} object containing the locations of
+\item{\code{points}}{ A \code{sf} object containing the locations of
 XXXXX.}
-\item{\code{samplers}:}{ A \code{sf} object containing the transect lines
+\item{\code{samplers}}{ A \code{sf} object containing the transect lines
 that were surveyed.}
-\item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a Delaunay triangulation
-mesh (a type of discretization of continuous space) covering the survey region.}
-\item{\code{boundary}:}{ An \code{sf} object defining the boundary polygon of the
+\item{\code{mesh}}{ An \code{fm_mesh_2d} object containing a Delaunay triangulation
+mesh (a type of discretization of continuous space) covering the survey
+region.}
+\item{\code{boundary}}{ An \code{sf} object defining the boundary polygon of the
 survey region.}
-\item{\code{covar}:}{ An \code{sf} containing sea depth estimates.}
+\item{\code{covar}}{ An \code{sf} containing sea depth estimates.}
 }
 }
 \source{
@@ -25,7 +26,8 @@ Library \code{MRSea}.
 mrsea
 }
 \description{
-Data imported from package MRSea, see \url{https://www.creem.st-andrews.ac.uk/software/}
+Data imported from package MRSea, see
+\url{https://www.creem.st-andrews.ac.uk/software/}
 }
 \examples{
 if (require(ggplot2, quietly = TRUE)) {

@@ -26,7 +26,8 @@ bru_options_reset()
 }
 \arguments{
 \item{...}{A collection of named options, optionally including one or more
-\code{\link{bru_options}} objects. Options specified later override the previous options.}
+\code{\link{bru_options}} objects. Options specified later override the previous
+options.}
 
 \item{x}{An object to be converted to an \code{bru_options} object.}
 
@@ -41,8 +42,8 @@ Default: NULL}
 \item{include_default}{logical; If \code{TRUE}, the default options are included
 together with the global override options. Default: \code{TRUE}}
 
-\item{.reset}{For \code{bru_options_set}, logical indicating if the global override
-options list should be emptied before setting the new option(s).}
+\item{.reset}{For \code{bru_options_set}, logical indicating if the global
+override options list should be emptied before setting the new option(s).}
 }
 \value{
 \code{bru_options()} returns a \code{bru_options} object.
@@ -102,9 +103,10 @@ For line search details, set \code{bru_verbose=2} or \code{3}.
 Default: 0, to not print any messages}
 \item{bru_verbose_store}{logical or numeric; if \code{TRUE}, log messages of
 \code{verbosity} \eqn{\le 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
-log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
-\item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
-to run inference.}
+log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all
+messages.}
+\item{bru_run}{If TRUE, run inference. Otherwise only return configuration
+needed to run inference.}
 \item{bru_max_iter}{maximum number of inla iterations, default 10.
 Also see the \code{bru_method$rel_tol} and related options below.}
 \item{bru_initial}{An \code{inla} object returned from previous calls of
@@ -116,9 +118,12 @@ integration method \code{ipoints} and \code{int.polygon} for 'cp' family models;
 \describe{
 \item{method}{"stable" or "direct". For "stable" (default) integration points
 are aggregated to mesh vertices.}
-\item{nsub1}{Number of integration points per knot interval in 1D. Default 30.}
-\item{nsub2}{Number of integration points along a triangle edge for 2D. Default 9.}
-\item{nsub}{Deprecated parameter that overrides \code{nsub1} and \code{nsub2} if set. Default \code{NULL}.}
+\item{nsub1}{Number of integration points per knot interval in 1D.
+Default 30.}
+\item{nsub2}{Number of integration points along a triangle edge for 2D.
+Default 9.}
+\item{nsub}{Deprecated parameter that overrides \code{nsub1} and \code{nsub2} if set.
+Default \code{NULL}.}
 }
 }
 \item{bru_method}{List of arguments controlling the iterative inlabru method:
@@ -137,12 +142,14 @@ To disable line search, set to an empty vector. Line search is not
 available for \code{taylor="legacy"}.}
 \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
 multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
-\item{rel_tol}{Stop the iterations when the largest change in linearisation point
+\item{rel_tol}{Stop the iterations when the largest change in linearisation
+point
 (the conditional latent state mode) in relation to the estimated posterior
 standard deviation is less than \code{rel_tol}. Default 0.1 (ten percent).}
 \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 full INLA step. Default is 2.}
-\item{line_opt_method}{Which method to use for the line search optimisation step.
+\item{line_opt_method}{Which method to use for the line search optimisation
+step.
 Default "onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.
 The method "full" does line optimisation on the full nonlinear predictor;
@@ -151,8 +158,8 @@ this is slow and intended for debugging purposes only.}
 }
 \item{bru_compress_cp}{logical; when \code{TRUE}, compress the
 \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
-part of the Poisson process likelihood (\code{family="cp"}) into a single term, with \eqn{y=n}{y=n},
-and predictor \code{mean(eta)}. Default: \code{TRUE}}
+part of the Poisson process likelihood (\code{family="cp"}) into a single term,
+with \eqn{y=n}{y=n}, and predictor \code{mean(eta)}. Default: \code{TRUE}}
 \item{bru_debug}{logical; when \code{TRUE}, activate temporary debug features for
 package development. Default: \code{FALSE}}
 \item{\code{inla()} options}{

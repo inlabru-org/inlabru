@@ -69,7 +69,6 @@ add_mappers <- function(...) {
 #' method, called inside [bru()].
 #'
 #' @details
-#'
 #' As shorthand, [bru()] will understand basic additive formulae describing
 #' fixed effect models. For instance, the components specification `y ~ x` will
 #' define the linear combination of an effect named `x` and an intercept to the
@@ -731,10 +730,9 @@ component_list.list <- function(object,
 }
 
 #' @export
-#' @details * `c.component`: The `...` arguments should be `component`
+#' @describeIn component_list The `...` arguments should be `component`
 #' objects. The environment from the first argument will be applied to the
 #' resulting ``component_list`.
-#' @rdname component_list
 `c.component` <- function(...) {
   stopifnot(all(vapply(
     list(...),
@@ -766,8 +764,8 @@ component_list.list <- function(object,
 
 #' @title Equip components with mappers
 #' @description Equip component(s) with mappers for subcomponents that do not
-#' have predefined mappers. When needed, the data in `lhoods` is used to determine
-#' the appropriate mapper(s).
+#'   have predefined mappers. When needed, the data in `lhoods` is used to
+#'   determine the appropriate mapper(s).
 #' @param component A `component` object
 #' @param lhoods A `bru_like_list` object
 #' @return A `component` object with completed mapper information
@@ -892,7 +890,10 @@ add_mappers.component_list <- function(components, lhoods, ...) {
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
-      stop("Internal error: copy model detected, but no copy information available.")
+      stop(paste0(
+        "Internal error: copy model detected, ",
+        "but no copy information available."
+      ))
     }
     if (is.null(components[[components[[k]][["copy"]]]])) {
       stop(paste0(
@@ -903,7 +904,8 @@ add_mappers.component_list <- function(components, lhoods, ...) {
         "'."
       ))
     }
-    components[[k]]$mapper <- components[[components[[k]][["copy"]]]][["mapper"]]
+    components[[k]]$mapper <-
+      components[[components[[k]][["copy"]]]][["mapper"]]
   }
   components
 }
@@ -1017,7 +1019,10 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
   if (any(is_spatial)) {
     bru_safe_sp(force = TRUE)
     if (!all(is_spatial)) {
-      stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
+      stop(paste0(
+        "Inconsistent spatial/non-spatial input. ",
+        "Unable to infer mapper information."
+      ))
     }
     inconsistent_crs <- FALSE
     inp_crs <- lapply(inp, fm_CRS)
@@ -1027,7 +1032,10 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(unlist(crs_info))) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop("Inconsistent spatial CRS information. Unable to infer mapper information.")
+      stop(paste0(
+        "Inconsistent spatial CRS information. ",
+        "Unable to infer mapper information."
+      ))
     }
     inp_values <- unique(do.call(
       rbind,
@@ -1039,7 +1047,10 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- nrow(inp_values)
   } else if (any(is_sfc)) {
     if (!all(is_sfc)) {
-      stop("Inconsistent spatial/non-spatial input. Unable to infer mapper information.")
+      stop(paste0(
+        "Inconsistent spatial/non-spatial input. ",
+        "Unable to infer mapper information."
+      ))
     }
     inconsistent_crs <- FALSE
     inp_crs <- lapply(inp, fm_crs)
@@ -1048,7 +1059,10 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(inp_crs)) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop("Inconsistent spatial crs information. Unable to infer mapper information.")
+      stop(paste0(
+        "Inconsistent spatial crs information. ",
+        "Unable to infer mapper information."
+      ))
     }
     inp_values <- sf::st_sfc(unique(do.call(c, inp)),
       crs = inp_crs[[1]]
@@ -1060,7 +1074,8 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     }
     # Add extra column to work around bug in unique.matrix for single-column
     # Matrix and ModelMatrix matrices:
-    inp_values <- unique.matrix(cbind(1, do.call(rbind, inp)))[, -1, drop = FALSE]
+    inp_values <-
+      unique.matrix(cbind(1, do.call(rbind, inp)))[, -1, drop = FALSE]
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {
@@ -1081,7 +1096,10 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       stop("Inconsistent input types; list and non-list")
     }
     if (!allow_list) {
-      stop("Unable to create automatic mapper. List data at this level requires an explicit mapper definition.")
+      stop(paste0(
+        "Unable to create automatic mapper. List data at this level requires ",
+        "an explicit mapper definition."
+      ))
     }
     inp_values <- list()
     n_values <- list()
@@ -1169,7 +1187,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
           paste0(
             "All covariate evaluations for '", label,
             "' are NULL; an intercept component was likely intended.\n",
-            "  Implicit latent intercept component specification is deprecated since version 2.1.14.\n",
+            "  Implicit latent intercept component specification is ",
+            "deprecated since version 2.1.14.\n",
             "  Use explicit notation '+ ", label, "(1)' instead",
             if (identical(label, "Intercept")) {
               " (or '+1' for '+ Intercept(1)')"
@@ -1334,7 +1353,8 @@ bru_get_mapper.inla.spde <- function(model, ...) {
       paste0(
         "Unknown SPDE mesh class '",
         paste0(class(model$mesh), collapse = ", "),
-        "' for bru_get_mapper.inla.spde. Please specify a mapper manually instead."
+        "' for bru_get_mapper.inla.spde. Please specify ",
+        "a mapper manually instead."
       ),
       immediate. = TRUE
     )
@@ -1635,7 +1655,11 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
   if (!verbose) {
     Summary <- paste0(
       object[["label"]],
-      if (is.null(object[["copy"]])) NULL else paste0("(=", object[["copy"]], ")"),
+      if (is.null(object[["copy"]])) {
+        NULL
+      } else {
+        paste0("(=", object[["copy"]], ")")
+      },
       ": ",
       paste0(
         unlist(lapply(
@@ -1709,7 +1733,10 @@ print.component_list <- function(x, ...) {
 #' the object's label.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
-format.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL) {
+format.bru_subcomponent <- function(x,
+                                    verbose = TRUE,
+                                    ...,
+                                    label.override = NULL) {
   text <- format(x[["input"]],
     verbose = verbose,
     ...,
@@ -1723,8 +1750,16 @@ format.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NUL
 #' @method summary bru_subcomponent
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
-summary.bru_subcomponent <- function(object, verbose = TRUE, ..., label.override = NULL) {
-  text <- format(object, verbose = verbose, ..., label.override = label.override)
+summary.bru_subcomponent <- function(object,
+                                     verbose = TRUE,
+                                     ...,
+                                     label.override = NULL) {
+  text <- format(
+    object,
+    verbose = verbose,
+    ...,
+    label.override = label.override
+  )
   res <- structure(
     list(
       text = text
@@ -1738,7 +1773,10 @@ summary.bru_subcomponent <- function(object, verbose = TRUE, ..., label.override
 #' @method print bru_subcomponent
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
-print.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL) {
+print.bru_subcomponent <- function(x,
+                                   verbose = TRUE,
+                                   ...,
+                                   label.override = NULL) {
   text <- format(x, verbose = verbose, ..., label.override = label.override)
   cat(text, "\n", sep = "")
   invisible(x)
@@ -1746,7 +1784,8 @@ print.bru_subcomponent <- function(x, verbose = TRUE, ..., label.override = NULL
 
 #' @export
 #' @method format bru_input
-#' @param type character; if non-NULL, added to the output'; `label = type(input)`.
+#' @param type character; if non-NULL, added to the output'; `label =
+#'   type(input)`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
 format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
@@ -1781,7 +1820,10 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
 #' @method summary bru_input
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.component
-summary.bru_input <- function(object, verbose = TRUE, ..., label.override = NULL) {
+summary.bru_input <- function(object,
+                              verbose = TRUE,
+                              ...,
+                              label.override = NULL) {
   res <- structure(
     list(
       text = format(object,
@@ -1916,12 +1958,14 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 
 #' @section Simple covariates and the map parameter:
 #'
-#' It is not unusual for a random effect act on a transformation of a covariate. In other frameworks this
-#' would mean that the transformed covariate would have to be calculated in advance and added to the
-#' data frame that is usually provided via the `data` parameter. inlabru provides the option to do
-#' this transformation automatically. For instance, one might be interested in the effect of a covariate
-#' \eqn{x^2}. In inla and other frameworks this would require to add a column `xsquared` to the
-#' input data frame and use the formula
+#' It is not unusual for a random effect act on a transformation of a covariate.
+#' In other frameworks this would mean that the transformed covariate would have
+#' to be calculated in advance and added to the data frame that is usually
+#' provided via the `data` parameter. inlabru provides the option to do this
+#' transformation automatically. For instance, one might be interested in the
+#' effect of a covariate \eqn{x^2}. In inla and other frameworks this would
+#' require to add a column `xsquared` to the input data frame and use the
+#' formula
 #'
 #' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
 #'
@@ -1936,15 +1980,16 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #'
 #' }
 #'
-#' In the first example inlabru will interpret the map parameter as an expression to be evaluated within
-#' the data provided. Since \eqn{x} is a known covariate it will know how to calculate it. The second
-#' example is an expression as well but it uses a function called `mySquareFun`. This function is
-#' defined by user but has to be accessible within the work space when setting up the components.
-#' The third example provides the function `myOtherSquareFun`. In this case,
-#'  inlabru will call the function as `myOtherSquareFun(.data.)`, where `.data.`
-#'  is the data provided via the [like()] `data` parameter.
-#' The function needs to know what parts of the data to use to construct the
-#' needed output. For example,
+#' In the first example inlabru will interpret the map parameter as an
+#' expression to be evaluated within the data provided. Since \eqn{x} is a known
+#' covariate it will know how to calculate it. The second example is an
+#' expression as well but it uses a function called `mySquareFun`. This function
+#' is defined by user but has to be accessible within the work space when
+#' setting up the components. The third example provides the function
+#' `myOtherSquareFun`. In this case, inlabru will call the function as
+#' `myOtherSquareFun(.data.)`, where `.data.` is the data provided via the
+#' [like()] `data` parameter. The function needs to know what parts of the data
+#' to use to construct the needed output. For example,
 #' ```
 #' myOtherSquareFun <- function(data) {
 #'   data[ ,"x"]^2
@@ -1953,33 +1998,35 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #'
 #' @section Spatial Covariates:
 #'
-#' When fitting spatial models it is common to work with covariates that depend on space, e.g. sea
-#' surface temperature or elevation. Although it is straightforward to add this data to the input
-#' data frame or write a covariate function like in the previous section there is an even more
-#' convenient way in inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
-#' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided directly via
-#' the input expressions if they are supported by [eval_spatial()], and
-#' the [like()] data is an `sf` or `SpatialPointsDataFrame` object.
-#' `inlabru` will then automatically
-#' evaluate and/or interpolate the covariate at your data locations when using code like
+#' When fitting spatial models it is common to work with covariates that depend
+#' on space, e.g. sea surface temperature or elevation. Although it is
+#' straightforward to add this data to the input data frame or write a covariate
+#' function like in the previous section there is an even more convenient way in
+#' inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
+#' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided
+#' directly via the input expressions if they are supported by [eval_spatial()],
+#' and the [like()] data is an `sf` or `SpatialPointsDataFrame` object.
+#' `inlabru` will then automatically evaluate and/or interpolate the covariate
+#' at your data locations when using code like
 #' ```
 #' components = y ~ psi(mySpatialPixels, model = "linear")
 #' ```
-#' For more precise control, use the the `layer` and `selector` arguments (see [component()]),
-#' or call `eval_spatial()` directly, e.g.:
+#' For more precise control, use the the `layer` and `selector` arguments (see
+#' [component()]), or call `eval_spatial()` directly, e.g.:
 #' ```
-#' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.), model = "linear")
+#' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.),
+#'                      model = "linear")
 #' ```
 #'
 #' @section Coordinates:
 #'
-#' A common spatial modelling component when using inla are SPDE models. An important feature of
-#' inlabru is that it will automatically calculate the so called A-matrix (a component model matrix)
-#' which maps SPDE
-#' values at the mesh vertices to values at the data locations. For this purpose, the input
-#' can be set to `coordinates`, which is the `sp` package function that extracts point
-#' coordinates from the `SpatialPointsDataFrame` that was provided as input to [like()]. The code for
-#' this would look as follows:
+#' A common spatial modelling component when using inla are SPDE models. An
+#' important feature of inlabru is that it will automatically calculate the so
+#' called A-matrix (a component model matrix) which maps SPDE values at the mesh
+#' vertices to values at the data locations. For this purpose, the input can be
+#' set to `coordinates`, which is the `sp` package function that extracts point
+#' coordinates from the `SpatialPointsDataFrame` that was provided as input to
+#' [like()]. The code for this would look as follows:
 #' ```
 #' components = y ~ field(coordinates, model = inla.spde2.matern(...))
 #' ```
@@ -2003,11 +2050,11 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' covariates and/or point locations.
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
-#' @return An list of mapper input values, formatted for the full component mapper
-#' (of type `bru_mapper_pipe`)
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @return An list of mapper input values, formatted for the full component
+#'   mapper (of type `bru_mapper_pipe`)
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
+#'   \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
-
 input_eval.component <- function(component,
                                  data,
                                  ...) {
@@ -2150,7 +2197,8 @@ input_eval.bru_input <- function(input, data, env = NULL,
             "The input evaluation '",
             input_string,
             "' for '", input$label,
-            "' failed. Perhaps you need to load the 'sp' package with 'library(sp)'?",
+            "' failed. Perhaps you need to load the 'sp' package ",
+            "with 'library(sp)'?",
             " Attempting 'sp::coordinates'."
           ),
           immediate. = TRUE
@@ -2169,7 +2217,8 @@ input_eval.bru_input <- function(input, data, env = NULL,
             "The input evaluation '",
             input_string,
             "' for '", input$label,
-            "' failed. Perhaps the data object doesn't contain the needed variables?",
+            "' failed. Perhaps the data object doesn't contain ",
+            "the needed variables?",
             " Falling back to '1'."
           ),
           immediate. = TRUE
@@ -2270,16 +2319,19 @@ input_eval.bru_input <- function(input, data, env = NULL,
     val <- e_input
   }
 
-  # ## Need to allow different sizes; K %*% effect needs to have same length as response, but the input and effect effect itself doesn't.
+  # ## Need to allow different sizes; K %*% effect needs to have same length as
+  # response, but the input and effect effect itself doesn't.
   #  # Always return as many rows as data has
   #  if (is.vector(val) && (length(val) == 1) && (n > 1)) {
   #    val <- rep(val, n)
   #  }
 
-  # Check if any of the locations are NA. If we are dealing with SpatialGridDataFrame try
-  # to fix that by filling in nearest neighbour values.
-  # # TODO: Check how to deal with this fully in the case of multilikelihood models
-  # Answer: should respect the lhood "include/exclude" info for the component list
+  # Check if any of the locations are NA. If we are dealing with
+  # SpatialGridDataFrame try to fix that by filling in nearest neighbour values.
+  # # TODO: Check how to deal with this fully in the case of multilikelihood
+  # models
+  # Answer: should respect the lhood "include/exclude" info for the component
+  # list
   if ((inherits(e_input, c(
     "SpatialGridDataFrame",
     "SpatialPixelsDataFrame",
@@ -2311,13 +2363,16 @@ input_eval.bru_input <- function(input, data, env = NULL,
   # models that aren't supposed to have NA inputs.
   #
   #  if (any(is.na(unlist(as.vector(val))))) {
-  #    # TODO: remove this check and make sure NAs are handled properly elsewhere,
+  #    # TODO: remove this check and make sure NAs are handled properly
+  #    # elsewhere,
   #    # if possible. Problem: treating NA as "no effect" can have negative side
-  #    # effects. For spatial covariates, can be handled by infill, but a general
+  #    # effects. For spatial covariates, can be handled by infill, but a
+  #    # general
   #    # solution doesn't exist, so not sure how to deal with this.
   #    stop(sprintf(
-  #      "Input '%s' of component '%s' has returned NA values. Please design your
-  #                 argument as to return non-NA for all points in your model domain/mesh.",
+  #      "Input '%s' of component '%s' has returned NA values. Please design
+  #       your argument as to return non-NA for all points in your model
+  #       domain/mesh.",
   #      as.character(input$input)[[1]], label
   #    ))
   #  }

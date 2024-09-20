@@ -171,7 +171,8 @@ over a product domain over space and `group`.  In versions `<= 2.7.0`, the integ
 domain had to be numeric, so we convert the group variable to a 0/1 variable,
 `group_major <- group == "major"`, which is also useful in the predictor expression:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.joint <- geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
+fml.joint <-
+  geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
 ```
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}

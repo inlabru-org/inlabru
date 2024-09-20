@@ -11,12 +11,14 @@
 \format{
 The data contain the following \code{R} objects:
 \describe{
-\item{\code{lambda1_1D}:}{ A function defining the intensity function of a
+\item{\code{lambda1_1D}}{ A function defining the intensity function of a
 nonhomogeneous Poisson process. Note that this function is only defined on
 the interval (0,55).}
 \item{\code{E_nc1}}{ The expected counts of the gridded data.}
-\item{\code{pts1}}{ The locations of the observed points (a data frame with one column, named \code{x}).}
-\item{\code{countdata1}}{ A data frame with three columns, containing the count data:}
+\item{\code{pts1}}{ The locations of the observed points (a data frame with
+one column, named \code{x}).}
+\item{\code{countdata1}}{ A data frame with three columns, containing the
+count data:}
 \describe{
 \item{\code{x}}{ The grid cell midpoint.}
 \item{\code{count}}{ The number of detections in the cell.}
@@ -28,8 +30,8 @@ the interval (0,55).}
 data(Poisson1_1D)
 }
 \description{
-Point data and count data, together with intensity function and expected counts for
-a homogeneous 1-dimensional Poisson process example.
+Point data and count data, together with intensity function and
+expected counts for a homogeneous 1-dimensional Poisson process example.
 }
 \examples{
 \donttest{

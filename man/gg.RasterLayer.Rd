@@ -13,7 +13,8 @@
 \arguments{
 \item{data}{A RasterLayer object.}
 
-\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
+\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to
+\code{geom_tile}.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }

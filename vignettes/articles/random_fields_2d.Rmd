@@ -67,10 +67,12 @@ matern_fine <-
   )
 true_range <- 4
 true_sigma <- 1
-true_Q <- inla.spde.precision(matern_fine, theta = log(c(true_range, true_sigma)))
+true_Q <- inla.spde.precision(matern_fine,
+                              theta = log(c(true_range, true_sigma)))
 ```
-What is the pointwise standard deviation of the field? Along straight boundaries,
-the variance is twice the target variance. At corners the variance is 4 times as large.
+What is the pointwise standard deviation of the field? Along straight
+boundaries, the variance is twice the target variance. At corners the variance
+is 4 times as large.
 
 ```{r results="hide"}
 true_sd <- diag(inla.qinv(true_Q))^0.5

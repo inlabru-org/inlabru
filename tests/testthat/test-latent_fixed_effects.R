@@ -101,7 +101,11 @@ test_that("interaction fixed effect model", {
   options <- list()
   mydata <- local_basic_fixed_effect_testdata()
   set.seed(123L)
-  mydata <- cbind(mydata, x2 = sample(x = factor(c("A", "B")), size = nrow(mydata), replace = TRUE))
+  mydata <- cbind(mydata, x2 = sample(
+    x = factor(c("A", "B")),
+    size = nrow(mydata),
+    replace = TRUE
+  ))
   mycomp1 <- y ~ -1 + mix(~ -1 + x1:x2, model = "fixed")
   fit0 <- INLA::inla(y ~ -1 + x1:x2, data = mydata, family = "normal")
   fit1 <- bru(mycomp1,

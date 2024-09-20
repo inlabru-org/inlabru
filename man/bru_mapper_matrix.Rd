@@ -16,8 +16,9 @@ bru_mapper_matrix(labels)
 \method{ibm_jacobian}{bru_mapper_matrix}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
-\item{labels}{Column labels for matrix mappings; Can be factor, character,
-or a single integer specifying the number of columns for integer column indexing.}
+\item{labels}{Column labels for matrix mappings; Can be factor, character, or
+a single integer specifying the number of columns for integer column
+indexing.}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 

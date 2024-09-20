@@ -1,9 +1,13 @@
 # Gaussian quadrature and other integration point constructors
 #
-# Construct integration points for each of lines defined by the start and end points provided.
+# Construct integration points for each of lines defined by the start and end
+# points provided.
 # The following schemes are available:
-# "equidistant" : Equidistant integration points without boundary. All weights are identical and sum uf to the length of a line.
-# "gaussian": Points and weight according to the Gaussian quadrature rule. Currently only n=1 and n=2 are supported (Exact integration for linear and quadratic functions).
+# "equidistant" : Equidistant integration points without boundary. All weights
+# are identical and sum uf to the length of a line.
+# "gaussian": Points and weight according to the Gaussian quadrature rule.
+# Currently only n=1 and n=2 are supported (Exact integration for linear and
+# quadratic functions).
 # "twosided-gaussian": Experimental
 #
 # @export
@@ -11,10 +15,16 @@
 # @param ep End points of lines
 # @param scheme Integration scheme (gaussian or equidistant)
 # @param n Number of integration points
-# @return List with integration poins (ips), weights (w) and weights including line length (wl)
+# @return List with integration poins (ips), weights (w) and weights including
+#   line length (wl)
 # @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk}
 
-int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points = 1, geometry = "euc", coords = NULL) {
+int.quadrature <- function(sp = NULL,
+                           ep = NULL,
+                           scheme = "gaussian",
+                           n.points = 1,
+                           geometry = "euc",
+                           coords = NULL) {
   if (is.null(colnames(sp)) && !is.null(coords)) {
     sp <- data.frame(sp)
     colnames(sp) <- coords
@@ -95,8 +105,18 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
     if (geometry == "geo") {
       stop("Geometry geo not supported")
     }
-    ips1 <- int.quadrature(sp, sp + 0.5 * (ep - sp), scheme = "gaussian", n.points = n.points, geometry, coords)
-    ips2 <- int.quadrature(sp + 0.5 * (ep - sp), ep, scheme = "gaussian", n.points = n.points, geometry, coords)
+    ips1 <- int.quadrature(sp,
+                           sp + 0.5 * (ep - sp),
+                           scheme = "gaussian",
+                           n.points = n.points,
+                           geometry,
+                           coords)
+    ips2 <- int.quadrature(sp + 0.5 * (ep - sp),
+                           ep,
+                           scheme = "gaussian",
+                           n.points = n.points,
+                           geometry,
+                           coords)
     ips <- rbind(ips1$ips, ips2$ips)
     w <- 0.5 * rbind(ips1$w, ips2$w)
     wl <- 0.5 * rbind(ips1$wl, ips2$wl)
@@ -106,7 +126,8 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
       stop("Geometry geo not supported")
     }
     # points
-    mult <- seq(0 - 1 / (2 * n.points), 1 + 1 / (2 * n.points), length.out = n.points + 2)[2:(n.points + 1)]
+    mult <- seq(0 - 1 / (2 * n.points), 1 + 1 / (2 * n.points),
+                length.out = n.points + 2)[2:(n.points + 1)]
     nips <- list()
     for (k in 1:n.points) {
       nips[[k]] <- sp + mult[k] * (ep - sp)
@@ -162,7 +183,8 @@ int.quadrature <- function(sp = NULL, ep = NULL, scheme = "gaussian", n.points =
 #' @describeIn inlabru-deprecated
 #' Aggregate integration weights onto mesh nodes
 #'
-#' `r lifecycle::badge("deprecated")` Use [fmesher::fm_vertex_projection()] instead.
+#' `r lifecycle::badge("deprecated")`
+#' Use [fmesher::fm_vertex_projection()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param integ `list` of `loc`, integration points,
@@ -184,7 +206,8 @@ integration_weight_aggregation <- function(mesh, integ) {
 #' @describeIn inlabru-deprecated
 #' Integration scheme for mesh triangle interiors
 #'
-#' `r lifecycle::badge("deprecated")` Use [fmesher::fm_int_mesh_2d_core()] instead.
+#' `r lifecycle::badge("deprecated")`
+#' Use [fmesher::fm_int_mesh_2d_core()] instead.
 #'
 #' @param mesh Mesh on which to integrate
 #' @param tri_subset Optional triangle index vector for integration on a subset
@@ -204,7 +227,9 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     "fmesher::fm_int_mesh_2d_core()"
   )
 
-  fmesher::fm_int_mesh_2d_core(mesh = mesh, tri_subset = tri_subset, nsub = nsub)
+  fmesher::fm_int_mesh_2d_core(mesh = mesh,
+                               tri_subset = tri_subset,
+                               nsub = nsub)
 }
 
 
@@ -223,47 +248,3 @@ bru_int_polygon <- function(...) {
     "fmesher::fm_int()"
   )
 }
-
-
-
-
-
-
-
-# From plotsample test, comparing before and after code refactor to avoid
-# recreating the full integration scheme for every polygon
-#
-# print(bench::mark(
-#   A=bru_int_polygon_old(domain,
-#     polylist=poly_segm,method=int.args$method,
-#     nsub=int.args$nsub2),
-#   B=bru_int_polygon(
-#     domain,
-#     polylist = poly_segm,
-#     method = int.args$method,
-#     nsub = int.args$nsub2),
-#   check = FALSE))
-## A tibble: 2 × 13
-## expression      min median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time  gc
-## <bch:expr> <bch:tm> <bch:>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <lis> <lis>
-##  1 A            14.03s 14.03s    0.0713        NA     2.28     1    32     14.03s <NULL> <NULL> <ben… <tib…
-##  2 B             8.05s  8.05s    0.124         NA     2.61     1    21      8.05s <NULL> <NULL> <ben… <tib…
-
-# With a SPDF samplers object:
-#
-# bench::mark(
-#   ips_old = ipoints(
-#     samplers = gorillas$plotsample$plots,
-#     domain = gorillas$mesh,
-#     int.args = list(use_new = FALSE)
-#   ),
-#   ips_new = ipoints(
-#     samplers = gorillas$plotsample$plots,
-#     domain = gorillas$mesh,
-#     int.args = list(use_new = TRUE)
-#   ),
-#   check = FALSE)
-# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc total_time result memory time    gc
-# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>   <bch:tm> <list> <list> <list>  <list>
-#   1 ips_old      10.04s   10.04s    0.0996        NA    1.10      1    11     10.04s <NULL> <NULL> <bench… <tibbl…
-# 2 ips_new       2.91s    2.91s    0.343         NA    0.343     1     1      2.91s <NULL> <NULL> <bench… <tibbl…

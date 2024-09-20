@@ -1,7 +1,7 @@
 # Test for data input with mismatching input/output sizes (e.g. for regional
 # integration models, etc)
 
-test_that("Component construction: default mesh/mapping construction, data is list", {
+test_that("Component construction: default mesh/mapping, data is list", {
   skip_on_cran()
   local_bru_safe_inla()
 
@@ -129,7 +129,9 @@ test_that("Component construction: separate response_data input", {
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik1$data$x))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main,
+               seq_along(lik1$data$x))
   cmp2 <- add_mappers(cmp1, lhoods = list(lik2))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, seq_along(lik2$data$x))
+  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main,
+               seq_along(lik2$data$x))
 })

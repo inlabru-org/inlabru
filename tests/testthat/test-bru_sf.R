@@ -14,9 +14,10 @@ test_that("sf gorillas lgcp vignette", {
   gorillas_sf <- list()
   gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
 
-  # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as st_as_sfc.SpatialPolygons
-  # ignores it. To get around it, need to convert to sfc_POLYGON first, and then do a separate
-  # st_sfc call, which does use check_ring_dir.
+  # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as
+  # st_as_sfc.SpatialPolygons ignores it. To get around it, need to convert to
+  # sfc_POLYGON first, and then do a separate st_sfc call, which does use
+  # check_ring_dir.
   # No effect:
   b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
   # st_sfc gives the proper effect:

@@ -11,16 +11,17 @@ The data are a list that contains these elements:
 \item{\code{df.size}:}{ IGNORE THIS }
 \item{\code{df.intensity}:}{ A \code{data.frame} with Poisson process
 intensity \code{d.lambda} at locations \code{x}}
-\item{\code{df.rate}:}{ A \code{data.frame} the locations \code{x} and associated \code{rate} which
-parameterized the exponential distribution from which the group sizes were drawn.}
+\item{\code{df.rate}:}{ A \code{data.frame} the locations \code{x} and associated \code{rate}
+which parameterized the exponential distribution from which the group
+sizes were drawn.}
 }
 }
 \usage{
 data(toygroups)
 }
 \description{
-This data set serves to teach the concept of modelling species that gather in groups and where
-the grouping behaviour depends on space.
+This data set serves to teach the concept of modelling species that gather in
+groups and where the grouping behaviour depends on space.
 }
 \examples{
 \donttest{

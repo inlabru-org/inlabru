@@ -1,36 +1,39 @@
 #' Sample from an inhomogeneous Poisson process
 #'
-#' This function provides point samples from one- and two-dimensional inhomogeneous Poisson processes. The
-#' log intensity has to be provided via its values at the nodes of an `fm_mesh_1d` or
-#' `fm_mesh_2d` object. In between mesh nodes the log intensity is assumed to be linear.
+#' This function provides point samples from one- and two-dimensional
+#' inhomogeneous Poisson processes. The log intensity has to be provided via its
+#' values at the nodes of an `fm_mesh_1d` or `fm_mesh_2d` object. In between
+#' mesh nodes the log intensity is assumed to be linear.
 #'
-#' For 2D processes on a sphere the `R` parameter can be used to adjust to sphere's radius implied by
-#' the mesh. If the intensity is very high the standard `strategy` "spherical" can cause memory issues.
-#' Using the "sliced-spherical" strategy can help in this case.
+#' For 2D processes on a sphere the `R` parameter can be used to adjust to
+#' sphere's radius implied by the mesh. If the intensity is very high the
+#' standard `strategy` "spherical" can cause memory issues. Using the
+#' "sliced-spherical" strategy can help in this case.
 #'
 #' @export
 #'
 #' @param mesh An [fmesher::fm_mesh_1d] or [fmesher::fm_mesh_2d] object
-#' @param loglambda vector or matrix; A vector of log intensities at the mesh vertices
-#'   (for higher order basis functions, e.g.
-#'   for `fm_mesh_1d` meshes, `loglambda` should be given as `mesh$m` basis
-#'   function weights rather than the values at the `mesh$n` vertices)
-#'   A single scalar is expanded to a vector of the appropriate length.
-#'   If a matrix is supplied, one process sample for each column is produced.
-#' @param strategy Only relevant for 2D meshes. One of `'triangulated'`, `'rectangle'`,
-#'   `'sliced-spherical'`, `'spherical'`. The `'rectangle'` method is only valid for
-#'   CRS-less flat 2D meshes.
+#' @param loglambda vector or matrix; A vector of log intensities at the mesh
+#'   vertices (for higher order basis functions, e.g. for `fm_mesh_1d` meshes,
+#'   `loglambda` should be given as `mesh$m` basis function weights rather than
+#'   the values at the `mesh$n` vertices) A single scalar is expanded to a
+#'   vector of the appropriate length. If a matrix is supplied, one process
+#'   sample for each column is produced.
+#' @param strategy Only relevant for 2D meshes. One of `'triangulated'`,
+#'   `'rectangle'`, `'sliced-spherical'`, `'spherical'`. The `'rectangle'`
+#'   method is only valid for CRS-less flat 2D meshes.
 #'   If `NULL` or `'auto'`, the the likely fastest method is chosen;
 #'   `'rectangle'` for flat 2D meshes with no CRS,
 #'   `'sliced-spherical'` for CRS `'longlat'` meshes, and
 #'   `'triangulated'` for all other meshes.
-#' @param R Numerical value only applicable to spherical and geographical meshes. It is interpreted as
-#'   `R` is the equivalent Earth radius, in km, used to scale the lambda intensity.
-#'     For CRS enabled meshes, the default is 6371. For CRS-less spherical meshes, the default is 1.
+#' @param R Numerical value only applicable to spherical and geographical
+#'   meshes. It is interpreted as `R` is the equivalent Earth radius, in km,
+#'   used to scale the lambda intensity. For CRS enabled meshes, the default is
+#'   6371. For CRS-less spherical meshes, the default is 1.
 #' @param samplers A `SpatialPolygonsDataFrame` or `fm_mesh_2d` object.
 #'   Simulated points that fall outside these polygons are discarded.
-#' @param ignore.CRS logical; if `TRUE`, ignore any CRS information in the mesh. Default `FALSE`.
-#'   This affects `R` and the permitted values for `strategy`.
+#' @param ignore.CRS logical; if `TRUE`, ignore any CRS information in the mesh.
+#'   Default `FALSE`. This affects `R` and the permitted values for `strategy`.
 #'
 #' @return A `data.frame` (1D case),
 #'   SpatialPoints (2D flat and 3D spherical surface cases)
@@ -40,19 +43,23 @@
 #' object of point locations.
 #'
 #' @details
-#' \itemize{
-#' \item For crs-less meshes on R2: Lambda is interpreted in the raw coordinate system. Output has an NA CRS.
-#' \item For crs-less meshes on S2: Lambda with raw units, after scaling the mesh to radius `R`, if specified.
+#' * For crs-less meshes on R2: Lambda is interpreted in the raw coordinate
+#'   system. Output has an NA CRS.
+#' * For crs-less meshes on S2: Lambda with raw units, after scaling the mesh
+#'   to radius `R`, if specified.
 #'   Output is given on the same domain as the mesh, with an NA CRS.
-#' \item For crs meshes on R2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
-#'   or `R`, if specified. Output given in the same CRS as the mesh.
-#' \item For crs meshes on S2: Lambda is interpreted as per km^2, after scaling the globe to the Earth radius 6371 km,
-#'   or `R`, if specified. Output given in the same CRS as the mesh.
-#' }
+#' * For crs meshes on R2: Lambda is interpreted as per km^2, after scaling the
+#'   globe to the Earth radius 6371 km, or `R`, if specified. Output given in
+#'   the same CRS as the mesh.
+#' * For crs meshes on S2: Lambda is interpreted as per km^2, after scaling the
+#'   globe to the Earth radius 6371 km, or `R`, if specified. Output given in
+#'   the same CRS as the mesh.
 #'
-#' @author Daniel Simpson \email{dp.simpson@@gmail.com} (base rectangle and spherical algorithms),
-#' Fabian E. Bachl \email{bachlfab@@gmail.com} (inclusion in inlabru, sliced spherical sampling),
-#' Finn Lindgren \email{finn.lindgren@@gmail.com} (extended CRS support, triangulated sampling)
+#' @author Daniel Simpson \email{dp.simpson@@gmail.com} (base rectangle and
+#'   spherical algorithms), Fabian E. Bachl \email{bachlfab@@gmail.com}
+#'   (inclusion in inlabru, sliced spherical sampling), Finn Lindgren
+#'   \email{finn.lindgren@@gmail.com} (extended CRS support, triangulated
+#'   sampling)
 #'
 #' @examples
 #' \donttest{
@@ -87,7 +94,11 @@
 #' }
 #' }
 #'
-sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = NULL,
+sample.lgcp <- function(mesh,
+                        loglambda,
+                        strategy = NULL,
+                        R = NULL,
+                        samplers = NULL,
                         ignore.CRS = FALSE) {
   mesh <- fm_as_fm(mesh)
   if (inherits(mesh, "fm_mesh_1d")) {
@@ -110,8 +121,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         loglambda <- as.vector(loglambda.matrix[, sample, drop = TRUE])
       }
 
-      # The B-spline basis expansion has a convex hull property
-      # which implies that the maximum weight is not greater or equal to the maximum function value.
+      # The B-spline basis expansion has a convex hull property which implies
+      # that the maximum weight is not greater or equal to the maximum function
+      # value.
       wmax <- max(loglambda)
 
       Npoints <- rpois(1, lambda = area * exp(wmax))
@@ -119,21 +131,25 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         points <- runif(n = Npoints, min = xmin, max = xmax)
         proj <- fm_basis(mesh, points, full = TRUE)
         if (length(loglambda) == 1) {
-          lambda_ratio <- exp(as.vector(Matrix::rowSums(proj$A) * loglambda) - wmax)
+          lambda_ratio <- exp(as.vector(
+            Matrix::rowSums(proj$A) * loglambda
+          ) - wmax)
         } else {
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - wmax)
         }
         keep <- (runif(Npoints) <= lambda_ratio)
         waste_ratio <- sum(keep) / length(keep)
         if (multi.samples) {
-          multi.sample[[sample]] <- data.frame(x = points[keep], sample = sample)
+          multi.sample[[sample]] <- data.frame(x = points[keep],
+                                               sample = sample)
         } else {
           multi.sample[[sample]] <- data.frame(x = points[keep])
         }
       } else {
         waste_ratio <- 0
         if (multi.samples) {
-          multi.sample[[sample]] <- data.frame(x = numeric(0), sample = integer(0))
+          multi.sample[[sample]] <- data.frame(x = numeric(0),
+                                               sample = integer(0))
         } else {
           multi.sample[[sample]] <- data.frame(x = numeric(0))
         }
@@ -209,7 +225,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         area.R <- 6371
         if (is.geocent) {
           if (abs(1 - space.R / area.R) > 1e-2) {
-            warning("The mesh has radius '", space.R, "', but crs information is available. Using radius 6371 for area calculations.")
+            warning("The mesh has radius '", space.R,
+                    "', but crs information is available. ",
+                    "Using radius 6371 for area calculations.")
           }
         }
       } else if (is.geocent) {
@@ -233,7 +251,9 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         }
         areas <- fm_fem(area.mesh, order = 0)$ta * area.R^2
 
-        loglambda_tri <- matrix(loglambda[mesh$graph$tv], nrow(mesh$graph$tv), ncol(mesh$graph$tv))
+        loglambda_tri <- matrix(loglambda[mesh$graph$tv],
+                                nrow(mesh$graph$tv),
+                                ncol(mesh$graph$tv))
         loglambda_max <- apply(loglambda_tri, 1, max)
 
         Npoints <- rpois(length(areas), lambda = exp(loglambda_max) * areas)
@@ -249,9 +269,11 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           points <-
             mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE] +
             (mesh$loc[mesh$graph$tv[triangle, 2], , drop = FALSE] -
-              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) * points[, 1] +
+              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) *
+            points[, 1] +
             (mesh$loc[mesh$graph$tv[triangle, 3], , drop = FALSE] -
-              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) * points[, 2]
+              mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) *
+            points[, 2]
           if (is.geocent) {
             points <- points / rowSums(points^2)^0.5
           }
@@ -269,12 +291,14 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           points <- sp::SpatialPoints(points, proj4string = target.crs)
 
           A <- fm_basis(mesh, points)
-          lambda_ratio <- exp(as.vector(A %*% loglambda) - loglambda_max[triangle])
+          lambda_ratio <- exp(as.vector(A %*% loglambda) -
+                                loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
           waste_ratio <- sum(keep) / length(keep)
         } else {
-          points <- sp::SpatialPoints(matrix(0, 1, 3), proj4string = target.crs)[-1]
+          points <- sp::SpatialPoints(matrix(0, 1, 3),
+                                      proj4string = target.crs)[-1]
           ret <- points
           waste_ratio <- 0
         }
@@ -292,7 +316,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         Npoints <- rpois(1, lambda = area * exp(lambda_max))
 
         if (Npoints == 0) {
-          ret <- sp::SpatialPoints(matrix(0, 1, 2), proj4string = internal.crs)[-1]
+          ret <- sp::SpatialPoints(matrix(0, 1, 2),
+                                   proj4string = internal.crs)[-1]
           waste_ratio <- 0
         } else {
           # Simulate uniform points on the bounding rectangle
@@ -321,7 +346,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         }
 
         if (Npoints == 0) {
-          ret <- sp::SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
+          ret <- sp::SpatialPoints(matrix(0, 1, 3),
+                                   proj4string = internal.crs)[-1]
           waste_ratio <- 0
         } else {
           # Choose z uniformly distributed in [-1,1].
@@ -377,9 +403,12 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
           }
 
           # Choose z uniformly distributed in [-1,1].
-          z <- runif(n = n.points, min = slat.range[1], max = slat.range[2]) # transforms into latitude
+          # Transforms into latitude
+          z <- runif(n = n.points, min = slat.range[1], max = slat.range[2])
           # Choose t uniformly distributed on [0, 2*pi).
-          angle <- runif(n = n.points, min = radlon.range[1], max = radlon.range[2])
+          angle <- runif(n = n.points,
+                         min = radlon.range[1],
+                         max = radlon.range[2])
           r <- sqrt(1 - z^2)
           x <- r * cos(angle)
           y <- r * sin(angle)
@@ -420,9 +449,14 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
 
     if (is.geocent) {
       if (length(ret) > 0) {
-        ret <- fm_transform(ret, crs = fm_CRS("sphere", args = list(a = space.R, b = space.R, units = "m")))
+        ret <- fm_transform(ret, crs = fm_CRS("sphere", args = list(
+          a = space.R, b = space.R, units = "m"
+        )))
       } else if (multi.samples) {
-        ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 3), data = data.frame(sample = 1))[-1]
+        ret <- sp::SpatialPointsDataFrame(
+          matrix(0, 1, 3),
+          data = data.frame(sample = 1)
+        )[-1]
       } else {
         ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
       }
@@ -436,7 +470,10 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
         if (length(ret) > 0) {
           ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
-          ret <- sp::SpatialPointsDataFrame(matrix(0, 1, 2), data = data.frame(sample = 1))[-1]
+          ret <- sp::SpatialPointsDataFrame(
+            matrix(0, 1, 2),
+            data = data.frame(sample = 1)
+          )[-1]
           sp::proj4string(ret) <- fm_CRS(input.crs)
         } else {
           ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
@@ -462,7 +499,8 @@ sample.lgcp <- function(mesh, loglambda, strategy = NULL, R = NULL, samplers = N
     }
   } else {
     stop(paste0(
-      "The `mesh` must be convertible by `fm_as_fm()` to `fm_mesh_1d` or `fm_mesh_2d`.\n",
+      "The `mesh` must be convertible by `fm_as_fm()` to `fm_mesh_1d` ",
+      "or `fm_mesh_2d`.\n",
       "  class = c('",
       paste0(class(mesh), collapse = "', '"),
       "')"

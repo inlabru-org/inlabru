@@ -66,7 +66,8 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \description{
 Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.
-The \code{state0} information indicates for which state the \code{offset} was evaluated;
+The \code{state0} information indicates for which state the \code{offset} was
+evaluated;
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 }

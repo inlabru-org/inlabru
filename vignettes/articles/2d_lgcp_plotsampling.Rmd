@@ -119,7 +119,10 @@ the function `lgcp( )`:
 ```{r results="hide",warning=FALSE,message=FALSE}
 cmp <- geometry ~ my.spde(geometry, model = matern)
 
-fit <- lgcp(cmp, sample$nests, samplers = sample$plots, domain = list(geometry = mesh))
+fit <- lgcp(cmp,
+            sample$nests,
+            samplers = sample$plots,
+            domain = list(geometry = mesh))
 ```
 
 
@@ -142,10 +145,12 @@ lambda.sample.plot
 
 Estimate the integrated intensity lambda. We compute both the overall integrated
 intensity, representative of an imagined new realisation of the point process,
-and the conditional expectation that takes the actually observed nests into account,
-by recognising that we have complete information in the surveyed plots. 
+and the conditional expectation that takes the actually observed nests into
+account, by recognising that we have complete information in the surveyed plots.
 ```{r results="hide",warning=FALSE,message=FALSE}
-Lambda <- predict(fit, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda <- predict(fit,
+                  fm_int(mesh, boundary),
+                  ~ sum(weight * exp(my.spde + Intercept)))
 Lambda.empirical <- predict(
   fit,
   rbind(
@@ -163,8 +168,9 @@ rbind(
 ```
 
 
-Fit the same model to the full dataset (the points in `gorillas_sf$nests`), or get your previous 
-fit, if you kept it. Plot the intensity surface and estimate the integrated intensity
+Fit the same model to the full dataset (the points in `gorillas_sf$nests`), or
+get your previous fit, if you kept it. Plot the intensity surface and estimate
+the integrated intensity
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 fit.all <- lgcp(cmp, nests,
@@ -172,7 +178,9 @@ fit.all <- lgcp(cmp, nests,
   domain = list(geometry = mesh)
 )
 lambda.all <- predict(fit.all, pxl, ~ exp(my.spde + Intercept))
-Lambda.all <- predict(fit.all, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda.all <- predict(fit.all,
+                      fm_int(mesh, boundary),
+                      ~ sum(weight * exp(my.spde + Intercept)))
 ```
 
 Your plot should look like this:
@@ -211,4 +219,5 @@ lambda.sample.plot + lambda.all.plot +
   scale_fill_continuous(limits = range(c(0, 340)))
 ```
 
-Do you understand the reason for the differences in the posteriors of the abundance estimates?
+Do you understand the reason for the differences in the posteriors of the
+abundance estimates?

@@ -9,7 +9,8 @@
 #'
 #' @format The data are a list that contains these elements:
 #'  \describe{
-#'    \item{`points`}{An `sf` object of point locations and and `z` measurements}
+#'    \item{`points`}{An `sf` object of point locations and and `z`
+#'      measurements}
 #'    \item{`mesh`}{An `fm_mesh_2d` object}
 #'    \item{`boundary`}{An `sf` polygon denting the region of interest}
 #'    \item{`pred_locs`}{A `sf` object with prediction point locations}

@@ -575,7 +575,11 @@ test_that("Marginal mapper", {
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
 
-  dqexp <- function(p, rate = 1, lower.tail = TRUE, log.p = FALSE, log = FALSE) {
+  dqexp <- function(p,
+                    rate = 1,
+                    lower.tail = TRUE,
+                    log.p = FALSE,
+                    log = FALSE) {
     if (log.p) {
       if (lower.tail) {
         val <- log1p(-exp(p)) + log(rate)

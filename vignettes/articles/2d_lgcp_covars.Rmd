@@ -112,7 +112,8 @@ an intercept. Instead, we can either use `model="factor_full"` without an interc
 or `model="factor_contrast"`, which does remove the first level.
 
 ```{r warning=FALSE,message=FALSE}
-comp1alt <- geometry ~ vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
+comp1alt <- geometry ~ vegetation(gcov$vegetation, model = "factor_contrast") +
+  Intercept(1)
 ```
 
 Fit the model as usual:
@@ -125,35 +126,42 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit1 <- readRDS(file = .cache_file)
 } else {
-  fit1 <- lgcp(comp1, nests, samplers = boundary, domain = list(geometry = mesh))
+  fit1 <- lgcp(comp1,
+               nests,
+               samplers = boundary,
+               domain = list(geometry = mesh))
   saveRDS(fit1, .cache_file)
 }
 ```
 
-Predict the intensity, and plot the median intensity surface. (In older versions, predicting takes some
-time because we did not have vegetation values outside the mesh so 'inlabru' needed 
-to predict these first. Since v2.0.0, the vegetation has been pre-extended.)
+Predict the intensity, and plot the median intensity surface. (In older
+versions, predicting takes some time because we did not have vegetation values
+outside the mesh so 'inlabru' needed to predict these first. Since v2.0.0, the
+vegetation has been pre-extended.)
 
-The `predict` function of `inlabru` takes into its `data` argument an `sf` object or other object
-supported by the predictor evaluation code (for non-geographical data, typically a `data.frame`).
-We can use the `inlabru` function `pixels` to generate
-an `sf` object with points only within the boundary, using its `mask` argument, as shown below.
+The `predict` function of `inlabru` takes into its `data` argument an `sf`
+object or other object supported by the predictor evaluation code (for
+non-geographical data, typically a `data.frame`). We can use the `inlabru`
+function `pixels` to generate an `sf` object with points only within the
+boundary, using its `mask` argument, as shown below.
 
 
 ```{r warning=FALSE,message=FALSE}
 pred.df <- fm_pixels(mesh, mask = boundary)
 int1 <- predict(fit1, pred.df, ~ exp(vegetation))
 
+# gg() with sf points and geom = "tile" plots a raster
 ggplot() +
-  gg(int1, geom = "tile") + # gg() with sf points and geom = "tile" plots a raster
+  gg(int1, geom = "tile") +
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests, color = "DarkGreen")
 ```
 
-Not surprisingly, given that most nests are in `Primary` vegetation, the high density 
-is in this vegetation. But there are substantial patches of predicted high density 
-that have no nests, and some areas of predicted low density that have nests. What 
-about the estimated abundance (there are really 647 nests there):
+Not surprisingly, given that most nests are in `Primary` vegetation, the high
+density is in this vegetation. But there are substantial patches of predicted
+high density that have no nests, and some areas of predicted low density that
+have nests. What about the estimated abundance (there are really 647 nests
+there):
 
 ```{r warning=FALSE,message=FALSE}
 ips <- fm_int(mesh, boundary)
@@ -186,7 +194,10 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit2 <- readRDS(file = .cache_file)
 } else {
-  fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(geometry = mesh))
+  fit2 <- lgcp(comp2,
+               nests,
+               samplers = boundary,
+               domain = list(geometry = mesh))
   saveRDS(fit2, .cache_file)
 }
 ```
@@ -214,7 +225,8 @@ Lambda2 <- predict(
 Lambda2
 ```
 
-Look at the contributions to the linear predictor from the SPDE and from vegetation:
+Look at the contributions to the linear predictor from the SPDE and from
+vegetation:
 ```{r warning=FALSE,message=FALSE}
 lp2 <- predict(fit2, pred.df, ~ list(
   smooth_veg = mySmooth + vegetation,
@@ -223,9 +235,9 @@ lp2 <- predict(fit2, pred.df, ~ list(
 ))
 ```
 
-The function `scale_fill_gradientn` sets the scale 
-for the plot legend. Here we set it to span the range of the three linear predictor
-components being plotted (medians are plotted by default).
+The function `scale_fill_gradientn` sets the scale for the plot legend. Here we
+set it to span the range of the three linear predictor components being plotted
+(medians are plotted by default).
 
 
 ```{r warning=FALSE,message=FALSE}
@@ -258,9 +270,8 @@ multiplot(plot.lp2, plot.lp2.spde, plot.lp2.veg, cols = 3)
 
 #### A model with SPDE only
 
-Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and choose
-between models on the basis of DIC, using 'deltaIC()'.
-
+Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and
+choose between models on the basis of DIC, using `deltaIC()`.
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
@@ -277,7 +288,10 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit3 <- readRDS(file = .cache_file)
 } else {
-  fit3 <- lgcp(comp3, nests, samplers = boundary, domain = list(geometry = mesh))
+  fit3 <- lgcp(comp3,
+               nests,
+               samplers = boundary,
+               domain = list(geometry = mesh))
   saveRDS(fit3, .cache_file)
 }
 ```
@@ -301,7 +315,8 @@ Lambda3
 ```{r warning=FALSE,message=FALSE}
 knitr::kable(deltaIC(fit1, fit2, fit3, criterion = c("DIC")))
 ```
-NOTE: the behaviour of DIC is currently a bit unclear, and is being investigated.
+NOTE: the behaviour of DIC is currently a bit unclear, and is being
+investigated.
 WAIC is related to leave-one-out cross-validation, and is not appropriate to
 use with the current current LGCP likelihood implementation.
 
@@ -341,9 +356,9 @@ ggplot() +
   gg(nests)
 ```
 
-Plot the vegetation "fixed effect" posteriors. First get their names - from `$marginals.random$vegetation` of the fitted object, 
-which contains the fixed effect marginal distribution data
-
+Plot the vegetation "fixed effect" posteriors. First get their names - from
+`$marginals.random$vegetation` of the fitted object, which contains the fixed
+effect marginal distribution data
 
 ```{r warning=FALSE,message=FALSE}
 flist <- vector("list", NROW(fit2$summary.random$vegetation))
@@ -351,10 +366,8 @@ for (i in seq_along(flist)) flist[[i]] <- plot(fit2, "vegetation", index = i)
 multiplot(plotlist = flist, cols = 3)
 ```
 
-Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors and the 
-Matern correlation and covariance functions
-for this model.
-
+Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors
+and the Matern correlation and covariance functions for this model.
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 spde.range <- spde.posterior(fit2, "mySmooth", what = "range")
@@ -371,9 +384,8 @@ multiplot(covplot, corplot)
 Continuous covariates
 -----------------------------------
 
-Now lets try a model with elevation as a (continuous) explanatory variable. (First centre elevations
-for more stable fitting.)
-
+Now lets try a model with elevation as a (continuous) explanatory variable.
+(First centre elevations for more stable fitting.)
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 elev <- gcov$elevation
@@ -385,25 +397,27 @@ ggplot() +
 ```
 
 
-The elevation variable here is of class 'SpatRaster', that can be
-handled in the same way as the vegetation covariate, with automatic evaluation via an `eval_spatial()` method. However, since in some
-cases data may be stored differently, other methods are needed to access
-the stored values, or there's some post-processing to be done.
-In such cases, we can define a function that knows how to
-evaluate the covariate at arbitrary points in the survey region, and call that
-function in the component definition. The method `eval_spatial()` is the method that handles this
-automatically, and supports `terra` `SpatRaster` and `sf` geometry points
-objects, and mismatching coordinate systems as well.  In the following evaluator example
-function, we only add infilling of missing values as a post-processing step.
-
+The elevation variable here is of class 'SpatRaster', that can be handled in the
+same way as the vegetation covariate, with automatic evaluation via an
+`eval_spatial()` method. However, since in some cases data may be stored
+differently, other methods are needed to access the stored values, or there's
+some post-processing to be done. In such cases, we can define a function that
+knows how to evaluate the covariate at arbitrary points in the survey region,
+and call that function in the component definition. The method `eval_spatial()`
+is the method that handles this automatically, and supports `terra` `SpatRaster`
+and `sf` geometry points objects, and mismatching coordinate systems as well.
+In the following evaluator example function, we only add infilling of missing
+values as a post-processing step.
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 # Note: this method is usually not needed; the automatic invocation of
-# `eval_spatial()` method by the component input evaluator is usually sufficient.
+# `eval_spatial()` method by the component input evaluator is usually
+# sufficient.
 f.elev <- function(where) {
   # Extract the values
   v <- eval_spatial(elev, where, layer = "elevation")
-  # Fill in missing values; this example would work for SpatialPixelsDataFrame data
+  # Fill in missing values; this example would work for
+  # SpatialPixelsDataFrame data
   # if (any(is.na(v))) {
   #   v <- bru_fill_missing(elev, where, v)
   # }
@@ -411,8 +425,9 @@ f.elev <- function(where) {
 }
 ```
 
-For brevity we are not going to consider models with elevation only, with elevation
-and a SPDE, and with SPDE only. We will just fit one with elevation and SPDE.
+For brevity we are not going to consider models with elevation only, with
+elevation and a SPDE, and with SPDE only. We will just fit one with elevation
+and SPDE.
 We create our model to pass to lgcp thus:
 
 
@@ -426,9 +441,9 @@ ecomp <- geometry ~ elev(f.elev(.data.), model = "linear") +
   mySmooth(geometry, model = matern) + Intercept(1)
 ```
 
-Note how the elevation effect is defined. We could alternatively use the `terra` grid
-object directly (causing `inlabru` to automatically call `eval_spatial()`), like
-in the vegetation case:
+Note how the elevation effect is defined. We could alternatively use the `terra`
+grid object directly (causing `inlabru` to automatically call `eval_spatial()`),
+like in the vegetation case:
 we specified it like
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
 elev(elev, model = "factor_full")
@@ -437,8 +452,8 @@ whereas with the special function method we specify the covariate like this:
 ```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
 elev(f.elev(.data.), model = "linear")
 ```
-Most applications can use the automatic method, and the special function method is
-included only as an example of how to handle more complex cases.
+Most applications can use the automatic method, and the special function method
+is included only as an example of how to handle more complex cases.
 
 We also now include an intercept term in the model.
 
@@ -452,7 +467,10 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   efit <- readRDS(file = .cache_file)
 } else {
-  efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(geometry = mesh))
+  efit <- lgcp(ecomp,
+               nests,
+               samplers = boundary,
+               domain = list(geometry = mesh))
   saveRDS(efit, .cache_file)
 }
 ```
@@ -539,9 +557,8 @@ multiplot(plot.e.lp,
 )
 ```
 
-You might also want to look at the posteriors of the fixed effects and of the SPDE.
-Adapt the code used for the vegetation factor to do this.
-
+You might also want to look at the posteriors of the fixed effects and of the
+SPDE. Adapt the code used for the vegetation factor to do this.
 
 ```{r warning=FALSE,message=FALSE}
 LambdaE <- predict(
@@ -561,9 +578,8 @@ for (i in seq_along(flist)) {
 multiplot(plotlist = flist, cols = 2)
 ```
 
-Plot the SPDE parameter posteriors and the Matern correlation and covariance functions
-for this model.
-
+Plot the SPDE parameter posteriors and the Matern correlation and covariance
+functions for this model.
 
 ```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 spde.range <- spde.posterior(efit, "mySmooth", what = "range")
@@ -577,8 +593,8 @@ covplot <- plot(spde.posterior(efit, "mySmooth", what = "matern.covariance"))
 multiplot(covplot, corplot)
 ```
 
-Also estimate abundance. The `data.frame` in the second call leads to inclusion of `N`
-in the prediction object, for easier plotting.
+Also estimate abundance. The `data.frame` in the second call leads to inclusion
+of `N` in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda <- predict(
@@ -619,13 +635,13 @@ adding the suffix `_eval` to the end of the component name in the predictor
 expression, and disabling normal component evaluation for all components with
 `include = character(0)`
 (since we're both bypassing the normal input to the `elev` component, and not
-supplying data for the other components).  From version `2.8.0`, `inlabru` attempts
-to automatically detect which model components are used in the expression, and the
-`include` argument can be left out entirely.
+supplying data for the other components).  From version `2.8.0`, `inlabru`
+attempts to automatically detect which model components are used in the
+expression, and the `include` argument can be left out entirely.
 
-Since the elevation effect in this
-model is linear, the resulting plot isn't very interesting, but the same method
-can be applied to non-linear effects as well, and combined into general R expressions.
+Since the elevation effect in this model is linear, the resulting plot isn't
+very interesting, but the same method can be applied to non-linear effects as
+well, and combined into general R expressions.
 
 ```{r}
 elev.pred <- predict(
@@ -656,12 +672,12 @@ ggplot(elev.pred) +
 
 A 1D Example
 ----------------
-Try fitting a 1-dimensional model to the point data in the `inlabru` dataset 
-`Poisson2_1D`. This comes with a covariate function called `cov2_1D`. Try to reproduce 
-the plot below (used in lectures) showing the effects of the `Intercept + z` and the 
-`SPDE`. (You may find it helpful to build on the model you fitted in the previous 
-practical, adding the covariate to the model specification.)
-
+Try fitting a 1-dimensional model to the point data in the `inlabru` dataset
+`Poisson2_1D`. This comes with a covariate function called `cov2_1D`. Try to
+reproduce the plot below (used in lectures) showing the effects of the
+`Intercept + z` and the `SPDE`. (You may find it helpful to build on the model
+you fitted in the previous practical, adding the covariate to the model
+specification.)
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 data(Poisson2_1D)
@@ -689,12 +705,15 @@ prcov1D <- predict(
 
 ggplot() +
   gg(prcov1D$total, color = "red") +
-  geom_line(aes(x = prcov1D$spde$x, y = prcov1D$spde$median), col = "blue", lwd = 1.25) +
-  geom_line(aes(x = prcov1D$fx$x, y = prcov1D$fx$median), col = "green", lwd = 1.25) +
+  geom_line(aes(x = prcov1D$spde$x, y = prcov1D$spde$median),
+            col = "blue", lwd = 1.25) +
+  geom_line(aes(x = prcov1D$fx$x, y = prcov1D$fx$median),
+            col = "green", lwd = 1.25) +
   geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
   xlab(expression(bold(s))) +
   ylab(expression(hat(lambda)(bold(s)) ~ ~"and its components")) +
   annotate(geom = "text", x = 40, y = 6, label = "Intensity", color = "red") +
-  annotate(geom = "text", x = 40, y = 5.5, label = "z-effect", color = "green") +
+  annotate(geom = "text", x = 40, y = 5.5, label = "z-effect",
+           color = "green") +
   annotate(geom = "text", x = 40, y = 5, label = "SPDE", color = "blue")
 ```

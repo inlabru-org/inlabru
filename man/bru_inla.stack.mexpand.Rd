@@ -11,11 +11,12 @@ bru_inla.stack.mexpand(
 )
 }
 \arguments{
-\item{...}{List of stacks that contain vector observations
-(existing multilikelihood observation matrices are also permitted)}
+\item{\dots}{List of stacks that contain vector observations (existing
+multilikelihood observation matrices are also permitted)}
 
-\item{old.names}{A vector of strings with the names of the observation vector/matrix for each stack.
-If a single string, this is assumed for all the stacks. (default "BRU.response")}
+\item{old.names}{A vector of strings with the names of the observation
+vector/matrix for each stack. If a single string, this is assumed for all
+the stacks. (default "BRU.response")}
 
 \item{new.name}{The name to be used for the expanded observation matrix,
 possibly the same as an old name. (default "BRU.response")}
@@ -24,9 +25,11 @@ possibly the same as an old name. (default "BRU.response")}
 a list of modified stacks with multicolumn observations
 }
 \description{
-Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
+Expand observation vectors/matrices in stacks into to a multicolumn matrix
+for multiple likelihoods
 }
 \author{
-Fabian E. Bachl \email{f.e.bachl@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@gmail.com}
+Fabian E. Bachl \email{f.e.bachl@bath.ac.uk} and Finn Lindgren
+\email{finn.lindgren@gmail.com}
 }
 \keyword{internal}
