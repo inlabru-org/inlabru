@@ -36,7 +36,8 @@ test_that("Aggregated Gaussian observations", {
             fixed = TRUE
           )
         )
-      )
+      ),
+      allow_combine = TRUE
     )
   )
 
@@ -66,7 +67,8 @@ test_that("Aggregated Gaussian observations", {
       data = pred_sf,
       control.family = list(
         hyper = list(prec = list(initial = 6, fixed = TRUE))
-      )
+      ),
+      allow_combine = TRUE
     )
   )
 
@@ -105,7 +107,8 @@ test_that("Aggregated Poisson observations", {
       ),
       family = "poisson",
       response_data = obs,
-      data = pred
+      data = pred,
+      allow_combine = TRUE
     )
   )
 
@@ -133,7 +136,8 @@ test_that("Aggregated Poisson observations", {
       family = "poisson",
       E = E,
       response_data = obs,
-      data = pred
+      data = pred,
+      allow_combine = TRUE
     )
   )
 

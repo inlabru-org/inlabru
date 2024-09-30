@@ -14,6 +14,8 @@
 * Reduced the amount of diagnostic messages in `bru_safe_inla()` (version `2.11.1.9005`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 * Remove unnecessary `INLA` namespace loading in `ggplot` methods (version `2.11.1.9008`)
+* Change logic for `like(allow_combine)` to allow user override, and add warnings
+  for ambiguous cases (version `2.11.1.9011`)
 
 ## Data set updates
 

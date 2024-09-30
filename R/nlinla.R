@@ -31,6 +31,9 @@ bru_compute_linearisation <- function(...) {
 #' directly available to the predictor expression, with a `_latent` suffix.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
+#' @param eps The finite difference step size
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.component <- function(cmp,
@@ -46,8 +49,15 @@ bru_compute_linearisation.component <- function(cmp,
                                                 allow_latent,
                                                 allow_combine,
                                                 eps,
-                                                ...) {
+                                                ...,
+                                                options = NULL) {
   label <- cmp[["label"]]
+  bru_log_message(
+    paste0("Linearise with respect to component '", label, "'"),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 4
+  )
 
   if (is.null(comp_simple)) {
     A <- NULL
@@ -337,7 +347,6 @@ bru_compute_linearisation.bru_like <- function(lhood,
 }
 
 #' @param lhoods A `bru_like_list` object
-#' @param eps The finite difference step size
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like_list <- function(lhoods,

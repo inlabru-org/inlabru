@@ -693,12 +693,15 @@ component_eval <- function(main,
 #' @param input A list of named lists of component inputs
 #' @param state A named list of component states
 #' @param inla_f Controls the input data interpretations
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
 #' @return A list (class 'comp_simple') of named lists (class
 #'   'comp_simple_list') of `bru_mapper_taylor` objects, one for each included
 #'   component
 #' @rdname evaluate_comp_lin
 #' @keywords internal
-evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
+evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
+                              options = NULL) {
   stopifnot(inherits(model, "bru_model"))
   mappers <-
     lapply(
@@ -714,7 +717,8 @@ evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
           model[["effects"]][included],
           input = inp[included],
           state = state[included],
-          inla_f = inla_f
+          inla_f = inla_f,
+          options = options
         )
 
         class(mappers) <- c("comp_simple_list", class(mappers))
@@ -745,13 +749,22 @@ evaluate_comp_simple <- function(...) {
 }
 
 #' @export
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
-                                                inla_f = FALSE, ...) {
+                                                inla_f = FALSE, ...,
+                                                options = NULL) {
   mappers <- lapply(
     components,
     function(x) {
       label <- x[["label"]]
+      bru_log_message(
+        paste0("Simplify component '", label, "'"),
+        verbose = options$bru_verbose,
+        verbose_store = options$bru_verbose_store,
+        verbosity = 4
+      )
       ibm_simplify(
         x[["mapper"]],
         input[[label]],

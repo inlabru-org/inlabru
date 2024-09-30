@@ -24,7 +24,8 @@ bru_compute_linearisation(...)
   allow_latent,
   allow_combine,
   eps,
-  ...
+  ...,
+  options = NULL
 )
 
 \method{bru_compute_linearisation}{bru_like}(
@@ -90,6 +91,9 @@ directly available to the predictor expression, with a \verb{_latent} suffix.}
 involve several rows of the input data to influence the same row.}
 
 \item{eps}{The finite difference step size}
+
+\item{options}{A \code{bru_options} object. The log verbosity options
+are used.}
 
 \item{lhood}{A \code{bru_like} object}
 

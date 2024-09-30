@@ -8,7 +8,7 @@
 \usage{
 evaluate_comp_simple(...)
 
-\method{evaluate_comp_simple}{component_list}(components, input, inla_f = FALSE, ...)
+\method{evaluate_comp_simple}{component_list}(components, input, inla_f = FALSE, ..., options = NULL)
 
 \method{evaluate_comp_simple}{bru_model}(model, input, ...)
 }
@@ -16,6 +16,9 @@ evaluate_comp_simple(...)
 \item{input}{A list of named lists of component inputs}
 
 \item{inla_f}{Controls the input data interpretations}
+
+\item{options}{A \code{bru_options} object. The log verbosity options
+are used.}
 
 \item{model}{A \code{bru_model} object}
 }

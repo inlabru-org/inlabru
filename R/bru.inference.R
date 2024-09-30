@@ -1311,9 +1311,9 @@ extended_bind_rows <- function(...) {
 #' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated.
 #'   Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve
-#'   several rows of the input data to influence the same row. Default `FALSE`,
-#'   but forced to `TRUE` if `response_data` is non-`NULL`, `data` is a `list`,
-#'   or the likelihood construction requires it.
+#'   several rows of the input data to influence the same row. When `NULL`,
+#'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
+#'   `list`, or the likelihood construction requires it.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
@@ -1640,15 +1640,22 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     allow_combine <- TRUE
   } else {
-    allow_combine <-
-      if (!is.null(response_data) ||
-        (is.list(data) && !is.data.frame(data))) {
-        TRUE
-      } else if (is.null(allow_combine)) {
-        FALSE
+    if (!is.logical(allow_combine)) {
+      if (!is.null(response_data)) {
+        warning("Non-null response data supplied; guessing allow_combine=TRUE.",
+                "\n  Specify allow_combine explicitly to avoid this warning.",
+                immediate. = TRUE)
+        allow_combine <- TRUE
+      } else if (is.list(data) && !is.data.frame(data)) {
+        warning("Non data-frame list-like data supplied; ",
+                "guessing allow_combine=TRUE.",
+                "\n  Specify allow_combine explicitly to avoid this warning.",
+                immediate. = TRUE)
+        allow_combine <- TRUE
       } else {
-        allow_combine
+        allow_combine <- FALSE
       }
+    }
 
     # Need to make a list instead of data.frame, to allow inla.mdata responses
     response_data <- list(
@@ -3698,7 +3705,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   comp_lin <- evaluate_comp_lin(model,
     input = inputs,
     state = states[[length(states)]],
-    inla_f = TRUE
+    inla_f = TRUE,
+    options = options
   )
   bru_log_message(
     "iinla: Evaluate component simplifications",
@@ -3708,7 +3716,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   )
   comp_simple <- evaluate_comp_simple(model,
     input = inputs,
-    inla_f = TRUE
+    inla_f = TRUE,
+    options = options
   )
   bru_log_message(
     "iinla: Evaluate predictor linearisation",
@@ -3721,7 +3730,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     lhoods = lhoods,
     input = inputs,
     state = states[[length(states)]],
-    comp_simple = comp_simple
+    comp_simple = comp_simple,
+    options = options
   )
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)

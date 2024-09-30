@@ -1920,6 +1920,8 @@ print.summary_bru_input <- function(x, ...) {
 #' @param state linearisation evaluation state
 #' @param ... Optional parameters passed on to `ibm_eval`
 #' and `ibm_jacobian.
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
 #' @return A `bru_mapper_taylor` or `comp_simple_list` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname comp_lin_eval
@@ -1927,7 +1929,14 @@ print.summary_bru_input <- function(x, ...) {
 comp_lin_eval.component <- function(component,
                                     input = NULL,
                                     state = NULL,
-                                    ...) {
+                                    ...,
+                                    options = NULL) {
+  bru_log_message(
+    paste0("Linearise component '", component[["label"]], "'"),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 4
+  )
   if (is.null(state)) {
     state <- rep(0, ibm_n(component[["mapper"]]))
   }
@@ -1937,7 +1946,8 @@ comp_lin_eval.component <- function(component,
 #' @export
 #' @rdname comp_lin_eval
 
-comp_lin_eval.component_list <- function(components, input, state, ...) {
+comp_lin_eval.component_list <- function(components, input, state, ...,
+                                         options = NULL) {
   # Note: Make sure the list element names carry over!
   mappers <-
     lapply(
@@ -1947,7 +1957,8 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
         comp_lin_eval(x,
           input = input[[label]],
           state = state[[label]],
-          ...
+          ...,
+          options = options
         )
       }
     )

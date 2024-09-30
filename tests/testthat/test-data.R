@@ -8,7 +8,8 @@ test_that("Component construction: default mesh/mapping, data is list", {
   lik <- like("gaussian",
     formula = y ~ .,
     data = list(x = c(1, 1.5, 2, NA, 3, 4), y = 11:15),
-    include = "effect"
+    include = "effect",
+    allow_combine = TRUE
   )
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
@@ -64,7 +65,8 @@ test_that("Component construction: default mesh/mapping, data is list", {
 
 test_that("Component construction: unsafe intercepts, data is list", {
   cmp <- component_list(~ something_unknown - 1)
-  lik <- like(formula = response ~ ., data = list(response = 1:5))
+  lik <- like(formula = response ~ ., data = list(response = 1:5),
+              allow_combine = TRUE)
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
@@ -84,14 +86,14 @@ test_that("Component construction: separate response_data input", {
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = list(x = c(1, 1.5, 2, 3, 4)),
     response_data = data.frame(y = 11:12),
-    include = "effect"
+    allow_combine = TRUE
   )
 
   lik2 <- like("gaussian",
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = data.frame(x = c(1, 1.5, 2, 3, 4)),
     response_data = data.frame(y = 11:12),
-    include = "effect"
+    allow_combine = TRUE
   )
 
 
