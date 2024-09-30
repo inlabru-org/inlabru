@@ -206,7 +206,14 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     inla.mode = "compact",
     envir = envir
   )
-  if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
+  sp_version <- tryCatch(
+    getNamespaceVersion("sp"),
+    error = function(e) {
+      NULL
+    }
+  )
+  if (!is.null(sp_version) &&
+      (utils::compareVersion(sp_version, "1.6-0") >= 0)) {
     old_sp_evolution_status <- tryCatch(
       sp::get_evolution_status(),
       error = function(e) {
