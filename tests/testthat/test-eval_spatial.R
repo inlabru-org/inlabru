@@ -132,7 +132,7 @@ test_that("eval_spatial.sf", {
   data(gorillas_sf, package = "inlabru", envir = environment())
 
   nests <- gorillas_sf$nests
-  plots <- gorillas_sf$plotsample$plots)
+  plots <- gorillas_sf$plotsample$plots
   plots$something_num <- seq_len(nrow(plots))
   nests$something_num <- eval_spatial(plots, nests, layer = "something_num")
   something_num <- eval_spatial(plots, plots, layer = "something_num")
