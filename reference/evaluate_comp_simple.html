@@ -9,7 +9,7 @@ components for each model likelihood, and keeps non-linear mappers intact."></he
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,7 @@ components for each model likelihood, and keeps non-linear mappers intact.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">evaluate_comp_simple</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'component_list'</span></span>
-<span><span class="fu">evaluate_comp_simple</span><span class="op">(</span><span class="va">components</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">evaluate_comp_simple</span><span class="op">(</span><span class="va">components</span>, <span class="va">input</span>, inla_f <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span>, options <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'bru_model'</span></span>
 <span><span class="fu">evaluate_comp_simple</span><span class="op">(</span><span class="va">model</span>, <span class="va">input</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -103,6 +103,11 @@ components for each model likelihood, and keeps non-linear mappers intact.</p>
 
 <dt id="arg-inla-f">inla_f<a class="anchor" aria-label="anchor" href="#arg-inla-f"></a></dt>
 <dd><p>Controls the input data interpretations</p></dd>
+
+
+<dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
+<dd><p>A <code>bru_options</code> object. The log verbosity options
+are used.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
