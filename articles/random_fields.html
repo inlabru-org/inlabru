@@ -168,8 +168,9 @@ don’t worry, the point of this is just to provide something to which we
 can compare the <code>inlabru</code> model fit.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>                data <span class="op">=</span> <span class="va">cd</span><span class="op">)</span></span></code></pre></div>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">cd</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The term <code>s(x,k=10)</code> just specifies that as nonparametric
 smooth function is to be fitted to the data, with <em>no more than</em>
 10 degrees of freedom (df). (The larger the df, the more wiggly the
@@ -289,7 +290,7 @@ add all components (unless a subset is selected via the
 <span><span class="co">#&gt;     Predictor: count ~ .</span></span>
 <span><span class="co">#&gt;     Used components: effects[field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.718, Running = 0.219, Post = 0.119, Total = 1.06 </span></span>
+<span><span class="co">#&gt;     Pre = 0.694, Running = 0.215, Post = 0.12, Total = 1.03 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;            mean    sd 0.025quant 0.5quant 0.975quant  mode   kld</span></span>
 <span><span class="co">#&gt; Intercept 0.978 0.702     -0.008    0.857      3.166 0.812 0.004</span></span>
@@ -319,9 +320,10 @@ must be a data frame, see <code><a href="../reference/predict.bru.html">?predict
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">xs</span><span class="op">)</span></span>
 <span><span class="va">pred2.bru</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2.bru</span>,</span>
-<span>                     <span class="va">x4pred</span>,</span>
-<span>                     <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>,</span>
-<span>                     n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="va">x4pred</span>,</span>
+<span>  <span class="va">x</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>,</span>
+<span>  n.samples <span class="op">=</span> <span class="fl">1000</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Let’s do a plot to compare the fitted model to the true model. The
 expected counts of the true model are stored in the variable
 <code>E_nc2</code> which comes with the dataset

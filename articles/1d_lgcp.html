@@ -202,20 +202,24 @@ and variance parameters, and for the covariance function (which involves
 both these parameters).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">post.log.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>,</span>
-<span>                                 name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
-<span>                                 what <span class="op">=</span> <span class="st">"log.range"</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"log.range"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.log.range</span><span class="op">)</span></span>
 <span><span class="va">post.variance</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>,</span>
-<span>                                name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
-<span>                                what <span class="op">=</span> <span class="st">"variance"</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"variance"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.variance</span><span class="op">)</span></span>
 <span><span class="va">post.log.variance</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>,</span>
-<span>                                    name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
-<span>                                    what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"log.variance"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.log.variance</span><span class="op">)</span></span>
 <span><span class="va">post.matcorr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit.spde</span>,</span>
-<span>                               name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
-<span>                               what <span class="op">=</span> <span class="st">"matern.correlation"</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="st">"spde1D"</span>,</span>
+<span>  what <span class="op">=</span> <span class="st">"matern.correlation"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">post.matcorr</span><span class="op">)</span></span></code></pre></div>
 <p>You can get a feel for sensitivity to priors by specifying different
 priors and looking at the posterior plots.</p>
@@ -231,9 +235,10 @@ we call <code>predict</code> thus:</p>
 <code class="sourceCode R"><span><span class="co"># Set up a data frame of explanatory values at which to predict</span></span>
 <span><span class="va">predf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pred_spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit.spde</span>,</span>
-<span>                     <span class="va">predf</span>,</span>
-<span>                     <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>,</span>
-<span>                     n.samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="va">predf</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">spde1D</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span>,</span>
+<span>  n.samples <span class="op">=</span> <span class="fl">1000</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>while to predict on the linear predictor scale (i.e. that of the log
 intensity,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(\lambda(s))</annotation></semantics></math>),
@@ -308,7 +313,7 @@ are constructed using the <code>fm_int</code> function</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Lambda</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 128.9721 11.05099 109.2842 129.2976 151.9565 129.2976     0.8142971        1.267959</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 130.3557 10.63297 111.0565 128.8079 151.3013 128.8079     0.7076528        1.204827</span></span></code></pre></div>
 <ul>
 <li>
 <code>mean</code> is the posterior mean abundance.</li>
@@ -345,23 +350,23 @@ to modify <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Nest</span><span class="op">[</span><span class="va">Nest</span><span class="op">$</span><span class="va">N</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">100</span><span class="op">:</span><span class="fl">105</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;      N        mean          sd       q0.025         q0.5     q0.975       median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 51 100 0.004455601 0.007563822 3.621189e-07 0.0007099238 0.03068001 0.0007099238  0.0010475038</span></span>
-<span><span class="co">#&gt; 52 101 0.005066127 0.008165784 5.600277e-07 0.0009217028 0.03261954 0.0009217028  0.0010590813</span></span>
-<span><span class="co">#&gt; 53 102 0.005725035 0.008753333 8.576113e-07 0.0011849262 0.03434246 0.0011849262  0.0010571585</span></span>
-<span><span class="co">#&gt; 54 103 0.006431138 0.009319650 1.300577e-06 0.0015085324 0.03580620 0.0015085324  0.0010419453</span></span>
-<span><span class="co">#&gt; 55 104 0.007182517 0.009858399 1.953381e-06 0.0019020497 0.03697423 0.0019020497  0.0010142824</span></span>
-<span><span class="co">#&gt; 56 105 0.007976501 0.010363841 2.905919e-06 0.0023753802 0.03781762 0.0023753802  0.0009756128</span></span>
+<span><span class="co">#&gt; 51 100 0.003491099 0.006450975 4.622759e-07 0.0007826648 0.02065122 0.0007826648  0.0011721260</span></span>
+<span><span class="co">#&gt; 52 101 0.003977357 0.006820277 7.110891e-07 0.0010129374 0.02280803 0.0010129374  0.0010930625</span></span>
+<span><span class="co">#&gt; 53 102 0.004515786 0.007226898 1.083139e-06 0.0012981078 0.02495078 0.0012981078  0.0010261322</span></span>
+<span><span class="co">#&gt; 54 103 0.005107988 0.007668447 1.633891e-06 0.0016474112 0.02610005 0.0016474112  0.0009705995</span></span>
+<span><span class="co">#&gt; 55 104 0.005754786 0.008139681 2.441080e-06 0.0020706052 0.02587011 0.0020706052  0.0009243111</span></span>
+<span><span class="co">#&gt; 56 105 0.006456120 0.008632874 3.612446e-06 0.0025777261 0.02628321 0.0025777261  0.0008847946</span></span>
 <span><span class="co">#&gt;    mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 51    0.0009658829</span></span>
-<span><span class="co">#&gt; 52    0.0010283946</span></span>
-<span><span class="co">#&gt; 53    0.0010867650</span></span>
-<span><span class="co">#&gt; 54    0.0011403540</span></span>
-<span><span class="co">#&gt; 55    0.0011886964</span></span>
-<span><span class="co">#&gt; 56    0.0012315067</span></span></code></pre></div>
+<span><span class="co">#&gt; 51    0.0008795227</span></span>
+<span><span class="co">#&gt; 52    0.0009006402</span></span>
+<span><span class="co">#&gt; 53    0.0009279162</span></span>
+<span><span class="co">#&gt; 54    0.0009609646</span></span>
+<span><span class="co">#&gt; 55    0.0009988303</span></span>
+<span><span class="co">#&gt; 56    0.0010402463</span></span></code></pre></div>
 <p>We compute the 95% prediction interval and the median as follows</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/marginal.html" class="external-link">inla.qmarginal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, marginal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">N</span>, y <span class="op">=</span> <span class="va">Nest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  99.60255 129.49772 164.78146</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 100.3286 130.6556 163.8018</span></span></code></pre></div>
 <p>Compare <code>Lambda</code> to <code>Nest</code> by plotting: First
 calculate the posterior conditional on the mean of
 <code>Lambda</code></p>
@@ -396,10 +401,13 @@ the LGCP fitted above and the true intensity.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cd2</span> <span class="op">&lt;-</span> <span class="va">countdata2</span></span>
 <span><span class="va">fit2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">exposure</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>                data <span class="op">=</span> <span class="va">cd2</span><span class="op">)</span></span>
-<span><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
-<span>                       exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cd2</span><span class="op">$</span><span class="va">exposure</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">cd2</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">dat4pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">55</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>  exposure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">cd2</span><span class="op">$</span><span class="va">exposure</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">pred2.gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit2.gam</span>, newdata <span class="op">=</span> <span class="va">dat4pred</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">dat4pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">dat4pred</span>, gam <span class="op">=</span> <span class="va">pred2.gam</span><span class="op">)</span></span></code></pre></div>
 <p>You should get a plot like this (thick line is the true intensity,
@@ -407,9 +415,11 @@ the thin solid line the inlabru fit, the dashed line the GAM fit:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_spde</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pts2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span>, pch <span class="op">=</span> <span class="st">"|"</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dat4pred2</span>,</span>
-<span>            <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">gam</span> <span class="op">/</span> <span class="va">exposure</span>, colour <span class="op">=</span> <span class="st">"gam()"</span><span class="op">)</span>,</span>
-<span>            lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">dat4pred2</span>,</span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">gam</span> <span class="op">/</span> <span class="va">exposure</span>, colour <span class="op">=</span> <span class="st">"gam()"</span><span class="op">)</span>,</span>
+<span>    lty <span class="op">=</span> <span class="fl">2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">true.lambda</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="st">"True"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cd2</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">count</span> <span class="op">/</span> <span class="va">exposure</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Intensity"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span></span></code></pre></div>
