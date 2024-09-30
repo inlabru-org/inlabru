@@ -120,9 +120,10 @@ the function `lgcp( )`:
 cmp <- geometry ~ my.spde(geometry, model = matern)
 
 fit <- lgcp(cmp,
-            sample$nests,
-            samplers = sample$plots,
-            domain = list(geometry = mesh))
+  sample$nests,
+  samplers = sample$plots,
+  domain = list(geometry = mesh)
+)
 ```
 
 
@@ -148,9 +149,11 @@ intensity, representative of an imagined new realisation of the point process,
 and the conditional expectation that takes the actually observed nests into
 account, by recognising that we have complete information in the surveyed plots.
 ```{r results="hide",warning=FALSE,message=FALSE}
-Lambda <- predict(fit,
-                  fm_int(mesh, boundary),
-                  ~ sum(weight * exp(my.spde + Intercept)))
+Lambda <- predict(
+  fit,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(my.spde + Intercept))
+)
 Lambda.empirical <- predict(
   fit,
   rbind(
@@ -178,9 +181,11 @@ fit.all <- lgcp(cmp, nests,
   domain = list(geometry = mesh)
 )
 lambda.all <- predict(fit.all, pxl, ~ exp(my.spde + Intercept))
-Lambda.all <- predict(fit.all,
-                      fm_int(mesh, boundary),
-                      ~ sum(weight * exp(my.spde + Intercept)))
+Lambda.all <- predict(
+  fit.all,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(my.spde + Intercept))
+)
 ```
 
 Your plot should look like this:

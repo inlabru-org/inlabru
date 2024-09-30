@@ -1157,8 +1157,8 @@ ibm_eval.bru_mapper_taylor <- function(mapper,
                                        state = NULL,
                                        ...) {
   if (is.null(mapper[["jacobian"]]) ||
-      (mapper[["n"]] == 0) ||
-      (is.null(state) && is.null(mapper[["state0"]]))) {
+    (mapper[["n"]] == 0) ||
+    (is.null(state) && is.null(mapper[["state0"]]))) {
     val <- mapper[["offset"]]
   } else if (is.list(mapper[["jacobian"]])) {
     stopifnot(is.null(state) || is.list(state))

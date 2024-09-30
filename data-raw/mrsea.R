@@ -166,11 +166,13 @@ import.mrsea <- function(format = c("sf", "sp")) {
 
 mrseanames2dsmnames <- function(data) {
   nam <- names(data)
-  cols2change <- c("transect.id",
-                   "transect.label",
-                   "x.pos",
-                   "y.pos",
-                   "segment.id")
+  cols2change <- c(
+    "transect.id",
+    "transect.label",
+    "x.pos",
+    "y.pos",
+    "segment.id"
+  )
   id <- NULL
   for (i in seq_along(cols2change)) {
     id <- c(id, grep(cols2change[i], nam))
@@ -229,11 +231,13 @@ makeobsdata <- function(data) {
   } else {
     obsdata$size <- obsdata$size
   }
-  obsdata <- obsdata[, c("object",
-                         "Sample.Label",
-                         "distance",
-                         "Effort",
-                         "size")]
+  obsdata <- obsdata[, c(
+    "object",
+    "Sample.Label",
+    "distance",
+    "Effort",
+    "size"
+  )]
   return(obsdata)
 }
 # ---------------------------------------------------------------------

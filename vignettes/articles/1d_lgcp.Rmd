@@ -126,20 +126,24 @@ covariance function (which involves both these parameters).
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE, eval=FALSE}
 post.log.range <- spde.posterior(fit.spde,
-                                 name = "spde1D",
-                                 what = "log.range")
+  name = "spde1D",
+  what = "log.range"
+)
 plot(post.log.range)
 post.variance <- spde.posterior(fit.spde,
-                                name = "spde1D",
-                                what = "variance")
+  name = "spde1D",
+  what = "variance"
+)
 plot(post.variance)
 post.log.variance <- spde.posterior(fit.spde,
-                                    name = "spde1D",
-                                    what = "log.variance")
+  name = "spde1D",
+  what = "log.variance"
+)
 plot(post.log.variance)
 post.matcorr <- spde.posterior(fit.spde,
-                               name = "spde1D",
-                               what = "matern.correlation")
+  name = "spde1D",
+  what = "matern.correlation"
+)
 plot(post.matcorr)
 ```
 
@@ -157,9 +161,10 @@ thus:
 # Set up a data frame of explanatory values at which to predict
 predf <- data.frame(x = seq(0, 55, by = 1))
 pred_spde <- predict(fit.spde,
-                     predf,
-                     ~ exp(spde1D + Intercept),
-                     n.samples = 1000)
+  predf,
+  ~ exp(spde1D + Intercept),
+  n.samples = 1000
+)
 ```
 
 while to predict on the linear predictor scale (i.e. that of the log intensity, 
@@ -315,10 +320,13 @@ the true intensity.
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 cd2 <- countdata2
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)),
-                family = poisson(),
-                data = cd2)
-dat4pred <- data.frame(x = seq(0, 55, length = 100),
-                       exposure = rep(cd2$exposure[1], 100))
+  family = poisson(),
+  data = cd2
+)
+dat4pred <- data.frame(
+  x = seq(0, 55, length = 100),
+  exposure = rep(cd2$exposure[1], 100)
+)
 pred2.gam <- predict(fit2.gam, newdata = dat4pred, type = "response")
 dat4pred2 <- cbind(dat4pred, gam = pred2.gam)
 ```
@@ -329,9 +337,11 @@ solid line the inlabru fit, the dashed line the GAM fit:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE,eval=TRUE}
 plot(pred_spde) +
   geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
-  geom_line(data = dat4pred2,
-            aes(x, gam / exposure, colour = "gam()"),
-            lty = 2) +
+  geom_line(
+    data = dat4pred2,
+    aes(x, gam / exposure, colour = "gam()"),
+    lty = 2
+  ) +
   geom_line(data = true.lambda, aes(x, y, colour = "True"), lwd = 1.5) +
   geom_point(data = cd2, aes(x, y = count / exposure)) +
   ylab("Intensity") + xlab("x")

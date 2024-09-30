@@ -82,8 +82,10 @@ materncov.bands <- function(manifold, dist, log.range,
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (inherits(manifold,
-                 c("fm_mesh_2d", "inla.mesh", "fm_mesh_1d", "inla.mesh.1d"))) {
+    if (inherits(
+      manifold,
+      c("fm_mesh_2d", "inla.mesh", "fm_mesh_1d", "inla.mesh.1d")
+    )) {
       if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
         S1.L <- diff(manifold$interval)
       }
@@ -143,7 +145,7 @@ materncov.bands <- function(manifold, dist, log.range,
     } else {
       qq <- qchisq(quantile, 2)^0.5
       log.kappas <- log(sqrt(8 * nu)) - (log.range$mean +
-                                           log.range$sd * c(qq, -qq))
+        log.range$sd * c(qq, -qq))
       log.variances <- log.variance$mean + log.variance$sd * c(-qq, qq)
       for (angle in 2 * pi * (1:n) / n) {
         ca <- cos(angle)

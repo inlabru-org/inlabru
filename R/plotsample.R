@@ -86,11 +86,11 @@ plotsample <- function(spdf,
                        nx = 5,
                        ny = 5) {
   if (x.ppn <= 0 ||
-      x.ppn >= 1) {
+    x.ppn >= 1) {
     stop("'x.ppn' must greater than 0 and less than 1")
   }
   if (y.ppn <= 0 ||
-      y.ppn >= 1) {
+    y.ppn >= 1) {
     stop("'y.ppn' must greater than 0 and less than 1")
   }
 
@@ -123,10 +123,14 @@ plotsample <- function(spdf,
 
   polys <- vector("list", nplots)
   for (i in 1:nplots) {
-    polys[[i]] <- sp::Polygons(list(makepoly(as.numeric(starts[i, ]),
-                                             width,
-                                             height)),
-                               i)
+    polys[[i]] <- sp::Polygons(
+      list(makepoly(
+        as.numeric(starts[i, ]),
+        width,
+        height
+      )),
+      i
+    )
   }
   plots <- sp::SpatialPolygons(polys, proj4string = fm_CRS(spdf))
   # remove bits of plot outside boundary

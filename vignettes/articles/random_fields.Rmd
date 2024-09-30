@@ -77,8 +77,9 @@ this is just to provide something to which we can compare the `inlabru` model fi
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)),
-                family = poisson(),
-                data = cd)
+  family = poisson(),
+  data = cd
+)
 ```
 
 The term `s(x,k=10)` just specifies that as nonparametric smooth function is to
@@ -204,9 +205,10 @@ Predict the values at the x points used for mesh
 ```{r }
 x4pred <- data.frame(x = xs)
 pred2.bru <- predict(fit2.bru,
-                     x4pred,
-                     x ~ exp(field + Intercept),
-                     n.samples = 1000)
+  x4pred,
+  x ~ exp(field + Intercept),
+  n.samples = 1000
+)
 ```
 
 Let's do a plot to compare the fitted model to the true model. The expected

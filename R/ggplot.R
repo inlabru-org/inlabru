@@ -360,8 +360,10 @@ gg.bru_prediction <- function(data,
           ggplot2::aes(fill = .data[[line.map[["colour"]]]])
         )
       }
-      geom <- c(geom,
-                ggplot2::geom_ribbon(data = data, ribbon.map, alpha = alpha))
+      geom <- c(
+        geom,
+        ggplot2::geom_ribbon(data = data, ribbon.map, alpha = alpha)
+      )
     }
   }
   geom
@@ -877,12 +879,18 @@ gg.fm_mesh_2d <- function(data,
   }
 
   df <- rbind(
-    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)],
-               b = data$loc[data$graph$tv[, 2], c(1, 2)]),
-    data.frame(a = data$loc[data$graph$tv[, 2], c(1, 2)],
-               b = data$loc[data$graph$tv[, 3], c(1, 2)]),
-    data.frame(a = data$loc[data$graph$tv[, 1], c(1, 2)],
-               b = data$loc[data$graph$tv[, 3], c(1, 2)])
+    data.frame(
+      a = data$loc[data$graph$tv[, 1], c(1, 2)],
+      b = data$loc[data$graph$tv[, 2], c(1, 2)]
+    ),
+    data.frame(
+      a = data$loc[data$graph$tv[, 2], c(1, 2)],
+      b = data$loc[data$graph$tv[, 3], c(1, 2)]
+    ),
+    data.frame(
+      a = data$loc[data$graph$tv[, 1], c(1, 2)],
+      b = data$loc[data$graph$tv[, 3], c(1, 2)]
+    )
   )
 
   colnames(df) <- c("x", "y", "xend", "yend")
@@ -1033,9 +1041,11 @@ gg.inla.mesh.1d <- gg.fm_mesh_1d
 #' }
 #' }
 gg.RasterLayer <- function(data,
-                           mapping = ggplot2::aes(x = .data[["x"]],
-                                                  y = .data[["y"]],
-                                                  fill = .data[["layer"]]),
+                           mapping = ggplot2::aes(
+                             x = .data[["x"]],
+                             y = .data[["y"]],
+                             fill = .data[["layer"]]
+                           ),
                            ...) {
   requireNamespace("ggplot2")
   requireNamespace("raster")

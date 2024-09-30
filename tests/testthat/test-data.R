@@ -65,8 +65,10 @@ test_that("Component construction: default mesh/mapping, data is list", {
 
 test_that("Component construction: unsafe intercepts, data is list", {
   cmp <- component_list(~ something_unknown - 1)
-  lik <- like(formula = response ~ ., data = list(response = 1:5),
-              allow_combine = TRUE)
+  lik <- like(
+    formula = response ~ ., data = list(response = 1:5),
+    allow_combine = TRUE
+  )
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
@@ -131,9 +133,13 @@ test_that("Component construction: separate response_data input", {
     ) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main,
-               seq_along(lik1$data$x))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    seq_along(lik1$data$x)
+  )
   cmp2 <- add_mappers(cmp1, lhoods = list(lik2))
-  expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main,
-               seq_along(lik2$data$x))
+  expect_equal(
+    ibm_values(cmp2$effect$mapper, multi = 1)$main,
+    seq_along(lik2$data$x)
+  )
 })

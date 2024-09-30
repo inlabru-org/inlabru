@@ -376,17 +376,18 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
           .data$iteration
         ) %>%
         dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd),
-                                          .data$sd, 1.0)) %>%
+          .data$sd, 1.0
+        )) %>%
         dplyr::summarise(
           MaxMode = max(abs(.data$mode - .data$mode.prev) / .data$sd),
           MeanMode = mean(abs(.data$mode - .data$mode.prev) / .data$sd),
           RMSMode = mean((.data$mode - .data$mode.prev)^2 / .data$sd^2)^0.5,
           MaxLin = max(abs(.data$new_linearisation -
-                             .data$new_linearisation.prev) / .data$sd),
+            .data$new_linearisation.prev) / .data$sd),
           MeanLin = mean(abs(.data$new_linearisation -
-                               .data$new_linearisation.prev) / .data$sd),
+            .data$new_linearisation.prev) / .data$sd),
           RMSLin = mean((.data$new_linearisation -
-                           .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
+            .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
           .groups = "drop"
         ) %>%
         dplyr::mutate(
@@ -459,11 +460,11 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
           MeanMode = mean(.data$mode - .data$mode.prev),
           MinMode = min(.data$mode - .data$mode.prev),
           MaxLin = max(.data$new_linearisation -
-                         .data$new_linearisation.prev),
+            .data$new_linearisation.prev),
           MeanLin = mean(.data$new_linearisation -
-                           .data$new_linearisation.prev),
+            .data$new_linearisation.prev),
           MinLin = min(.data$new_linearisation -
-                         .data$new_linearisation.prev),
+            .data$new_linearisation.prev),
           .groups = "drop"
         )
     ) +

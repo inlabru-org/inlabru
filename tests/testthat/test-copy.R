@@ -200,7 +200,8 @@ test_that("Component copy feature with group", {
     f(x2,
       copy = "x1",
       fixed = FALSE,
-      group = z2)
+      group = z2
+    )
   fit <- INLA::inla(
     formula = inlaform, data = mydata, family = "normal",
     control.inla = list(int.strategy = "eb"),

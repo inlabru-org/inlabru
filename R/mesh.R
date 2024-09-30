@@ -49,8 +49,10 @@ vertices.inla.mesh <- function(...) {
     details =
       c(
         "!" = "fm_vertices() by default returns 'sf' instead of SPDF.",
-        "!" = paste0("fm_vertices() includes a '.vertex' column instead of a ",
-                     "'vertex' column.")
+        "!" = paste0(
+          "fm_vertices() includes a '.vertex' column instead of a ",
+          "'vertex' column."
+        )
       )
   )
 

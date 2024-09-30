@@ -67,8 +67,10 @@ ggplot() +
   gg(mexdolphin$ppoly) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"),
-        legend.key.height = unit(x = 0.3, "cm")) +
+  theme(
+    legend.key.width = unit(x = 0.2, "cm"),
+    legend.key.height = unit(x = 0.3, "cm")
+  ) +
   theme(legend.text = element_text(size = 6)) +
   coord_sf(datum = fm_crs(mexdolphin$ppoly))
 ```
@@ -202,8 +204,10 @@ ggplot() +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"),
-        legend.key.height = unit(x = 0.3, "cm")) +
+  theme(
+    legend.key.width = unit(x = 0.2, "cm"),
+    legend.key.height = unit(x = 0.3, "cm")
+  ) +
   theme(legend.text = element_text(size = 6))
 ```
 
@@ -319,8 +323,10 @@ ggplot() +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
   gg(mexdolphin$samplers, color = "grey") +
   gg(mexdolphin$points, size = 0.2, alpha = 1) +
-  theme(legend.key.width = unit(x = 0.2, "cm"),
-        legend.key.height = unit(x = 0.3, "cm")) +
+  theme(
+    legend.key.width = unit(x = 0.2, "cm"),
+    legend.key.height = unit(x = 0.3, "cm")
+  ) +
   theme(legend.text = element_text(size = 6))
 ```
 ```{r detection.plot, warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
@@ -493,11 +499,14 @@ Plot without the 95% credible intervals
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance),
-                 breaks = seq(0, 8, length.out = 9),
-                 alpha = 0.3) +
+    breaks = seq(0, 8, length.out = 9),
+    alpha = 0.3
+  ) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
-  geom_line(data = dlines,
-            aes(x = distance, y = En, group = model, col = model))
+  geom_line(
+    data = dlines,
+    aes(x = distance, y = En, group = model, col = model)
+  )
 ```
 
 Plot with the 95% credible intervals (without taking the count rescaling into
@@ -505,19 +514,24 @@ account)
 ```{r,warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance),
-                 breaks = seq(0, 8, length.out = 9),
-                 alpha = 0.3) +
+    breaks = seq(0, 8, length.out = 9),
+    alpha = 0.3
+  ) +
   geom_point(aes(x = distance), y = 0.2, shape = "|", size = 3) +
-  geom_line(data = dlines,
-            aes(x = distance, y = En, group = model, col = model)) +
+  geom_line(
+    data = dlines,
+    aes(x = distance, y = En, group = model, col = model)
+  ) +
   geom_ribbon(
     data = dlines,
-    aes(x = distance,
-        ymin = En.lower,
-        ymax = En.upper,
-        group = model,
-        col = model,
-        fill = model),
+    aes(
+      x = distance,
+      ymin = En.lower,
+      ymax = En.upper,
+      group = model,
+      col = model,
+      fill = model
+    ),
     alpha = 0.2, lty = 2
   )
 ```

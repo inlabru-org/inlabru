@@ -131,13 +131,15 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
   } # End of blocks
 
   # Tidy up - get rid of unnecessary columns
-  exc.labels <- c("quadrant",
-                  "angle",
-                  "what.angle",
-                  "x",
-                  "y",
-                  "latitude",
-                  "longitude")
+  exc.labels <- c(
+    "quadrant",
+    "angle",
+    "what.angle",
+    "x",
+    "y",
+    "latitude",
+    "longitude"
+  )
   col.names <- names(blocks)
   col.names <- !is.element(col.names, exc.labels)
   # print(col.names)
@@ -170,8 +172,10 @@ add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
     temp <- seg[seg$Sample.Label == dists$Sample.Label[i], ]
     # Should only have one record - check
     if (dim(temp)[1] > 1) {
-      print(paste("More than one segment chosen for observation, object=",
-                  dists$object[i]))
+      print(paste(
+        "More than one segment chosen for observation, object=",
+        dists$object[i]
+      ))
     }
     dists$Block.Label[i] <- temp$Block.Label[1]
   } # End of observations
@@ -596,7 +600,7 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
 
     rlon <- (lon2 - lon1) * rad
     posdist <- 60 * (1 / rad) * acos(sin(rlat1) * sin(rlat2) +
-                                       cos(rlat1) * cos(rlat2) * cos(rlon))
+      cos(rlat1) * cos(rlat2) * cos(rlon))
   }
 
   # Convert to km

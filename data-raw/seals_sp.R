@@ -38,7 +38,7 @@ import.seals <- function(
   #' Select a strip
 
   seals <- seals[(sp::coordinates(seals)[, 2] > 7947) &
-                   (sp::coordinates(seals)[, 2] < 7954), ] # strip 9
+    (sp::coordinates(seals)[, 2] < 7954), ] # strip 9
   # seals = seals[(sp::coordinates(seals)[,2]>7931) &
   #  (sp::coordinates(seals)[,2]<7938.5), ] # strip 12
   # seals = seals[(sp::coordinates(seals)[,2]>7925) &
@@ -95,8 +95,10 @@ import.seals <- function(
   ice.band1 <- function(x, y) {
     NULL
   }
-  seals$ice <- ice.band1(x = sp::coordinates(seals)[, 1],
-                         y = sp::coordinates(seals)[, 2])
+  seals$ice <- ice.band1(
+    x = sp::coordinates(seals)[, 1],
+    y = sp::coordinates(seals)[, 2]
+  )
 
   #' Plot seal count and ice together
   #

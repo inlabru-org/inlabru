@@ -140,16 +140,20 @@ sample.lgcp <- function(mesh,
         keep <- (runif(Npoints) <= lambda_ratio)
         waste_ratio <- sum(keep) / length(keep)
         if (multi.samples) {
-          multi.sample[[sample]] <- data.frame(x = points[keep],
-                                               sample = sample)
+          multi.sample[[sample]] <- data.frame(
+            x = points[keep],
+            sample = sample
+          )
         } else {
           multi.sample[[sample]] <- data.frame(x = points[keep])
         }
       } else {
         waste_ratio <- 0
         if (multi.samples) {
-          multi.sample[[sample]] <- data.frame(x = numeric(0),
-                                               sample = integer(0))
+          multi.sample[[sample]] <- data.frame(
+            x = numeric(0),
+            sample = integer(0)
+          )
         } else {
           multi.sample[[sample]] <- data.frame(x = numeric(0))
         }
@@ -225,9 +229,11 @@ sample.lgcp <- function(mesh,
         area.R <- 6371
         if (is.geocent) {
           if (abs(1 - space.R / area.R) > 1e-2) {
-            warning("The mesh has radius '", space.R,
-                    "', but crs information is available. ",
-                    "Using radius 6371 for area calculations.")
+            warning(
+              "The mesh has radius '", space.R,
+              "', but crs information is available. ",
+              "Using radius 6371 for area calculations."
+            )
           }
         }
       } else if (is.geocent) {
@@ -251,9 +257,11 @@ sample.lgcp <- function(mesh,
         }
         areas <- fm_fem(area.mesh, order = 0)$ta * area.R^2
 
-        loglambda_tri <- matrix(loglambda[mesh$graph$tv],
-                                nrow(mesh$graph$tv),
-                                ncol(mesh$graph$tv))
+        loglambda_tri <- matrix(
+          loglambda[mesh$graph$tv],
+          nrow(mesh$graph$tv),
+          ncol(mesh$graph$tv)
+        )
         loglambda_max <- apply(loglambda_tri, 1, max)
 
         Npoints <- rpois(length(areas), lambda = exp(loglambda_max) * areas)
@@ -270,10 +278,10 @@ sample.lgcp <- function(mesh,
             mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE] +
             (mesh$loc[mesh$graph$tv[triangle, 2], , drop = FALSE] -
               mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) *
-            points[, 1] +
+              points[, 1] +
             (mesh$loc[mesh$graph$tv[triangle, 3], , drop = FALSE] -
               mesh$loc[mesh$graph$tv[triangle, 1], , drop = FALSE]) *
-            points[, 2]
+              points[, 2]
           if (is.geocent) {
             points <- points / rowSums(points^2)^0.5
           }
@@ -292,13 +300,14 @@ sample.lgcp <- function(mesh,
 
           A <- fm_basis(mesh, points)
           lambda_ratio <- exp(as.vector(A %*% loglambda) -
-                                loglambda_max[triangle])
+            loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep]
           waste_ratio <- sum(keep) / length(keep)
         } else {
           points <- sp::SpatialPoints(matrix(0, 1, 3),
-                                      proj4string = target.crs)[-1]
+            proj4string = target.crs
+          )[-1]
           ret <- points
           waste_ratio <- 0
         }
@@ -317,7 +326,8 @@ sample.lgcp <- function(mesh,
 
         if (Npoints == 0) {
           ret <- sp::SpatialPoints(matrix(0, 1, 2),
-                                   proj4string = internal.crs)[-1]
+            proj4string = internal.crs
+          )[-1]
           waste_ratio <- 0
         } else {
           # Simulate uniform points on the bounding rectangle
@@ -347,7 +357,8 @@ sample.lgcp <- function(mesh,
 
         if (Npoints == 0) {
           ret <- sp::SpatialPoints(matrix(0, 1, 3),
-                                   proj4string = internal.crs)[-1]
+            proj4string = internal.crs
+          )[-1]
           waste_ratio <- 0
         } else {
           # Choose z uniformly distributed in [-1,1].
@@ -406,9 +417,11 @@ sample.lgcp <- function(mesh,
           # Transforms into latitude
           z <- runif(n = n.points, min = slat.range[1], max = slat.range[2])
           # Choose t uniformly distributed on [0, 2*pi).
-          angle <- runif(n = n.points,
-                         min = radlon.range[1],
-                         max = radlon.range[2])
+          angle <- runif(
+            n = n.points,
+            min = radlon.range[1],
+            max = radlon.range[2]
+          )
           r <- sqrt(1 - z^2)
           x <- r * cos(angle)
           y <- r * sin(angle)

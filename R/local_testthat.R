@@ -213,7 +213,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     }
   )
   if (!is.null(sp_version) &&
-      (utils::compareVersion(sp_version, "1.6-0") >= 0)) {
+    (utils::compareVersion(sp_version, "1.6-0") >= 0)) {
     old_sp_evolution_status <- tryCatch(
       sp::get_evolution_status(),
       error = function(e) {

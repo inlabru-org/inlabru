@@ -1643,14 +1643,16 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     if (!is.logical(allow_combine)) {
       if (!is.null(response_data)) {
         warning("Non-null response data supplied; guessing allow_combine=TRUE.",
-                "\n  Specify allow_combine explicitly to avoid this warning.",
-                immediate. = TRUE)
+          "\n  Specify allow_combine explicitly to avoid this warning.",
+          immediate. = TRUE
+        )
         allow_combine <- TRUE
       } else if (is.list(data) && !is.data.frame(data)) {
         warning("Non data-frame list-like data supplied; ",
-                "guessing allow_combine=TRUE.",
-                "\n  Specify allow_combine explicitly to avoid this warning.",
-                immediate. = TRUE)
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning.",
+          immediate. = TRUE
+        )
         allow_combine <- TRUE
       } else {
         allow_combine <- FALSE
@@ -3311,17 +3313,21 @@ bru_line_search <- function(model,
       ggplot2::ylab("(eta - lin1) * sqrt(w)")
     pl3 <- ggplot2::ggplot(df_debug) +
       ggplot2::geom_point(ggplot2::aes(.data$idx,
-                                       .data$lin0,
-                                       col = "start")) +
+        .data$lin0,
+        col = "start"
+      )) +
       ggplot2::geom_point(ggplot2::aes(.data$idx,
-                                       .data$lin1,
-                                       col = "inla")) +
+        .data$lin1,
+        col = "inla"
+      )) +
       ggplot2::geom_point(ggplot2::aes(.data$idx,
-                                       .data$nonlin1,
-                                       col = "full")) +
+        .data$nonlin1,
+        col = "full"
+      )) +
       ggplot2::geom_point(ggplot2::aes(.data$idx,
-                                       .data$nonlinopt,
-                                       col = "opt")) +
+        .data$nonlinopt,
+        col = "opt"
+      )) +
       ggplot2::geom_ribbon(
         ggplot2::aes(
           as.numeric(.data$idx),
@@ -4072,7 +4078,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           stk.data <- INLA::inla.stack.data(stk)
         } else {
           stk.data <- INLA::inla.stack.data(stk,
-                                            .response.name = "BRU.response")
+            .response.name = "BRU.response"
+          )
         }
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
       }

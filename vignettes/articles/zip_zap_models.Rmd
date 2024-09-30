@@ -391,7 +391,7 @@ pred_zap <- predict(
       variance = variance,
       obs_prob = (1 - presence_prob) * (count == 0) +
         (count > 0) * presence_prob * dpois(count, expect_param) /
-        (1 - dpois(0, expect_param))
+          (1 - dpois(0, expect_param))
     )
   },
   n.samples = 2500
@@ -580,9 +580,11 @@ We see that the average scores are very similar between all three models
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
   tibble::as_tibble() %>%
-  cbind(geometry = c(counts_df$geometry,
-                     counts_df$geometry,
-                     counts_df$geometry))
+  cbind(geometry = c(
+    counts_df$geometry,
+    counts_df$geometry,
+    counts_df$geometry
+  ))
 df_ <- df %>%
   left_join(
     df %>%
@@ -620,7 +622,9 @@ p1 <- ggplot() +
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZIP"),
-     aes(fill = DS - DS_Poisson), geom = "tile") +
+    aes(fill = DS - DS_Poisson),
+    geom = "tile"
+  ) +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP Dawid-Sebastiani score difference") +
@@ -628,7 +632,9 @@ p2 <- ggplot() +
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZAP"),
-     aes(fill = DS - DS_Poisson), geom = "tile") +
+    aes(fill = DS - DS_Poisson),
+    geom = "tile"
+  ) +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-5, 5)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP Dawid-Sebastiani score difference") +
@@ -659,7 +665,9 @@ p1 <- ggplot() +
 p2 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZIP"),
-     aes(fill = LG - LG_Poisson), geom = "tile") +
+    aes(fill = LG - LG_Poisson),
+    geom = "tile"
+  ) +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZIP LG score difference") +
@@ -667,7 +675,9 @@ p2 <- ggplot() +
 p3 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ %>% filter(Model == "ZAP"),
-     aes(fill = LG - LG_Poisson), geom = "tile") +
+    aes(fill = LG - LG_Poisson),
+    geom = "tile"
+  ) +
   scale_fill_distiller(type = "div", palette = "RdBu", limits = c(-2, 2)) +
   geom_sf(data = nests, color = "firebrick", size = 1, pch = 4, alpha = 0.2) +
   ggtitle("ZAP LG score difference") +

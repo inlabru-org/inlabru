@@ -527,9 +527,11 @@ evaluate_predictor <- function(model,
             state = .state
           )
           if (any(not_ok)) {
-            warning("Inputs for `ibm_eval()` for '",
-                    .comp[["label"]],
-                    '" give some invalid outputs.')
+            warning(
+              "Inputs for `ibm_eval()` for '",
+              .comp[["label"]],
+              '" give some invalid outputs.'
+            )
           }
         } else { # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the

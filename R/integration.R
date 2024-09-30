@@ -106,17 +106,19 @@ int.quadrature <- function(sp = NULL,
       stop("Geometry geo not supported")
     }
     ips1 <- int.quadrature(sp,
-                           sp + 0.5 * (ep - sp),
-                           scheme = "gaussian",
-                           n.points = n.points,
-                           geometry,
-                           coords)
+      sp + 0.5 * (ep - sp),
+      scheme = "gaussian",
+      n.points = n.points,
+      geometry,
+      coords
+    )
     ips2 <- int.quadrature(sp + 0.5 * (ep - sp),
-                           ep,
-                           scheme = "gaussian",
-                           n.points = n.points,
-                           geometry,
-                           coords)
+      ep,
+      scheme = "gaussian",
+      n.points = n.points,
+      geometry,
+      coords
+    )
     ips <- rbind(ips1$ips, ips2$ips)
     w <- 0.5 * rbind(ips1$w, ips2$w)
     wl <- 0.5 * rbind(ips1$wl, ips2$wl)
@@ -127,7 +129,8 @@ int.quadrature <- function(sp = NULL,
     }
     # points
     mult <- seq(0 - 1 / (2 * n.points), 1 + 1 / (2 * n.points),
-                length.out = n.points + 2)[2:(n.points + 1)]
+      length.out = n.points + 2
+    )[2:(n.points + 1)]
     nips <- list()
     for (k in 1:n.points) {
       nips[[k]] <- sp + mult[k] * (ep - sp)
@@ -227,9 +230,11 @@ mesh_triangle_integration <- function(mesh, tri_subset = NULL, nsub = NULL) {
     "fmesher::fm_int_mesh_2d_core()"
   )
 
-  fmesher::fm_int_mesh_2d_core(mesh = mesh,
-                               tri_subset = tri_subset,
-                               nsub = nsub)
+  fmesher::fm_int_mesh_2d_core(
+    mesh = mesh,
+    tri_subset = tri_subset,
+    nsub = nsub
+  )
 }
 
 

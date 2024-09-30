@@ -230,7 +230,7 @@ mu_quad <- uniroot(
 )$root
 sd_quad <- (-D2log_p(mu_quad, y = y, gamma = g))^-0.5
 sd_lin <- (1 + length(y) * D1log_lambda(mu_quad, gamma = g)^2 *
-             lambda(mu_quad, gamma = g))^-0.5
+  lambda(mu_quad, gamma = g))^-0.5
 lambda0 <- lambda(mu_quad, gamma = g)
 ```
 
@@ -325,17 +325,25 @@ ggplot() +
     n = 1000
   ) +
   geom_vline(
-    mapping = aes(xintercept = lambda_inv((1 + sum(y)) / (g + length(y)),
-                                          gamma = g
-    ),
-    lty = "Bayes mean")
+    mapping = aes(
+      xintercept = lambda_inv((1 + sum(y)) / (g + length(y)),
+        gamma = g
+      ),
+      lty = "Bayes mean"
+    )
   ) +
   geom_vline(
-    mapping = aes(xintercept = lambda_inv(lambda0, gamma = g),
-                  lty = "Bayes mode")) +
+    mapping = aes(
+      xintercept = lambda_inv(lambda0, gamma = g),
+      lty = "Bayes mode"
+    )
+  ) +
   geom_vline(
-    mapping = aes(xintercept = lambda_inv(mean(y), gamma = g),
-                  lty = "Plain mean"))
+    mapping = aes(
+      xintercept = lambda_inv(mean(y), gamma = g),
+      lty = "Plain mean"
+    )
+  )
 ```
 
 ### Posterior CDFs

@@ -521,7 +521,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
     !allow_verbose ||
     (is.null(verbose_store) &&
       (bru_options_get("bru_verbose_store",
-                      include_default = TRUE) >= verbosity))) {
+        include_default = TRUE
+      ) >= verbosity))) {
     if (is.null(x)) {
       envir <- bru_env_get()
       envir[["log"]][["log"]] <- rbind(envir[["log"]][["log"]], new_x)
@@ -742,7 +743,8 @@ bru_options_deprecated <- function(args) {
       warning(paste0(
         "Ignoring deprecated global options '",
         paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0],
-               collapse = "', '"),
+          collapse = "', '"
+        ),
         "'."
       ))
       names_args <- setdiff(

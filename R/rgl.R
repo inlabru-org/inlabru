@@ -27,9 +27,10 @@ globe <- function(R = 1,
   # coordinates for texture
   n.smp <- 50
   lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)),
-                n.smp,
-                n.smp,
-                byrow = TRUE)
+    n.smp,
+    n.smp,
+    byrow = TRUE
+  )
   long <- matrix(seq(-180, 180, length.out = n.smp) * pi / 180, n.smp, n.smp)
   x <- R * cos(lat) * cos(long)
   y <- R * cos(lat) * sin(long)
@@ -144,9 +145,10 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
   na <- matrix(NA, ncol = 3, nrow = nrow(cs))
 
   mm <- matrix(t(cbind(cs, ce, na)),
-               ncol = 3,
-               nrow = 3 * nrow(ce),
-               byrow = TRUE)
+    ncol = 3,
+    nrow = 3 * nrow(ce),
+    byrow = TRUE
+  )
 
   requireNamespace("rgl")
 

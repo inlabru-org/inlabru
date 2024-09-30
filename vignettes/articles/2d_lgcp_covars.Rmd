@@ -127,9 +127,10 @@ if ((!.cache_recompute) &&
   fit1 <- readRDS(file = .cache_file)
 } else {
   fit1 <- lgcp(comp1,
-               nests,
-               samplers = boundary,
-               domain = list(geometry = mesh))
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
   saveRDS(fit1, .cache_file)
 }
 ```
@@ -195,9 +196,10 @@ if ((!.cache_recompute) &&
   fit2 <- readRDS(file = .cache_file)
 } else {
   fit2 <- lgcp(comp2,
-               nests,
-               samplers = boundary,
-               domain = list(geometry = mesh))
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
   saveRDS(fit2, .cache_file)
 }
 ```
@@ -289,9 +291,10 @@ if ((!.cache_recompute) &&
   fit3 <- readRDS(file = .cache_file)
 } else {
   fit3 <- lgcp(comp3,
-               nests,
-               samplers = boundary,
-               domain = list(geometry = mesh))
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
   saveRDS(fit3, .cache_file)
 }
 ```
@@ -468,9 +471,10 @@ if ((!.cache_recompute) &&
   efit <- readRDS(file = .cache_file)
 } else {
   efit <- lgcp(ecomp,
-               nests,
-               samplers = boundary,
-               domain = list(geometry = mesh))
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
   saveRDS(efit, .cache_file)
 }
 ```
@@ -706,14 +710,18 @@ prcov1D <- predict(
 ggplot() +
   gg(prcov1D$total, color = "red") +
   geom_line(aes(x = prcov1D$spde$x, y = prcov1D$spde$median),
-            col = "blue", lwd = 1.25) +
+    col = "blue", lwd = 1.25
+  ) +
   geom_line(aes(x = prcov1D$fx$x, y = prcov1D$fx$median),
-            col = "green", lwd = 1.25) +
+    col = "green", lwd = 1.25
+  ) +
   geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
   xlab(expression(bold(s))) +
   ylab(expression(hat(lambda)(bold(s)) ~ ~"and its components")) +
   annotate(geom = "text", x = 40, y = 6, label = "Intensity", color = "red") +
-  annotate(geom = "text", x = 40, y = 5.5, label = "z-effect",
-           color = "green") +
+  annotate(
+    geom = "text", x = 40, y = 5.5, label = "z-effect",
+    color = "green"
+  ) +
   annotate(geom = "text", x = 40, y = 5, label = "SPDE", color = "blue")
 ```

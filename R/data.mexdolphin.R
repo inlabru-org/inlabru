@@ -117,8 +117,9 @@
 #'
 #'   ggplot() +
 #'     gg(mexdolphin_sf$mesh,
-#'        color = mexdolphin_sf$lambda,
-#'        mask = mexdolphin_sf$ppoly)
+#'       color = mexdolphin_sf$lambda,
+#'       mask = mexdolphin_sf$ppoly
+#'     )
 #' }
 #' }
 "mexdolphin_sf"

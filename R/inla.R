@@ -167,7 +167,7 @@ extract_property <- function(result, property,
 ##
 
 post.sample.structured <- function(result, n, seed = NULL,
-                                             num.threads = NULL, ...) {
+                                   num.threads = NULL, ...) {
   if (!is.null(seed) && (seed != 0L)) {
     num.threads <- "1:1"
   }
@@ -223,8 +223,9 @@ post.sample.structured <- function(result, n, seed = NULL,
         #        model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
         vals[[name]] <- extract_entries(name,
-                                        smpl.latent,
-                                        .contents = .contents)
+          smpl.latent,
+          .contents = .contents
+        )
         #        }
         #        else {
         #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
@@ -278,7 +279,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
     return(numeric(0L))
   }
   vals <- smpl[.contents[["start"]][idx] +
-                 seq_len(.contents[["length"]][idx]) - 1L]
+    seq_len(.contents[["length"]][idx]) - 1L]
   return(vals)
 }
 
@@ -403,8 +404,9 @@ bru_inla.stack.mjoin <- function(...,
                                  new.name = "BRU.response") {
   if (utils::packageVersion("INLA") <= "24.06.02") {
     stacks <- bru_inla.stack.mexpand(...,
-                                     old.names = old.names,
-                                     new.name = new.name)
+      old.names = old.names,
+      new.name = new.name
+    )
     do.call(INLA::inla.stack.join, c(
       stacks,
       list(
@@ -414,8 +416,9 @@ bru_inla.stack.mjoin <- function(...,
     ))
   } else {
     stacks <- bru_inla.stack.mexpand(...,
-                                     old.names = old.names,
-                                     new.name = new.name)
+      old.names = old.names,
+      new.name = new.name
+    )
     do.call(INLA::inla.stack.join, c(
       stacks,
       list(
@@ -459,8 +462,10 @@ plotmarginal.inla <- function(result,
       vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     } else if (varname %in% names(result$summary.random)) {
-      marg <- INLA::inla.tmarginal(link,
-                                   result$marginals.random[[varname]][[index]])
+      marg <- INLA::inla.tmarginal(
+        link,
+        result$marginals.random[[varname]][[index]]
+      )
       ovarname <- paste0(ovarname, " ", index)
       if (ovarname %in% rownames(vars)) {
         if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
@@ -477,8 +482,10 @@ plotmarginal.inla <- function(result,
     lq <- INLA::inla.qmarginal(0.025, marg)
     lqy <- INLA::inla.dmarginal(lq, marg)
     inner.x <- seq(lq, uq, length.out = 100)
-    inner.marg <- data.frame(x = inner.x,
-                             y = INLA::inla.dmarginal(inner.x, marg))
+    inner.marg <- data.frame(
+      x = inner.x,
+      y = INLA::inla.dmarginal(inner.x, marg)
+    )
 
     df <- data.frame(marg)
     ggplot2::ggplot(
@@ -507,7 +514,7 @@ plotmarginal.inla <- function(result,
     df$mean <- link(df$mean)
     h <- 1e-6
     df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) /
-                                 (2 * h))
+      (2 * h))
     df$lower <- link(df$lower)
     df$mid <- link(df$mid)
     df$upper <- link(df$upper)
