@@ -44,8 +44,9 @@ km, i.e. maximal detection distance 8 km (transect half-width 8 km).
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE)) {
-  data(mexdolphin, package = "inlabru")
+if (require("ggplot2", quietly = TRUE) &&
+    require("sp", quietly = TRUE)) {
+  data(mexdolphin, package = "inlabru", envir = environment())
   ggplot() +
     gg(mexdolphin$mesh) +
     gg(mexdolphin$ppoly, color = "blue") +

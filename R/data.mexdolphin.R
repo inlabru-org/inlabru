@@ -45,8 +45,9 @@
 #'
 #' @examples
 #' \donttest{
-#' if (require("ggplot2", quietly = TRUE)) {
-#'   data(mexdolphin, package = "inlabru")
+#' if (require("ggplot2", quietly = TRUE) &&
+#'     require("sp", quietly = TRUE)) {
+#'   data(mexdolphin, package = "inlabru", envir = environment())
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +
 #'     gg(mexdolphin$ppoly, color = "blue") +
@@ -107,7 +108,7 @@
 #' @examples
 #' \donttest{
 #' if (require("ggplot2", quietly = TRUE)) {
-#'   data(mexdolphin_sf, package = "inlabru")
+#'   data(mexdolphin_sf, package = "inlabru", envir = environment())
 #'   ggplot() +
 #'     gg(mexdolphin_sf$mesh) +
 #'     gg(mexdolphin_sf$ppoly, color = "blue", alpha = 0, linewidth = 1) +

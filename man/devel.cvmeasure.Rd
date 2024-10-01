@@ -31,11 +31,11 @@ introduced by Yuan et al. (2017).
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE) &&
     bru_safe_sp() &&
-    require("sp")) {
+    require("sn")) {
 
   # Load Gorilla data
 
-  data("gorillas", package = "inlabru")
+  data("gorillas", package = "inlabru", envir = environment())
 
   # Use RColorBrewer
 

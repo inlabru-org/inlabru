@@ -43,7 +43,7 @@ km (transect half-width 8 km).
 \examples{
 \donttest{
 if (require("ggplot2", quietly = TRUE)) {
-  data(mexdolphin_sf, package = "inlabru")
+  data(mexdolphin_sf, package = "inlabru", envir = environment())
   ggplot() +
     gg(mexdolphin_sf$mesh) +
     gg(mexdolphin_sf$ppoly, color = "blue", alpha = 0, linewidth = 1) +

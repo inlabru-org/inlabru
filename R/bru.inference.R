@@ -2063,7 +2063,8 @@ bru_like_expr <- function(lhood, components) {
 #' \donttest{
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   require(fmesher, quietly = TRUE)) {
+#'   require(fmesher, quietly = TRUE) &&
+#'   require(sn, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data <- gorillas_sf
 #'
