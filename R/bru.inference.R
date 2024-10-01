@@ -4056,7 +4056,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         comp_lin <- evaluate_comp_lin(model,
           input = inputs,
           state = state,
-          inla_f = TRUE
+          inla_f = TRUE,
+          options = options
         )
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
@@ -4069,7 +4070,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           lhoods = lhoods,
           input = inputs,
           state = state,
-          comp_simple = comp_simple
+          comp_simple = comp_simple,
+          options = options
         )
 
         stk <- bru_make_stack(lhoods, lin, idx)
