@@ -46,7 +46,7 @@
 #' @examples
 #' \donttest{
 #' if (require("ggplot2", quietly = TRUE) &&
-#'     require("sp", quietly = TRUE)) {
+#'   require("sp", quietly = TRUE)) {
 #'   data(mexdolphin, package = "inlabru", envir = environment())
 #'   ggplot() +
 #'     gg(mexdolphin$mesh) +

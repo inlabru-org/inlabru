@@ -67,7 +67,7 @@ as well as
 which sets \code{main = temperature}.
 
 On the other hand, \code{main} can also be a function mapping, e.g the
-\code{\link[sp:coordinates]{sp::coordinates()}} function:
+\code{sp::coordinates()} function:
 
 \code{y ~ mySPDE(coordinates, ...)}
 

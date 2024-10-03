@@ -7,7 +7,7 @@
 \method{gg}{SpatialPixels}(data, ...)
 }
 \arguments{
-\item{data}{A \link[sp:SpatialGrid]{sp::SpatialPixels} object.}
+\item{data}{A \code{sp::SpatialPixels} object.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }

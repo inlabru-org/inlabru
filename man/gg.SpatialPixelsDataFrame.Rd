@@ -19,10 +19,10 @@ mapping. The default mapping is
 )
 }\if{html}{\out{</div>}}}
 
-\item{crs}{A \code{\link[sp:CRS-class]{sp::CRS}} object defining the coordinate system to project the
+\item{crs}{A \code{sp::CRS} object defining the coordinate system to project the
 data to before plotting.}
 
-\item{mask}{A \code{\link[sp:SpatialPolygons]{sp::SpatialPolygons}} object defining the region that is
+\item{mask}{A \code{sp::SpatialPolygons} object defining the region that is
 plotted.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}

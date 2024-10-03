@@ -18,7 +18,7 @@ mapping. The default mapping is
 )
 }\if{html}{\out{</div>}}}
 
-\item{crs}{A \link[sp:CRS-class]{sp::CRS} object defining the coordinate system to project the
+\item{crs}{A \code{sp::CRS} object defining the coordinate system to project the
 data to before plotting.}
 
 \item{...}{Arguments passed on to \code{geom_point}.}

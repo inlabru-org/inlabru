@@ -16,20 +16,20 @@ sline(
 \arguments{
 \item{data}{A data.frame}
 
-\item{start.cols}{Character array poitning out the columns of \code{data} that
+\item{start.cols}{Character array pointing out the columns of \code{data} that
 hold the start points of the lines}
 
-\item{end.cols}{Character array poitning out the columns of \code{data} that hold
+\item{end.cols}{Character array pointing out the columns of \code{data} that hold
 the end points of the lines}
 
 \item{crs}{Coordinate reference system of the original \code{data}}
 
-\item{to.crs}{Coordinate reference system for the SpatialLines ouput.}
+\item{to.crs}{Coordinate reference system for the output.}
 
-\item{format}{Format of the output object. Either "sp" (default) or "sf"}
+\item{format}{Format of the output object. Either \code{"sp"} (default) or \code{"sf"}}
 }
 \value{
-\link[sp:SpatialLines]{sp::SpatialLinesDataFrame} or \link[sf:sf]{sf::sf}
+\code{sp::SpatialLinesDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
 A line in 2D space is defined by a start and an end point, each associated
@@ -40,7 +40,7 @@ must be used to point out the names of the columns that define the start and
 end coordinates of the line. The data is then converted to a
 \code{SpatialLinesDataFrame} \code{DF}. If a coordinate reference system \code{crs} is
 provided it is attached to \code{DF}. If also \code{to.crs} is provided, the coordinate
-system of \code{DF} is transfromed accordingly. Additional columns of the input
+system of \code{DF} is transformed accordingly. Additional columns of the input
 data, e.g. covariates, are retained and attached to \code{DF}.
 }
 \examples{

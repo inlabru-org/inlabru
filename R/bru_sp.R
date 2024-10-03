@@ -53,19 +53,19 @@ sfill <- function(data, where = NULL) {
 #' end coordinates of the line. The data is then converted to a
 #' `SpatialLinesDataFrame` `DF`. If a coordinate reference system `crs` is
 #' provided it is attached to `DF`. If also `to.crs` is provided, the coordinate
-#' system of `DF` is transfromed accordingly. Additional columns of the input
+#' system of `DF` is transformed accordingly. Additional columns of the input
 #' data, e.g. covariates, are retained and attached to `DF`.
 #'
 #' @export
 #' @param data A data.frame
-#' @param start.cols Character array poitning out the columns of `data` that
+#' @param start.cols Character array pointing out the columns of `data` that
 #'   hold the start points of the lines
-#' @param end.cols Character array poitning out the columns of `data` that hold
+#' @param end.cols Character array pointing out the columns of `data` that hold
 #'   the end points of the lines
 #' @param crs Coordinate reference system of the original `data`
-#' @param to.crs Coordinate reference system for the SpatialLines ouput.
-#' @param format Format of the output object. Either "sp" (default) or "sf"
-#' @return [sp::SpatialLinesDataFrame] or [sf::sf]
+#' @param to.crs Coordinate reference system for the output.
+#' @param format Format of the output object. Either `"sp"` (default) or `"sf"`
+#' @return `sp::SpatialLinesDataFrame` or [sf::sf]
 #' @keywords internal
 #'
 #' @examples
@@ -153,7 +153,7 @@ sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
 #' @param crs Coordinate reference system of the points
 #' @param to.crs Coordinate reference system for the `SpatialLines`/`sf` ouput.
 #' @param format Format of the output object. Either "sp" (default) or "sf"
-#' @return [sp::SpatialPolygonsDataFrame] or [sf::sf]
+#' @return `sp::SpatialPolygonsDataFrame` or [sf::sf]
 #'
 #' @examples
 #' \donttest{

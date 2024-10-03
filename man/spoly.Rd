@@ -25,7 +25,7 @@ spoly(
 \item{format}{Format of the output object. Either "sp" (default) or "sf"}
 }
 \value{
-\link[sp:SpatialPolygons]{sp::SpatialPolygonsDataFrame} or \link[sf:sf]{sf::sf}
+\code{sp::SpatialPolygonsDataFrame} or \link[sf:sf]{sf::sf}
 }
 \description{
 A polygon can be described as a sequence of points defining the polygon's

@@ -390,7 +390,7 @@ gg.prediction <- function(data, ...) {
 #'     y = .data[[sp::coordnames(data)[2]]]
 #'   )
 #'   ```
-#' @param crs A [sp::CRS] object defining the coordinate system to project the
+#' @param crs A `sp::CRS` object defining the coordinate system to project the
 #'   data to before plotting.
 #' @param ... Arguments passed on to `geom_point`.
 #' @return A `geom_point` return value
@@ -648,9 +648,9 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #'     fill = .data[[names(data)[[1]]]]
 #'   )
 #'   ```
-#' @param crs A [`sp::CRS`] object defining the coordinate system to project the
+#' @param crs A `sp::CRS` object defining the coordinate system to project the
 #'   data to before plotting.
-#' @param mask A [`sp::SpatialPolygons`] object defining the region that is
+#' @param mask A `sp::SpatialPolygons` object defining the region that is
 #'   plotted.
 #' @param ... Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
@@ -698,7 +698,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' Requires the `ggplot2` package.
 #'
 #' @export
-#' @param data A [sp::SpatialPixels] object.
+#' @param data A `sp::SpatialPixels` object.
 #' @param ... Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data

@@ -40,7 +40,7 @@
 #' which sets `main = temperature`.
 #'
 #' On the other hand, `main` can also be a function mapping, e.g the
-#' [sp::coordinates()] function:
+#' `sp::coordinates()` function:
 #'
 #' `y ~ mySPDE(coordinates, ...)`
 #'
