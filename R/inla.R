@@ -14,7 +14,7 @@ bru_standardise_names <- function(x) {
   new_names <- vapply(
     x,
     function(x) {
-      gsub("[-() ]", "_", x = x, fixed = FALSE)
+      gsub("\\[|\\]|[-() ]", "_", x = x, fixed = FALSE)
     },
     "name"
   )
