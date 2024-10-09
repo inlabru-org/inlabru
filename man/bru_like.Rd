@@ -252,6 +252,8 @@ if (bru_safe_inla() &&
 }
 }
 \seealso{
+\code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=component]{component()}}, \code{\link[=component_eval]{component_eval()}}
+
 \code{\link[=summary.bru_like]{summary.bru_like()}}
 }
 \author{

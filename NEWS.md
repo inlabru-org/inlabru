@@ -21,6 +21,8 @@
   warnings for ambiguous cases (version `2.11.1.9011`)
 * Add `[` and `]` to disallowed character set in `bru_standardise_names()`
   (version `2.11.1.9012`)
+* Add `bru_response_size` method for extracting the response size for each
+  observation `like()` object (version `2.11.1.9013`)
 
 ## Data set updates
 

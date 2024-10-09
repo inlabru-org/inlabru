@@ -34,15 +34,19 @@ test_that("Linear predictor offset", {
     tolerance = midtol
   )
 
-  # Ignore option option but give error. Note the need to make the
-  # Intercept have the right length for a non-linear model
+  # Give an error if an 'offset' option is specified.
+  # Note the since 2.11.1.9013 there is no need to make the have the full
+  # predictor length for a non-linear model.
   expect_error(
-    m3 <- bru(
-      ~ Intercept(rep(1, NROW(.data.))),
-      formula = deaths ~ Intercept,
-      data = dat,
-      family = "poisson",
-      options = list(offset = log(dat$pop))
-    )
+    {
+      m3 <- bru(
+        ~ Intercept(1),
+        formula = deaths ~ Intercept,
+        data = dat,
+        family = "poisson",
+        options = list(offset = log(dat$pop))
+      )
+    },
+    "An offset option was specified which may interfere"
   )
 })

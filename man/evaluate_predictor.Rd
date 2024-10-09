@@ -11,7 +11,8 @@ evaluate_predictor(
   effects,
   predictor,
   used = NULL,
-  format = "auto"
+  format = "auto",
+  n_pred = NULL
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ expression for a state.
 }
 
 Default: "auto"}
+
+\item{n_pred}{integer. If provided, scalar predictor results are expanded to
+vectors of length \code{n_pred}.}
 }
 \value{
 A list or matrix is returned, as specified by \code{format}

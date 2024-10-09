@@ -372,7 +372,7 @@ computed where $B = W$.
 
 ```{r int-mod, echo=TRUE}
 # Define the Intercept model
-comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
+comp3 <- coordinates ~ Intercept(1)
 fit3 <- lgcp(comp3, nests,
   samplers = boundary,
   domain = list(coordinates = mesh)

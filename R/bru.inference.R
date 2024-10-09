@@ -1322,6 +1322,7 @@ extended_bind_rows <- function(...) {
 #'   `data`. Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
+#' @seealso [bru_response_size()], [bru_used()], [component()], [component_eval()]
 #'
 #' @example inst/examples/like.R
 
@@ -1722,6 +1723,54 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   # Return likelihood
   lh
 }
+
+
+#' @title Response size queries
+#'
+#' @description
+#' Extract the number of response values from `bru` and related objects.
+#' @return An `integer` vector.
+#' @param object An object from which to extract response size(s).
+#' @seealso [like()]
+#' @export
+#' @examples
+#' bru_response_size(like(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian"))
+bru_response_size <- function(object) {
+  UseMethod("bru_response_size")
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a `bru_like` object.
+#' @export
+bru_response_size.bru_like <- function(object) {
+  resp <- object[["response_data"]][[object[["response"]]]]
+  if (inherits(resp, "inla.surv")) {
+    # This special case handling is needed because inla.surv objects are
+    # lists. When the INLA package changes representation of `inla.surv`
+    # to a tibble or data.frame, this special case won't be needed anymore.
+    NROW(resp[[1]])
+  } else {
+    NROW(resp)
+  }
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a `bru_like_list` object.
+#' @export
+bru_response_size.bru_like_list <- function(object) {
+  vapply(object, bru_response_size, 1L)
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a `bru_info` object.
+#' @export
+bru_response_size.bru_info <- function(object) {
+  bru_response_size(object[["lhoods"]])
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a `bru` object.
+#' @export
+bru_response_size.bru <- function(object) {
+  bru_response_size(object[["bru_info"]])
+}
+
 
 # Placeholder for future modularised version of like()
 ## @describeIn bru_like
@@ -2792,7 +2841,8 @@ nonlin_predictor <- function(param, state) {
               param[["lhoods"]][[lh_idx]],
               param[["model"]][["effects"]]
             ),
-            format = "matrix"
+            format = "matrix",
+            n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
           )
         )
       }
@@ -3762,6 +3812,30 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
   }
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+
+  N_response <- sum(bru_response_size(lhoods))
+  N_predictor <- NROW(inla.options$control.predictor$A)
+  if (N_response != N_predictor) {
+    msg <- paste0(
+      "The total number of response values (N=",
+      N_response,
+      ") and predictor values (N=",
+      N_predictor,
+      ") do not match.\n",
+      "  This is likely due to a mistake in the component or predictor constructions."
+    )
+    if ((N_response > 1L) && (N_predictor == 1L)) {
+      msg <- paste(msg, "\nPerhaps you only have components with scalar inputs?")
+    }
+    bru_log_message(
+      msg,
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 1
+    )
+    stop(msg)
+  }
+
   bru_log_message(
     "iinla: Model initialisation completed",
     verbose = options$bru_verbose,
@@ -4085,6 +4159,29 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           )
         }
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+
+        N_response <- sum(bru_response_size(lhoods))
+        N_predictor <- NROW(inla.options$control.predictor$A)
+        if (N_response != N_predictor) {
+          msg <- paste0(
+            "The total number of response values (N=",
+            N_response,
+            ") and predictor values (N=",
+            N_predictor,
+            ") do not match.\n",
+            "  This is likely due to a mistake in the component or predictor constructions."
+          )
+          if ((N_response > 1L) && (N_predictor == 1L)) {
+            msg <- paste(msg, "\nPerhaps you only have components with scalar inputs?")
+          }
+          bru_log_message(
+            msg,
+            verbose = options$bru_verbose,
+            verbose_store = options$bru_verbose_store,
+            verbosity = 1
+          )
+          stop(msg)
+        }
       }
       # Store the state
       states <- c(states, list(state))

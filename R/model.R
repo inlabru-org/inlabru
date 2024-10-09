@@ -154,6 +154,8 @@ print.summary_bru_model <- function(x, ...) {
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
 #' @param used A [bru_used()] object, or NULL (default)
+#' @param n_pred integer. If provided, scalar predictor results are expanded to
+#' vectors of length `n_pred`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample`
 #' @details * `evaluate_model` is a wrapper to evaluate model state, A-matrices,
 #' effects, and predictor, all in one call.
@@ -168,6 +170,7 @@ evaluate_model <- function(model,
                            predictor = NULL,
                            format = NULL,
                            used = NULL,
+                           n_pred = NULL,
                            ...) {
   used <- bru_used(used, labels = names(model$effects))
 
@@ -208,7 +211,8 @@ evaluate_model <- function(model,
     effects = effects,
     predictor = predictor,
     format = format,
-    used = used
+    used = used,
+    n_pred = n_pred
   )
 
   values
@@ -415,6 +419,8 @@ evaluate_effect_multi_state.component_list <- function(components,
 #' expression for a state.
 #'
 #' Default: "auto"
+#' @param n_pred integer. If provided, scalar predictor results are expanded to
+#' vectors of length `n_pred`.
 #' @details For each component, e.g. "name", the state values are available as
 #'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
 #'   see [component_eval()].
@@ -427,7 +433,8 @@ evaluate_predictor <- function(model,
                                effects,
                                predictor,
                                used = NULL,
-                               format = "auto") {
+                               format = "auto",
+                               n_pred = NULL) {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
   pred.envir <- environment(predictor)
@@ -600,6 +607,9 @@ evaluate_predictor <- function(model,
     }
 
     result_ <- eval(predictor, envir = envir, enclos = enclos)
+    if (!is.null(n_pred) && is.numeric(result_) && length(result_) == 1) {
+      result_ <- rep(result_, n_pred)
+    }
     if (k == 1) {
       if (identical(format, "auto")) {
         if ((is.vector(result_) && !is.list(result_)) ||
