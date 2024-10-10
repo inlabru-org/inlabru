@@ -29,7 +29,8 @@ Extract the number of response values from \code{bru} and related objects.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_response_size(bru_like)}: Extract the number of observations from a \code{bru_like} object.
+\item \code{bru_response_size(bru_like)}: Extract the number of observations from a
+\code{bru_like} object.
 
 \item \code{bru_response_size(bru_like_list)}: Extract the number of observations from a
 \code{bru_like_list} object.

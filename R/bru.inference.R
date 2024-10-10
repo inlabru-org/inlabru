@@ -1742,7 +1742,8 @@ bru_response_size <- function(object) {
   UseMethod("bru_response_size")
 }
 
-#' @describeIn bru_response_size Extract the number of observations from a `bru_like` object.
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru_like` object.
 #' @export
 bru_response_size.bru_like <- function(object) {
   resp <- object[["response_data"]][[object[["response"]]]]
