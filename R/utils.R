@@ -292,6 +292,7 @@ extract_selector <- function(where, selector) {
     return(NULL)
   }
   if (inherits(where, "SpatVector")) {
+    requireNamespace("terra")
     layer <- terra::values(where)[[selector]]
   } else {
     layer <- where[[selector]]
@@ -480,6 +481,7 @@ eval_spatial.SpatRaster <- function(data,
                                     where,
                                     layer = NULL,
                                     selector = NULL) {
+  requireNamespace("terra")
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
@@ -619,6 +621,7 @@ bru_fill_missing <- function(data, where, values,
   ))
   # Convert to sf and terra
   if (inherits(data, c("SpatialGrid", "SpatialPixelsDataFrame", "Raster"))) {
+    requireNamespace("terra")
     data <- terra::rast(data)
   } else if (inherits(data, "SpatialPointsDataFrame")) {
     data <- sf::st_as_sf(data)
@@ -657,6 +660,7 @@ bru_fill_missing <- function(data, where, values,
 
   data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
+    requireNamespace("terra")
     data_values <- terra::values(
       data[[layer]],
       dataframe = TRUE,

@@ -704,7 +704,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   require("terra", quietly = TRUE) &&
+#'   requireNamespace("terra", quietly = TRUE) &&
 #'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
@@ -737,6 +737,7 @@ gg.SpatialPixels <- function(data, ...) {
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
+#'   requireNamespace("terra", quietly = TRUE) &&
 #'   require("tidyterra", quietly = TRUE)) {
 #'   # Load Gorilla covariates
 #'
@@ -755,6 +756,7 @@ gg.SpatRaster <- function(data, ...) {
     ))
   }
   if (".mask" %in% names(data)) {
+    requireNamespace("terra")
     data <-
       terra::mask(
         data,
@@ -783,7 +785,7 @@ gg.SpatRaster <- function(data, ...) {
 #' Also see the [fmesher::geom_fm()] method.
 #'
 #' @export
-
+#'
 #' @param data An `fm_mesh_2d` object.
 #' @param color A vector of scalar values to fill the mesh with colors.
 #' The length of the vector mus correspond to the number of mesh vertices.

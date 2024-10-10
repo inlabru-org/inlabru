@@ -151,6 +151,7 @@ test_that("eval_spatial.sf", {
 
 
 test_that("eval_spatial.stars", {
+  skip_if_not_installed("terra")
   skip_if_not_installed("stars")
 
   # Load the Gorilla data

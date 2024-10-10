@@ -5,24 +5,28 @@
 * Remove unneeded `"list"` class inheritance from solitary classes
   (version `2.11.1.9001`)
 * Expand the `summary` and `print` method class coverage (version `2.11.1.9002`)
-* Remove `ggmap` support (version `2.11.1.9002`)
-* Move `sp` from `Imports` to `Suggests`. Component definitions using
-  `coordinates` as input require either `sp::coordinates` or `sp` having been
-  already loaded with e.g. `library(sp)` (version `2.11.1.9003`)
 * Use `bru_safe_inla(multicore=TRUE)` in `bru()` to allow multicore in
   non-interactive mode. Fixes regression bug that disabled multicore for
   non-interactive sessions. (version `2.11.1.9004`)
 * Reduced the amount of diagnostic messages in `bru_safe_inla()`
   (version `2.11.1.9005`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
-* Remove unnecessary `INLA` namespace loading in `ggplot` methods
-  (version `2.11.1.9008`)
 * Change logic for `like(allow_combine)` to allow user override, and add
   warnings for ambiguous cases (version `2.11.1.9011`)
 * Add `[` and `]` to disallowed character set in `bru_standardise_names()`
   (version `2.11.1.9012`)
 * Add `bru_response_size` method for extracting the response size for each
   observation `like()` object (version `2.11.1.9013`)
+
+## Namespace changes
+
+* Remove `ggmap` support (version `2.11.1.9002`)
+* Move `sp` from `Imports` to `Suggests`. Component definitions using
+  `coordinates` as input require either `sp::coordinates` or `sp` having been
+  already loaded with e.g. `library(sp)` (version `2.11.1.9003`)
+* Remove unnecessary `INLA` namespace loading in `ggplot` methods
+  (version `2.11.1.9008`)
+* Move `terra` from `Imports` to `Suggests` (version `2.11.1.9014`)
 
 ## Data set updates
 

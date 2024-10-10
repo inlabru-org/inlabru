@@ -86,7 +86,7 @@ if (interactive() &&
   bru_safe_sp() &&
   require("sp") &&
   require(ggplot2, quietly = TRUE) &&
-  requireNamespace("terra")) {
+  requireNamespace("terra", quietly = TRUE)) {
   # plot all the nests, mesh and boundary
   ggplot() +
     gg(gorillas_sf$mesh) +
@@ -108,7 +108,9 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$plotsample$nests)
 }
 \dontrun{
-gorillas_sf$gcov <- gorillas_sf_gcov()
+if (requireNamespace("terra", quietly = TRUE)) {
+  gorillas_sf$gcov <- gorillas_sf_gcov()
+}
 }
 }
 \references{

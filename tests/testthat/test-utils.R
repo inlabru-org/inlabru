@@ -2,6 +2,7 @@ test_that("Missing data infilling", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
+  skip_if_not_installed("terra")
 
   points <-
     sp::SpatialPointsDataFrame(
@@ -15,8 +16,8 @@ test_that("Missing data infilling", {
       input_coord,
       data = input_data
     )
-  val0 <- bru_fill_missing(input, points, points$val)
 
+  val0 <- bru_fill_missing(input, points, points$val)
 
   input <-
     sp::SpatialPointsDataFrame(

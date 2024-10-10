@@ -1,6 +1,6 @@
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      require("terra", quietly = TRUE) &&
+      requireNamespace("terra", quietly = TRUE) &&
       require("tidyterra", quietly = TRUE)) {
     # Load Gorilla data
 

@@ -38,7 +38,7 @@ Requires the \code{ggplot2} package.
 \examples{
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      require("terra", quietly = TRUE) &&
+      requireNamespace("terra", quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data

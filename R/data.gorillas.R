@@ -172,7 +172,7 @@
 #'   bru_safe_sp() &&
 #'   require("sp") &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   requireNamespace("terra")) {
+#'   requireNamespace("terra", quietly = TRUE)) {
 #'   # plot all the nests, mesh and boundary
 #'   ggplot() +
 #'     gg(gorillas_sf$mesh) +
@@ -201,8 +201,11 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' gorillas_sf$gcov <- gorillas_sf_gcov()
+#' if (requireNamespace("terra", quietly = TRUE)) {
+#'   gorillas_sf$gcov <- gorillas_sf_gcov()
+#' }
 #' }
 gorillas_sf_gcov <- function() {
+  requireNamespace("terra")
   terra::rast(system.file(inlabru::gorillas_sf$gcov_file, package = "inlabru"))
 }
