@@ -61,7 +61,8 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -263,14 +264,14 @@ samples gave sufficient information for the overall prediction:</p>
 <span>  AllEmp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;              mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots    656.2178 46.24807 567.0926 660.1725 732.2490 660.1725      2.805871</span></span>
-<span><span class="co">#&gt; PlotsEmp 637.6874 40.30021 570.1710 631.5774 716.1256 631.5774      2.723129</span></span>
-<span><span class="co">#&gt; All      678.8175 25.99923 626.1540 678.9488 729.4829 678.9488      1.889313</span></span>
+<span><span class="co">#&gt; Plots    651.6182 54.57142 544.6670 648.2275 772.2904 648.2275      4.202838</span></span>
+<span><span class="co">#&gt; PlotsEmp 644.1461 37.61216 580.1686 642.1190 717.1161 642.1190      3.669941</span></span>
+<span><span class="co">#&gt; All      670.8073 22.89218 628.1115 672.9239 706.9406 672.9239      1.293096</span></span>
 <span><span class="co">#&gt; AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA            NA</span></span>
 <span><span class="co">#&gt;          mean.mc_std_err</span></span>
-<span><span class="co">#&gt; Plots           5.185982</span></span>
-<span><span class="co">#&gt; PlotsEmp        4.574647</span></span>
-<span><span class="co">#&gt; All             2.977786</span></span>
+<span><span class="co">#&gt; Plots           6.297710</span></span>
+<span><span class="co">#&gt; PlotsEmp        4.495204</span></span>
+<span><span class="co">#&gt; All             2.547837</span></span>
 <span><span class="co">#&gt; AllEmp                NA</span></span></code></pre></div>
 <p>Now, let’s compare the results</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
