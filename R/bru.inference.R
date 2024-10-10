@@ -1598,15 +1598,23 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       if (!linear) {
         expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
-          "{BRU_eta <- ", expr_text, "\n",
-          "if (length(BRU_eta) == 1L) {BRU_eta <- rep(BRU_eta, length(BRU_aggregate))}\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+          "{\n",
+          "  BRU_eta <- ", expr_text, "\n",
+          "  if (length(BRU_eta) == 1L) {\n",
+          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
+          "  }\n",
+          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "}"
         )
       } else {
         expr_text <- paste0(
-          "{BRU_eta <- BRU_EXPRESSION\n",
-          "if (length(BRU_eta) == 1L) {BRU_eta <- rep(BRU_eta, length(BRU_aggregate))}\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+          "{\n",
+          "  BRU_eta <- BRU_EXPRESSION\n",
+          "  if (length(BRU_eta) == 1L) {\n",
+          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
+          "  }\n",
+          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "}"
         )
       }
       expr <- parse(text = expr_text)

@@ -51,7 +51,6 @@ jobs:
             any::tmaptools
             any::patchwork
             any::raster
-            any::data.table
           needs: website
 
       - name: Session info

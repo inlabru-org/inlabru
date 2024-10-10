@@ -9,7 +9,6 @@ suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("lwgeom"))
 suppressPackageStartupMessages(library("patchwork"))
 suppressPackageStartupMessages(library("terra"))
-suppressPackageStartupMessages(library("data.table"))
 theme_set(theme_bw())
 
 
@@ -319,5 +318,5 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
 #'
 edit_df <- function(df, columns) {
   # Remove the columns that are not required
-  df[, !(colnames(df) %in% columns)]
+  df[, !(colnames(df) %in% columns), drop = FALSE]
 }
