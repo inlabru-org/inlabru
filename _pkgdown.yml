@@ -53,7 +53,9 @@ navbar:
         href: articles/2d_lgcp_multilikelihood.html
       - text: LGCPs - An example in space and time
         href: articles/2d_lgcp_spatiotemporal.html
-      - text: LGCPs - Residuals
+      - text: LGCPs - Residuals (sf version)
+        href: articles/2d_lgcp_residuals_sf.html
+      - text: LGCPs - Residuals (sp version)
         href: articles/2d_lgcp_residuals.html
     technical-articles:
       text: Technical articles
@@ -85,6 +87,7 @@ redirects:
   - ["articles/web/2d_lgcp_plotsampling.html", "articles/2d_lgcp_plotsampling.html"]
   - ["articles/web/2d_lgcp_distancesampling.html", "articles/2d_lgcp_distancesampling.html"]
   - ["articles/web/2d_lgcp_covars.html", "articles/2d_lgcp_covars.html"]
+  - ["articles/web/2d_lgcp_residuals_sf.html", "articles/2d_lgcp_residuals_sf.html"]
   - ["articles/web/2d_lgcp_residuals.html", "articles/2d_lgcp_residuals.html"]
   - ["articles/web/random_fields.html", "articles/random_fields.html"]
   - ["articles/web/mesh_mapping.html", "articles/mesh_mapping.html"]
