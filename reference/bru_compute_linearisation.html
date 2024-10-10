@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9013</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,6 +98,7 @@
 <span>  <span class="va">allow_latent</span>,</span>
 <span>  <span class="va">allow_combine</span>,</span>
 <span>  <span class="va">eps</span>,</span>
+<span>  n_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -196,6 +197,11 @@ involve several rows of the input data to influence the same row.</p></dd>
 
 <dt id="arg-eps">eps<a class="anchor" aria-label="anchor" href="#arg-eps"></a></dt>
 <dd><p>The finite difference step size</p></dd>
+
+
+<dt id="arg-n-pred">n_pred<a class="anchor" aria-label="anchor" href="#arg-n-pred"></a></dt>
+<dd><p>The length of the predictor expression. If not <code>NULL</code>, scalar
+predictor evaluations are expanded to vectors of length <code>n_pred</code>.</p></dd>
 
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>

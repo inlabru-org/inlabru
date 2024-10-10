@@ -9,7 +9,7 @@ several states of the latent variables and hyperparameters."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9013</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,8 @@ several states of the latent variables and hyperparameters.</p>
 <span>  <span class="va">effects</span>,</span>
 <span>  <span class="va">predictor</span>,</span>
 <span>  used <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  format <span class="op">=</span> <span class="st">"auto"</span></span>
+<span>  format <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  n_pred <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -131,6 +132,11 @@ expression for a state.</p></li>
 <li><p><code>"list"</code> A list where each column contains the evaluated predictor
 expression for a state.</p></li>
 </ul><p>Default: "auto"</p></dd>
+
+
+<dt id="arg-n-pred">n_pred<a class="anchor" aria-label="anchor" href="#arg-n-pred"></a></dt>
+<dd><p>integer. If provided, scalar predictor results are expanded to
+vectors of length <code>n_pred</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

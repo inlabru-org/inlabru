@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9013</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,6 +90,7 @@
 <span>  predictor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  format <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  used <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -150,6 +151,11 @@ expression for a state.</p></li>
 
 <dt id="arg-used">used<a class="anchor" aria-label="anchor" href="#arg-used"></a></dt>
 <dd><p>A <code><a href="bru_used.html">bru_used()</a></code> object, or NULL (default)</p></dd>
+
+
+<dt id="arg-n-pred">n_pred<a class="anchor" aria-label="anchor" href="#arg-n-pred"></a></dt>
+<dd><p>integer. If provided, scalar predictor results are expanded to
+vectors of length <code>n_pred</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
