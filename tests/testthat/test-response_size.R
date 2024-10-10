@@ -68,6 +68,11 @@ test_that("Response and predictor mismatch handling", {
     )
   )
 
+
+  # INLA prior to mdata/surv stack support will give a different error message
+  # than the one below, so we skip the test for old INLA versions.
+  skip_if(utils::packageVersion("INLA") <= "24.06.26")
+
   expect_error(
     {
       fit4 <- bru(y ~ 0 + comp(1:3),
