@@ -105,6 +105,7 @@ reference:
   - starts_with("component")
   - starts_with("like")
   - starts_with("lgcp")
+  - starts_with("bru_response_size")
 - title: "Posterior evaluation"
   desc: "Functions for evaluating posterior properties."
   contents:
