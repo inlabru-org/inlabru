@@ -1150,6 +1150,8 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
 
 
 # Extend bind_rows to handle XY/XYZ mismatches in one or more sfc columns
+# TODO: detect non-point-data and either warn/stop or handle it properly.
+# E.g. POLYGON + POINT data combinations currently fail with obscure error.
 extended_bind_rows <- function(...) {
   dt <- list(...)
   names_ <- lapply(dt, names)
