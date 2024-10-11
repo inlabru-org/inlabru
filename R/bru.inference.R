@@ -1186,7 +1186,8 @@ extended_bind_rows <- function(...) {
     ncol_ <- vapply(
       sf_data_idx_,
       function(i) {
-        ncol(sf::st_coordinates(dt[[i]][[nm]]))
+        crds <- sf::st_coordinates(dt[[i]][[nm]])
+        length(intersect(colnames(crds), c("X", "Y", "Z")))
       },
       0L
     )
@@ -1198,14 +1199,7 @@ extended_bind_rows <- function(...) {
         # Extend columns
         if (nrow(dt[[i]]) > 0) {
           dt[[i]][[nm]] <-
-            sf::st_as_sf(
-              as.data.frame(cbind(
-                sf::st_coordinates(dt[[i]][[nm]]),
-                matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
-              )),
-              coords = seq_len(ncol_max),
-              crs = fm_crs(dt[[i]][[nm]])
-            )$geometry
+            sf::st_zm(dt[[i]][[nm]], drop = FALSE, what = "Z")
         } else {
           dt[[i]][[nm]] <-
             sf::st_as_sf(
