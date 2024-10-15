@@ -113,13 +113,13 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
 #' @return The [mexdolphin] data set
 #' @examples
 #' \dontrun{
-#' mexdolphin <- import.mexdolphin()
+#' mexdolphin <- import_mexdolphin()
 #' }
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
 
-import.mexdolphin <- function() {
+import_mexdolphin <- function() {
   envir <- new.env()
   data("mexdolphins", package = "dsm", envir = envir)
   mexdolphins <- as.list(envir)
@@ -245,8 +245,8 @@ import.mexdolphin <- function() {
   mexdolphin
 }
 
-#' @describeIn import.mexdolphin Import mexdolphin data as `sf`
-import.mexdolphin.sf <- function() {
+#' @describeIn import_mexdolphin Import mexdolphin data as `sf`
+import_mexdolphin_sf <- function() {
   envir <- new.env()
   data("mexdolphins", package = "dsm", envir = envir)
   mexdolphins <- as.list(envir)
@@ -257,7 +257,7 @@ import.mexdolphin.sf <- function() {
   data_crs <- fm_crs(data.p4s)
 
   dset <- import.dsmdata(mexdolphins, covar.col = 8)
-  dset$mesh$crs <- fm_CRS(data_crs)
+  dset$mesh$crs <- fm_crs(data_crs)
   mexdolphin <- as.spatial.dsdata(
     dset,
     cnames = c("x", "y"),

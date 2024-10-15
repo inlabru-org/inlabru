@@ -33,6 +33,8 @@
 * Convert `mrsea` to `sf` format (version `2.11.1.9009`)
 * Convert the `shrimp` data set to `sf` format (version `2.11.1.9007`)
 * Remove `seals_sp` data set due to excessive size (version `2.11.1.9010`)
+* Replace the `mexdolphin` dataset with a function `mexdolphin_sp()`
+  to avoid `sp` data objects in the package (version `2.11.1.9015`)
 
 # inlabru 2.11.1
 

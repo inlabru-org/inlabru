@@ -3,6 +3,7 @@
 \docType{data}
 \name{mexdolphin_sf}
 \alias{mexdolphin_sf}
+\alias{mexdolphin_sp}
 \title{Pan-tropical spotted dolphins in the Gulf of Mexico}
 \format{
 A list of objects:
@@ -29,6 +30,8 @@ Library \code{dsm}.
 }
 \usage{
 mexdolphin_sf
+
+mexdolphin_sp()
 }
 \description{
 This a version of the \code{mexdolphins} dataset from the package
@@ -40,6 +43,12 @@ group size was recorded, as well as the Beaufort sea state at the time of
 the observation. Transect width is 16 km, i.e. maximal detection distance 8
 km (transect half-width 8 km).
 }
+\section{Functions}{
+\itemize{
+\item \code{mexdolphin_sp()}: Convert \code{mexdolphin_sf} to \code{sp} format. Replaces
+the old \code{mexdolphin} dataset.
+
+}}
 \examples{
 \donttest{
 if (require("ggplot2", quietly = TRUE)) {
@@ -56,6 +65,25 @@ if (require("ggplot2", quietly = TRUE)) {
       color = mexdolphin_sf$lambda,
       mask = mexdolphin_sf$ppoly
     )
+}
+}
+\donttest{
+if (require("ggplot2", quietly = TRUE) &&
+  require("sp", quietly = TRUE)) {
+  mexdolphin <- mexdolphin_sp()
+  ggplot() +
+    gg(mexdolphin$mesh) +
+    gg(mexdolphin$ppoly, color = "blue") +
+    gg(mexdolphin$samplers) +
+    gg(mexdolphin$points, aes(size = size), color = "red") +
+    scale_size_area() +
+    coord_equal()
+
+  ggplot() +
+    gg(mexdolphin$mesh,
+      col = mexdolphin$lambda,
+      mask = mexdolphin$ppoly) +
+      coord_equal()
 }
 }
 }

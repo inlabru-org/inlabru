@@ -67,7 +67,7 @@ for \code{SpatialPolygons/DataFrame} objects.
 
     # Load pantropical dolphin data
 
-    mexdolphin <- inlabru::mexdolphin
+    mexdolphin <- inlabru::mexdolphin_sp()
 
     # Plot the pantropical survey boundary, ship transects and dolphin sightings
 

@@ -22,7 +22,7 @@
 #' `bru(..., like(model="cp", ...))`.
 #'
 #' The package comes with multiple real world data sets, namely [gorillas],
-#' [mexdolphin], [gorillas_sf], [mexdolphin_sf]. Plotting these data
+#' [gorillas_sf], [mexdolphin_sf]. Plotting these data
 #' sets is straight forward using inlabru's extensions
 #' to `ggplot2`, e.g. the [gg()] function. For educational purposes some
 #' simulated data sets are available as well, e.g. [Poisson1_1D],

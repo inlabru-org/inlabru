@@ -8,7 +8,7 @@ if (interactive() &&
   globe()
 
   # Load pantropoical dolphin data
-  data("mexdolphin", package = "inlabru")
+  mexdolphin <- inlabru::mexdolphin_sp()
 
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively

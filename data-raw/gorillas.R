@@ -5,7 +5,7 @@
 #' David L. Borchers \email{dlb@@st-andrews.ac.uk}
 #' @return gorilla data
 
-import.gorillas <- function() {
+import_gorillas_sp <- function() {
   stopifnot(inlabru:::check_spatstat("spatstat.data"))
   gorillas <- spatstat.data::gorillas
   gorillas.extra <- spatstat.data::gorillas.extra
@@ -113,8 +113,8 @@ import.gorillas <- function() {
 }
 
 
-#' @describeIn import.gorillas Convert gorillas to `sf` and `terra` format
-import.gorillas.sf <- function(gorillas = NULL, overwrite = FALSE) {
+#' @describeIn import_gorillas_sp Convert gorillas to `sf` and `terra` format
+import_gorillas_sf <- function(gorillas = NULL, overwrite = FALSE) {
   if (is.null(gorillas)) {
     gorillas <- inlabru::gorillas
   }
@@ -148,7 +148,7 @@ import.gorillas.sf <- function(gorillas = NULL, overwrite = FALSE) {
 }
 
 
-# gorillas <- import.gorillas()
+# gorillas <- import_gorillas_sp()
 # usethis::use_data(gorillas, overwrite=TRUE)
-# gorillas_sf <- import.gorillas.sf(gorillas)
+# gorillas_sf <- import_gorillas_sf(gorillas)
 # usethis::use_data(gorillas_sf, overwrite = TRUE)
