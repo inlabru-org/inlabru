@@ -37,7 +37,6 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
-bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -47,7 +46,7 @@ Get the data
 data(gorillas_sf, package = "inlabru")
 ```
 
-This dataset is a list (see `help(gorillas)` for details. Extract the the objects 
+This dataset is a list (see `help(gorillas_sf)` for details. Extract the the objects 
 you need from the list, for convenience:
 
 ```{r }
@@ -57,7 +56,7 @@ boundary <- gorillas_sf$boundary
 gcov <- gorillas_sf_gcov()
 ```
 
-The `gorillas` data also contains a plot sample subset which covers 60% of the survey region.
+The `gorillas_sf` data also contains a plot sample subset which covers 60% of the survey region.
 
 ```{r }
 sample <- gorillas_sf$plotsample
@@ -99,8 +98,8 @@ plot(plotwithall)
 
 Inference
 ------------------------------------
-The observed nest locations are in the SpatialPointsDataFrame `sample$nests`, and the 
-plots are in the SpatialPolygonsDataFrame `sample$plots`. Again, we are using the following SPDE
+The observed nest locations are in the `sf` `sample$nests`, and the 
+plots are in the `sf` `sample$plots`. Again, we are using the following SPDE
 setup:
 
 
@@ -209,7 +208,10 @@ rbind(
   Plots = Lambda,
   PlotsEmp = Lambda.empirical,
   All = Lambda.all,
-  AllEmp = c(nrow(gorillas$nests), 0, rep(nrow(gorillas$nests), 3), rep(NA, 3))
+  AllEmp = c(nrow(gorillas_sf$nests),
+             0,
+             rep(nrow(gorillas_sf$nests), 3),
+             rep(NA, 3))
 )
 ```
 
