@@ -249,10 +249,10 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.348, Running = 2.63, Post = 0.558, Total = 3.53 </span></span>
+<span><span class="co">#&gt;     Pre = 0.351, Running = 2.56, Post = 0.557, Total = 3.47 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.085   0</span></span>
+<span><span class="co">#&gt; veg_disturbed  0.085 0.351     -0.603    0.086      0.773  0.086   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.230 0.382     -1.980   -1.230     -0.480 -1.230   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002      0.000    0.003      0.007  0.003   0</span></span>
 <span><span class="co">#&gt; Intercept     -6.173 3.464    -13.001   -6.167      0.637 -6.157   0</span></span>
@@ -264,7 +264,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant mode</span></span>
 <span><span class="co">#&gt; Range for field 2.35 0.654       1.38     2.25       3.92 2.04</span></span>
-<span><span class="co">#&gt; Stdev for field 2.94 0.679       1.89     2.85       4.54 2.66</span></span>
+<span><span class="co">#&gt; Stdev for field 2.94 0.679       1.88     2.85       4.54 2.66</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1555.96</span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 826.72</span></span>
@@ -367,13 +367,13 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Predictor: count ~ veg_disturbed + veg_grassland + elevation + field + Intercept</span></span>
 <span><span class="co">#&gt;     Used components: effects[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.363, Running = 1.63, Post = 0.128, Total = 2.12 </span></span>
+<span><span class="co">#&gt;     Pre = 0.377, Running = 1.68, Post = 0.127, Total = 2.19 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.005 0.346     -0.681   -0.006      0.678 -0.006   0</span></span>
 <span><span class="co">#&gt; veg_grassland -1.240 0.377     -1.979   -1.240     -0.501 -1.240   0</span></span>
 <span><span class="co">#&gt; elevation      0.003 0.002     -0.001    0.003      0.006  0.003   0</span></span>
-<span><span class="co">#&gt; Intercept     -5.511 3.432    -12.375   -5.482      1.200 -5.480   0</span></span>
+<span><span class="co">#&gt; Intercept     -5.512 3.432    -12.376   -5.483      1.199 -5.480   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;   Name     Model</span></span>
@@ -394,11 +394,11 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; Stdev for field                                        2.632</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Deviance Information Criterion (DIC) ...............: 1553.47</span></span>
-<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.35</span></span>
-<span><span class="co">#&gt; Effective number of parameters .....................: 125.16</span></span>
+<span><span class="co">#&gt; Deviance Information Criterion (DIC, saturated) ....: 784.36</span></span>
+<span><span class="co">#&gt; Effective number of parameters .....................: 125.17</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.24</span></span>
-<span><span class="co">#&gt; Effective number of parameters .................: 109.70</span></span>
+<span><span class="co">#&gt; Watanabe-Akaike information criterion (WAIC) ...: 1559.23</span></span>
+<span><span class="co">#&gt; Effective number of parameters .................: 109.71</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Marginal log-Likelihood:  -845.29 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
@@ -577,11 +577,11 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
 <span><span class="co">#&gt; iinla: Construct inla stack</span></span>
 <span><span class="co">#&gt; iinla: Model initialisation completed</span></span>
 <span><span class="co">#&gt; iinla: Iteration 1 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.541e-14, norm01 = 220.6)</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 220.6, norm1 = 3.646e-14, norm01 = 220.6)</span></span>
 <span><span class="co">#&gt; iinla: Optimisation did not improve on previous solution.</span></span>
 <span><span class="co">#&gt; iinla: |lin1-lin0| = 220.6</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -6.983e-17</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.683e-14</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = 5.587e-16</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 3.756e-14</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; Linearise component 'veg_disturbed'</span></span>
 <span><span class="co">#&gt; Linearise component 'veg_grassland'</span></span>
@@ -601,10 +601,10 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
 <span><span class="co">#&gt; Linearise with respect to component 'elevation'</span></span>
 <span><span class="co">#&gt; Linearise with respect to component 'field_count'</span></span>
 <span><span class="co">#&gt; iinla: Iteration 2 [max:10]</span></span>
-<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04559, norm1 = 7.661e-12, norm01 = 0.04559)</span></span>
-<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04559</span></span>
-<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -5.592e-14</span></span>
-<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.661e-12</span></span>
+<span><span class="co">#&gt; iinla: Step rescaling: 100%, Approx Optimisation (norm0 = 0.04569, norm1 = 7.621e-12, norm01 = 0.04569)</span></span>
+<span><span class="co">#&gt; iinla: |lin1-lin0| = 0.04569</span></span>
+<span><span class="co">#&gt;        &lt;eta-lin1,delta&gt;/|delta| = -3.809e-14</span></span>
+<span><span class="co">#&gt;        |eta-lin0 - delta &lt;delta,eta-lin0&gt;/&lt;delta,delta&gt;| = 7.621e-12</span></span>
 <span><span class="co">#&gt; iinla: Evaluate component linearisations</span></span>
 <span><span class="co">#&gt; Linearise component 'veg_disturbed'</span></span>
 <span><span class="co">#&gt; Linearise component 'veg_grassland'</span></span>
@@ -655,7 +655,7 @@ Var(count)&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
 <span><span class="co">#&gt;     Predictor: count ~ elevation + field_count + Intercept_count</span></span>
 <span><span class="co">#&gt;     Used components: effects[Intercept_count, elevation, field_count], latent[]</span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.52, Running = 3.98, Post = 0.271, Total = 4.77 </span></span>
+<span><span class="co">#&gt;     Pre = 0.53, Running = 4.05, Post = 0.278, Total = 4.86 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed      -1.264 0.549     -2.336   -1.266     -0.179  -1.266   0</span></span>
@@ -939,24 +939,24 @@ respectively. The (negated) Log score is a strictly proper score <span class="ci
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.2425692</td>
-<td align="right">0.5617268</td>
-<td align="right">-2.562989</td>
-<td align="right">0.3929025</td>
+<td align="right">0.2422742</td>
+<td align="right">0.5609368</td>
+<td align="right">-2.607588</td>
+<td align="right">0.3925232</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.2548734</td>
-<td align="right">0.6008354</td>
-<td align="right">-2.637722</td>
-<td align="right">0.4026577</td>
+<td align="right">0.2542197</td>
+<td align="right">0.6002411</td>
+<td align="right">-2.636802</td>
+<td align="right">0.4022430</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.2799851</td>
-<td align="right">0.6538842</td>
-<td align="right">-2.305295</td>
-<td align="right">0.4001033</td>
+<td align="right">0.2801550</td>
+<td align="right">0.6536929</td>
+<td align="right">-2.284666</td>
+<td align="right">0.4003185</td>
 </tr>
 </tbody>
 </table>
