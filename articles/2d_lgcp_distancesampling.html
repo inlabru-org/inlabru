@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -262,11 +262,11 @@ and distance dimensions:</p>
 <p>Look at the SPDE parameter posteriors</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"mySPDE"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"mySPDE"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-12-2.png" width="672"></p>
 <p>Predict spatial intensity, and plot it:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -293,20 +293,20 @@ information.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">distdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">dfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hn</span><span class="op">(</span><span class="va">distance</span>, <span class="va">sigma</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-15-1.png" width="960">
 The average detection probability within the maximum detection distance
-is estimated to be 0.685945.</p>
+is estimated to be 0.6980418.</p>
 <p>We can look at the posterior for expected number of dolphins as
 usual:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025    q0.5   q0.975  median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 236.3895 50.02178 161.3573 224.674 342.3467 224.674      3.297531</span></span>
+<span><span class="co">#&gt;       mean      sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 237.3086 46.8081 165.1684 232.8013 353.3572 232.8013      4.091911</span></span>
 <span><span class="co">#&gt;   mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1        5.661684</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        5.499193</span></span></code></pre></div>
 <p>and including the randomness about the expected number. In this case,
 it turns out that you need lots of posterior samples, e.g. 2,000 to
 smooth out the Monte Carlo error in the posterior, and this takes a
@@ -378,11 +378,11 @@ this example it’s a reasonable choice):</p>
 <p>Plots:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spde.range</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="st">"mySPDE"</span>, what <span class="op">=</span> <span class="st">"range"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.range</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/spde.range.plot-1.png" width="672"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spde.logvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spde.posterior.html">spde.posterior</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="st">"mySPDE"</span>, what <span class="op">=</span> <span class="st">"log.variance"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spde.logvar</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/spde.logvar.plot-1.png" width="672"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pr.int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">pxl</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
@@ -401,16 +401,16 @@ this example it’s a reasonable choice):</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">distdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>distance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">dfun1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">distdf</span>, <span class="op">~</span> <span class="fu">hr</span><span class="op">(</span><span class="va">distance</span>, <span class="va">sigma</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dfun1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_distancesampling_files/figure-html/detection.plot-1.png" width="672"></p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predpts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span><span class="va">mexdolphin</span><span class="op">$</span><span class="va">mesh</span>, <span class="va">mexdolphin</span><span class="op">$</span><span class="va">ppoly</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>, <span class="va">predpts</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySPDE</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda1</span></span>
-<span><span class="co">#&gt;       mean     sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 302.2048 75.521 174.8021 296.6228 444.7598 296.6228      4.666266</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median sd.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 286.6045 72.53983 174.4717 275.4769 433.8664 275.4769      5.275459</span></span>
 <span><span class="co">#&gt;   mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1        8.485353</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        8.309074</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">650</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">Nest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
@@ -520,7 +520,7 @@ have same area as that of histogram.</p>
 <span>  lower <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.025</span>,</span>
 <span>  upper <span class="op">=</span> <span class="va">detfun</span><span class="op">$</span><span class="va">q0.975</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hnline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
+<span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hnline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">wts</span>, <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">hnarea</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">wts</span> <span class="op">*</span> <span class="va">hnline</span><span class="op">$</span><span class="va">p</span><span class="op">)</span></span>
@@ -537,7 +537,7 @@ have same area as that of histogram.</p>
 <span>  lower <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">q0.025</span>,</span>
 <span>  upper <span class="op">=</span> <span class="va">detfun1</span><span class="op">$</span><span class="va">q0.975</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hrline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
+<span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">hrline</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="va">wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">wts</span>, <span class="va">wts</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">hrarea</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">wts</span> <span class="op">*</span> <span class="va">hrline</span><span class="op">$</span><span class="va">p</span><span class="op">)</span></span>

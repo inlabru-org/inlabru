@@ -11,7 +11,7 @@ correlation or covariance function. inla.spde.result."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,32 +145,32 @@ correlation or covariance function. <code>inla.spde.result</code>.</p>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior range</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">range</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"range"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">range</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior log range</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">lrange</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"log.range"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lrange</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lrange</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior variance</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">variance</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"variance"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">variance</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">variance</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior log variance</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">lvariance</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"log.variance"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lvariance</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lvariance</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior Matern correlation</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">matcor</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"matern.correlation"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">matcor</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">matcor</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Calculate and plot the posterior Matern covariance</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">matcov</span> <span class="op">&lt;-</span> <span class="fu">spde.posterior</span><span class="op">(</span><span class="va">fit</span>, <span class="st">"spde1D"</span>, <span class="st">"matern.covariance"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">matcov</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">matcov</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="spde.posterior-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

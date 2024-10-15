@@ -9,7 +9,7 @@ reformatted as point process data for use with inlabru."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,9 @@ reformatted as point process data for use with <code>inlabru</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">gorillas_sf</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gorillas_sf</span>, package <span class="op">=</span> <span class="st">"inlabru"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">gorillas_sf_gcov</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">gorillas_sf_gcov</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">gorillas_sp</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -150,18 +152,19 @@ metres.</p></dd>
 <dt><code>plotsample</code></dt>
 <dd><p>Plot sample of gorilla nests, sampling 9x9 over the
 region, with 60\<!-- % coverage. Components: --></p><dl><dt><code>counts</code></dt>
-<dd><p>A SpatialPointsDataFrame frame with elements
-<code>x</code>, <code>y</code>, <code>count</code>, <code>exposure</code>, being the x- and y-coordinates of
-the centre of each plot, the count in each
+<dd><p>An <code>sf</code> object with elements
+<code>count</code>, <code>exposure</code>, and <code>geometry</code>, holding the point geometry for the
+centre of each plot, the count in each
 plot and the area of each plot.</p></dd>
 
 <dt><code>plots</code></dt>
-<dd><p>A <code>SpatialPolygonsDataFrame</code> defining the individual
-plot boundaries.</p></dd>
+<dd><p>An <code>sf</code> object with <code>MULTIPOLYGON</code> objects defining the
+individual plot boundaries and an all-ones <code>weight</code> column.</p></dd>
 
 <dt><code>nests</code></dt>
-<dd><p>A <code>SpatialPointsDataFrame</code> giving the locations of
-each detected nest.</p></dd>
+<dd><p>An <code>sf</code> giving the locations of
+each detected nests, <code>group</code> ("minor" or "major"),
+<code>season</code> ("dry" or "rainy"), and <code>date</code> (in <code>Date</code> format).</p></dd>
 
 
 </dl></dd>
@@ -177,6 +180,9 @@ each detected nest.</p></dd>
 
 <ul><li><p><code>gorillas_sf_gcov()</code>: Access the <code>gorillas_sf</code> covariates data as a
 <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code> object.</p></li>
+<li><p><code>gorillas_sp()</code>: Access the <code>gorillas_sf</code> data in <code>sp</code> format.
+The covariate data is added as <code>gcov</code>, a list of <code><a href="https://edzer.github.io/sp/reference/SpatialGridDataFrame.html" class="external-link">sp::SpatialPixelsDataFrame</a></code>
+objects. Requires the <code>sp</code>, <code>sf</code>, and <code>terra</code> packages to be installed.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
