@@ -85,7 +85,7 @@ reformatted as point process data for use with \code{inlabru}.
 
 \item \code{gorillas_sp()}: Access the \code{gorillas_sf} data in \code{sp} format.
 The covariate data is added as \code{gcov}, a list of \code{sp::SpatialPixelsDataFrame}
-objects.
+objects. Requires the \code{sp}, \code{sf}, and \code{terra} packages to be installed.
 
 }}
 \examples{

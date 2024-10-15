@@ -4,6 +4,8 @@ test_that("2D LGCP fitting", {
   skip_if_not(bru_safe_sp())
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
   gorillas <- gorillas_sp()
 
   # Uses the component label to pick the covariate layer to extract,

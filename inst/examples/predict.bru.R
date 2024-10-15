@@ -3,7 +3,9 @@ if (bru_safe_inla() &&
     bru_safe_sp() &&
     require("sp") &&
     require("sn", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE)) {
+    require("ggplot2", quietly = TRUE) &&
+    require("terra", quietly = TRUE) &&
+    require("sf", quietly = TRUE)) {
 
   # Load the Gorilla data
 

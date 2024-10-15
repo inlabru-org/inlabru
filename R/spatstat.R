@@ -47,7 +47,9 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #' \donttest{
 #' if (require("spatstat.geom") &&
 #'   bru_safe_sp() &&
-#'   require("sp")) {
+#'   require("sp") &&
+#'   require("terra", quietly = TRUE) &&
+#'   require("sf", quietly = TRUE)) {
 #'   # Load Gorilla data
 #'
 #'   gorillas <- gorillas_sp()

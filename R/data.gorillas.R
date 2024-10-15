@@ -120,9 +120,11 @@ gorillas_sf_gcov <- function() {
 
 #' @describeIn gorillas_sf Access the `gorillas_sf` data in `sp` format.
 #' The covariate data is added as `gcov`, a list of `sp::SpatialPixelsDataFrame`
-#' objects.
+#' objects. Requires the `sp`, `sf`, and `terra` packages to be installed.
 #' @export
 gorillas_sp <- function() {
+  requireNamespace("sf")
+  requireNamespace("terra")
   stopifnot(bru_safe_sp())
   dat <- inlabru::gorillas_sf
   gcov <- gorillas_sf_gcov()

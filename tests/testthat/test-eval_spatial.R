@@ -67,6 +67,8 @@ test_that("eval_spatial.Spatial*", {
   skip_if_not(bru_safe_sp())
 
   # Load the Gorilla data
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
   gorillas <- gorillas_sp()
 
   covs <- gorillas$gcov$elevation
