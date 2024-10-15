@@ -53,8 +53,8 @@
 #'      `count`, `exposure`, and `geometry`, holding the point geometry for the
 #'      centre of each plot, the count in each
 #'      plot and the area of each plot.}
-#'      \item{`plots`}{An `sf` object with `MULTIPOLYGON` objects defining the individual
-#'      plot boundaries and an all-ones `weight` column.}
+#'      \item{`plots`}{An `sf` object with `MULTIPOLYGON` objects defining the
+#'      individual plot boundaries and an all-ones `weight` column.}
 #'      \item{`nests`}{An `sf` giving the locations of
 #'      each detected nests, `group` ("minor" or "major"),
 #'      `season` ("dry" or "rainy"), and `date` (in `Date` format).}

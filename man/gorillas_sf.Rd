@@ -54,8 +54,8 @@ region, with 60\\% coverage. Components:
 \code{count}, \code{exposure}, and \code{geometry}, holding the point geometry for the
 centre of each plot, the count in each
 plot and the area of each plot.}
-\item{\code{plots}}{An \code{sf} object with \code{MULTIPOLYGON} objects defining the individual
-plot boundaries and an all-ones \code{weight} column.}
+\item{\code{plots}}{An \code{sf} object with \code{MULTIPOLYGON} objects defining the
+individual plot boundaries and an all-ones \code{weight} column.}
 \item{\code{nests}}{An \code{sf} giving the locations of
 each detected nests, \code{group} ("minor" or "major"),
 \code{season} ("dry" or "rainy"), and \code{date} (in \code{Date} format).}
