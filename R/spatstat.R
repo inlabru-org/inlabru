@@ -50,7 +50,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
 #'   require("sp")) {
 #'   # Load Gorilla data
 #'
-#'   data("gorillas", package = "inlabru")
+#'   gorillas <- gorillas_sp()
 #'
 #'   # Use nest locations and survey boundary to create a spatstat ppp object
 #'

@@ -67,7 +67,7 @@ test_that("eval_spatial.Spatial*", {
   skip_if_not(bru_safe_sp())
 
   # Load the Gorilla data
-  data(gorillas, package = "inlabru", envir = environment())
+  gorillas <- gorillas_sp()
 
   covs <- gorillas$gcov$elevation
   names(covs) <- "A"

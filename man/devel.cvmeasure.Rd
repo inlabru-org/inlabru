@@ -35,7 +35,7 @@ if (bru_safe_inla() &&
 
   # Load Gorilla data
 
-  data("gorillas", package = "inlabru", envir = environment())
+  gorillas <- gorillas_sp()
 
   # Use RColorBrewer
 

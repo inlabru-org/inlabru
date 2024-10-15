@@ -695,7 +695,6 @@ bru_fill_missing <- function(data, where, values,
 # Resave data
 resave_package_data <- function() {
   name_list <- c(
-    "gorillas",
     "gorillas_sf", "mexdolphin_sf",
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",

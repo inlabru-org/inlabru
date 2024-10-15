@@ -111,7 +111,7 @@ if (bru_safe_inla() &&
 
   # Load the Gorilla data
 
-  data(gorillas, package = "inlabru")
+  gorillas <- gorillas_sp()
 
   # Plot the Gorilla nests, the mesh and the survey boundary
 

@@ -66,7 +66,7 @@ makepoly <- function(start, width, height) {
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'   data(gorillas, package = "inlabru")
+#'   gorillas <- gorillas_sp()
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
 #'     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
 #'   )
@@ -164,7 +164,7 @@ plotsample <- function(spdf,
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE)) {
-#'   data(gorillas, package = "inlabru")
+#'   gorillas <- gorillas_sp()
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
 #'     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
 #'   )

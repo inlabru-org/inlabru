@@ -229,7 +229,7 @@ data using different model definitions.
 
 ```{r load-data, echo=TRUE}
 # Load data
-data(gorillas, package = "inlabru")
+gorillas <- gorillas_sp()
 nests <- gorillas$nests
 mesh <- gorillas$mesh
 boundary <- gorillas$boundary

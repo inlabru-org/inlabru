@@ -97,7 +97,7 @@ if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   bru_safe_sp() &&
   require("sp")) {
-  data("gorillas", package = "inlabru")
+  gorillas <- gorillas_sp()
   pts <- sample.lgcp(gorillas$mesh,
     loglambda = 1.5,
     samplers = gorillas$boundary

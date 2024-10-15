@@ -4,6 +4,7 @@
 \name{gorillas_sf}
 \alias{gorillas_sf}
 \alias{gorillas_sf_gcov}
+\alias{gorillas_sp}
 \title{Gorilla nesting sites in sf format}
 \format{
 The data are a list that contains these elements:
@@ -49,14 +50,15 @@ Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
 \item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the
 region, with 60\\% coverage. Components:
 \describe{
-\item{\code{counts}}{ A SpatialPointsDataFrame frame with elements
-\code{x}, \code{y}, \code{count}, \code{exposure}, being the x- and y-coordinates of
-the centre of each plot, the count in each
+\item{\code{counts}}{An \code{sf} object with elements
+\code{count}, \code{exposure}, and \code{geometry}, holding the point geometry for the
+centre of each plot, the count in each
 plot and the area of each plot.}
-\item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual
-plot boundaries.}
-\item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of
-each detected nest.}
+\item{\code{plots}}{An \code{sf} object with \code{MULTIPOLYGON} objects defining the individual
+plot boundaries and an all-ones \code{weight} column.}
+\item{\code{nests}}{An \code{sf} giving the locations of
+each detected nests, \code{group} ("minor" or "major"),
+\code{season} ("dry" or "rainy"), and \code{date} (in \code{Date} format).}
 }
 }
 }
@@ -69,6 +71,8 @@ gorillas_sf
 data(gorillas_sf, package = "inlabru")
 
 gorillas_sf_gcov()
+
+gorillas_sp()
 }
 \description{
 This is the \code{gorillas} dataset from the package \code{spatstat.data},
@@ -78,6 +82,10 @@ reformatted as point process data for use with \code{inlabru}.
 \itemize{
 \item \code{gorillas_sf_gcov()}: Access the \code{gorillas_sf} covariates data as a
 \code{terra::rast()} object.
+
+\item \code{gorillas_sp()}: Access the \code{gorillas_sf} data in \code{sp} format.
+The covariate data is added as \code{gcov}, a list of \code{sp::SpatialPixelsDataFrame}
+objects.
 
 }}
 \examples{
