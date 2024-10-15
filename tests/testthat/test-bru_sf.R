@@ -21,7 +21,8 @@ test_that("sf gorillas lgcp vignette", {
   # b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
   # # st_sfc gives the proper effect:
   # b2 <- b1
-  # b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry), check_ring_dir = TRUE)
+  # b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry),
+  #   check_ring_dir = TRUE)
   #
   # gorillas_sf$boundary <- b2
 

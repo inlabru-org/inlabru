@@ -81,8 +81,9 @@
 #'   ggplot() +
 #'     gg(mexdolphin$mesh,
 #'       col = mexdolphin$lambda,
-#'       mask = mexdolphin$ppoly) +
-#'       coord_equal()
+#'       mask = mexdolphin$ppoly
+#'     ) +
+#'     coord_equal()
 #' }
 #' }
 mexdolphin_sp <- function() {

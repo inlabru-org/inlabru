@@ -82,8 +82,9 @@ if (require("ggplot2", quietly = TRUE) &&
   ggplot() +
     gg(mexdolphin$mesh,
       col = mexdolphin$lambda,
-      mask = mexdolphin$ppoly) +
-      coord_equal()
+      mask = mexdolphin$ppoly
+    ) +
+    coord_equal()
 }
 }
 }

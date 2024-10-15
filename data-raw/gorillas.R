@@ -21,7 +21,7 @@ import_gorillas_sp <- function() {
 
   # Turn the observation window into spatial polygon
   boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
-                    crs = crs
+    crs = crs
   )
 
   # Build mesh
@@ -69,7 +69,7 @@ import_gorillas_sp <- function() {
   # Create a plot sampling data set
   set.seed(121)
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
-                        x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4
+    x.ppn = 0.6, y.ppn = 0.6, nx = 5.4, ny = 5.4
   )
   counts <- point2count(plotpts$plots, plotpts$dets)
   x <- sp::coordinates(counts)[, 1]
@@ -96,8 +96,8 @@ import_gorillas_sp <- function() {
 
   # Extrapolate covariate
   pxl_ <- fm_pixels(gorillas$mesh,
-                    mask = FALSE, dims = c(220, 180),
-                    format = "sp"
+    mask = FALSE, dims = c(220, 180),
+    format = "sp"
   )
   pxl_ <- fm_transform(pxl_, fm_crs(gorillas$gcov[[1]]))
   for (k in names(gorillas$gcov)) {
@@ -126,13 +126,15 @@ import_gorillas_sf <- function(overwrite = FALSE) {
 
   # Create sf representing nest locations
   nests <- sf::st_as_sf(as.data.frame(gorillas),
-                        coords = c("x", "y"),
-                        crs = crs)
+    coords = c("x", "y"),
+    crs = crs
+  )
 
   # Turn the observation window into spatial polygon
   boundary <- spoly(as.data.frame(gorillas$window$bdry[[1]]),
-                    crs = crs,
-                    format = "sf")
+    crs = crs,
+    format = "sf"
+  )
 
   # Build mesh
   bnd <- fm_as_segm(boundary)
@@ -149,8 +151,9 @@ import_gorillas_sf <- function(overwrite = FALSE) {
     terra::crs(gcov_) <- fm_proj4string(crs)
     names(gcov_) <- nm
     if (is.character(terra::values(gcov_,
-                                   mat = FALSE,
-                                   dataframe = TRUE)[[1]])) {
+      mat = FALSE,
+      dataframe = TRUE
+    )[[1]])) {
       terra::values(gcov_) <- as.factor(terra::values(gcov_))
     }
     if (is.null(gcov)) {
