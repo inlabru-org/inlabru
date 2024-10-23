@@ -9,6 +9,8 @@
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 * Add `[` and `]` to disallowed character set in `bru_standardise_names()`
   (version `2.11.1.9012`)
+* Add `bru_index()` method for accessing predictor index information for
+  sub-models (version `2.11.1.9017`)
 
 ## Namespace changes
 

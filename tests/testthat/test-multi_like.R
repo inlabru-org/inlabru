@@ -46,3 +46,48 @@ test_that("Multiple likelihoods: basic model", {
     tolerance = midtol
   )
 })
+
+
+test_that("Predictor indexing", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  fit <- bru(
+    ~ 0 + x,
+    like(
+      y ~ .,
+      data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
+      tag = "A"
+    ),
+    like(
+      y ~ .,
+      data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
+      tag = "B"
+    )
+  )
+
+  expect_equal(
+    bru_index(fit),
+    1L:7L
+  )
+  expect_equal(
+    bru_index(fit, "A"),
+    1L:3L
+  )
+  expect_equal(
+    bru_index(fit, "B"),
+    4L:7L
+  )
+  expect_equal(
+    bru_index(fit, c("B", "A")),
+    c(4L:7L, 1L:3L)
+  )
+  expect_equal(
+    bru_index(fit, what = "observed"),
+    c(1L:3L, 6L:7L)
+  )
+  expect_equal(
+    bru_index(fit, what = "missing"),
+    4L:5L
+  )
+})

@@ -30,6 +30,7 @@ like(
   allow_latent = deprecated(),
   allow_combine = NULL,
   control.family = NULL,
+  tag = NULL,
   options = list(),
   .envir = parent.frame()
 )
@@ -142,6 +143,9 @@ defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \co
 \code{list}, or the likelihood construction requires it.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
+
+\item{tag}{character; Name that can be used to identify the relevant parts
+of INLA predictor vector output, via \code{\link[=bru_index]{bru_index()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
