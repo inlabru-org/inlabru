@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.11.1.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,6 +102,7 @@
 <span>  allow_latent <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  allow_combine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  control.family <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tag <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  .envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -255,6 +256,11 @@ defaults to <code>FALSE</code>, unless <code>response_data</code> is non-<code>N
 
 <dt id="arg-control-family">control.family<a class="anchor" aria-label="anchor" href="#arg-control-family"></a></dt>
 <dd><p>A optional <code>list</code> of <code><a href="https://rdrr.io/pkg/INLA/man/control.family.html" class="external-link">INLA::control.family</a></code> options</p></dd>
+
+
+<dt id="arg-tag">tag<a class="anchor" aria-label="anchor" href="#arg-tag"></a></dt>
+<dd><p>character; Name that can be used to identify the relevant parts
+of INLA predictor vector output, via <code><a href="bru_index.html">bru_index()</a></code>.</p></dd>
 
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
