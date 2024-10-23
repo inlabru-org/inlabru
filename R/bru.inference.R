@@ -1746,26 +1746,24 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 #' @param \dots Arguments passed on to sub-methods.
 #' @returns An `integer` vector.
 #' @examplesIf bru_safe_inla()
-#' \dontrun{
-#'    fit <- bru(
-#'      ~ 0 + x,
-#'      like(
-#'        y ~ .,
-#'        data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
-#'        tag = "A"
-#'      ),
-#'      like(
-#'        y ~ .,
-#'        data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
-#'        tag = "B"
-#'      )
-#'    )
-#'    bru_index(fit)
-#'    bru_index(fit, "A")
-#'    bru_index(fit, "B")
-#'    bru_index(fit, c("B", "A"))
-#'    bru_index(fit, what = "missing")
-#' }
+#' fit <- bru(
+#'   ~ 0 + x,
+#'   like(
+#'     y ~ .,
+#'     data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
+#'     tag = "A"
+#'   ),
+#'   like(
+#'     y ~ .,
+#'     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
+#'     tag = "B"
+#'   )
+#' )
+#' bru_index(fit)
+#' bru_index(fit, "A")
+#' bru_index(fit, "B")
+#' bru_index(fit, c("B", "A"))
+#' bru_index(fit, what = "missing")
 #' @export
 bru_index <- function(object, ...) {
   UseMethod("bru_index")

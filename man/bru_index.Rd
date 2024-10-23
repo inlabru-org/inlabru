@@ -49,25 +49,23 @@ more specified observation \code{\link[=like]{like()}} sub-models. Accepts any c
 }}
 \examples{
 \dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-\dontrun{
-   fit <- bru(
-     ~ 0 + x,
-     like(
-       y ~ .,
-       data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
-       tag = "A"
-     ),
-     like(
-       y ~ .,
-       data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
-       tag = "B"
-     )
-   )
-   bru_index(fit)
-   bru_index(fit, "A")
-   bru_index(fit, "B")
-   bru_index(fit, c("B", "A"))
-   bru_index(fit, what = "missing")
-}
+fit <- bru(
+  ~ 0 + x,
+  like(
+    y ~ .,
+    data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
+    tag = "A"
+  ),
+  like(
+    y ~ .,
+    data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
+    tag = "B"
+  )
+)
+bru_index(fit)
+bru_index(fit, "A")
+bru_index(fit, "B")
+bru_index(fit, c("B", "A"))
+bru_index(fit, what = "missing")
 \dontshow{\}) # examplesIf}
 }
