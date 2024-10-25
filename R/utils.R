@@ -1,5 +1,8 @@
-#' Load INLA safely for examples and tests
+#' @include deprecated.R
+
+#' @title Load INLA safely for examples and tests
 #'
+#' @description
 #' Loads the INLA package with `requireNamespace("INLA", quietly = TRUE)`, and
 #' optionally checks and sets the multicore `num.threads` INLA option.
 #'
@@ -771,14 +774,14 @@ resave_package_data <- function() {
 }
 
 
-#' @title Row-wise Kronecker products
-#'
-#' @description
+#' @describeIn inlabru-deprecated Row-wise Kronecker products
 #' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_row_kron()].
 #'
 #' Takes two Matrices and computes the row-wise Kronecker product.  Optionally
 #' applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker
 #' matrix product.
+#'
+#' Returns a `Matrix::sparseMatrix` object.
 #'
 #' @param M1 A matrix that can be transformed into a sparse Matrix.
 #' @param M2 A matrix that can be transformed into a sparse Matrix.
@@ -789,10 +792,14 @@ resave_package_data <- function() {
 #' `INLA::inla.spde.make.A()`.
 #' @param weights Optional scaling weights to be applied row-wise to the
 #' resulting matrix.
-#' @return A `Matrix::sparseMatrix` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
 #' @keywords internal
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
+  lifecycle::deprecate_warn(
+    "2.10.0",
+    "row_kron()",
+    "fmesher::fm_row_kron()"
+  )
   fm_row_kron(M1 = M1, M2 = M2, repl = repl, n.repl = n.repl, weights = weights)
 }

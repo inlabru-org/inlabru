@@ -1,3 +1,5 @@
+#' @include deprecated.R
+
 # Gaussian quadrature and other integration point constructors
 #
 # Construct integration points for each of lines defined by the start and end

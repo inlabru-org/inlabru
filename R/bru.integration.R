@@ -1,3 +1,5 @@
+#' @include deprecated.R
+
 #' @describeIn inlabru-deprecated
 #' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_int()]
 #'

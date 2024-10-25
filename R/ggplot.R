@@ -1,3 +1,5 @@
+#' @include deprecated.R
+
 #' @describeIn inlabru-deprecated
 #' Plot a map using extent of a spatial object
 #'

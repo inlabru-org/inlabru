@@ -1,9 +1,8 @@
+#' @include deprecated.R
+
 # Generics ----
 
-#' Constructors for `bru_mapper` objects
-#' @name bru_mapper
-NULL
-
+#' @title Constructors for `bru_mapper` objects
 #' @param \dots Arguments passed on to sub-methods, or used for special
 #'   purposes, see details for each function below.
 #' @export
@@ -2644,7 +2643,7 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
   # (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
   A_ <- sub_A[[1]]
   for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-    A_ <- row_kron(sub_A[[k + 1]], A_)
+    A_ <- fm_row_kron(sub_A[[k + 1]], A_)
   }
   return(A_)
 }

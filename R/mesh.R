@@ -1,3 +1,5 @@
+#' @include deprecated.R
+
 # GENERICS
 # refine = function(...) {UseMethod("refine")}
 # tsplit = function(...) {UseMethod("tsplit")}
