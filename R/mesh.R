@@ -40,9 +40,8 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 
 #' @describeIn inlabru-deprecated Extract vertex locations from an `inla.mesh`.
 #'   Converts the vertices of an `inla.mesh` object into a
-#'   `SpatialPointsDataFrame`. Deprecated in favour of [fm_vertices()]
-#'
-#' @export vertices.inla.mesh
+#'   `SpatialPointsDataFrame`. Deprecated in favour of [fm_vertices()] and no
+#'   longer exported.
 vertices.inla.mesh <- function(...) {
   lifecycle::deprecate_stop(
     "2.8.0",

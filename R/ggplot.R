@@ -1143,7 +1143,8 @@ plot.prediction <- function(x, y = NULL, ...) {
 #' @title Multiple ggplots on a page.
 #'
 #' @description
-#' `r lifecycle::badge("deprecated")` in favour of the `patchwork` package.
+#' `r lifecycle::badge("deprecated")` in favour of the `patchwork` package;
+#' see the example below.
 #'
 #' Renders multiple ggplots on a single page.
 #'
@@ -1163,15 +1164,20 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'
 #' @examples
 #' if (require("ggplot2", quietly = TRUE)) {
-#'   df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
+#'   df <- data.frame(x = 1:10, y = cos(1:10), z = sin(1:10))
 #'   pl1 <- ggplot(data = df) +
 #'     geom_line(mapping = aes(x, y), color = "red")
 #'   pl2 <- ggplot(data = df) +
 #'     geom_line(mapping = aes(x, z), color = "blue")
-#'   multiplot(pl1, pl2, cols = 2)
+#'   pl3 <- ggplot(data = df) +
+#'     geom_path(mapping = aes(y, z), color = "magenta")
+#'   multiplot(
+#'     pl1, pl2, pl3,
+#'     layout = rbind(c(1, 2), c(3, 3))
+#'   )
 #'
 #'   if (require("patchwork")) {
-#'     (pl1 + pl2)
+#'     (pl1 + pl2) / pl3
 #'   }
 #' }
 #' @export

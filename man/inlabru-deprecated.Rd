@@ -45,7 +45,7 @@ bru_mapper_offset(...)
 
 is.inside(mesh, loc, mesh.coords = NULL)
 
-\method{vertices}{inla.mesh}(...)
+vertices.inla.mesh(...)
 
 pixels(mesh, nx = 150, ny = 150, mask = TRUE)
 
@@ -235,9 +235,10 @@ and removed in version 2.11.0
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[=fm_is_within]{fm_is_within()}}.
 Replace \code{is.inside(mesh, loc)} with \code{fm_is_within(loc, mesh)}.
 
-\item \code{vertices(inla.mesh)}: Extract vertex locations from an \code{inla.mesh}.
+\item \code{vertices.inla.mesh()}: Extract vertex locations from an \code{inla.mesh}.
 Converts the vertices of an \code{inla.mesh} object into a
-\code{SpatialPointsDataFrame}. Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}}
+\code{SpatialPointsDataFrame}. Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}} and no
+longer exported.
 
 \item \code{pixels()}: Generate \code{SpatialPixels} covering an \code{inla.mesh}.
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_pixels]{fmesher::fm_pixels()}}
