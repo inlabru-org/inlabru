@@ -208,10 +208,12 @@ rbind(
   Plots = Lambda,
   PlotsEmp = Lambda.empirical,
   All = Lambda.all,
-  AllEmp = c(nrow(gorillas_sf$nests),
-             0,
-             rep(nrow(gorillas_sf$nests), 3),
-             rep(NA, 3))
+  AllEmp = c(
+    nrow(gorillas_sf$nests),
+    0,
+    rep(nrow(gorillas_sf$nests), 3),
+    rep(NA, 3)
+  )
 )
 ```
 
