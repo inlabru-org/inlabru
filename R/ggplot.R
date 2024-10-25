@@ -1143,6 +1143,8 @@ plot.prediction <- function(x, y = NULL, ...) {
 #' @title Multiple ggplots on a page.
 #'
 #' @description
+#' `r lifecycle::badge("deprecated")` in favour of the `patchwork` package.
+#'
 #' Renders multiple ggplots on a single page.
 #'
 #' @param ... Comma-separated `ggplot` objects.
@@ -1167,6 +1169,10 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'   pl2 <- ggplot(data = df) +
 #'     geom_line(mapping = aes(x, z), color = "blue")
 #'   multiplot(pl1, pl2, cols = 2)
+#'
+#'   if (require("patchwork")) {
+#'     (pl1 + pl2)
+#'   }
 #' }
 #' @export
 #

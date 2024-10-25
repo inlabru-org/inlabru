@@ -4,6 +4,7 @@
 \alias{evaluate_comp_simple}
 \alias{evaluate_comp_simple.component_list}
 \alias{evaluate_comp_simple.bru_model}
+\alias{[.comp_simple_list}
 \title{Compute simplified component mappings}
 \usage{
 evaluate_comp_simple(...)
@@ -11,6 +12,8 @@ evaluate_comp_simple(...)
 \method{evaluate_comp_simple}{component_list}(components, input, inla_f = FALSE, ..., options = NULL)
 
 \method{evaluate_comp_simple}{bru_model}(model, input, ...)
+
+\method{[}{comp_simple_list}(x, i)
 }
 \arguments{
 \item{input}{A list of named lists of component inputs}
@@ -21,6 +24,10 @@ evaluate_comp_simple(...)
 are used.}
 
 \item{model}{A \code{bru_model} object}
+
+\item{x}{\code{comp_simple_list} object from which to extract element(s)}
+
+\item{i}{indices specifying elements to extract}
 }
 \value{
 A list (class 'comp_simple_list_list') of named lists (class
@@ -31,4 +38,9 @@ component
 Computes individual \code{bru_mapper_taylor} objects for included linear
 components for each model likelihood, and keeps non-linear mappers intact.
 }
+\section{Functions}{
+\itemize{
+\item \code{[}: Subsetting of comp_simple_list objects, retaining class
+
+}}
 \keyword{internal}

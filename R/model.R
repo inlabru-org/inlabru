@@ -696,8 +696,9 @@ component_eval <- function(main,
 
 
 
-#' Compute all component linearisations
+#' @title Compute all component linearisations
 #'
+#' @description
 #' Computes individual `bru_mapper_taylor` objects for included components
 #' for each model likelihood
 #'
@@ -742,8 +743,9 @@ evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
   mappers
 }
 
-#' Compute simplified component mappings
+#' @title Compute simplified component mappings
 #'
+#' @description
 #' Computes individual `bru_mapper_taylor` objects for included linear
 #' components for each model likelihood, and keeps non-linear mappers intact.
 #'
@@ -811,12 +813,12 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
   mappers
 }
 
+#' @describeIn evaluate_comp_simple
 #' Subsetting of comp_simple_list objects, retaining class
 #' @export
 #' @param x `comp_simple_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
 #' @keywords internal
-#' @rdname evaluate_comp_simple_list_subsetting
 `[.comp_simple_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()

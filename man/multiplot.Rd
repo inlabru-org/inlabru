@@ -23,6 +23,8 @@ then plot 1 will go in the upper left, 2 will go in the upper right, and 3
 will go all the way across the bottom.}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of the \code{patchwork} package.
+
 Renders multiple ggplots on a single page.
 }
 \examples{
@@ -33,6 +35,10 @@ if (require("ggplot2", quietly = TRUE)) {
   pl2 <- ggplot(data = df) +
     geom_line(mapping = aes(x, z), color = "blue")
   multiplot(pl1, pl2, cols = 2)
+
+  if (require("patchwork")) {
+    (pl1 + pl2)
+  }
 }
 }
 \author{

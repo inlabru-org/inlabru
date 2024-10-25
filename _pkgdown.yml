@@ -182,10 +182,6 @@ reference:
   - starts_with("bru_safe_sp", internal = TRUE)
   - starts_with("bru_call_options", internal = TRUE)
   - starts_with("bru_compute_linearisation", internal = TRUE)
-- title: "Re-exported fmesher functions"
-  desc: "Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility."
-  contents:
-  - starts_with("fm_")
 - title: "Deprecated methods"
   desc: "Deprecated methods"
   contents:
