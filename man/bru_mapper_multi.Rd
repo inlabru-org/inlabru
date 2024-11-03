@@ -106,9 +106,9 @@ of mappers in the multi-mapper x}
 }
 }
 \description{
-Constructs a rowwise Kronecker product mapping of linear/affine mappers.
-Any offset in sub-mappers is added into a combined offset.
-Only linear/affine sub-mappers are allowed.
+Constructs a row-wise Kronecker product mapping of linear/affine
+mappers. Any offset in sub-mappers is added into a combined offset. Only
+linear/affine sub-mappers are allowed.
 }
 \section{Methods (by generic)}{
 \itemize{

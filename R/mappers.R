@@ -2473,9 +2473,9 @@ ibm_simplify.bru_mapper_pipe <- function(mapper,
 
 #' @title Mapper for tensor product domains
 #' @param mappers A list of `bru_mapper` objects
-#' @description Constructs a rowwise Kronecker product mapping of linear/affine mappers.
-#' Any offset in sub-mappers is added into a combined offset.
-#' Only linear/affine sub-mappers are allowed.
+#' @description Constructs a row-wise Kronecker product mapping of linear/affine
+#'   mappers. Any offset in sub-mappers is added into a combined offset. Only
+#'   linear/affine sub-mappers are allowed.
 #' @export
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2698,10 +2698,10 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
     the_offset <- 0
     for (m in names(mapper[["mappers"]])) {
       val <- ibm_eval(mapper[["mappers"]][[m]],
-                      input = input[[m]],
-                      state = NULL,
-                      inla_f = inla_f,
-                      multi = FALSE
+        input = input[[m]],
+        state = NULL,
+        inla_f = inla_f,
+        multi = FALSE
       )
       the_offset <- the_offset + val
     }
