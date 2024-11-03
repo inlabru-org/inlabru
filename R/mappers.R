@@ -2473,7 +2473,9 @@ ibm_simplify.bru_mapper_pipe <- function(mapper,
 
 #' @title Mapper for tensor product domains
 #' @param mappers A list of `bru_mapper` objects
-#' @description Constructs a rowwise Kronecker product mapping
+#' @description Constructs a rowwise Kronecker product mapping of linear/affine mappers.
+#' Any offset in sub-mappers is added into a combined offset.
+#' Only linear/affine sub-mappers are allowed.
 #' @export
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2621,7 +2623,7 @@ ibm_jacobian.bru_mapper_multi <- function(mapper,
                                           sub_A = NULL) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
 
-  # Note: the multi-mapper only handles linear sub-mappers.
+  # Note: the multi-mapper only handles linear/affine sub-mappers.
   if (is.null(sub_A)) {
     sub_A <-
       lapply(
@@ -2693,13 +2695,23 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
       ...
     )
   } else {
+    the_offset <- 0
+    for (m in names(mapper[["mappers"]])) {
+      val <- ibm_eval(mapper[["mappers"]][[m]],
+                      input = input[[m]],
+                      state = NULL,
+                      inla_f = inla_f,
+                      multi = FALSE
+      )
+      the_offset <- the_offset + val
+    }
     if (is.null(jacobian)) {
       jacobian <- ibm_jacobian(mapper,
         input = input, state = state,
         inla_f = inla_f, multi = FALSE, ...
       )
     }
-    val <- jacobian %*% state
+    val <- the_offset + jacobian %*% state
   }
   as.vector(val)
 }

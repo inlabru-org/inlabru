@@ -334,15 +334,52 @@ test_that("Multi-mapper bru input", {
     x = 1,
     dims = c(3, 12)
   )
+  set.seed(123L)
+  state <- rnorm(12)
+  val <- as.vector(A %*% state)
+  expect_equal(ibm_eval(mapper, list_data, state = state), val)
+  expect_equal(ibm_eval(mapper, olist_data, state = state), val)
+  expect_equal(ibm_eval(mapper, df_data, state = state), val)
+  expect_equal(ibm_eval(mapper, matrix_data, state = state), val)
+  expect_equal(ibm_eval(mapper, omatrix_data, state = state), val)
+
   expect_equal(ibm_jacobian(mapper, list_data), A)
   expect_equal(ibm_jacobian(mapper, olist_data), A)
   expect_equal(ibm_jacobian(mapper, df_data), A)
   expect_equal(ibm_jacobian(mapper, matrix_data), A)
   expect_equal(ibm_jacobian(mapper, omatrix_data), A)
-
-  data <- cbind(df_data, y = 1:3)
 })
 
+test_that("Multi-mapper bru input with offset", {
+  mapper <- bru_mapper_multi(list(space = bru_mapper_pipe(
+    list(mapper = bru_mapper_index(4), offset = bru_mapper_shift())
+  ), time = bru_mapper_index(3)))
+  expect_equal(ibm_n(mapper), 12)
+  expect_equal(ibm_n(mapper, multi = 1), list(space = 4, time = 3))
+  expect_equal(ibm_values(mapper), seq_len(12))
+  expect_equal(
+    as.data.frame(ibm_values(mapper, multi = 1)),
+    expand.grid(space = seq_len(4), time = seq_len(3)),
+    ignore_attr = TRUE
+  )
+
+  list_data <- list(time = 1:3, space = list(mapper = 2:4, offset = 3:5))
+  olist_data <- list(space = list(mapper = 2:4, offset = 3:5), time = 1:3)
+  A <- Matrix::sparseMatrix(
+    i = 1:3,
+    j = c(2, 7, 12),
+    x = 1,
+    dims = c(3, 12)
+  )
+  set.seed(123L)
+  state <- rnorm(12)
+  val <- list_data$space$offset + as.vector(A %*% state)
+  expect_equal(ibm_eval(mapper, list_data, state = state), val)
+  expect_equal(ibm_eval(mapper, olist_data, state = state), val)
+
+  expect_equal(ibm_jacobian(mapper, list_data), A)
+  expect_equal(ibm_jacobian(mapper, olist_data), A)
+})
 
 
 

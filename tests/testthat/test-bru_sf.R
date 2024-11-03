@@ -62,10 +62,13 @@ test_that("sf gorillas lgcp vignette", {
   cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
 
-  fit <- lgcp(
-    cmp,
-    data = gorillas_sf$nests,
-    samplers = gorillas_sf$boundary,
-    domain = list(geometry = mesh_sf)
+  expect_error(
+    fit <- lgcp(
+      cmp,
+      data = gorillas_sf$nests,
+      samplers = gorillas_sf$boundary,
+      domain = list(geometry = mesh_sf)
+    ),
+    NA
   )
 })
