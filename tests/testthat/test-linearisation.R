@@ -11,7 +11,7 @@ test_that("Linearisation", {
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
   lhoods <-
-    like_list(
+    bru_like_list(
       like(
         formula = y ~ exp(x) + Int_y_latent,
         data = data

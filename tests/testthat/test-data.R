@@ -13,14 +13,14 @@ test_that("Component construction: default mesh/mapping, data is list", {
   )
 
   cmp1 <- component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
   )
 
   cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -42,7 +42,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
       mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -54,7 +54,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
       mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(sort(unique(lik$data$x), na.last = NA))
@@ -72,7 +72,7 @@ test_that("Component construction: unsafe intercepts, data is list", {
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
-      model <- bru_model(cmp, like_list(list(lik)))
+      model <- bru_model(cmp, bru_like_list(list(lik)))
     },
     "All covariate evaluations for 'something_unknown' are NULL"
   )

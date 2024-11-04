@@ -2,9 +2,9 @@
 % Please edit documentation in R/bru.inference.R
 \name{like}
 \alias{like}
-\alias{like_list}
-\alias{like_list.list}
-\alias{like_list.bru_like}
+\alias{bru_like_list}
+\alias{bru_like_list.list}
+\alias{bru_like_list.bru_like}
 \alias{c.bru_like}
 \alias{c.bru_like_list}
 \alias{[.bru_like_list}
@@ -35,11 +35,11 @@ like(
   .envir = parent.frame()
 )
 
-like_list(...)
+bru_like_list(...)
 
-\method{like_list}{list}(object, envir = NULL, ...)
+\method{bru_like_list}{list}(object, envir = NULL, ...)
 
-\method{like_list}{bru_like}(..., envir = NULL)
+\method{bru_like_list}{bru_like}(..., envir = NULL)
 
 \method{c}{bru_like}(..., envir = NULL)
 
@@ -154,7 +154,7 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
 \code{data}. Defaults to the calling environment.}
 
-\item{\dots}{For \code{like_list.bru_like}, one or more \code{bru_like} objects}
+\item{\dots}{For \code{bru_like_list.bru_like}, one or more \code{bru_like} objects}
 
 \item{object}{A list of \code{bru_like} objects}
 
@@ -172,7 +172,7 @@ Observation model construction for usage with \code{\link[=bru]{bru()}}
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{like_list(bru_like)}: Combine several \code{bru_like} likelihoods
+\item \code{bru_like_list(bru_like)}: Combine several \code{bru_like} likelihoods
 into a \code{bru_like_list} object
 
 \item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
@@ -181,9 +181,9 @@ objects into a \code{bru_like_list} object
 }}
 \section{Functions}{
 \itemize{
-\item \code{like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
+\item \code{bru_like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
 
-\item \code{like_list(list)}: Combine a list of \code{bru_like} likelihoods
+\item \code{bru_like_list(list)}: Combine a list of \code{bru_like} likelihoods
 into a \code{bru_like_list} object
 
 \item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}

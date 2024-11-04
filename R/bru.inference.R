@@ -1909,10 +1909,10 @@ bru_response_size.bru <- function(object) {
 
 #' @describeIn bru_like
 #' Combine `bru_like` likelihoods into a `bru_like_list` object
-#' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
+#' @param \dots For `bru_like_list.bru_like`, one or more `bru_like` objects
 #' @export
-like_list <- function(...) {
-  UseMethod("like_list")
+bru_like_list <- function(...) {
+  UseMethod("bru_like_list")
 }
 
 #' @describeIn bru_like
@@ -1921,7 +1921,7 @@ like_list <- function(...) {
 #' @param object A list of `bru_like` objects
 #' @param envir An optional environment for the new `bru_like_list` object
 #' @export
-like_list.list <- function(object, envir = NULL, ...) {
+bru_like_list.list <- function(object, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
@@ -1955,7 +1955,7 @@ like_list.list <- function(object, envir = NULL, ...) {
 #' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
-like_list.bru_like <- function(..., envir = NULL) {
+bru_like_list.bru_like <- function(..., envir = NULL) {
   do.call(c, list(..., envir = envir))
 }
 
@@ -1974,7 +1974,7 @@ c.bru_like <- function(..., envir = NULL) {
     }
   })
   lst <- do.call(c, lst)
-  like_list(lst, envir = envir)
+  bru_like_list(lst, envir = envir)
 }
 
 #' @describeIn bru_like
@@ -2002,7 +2002,7 @@ c.bru_like_list <- function(..., envir = NULL) {
     return(do.call("c", lst))
   }
   object <- NextMethod()
-  like_list(object, envir = envir)
+  bru_like_list(object, envir = envir)
 }
 
 
