@@ -38,7 +38,7 @@ library(ggplot2)
 bru_safe_sp(force = TRUE)
 ```
 ```{r echo=FALSE}
-INLA::inla.setOption(num.threads="2:1")
+INLA::inla.setOption(num.threads = "2:1")
 inla.setOption(smtp = "taucs")
 ```
 
