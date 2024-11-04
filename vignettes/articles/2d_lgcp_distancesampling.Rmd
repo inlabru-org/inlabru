@@ -38,6 +38,10 @@ library(fmesher)
 library(INLA)
 library(ggplot2)
 ```
+```{r echo=FALSE}
+INLA::inla.setOption(num.threads="2:1")
+inla.setOption(smtp = "taucs")
+```
 
 Get the data
 -----------------------------------------------------------------
