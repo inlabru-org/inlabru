@@ -23,6 +23,7 @@
 * Remove unnecessary `INLA` namespace loading in `ggplot` methods
   (version `2.11.1.9008`)
 * Move `terra` from `Imports` to `Suggests` (version `2.11.1.9014`)
+* Stop re-exporting `fmesher` methods (version `2.11.1.9020`)
 
 ## Data set updates
 

@@ -32,6 +32,7 @@
 #' @import stats
 #' @import methods
 #' @importFrom Matrix diag
+#' @import fmesher
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'   and Finn Lindgren \email{finn.lindgren@@gmail.com}
 "_PACKAGE"
