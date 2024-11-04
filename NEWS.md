@@ -12,7 +12,7 @@
 * Add `bru_index()` method for accessing predictor index information for
   sub-models (version `2.11.1.9017`)
 * Allow `bru_mapper_multi` sub-mappers to have non-zero offsets, that are
-  added to generate the combined offset (version `2.11.1.9018`)
+  added to generate the combined offset (version `2.11.1.9019`)
 
 ## Namespace changes
 

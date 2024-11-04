@@ -2488,6 +2488,14 @@ ibm_simplify.bru_mapper_pipe <- function(mapper,
 #' ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
 #'
 bru_mapper_multi <- function(mappers) {
+  if (!is.list(mappers)) {
+    stop("bru_mapper_multi requires a list of sub-mappers.")
+  }
+  if (is.null(names(mappers))) {
+    names(mappers) <- as.character(seq_along(mappers))
+  } else if (any(names(mappers) == "")) {
+    stop("Either all or none of the multi sub-mappers should be named.")
+  }
   mapper <- list(
     mappers = mappers,
     n_multi = lapply(mappers, ibm_n),
@@ -2533,11 +2541,12 @@ ibm_n.bru_mapper_multi <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
 ibm_n_output.bru_mapper_multi <- function(mapper, input, ...) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
   # Assume that the first mapper fully handles the output size
+  nm <- names(mapper[["mappers"]])[1]
   if (is.matrix(input)) {
-    ibm_n_output(mapper[["mapper"]][[1]], input[, 1, drop = TRUE], ...)
+    ibm_n_output(mapper[["mappers"]][[nm]], input[, nm, drop = TRUE], ...)
   } else {
     stopifnot(is.list(input)) # data.frame or list
-    ibm_n_output(mapper[["mapper"]][[1]], input[[1]], ...)
+    ibm_n_output(mapper[["mappers"]][[nm]], input[[nm]], ...)
   }
 }
 
@@ -2684,34 +2693,40 @@ ibm_eval.bru_mapper_multi <- function(mapper, input, state = NULL,
                                       jacobian = NULL,
                                       pre_A = deprecated()) {
   input <- bru_mapper_multi_prepare_input(mapper, input)
-  if ((ibm_n(mapper) == 0) || is.null(state)) {
-    # Handle the case when the mapper is a _const mapper
-    val <- ibm_eval(
-      mapper[["mappers"]][[1]],
-      input = input[[1]],
+
+  if (ibm_n(mapper) == 0L) {
+    # TODO: Ensure that this code is only reached when the first sub-mapper
+    # is constant (mapper_const or a pipe that is state-invariant)
+    val <- 0
+    m <- names(mapper[["mappers"]])[1]
+    val_add <- ibm_eval(mapper[["mappers"]][[m]],
+      input = input[[m]],
       state = NULL,
       inla_f = inla_f,
-      multi = FALSE,
-      ...
+      multi = FALSE
     )
-  } else {
-    the_offset <- 0
-    for (m in names(mapper[["mappers"]])) {
-      val <- ibm_eval(mapper[["mappers"]][[m]],
-        input = input[[m]],
-        state = NULL,
-        inla_f = inla_f,
-        multi = FALSE
-      )
-      the_offset <- the_offset + val
-    }
+    val <- val + val_add
+    return(val)
+  }
+
+  val <- rep(0, ibm_n_output(mapper, input, state = state, inla_f = inla_f))
+  for (m in names(mapper[["mappers"]])) {
+    val_add <- ibm_eval(mapper[["mappers"]][[m]],
+      input = input[[m]],
+      state = NULL,
+      inla_f = inla_f,
+      multi = FALSE
+    )
+    val <- val + val_add
+  }
+  if ((ibm_n(mapper) > 0) && !is.null(state)) {
     if (is.null(jacobian)) {
       jacobian <- ibm_jacobian(mapper,
         input = input, state = state,
         inla_f = inla_f, multi = FALSE, ...
       )
     }
-    val <- the_offset + jacobian %*% state
+    val <- val + jacobian %*% state
   }
   as.vector(val)
 }
@@ -2733,7 +2748,7 @@ bm_multi_indexing <- function(mapper, input) {
   } else {
     indexing <- intersect(nms_mapper, nms)
   }
-  names(indexing) <- nms_mapper[indexing]
+  names(indexing) <- indexing
   indexing
 }
 
