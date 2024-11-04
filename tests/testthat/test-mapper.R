@@ -351,9 +351,14 @@ test_that("Multi-mapper bru input", {
 })
 
 test_that("Multi-mapper bru input with offset", {
-  mapper <- bru_mapper_multi(list(space = bru_mapper_pipe(
-    list(mapper = bru_mapper_index(4), offset = bru_mapper_shift())
-  ), time = bru_mapper_index(3)))
+  mapper <- bru_mapper_multi(
+    list(
+      space = bru_mapper_pipe(
+        list(mapper = bru_mapper_index(4), offset = bru_mapper_shift())
+      ),
+      time = bru_mapper_index(3)
+    )
+  )
   expect_equal(ibm_n(mapper), 12)
   expect_equal(ibm_n(mapper, multi = 1), list(space = 4, time = 3))
   expect_equal(ibm_values(mapper), seq_len(12))
@@ -376,9 +381,19 @@ test_that("Multi-mapper bru input with offset", {
   val <- list_data$space$offset + as.vector(A %*% state)
   expect_equal(ibm_eval(mapper, list_data, state = state), val)
   expect_equal(ibm_eval(mapper, olist_data, state = state), val)
+  expect_equal(
+    ibm_eval(mapper, list_data, state = NULL),
+    list_data$space$offset
+  )
+  expect_equal(
+    ibm_eval(mapper, olist_data, state = NULL),
+    list_data$space$offset
+  )
 
   expect_equal(ibm_jacobian(mapper, list_data), A)
   expect_equal(ibm_jacobian(mapper, olist_data), A)
+  expect_equal(ibm_jacobian(mapper, list_data, state = NULL), A)
+  expect_equal(ibm_jacobian(mapper, olist_data, state = NULL), A)
 })
 
 

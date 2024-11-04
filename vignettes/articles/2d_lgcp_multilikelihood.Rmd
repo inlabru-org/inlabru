@@ -140,7 +140,6 @@ jfit <- bru_rerun(jfit)
 
 
 ```{r, warning=FALSE,fig.width=8}
-library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas_sf$mesh,
     mask = gorillas_sf$boundary,
@@ -191,7 +190,8 @@ lik_joint <- like("cp",
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
-    control.inla = list(int.strategy = "eb") # Approximate for faster vignette
+    control.inla = list(int.strategy = "eb"), # Approximate for faster vignette
+    bru_max_iter = 1
   )
 )
 ```
