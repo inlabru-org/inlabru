@@ -165,7 +165,7 @@ The `inlabru` package contains a pregenerated version of the data subset,
 called `robins_subset`, that can be accessed with `data(robins_subset)`,
 to avoid accessing the full data online.
 The following code was used to generate the subset:
-```{r data-extraction, eval=F, cache=T}
+```{r data-extraction, eval=FALSE}
 robins_subset <- read.csv(paste0(
   "https://raw.github.com/tmeeha/inlaSVCBC",
   "/master/code/modeling_data.csv"
@@ -187,7 +187,7 @@ robins_subset <- read.csv(paste0(
 We load the data, filter out observation sites with less than 20 years of data, add
 index variables to uniquely index site and year information, and transform the
 coordinates to the `epsg6703km` CRS:
-```{r data, eval=T, cache=T}
+```{r data, eval=TRUE}
 data(robins_subset)
 count_dat <- robins_subset %>%
   mutate(site_idx = as.numeric(factor(paste(circle, lon, lat)))) %>%
@@ -429,7 +429,7 @@ about 1 minutes on a standard laptop computer. Another option is to
 use the Variational Bayes approximation as detailed in Van Niekerk and
 Rue (2021) and Van Niekerk et. al. (2022).
 
-```{r run, eval=T, cache=TRUE}
+```{r run, eval=TRUE}
 res <- bru(
   svc_components,
   like(
@@ -440,7 +440,8 @@ res <- bru(
   options = list(
     control.compute = list(waic = TRUE, cpo = FALSE),
     control.inla = list(int.strategy = "eb"),
-    verbose = FALSE
+    verbose = TRUE,
+    bru_verbose = 4
   )
 )
 ```
