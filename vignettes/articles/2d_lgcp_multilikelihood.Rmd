@@ -39,7 +39,9 @@ bru_safe_sp(force = TRUE)
 ```
 ```{r echo=FALSE}
 INLA::inla.setOption(num.threads = "2:1")
-inla.setOption(smtp = "taucs")
+INLA::inla.setOption(smtp = "taucs")
+#Sys.setenv(INLA_TRACE = "*")
+#INLA::inla.setOption(verbose = TRUE)
 ```
 
 Get the data
@@ -108,7 +110,8 @@ lik_major <- like("cp",
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 jfit <- bru(cmp, lik_major, lik_minor,
   options = list(
-    control.inla = list(int.strategy = "eb"),
+    control.inla = list(int.strategy = "eb",
+                        parallel.linesearch = TRUE),
     bru_max_iter = 1
   )
 )
@@ -192,9 +195,11 @@ lik_joint <- like("cp",
 ```
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+# Approximate with "eb" for faster vignette
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
-    control.inla = list(int.strategy = "eb"), # Approximate for faster vignette
+    control.inla = list(int.strategy = "eb",
+                        parallel.linesearch = TRUE),
     bru_max_iter = 1
   )
 )
