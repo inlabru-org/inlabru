@@ -439,7 +439,10 @@ res <- bru(
   ),
   options = list(
     control.compute = list(waic = TRUE, cpo = FALSE),
-    control.inla = list(int.strategy = "eb"),
+    control.inla = list(
+      int.strategy = "eb",
+      tolerance.step = inla.set.control.inla.default()$tolerance / 10
+    ),
     verbose = TRUE,
     bru_verbose = 4
   )
