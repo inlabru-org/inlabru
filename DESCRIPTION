@@ -52,7 +52,7 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.1.7.9002),
+    fmesher (>= 0.2.0),
     methods,
     R (>= 3.6),
     stats
@@ -84,7 +84,7 @@ Suggests:
     scales,
     shiny,
     sn,
-    sp (>= 1.4-5),
+    sp (>= 2.1),
     spatstat.geom,
     spatstat.data,
     sphereplot,
