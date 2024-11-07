@@ -111,8 +111,7 @@ lik_major <- like("cp",
 jfit <- bru(cmp, lik_major, lik_minor,
   options = list(
     control.inla = list(
-      int.strategy = "eb",
-      tolerance.step = inla.set.control.inla.default()$tolerance / 10
+      int.strategy = "eb"
     ),
     bru_max_iter = 1
   )
@@ -201,8 +200,7 @@ lik_joint <- like("cp",
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
     control.inla = list(
-      int.strategy = "eb",
-      tolerance.step = inla.set.control.inla.default()$tolerance / 10
+      int.strategy = "eb"
     ),
     bru_max_iter = 1
   )
