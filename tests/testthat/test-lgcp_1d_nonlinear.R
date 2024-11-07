@@ -1,6 +1,8 @@
 test_that("Mexdolphin: Hazard rate detection function", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
+
   mexdolphin <- inlabru::mexdolphin_sp()
 
   sig <- function(x) bru_forward_transformation(qexp, x, rate = 1 / 8)
