@@ -95,7 +95,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 #'
 #' Inputs:
 #' @param model fitted model for which residuals need to be calculated
-#' @param df SpatialPointsDataFrame object containing all the locations 'u'
+#' @param df sf object containing all the locations 'u'
 #' for calculating residuals
 #' @param expr an expression object containing the formula of the model
 #' @param A_sum matrix used to compute the summation term of the residuals
@@ -207,7 +207,7 @@ set_csc <- function(residuals, col_theme) {
 #' plots the three types of residuals for each polygon
 #'
 #' Input:
-#' @param samplers A SpatialPolygonsDataFrame containing partitions for which
+#' @param samplers A sf containing partitions for which
 #' residuals are to be calculated
 #' @param residuals frame containing residual information for each of the
 #' partitions of the subset 'B'
@@ -269,14 +269,14 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 #' https://rpubs.com/huanfaChen/grid_from_polygon
 #'
 #' Input:
-#' @param samplers A SpatialPolygonsDataFrame containing region for which
+#' @param samplers A sf polygon containing region for which
 #' partitions need to be created
 #' @param resolution resolution of the grids that are required
 #' @param nrows number of rows of grids that are required
 #' @param ncols number of columns of grids that are required
 #'
 #' Output:
-#' @return a partitioned SpatialPolygonsDataFrame as required
+#' @return a partitioned sf with polygons as required
 #'
 #'
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
