@@ -7,10 +7,10 @@
 
 #' @describeIn inlabru-deprecated
 #' Find out which points are inside a mesh.
-#' `r lifecycle::badge("deprecated")` in favour of [fm_is_within()].
+#' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_is_within()].
 #' Replace `is.inside(mesh, loc)` with `fm_is_within(loc, mesh)`.
 #'
-#' @seealso [fm_is_within()]
+#' @seealso [fmesher::fm_is_within()]
 #' @export
 #' @param mesh an inla.mesh object.
 #' @param loc Points in space stored either as data.frame, a two-column matrix
@@ -40,8 +40,8 @@ is.inside <- function(mesh, loc, mesh.coords = NULL) {
 
 #' @describeIn inlabru-deprecated Extract vertex locations from an `inla.mesh`.
 #'   Converts the vertices of an `inla.mesh` object into a
-#'   `SpatialPointsDataFrame`. Deprecated in favour of [fm_vertices()] and no
-#'   longer exported.
+#'   `SpatialPointsDataFrame`. Deprecated in favour of [fmesher::fm_vertices()]
+#'   and no longer exported.
 vertices.inla.mesh <- function(...) {
   lifecycle::deprecate_stop(
     "2.8.0",

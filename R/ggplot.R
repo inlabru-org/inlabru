@@ -803,8 +803,8 @@ gg.SpatRaster <- function(data, ...) {
 #' @param exterior If TRUE, plot the exterior boundaries of the mesh.
 #' @param ext.color Color used to plot the exterior boundary edges.
 #' @param ext.linewidth Line width for the exterior boundary edges. Default 1
-#' @param crs A CRS object supported by [fm_transform()] defining the coordinate
-#'   system to project the mesh to before plotting.
+#' @param crs A CRS object supported by [fmesher::fm_transform()] defining the
+#'   coordinate system to project the mesh to before plotting.
 #' @param nx Number of pixels in x direction (when plotting using the color
 #'   parameter).
 #' @param ny Number of pixels in y direction (when plotting using the color

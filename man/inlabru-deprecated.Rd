@@ -107,7 +107,7 @@ elements needed removing.}
 
 \item{.blockwise}{logical; if \code{FALSE}, computes full tensor product
 integration. If \code{TRUE}, computes within-block tensor product integration
-(used internally by \code{\link[=fm_int]{fm_int()}}). Default \code{FALSE}}
+(used internally by \code{\link[fmesher:fm_int]{fmesher::fm_int()}}). Default \code{FALSE}}
 
 \item{mesh}{An \code{inla.mesh} object}
 
@@ -184,7 +184,7 @@ dimensions and multiplies their weights accordingly.
 If the object defining points in a particular dimension has no
 weights attached to it all weights are assumed to be 1.
 
-Legacy wrapper for \code{\link[=fm_cprod]{fm_cprod()}}
+Legacy wrapper for \code{\link[fmesher:fm_cprod]{fmesher::fm_cprod()}}
 
 \item \code{gmap()}: Plot a map using extent of a spatial object
 
@@ -232,13 +232,13 @@ and removed in version 2.11.0
 \item \code{bru_mapper_offset()}: Creates a \code{\link[=bru_mapper_const]{bru_mapper_const()}} mapper.
 
 \item \code{is.inside()}: Find out which points are inside a mesh.
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[=fm_is_within]{fm_is_within()}}.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_is_within]{fmesher::fm_is_within()}}.
 Replace \code{is.inside(mesh, loc)} with \code{fm_is_within(loc, mesh)}.
 
 \item \code{vertices.inla.mesh()}: Extract vertex locations from an \code{inla.mesh}.
 Converts the vertices of an \code{inla.mesh} object into a
-\code{SpatialPointsDataFrame}. Deprecated in favour of \code{\link[=fm_vertices]{fm_vertices()}} and no
-longer exported.
+\code{SpatialPointsDataFrame}. Deprecated in favour of \code{\link[fmesher:fm_vertices]{fmesher::fm_vertices()}}
+and no longer exported.
 
 \item \code{pixels()}: Generate \code{SpatialPixels} covering an \code{inla.mesh}.
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{\link[fmesher:fm_pixels]{fmesher::fm_pixels()}}
@@ -254,9 +254,9 @@ Returns a \code{Matrix::sparseMatrix} object.
 
 }}
 \seealso{
-\code{\link[=fm_cprod]{fm_cprod()}}
+\code{\link[fmesher:fm_cprod]{fmesher::fm_cprod()}}
 
-\code{\link[=fm_is_within]{fm_is_within()}}
+\code{\link[fmesher:fm_is_within]{fmesher::fm_is_within()}}
 }
 \author{
 Finn Lindgren \email{finn.lindgren@gmail.com}

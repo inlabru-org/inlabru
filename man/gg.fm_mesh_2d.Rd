@@ -70,8 +70,8 @@ provided.}
 
 \item{ext.linewidth}{Line width for the exterior boundary edges. Default 1}
 
-\item{crs}{A CRS object supported by \code{\link[=fm_transform]{fm_transform()}} defining the coordinate
-system to project the mesh to before plotting.}
+\item{crs}{A CRS object supported by \code{\link[fmesher:fm_transform]{fmesher::fm_transform()}} defining the
+coordinate system to project the mesh to before plotting.}
 
 \item{mask}{A \code{SpatialPolygon} or \code{sf} polygon defining the region that is
 plotted.}

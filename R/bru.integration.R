@@ -69,9 +69,9 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #' If the object defining points in a particular dimension has no
 #' weights attached to it all weights are assumed to be 1.
 #'
-#' Legacy wrapper for [fm_cprod()]
+#' Legacy wrapper for [fmesher::fm_cprod()]
 #'
-#' @seealso [fm_cprod()]
+#' @seealso [fmesher::fm_cprod()]
 #' @keywords internal
 #'
 #'
@@ -81,7 +81,7 @@ ipoints <- function(samplers = NULL, domain = NULL, name = NULL, group = NULL,
 #'   elements needed removing.
 #' @param .blockwise logical; if `FALSE`, computes full tensor product
 #'   integration. If `TRUE`, computes within-block tensor product integration
-#'   (used internally by [fm_int()]). Default `FALSE`
+#'   (used internally by [fmesher::fm_int()]). Default `FALSE`
 #' @return A `data.frame`, `sf`, or `SpatialPointsDataFrame` of multidimensional
 #' integration points and their weights
 cprod <- function(..., na.rm = NULL, .blockwise = FALSE) {
