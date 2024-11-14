@@ -317,7 +317,9 @@ summary.bru_mapper_multi <- function(object, ...,
                                      depth = 1) {
   summary_object <- NextMethod()
   if (depth <= 0) {
-    class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    if (!inherits(summary_object, "summary_bru_mapper")) {
+      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    }
     return(summary_object)
   }
   sub_prefix <- paste0(prefix, "      ")
@@ -359,7 +361,9 @@ summary.bru_mapper_pipe <- function(object, ...,
                                     depth = 1) {
   summary_object <- NextMethod()
   if (depth <= 0) {
-    class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    if (!inherits(summary_object, "summary_bru_mapper")) {
+      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    }
     return(summary_object)
   }
   sub_prefix <- paste0(prefix, "      ")
@@ -395,7 +399,9 @@ summary.bru_mapper_collect <- function(object, ...,
                                        depth = 1) {
   summary_object <- NextMethod()
   if (depth <= 0) {
-    class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    if (!inherits(summary_object, "summary_bru_mapper")) {
+      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+    }
     return(summary_object)
   }
   sub_prefix <- paste0(prefix, "      ")
@@ -437,6 +443,48 @@ summary.bru_mapper_collect <- function(object, ...,
   summary_object
 }
 
+#' @export
+#' @method summary bru_mapper_repeat
+#' @rdname bru_mapper_summary
+#' @examples
+#' mapper <-
+#'   bru_mapper_repeat(
+#'     bru_mapper_multi(
+#'       list(
+#'         A = bru_mapper_index(2),
+#'         B = bru_mapper_index(3)
+#'       )
+#'     ),
+#'     3
+#'   )
+#' summary(mapper)
+#' summary(mapper, depth = 0)
+summary.bru_mapper_repeat <- function(object, ...,
+                                      prefix = "",
+                                      initial = prefix,
+                                      depth = 1) {
+  summary_object <- NextMethod()
+  sub_prefix <- paste0(prefix, "      ")
+  summary_object <-
+    paste0(
+      summary_object,
+      "(",
+      object[["n_rep"]],
+      " x ",
+      paste0(
+        summary(
+          object[["mapper"]],
+          prefix = sub_prefix,
+          initial = "",
+          depth = depth
+        )
+      ),
+      ")"
+    )
+  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
+  summary_object
+}
+
 
 #' @param x Object to be printed
 #' @export
@@ -457,7 +505,7 @@ print.bru_mapper <- function(x, ...,
   print(summary(x,
     prefix = "",
     initial = prefix,
-    depth = 1
+    depth = depth
   ), ...)
   invisible(x)
 }
@@ -743,12 +791,67 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 
 
 
+## _fmesher ####
+
+#' @title Mapper for general `fmesher` function space objects
+#' @param x An `fmesher` object to map, supported by
+#' [fmesher::fm_basis]`(x, input)` and
+#' [fmesher::fm_dof]`(x)`.
+#' @export
+#' @description Creates a mapper for general `fmesher` function space objects.
+#' @details For `fmesher` before version "0.2.0.9002", [fmesher::fm_mesh_1d] objects
+#'   will be handed over to [bru_mapper_fm_mesh_1d()], which handles NA inputs
+#'   for older fmesher versions.
+#' @returns A `bru_mapper_fmesher` object.
+#' @rdname bru_mapper_fmesher
+#' @inheritParams bru_mapper_generics
+#' @seealso [bru_mapper], [bru_mapper_generics]
+#' @family mappers
+#' @examples
+#' m <- bru_mapper_fmesher(fmesher::fmexample$mesh)
+#' ibm_n(m)
+#' ibm_eval(m, as.matrix(expand.grid(-2:2, -2:2)), seq_len(ibm_n(m)))
+#'
+bru_mapper_fmesher <- function(x) {
+  if (inherits(x, "fm_mesh_1d") &&
+      (utils::packageVersion("fmesher") < "0.2.0.9002")) {
+    # The old mapper handles NA inputs for older fmesher versions.
+    mapper <- bru_mapper(x, indexed = TRUE)
+    return(mapper)
+  }
+  mapper <- list(x = x)
+  bru_mapper_define(mapper, new_class = "bru_mapper_fmesher")
+}
+
+#' @export
+#' @rdname bru_mapper_fmesher
+ibm_n.bru_mapper_fmesher <- function(mapper, ...) {
+  fmesher::fm_dof(mapper[["x"]])
+}
+#' @export
+#' @rdname bru_mapper_fmesher
+ibm_values.bru_mapper_fmesher <- function(mapper, ...) {
+  seq_len(fmesher::fm_dof(mapper[["x"]]))
+}
+#' @export
+#' @rdname bru_mapper_fmesher
+ibm_jacobian.bru_mapper_fmesher <- function(mapper, input, ...) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
+  }
+  fmesher::fm_basis(mapper[["x"]], input)
+}
+
+
 ## fm_mesh_2d ####
 
 #' @title Mapper for `fm_mesh_2d`
 #' @param mesh An `fm_mesh_2d` object to use as a mapper
 #' @export
 #' @description Creates a mapper for 2D `fm_mesh_2d` objects
+#' @returns A `bru_mapper_fmesher` object. Note: Prior to version `2.12.0.9021`,
+#'   this was a `bru_mapper_fm_mesh_2d` object. Also see the note for
+#'   [bru_mapper_fm_mesh_1d()].
 #' @rdname bru_mapper_fm_mesh_2d
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -759,9 +862,10 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' ibm_eval(m, as.matrix(expand.grid(-2:2, -2:2)), seq_len(ibm_n(m)))
 #'
 bru_mapper.fm_mesh_2d <- function(mesh, ...) {
-  mapper <- list(mesh = mesh)
-  bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_2d")
+  bru_mapper_fmesher(mesh)
 }
+
+## The following methods are only used for old stored mapper objects
 
 #' @export
 #' @rdname bru_mapper_fm_mesh_2d
@@ -780,12 +884,6 @@ ibm_jacobian.bru_mapper_fm_mesh_2d <- function(mapper, input, ...) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
   fm_basis(mapper[["mesh"]], input)
-}
-
-#' @export
-#' @describeIn bru_mapper_fm_mesh_2d Creates a mapper for 2D `inla.mesh` objects
-bru_mapper.inla.mesh <- function(mesh, ...) {
-  bru_mapper.fm_mesh_2d(fm_as_mesh_2d(mesh))
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -813,11 +911,16 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 ## fm_mesh_1d ####
 
 #' @title Mapper for `fm_mesh_1d`
-#' @param indexed logical; If `TRUE`, the `ibm_values()` output will be the
+#' @param indexed logical; If `TRUE` (default), the `ibm_values()` output will be the
 #'   integer indexing sequence for the latent variables (needed for `spde`
 #'   models). If `FALSE`, the knot locations are returned (useful as an
 #'   interpolator for `rw2` models and similar).
 #' Default: `NULL`, to force user specification of this parameter
+#' @returns A `bru_mapper_fm_mesh_1d` or `fm_mapper_fmesher` object. The the
+#'   general [bru_mapper_fmesher()] mapper handles all indexed `fmesher`
+#'   objects, except that `NA` inputs for `fm_mesh_1d` requires `fmesher`
+#'   version `0.2.0.9002` or later. The `fmesher` version is detected, and an
+#'   appropriate mapper is created.
 #' @export
 #' @description Create mapper for an `fm_mesh_1d` object
 #' @param mesh An `fm_mesh_1d` object to use as a mapper
@@ -827,19 +930,17 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @examples
+#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
+#' ibm_values(m)
+#' ibm_eval(m, 1:7, 1:5)
 #' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:5)
-#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = TRUE)
-#' ibm_values(m)
-#' ibm_eval(m, 1:7, 1:5)
 #'
-bru_mapper.fm_mesh_1d <- function(mesh, indexed = NULL, ...) {
-  if (is.null(indexed)) {
-    stop(paste0(
-      "`indexed=TRUE/FALSE` needs to be specified to convert ",
-      "`fm_mesh_1d` to a `bru_mapper`"
-    ))
+bru_mapper.fm_mesh_1d <- function(mesh, indexed = TRUE, ...) {
+  if (indexed && utils::packageVersion("fmesher") >= "0.2.0.9002") {
+    mapper <- bru_mapper_fmesher(mesh)
+    return(mapper)
   }
   mapper <- list(
     mesh = mesh,
@@ -876,13 +977,6 @@ ibm_jacobian.bru_mapper_fm_mesh_1d <- function(mapper, input, ...) {
     A[ok, ] <- fm_basis(mapper[["mesh"]], input[ok])
   }
   A
-}
-
-#' @export
-#' @describeIn bru_mapper_fm_mesh_1d Create mapper for an `inla.mesh.1d` object;
-#'   converts the mesh fo `fm_mesh_1d` first.
-bru_mapper.inla.mesh.1d <- function(mesh, indexed = NULL, ...) {
-  bru_mapper.fm_mesh_1d(fm_as_mesh_1d(mesh), indexed = indexed, ...)
 }
 
 ## The following methods are only used for old stored mapper objects

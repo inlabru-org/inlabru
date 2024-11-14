@@ -13,6 +13,8 @@
   sub-models (version `2.11.1.9017`)
 * Allow `bru_mapper_multi` sub-mappers to have non-zero offsets, that are
   added to generate the combined offset (version `2.11.1.9019`)
+* General `bru_mapper_fmesher()` mapper added, for indexed mapping of
+  all objects supporting `fm_dof()` and `fm_basis()` (version `2.11.1.9021`)
 
 ## Namespace changes
 
