@@ -747,5 +747,3 @@ test_that("Repeat mapper works", {
     NA
   )
 })
-
-

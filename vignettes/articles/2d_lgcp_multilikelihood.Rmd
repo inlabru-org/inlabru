@@ -40,8 +40,8 @@ bru_safe_sp(force = TRUE)
 ```{r echo=FALSE}
 INLA::inla.setOption(num.threads = "2:1")
 INLA::inla.setOption(smtp = "taucs")
-#Sys.setenv(INLA_TRACE = "*")
-#INLA::inla.setOption(verbose = TRUE)
+# Sys.setenv(INLA_TRACE = "*")
+# INLA::inla.setOption(verbose = TRUE)
 ```
 
 Get the data

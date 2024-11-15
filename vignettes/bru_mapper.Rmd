@@ -279,7 +279,7 @@ of length `nrep * ibm_n(mapper, ...)`. The `ibm_` method inputs are
 passed on to the sub-mapper methods.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_repeat(mapper = ..., n_rep =...)
+mapper <- bru_mapper_repeat(mapper = ..., n_rep = ...)
 ibm_eval(mapper,
   input = ...,
   state = ...
