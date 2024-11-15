@@ -802,7 +802,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' @export
 #' @description Creates a mapper for general `fmesher` function space objects.
 #' @details For `fmesher` before version "0.2.0.9002", [fmesher::fm_mesh_1d] objects
-#'   will be handed over to [bru_mapper_fm_mesh_1d], which handles NA inputs
+#'   will be handed over to [bru_mapper.fm_mesh_1d()], which handles NA inputs
 #'   for older fmesher versions.
 #' @returns A `bru_mapper_fmesher` object.
 #' @rdname bru_mapper_fmesher
@@ -853,7 +853,7 @@ ibm_jacobian.bru_mapper_fmesher <- function(mapper, input, ...) {
 #' @description Creates a mapper for 2D `fm_mesh_2d` objects
 #' @returns A `bru_mapper_fmesher` object. Note: Prior to version `2.12.0.9021`,
 #'   this was a `bru_mapper_fm_mesh_2d` object. Also see the note for
-#'   [bru_mapper_fm_mesh_1d].
+#'   [bru_mapper.fm_mesh_1d].
 #' @rdname bru_mapper_fm_mesh_2d
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
