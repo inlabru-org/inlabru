@@ -34,7 +34,7 @@ Creates a mapper for general \code{fmesher} function space objects.
 }
 \details{
 For \code{fmesher} before version "0.2.0.9002", \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d} objects
-will be handed over to \code{\link[=bru_mapper_fm_mesh_1d]{bru_mapper_fm_mesh_1d()}}, which handles NA inputs
+will be handed over to \link{bru_mapper_fm_mesh_1d}, which handles NA inputs
 for older fmesher versions.
 }
 \examples{

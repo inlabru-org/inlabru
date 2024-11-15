@@ -36,7 +36,7 @@
 \value{
 A \code{bru_mapper_fmesher} object. Note: Prior to version \verb{2.12.0.9021},
 this was a \code{bru_mapper_fm_mesh_2d} object. Also see the note for
-\code{\link[=bru_mapper_fm_mesh_1d]{bru_mapper_fm_mesh_1d()}}.
+\link{bru_mapper_fm_mesh_1d}.
 }
 \description{
 Creates a mapper for 2D \code{fm_mesh_2d} objects
