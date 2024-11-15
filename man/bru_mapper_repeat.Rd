@@ -4,6 +4,7 @@
 \alias{bru_mapper_repeat}
 \alias{ibm_n.bru_mapper_repeat}
 \alias{ibm_n_output.bru_mapper_repeat}
+\alias{ibm_values.bru_mapper_repeat}
 \alias{ibm_jacobian.bru_mapper_repeat}
 \alias{ibm_eval.bru_mapper_repeat}
 \alias{ibm_linear.bru_mapper_repeat}
@@ -15,6 +16,8 @@ bru_mapper_repeat(mapper, n_rep)
 \method{ibm_n}{bru_mapper_repeat}(mapper, ...)
 
 \method{ibm_n_output}{bru_mapper_repeat}(mapper, ...)
+
+\method{ibm_values}{bru_mapper_repeat}(mapper, ...)
 
 \method{ibm_jacobian}{bru_mapper_repeat}(mapper, input, state = NULL, ..., sub_lin = NULL)
 
@@ -43,7 +46,8 @@ A \code{bru_mapper_repeat} object.
 }
 \description{
 Defines a repeated-space mapper that sums the contributions for
-each copy. The \code{ibm_n()} method returns \code{ibm_n(mapper) * n_rep}.
+each copy. The \code{ibm_n()} method returns \code{ibm_n(mapper) * n_rep}, and
+\code{ibm_values()} returns \code{seq_len(ibm_n(mapper))}.
 }
 \section{Methods (by generic)}{
 \itemize{

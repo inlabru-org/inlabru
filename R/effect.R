@@ -1343,10 +1343,9 @@ bru_get_mapper <- function(model, ...) {
 #' if no known mesh type is found in the model object.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  if (inherits(model$mesh, c("fm_mesh_2d", "inla.mesh"))) {
-    mapper <- bru_mapper(model$mesh)
-  } else if (inherits(model$mesh, c("fm_mesh_1d", "inla.mesh.1d"))) {
-    mapper <- bru_mapper(model$mesh, indexed = TRUE)
+  if (inherits(model$mesh, c("fm_mesh_2d", "inla.mesh",
+                             "fm_mesh_1d", "inla.mesh.1d"))) {
+    mapper <- bru_mapper_fmesher(model$mesh)
   } else {
     mapper <- NULL
     warning(

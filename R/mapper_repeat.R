@@ -8,7 +8,8 @@
 #' @param n_rep The number of times to repeat the mapper.
 #' @export
 #' @description Defines a repeated-space mapper that sums the contributions for
-#'   each copy. The `ibm_n()` method returns `ibm_n(mapper) * n_rep`.
+#'   each copy. The `ibm_n()` method returns `ibm_n(mapper) * n_rep`, and
+#'   `ibm_values()` returns `seq_len(ibm_n(mapper))`.
 #' @returns A `bru_mapper_repeat` object.
 #' @rdname bru_mapper_repeat
 #' @inheritParams bru_mapper_generics
@@ -43,10 +44,9 @@ ibm_n_output.bru_mapper_repeat <- function(mapper, ...) {
   ibm_n_output(mapper[["mapper"]], ...)
 }
 
-
 #' @export
-#' @rdname bru_mapper_fmesher
-ibm_values.bru_mapper_fmesher <- function(mapper, ...) {
+#' @rdname bru_mapper_repeat
+ibm_values.bru_mapper_repeat <- function(mapper, ...) {
   seq_len(ibm_n(mapper, ...))
 }
 
