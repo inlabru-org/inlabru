@@ -53,7 +53,6 @@ mapper <-
     )
   )
 summary(mapper, depth = 2)
-\dontrun{
 mapper <-
   bru_mapper_repeat(
     bru_mapper_multi(
@@ -66,5 +65,4 @@ mapper <-
   )
 summary(mapper)
 summary(mapper, depth = 0)
-}
 }

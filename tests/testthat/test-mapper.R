@@ -690,3 +690,62 @@ test_that("Mesh 2d mapper", {
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 9)
 })
+
+
+
+test_that("Repeat mapper, direct construction", {
+  set.seed(1234L)
+
+  mapper <- bru_mapper_repeat(
+    bru_mapper_index(4),
+    n_rep = 3
+  )
+  expect_equal(ibm_n(mapper), 12)
+  expect_equal(ibm_values(mapper), seq_len(12))
+
+  data <- 3:1
+  A <- Matrix::sparseMatrix(
+    i = 1:3,
+    j = data,
+    x = 1,
+    dims = c(3, 4)
+  )
+  A <- cbind(A, A, A)
+  A <- as(as(as(A, "dMatrix"), "generalMatrix"), "CsparseMatrix")
+  expect_equal(ibm_jacobian(mapper, data), A)
+})
+
+
+
+
+test_that("Repeat mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  set.seed(12345L)
+  data <- data.frame(
+    y = 4 + rnorm(6),
+    x = c(1, 2, 3, 2, 3, 4)
+  )
+
+  expect_error(
+    {
+      fit_bru <-
+        bru(
+          y ~ Intercept(1) + field(
+            x,
+            model = "iid",
+            mapper = bru_mapper_repeat(bru_mapper_index(4), n_rep = 2)
+          ),
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          ))),
+          options = list(bru_initial = list(field = rep(10, 8)))
+        )
+    },
+    NA
+  )
+})
+
+

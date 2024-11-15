@@ -447,7 +447,6 @@ summary.bru_mapper_collect <- function(object, ...,
 #' @method summary bru_mapper_repeat
 #' @rdname bru_mapper_summary
 #' @examples
-#' \dontrun{
 #' mapper <-
 #'   bru_mapper_repeat(
 #'     bru_mapper_multi(
@@ -460,7 +459,6 @@ summary.bru_mapper_collect <- function(object, ...,
 #'   )
 #' summary(mapper)
 #' summary(mapper, depth = 0)
-#' }
 summary.bru_mapper_repeat <- function(object, ...,
                                       prefix = "",
                                       initial = prefix,
