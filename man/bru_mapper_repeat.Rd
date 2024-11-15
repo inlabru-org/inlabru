@@ -51,8 +51,8 @@ each copy. The \code{ibm_n()} method returns \code{ibm_n(mapper) * n_rep}, and
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{ibm_jacobian(bru_mapper_repeat)}: The input should take the format of the repeated
-submapper.
+\item \code{ibm_jacobian(bru_mapper_repeat)}: The input should take the format of the
+repeated submapper.
 
 \item \code{ibm_invalid_output(bru_mapper_repeat)}: Passes on the input to the corresponding method.
 

@@ -814,7 +814,7 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #'
 bru_mapper_fmesher <- function(mesh) {
   if (inherits(mesh, "fm_mesh_1d") &&
-      (utils::packageVersion("fmesher") < "0.2.0.9002")) {
+    (utils::packageVersion("fmesher") < "0.2.0.9002")) {
     # The old mapper handles NA inputs for older fmesher versions.
     mapper <- bru_mapper(mesh, indexed = TRUE)
     return(mapper)

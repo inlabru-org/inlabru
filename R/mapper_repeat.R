@@ -53,7 +53,7 @@ ibm_values.bru_mapper_repeat <- function(mapper, ...) {
 
 
 bm_repeat_sub_lin <- function(mapper, input, state,
-                               ...) {
+                              ...) {
   # We need all the sub_lin objects even for linear mappers
   n <- ibm_n(mapper[["mapper"]])
   n_offset <- n * (seq_len(mapper[["n_rep"]]) - 1L)
@@ -74,8 +74,8 @@ bm_repeat_sub_lin <- function(mapper, input, state,
 
 
 
-#' @describeIn bru_mapper_repeat The input should take the format of the repeated
-#'   submapper.
+#' @describeIn bru_mapper_repeat The input should take the format of the
+#'   repeated submapper.
 #' @export
 ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
                                            ...,
@@ -93,8 +93,8 @@ ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
 #' @export
 #' @rdname bru_mapper_repeat
 ibm_eval.bru_mapper_repeat <- function(mapper, input, state,
-                                        ...,
-                                        sub_lin = NULL) {
+                                       ...,
+                                       sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_repeat_sub_lin(mapper, input, state)
   }
@@ -112,7 +112,8 @@ ibm_eval.bru_mapper_repeat <- function(mapper, input, state,
 ibm_linear.bru_mapper_repeat <- function(mapper, input, state,
                                          ...) {
   sub_lin <-
-    bm_repeat_sub_lin(mapper, input, state,
+    bm_repeat_sub_lin(
+      mapper, input, state,
       ...
     )
   eval2 <- ibm_eval2(
@@ -146,4 +147,3 @@ ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
     )
   )
 }
-
