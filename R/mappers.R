@@ -796,14 +796,14 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 ## _fmesher ####
 
 #' @title Mapper for general `fmesher` function space objects
-#' @param x An `fmesher` object to map, supported by
-#' [fmesher::fm_basis]`(x, input)` and
-#' [fmesher::fm_dof]`(x)`.
+#' @param mesh An `fmesher` object to map, supported by
+#' [fmesher::fm_basis]`(mesh, input)` and
+#' [fmesher::fm_dof]`(mesh)`.
 #' @export
 #' @description Creates a mapper for general `fmesher` function space objects.
-#' @details For `fmesher` before version "0.2.0.9002", [fmesher::fm_mesh_1d] objects
-#'   will be handed over to [bru_mapper.fm_mesh_1d()], which handles NA inputs
-#'   for older fmesher versions.
+#' @details For `fmesher` before version "0.2.0.9002", [fmesher::fm_mesh_1d]
+#'   objects will be handed over to [bru_mapper.fm_mesh_1d()], which handles NA
+#'   inputs for older fmesher versions.
 #' @returns A `bru_mapper_fmesher` object.
 #' @rdname bru_mapper_fmesher
 #' @inheritParams bru_mapper_generics
@@ -814,26 +814,26 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
 #' ibm_n(m)
 #' ibm_eval(m, as.matrix(expand.grid(-2:2, -2:2)), seq_len(ibm_n(m)))
 #'
-bru_mapper_fmesher <- function(x) {
+bru_mapper_fmesher <- function(mesh) {
   if (inherits(x, "fm_mesh_1d") &&
       (utils::packageVersion("fmesher") < "0.2.0.9002")) {
     # The old mapper handles NA inputs for older fmesher versions.
-    mapper <- bru_mapper(x, indexed = TRUE)
+    mapper <- bru_mapper(mesh, indexed = TRUE)
     return(mapper)
   }
-  mapper <- list(x = x)
+  mapper <- list(mesh = mesh)
   bru_mapper_define(mapper, new_class = "bru_mapper_fmesher")
 }
 
 #' @export
 #' @rdname bru_mapper_fmesher
 ibm_n.bru_mapper_fmesher <- function(mapper, ...) {
-  fmesher::fm_dof(mapper[["x"]])
+  fmesher::fm_dof(mapper[["mesh"]])
 }
 #' @export
 #' @rdname bru_mapper_fmesher
 ibm_values.bru_mapper_fmesher <- function(mapper, ...) {
-  seq_len(fmesher::fm_dof(mapper[["x"]]))
+  seq_len(fmesher::fm_dof(mapper[["mesh"]]))
 }
 #' @export
 #' @rdname bru_mapper_fmesher
@@ -841,7 +841,7 @@ ibm_jacobian.bru_mapper_fmesher <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fmesher::fm_basis(mapper[["x"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 
@@ -913,11 +913,10 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 ## fm_mesh_1d ####
 
 #' @title Mapper for `fm_mesh_1d`
-#' @param indexed logical; If `TRUE` (default), the `ibm_values()` output will be the
-#'   integer indexing sequence for the latent variables (needed for `spde`
-#'   models). If `FALSE`, the knot locations are returned (useful as an
+#' @param indexed logical; If `TRUE` (default), the `ibm_values()` output will
+#'   be the integer indexing sequence for the latent variables (needed for
+#'   `spde` models). If `FALSE`, the knot locations are returned (useful as an
 #'   interpolator for `rw2` models and similar).
-#' Default: `NULL`, to force user specification of this parameter
 #' @returns A `bru_mapper_fm_mesh_1d` or `fm_mapper_fmesher` object. The the
 #'   general [bru_mapper_fmesher()] mapper handles all indexed `fmesher`
 #'   objects, except that `NA` inputs for `fm_mesh_1d` requires `fmesher`

@@ -7,7 +7,7 @@
 \alias{ibm_jacobian.bru_mapper_fmesher}
 \title{Mapper for general \code{fmesher} function space objects}
 \usage{
-bru_mapper_fmesher(x)
+bru_mapper_fmesher(mesh)
 
 \method{ibm_n}{bru_mapper_fmesher}(mapper, ...)
 
@@ -16,9 +16,9 @@ bru_mapper_fmesher(x)
 \method{ibm_jacobian}{bru_mapper_fmesher}(mapper, input, ...)
 }
 \arguments{
-\item{x}{An \code{fmesher} object to map, supported by
-\link[fmesher:fm_basis]{fmesher::fm_basis}\verb{(x, input)} and
-\link[fmesher:fm_dof]{fmesher::fm_dof}\code{(x)}.}
+\item{mesh}{An \code{fmesher} object to map, supported by
+\link[fmesher:fm_basis]{fmesher::fm_basis}\verb{(mesh, input)} and
+\link[fmesher:fm_dof]{fmesher::fm_dof}\code{(mesh)}.}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
@@ -33,9 +33,9 @@ A \code{bru_mapper_fmesher} object.
 Creates a mapper for general \code{fmesher} function space objects.
 }
 \details{
-For \code{fmesher} before version "0.2.0.9002", \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d} objects
-will be handed over to \code{\link[=bru_mapper.fm_mesh_1d]{bru_mapper.fm_mesh_1d()}}, which handles NA inputs
-for older fmesher versions.
+For \code{fmesher} before version "0.2.0.9002", \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d}
+objects will be handed over to \code{\link[=bru_mapper.fm_mesh_1d]{bru_mapper.fm_mesh_1d()}}, which handles NA
+inputs for older fmesher versions.
 }
 \examples{
 m <- bru_mapper_fmesher(fmesher::fmexample$mesh)

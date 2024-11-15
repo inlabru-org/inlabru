@@ -27,11 +27,10 @@
 \arguments{
 \item{mesh}{An \code{fm_mesh_1d} object to use as a mapper}
 
-\item{indexed}{logical; If \code{TRUE} (default), the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde}
-models). If \code{FALSE}, the knot locations are returned (useful as an
-interpolator for \code{rw2} models and similar).
-Default: \code{NULL}, to force user specification of this parameter}
+\item{indexed}{logical; If \code{TRUE} (default), the \code{ibm_values()} output will
+be the integer indexing sequence for the latent variables (needed for
+\code{spde} models). If \code{FALSE}, the knot locations are returned (useful as an
+interpolator for \code{rw2} models and similar).}
 
 \item{...}{Arguments passed on to other methods}
 
