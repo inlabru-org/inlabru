@@ -2,16 +2,18 @@
 
 ## General changes
 
+* Introduce `bru_like()` function to help avoid namespace clashes with e.g.
+  `data.table::like()` (version `2.11.1.9024`)
 * Change logic for `like(allow_combine)` to allow user override, and add
   warnings for ambiguous cases (version `2.11.1.9011`)
-* Add `bru_response_size` method for extracting the response size for each
-  observation `like()` object (version `2.11.1.9013`)
+* Add `bru_response_size()` method for extracting the response size for each
+  observation `bru_like` object (version `2.11.1.9013`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 * Add `[` and `]` to disallowed character set in `bru_standardise_names()`
   (version `2.11.1.9012`)
 * Add `bru_index()` method for accessing predictor index information for
   sub-models (version `2.11.1.9017`)
-* Allow `bru_mapper_multi` sub-mappers to have non-zero offsets, that are
+* Allow `bru_mapper_multi()` sub-mappers to have non-zero offsets, that are
   added to generate the combined offset (version `2.11.1.9019`)
 * Add general `bru_mapper_fmesher()` mapper, for indexed mapping of
   all objects supporting `fm_dof()` and `fm_basis()` (version `2.11.1.9021`)

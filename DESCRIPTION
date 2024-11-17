@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.11.1.9023
+Version: 2.11.1.9024
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -135,6 +135,7 @@ Collate:
     'stack.R'
     'track_plotting.R'
     'transformation.R'
+    'used.R'
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true
