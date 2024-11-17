@@ -1246,7 +1246,6 @@ extended_bind_rows <- function(...) {
 #' @param response_data Likelihood-specific data for models that need different
 #'   size/format for inputs and response variables, as a `data.frame` or
 #'   `SpatialPoints[DataFrame]` object.
-#' @param mesh Deprecated.
 #' @param E Exposure parameter for family = 'poisson' passed on to `INLA::inla`.
 #'   Special case if family is 'cp': rescale all integration weights by a scalar
 #'   E. For sampler specific reweighting/effort, use a `weight` column in the
@@ -1304,8 +1303,6 @@ extended_bind_rows <- function(...) {
 #'   latent = include_latent
 #' )
 #' ```
-#' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated.
-#'   Use `include_latent` instead.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
@@ -1325,9 +1322,10 @@ extended_bind_rows <- function(...) {
 #'
 #' @example inst/examples/like.R
 
-like <- function(formula = . ~ ., family = "gaussian", data = NULL,
-                 response_data = NULL, # agg
-                 mesh = deprecated(),
+like <- function(formula = . ~ .,
+                 family = "gaussian",
+                 data = NULL,
+                 response_data = NULL,
                  E = NULL,
                  Ntrials = NULL,
                  weights = NULL,
@@ -1339,7 +1337,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
                  exclude = NULL,
                  include_latent = NULL,
                  used = NULL,
-                 allow_latent = deprecated(),
                  allow_combine = NULL,
                  control.family = NULL,
                  tag = NULL,
@@ -1688,22 +1685,6 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       latent = include_latent
     )
   }
-  if (lifecycle::is_present(allow_latent)) {
-    lifecycle::deprecate_stop(
-      "2.8.0",
-      "like(allow_latent = 'is deprecated')",
-      "like(include_latent)",
-      details = paste0(
-        "The default `like(..., include_latent = NULL)` auto-detects use of ",
-        "`_latent` and `_eval`."
-      )
-    )
-    if (allow_latent && is.null(include_latent)) {
-      # Set to NULL so that later bru_used_update adds all components.
-      used[["latent"]] <- NULL
-    }
-  }
-
 
   # The likelihood object that will be returned
 
@@ -2452,23 +2433,21 @@ predict.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.8.0",
         "predict(data)",
         "predict(newdata)",
         details =
-          "`data` provided but not `newdata`. Setting `newdata <- data`."
+          "`data` provided but not `newdata`."
       )
-      newdata <- data
     } else {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.8.0",
         "predict(data)",
         "predict(newdata)",
-        details = "Both `newdata` and `data` provided. `data` will be ignored."
+        details = "Both `newdata` and `data` provided."
       )
     }
-    data <- NULL
   }
 
   # Convert data into list, data.frame or a Spatial object if not provided as
@@ -2652,23 +2631,21 @@ generate.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.8.0",
         "generate(data)",
         "generate(newdata)",
         details =
-          "Both `data` provided but not `newdata`. Setting `newdata <- data`."
+          "Both `data` provided but not `newdata`."
       )
-      newdata <- data
     } else {
-      lifecycle::deprecate_warn(
+      lifecycle::deprecate_stop(
         "2.8.0",
         "generate(data)",
         "generate(newdata)",
-        details = "Both `newdata` and `data` provided. `data` will be ignored."
+        details = "Both `newdata` and `data` provided."
       )
     }
-    data <- NULL
   }
 
   # Convert data into list, data.frame or a Spatial object if not provided as

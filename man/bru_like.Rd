@@ -15,7 +15,6 @@ like(
   family = "gaussian",
   data = NULL,
   response_data = NULL,
-  mesh = deprecated(),
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -27,7 +26,6 @@ like(
   exclude = NULL,
   include_latent = NULL,
   used = NULL,
-  allow_latent = deprecated(),
   allow_combine = NULL,
   control.family = NULL,
   tag = NULL,
@@ -67,8 +65,6 @@ object.}
 \item{response_data}{Likelihood-specific data for models that need different
 size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]} object.}
-
-\item{mesh}{Deprecated.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
 Special case if family is 'cp': rescale all integration weights by a scalar
@@ -133,9 +129,6 @@ latent vectors are made available to the predictor evaluation is defined by
   latent = include_latent
 )
 }\if{html}{\out{</div>}}}
-
-\item{allow_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} logical, deprecated.
-Use \code{include_latent} instead.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
 several rows of the input data to influence the same row. When \code{NULL},

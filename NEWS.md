@@ -39,6 +39,15 @@
 * Replace the `gorillas` dataset with a function `gorillas_sp()`
   to avoid `sp` data objects in the package (version `2.11.1.9016`)
 
+## Deprecated methods
+
+* Deprecated (since 2.8.0) method `is.inside()` have been removed.
+  Use `fmesher::fm_is_within()` instead.
+* Deprecated (since 2.7.0) `bru_mapper.default()` to define new mapper classes
+  has been removed. Use `bru_mapper_define()` instead.
+* Deprecated (since 2.6.0) `bru_mapper_offset()` method has been removed.
+  Use `bru_mapper_const()` instead.
+
 ## Internal changes
 
 * Remove unneeded `"list"` class inheritance from solitary classes

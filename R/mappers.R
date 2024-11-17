@@ -556,22 +556,6 @@ bru_mapper_define <- function(mapper,
 
 ## Default methods ----
 
-#' @describeIn inlabru-deprecated
-#' Calls `bru_mapper_define`, passing all
-#' arguments along. Mapper implementations should call [bru_mapper_define()]
-#' instead, and supply at least a `new_class` class name.
-#' Use of the `bru_mapper.default` method was deprecated from version 2.7.0,
-#' and removed in version 2.11.0
-#' @export
-bru_mapper.default <- function(...) {
-  lifecycle::deprecate_stop(
-    "2.7.0",
-    "bru_mapper.default()",
-    "bru_mapper_define()"
-  )
-  bru_mapper_define(...)
-}
-
 
 #' @describeIn bru_mapper_generics
 #' Returns a non-null element 'n' from the
@@ -1578,22 +1562,6 @@ ibm_eval.bru_mapper_const <- function(mapper, input, state = NULL, ...) {
   input[!ok] <- 0
   input
 }
-
-
-## _offset ####
-
-#' @export
-#' @describeIn inlabru-deprecated Creates a [bru_mapper_const()] mapper.
-bru_mapper_offset <- function(...) {
-  lifecycle::deprecate_warn(
-    "2.6.0",
-    "bru_mapper_offset()",
-    "bru_mapper_const()"
-  )
-  bru_mapper_const(...)
-}
-
-
 
 
 ## _shift ####

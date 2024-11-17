@@ -27,15 +27,13 @@ bru_compute_linearisation <- function(...) {
 #' expression
 #' @param pred0 Precomputed predictor for the given state
 #' @param used A [bru_used()] object for the predictor expression
-#' @param allow_latent logical. If `TRUE`, the latent state of each component is
-#' directly available to the predictor expression, with a `_latent` suffix.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' @param eps The finite difference step size
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
 #' @param n_pred The length of the predictor expression. If not `NULL`, scalar
 #' predictor evaluations are expanded to vectors of length `n_pred`.
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
 #'
 #' @export
 #' @rdname bru_compute_linearisation
@@ -49,7 +47,6 @@ bru_compute_linearisation.component <- function(cmp,
                                                 effects,
                                                 pred0,
                                                 used,
-                                                allow_latent,
                                                 allow_combine,
                                                 eps,
                                                 n_pred = NULL,
@@ -72,6 +69,8 @@ bru_compute_linearisation.component <- function(cmp,
       dims = c(NROW(pred0), 0)
     ))
   }
+
+  allow_latent <- label %in% used[["latent"]]
 
   if (is.null(comp_simple)) {
     A <- NULL
@@ -349,7 +348,6 @@ bru_compute_linearisation.bru_like <- function(lhood,
             effects = effects,
             pred0 = pred0,
             used = used,
-            allow_latent = label %in% used[["latent"]],
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
             n_pred = n_pred,
