@@ -19,12 +19,12 @@ The iterative method used for non-linear predictors is documented in the
 \code{method} vignette.
 
 The main function for inference using inlabru is \code{\link[=bru]{bru()}}.
-The general model specification details is documented in \code{\link[=component]{component()}} and
-\code{\link[=like]{like()}}.
+The general model specification details is documented in \code{\link[=bru_component]{bru_component()}}
+and \code{\link[=bru_obs]{bru_obs()}}.
 Posterior quantities beyond the basic summaries can be calculated with
 a \code{predict()} method, documented in \code{\link[=predict.bru]{predict.bru()}}.
 For point process inference \code{\link[=lgcp]{lgcp()}} can be used as a shortcut to
-\code{bru(..., like(model="cp", ...))}.
+\code{bru(..., bru_obs(model="cp", ...))}.
 
 The package comes with multiple real world data sets, namely \link{gorillas},
 \link{gorillas_sf}, \link{mexdolphin_sf}. Plotting these data

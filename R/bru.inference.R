@@ -440,14 +440,13 @@ bru_timings.bru <- function(object, ...) {
 #'
 #' @param components A `formula`-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
-#'   [component()] for details.
-#' @param ... Likelihoods, each constructed by a calling [like()], or named
-#'   parameters that can be passed to a single [like()] call. Note that
-#'   all the arguments will be evaluated before calling [like()] in order
-#'   to detect if they are `like` objects. This means that
-#'   special arguments that need to be evaluated in the context of
-#'   `response_data` or `data` (such as `Ntrials`) may will only work that
-#'   way in direct calls to [like()].
+#'   [bru_component()] for details.
+#' @param ... Obervation models, each constructed by a calling [bru_obs()], or
+#'   named parameters that can be passed to a single [bru_obs()] call. Note that
+#'   all the arguments will be evaluated before calling [bru_obs()] in order to
+#'   detect if they are `like` objects. This means that special arguments that
+#'   need to be evaluated in the context of `response_data` or `data` (such as
+#'   `Ntrials`) may will only work that way in direct calls to [bru_obs()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
@@ -495,13 +494,13 @@ bru <- function(components = ~ Intercept(1),
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
       stop(paste0(
-        "Cannot mix like() parameters with 'bru_like' ",
+        "Cannot mix bru_obs() parameters with 'bru_like' ",
         "and `bru_like_list` objects.",
         "\n  Check if the argument(s) ",
         paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
           collapse = ", "
         ),
-        " were meant to be given to a call to 'like()',\n  or in the ",
+        " were meant to be given to a call to 'bru_obs()',\n  or in the ",
         "'options' list argument instead."
       ))
     }
@@ -516,7 +515,7 @@ bru <- function(components = ~ Intercept(1),
       )
     }
     lhoods <- list(do.call(
-      like,
+      bru_obs,
       c(
         lhoods,
         list(
@@ -531,12 +530,12 @@ bru <- function(components = ~ Intercept(1),
   lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
 
   if (length(lhoods) == 0) {
-    stop("No response likelihood models provided.")
+    stop("No observation models provided.")
   }
 
   # Turn input into a list of components (from existing list, or a special
   # formula)
-  components <- component_list(components, .envir = .envir)
+  components <- bru_component_list(components, .envir = .envir)
 
   # Update include/exclude information to limit it to existing components
   lhoods <- bru_used_update(lhoods, labels = names(components))
@@ -827,9 +826,17 @@ extended_bind_rows <- function(...) {
 }
 
 
-#' Observation model construction for usage with [bru()]
+#' @title Observation model construction for usage with [bru()]
 #'
-#' @rdname bru_like
+#' @description Observation model construction for usage with [bru()].
+#'
+#' Note: Prior to version `2.12.0`, this function was called `like()`, and that
+#' alias will remain for a while until examples etc have been updated and users
+#' made aware of the change. The name change is to avoid issues with namespace
+#' clashes, e.g. with `data.table::like()`, and also to signal that the function
+#' defines observation models, not just likelihood functions.
+#'
+#' @rdname bru_obs
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -892,8 +899,8 @@ extended_bind_rows <- function(...) {
 #'   functions with suffix `_eval` available, taking parameters `main`, `group`,
 #'   and `replicate`, taking values for where to evaluate the component effect
 #'   that are different than those defined in the component definition itself
-#'   (see [component_eval()]). If `NULL`, the [bru_used()] method auto-detects
-#'   use of `_latent` and `_eval` in the predictor expression.
+#'   (see [bru_component_eval()]). If `NULL`, the [bru_used()] method
+#'   auto-detects use of `_latent` and `_eval` in the predictor expression.
 #'   }
 #' }
 #' @param used Wither `NULL` (default) or a [bru_used()] object, that overrides
@@ -922,32 +929,30 @@ extended_bind_rows <- function(...) {
 #'   `data`. Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
-#' @seealso [bru_response_size()], [bru_used()], [component()],
-#' [component_eval()]
+#' @seealso [bru_response_size()], [bru_used()], [bru_component()],
+#' [bru_component_eval()]
 #'
-#' @example inst/examples/like.R
-
-
-bru_like <- function(formula = . ~ .,
-                     family = "gaussian",
-                     data = NULL,
-                     response_data = NULL,
-                     E = NULL,
-                     Ntrials = NULL,
-                     weights = NULL,
-                     scale = NULL,
-                     domain = NULL,
-                     samplers = NULL,
-                     ips = NULL,
-                     include = NULL,
-                     exclude = NULL,
-                     include_latent = NULL,
-                     used = NULL,
-                     allow_combine = NULL,
-                     control.family = NULL,
-                     tag = NULL,
-                     options = list(),
-                     .envir = parent.frame()) {
+#' @example inst/examples/bru_obs.R
+bru_obs <- function(formula = . ~ .,
+                    family = "gaussian",
+                    data = NULL,
+                    response_data = NULL,
+                    E = NULL,
+                    Ntrials = NULL,
+                    weights = NULL,
+                    scale = NULL,
+                    domain = NULL,
+                    samplers = NULL,
+                    ips = NULL,
+                    include = NULL,
+                    exclude = NULL,
+                    include_latent = NULL,
+                    used = NULL,
+                    allow_combine = NULL,
+                    control.family = NULL,
+                    tag = NULL,
+                    options = list(),
+                    .envir = parent.frame()) {
   options <- bru_call_options(options)
 
   # Some defaults
@@ -1058,7 +1063,7 @@ bru_like <- function(formula = . ~ .,
   if (family == "cp") {
     if (is.null(response)) {
       stop(paste0(
-        "You called like() with family='cp' but the evaluated ",
+        "You called bru_obs() with family='cp' but the evaluated ",
         "response information is NULL"
       ))
     }
@@ -1322,7 +1327,8 @@ bru_like <- function(formula = . ~ .,
   lh
 }
 
-#' @describeIn bru_like Legacy `like()` method.
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
+#' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
 #' @export
 like <- function(formula = . ~ .,
                  family = "gaussian",
@@ -1344,6 +1350,12 @@ like <- function(formula = . ~ .,
                  tag = NULL,
                  options = list(),
                  .envir = parent.frame()) {
+  lifecycle::deprecate_soft(
+    "2.11.1.9026",
+    "like()",
+    "bru_obs()"
+  )
+
   options <- bru_call_options(options)
 
   E <- eval_in_data_context(
@@ -1381,7 +1393,7 @@ like <- function(formula = . ~ .,
   assign("weights", weights, envir = special_env)
   assign("scale", scale, envir = special_env)
 
-  bru_like(
+  bru_obs(
     formula = formula,
     family = family,
     data = data,
@@ -1409,21 +1421,21 @@ like <- function(formula = . ~ .,
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
-#' Extract the index vector for a [like()] predictor,
+#' Extract the index vector for a [bru_obs()] predictor,
 #' or the whole or a subset of a full [bru()] predictor.
 #'
-#' @param object A [bru()] or [like()] output object
+#' @param object A [bru()] or [bru_obs()] output object
 #' @param \dots Arguments passed on to sub-methods.
 #' @returns An `integer` vector.
 #' @examplesIf bru_safe_inla()
 #' fit <- bru(
 #'   ~ 0 + x,
-#'   like(
+#'   bru_obs(
 #'     y ~ .,
 #'     data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
 #'     tag = "A"
 #'   ),
-#'   like(
+#'   bru_obs(
 #'     y ~ .,
 #'     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
 #'     tag = "B"
@@ -1440,7 +1452,7 @@ bru_index <- function(object, ...) {
 }
 
 #' @describeIn bru_index Extract the index vector for the predictor vector
-#' for a [like()] sub-model. The indices are relative to the sub-model, and need
+#' for a [bru_obs()] sub-model. The indices are relative to the sub-model, and need
 #' to be appropriately offset to be used in the full model predictor.
 #' @param what `character` or `NULL`; One of `NULL`, "all", "observed", and
 #'   "missing". If `NULL` (default) or "all", gives the index vector for the
@@ -1469,10 +1481,10 @@ bru_index.bru_like <- function(object, what = NULL, ...) {
 }
 
 #' @describeIn bru_index Extract the index vector for "APredictor" for one or
-#'   more specified observation [like()] sub-models. Accepts any combination of
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination of
 #'   `tag` and `what`.
 #' @param tag `character` or `integer`; Either a character vector identifying
-#'   the tags of one or more of the [like()] observation models, or an integer
+#'   the tags of one or more of the [bru_obs()] observation models, or an integer
 #'   vector identifying models by their [bru()] specification order. If `NULL`
 #'   (default) computes indices for all sub-models.
 #' @export
@@ -1527,7 +1539,7 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @examples
 #' bru_response_size(
-#'   like(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian")
+#'   bru_obs(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian")
 #' )
 bru_response_size <- function(object) {
   UseMethod("bru_response_size")
@@ -1570,14 +1582,7 @@ bru_response_size.bru <- function(object) {
 }
 
 
-# Placeholder for future modularised version of like()
-## @describeIn bru_like
-## Alias for `like()`, with `obs` standing for "observation model"
-## @export
-# bru_obs <- like
-
-
-#' @describeIn bru_like
+#' @describeIn bru_obs
 #' Combine `bru_like` likelihoods into a `bru_like_list` object
 #' @param \dots For `bru_like_list.bru_like`, one or more `bru_like` objects
 #' @export
@@ -1585,7 +1590,7 @@ bru_like_list <- function(...) {
   UseMethod("bru_like_list")
 }
 
-#' @describeIn bru_like
+#' @describeIn bru_obs
 #' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @param object A list of `bru_like` objects
@@ -1621,7 +1626,7 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
   object
 }
 
-#' @describeIn bru_like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
@@ -1629,7 +1634,7 @@ bru_like_list.bru_like <- function(..., envir = NULL) {
   do.call(c, list(..., envir = envir))
 }
 
-#' @describeIn bru_like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1647,7 +1652,7 @@ c.bru_like <- function(..., envir = NULL) {
   bru_like_list(lst, envir = envir)
 }
 
-#' @describeIn bru_like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1680,7 +1685,7 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' @export
 #' @param x `bru_like_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
-#' @rdname bru_like
+#' @rdname bru_obs
 #' @seealso [summary.bru_like()]
 `[.bru_like_list` <- function(x, i) {
   env <- environment(x)
@@ -1694,7 +1699,7 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' Summary and print methods for observation models
 #'
 #' @rdname bru_like_print
-#' @seealso [like()]
+#' @seealso [bru_obs()]
 #' @param object Object to operate on
 #' @param verbose logical; If `TRUE`, include more details of the
 #' component definitions. If `FALSE`, only show basic component
@@ -1704,7 +1709,7 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' @method summary bru_like
 #' @export
 #' @examples
-#' obs <- like(y ~ ., data = data.frame(y = rnorm(10)))
+#' obs <- bru_obs(y ~ ., data = data.frame(y = rnorm(10)))
 #' summary(obs)
 #' print(obs)
 #'
@@ -1918,7 +1923,7 @@ bru_like_expr <- function(lhood, components) {
 #' @export
 #' @inheritParams like
 #' @inheritParams bru
-#' @param \dots Further arguments passed on to [like()]. In particular, optional
+#' @param \dots Further arguments passed on to [bru_obs()]. In particular, optional
 #'   `E`, a single numeric used rescale all integration weights by a fixed
 #'   factor.
 #' @return An [bru()] object
@@ -1984,7 +1989,7 @@ lgcp <- function(components,
     response <- extract_response(components)
     formula <- auto_response(formula, response)
   }
-  lik <- like(
+  lik <- bru_obs(
     family = "cp",
     formula = formula, data = data,
     domain = domain, samplers = samplers, ips = ips,
@@ -2096,7 +2101,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_component_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
@@ -2297,7 +2302,7 @@ predict.bru <- function(object,
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_component_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
@@ -3346,7 +3351,7 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #'
 #' @export
 #' @param model A [bru_model] object
-#' @param lhoods A list of likelihood objects from [like()]
+#' @param lhoods A list of likelihood objects from [bru_obs()]
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`

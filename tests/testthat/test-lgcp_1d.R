@@ -180,7 +180,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   fit1 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ .,
       family = "cp",
       data = pts2,
@@ -190,7 +190,7 @@ test_that("1D LGCP fitting, compressed format", {
   )
   fit2 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ .,
       family = "cp",
       data = pts2,
@@ -247,7 +247,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   fit3 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ spde1D + Intercept,
       family = "cp",
       data = pts2,
@@ -257,7 +257,7 @@ test_that("1D LGCP fitting, compressed format", {
   )
   fit4 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ spde1D + Intercept,
       family = "cp",
       data = pts2,

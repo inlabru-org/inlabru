@@ -41,7 +41,7 @@ Obtain component inputs
 happen, unless the component use logic is incorrect,
 (e.g. via \code{include}/\code{exclude})
 leading to missing columns for a certain likelihood in a
-multi-\code{like()} model.
+multi-\code{bru_obs()} model.
 \item If we obtain a function, apply the function to the data object
 \item If we obtain an object supported by \code{\link[=eval_spatial]{eval_spatial()}}, extract the values
 of that data frame at the point locations
@@ -83,7 +83,7 @@ is defined by user but has to be accessible within the work space when
 setting up the components. The third example provides the function
 \code{myOtherSquareFun}. In this case, inlabru will call the function as
 \code{myOtherSquareFun(.data.)}, where \code{.data.} is the data provided via the
-\code{\link[=like]{like()}} \code{data} parameter. The function needs to know what parts of the data
+\code{\link[=bru_obs]{bru_obs()}} \code{data} parameter. The function needs to know what parts of the data
 to use to construct the needed output. For example,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{myOtherSquareFun <- function(data) \{
@@ -102,7 +102,7 @@ function like in the previous section there is an even more convenient way in
 inlabru. Spatial covariates are often stored as \code{SpatialPixelsDataFrame},
 \code{SpatialPixelsDataFrame} or \code{RasterLayer} objects. These can be provided
 directly via the input expressions if they are supported by \code{\link[=eval_spatial]{eval_spatial()}},
-and the \code{\link[=like]{like()}} data is an \code{sf} or \code{SpatialPointsDataFrame} object.
+and the \code{\link[=bru_obs]{bru_obs()}} data is an \code{sf} or \code{SpatialPointsDataFrame} object.
 \code{inlabru} will then automatically evaluate and/or interpolate the covariate
 at your data locations when using code like
 
@@ -110,7 +110,7 @@ at your data locations when using code like
 }\if{html}{\out{</div>}}
 
 For more precise control, use the the \code{layer} and \code{selector} arguments (see
-\code{\link[=component]{component()}}), or call \code{eval_spatial()} directly, e.g.:
+\code{\link[=bru_component]{bru_component()}}), or call \code{eval_spatial()} directly, e.g.:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.),
                      model = "linear")
@@ -126,7 +126,7 @@ called A-matrix (a component model matrix) which maps SPDE values at the mesh
 vertices to values at the data locations. For this purpose, the input can be
 set to \code{coordinates}, which is the \code{sp} package function that extracts point
 coordinates from the \code{SpatialPointsDataFrame} that was provided as input to
-\code{\link[=like]{like()}}. The code for this would look as follows:
+\code{\link[=bru_obs]{bru_obs()}}. The code for this would look as follows:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ field(coordinates, model = inla.spde2.matern(...))
 }\if{html}{\out{</div>}}
@@ -146,7 +146,7 @@ to be built on a different CRS than the observation data.
 }
 
 \seealso{
-\code{\link[=component]{component()}}
+\code{\link[=bru_component]{bru_component()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren

@@ -14,12 +14,12 @@
 #' `method` vignette.
 #'
 #' The main function for inference using inlabru is [bru()].
-#' The general model specification details is documented in [component()] and
-#' [like()].
+#' The general model specification details is documented in [bru_component()]
+#' and [bru_obs()].
 #' Posterior quantities beyond the basic summaries can be calculated with
 #' a `predict()` method, documented in [predict.bru()].
 #' For point process inference [lgcp()] can be used as a shortcut to
-#' `bru(..., like(model="cp", ...))`.
+#' `bru(..., bru_obs(model="cp", ...))`.
 #'
 #' The package comes with multiple real world data sets, namely [gorillas],
 #' [gorillas_sf], [mexdolphin_sf]. Plotting these data

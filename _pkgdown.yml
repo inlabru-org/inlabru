@@ -103,13 +103,14 @@ reference:
   contents:
   - matches("^inlabru-package$")
   - matches("^bru$")
+  - matches("^bru_like$")
   - matches("^bru_rerun$")
   - matches("^bru_options$")
-  - starts_with("component")
-  - starts_with("like")
+  - starts_with("bru_component")
   - starts_with("lgcp")
   - starts_with("bru_response_size")
   - starts_with("bru_index")
+  - starts_with("like")
 - title: "Posterior evaluation"
   desc: "Functions for evaluating posterior properties."
   contents:

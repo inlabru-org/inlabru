@@ -7,7 +7,7 @@ test_that("Response and predictor mismatch handling", {
   cmpA <- ~ -1 + beta(1, model = "linear")
   cmpB <- ~ -1 + beta(rep(1, NROW(.data.)), model = "linear")
 
-  lik1 <- like("poisson",
+  lik1 <- bru_obs("poisson",
     formula = Y ~ .,
     data = df
   )
@@ -26,7 +26,7 @@ test_that("Response and predictor mismatch handling", {
     NA
   )
 
-  lik2 <- like("poisson",
+  lik2 <- bru_obs("poisson",
     formula = Y ~ beta,
     data = df
   )
@@ -44,7 +44,7 @@ test_that("Response and predictor mismatch handling", {
     NA
   )
 
-  lik3 <- like("poisson",
+  lik3 <- bru_obs("poisson",
     formula = Y ~ c(beta, beta),
     data = df
   )

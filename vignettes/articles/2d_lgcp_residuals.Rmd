@@ -365,7 +365,7 @@ This model is also taken from
 https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html .
 The model is defined such that the gorilla nests have a constant effect. 
 
-The code chunk below shows how the model is defined by `like()` and also 
+The code chunk below shows how the model is defined by `bru_obs()` and also 
 displays the model in the form of a plot. The residuals of the model are also 
 computed where $B = W$.
 
@@ -373,7 +373,7 @@ computed where $B = W$.
 # Define the Intercept model. Need to explicitly extend it to match the
 # data size to use it in spatial predictions.
 comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
-lik3 <- like(
+lik3 <- bru_obs(
   coordinates ~ .,
   data = nests,
   samplers = boundary,

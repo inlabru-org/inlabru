@@ -35,8 +35,8 @@ if (bru_safe_inla() &&
 
   # A joint model has two likelihoods, which are set up using the like function
 
-  lik1 <- like("gaussian", formula = y ~ x + Intercept, data = df1)
-  lik2 <- like("poisson", formula = y ~ x + z + Intercept, data = df2)
+  lik1 <- bru_obs("gaussian", formula = y ~ x + Intercept, data = df1)
+  lik2 <- bru_obs("poisson", formula = y ~ x + z + Intercept, data = df2)
 
   # The union of effects of both models gives the components needed to run bru
 

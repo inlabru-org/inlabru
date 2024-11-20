@@ -126,7 +126,7 @@ comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
 
 fit_poi <- bru(
   comps,
-  like(
+  bru_obs(
     family = "poisson", data = counts_df,
     formula = count ~
       veg_disturbed + veg_grassland +
@@ -201,7 +201,7 @@ $$
 ```{r fig-pred-zip, fig.cap="Predictions from zero-inflated model",fig.width=7, fig.height=5, out.width="80%", fig.align='center'}
 fit_zip <- bru(
   comps,
-  like(
+  bru_obs(
     family = "zeroinflatedpoisson1", data = counts_df,
     formula = count ~
       veg_disturbed + veg_grassland +
@@ -319,7 +319,7 @@ comps <- ~
 
 truncated_poisson_like <-
   if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
-    like(
+    bru_obs(
       family = "zeroinflatedpoisson0",
       data = counts_df[counts_df$present > 0, ],
       formula = count ~ elevation + field_count + Intercept_count,
@@ -329,7 +329,7 @@ truncated_poisson_like <-
       )))
     )
   } else {
-    like(
+    bru_obs(
       family = "nzpoisson",
       data = counts_df[counts_df$present > 0, ],
       formula = count ~ elevation + field_count + Intercept_count,
@@ -337,7 +337,7 @@ truncated_poisson_like <-
     )
   }
 
-present_like <- like(
+present_like <- bru_obs(
   family = "binomial",
   data = counts_df,
   formula = present ~ # vegetation +

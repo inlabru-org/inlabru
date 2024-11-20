@@ -15,9 +15,9 @@ if (bru_safe_inla()) {
 
 
 if (bru_safe_inla()) {
-  # Alternatively, we can use the like() function to construct the likelihood:
+  # Alternatively, we can use the bru_obs() function to construct the likelihood:
 
-  lik <- like(family = "gaussian",
+  lik <- bru_obs(family = "gaussian",
               formula = y ~ x + Intercept,
               data = input.df)
   fit <- bru(~ x + Intercept(1), lik)
@@ -25,7 +25,7 @@ if (bru_safe_inla()) {
 }
 
 # An important addition to the INLA methodology is bru's ability to use
-# non-linear predictors. Such a predictor can be formulated via like()'s
+# non-linear predictors. Such a predictor can be formulated via bru_obs()'s
 # \code{formula} parameter. The z(1) notation is needed to ensure that
 # the z component should be interpreted as single latent variable and not
 # a covariate:
@@ -35,7 +35,7 @@ if (bru_safe_inla()) {
   input.df <- within(input.df, {
     y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1)
   })
-  lik <- like(
+  lik <- bru_obs(
     family = "gaussian", data = input.df,
     formula = y ~ exp(z) * x + Intercept
   )

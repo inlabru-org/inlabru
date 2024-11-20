@@ -9,7 +9,7 @@ iinla(model, lhoods, initial = NULL, options)
 \arguments{
 \item{model}{A \link{bru_model} object}
 
-\item{lhoods}{A list of likelihood objects from \code{\link[=like]{like()}}}
+\item{lhoods}{A list of likelihood objects from \code{\link[=bru_obs]{bru_obs()}}}
 
 \item{initial}{A previous \code{bru} result or a list of named latent variable
 initial states (missing elements are set to zero), to be used as starting

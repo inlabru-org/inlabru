@@ -55,6 +55,6 @@ several states of the latent variables and hyperparameters.
 \details{
 For each component, e.g. "name", the state values are available as
 \code{name_latent}, and arbitrary evaluation can be done with \code{name_eval(...)},
-see \code{\link[=component_eval]{component_eval()}}.
+see \code{\link[=bru_component_eval]{bru_component_eval()}}.
 }
 \keyword{internal}

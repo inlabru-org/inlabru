@@ -177,7 +177,7 @@ For models that only adds the model components, we don't need to specify the
 full predictor formula. Instead, we can provide the name of the output to the
 left of the `~` in the component specification, and "." on the right hand side,
 which will cause it to add all components (unless a subset is selected via the
-`include`/`exclude` arguments to `like()`).
+`include`/`exclude` arguments to `bru_obs()`).
 
 ```{r }
 the_spde <- inla.spde2.pcmatern(mesh1D,
@@ -189,7 +189,7 @@ comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1 / 2^2)
 
 fit2.bru <- bru(
   comp,
-  like(count ~ .,
+  bru_obs(count ~ .,
     data = cd,
     family = "poisson",
     E = exposure

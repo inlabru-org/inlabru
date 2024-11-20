@@ -22,7 +22,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 
   fit <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form,
       family = "cp",
       data = pts,
@@ -61,7 +61,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 
   fit_list <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form_list,
       family = "cp",
       data = pts,
@@ -177,7 +177,7 @@ test_that("Marginal parameter transformation", {
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- component_list(~
+  cmp <- bru_component_list(~
     sigma(
       1,
       prec.linear = 1,
@@ -194,7 +194,7 @@ test_that("Marginal parameter transformation", {
 
   fit <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form,
       family = "cp",
       data = pts,

@@ -122,7 +122,7 @@ cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
   cmp,
-  like(
+  bru_obs(
     formula = geometry ~ .,
     family = "cp",
     data = gorillas_sf$nests,

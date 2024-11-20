@@ -20,7 +20,7 @@ test_that("Aggregated Gaussian observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       z ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -56,7 +56,7 @@ test_that("Aggregated Gaussian observations", {
 
   fit_sf <- bru(
     comp_sf,
-    like(
+    bru_obs(
       z ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -99,7 +99,7 @@ test_that("Aggregated Poisson observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       y ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -127,7 +127,7 @@ test_that("Aggregated Poisson observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       y ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),

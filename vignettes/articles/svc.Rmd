@@ -432,7 +432,7 @@ Rue (2021) and Van Niekerk et. al. (2022).
 ```{r run, eval=TRUE}
 res <- bru(
   svc_components,
-  like(
+  bru_obs(
     formula = svc_formula,
     family = "nbinomial",
     data = count_dat

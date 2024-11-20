@@ -534,11 +534,11 @@ test_that("Collect mapper, automatic construction", {
     )
   # fm_mesh_1d mapper
 
-  lik <- like(formula = y ~ ., data = data)
+  lik <- bru_obs(formula = y ~ ., data = data)
 
   # These tests do not trigger INLA:inla.mesh.1d usage:
-  cmp1 <- component_list(cmp1, lhoods = bru_like_list(list(lik)))
-  cmp2 <- component_list(cmp2, lhoods = bru_like_list(list(lik)))
+  cmp1 <- bru_component_list(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- bru_component_list(cmp2, lhoods = bru_like_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
     expect_identical(

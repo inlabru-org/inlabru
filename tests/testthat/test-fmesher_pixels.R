@@ -26,7 +26,7 @@ test_that("fm_pixels sp vs sf", {
           prior.sigma = c(1, 0.01)
         )
       ),
-    like(
+    bru_obs(
       y ~ .,
       family = "gaussian",
       data = mydata

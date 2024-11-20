@@ -19,17 +19,17 @@ test_that("bru: inla copy feature", {
         )
       ) +
       myLin2(x, copy = "myLin1", fixed = FALSE)
-  cmps <- component_list(cmp)
+  cmps <- bru_component_list(cmp)
 
   fit <- bru(
     cmp,
-    like(
+    bru_obs(
       y ~ Intercept + exp(myLin1),
       family = "gaussian",
       data = df1,
       exclude = "myLin2"
     ),
-    like(
+    bru_obs(
       y ~ Intercept + (myLin2),
       family = "gaussian",
       data = df2,
@@ -88,13 +88,13 @@ test_that("bru: inla copy feature", {
 #     ) +
 #         myLin2(x, copy = "myLin1", fixed = FALSE, initial = 1)
 # #    myLin2(1)
-#   cmps <- component_list(cmp)
+#   cmps <- bru_component_list(cmp)
 #
 #   fit <- bru(
 #     cmp,
-#     like(y ~ I1 + myLin1, family = "gaussian", data = df1),
-# #    like(y ~ I2 + myLin2*myLin1, family = "poisson", data = df2),
-#     like(y ~ I2 + myLin2, family = "poisson", data = df2),
+#     bru_obs(y ~ I1 + myLin1, family = "gaussian", data = df1),
+# #    bru_obs(y ~ I2 + myLin2*myLin1, family = "poisson", data = df2),
+#     bru_obs(y ~ I2 + myLin2, family = "poisson", data = df2),
 #     options = list(control.inla = list(int.strategy = "eb"),
 #                    bru_initial = list(myLin2 = 1, myLin1 = rnorm(100)))
 #   )

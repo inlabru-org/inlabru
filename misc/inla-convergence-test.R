@@ -37,7 +37,7 @@ fit <- bru(
   components = ~
     Intercept(1) +
       X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
-  like(
+  bru_obs(
     formula = y ~ Intercept + X,
     family = "gaussian",
     data = df
@@ -100,7 +100,7 @@ fit2 <- bru(
   components = ~
     Intercept(1) +
       X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
-  like(
+  bru_obs(
     formula = y ~ exp(Intercept) + X,
     family = "gaussian",
     data = df
@@ -121,7 +121,7 @@ fit3c <- bru(
         model = "rw2", constr = TRUE, scale.model = TRUE,
         hyper = list(prec = list(prior = "pc.prec", param = c(0.1, 0.01)))
       ),
-  like(
+  bru_obs(
     formula = y ~ Intercept + exp(X),
     family = "gaussian",
     data = df,

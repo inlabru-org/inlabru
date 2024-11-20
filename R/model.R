@@ -78,7 +78,7 @@ bru_model <- function(components, lhoods) {
   # TODO: detect pure effect additivity (allowing nonlinear components)
 
   # Complete the used component definitions based on data
-  components <- component_list(components[included], lhoods)
+  components <- bru_component_list(components[included], lhoods)
 
   for (cmp in included) {
     if (linear ||
@@ -423,7 +423,7 @@ evaluate_effect_multi_state.component_list <- function(components,
 #' vectors of length `n_pred`.
 #' @details For each component, e.g. "name", the state values are available as
 #'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
-#'   see [component_eval()].
+#'   see [bru_component_eval()].
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -681,14 +681,14 @@ evaluate_predictor <- function(model,
 #'   )
 #' }
 #' }
-component_eval <- function(main,
+bru_component_eval <- function(main,
                            group = NULL,
                            replicate = NULL,
                            weights = NULL,
                            .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",
-    "'component_eval(...)'.  See ?component_eval for more information."
+    "'bru_component_eval(...)'.  See ?bru_component_eval for more information."
   ))
 }
 

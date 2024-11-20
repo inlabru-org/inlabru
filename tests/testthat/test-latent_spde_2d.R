@@ -28,7 +28,7 @@ test_that("Georeferenced data with sp", {
   # Check that mistaken empty or unnamed arguments are detected
   cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern, )
   expect_error(
-    component_list(cmp),
+    bru_component_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
   )
 

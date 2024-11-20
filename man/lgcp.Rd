@@ -19,7 +19,7 @@ lgcp(
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\code{\link[=component]{component()}} for details.}
+\code{\link[=bru_component]{bru_component()}} for details.}
 
 \item{data}{Likelihood-specific data, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]}
@@ -37,7 +37,7 @@ overrides \code{domain} and \code{samplers}.}
 \item{formula}{a \code{formula} where the right hand side is a general R
 expression defines the predictor used in the model.}
 
-\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular, optional
+\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}. In particular, optional
 \code{E}, a single numeric used rescale all integration weights by a fixed
 factor.}
 

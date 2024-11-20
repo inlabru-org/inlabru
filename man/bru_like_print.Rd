@@ -36,11 +36,11 @@ definition information. Default: \code{TRUE}}
 Summary and print methods for observation models
 }
 \examples{
-obs <- like(y ~ ., data = data.frame(y = rnorm(10)))
+obs <- bru_obs(y ~ ., data = data.frame(y = rnorm(10)))
 summary(obs)
 print(obs)
 
 }
 \seealso{
-\code{\link[=like]{like()}}
+\code{\link[=bru_obs]{bru_obs()}}
 }

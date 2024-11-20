@@ -83,7 +83,7 @@ test_that("mdata", {
       model = "fixed",
       hyper = list(prec = list(initial = 0, fixed = TRUE))
     ),
-    like(
+    bru_obs(
       INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x * z)) ~ .,
       family = "0poisson",
       data = data.frame(y, E, x, z, xx, zz),
@@ -242,7 +242,7 @@ test_that("surv", {
 
   r2_bru <- bru(
     ~ 0 + Intercept(Intercept, prec.linear = 0) + xx(xx),
-    like(
+    bru_obs(
       INLA::inla.surv(time, event) ~ .,
       family = "exponentialsurv",
       data = rbind(
@@ -250,7 +250,7 @@ test_that("surv", {
         data.frame(time = NA, event = df$event, xx = df$xx, Intercept = 1)
       )
     ),
-    like(
+    bru_obs(
       INLA::inla.surv(time, event) ~ .,
       family = "weibullsurv",
       data = df,

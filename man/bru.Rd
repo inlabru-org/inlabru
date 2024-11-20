@@ -15,15 +15,14 @@ bru_rerun(result, options = list())
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\code{\link[=component]{component()}} for details.}
+\code{\link[=bru_component]{bru_component()}} for details.}
 
-\item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
-parameters that can be passed to a single \code{\link[=like]{like()}} call. Note that
-all the arguments will be evaluated before calling \code{\link[=like]{like()}} in order
-to detect if they are \code{like} objects. This means that
-special arguments that need to be evaluated in the context of
-\code{response_data} or \code{data} (such as \code{Ntrials}) may will only work that
-way in direct calls to \code{\link[=like]{like()}}.}
+\item{...}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
+named parameters that can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. Note that
+all the arguments will be evaluated before calling \code{\link[=bru_obs]{bru_obs()}} in order to
+detect if they are \code{like} objects. This means that special arguments that
+need to be evaluated in the context of \code{response_data} or \code{data} (such as
+\code{Ntrials}) may will only work that way in direct calls to \code{\link[=bru_obs]{bru_obs()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
@@ -92,9 +91,9 @@ if (bru_safe_inla()) {
 
 
 if (bru_safe_inla()) {
-  # Alternatively, we can use the like() function to construct the likelihood:
+  # Alternatively, we can use the bru_obs() function to construct the likelihood:
 
-  lik <- like(family = "gaussian",
+  lik <- bru_obs(family = "gaussian",
               formula = y ~ x + Intercept,
               data = input.df)
   fit <- bru(~ x + Intercept(1), lik)
@@ -102,7 +101,7 @@ if (bru_safe_inla()) {
 }
 
 # An important addition to the INLA methodology is bru's ability to use
-# non-linear predictors. Such a predictor can be formulated via like()'s
+# non-linear predictors. Such a predictor can be formulated via bru_obs()'s
 # \code{formula} parameter. The z(1) notation is needed to ensure that
 # the z component should be interpreted as single latent variable and not
 # a covariate:
@@ -112,7 +111,7 @@ if (bru_safe_inla()) {
   input.df <- within(input.df, {
     y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1)
   })
-  lik <- like(
+  lik <- bru_obs(
     family = "gaussian", data = input.df,
     formula = y ~ exp(z) * x + Intercept
   )

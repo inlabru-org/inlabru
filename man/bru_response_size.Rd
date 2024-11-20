@@ -44,7 +44,7 @@ Extract the number of response values from \code{bru} and related objects.
 }}
 \examples{
 bru_response_size(
-  like(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian")
+  bru_obs(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian")
 )
 }
 \seealso{

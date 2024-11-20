@@ -85,7 +85,7 @@ cmp <- ~
 
 Given these components we define the linear predictor for each of the likelihoods.
 (Using "." indicates a pure additive model, and one can use include/exclude
-options for `like()` to indicate which components are actively involved in each model.)
+options for `bru_obs()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 fml.major <- geometry ~ Intercept + Common + Difference / 2
 fml.minor <- geometry ~ Intercept + Common - Difference / 2
@@ -93,13 +93,13 @@ fml.minor <- geometry ~ Intercept + Common - Difference / 2
 
 Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-lik_minor <- like("cp",
+lik_minor <- bru_obs("cp",
   formula = fml.major,
   data = gorillas_sf$nests[gorillas_sf$nests$group == "major", ],
   samplers = gorillas_sf$boundary,
   domain = list(geometry = gorillas_sf$mesh)
 )
-lik_major <- like("cp",
+lik_major <- bru_obs("cp",
   formula = fml.minor,
   data = gorillas_sf$nests[gorillas_sf$nests$group == "minor", ],
   samplers = gorillas_sf$boundary,
@@ -184,7 +184,7 @@ fml.joint <-
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 gorillas_sf$nests$group_major <- gorillas_sf$nests$group == "major"
-lik_joint <- like("cp",
+lik_joint <- bru_obs("cp",
   formula = fml.joint,
   data = gorillas_sf$nests,
   samplers = gorillas_sf$boundary,

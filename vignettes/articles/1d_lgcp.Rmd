@@ -85,7 +85,7 @@ comp <- ~ spde1D(x, model = matern) + Intercept(1)
 ```
 
 Here we want to fit to the actual points, and the `inlabru` functions that are
-used for this are `bru()` and `like(..., family = "cp")`.
+used for this are `bru()` and `bru_obs(..., family = "cp")`.
 For this special case there is also a shortcut function `lgcp()` (for 'Log Gaussian Cox Process'),
 but it doesn't support all features. The standard way of specifying
 the function space for integration is via the `domain` argument.
@@ -93,7 +93,7 @@ the function space for integration is via the `domain` argument.
 ```{r results="hide",warning=FALSE,message=FALSE}
 fit.spde <- bru(
   comp,
-  like(x ~ ., family = "cp", data = pts2, domain = list(x = mesh1D))
+  bru_obs(x ~ ., family = "cp", data = pts2, domain = list(x = mesh1D))
 )
 ## Equivalent call for this particular example:
 # fit.spde <- lgcp(
