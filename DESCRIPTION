@@ -118,6 +118,7 @@ Collate:
     'deprecated.R'
     'effect.R'
     'environment.R'
+    'fmesher.R'
     'ggplot.R'
     'inla.R'
     'inlabru-package.R'
