@@ -83,8 +83,8 @@ is defined by user but has to be accessible within the work space when
 setting up the components. The third example provides the function
 \code{myOtherSquareFun}. In this case, inlabru will call the function as
 \code{myOtherSquareFun(.data.)}, where \code{.data.} is the data provided via the
-\code{\link[=bru_obs]{bru_obs()}} \code{data} parameter. The function needs to know what parts of the data
-to use to construct the needed output. For example,
+\code{\link[=bru_obs]{bru_obs()}} \code{data} parameter. The function needs to know what parts of the
+data to use to construct the needed output. For example,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{myOtherSquareFun <- function(data) \{
   data[ ,"x"]^2

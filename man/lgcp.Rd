@@ -37,9 +37,9 @@ overrides \code{domain} and \code{samplers}.}
 \item{formula}{a \code{formula} where the right hand side is a general R
 expression defines the predictor used in the model.}
 
-\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}. In particular, optional
-\code{E}, a single numeric used rescale all integration weights by a fixed
-factor.}
+\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}. In particular,
+optional \code{E}, a single numeric used rescale all integration weights by a
+fixed factor.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}

@@ -24,9 +24,9 @@ observed part (response is not \code{NA}). If "missing", gives the index vector
 for the missing part (response is \code{NA}) of the model.}
 
 \item{tag}{\code{character} or \code{integer}; Either a character vector identifying
-the tags of one or more of the \code{\link[=bru_obs]{bru_obs()}} observation models, or an integer
-vector identifying models by their \code{\link[=bru]{bru()}} specification order. If \code{NULL}
-(default) computes indices for all sub-models.}
+the tags of one or more of the \code{\link[=bru_obs]{bru_obs()}} observation models, or an
+integer vector identifying models by their \code{\link[=bru]{bru()}} specification order. If
+\code{NULL} (default) computes indices for all sub-models.}
 }
 \value{
 An \code{integer} vector.
@@ -38,13 +38,13 @@ or the whole or a subset of a full \code{\link[=bru]{bru()}} predictor.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_index(bru_like)}: Extract the index vector for the predictor vector
-for a \code{\link[=bru_obs]{bru_obs()}} sub-model. The indices are relative to the sub-model, and need
+\item \code{bru_index(bru_like)}: Extract the index vector for the predictor vector for a
+\code{\link[=bru_obs]{bru_obs()}} sub-model. The indices are relative to the sub-model, and need
 to be appropriately offset to be used in the full model predictor.
 
 \item \code{bru_index(bru)}: Extract the index vector for "APredictor" for one or
-more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination of
-\code{tag} and \code{what}.
+more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination
+of \code{tag} and \code{what}.
 
 }}
 \examples{

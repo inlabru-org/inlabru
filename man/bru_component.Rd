@@ -154,8 +154,8 @@ effect \eqn{\psi = \beta * x } as \code{x}.
 Hence, it is not clear when \code{x} refers to the covariate
 or the effect of the covariate.
 
-The \code{bru_component.character} method is inlabru's equivalent to INLA's
-\code{f} function but adds functionality that is unique to inlabru.
+The \code{bru_component.character} method is inlabru's equivalent to
+\code{INLA}'s \code{f()} function but adds functionality that is unique to inlabru.
 
 Deprecated parameters:
 \itemize{

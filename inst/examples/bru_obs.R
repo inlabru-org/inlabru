@@ -2,9 +2,10 @@
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE)) {
 
-  # The like function's main purpose is to set up models with multiple likelihoods.
-  # The following example generates some random covariates which are observed through
-  # two different random effect models with different likelihoods
+  # The like function's main purpose is to set up models with multiple
+  # likelihoods.
+  # The following example generates some random covariates which are observed
+  # through two different random effect models with different likelihoods
 
   # Generate the data
 
@@ -33,7 +34,8 @@ if (bru_safe_inla() &&
   fit2 <- bru(cmp2, family = "poisson", data = df2)
   summary(fit2)
 
-  # A joint model has two likelihoods, which are set up using the like function
+  # A joint model has two likelihoods, which are set up using the bru_obs
+  # function
 
   lik1 <- bru_obs("gaussian", formula = y ~ x + Intercept, data = df1)
   lik2 <- bru_obs("poisson", formula = y ~ x + z + Intercept, data = df2)
