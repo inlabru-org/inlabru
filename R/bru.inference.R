@@ -2132,14 +2132,14 @@ predict.bru <- function(object,
         "predict(data)",
         "predict(newdata)",
         details =
-          "`data` provided but not `newdata`."
+          "Only `data` provided and not `newdata`. Use `newdata` only."
       )
     } else {
       lifecycle::deprecate_stop(
         "2.8.0",
         "predict(data)",
         "predict(newdata)",
-        details = "Both `newdata` and `data` provided."
+        details = "Both `newdata` and `data` provided. Use `newdata` only."
       )
     }
   }
@@ -2151,7 +2151,7 @@ predict.bru <- function(object,
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_stop(
       "2.8.0",
-      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
+      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
       details = paste0(
         "Use 'newdata = fm_vertices(mesh, format = ...)' ",
         "instead of 'newdata = mesh'"
@@ -2330,14 +2330,14 @@ generate.bru <- function(object,
         "generate(data)",
         "generate(newdata)",
         details =
-          "Both `data` provided but not `newdata`."
+          "Only `data` provided and not `newdata`. Use `newdata` only."
       )
     } else {
       lifecycle::deprecate_stop(
         "2.8.0",
         "generate(data)",
         "generate(newdata)",
-        details = "Both `newdata` and `data` provided."
+        details = "Both `newdata` and `data` provided. Use `newdata` only."
       )
     }
   }
@@ -2349,7 +2349,7 @@ generate.bru <- function(object,
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_stop(
       "2.8.0",
-      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
+      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
       details = paste0(
         "Use 'newdata = fm_vertices(mesh, format = ...)' ",
         "instead of 'newdata = mesh'"
