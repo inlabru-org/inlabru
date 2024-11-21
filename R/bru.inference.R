@@ -1590,6 +1590,18 @@ bru_like_list <- function(...) {
   UseMethod("bru_like_list")
 }
 
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like_list()`
+#'   alias. Use [bru_like_list()] instead.
+#' @export
+like_list <- function(...) {
+  # lifecycle::deprecate_soft(
+  #   "2.12.0",
+  #   "like_list()",
+  #   "bru_like_list()"
+  # )
+  UseMethod("bru_like_list")
+}
+
 #' @describeIn bru_obs
 #' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
