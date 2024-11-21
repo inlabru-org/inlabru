@@ -3,7 +3,7 @@
 \name{gg.fm_mesh_2d}
 \alias{gg.fm_mesh_2d}
 \alias{gg.inla.mesh}
-\title{Geom for inla.mesh objects}
+\title{Geom for fm_mesh_2d objects}
 \usage{
 \method{gg}{fm_mesh_2d}(
   data,
@@ -50,7 +50,8 @@
 The length of the vector mus correspond to the number of mesh vertices.
 The alternative name \code{colour} is also recognised.}
 
-\item{alpha}{A vector of scalar values setting the alpha value of the colors provided.}
+\item{alpha}{A vector of scalar values setting the alpha value of the colors
+provided.}
 
 \item{edge.color}{Color of the regular mesh edges.}
 
@@ -60,7 +61,8 @@ The alternative name \code{colour} is also recognised.}
 
 \item{int.color}{Color used to plot the interior constraint edges.}
 
-\item{int.linewidth}{Line width for the interior constraint edges. Default 0.5}
+\item{int.linewidth}{Line width for the interior constraint edges. Default
+0.5}
 
 \item{exterior}{If TRUE, plot the exterior boundaries of the mesh.}
 
@@ -68,14 +70,17 @@ The alternative name \code{colour} is also recognised.}
 
 \item{ext.linewidth}{Line width for the exterior boundary edges. Default 1}
 
-\item{crs}{A CRS object supported by \code{\link[=fm_transform]{fm_transform()}} defining the coordinate
-system to project the mesh to before plotting.}
+\item{crs}{A CRS object supported by \code{\link[fmesher:fm_transform]{fmesher::fm_transform()}} defining the
+coordinate system to project the mesh to before plotting.}
 
-\item{mask}{A SpatialPolygon defining the region that is plotted.}
+\item{mask}{A \code{SpatialPolygon} or \code{sf} polygon defining the region that is
+plotted.}
 
-\item{nx}{Number of pixels in x direction (when plotting using the color parameter).}
+\item{nx}{Number of pixels in x direction (when plotting using the color
+parameter).}
 
-\item{ny}{Number of pixels in y direction (when plotting using the color parameter).}
+\item{ny}{Number of pixels in y direction (when plotting using the color
+parameter).}
 
 \item{...}{ignored arguments (S3 generic compatibility).}
 }
@@ -84,11 +89,14 @@ system to project the mesh to before plotting.}
 values of \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}.
 }
 \description{
-This function extracts the graph of an inla.mesh object and uses \code{geom_line} to visualize
-the graph's edges. Alternatively, if the \code{color} argument is provided, interpolates the colors
-across for a set of SpatialPixels covering the mesh area and calls \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}
+This function extracts the graph of an \link[fmesher:fm_mesh_2d]{fmesher::fm_mesh_2d} object and uses
+\code{geom_line} to visualize the graph's edges. Alternatively, if the \code{color}
+argument is provided, interpolates the colors across for a set of
+SpatialPixels covering the mesh area and calls \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}
 to plot the interpolation.
 Requires the \code{ggplot2} package.
+
+Also see the \code{\link[fmesher:geom_fm]{fmesher::geom_fm()}} method.
 }
 \section{Functions}{
 \itemize{
@@ -102,7 +110,7 @@ if (require(fmesher, quietly = TRUE) &&
     require(ggplot2, quietly = TRUE)) {
 
   # Load Gorilla data
-  data("gorillas", package = "inlabru")
+  gorillas <- inlabru::gorillas_sf
 
   # Plot mesh using default edge colors
 
@@ -129,14 +137,13 @@ if (require(fmesher, quietly = TRUE) &&
   xcoord <- gorillas$mesh$loc[, 1]
   ggplot() +
     gg(gorillas$mesh, color = (xcoord - 580), mask = gorillas$boundary) +
-    gg(gorillas$boundary)
+    gg(gorillas$boundary, alpha = 0)
 }
 }
 }
 \seealso{
 Other geomes for meshes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_1d}()},
-\code{\link{gm}()}
+\code{\link{gg.fm_mesh_1d}()}
 }
 \concept{geomes for meshes}

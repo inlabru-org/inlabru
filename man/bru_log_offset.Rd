@@ -23,7 +23,8 @@ shift (forwards or backwards) to the bookmark list.}
 the sequence between bookmark \code{i} and the next bookmark (or the end of the
 log if \code{i} is the last bookmark)}
 
-\item{verbosity}{integer value for limiting the highest verbosity level being returned.}
+\item{verbosity}{integer value for limiting the highest verbosity level being
+returned.}
 }
 \description{
 Position methods for \code{bru_log} objects.

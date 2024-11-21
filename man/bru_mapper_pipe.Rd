@@ -66,11 +66,13 @@ a list of inputs, one for each mapper.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls \code{\link[=ibm_linear]{ibm_linear()}}.
-For partially non-linear pipes, replaces each sequence of linear mappers with a single
-\code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of original mapper
-names, allowing the original \code{input} structure to be used also with the simplified
-mappers, since the \code{taylor} mappers are not dependent on inputs.
+\item \code{ibm_simplify(bru_mapper_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls
+\code{\link[=ibm_linear]{ibm_linear()}}.
+For partially non-linear pipes, replaces each sequence of linear mappers with
+a single \code{\link[=bru_mapper_taylor]{bru_mapper_taylor()}} mapper, while keeping the full list of
+original mapper names, allowing the original \code{input} structure to be used
+also with the simplified mappers, since the \code{taylor} mappers are not
+dependent on inputs.
 
 }}
 \examples{
@@ -93,6 +95,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -102,6 +105,7 @@ Other mappers:
 \code{\link{bru_mapper_matrix}()},
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

@@ -20,9 +20,11 @@ shift (forwards or backwards) to the bookmark list.}
 \item{x}{A \code{bru_log} object. If \code{NULL}, the global \code{inlabru} log is used.}
 }
 \value{
-\code{bru_log_bookmark()}: Returns the modified \code{bru_log} object if \code{x} is non-NULL.
+\code{bru_log_bookmark()}: Returns the modified \code{bru_log} object if \code{x}
+is non-NULL.
 
-\code{bru_log_bookmarks()}: Returns the bookmark vector associated with \code{x}
+\code{bru_log_bookmarks()}: Returns the bookmark vector associated with
+\code{x}
 }
 \description{
 Methods for \code{bru_log} bookmarks.
@@ -32,9 +34,9 @@ Methods for \code{bru_log} bookmarks.
 \item \code{bru_log_bookmark()}: Set a log bookmark. If \code{offset} is \code{NULL} (the default),
 the bookmark will point to the current end of the log.
 
-\item \code{bru_log_bookmarks()}: Return a integer vector with named elements being
-bookmarks into the global \code{inlabru} log with associated log
-position offsets.
+\item \code{bru_log_bookmarks()}: Return a integer vector with named elements
+being bookmarks into the global \code{inlabru} log with associated log position
+offsets.
 
 }}
 \seealso{

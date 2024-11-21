@@ -1,6 +1,7 @@
 test_that("fm_pixels sp vs sf", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
   skip_if_not_installed("sn")
 
   mesh <- fm_mesh_2d_inla(cbind(0, 0),
@@ -25,7 +26,7 @@ test_that("fm_pixels sp vs sf", {
           prior.sigma = c(1, 0.01)
         )
       ),
-    like(
+    bru_obs(
       y ~ .,
       family = "gaussian",
       data = mydata

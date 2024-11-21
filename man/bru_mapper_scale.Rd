@@ -43,10 +43,12 @@ If \code{mapper} is non-null, the \code{bru_mapper_scale()} constructor
 returns
 \code{bru_mapper_pipe(list(mapper = mapper, scale = bru_mapper_scale()))}
 }
-\details{
-For \code{bru_mapper_scale}, \code{input} NULL values
+\section{Methods (by generic)}{
+\itemize{
+\item \code{ibm_jacobian(bru_mapper_scale)}: \code{input} NULL values
 are interpreted as no scaling.
-}
+
+}}
 \examples{
 m <- bru_mapper_scale()
 ibm_eval2(m, c(1, 2, 1, 2), 1:4)
@@ -64,6 +66,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -74,6 +77,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}
 }

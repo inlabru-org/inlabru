@@ -44,7 +44,10 @@ test_that("Latent models: RW2 mapping, data is list with different I/O sizes", {
     constr = FALSE, scale.model = TRUE
   ) - Intercept
   formula <- obs ~ rep(time, times = 4)
-  fit1 <- bru(cmp1, formula = formula, data = data1, family = "gaussian")
+  fit1 <- bru(cmp1,
+    formula = formula, data = data1, family = "gaussian",
+    allow_combine = TRUE
+  )
 
   expect_equal(
     fit1$summary.random$time$mean,

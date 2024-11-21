@@ -7,8 +7,8 @@
 lgcp(
   components,
   data,
-  samplers = NULL,
   domain = NULL,
+  samplers = NULL,
   ips = NULL,
   formula = . ~ .,
   ...,
@@ -17,32 +17,36 @@ lgcp(
 )
 }
 \arguments{
-\item{components}{A formula describing the latent components}
+\item{components}{A \code{formula}-like specification of latent components.
+Also used to define a default linear additive predictor.  See
+\code{\link[=bru_component]{bru_component()}} for details.}
 
-\item{data}{A data frame or \code{SpatialPoints(DataFrame)} object}
+\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\code{SpatialPoints[DataFrame]}
+object.}
 
-\item{samplers}{A data frame or \verb{Spatial[Points/Lines/Polygons]DataFrame}
-objects}
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\describe{
+\item{\code{domain}}{Named list of domain definitions.}
+\item{\code{samplers}}{Integration subdomain for 'cp' family.}
+\item{\code{ips}}{Integration points for 'cp' family. Defaults
+to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}.}
+}}
 
-\item{domain}{Named list of domain definitions}
+\item{formula}{a \code{formula} where the right hand side is a general R
+expression defines the predictor used in the model.}
 
-\item{ips}{Integration points (overrides \code{samplers})}
+\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}. In particular,
+optional \code{E}, a single numeric used rescale all integration weights by a
+fixed factor.}
 
-\item{formula}{If NULL, the linear combination implied by the \code{components} is
-used as a predictor for the point location intensity. If a (possibly
-non-linear) expression is provided the respective Taylor approximation is
-used as a predictor. Multiple runs of INLA are then required for a better
-approximation of the posterior.}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 
-\item{\dots}{Further arguments passed on to \code{\link[=like]{like()}}. In particular,
-optional \code{E}, a single numeric used rescale all integration weights by a fixed
-factor.}
-
-\item{options}{See \code{\link[=bru_options_set]{bru_options_set()}}}
-
-\item{.envir}{The evaluation environment to use for special arguments
-(\code{E}, \code{Ntrials}, \code{weights}, \code{scale}) if not found in response_data or data.
-Defaults to the calling environment.}
+\item{.envir}{The evaluation environment to use for special arguments (\code{E},
+\code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
+\code{data}. Defaults to the calling environment.}
 }
 \value{
 An \code{\link[=bru]{bru()}} object
@@ -70,7 +74,8 @@ assumed that all of the LGCP's dimensions have been observed completely.
 \donttest{
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
-  require(fmesher, quietly = TRUE)) {
+  require(fmesher, quietly = TRUE) &&
+  require(sn, quietly = TRUE)) {
   # Load the Gorilla data
   data <- gorillas_sf
 

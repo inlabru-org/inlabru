@@ -5,6 +5,7 @@
 \alias{summary.bru_mapper_multi}
 \alias{summary.bru_mapper_pipe}
 \alias{summary.bru_mapper_collect}
+\alias{summary.bru_mapper_repeat}
 \alias{print.summary_bru_mapper}
 \alias{print.bru_mapper}
 \title{mapper object summaries}
@@ -16,6 +17,8 @@
 \method{summary}{bru_mapper_pipe}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{summary}{bru_mapper_collect}(object, ..., prefix = "", initial = prefix, depth = 1)
+
+\method{summary}{bru_mapper_repeat}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{print}{summary_bru_mapper}(x, ...)
 
@@ -30,8 +33,8 @@
 
 \item{initial}{character prefix for the first line. Default \code{initial=prefix}.}
 
-\item{depth}{The recursion depth for multi/collection/pipe mappers.
-Default 1, to only show the collection, and not the contents of the sub-mappers.}
+\item{depth}{The recursion depth for multi/collection/pipe mappers. Default
+1, to only show the collection, and not the contents of the sub-mappers.}
 
 \item{x}{Object to be printed}
 }
@@ -50,4 +53,16 @@ mapper <-
     )
   )
 summary(mapper, depth = 2)
+mapper <-
+  bru_mapper_repeat(
+    bru_mapper_multi(
+      list(
+        A = bru_mapper_index(2),
+        B = bru_mapper_index(3)
+      )
+    ),
+    3
+  )
+summary(mapper)
+summary(mapper, depth = 0)
 }

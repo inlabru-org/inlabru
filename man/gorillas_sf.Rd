@@ -4,6 +4,7 @@
 \name{gorillas_sf}
 \alias{gorillas_sf}
 \alias{gorillas_sf_gcov}
+\alias{gorillas_sp}
 \title{Gorilla nesting sites in sf format}
 \format{
 The data are a list that contains these elements:
@@ -14,22 +15,29 @@ the gorilla nests.}
 of the region that was searched for the nests.}
 \item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a mesh that can be used
 with function \code{lgcp} to fit a LGCP to the nest data.}
-\item{\code{gcov_file}:}{ The in-package filename of a \code{terra::SpatRaster} object,
-with one layer for each of these spatial covariates:
+\item{\code{gcov_file}:}{ The in-package filename of a \code{terra::SpatRaster}
+object, with one layer for each of these spatial covariates:
 \describe{
-\item{\code{aspect}}{ Compass direction of the terrain slope. Categorical, with levels
+\item{\code{aspect}}{ Compass direction of the terrain slope. Categorical,
+with levels
 N, NE, E, SE, S, SW, W and NW, which are coded as integers 1 to 8.}
 \item{\code{elevation}}{ Digital elevation of terrain, in metres.}
-\item{\code{heat}}{ Heat Load Index at each point on the surface (Beer's aspect),
-discretised. Categorical with values Warmest (Beer's aspect between 0 and 0.999),
-Moderate (Beer's aspect between 1 and 1.999), Coolest (Beer's aspect equals 2). These are
+\item{\code{heat}}{ Heat Load Index at each point on the surface
+(Beer's aspect),
+discretised. Categorical with values Warmest (Beer's aspect between
+0 and 0.999),
+Moderate (Beer's aspect between 1 and 1.999), Coolest (Beer's aspect
+equals 2). These are
 coded as integers 1, 2 and 3, in that order.}
 \item{\code{slopangle}}{ Terrain slope, in degrees.}
-\item{\code{slopetype}}{ Type of slope. Categorical, with values Valley, Toe (toe slope),
+\item{\code{slopetype}}{ Type of slope. Categorical, with values Valley,
+Toe (toe slope),
 Flat, Midslope, Upper and Ridge. These are coded as integers 1 to 6.}
-\item{\code{vegetation}}{ Vegetation type: a categorical variable with 6 levels coded as
+\item{\code{vegetation}}{ Vegetation type: a categorical variable with 6
+levels coded as
 integers 1 to 6 (in order of increasing expected habitat suitability)}
-\item{\code{waterdist}}{ Euclidean distance from nearest water body, in metres.}
+\item{\code{waterdist}}{ Euclidean distance from nearest water body, in
+metres.}
 }
 Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
 
@@ -39,13 +47,18 @@ Loading of the covariates can be done with \code{gorillas_sf_gcov()} or
 }\if{html}{\out{</div>}}
 
 }
-\item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the region, with 60\\% coverage. Components:
+\item{\code{plotsample}}{Plot sample of gorilla nests, sampling 9x9 over the
+region, with 60\\% coverage. Components:
 \describe{
-\item{\code{counts}}{ A SpatialPointsDataFrame frame with elements \code{x}, \code{y}, \code{count},
-\code{exposure}, being the x- and y-coordinates of the centre of each plot, the count in each
+\item{\code{counts}}{An \code{sf} object with elements
+\code{count}, \code{exposure}, and \code{geometry}, holding the point geometry for the
+centre of each plot, the count in each
 plot and the area of each plot.}
-\item{\code{plots}}{ A \code{SpatialPolygonsDataFrame} defining the individual plot boundaries.}
-\item{\code{nests}}{ A \code{SpatialPointsDataFrame} giving the locations of each detected nest.}
+\item{\code{plots}}{An \code{sf} object with \code{MULTIPOLYGON} objects defining the
+individual plot boundaries and an all-ones \code{weight} column.}
+\item{\code{nests}}{An \code{sf} giving the locations of
+each detected nests, \code{group} ("minor" or "major"),
+\code{season} ("dry" or "rainy"), and \code{date} (in \code{Date} format).}
 }
 }
 }
@@ -58,15 +71,21 @@ gorillas_sf
 data(gorillas_sf, package = "inlabru")
 
 gorillas_sf_gcov()
+
+gorillas_sp()
 }
 \description{
-This is the \code{gorillas} dataset from the package \code{spatstat.data}, reformatted
-as point process data for use with \code{inlabru}.
+This is the \code{gorillas} dataset from the package \code{spatstat.data},
+reformatted as point process data for use with \code{inlabru}.
 }
 \section{Functions}{
 \itemize{
 \item \code{gorillas_sf_gcov()}: Access the \code{gorillas_sf} covariates data as a
 \code{terra::rast()} object.
+
+\item \code{gorillas_sp()}: Access the \code{gorillas_sf} data in \code{sp} format.
+The covariate data is added as \code{gcov}, a list of \code{sp::SpatialPixelsDataFrame}
+objects. Requires the \code{sp}, \code{sf}, and \code{terra} packages to be installed.
 
 }}
 \examples{
@@ -75,7 +94,7 @@ if (interactive() &&
   bru_safe_sp() &&
   require("sp") &&
   require(ggplot2, quietly = TRUE) &&
-  requireNamespace("terra")) {
+  requireNamespace("terra", quietly = TRUE)) {
   # plot all the nests, mesh and boundary
   ggplot() +
     gg(gorillas_sf$mesh) +
@@ -97,16 +116,18 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$plotsample$nests)
 }
 \dontrun{
-gorillas_sf$gcov <- gorillas_sf_gcov()
+if (requireNamespace("terra", quietly = TRUE)) {
+  gorillas_sf$gcov <- gorillas_sf_gcov()
+}
 }
 }
 \references{
-Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the Kagwene Gorilla
-Sanctuary, Cameroon. M.Sc. thesis, Geology and Environmental Science, University of Buea,
-Cameroon.
+Funwi-Gabga, N. (2008) A pastoralist survey and fire impact assessment in the
+Kagwene Gorilla Sanctuary, Cameroon. M.Sc. thesis, Geology and Environmental
+Science, University of Buea, Cameroon.
 
-Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial behaviour of gorillas
-in the Kagwene Sanctuary, Cameroon. Stochastic Environmental Research and Risk Assessment
-26 (6), 793-811.
+Funwi-Gabga, N. and Mateu, J. (2012) Understanding the nesting spatial
+behaviour of gorillas in the Kagwene Sanctuary, Cameroon. Stochastic
+Environmental Research and Risk Assessment 26 (6), 793-811.
 }
 \keyword{datasets}

@@ -7,8 +7,8 @@
 point2count(plots, dets)
 }
 \arguments{
-\item{plots}{A \code{SpatialPolygonsDataFrame} object containing the plots that were
-sampled.}
+\item{plots}{A \code{SpatialPolygonsDataFrame} object containing the plots that
+were sampled.}
 
 \item{dets}{A \code{SpatialPointsDataFrame} object containing the locations of the
 points within the plots.}
@@ -18,8 +18,8 @@ A \code{SpatialPolygonsDataFrame} with counts in each plot contained in
 slot \verb{@data$n}.
 }
 \description{
-Converts a plot sample with locations of each point within each plot, into a plot
-sample with only the count within each plot.
+Converts a plot sample with locations of each point within each plot, into a
+plot sample with only the count within each plot.
 }
 \examples{
 \donttest{
@@ -27,8 +27,10 @@ sample with only the count within each plot.
 if (bru_safe_sp() &&
   require("sp") &&
   require("raster", quietly = TRUE) &&
-  require("ggplot2", quietly = TRUE)) {
-  data(gorillas, package = "inlabru")
+  require("ggplot2", quietly = TRUE) &&
+  require("terra", quietly = TRUE) &&
+  require("sf", quietly = TRUE)) {
+  gorillas <- gorillas_sp()
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
   )
@@ -37,8 +39,8 @@ if (bru_safe_sp() &&
     gg(plotpts$dets) +
     gg(gorillas$boundary)
   countdata <- point2count(plotpts$plots, plotpts$dets)
-  x <- coordinates(countdata)[, 1]
-  y <- coordinates(countdata)[, 2]
+  x <- sp::coordinates(countdata)[, 1]
+  y <- sp::coordinates(countdata)[, 2]
   count <- countdata@data$n
   p2 <- ggplot() +
     gg(gorillas$boundary) +

@@ -69,8 +69,8 @@ output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 \item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 }
 \value{
-a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values and
-other summary statistics attached. Non-S4 object outputs have the class
+a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values
+and other summary statistics attached. Non-S4 object outputs have the class
 "bru_prediction" added at the front of the class list.
 }
 \description{
@@ -96,22 +96,24 @@ to directly access the latent state for a component, and the suffix function
 \verb{_eval} can be used to evaluate a component at other input values than the
 expressions defined in the component definition itself, e.g.
 \code{field_eval(cbind(x, y))} for a component that was defined with
-\code{field(coordinates, ...)} (see also \code{\link[=component_eval]{component_eval()}}).
+\code{field(coordinates, ...)} (see also \code{\link[=bru_component_eval]{bru_component_eval()}}).
 
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE) &&
+if (bru_safe_inla() &&
     bru_safe_sp() &&
     require("sp") &&
     require("sn", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE)) {
+    require("ggplot2", quietly = TRUE) &&
+    require("terra", quietly = TRUE) &&
+    require("sf", quietly = TRUE)) {
 
   # Load the Gorilla data
 
-  data(gorillas, package = "inlabru")
+  gorillas <- gorillas_sp()
 
   # Plot the Gorilla nests, the mesh and the survey boundary
 

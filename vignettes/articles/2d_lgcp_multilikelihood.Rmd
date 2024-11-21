@@ -37,6 +37,12 @@ library(INLA)
 library(ggplot2)
 bru_safe_sp(force = TRUE)
 ```
+```{r echo=FALSE}
+INLA::inla.setOption(num.threads = "2:1")
+INLA::inla.setOption(smtp = "taucs")
+# Sys.setenv(INLA_TRACE = "*")
+# INLA::inla.setOption(verbose = TRUE)
+```
 
 Get the data
 -----------------------------------
@@ -79,7 +85,7 @@ cmp <- ~
 
 Given these components we define the linear predictor for each of the likelihoods.
 (Using "." indicates a pure additive model, and one can use include/exclude
-options for `like()` to indicate which components are actively involved in each model.)
+options for `bru_obs()` to indicate which components are actively involved in each model.)
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 fml.major <- geometry ~ Intercept + Common + Difference / 2
 fml.minor <- geometry ~ Intercept + Common - Difference / 2
@@ -87,13 +93,13 @@ fml.minor <- geometry ~ Intercept + Common - Difference / 2
 
 Setting up the Cox process likelihoods is easy in this example. Both nest types were observed within the same window:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-lik_minor <- like("cp",
+lik_minor <- bru_obs("cp",
   formula = fml.major,
   data = gorillas_sf$nests[gorillas_sf$nests$group == "major", ],
   samplers = gorillas_sf$boundary,
   domain = list(geometry = gorillas_sf$mesh)
 )
-lik_major <- like("cp",
+lik_major <- bru_obs("cp",
   formula = fml.minor,
   data = gorillas_sf$nests[gorillas_sf$nests$group == "minor", ],
   samplers = gorillas_sf$boundary,
@@ -104,7 +110,9 @@ lik_major <- like("cp",
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 jfit <- bru(cmp, lik_major, lik_minor,
   options = list(
-    control.inla = list(int.strategy = "eb"),
+    control.inla = list(
+      int.strategy = "eb"
+    ),
     bru_max_iter = 1
   )
 )
@@ -140,7 +148,6 @@ jfit <- bru_rerun(jfit)
 
 
 ```{r, warning=FALSE,fig.width=8}
-library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas_sf$mesh,
     mask = gorillas_sf$boundary,
@@ -171,12 +178,13 @@ over a product domain over space and `group`.  In versions `<= 2.7.0`, the integ
 domain had to be numeric, so we convert the group variable to a 0/1 variable,
 `group_major <- group == "major"`, which is also useful in the predictor expression:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-fml.joint <- geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
+fml.joint <-
+  geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
 ```
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 gorillas_sf$nests$group_major <- gorillas_sf$nests$group == "major"
-lik_joint <- like("cp",
+lik_joint <- bru_obs("cp",
   formula = fml.joint,
   data = gorillas_sf$nests,
   samplers = gorillas_sf$boundary,
@@ -188,9 +196,13 @@ lik_joint <- like("cp",
 ```
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+# Approximate with "eb" for faster vignette
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
-    control.inla = list(int.strategy = "eb") # Approximate for faster vignette
+    control.inla = list(
+      int.strategy = "eb"
+    ),
+    bru_max_iter = 1
   )
 )
 ```

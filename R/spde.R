@@ -9,8 +9,8 @@
 #' @keywords internal
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
-#'     `mesh$manifold`, or a full `inla.mesh` or
-#'     `inla.mesh.1d` object.
+#'     `fm_manifold(mesh)`, or a full `fm_mesh_2d` or
+#'     `fm_mesh_1d` object.
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by
@@ -24,21 +24,23 @@
 #'     approximation. Default 64.
 #' @param S1.L For `manifold` `"S1"`, give the length of the
 #'     cyclic interval
-#' @return A list with estimated covariance or correlation (when `log.variance` is
-#'     `NULL`) functions:
+#' @return A list with estimated covariance or correlation (when `log.variance`
+#'   is `NULL`) functions:
 #' \item{lower}{An approximate lower bound for the `quantile` credible region}
-#' \item{median}{The function for for the approximate median parameters quantile}
+#' \item{median}{The function for for the approximate median parameters
+#' quantile}
 #' \item{upper}{An approximate upper bound for the `quantile` credible region}
 #'
 #' @details
-#' Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
-#' space with approximately `quantile` probability.
+#' Uses a Gaussian assumption for the internal model parameters, and finds a
+#' region in parameter space with approximately `quantile` probability.
 #'
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 materncov.bands <- function(manifold, dist, log.range,
                             log.variance = NULL, alpha = 2,
                             quantile = 0.95, n = 64, S1.L = NULL) {
+  stopifnot(bru_safe_inla(multicore = TRUE))
   calc.cov.R <- function(dist, kappa, var) {
     INLA::inla.matern.cov(nu = nu, kappa, x = dist, d = d, corr = TRUE) * var
   }
@@ -50,7 +52,8 @@ materncov.bands <- function(manifold, dist, log.range,
       kappa,
       var
     )
-    cov0 <- calc.cov.R(0, kappa, 1) ## Measure the relative contribution of each term
+    # Measure the relative contribution of each term:
+    cov0 <- calc.cov.R(0, kappa, 1)
     loop <- 0
     max.loop <- 10
     while ((cov0 > 1e-3) && (loop < max.loop)) {
@@ -79,12 +82,14 @@ materncov.bands <- function(manifold, dist, log.range,
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (inherits(manifold, "inla.mesh") ||
-      inherits(manifold, "inla.mesh.1d")) {
-      if ((manifold$manifold == "S1") && is.null(S1.L)) {
+    if (inherits(
+      manifold,
+      c("fm_mesh_2d", "inla.mesh", "fm_mesh_1d", "inla.mesh.1d")
+    )) {
+      if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
         S1.L <- diff(manifold$interval)
       }
-      manifold <- manifold$manifold
+      manifold <- fm_manifold(manifold)
     }
   }
   if (manifold == "R1") {
@@ -139,7 +144,8 @@ materncov.bands <- function(manifold, dist, log.range,
       out$upper <- out$median
     } else {
       qq <- qchisq(quantile, 2)^0.5
-      log.kappas <- log(sqrt(8 * nu)) - (log.range$mean + log.range$sd * c(qq, -qq))
+      log.kappas <- log(sqrt(8 * nu)) - (log.range$mean +
+        log.range$sd * c(qq, -qq))
       log.variances <- log.variance$mean + log.variance$sd * c(-qq, qq)
       for (angle in 2 * pi * (1:n) / n) {
         ca <- cos(angle)
@@ -161,16 +167,19 @@ materncov.bands <- function(manifold, dist, log.range,
 
 
 
-#' @title Posteriors of SPDE hyper parameters and Matern correlation or covariance function.
+#' @title Posteriors of SPDE hyper parameters and Matern correlation or
+#'   covariance function.
 #'
 #' @description
-#' Calculate posterior distribution of the range, log(range), variance, or log(variance)
-#' parameter of a model's SPDE component. Can also plot Matern correlation or covariance function.
-#' `inla.spde.result`.
+#' Calculate posterior distribution of the range, log(range), variance, or
+#' log(variance) parameter of a model's SPDE component. Can also plot Matern
+#' correlation or covariance function. `inla.spde.result`.
 #'
 #' @param result An object inheriting from `inla`.
-#' @param name Character stating the name of the SPDE effect, see `names(result$summary.random)`.
-#' @param what One of "range", "log.range", "variance", "log.variance", "matern.correlation" or "matern.covariance".
+#' @param name Character stating the name of the SPDE effect, see
+#'   `names(result$summary.random)`.
+#' @param what One of "range", "log.range", "variance", "log.variance",
+#'   "matern.correlation" or "matern.covariance".
 #' @return A `prediction` object.
 #'
 #' @export
@@ -179,6 +188,8 @@ materncov.bands <- function(manifold, dist, log.range,
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
 spde.posterior <- function(result, name, what = "range") {
+  stopifnot(bru_safe_inla(multicore = TRUE))
+
   spdespec <- result$bru_info$model$effects[[name]]$main$model
   spderesult <- INLA::inla.spde.result(result, name, spdespec)
 
@@ -196,7 +207,8 @@ spde.posterior <- function(result, name, what = "range") {
     if (what == "matern.correlation") {
       corr <- TRUE
       ylab <- "Matern Correlation"
-      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper$mesh,
+      out <- materncov.bands(
+        result$bru_info$model$effects[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = NULL,
@@ -205,7 +217,8 @@ spde.posterior <- function(result, name, what = "range") {
     } else {
       corr <- FALSE
       ylab <- "Matern Covariance"
-      out <- materncov.bands(result$bru_info$model$effects[[name]]$main$mapper$mesh,
+      out <- materncov.bands(
+        result$bru_info$model$effects[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = log.variance,
@@ -229,20 +242,30 @@ spde.posterior <- function(result, name, what = "range") {
       variance = spderesult$marginals.variance.nominal[[1]],
       log.variance = spderesult$marginals.log.variance.nominal[[1]]
     )
-    if (is.null(marg)) stop("Invalid varname: ", what, ". must be one of 'range',
+    if (is.null(marg)) {
+      stop("Invalid varname: ", what, ". must be one of 'range',
                            'log.range',  'variance',  'log.variance',
                            'matern.correlation', matern.covariance")
+    }
 
     med <- INLA::inla.qmarginal(0.5, marg)
     uq <- INLA::inla.qmarginal(0.975, marg)
     lq <- INLA::inla.qmarginal(0.025, marg)
     inner.x <- seq(lq, uq, length.out = 100)
-    inner.marg <- data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
+    inner.marg <- data.frame(
+      x = inner.x,
+      y = INLA::inla.dmarginal(inner.x, marg)
+    )
     colnames(inner.marg) <- c(what, "pdf")
     df <- data.frame(marg)
     colnames(df) <- c(what, "pdf")
     attr(df, "type") <- "0d"
-    attr(df, "summary") <- list(uq = uq, lq = lq, median = med, inner.marg = inner.marg)
+    attr(df, "summary") <- list(
+      uq = uq,
+      lq = lq,
+      median = med,
+      inner.marg = inner.marg
+    )
     class(df) <- list("prediction", "data.frame")
     df
   }

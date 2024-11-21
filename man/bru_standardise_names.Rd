@@ -20,3 +20,4 @@ with underscores.
 \examples{
 bru_standardise_names("Precision for the Gaussian observations")
 }
+\keyword{internal}

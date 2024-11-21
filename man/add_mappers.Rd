@@ -29,8 +29,8 @@ Add missing mappers between input data and latent variables,
 based on likelihood data
 
 Equip component(s) with mappers for subcomponents that do not
-have predefined mappers. When needed, the data in \code{lhoods} is used to determine
-the appropriate mapper(s).
+have predefined mappers. When needed, the data in \code{lhoods} is used to
+determine the appropriate mapper(s).
 }
 \examples{
 \dontrun{

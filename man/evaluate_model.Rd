@@ -14,6 +14,7 @@ evaluate_model(
   predictor = NULL,
   format = NULL,
   used = NULL,
+  n_pred = NULL,
   ...
 )
 
@@ -57,6 +58,9 @@ expression for a state.
 }}
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object, or NULL (default)}
+
+\item{n_pred}{integer. If provided, scalar predictor results are expanded to
+vectors of length \code{n_pred}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample}}
 

@@ -1,6 +1,8 @@
 test_that("Missing data infilling", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
+  skip_if_not_installed("terra")
 
   points <-
     sp::SpatialPointsDataFrame(
@@ -14,8 +16,8 @@ test_that("Missing data infilling", {
       input_coord,
       data = input_data
     )
-  val0 <- bru_fill_missing(input, points, points$val)
 
+  val0 <- bru_fill_missing(input, points, points$val)
 
   input <-
     sp::SpatialPointsDataFrame(
@@ -26,8 +28,8 @@ test_that("Missing data infilling", {
 
   expect_equal(val2, val0)
 
-  input <- SpatialGrid(GridTopology(c(0, 0), c(1, 1), c(7, 8)))
-  input_data <- data.frame(val = as.vector(coordinates(input)[, 2]))
+  input <- sp::SpatialGrid(sp::GridTopology(c(0, 0), c(1, 1), c(7, 8)))
+  input_data <- data.frame(val = as.vector(sp::coordinates(input)[, 2]))
   input <-
     sp::SpatialGridDataFrame(
       input,

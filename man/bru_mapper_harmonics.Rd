@@ -48,9 +48,9 @@ as "bym2", which can be handled by \code{bru_mapper_collect}.}
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 }
 \description{
-Constructs a mapper for \code{cos}/\code{sin} functions
-of orders 1 (if \code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total
-number of basis functions is \code{intercept + 2 * order}.
+Constructs a mapper for \code{cos}/\code{sin} functions of orders 1 (if
+\code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total number of
+basis functions is \code{intercept + 2 * order}.
 
 Optionally, each order can be given a non-unit scaling, via the \code{scaling}
 vector, of length \code{intercept + order}. This can be used to
@@ -72,8 +72,8 @@ Then, with
 u2 = ibm_eval(bmh2, input = x, state = rnorm(9))
 }\if{html}{\out{</div>}}
 
-the stochastic properties of \code{u1} and \code{u2} will be the same, with \code{scaling^2}
-determining the variance for each frequency contribution.
+the stochastic properties of \code{u1} and \code{u2} will be the same, with
+\code{scaling^2} determining the variance for each frequency contribution.
 
 The period for the first order harmonics is shifted and scaled to match
 \code{interval}.
@@ -95,6 +95,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_index}()},
 \code{\link{bru_mapper_linear}()},
@@ -104,6 +105,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

@@ -2,17 +2,18 @@ test_that("eval_spatial.SpatRaster", {
   skip_if_not_installed("terra")
 
   # Load the Gorilla data
-  data(gorillas, package = "inlabru", envir = environment())
+  data(gorillas_sf, package = "inlabru", envir = environment())
+  gcov <- gorillas_sf_gcov()
 
   covs <- c(
-    terra::rast(gorillas$gcov$elevation),
-    terra::rast(gorillas$gcov$elevation)
+    gcov$elevation,
+    gcov$elevation
   )
   names(covs) <- c("A", "B")
   covs$B <- covs$B + 1
 
   # Multirow
-  where <- gorillas$nests[seq_len(5), , drop = FALSE]
+  where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
   A_val <- eval_spatial(covs,
     where = where,
     layer = rep("A", nrow(where))
@@ -33,7 +34,7 @@ test_that("eval_spatial.SpatRaster", {
   expect_equal(c(A_val[1:2], B_val[3:5]), AB_val)
 
   # Multirow
-  where <- gorillas$nests[seq_len(5), , drop = FALSE]
+  where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
   A1_val <- eval_spatial(covs,
     where = where,
     layer = "A"
@@ -47,7 +48,7 @@ test_that("eval_spatial.SpatRaster", {
   expect_equal(B1_val, B_val)
 
   # Single row
-  where <- gorillas$nests[5, , drop = FALSE]
+  where <- gorillas_sf$nests[5, , drop = FALSE]
   A2_val <- eval_spatial(covs,
     where = where,
     layer = "A"
@@ -63,8 +64,12 @@ test_that("eval_spatial.SpatRaster", {
 
 
 test_that("eval_spatial.Spatial*", {
+  skip_if_not(bru_safe_sp())
+
   # Load the Gorilla data
-  data(gorillas, package = "inlabru", envir = environment())
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
+  gorillas <- gorillas_sp()
 
   covs <- gorillas$gcov$elevation
   names(covs) <- "A"
@@ -126,10 +131,10 @@ test_that("eval_spatial.Spatial*", {
 
 test_that("eval_spatial.sf", {
   # Load the Gorilla data
-  data(gorillas, package = "inlabru", envir = environment())
+  data(gorillas_sf, package = "inlabru", envir = environment())
 
-  nests <- sf::st_as_sf(gorillas$nests)
-  plots <- sf::st_as_sf(gorillas$plotsample$plots)
+  nests <- gorillas_sf$nests
+  plots <- gorillas_sf$plotsample$plots
   plots$something_num <- seq_len(nrow(plots))
   nests$something_num <- eval_spatial(plots, nests, layer = "something_num")
   something_num <- eval_spatial(plots, plots, layer = "something_num")
@@ -148,20 +153,22 @@ test_that("eval_spatial.sf", {
 
 
 test_that("eval_spatial.stars", {
+  skip_if_not_installed("terra")
   skip_if_not_installed("stars")
 
   # Load the Gorilla data
-  data(gorillas, package = "inlabru", envir = environment())
+  data(gorillas_sf, package = "inlabru", envir = environment())
+  gcov <- gorillas_sf_gcov()
 
   covs <- c(
-    stars::st_as_stars(gorillas$gcov$elevation),
-    stars::st_as_stars(gorillas$gcov$elevation)
+    gcov$elevation,
+    gcov$elevation
   )
   names(covs) <- c("A", "B")
   covs$B <- covs$B + 10000L
 
   # Multirow
-  where <- gorillas$nests[seq_len(5), , drop = FALSE]
+  where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
   A_val <- eval_spatial(covs,
     where = where,
     layer = rep("A", nrow(where))
@@ -182,7 +189,7 @@ test_that("eval_spatial.stars", {
   expect_equal(c(A_val[1:2], B_val[3:5]), AB_val)
 
   # Multirow
-  where <- gorillas$nests[seq_len(5), , drop = FALSE]
+  where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
   A1_val <- eval_spatial(covs,
     where = where,
     layer = "A"
@@ -196,7 +203,7 @@ test_that("eval_spatial.stars", {
   expect_equal(B1_val, B_val)
 
   # Single row
-  where <- gorillas$nests[5, , drop = FALSE]
+  where <- gorillas_sf$nests[5, , drop = FALSE]
   A2_val <- eval_spatial(covs,
     where = where,
     layer = "A"

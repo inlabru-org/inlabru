@@ -39,7 +39,10 @@ test_that("mdata", {
   ## head(data.frame(y, E, x, z, xx, zz))
   suppressWarnings(
     r <- INLA::inla(
-      INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x * z)) ~ 1 + xx + zz + xx * zz,
+      INLA::inla.mdata(
+        cbind(y, E),
+        cbind(1, x, z, x * z)
+      ) ~ 1 + xx + zz + xx * zz,
       family = "0poisson",
       data = data.frame(y, E, x, z, xx, zz),
       control.fixed = list(prec = 1, prec.intercept = 1),
@@ -80,7 +83,7 @@ test_that("mdata", {
       model = "fixed",
       hyper = list(prec = list(initial = 0, fixed = TRUE))
     ),
-    like(
+    bru_obs(
       INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x * z)) ~ .,
       family = "0poisson",
       data = data.frame(y, E, x, z, xx, zz),
@@ -139,11 +142,14 @@ test_that("mdata", {
     res <- cbind(res,
       diff = (res[, 2] - beta),
       diffS = (res[, 3] - beta),
-      "diff/sd" = (res[, 2] - beta) / c(r$summary.fixed$sd, r$summary.hyperpar$sd),
-      "diffS/sd" = (res[, 3] - beta) / c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
+      "diff/sd" = (res[, 2] - beta) /
+        c(r$summary.fixed$sd, r$summary.hyperpar$sd),
+      "diffS/sd" = (res[, 3] - beta) /
+        c(rr$summary.hyperpar$sd, rr$summary.fixed$sd)
     )
     mm <- nrow(res) %/% 2
-    rownames(res) <- c(paste0("beta", 1:mm, ".poisson"), paste0("beta", 1:mm, ".prob"))
+    rownames(res) <-
+      c(paste0("beta", 1:mm, ".poisson"), paste0("beta", 1:mm, ".prob"))
     print(round(dig = 2, res))
   }
 })
@@ -154,10 +160,16 @@ test_that("surv", {
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.26")
 
-  df <- data.frame(time = 1:4, event = c(1, 1, 0, 1), xx = rnorm(4), Intercept = 1)
+  df <- data.frame(
+    time = 1:4,
+    event = c(1, 1, 0, 1),
+    xx = rnorm(4),
+    Intercept = 1
+  )
 
   r_inla <- INLA::inla(
-    INLA::inla.surv(time, event) ~ 0 + f(Intercept, model = "linear", prec.linear = 0) +
+    INLA::inla.surv(time, event) ~ 0 +
+      f(Intercept, model = "linear", prec.linear = 0) +
       f(xx, model = "linear"),
     family = "weibullsurv",
     data = df
@@ -221,7 +233,8 @@ test_that("surv", {
 
   stk_data <- INLA::inla.stack.data(stk, .response.name = "response")
   r2_inla <- INLA::inla(
-    response ~ 0 + f(Intercept, model = "linear", prec.linear = 0) + f(xx, model = "linear"),
+    response ~ 0 + f(Intercept, model = "linear", prec.linear = 0) +
+      f(xx, model = "linear"),
     family = c("exponentialsurv", "weibullsurv"),
     data = stk_data,
     control.predictor = list(A = INLA::inla.stack.A(stk), link = stk_data$link)
@@ -229,12 +242,15 @@ test_that("surv", {
 
   r2_bru <- bru(
     ~ 0 + Intercept(Intercept, prec.linear = 0) + xx(xx),
-    like(
+    bru_obs(
       INLA::inla.surv(time, event) ~ .,
       family = "exponentialsurv",
-      data = rbind(df, data.frame(time = NA, event = df$event, xx = df$xx, Intercept = 1))
+      data = rbind(
+        df,
+        data.frame(time = NA, event = df$event, xx = df$xx, Intercept = 1)
+      )
     ),
-    like(
+    bru_obs(
       INLA::inla.surv(time, event) ~ .,
       family = "weibullsurv",
       data = df,

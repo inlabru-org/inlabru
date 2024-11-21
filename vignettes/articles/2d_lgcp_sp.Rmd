@@ -42,10 +42,10 @@ Get the data
 -----------------------------------
 For the next few practicals we are going to be working with a dataset obtained from 
 the `R` package `spatstat`, which contains the locations of 647 gorilla nests. We load the 
-dataset like this:
+dataset in `sp` format like this:
 
 ```{r }
-data(gorillas, package = "inlabru")
+gorillas <- gorillas_sp()
 ```
 
 This dataset is a list containing a number of `R` objects, including the locations of the 

@@ -7,7 +7,7 @@
 \method{gg}{SpatialPixels}(data, ...)
 }
 \arguments{
-\item{data}{A \link[sp:SpatialGrid]{sp::SpatialPixels} object.}
+\item{data}{A \code{sp::SpatialPixels} object.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }
@@ -20,13 +20,16 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
+  requireNamespace("terra", quietly = TRUE) &&
   bru_safe_sp()) {
   # Load Gorilla data
 
-  data(gorillas, package = "inlabru")
+  gcov <- gorillas_sf_gcov()
+  elev <- terra::as.data.frame(gcov$elevation, xy = TRUE)
+  pxl <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
 
   # Turn elevation covariate into SpatialPixels
-  pxl <- sp::SpatialPixels(sp::SpatialPoints(gorillas$gcov$elevation))
+  pxl <- sp::SpatialPixels(pxl)
 
   # Plot the pixel centers
   ggplot() +
@@ -42,7 +45,6 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
 \code{\link{gg.SpatialPolygons}()},
-\code{\link{gg.sf}()},
-\code{\link{gm}()}
+\code{\link{gg.sf}()}
 }
 \concept{geomes for spatial data}

@@ -11,11 +11,13 @@
 #' @param x a [bru] object, typically a result from [bru()] for a nonlinear
 #' predictor model
 #' @param from,to integer values for the range of iterations to plot.
-#' Default `from = 1` (start from the first iteration) and `to = NULL` (end at the last iteration).
+#' Default `from = 1` (start from the first iteration) and `to = NULL` (end at
+#' the last iteration).
 #' Set `from = 0` to include the initial linearisation point in the track plot.
 #' @return A ggplot object with four panels of convergence diagnostics:
 #' - `Tracks`: Mode and linearisation values for each effect
-#' - `Mode - Lin`: Difference between mode and linearisation values for each effect
+#' - `Mode - Lin`: Difference between mode and linearisation values for each
+#'   effect
 #' - `|Change| / sd`: Absolute change in mode and linearisation values
 #' divided by the standard deviation for each effect
 #' - `Change & sd`: Absolute change in mode and linearisation values
@@ -352,7 +354,10 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
     pl_theme_rel +
     ggplot2::ggtitle("Mode - Lin")
 
-  track_data_prev <- dplyr::filter(track_data, .data$iteration < max(.data$iteration))
+  track_data_prev <- dplyr::filter(
+    track_data,
+    .data$iteration < max(.data$iteration)
+  )
   track_data_prev$iteration <- track_data_prev$iteration + 1
   track_data <- dplyr::left_join(track_data, track_data_prev,
     by = c("effect", "iteration", "index"),
@@ -370,14 +375,19 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
           .data$effect,
           .data$iteration
         ) %>%
-        dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd), .data$sd, 1.0)) %>%
+        dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd),
+          .data$sd, 1.0
+        )) %>%
         dplyr::summarise(
           MaxMode = max(abs(.data$mode - .data$mode.prev) / .data$sd),
           MeanMode = mean(abs(.data$mode - .data$mode.prev) / .data$sd),
           RMSMode = mean((.data$mode - .data$mode.prev)^2 / .data$sd^2)^0.5,
-          MaxLin = max(abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd),
-          MeanLin = mean(abs(.data$new_linearisation - .data$new_linearisation.prev) / .data$sd),
-          RMSLin = mean((.data$new_linearisation - .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
+          MaxLin = max(abs(.data$new_linearisation -
+            .data$new_linearisation.prev) / .data$sd),
+          MeanLin = mean(abs(.data$new_linearisation -
+            .data$new_linearisation.prev) / .data$sd),
+          RMSLin = mean((.data$new_linearisation -
+            .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
           .groups = "drop"
         ) %>%
         dplyr::mutate(
@@ -449,9 +459,12 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
           MaxMode = max(.data$mode - .data$mode.prev),
           MeanMode = mean(.data$mode - .data$mode.prev),
           MinMode = min(.data$mode - .data$mode.prev),
-          MaxLin = max(.data$new_linearisation - .data$new_linearisation.prev),
-          MeanLin = mean(.data$new_linearisation - .data$new_linearisation.prev),
-          MinLin = min(.data$new_linearisation - .data$new_linearisation.prev),
+          MaxLin = max(.data$new_linearisation -
+            .data$new_linearisation.prev),
+          MeanLin = mean(.data$new_linearisation -
+            .data$new_linearisation.prev),
+          MinLin = min(.data$new_linearisation -
+            .data$new_linearisation.prev),
           .groups = "drop"
         )
     ) +
@@ -609,7 +622,8 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
         pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")
     ) /
       (
-        pl_relative_change + ggplot2::guides(linetype = "none", color = "none") |
+        pl_relative_change +
+          ggplot2::guides(linetype = "none", color = "none") |
           pl_change + ggplot2::guides(linetype = "none", color = "none")
       )
     ) +

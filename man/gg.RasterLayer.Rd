@@ -13,7 +13,8 @@
 \arguments{
 \item{data}{A RasterLayer object.}
 
-\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
+\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to
+\code{geom_tile}.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }
@@ -34,7 +35,7 @@ if (require("spatstat.data", quietly = TRUE) &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   # Load Gorilla data
-  data("gorillas", package = "spatstat.data")
+  data("gorillas", package = "spatstat.data", envir = environment())
 
   # Convert elevation covariate to RasterLayer
 
@@ -49,7 +50,6 @@ if (require("spatstat.data", quietly = TRUE) &&
 }
 \seealso{
 Other geomes for Raster data: 
-\code{\link{gg}()},
-\code{\link{gm}()}
+\code{\link{gg}()}
 }
 \concept{geomes for Raster data}

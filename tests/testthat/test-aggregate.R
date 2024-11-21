@@ -20,7 +20,7 @@ test_that("Aggregated Gaussian observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       z ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -36,7 +36,8 @@ test_that("Aggregated Gaussian observations", {
             fixed = TRUE
           )
         )
-      )
+      ),
+      allow_combine = TRUE
     )
   )
 
@@ -55,7 +56,7 @@ test_that("Aggregated Gaussian observations", {
 
   fit_sf <- bru(
     comp_sf,
-    like(
+    bru_obs(
       z ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -64,7 +65,10 @@ test_that("Aggregated Gaussian observations", {
       family = "normal",
       response_data = obs_sf,
       data = pred_sf,
-      control.family = list(hyper = list(prec = list(initial = 6, fixed = TRUE)))
+      control.family = list(
+        hyper = list(prec = list(initial = 6, fixed = TRUE))
+      ),
+      allow_combine = TRUE
     )
   )
 
@@ -95,7 +99,7 @@ test_that("Aggregated Poisson observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       y ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -103,7 +107,8 @@ test_that("Aggregated Poisson observations", {
       ),
       family = "poisson",
       response_data = obs,
-      data = pred
+      data = pred,
+      allow_combine = TRUE
     )
   )
 
@@ -122,7 +127,7 @@ test_that("Aggregated Poisson observations", {
 
   fit <- bru(
     comp,
-    like(
+    bru_obs(
       y ~ ibm_eval(
         agg,
         input = list(weights = weights, block = grp),
@@ -131,7 +136,8 @@ test_that("Aggregated Poisson observations", {
       family = "poisson",
       E = E,
       response_data = obs,
-      data = pred
+      data = pred,
+      allow_combine = TRUE
     )
   )
 

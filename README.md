@@ -16,7 +16,7 @@ status](https://github.com/inlabru-org/inlabru/workflows/test-coverage/badge.svg
 [![lintr
 status](https://github.com/inlabru-org/inlabru/workflows/lint/badge.svg)](https://github.com/inlabru-org/inlabru/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/inlabru-org/inlabru/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru?branch=devel)
+coverage](https://codecov.io/gh/inlabru-org/inlabru/graph/badge.svg)](https://app.codecov.io/gh/inlabru-org/inlabru)
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
@@ -44,12 +44,48 @@ found at <https://inlabru-org.github.io/inlabru/articles/>
 
 ## Installation
 
-You can install the current [CRAN](https://CRAN.R-project.org) version
-of inlabru:
+You can install the current [CRAN
+version](https://cran.r-project.org/package=inlabru) version of inlabru:
 
 ``` r
+options(repos = c(
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  getOption("repos")
+))
 install.packages("inlabru")
 ```
+
+### Installation using [pak](https://pak.r-lib.org/)
+
+You can install the latest bugfix release of inlabru from
+[GitHub](https://github.com/inlabru-org/inlabru) with:
+
+``` r
+# install.packages("pak")
+pak::repo_add(INLA = "https://inla.r-inla-download.org/R/testing")
+pak::pkg_install("inlabru-org/inlabru@stable")
+```
+
+You can install the development version of inlabru from
+[GitHub](https://github.com/inlabru-org/inlabru) with
+
+``` r
+pak::pkg_install("inlabru-org/inlabru")
+```
+
+or track the development version builds via
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
+
+``` r
+# Enable universe(s) by inlabru-org
+pak::repo_add(inlabruorg = "https://inlabru-org.r-universe.dev")
+pak::pkg_install("inlabru")
+```
+
+This will pick the r-universe version if it is more recent than the CRAN
+version.
+
+### Installation using `remotes`
 
 You can install the latest bugfix release of inlabru from
 [GitHub](https://github.com/inlabru-org/inlabru) with:
@@ -63,7 +99,6 @@ You can install the development version of inlabru from
 [GitHub](https://github.com/inlabru-org/inlabru) with
 
 ``` r
-# install.packages("remotes")
 remotes::install_github("inlabru-org/inlabru", ref = "devel")
 ```
 
@@ -91,19 +126,12 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> Loading required package: sp
-#> This is INLA_24.06.27 built 2024-06-27 02:36:04 UTC.
+#> This is INLA_24.11.17 built 2024-11-17 09:15:42 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - List available models/likelihoods/etc with inla.list.models()
 #>  - Use inla.doc(<NAME>) to access documentation
-```
-
-``` r
 library(inlabru)
 #> Loading required package: fmesher
-```
-
-``` r
 library(fmesher)
 library(ggplot2)
 
@@ -118,7 +146,7 @@ cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
   cmp,
-  like(
+  bru_obs(
     formula = geometry ~ .,
     family = "cp",
     data = gorillas_sf$nests,
@@ -134,15 +162,24 @@ lambda <- predict(
   fm_pixels(gorillas_sf$mesh, mask = gorillas_sf$boundary),
   ~ exp(mySmooth + Intercept)
 )
+```
 
+``` r
 # Plot the result
 ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
   gg(lambda, geom = "tile") +
-  gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
+  gg(gorillas_sf$nests, color = "red", size = 0.5, alpha = 0.5) +
   ggtitle("Nest intensity per km squared") +
   xlab("") +
   ylab("")
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+<div class="figure">
+
+<img src="man/figures/README-plot-1.png" alt="Nest intensity per km squared" width="100%" />
+<p class="caption">
+Nest intensity per km squared
+</p>
+
+</div>

@@ -26,7 +26,11 @@ globe <- function(R = 1,
                   xlab = "", ylab = "", zlab = "") {
   # coordinates for texture
   n.smp <- 50
-  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)), n.smp, n.smp, byrow = TRUE)
+  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)),
+    n.smp,
+    n.smp,
+    byrow = TRUE
+  )
   long <- matrix(seq(-180, 180, length.out = n.smp) * pi / 180, n.smp, n.smp)
   x <- R * cos(lat) * cos(long)
   y <- R * cos(lat) * sin(long)
@@ -37,8 +41,15 @@ globe <- function(R = 1,
   rgl::persp3d(x, y, z,
     col = "white",
     texture = system.file("misc/Lambert_ocean.png", package = "inlabru"),
-    specular = "black", axes = axes, box = box, xlab = xlab, ylab = ylab, zlab = zlab,
-    normal_x = x, normal_y = y, normal_z = z
+    specular = "black",
+    axes = axes,
+    box = box,
+    xlab = xlab,
+    ylab = ylab,
+    zlab = zlab,
+    normal_x = x,
+    normal_y = y,
+    normal_z = z
   )
 
   # spheric grid
@@ -48,9 +59,9 @@ globe <- function(R = 1,
 
 #' Render objects using RGL
 #'
-#' `glplot()` is a generic function for renders various kinds of spatial objects, i.e. `Spatial*` data
-#' and `fm_mesh_2d` objects. The function invokes particular methods which depend on the class of
-#' the first argument.
+#' `glplot()` is a generic function for renders various kinds of spatial
+#' objects, i.e. `Spatial*` data and `fm_mesh_2d` objects. The function invokes
+#' particular methods which depend on the class of the first argument.
 #'
 #' @name glplot
 #' @export
@@ -65,59 +76,79 @@ glplot <- function(object, ...) {
   UseMethod("glplot")
 }
 
-#' @describeIn glplot This function will calculate the cartesian coordinates of the points provided
-#' and use points3d() in order to render them.
+#' @describeIn glplot This function will calculate the cartesian coordinates of
+#'   the points provided and use points3d() in order to render them.
 #'
 #' @export
 #'
-#' @param add If TRUE, add the points to an existing plot. If FALSE, create new plot.
+#' @param add If TRUE, add the points to an existing plot. If FALSE, create new
+#'   plot.
 #' @param color vector of R color characters. See material3d() for details.
 #'
 #' @family inlabru RGL tools
 
 
 glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
-  if (length(coordnames(object)) < 3) {
+  if (length(sp::coordnames(object)) < 3) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
-    coordinates(ll) <- c(coordnames(object), "TMP.ZCOORD")
-    proj4string(ll) <- fm_CRS(object)
+    sp::coordinates(ll) <- c(sp::coordnames(object), "TMP.ZCOORD")
+    sp::proj4string(ll) <- fm_CRS(object)
     object <- ll
   }
 
   object <- fm_transform(object, crs = fm_crs("sphere"))
-  cc <- coordinates(object)
+  cc <- sp::coordinates(object)
   requireNamespace("rgl")
-  rgl::points3d(x = cc[, 1], y = cc[, 2], z = cc[, 3], add = add, color = color, ...)
+  rgl::points3d(
+    x = cc[, 1],
+    y = cc[, 2],
+    z = cc[, 3],
+    add = add,
+    color = color,
+    ...
+  )
 }
 
-#' @describeIn glplot This function will calculate a cartesian representation of the lines provided
-#' and use lines3d() in order to render them.
+#' @describeIn glplot This function will calculate a cartesian representation of
+#'   the lines provided and use `lines3d()` in order to render them.
 #'
 #' @export
 #'
 #' @family inlabru RGL tools
 
 glplot.SpatialLines <- function(object, add = TRUE, ...) {
-  qq <- coordinates(object)
-  sp <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))))
-  ep <- do.call(rbind, lapply(qq, function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))))
+  qq <- sp::coordinates(object)
+  sp <- do.call(rbind, lapply(qq, function(k) {
+    do.call(rbind, lapply(k, function(x) {
+      x[1:(nrow(x) - 1), ]
+    }))
+  }))
+  ep <- do.call(rbind, lapply(qq, function(k) {
+    do.call(rbind, lapply(k, function(x) {
+      x[2:(nrow(x)), ]
+    }))
+  }))
   sp <- data.frame(x = sp[, 1], y = sp[, 2], z = 0)
   ep <- data.frame(x = ep[, 1], y = ep[, 2], z = 0)
 
-  coordinates(sp) <- c("x", "y", "z")
-  coordinates(ep) <- c("x", "y", "z")
-  proj4string(sp) <- fm_CRS(object)
-  proj4string(ep) <- fm_CRS(object)
+  sp::coordinates(sp) <- c("x", "y", "z")
+  sp::coordinates(ep) <- c("x", "y", "z")
+  sp::proj4string(sp) <- fm_CRS(object)
+  sp::proj4string(ep) <- fm_CRS(object)
 
   sp <- fm_transform(sp, crs = fm_crs("sphere"))
   ep <- fm_transform(ep, crs = fm_crs("sphere"))
 
-  cs <- coordinates(sp)
-  ce <- coordinates(ep)
+  cs <- sp::coordinates(sp)
+  ce <- sp::coordinates(ep)
   na <- matrix(NA, ncol = 3, nrow = nrow(cs))
 
-  mm <- matrix(t(cbind(cs, ce, na)), ncol = 3, nrow = 3 * nrow(ce), byrow = TRUE)
+  mm <- matrix(t(cbind(cs, ce, na)),
+    ncol = 3,
+    nrow = 3 * nrow(ce),
+    byrow = TRUE
+  )
 
   requireNamespace("rgl")
 
@@ -125,12 +156,13 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 }
 
 
-#' @describeIn glplot This function transforms the mesh to 3D cartesian coordinates and uses
-#' inla.plot.mesh() with `rgl=TRUE` to plot the result.
+#' @describeIn glplot This function transforms the mesh to 3D cartesian
+#'   coordinates and uses `inla.plot.mesh()` with `rgl=TRUE` to plot the result.
 #'
 #' @export
 #'
-#' @param col Color specification. A single named color, a vector of scalar values, or a matrix of RGB values.
+#' @param col Color specification. A single named color, a vector of scalar
+#'   values, or a matrix of RGB values.
 #' @param ... Parameters passed on to plot_rgl.fm_mesh_2d()
 #'
 #' @family inlabru RGL tools

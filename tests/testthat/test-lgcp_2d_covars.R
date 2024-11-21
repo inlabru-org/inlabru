@@ -1,9 +1,12 @@
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
-  data(gorillas, package = "inlabru", envir = environment())
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
+  gorillas <- gorillas_sp()
 
   # Uses the component label to pick the covariate layer to extract,
   # so doesn't need an explicit main_layer="vegetation".

@@ -5,7 +5,6 @@
 \alias{ibm_n.bru_mapper_fm_mesh_2d}
 \alias{ibm_values.bru_mapper_fm_mesh_2d}
 \alias{ibm_jacobian.bru_mapper_fm_mesh_2d}
-\alias{bru_mapper.inla.mesh}
 \alias{ibm_n.bru_mapper_inla_mesh_2d}
 \alias{ibm_values.bru_mapper_inla_mesh_2d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_2d}
@@ -19,8 +18,6 @@
 
 \method{ibm_jacobian}{bru_mapper_fm_mesh_2d}(mapper, input, ...)
 
-\method{bru_mapper}{inla.mesh}(mesh, ...)
-
 \method{ibm_n}{bru_mapper_inla_mesh_2d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_inla_mesh_2d}(mapper, ...)
@@ -28,7 +25,7 @@
 \method{ibm_jacobian}{bru_mapper_inla_mesh_2d}(mapper, input, ...)
 }
 \arguments{
-\item{mesh}{An \code{fm_mesh_2d} or \code{inla.mesh.2d} object to use as a mapper}
+\item{mesh}{An \code{fm_mesh_2d} object to use as a mapper}
 
 \item{...}{Arguments passed on to other methods}
 
@@ -36,14 +33,14 @@
 
 \item{input}{Data input for the mapper.}
 }
+\value{
+A \code{bru_mapper_fmesher} object. Note: Prior to version \verb{2.12.0.9021},
+this was a \code{bru_mapper_fm_mesh_2d} object. Also see the note for
+\link{bru_mapper.fm_mesh_1d}.
+}
 \description{
 Creates a mapper for 2D \code{fm_mesh_2d} objects
 }
-\section{Functions}{
-\itemize{
-\item \code{bru_mapper(inla.mesh)}: Creates a mapper for 2D \code{inla.mesh} objects
-
-}}
 \examples{
 m <- bru_mapper(fmesher::fmexample$mesh)
 ibm_n(m)
@@ -61,6 +58,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -71,6 +69,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

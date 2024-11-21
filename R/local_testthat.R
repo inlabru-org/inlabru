@@ -91,52 +91,15 @@ local_basic_fixed_effect_testdata <- function() {
 }
 
 
-
-
-#' @export
-#' @rdname local_testthat
-local_mrsea_convert <- function(x, use_km = FALSE) {
-  # The estimation is numerically unreliable when the spatial
-  # domain is represented in metres, and has been seen to produce
-  # different results on different systems (e.g. Travis CI).
-
-  # The data is stored in km scale
-  if (!use_km) {
-    # Transform km to m:
-    crs_m <- fm_crs_set_lengthunit(x$mesh$crs, "m")
-    x$mesh <- fm_transform(x$mesh, crs_m)
-    x$samplers <- fm_transform(x$samplers, crs_m)
-    x$samplers$weight <- x$samplers$weight * 1000
-    x$points <- fm_transform(x$points, crs_m)
-    x$boundary <- fm_transform(x$boundary, crs_m)
-    x$covar <- fm_transform(x$covar, crs_m)
-    x$points$Effort <- x$points$Effort * 1000
-    x$points$mid.x <- x$points$mid.x * 1000
-    x$points$mid.y <- x$points$mid.y * 1000
-    x$points$start.x <- x$points$start.x * 1000
-    x$points$start.y <- x$points$start.y * 1000
-    x$points$end.x <- x$points$end.x * 1000
-    x$points$end.y <- x$points$end.y * 1000
-    x$points$distance <- x$points$distance * 1000
-    x$samplers$Effort <- x$samplers$Effort * 1000
-    x$samplers$mid.x <- x$samplers$mid.x * 1000
-    x$samplers$mid.y <- x$samplers$mid.y * 1000
-  }
-  x
-}
-
-
-
-
 #' @describeIn local_testthat Tests should set num.threads = "1:1" to ensure
-#' within-system repeatability by calling `local_bru_safe_inla()`;
-#' see also [bru_safe_inla()]
-#' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
-#' INLA `num.threads` option is not checked or altered. Default: `FALSE`, multicore
-#' not allowed (used for examples and unit tests).
+#'   within-system repeatability by calling `local_bru_safe_inla()`; see also
+#'   [bru_safe_inla()]
+#' @param multicore logical; if `TRUE`, multiple cores are allowed, and the INLA
+#'   `num.threads` option is not checked or altered. Default: `FALSE`, multicore
+#'   not allowed (used for examples and unit tests).
 #' @param quietly logical; if `TRUE`, prints diagnostic messages. A message is
-#' always printed if the INLA `num.threads` option is altered, regardless of the
-#' `quietly` argument. Default: TRUE.
+#'   always printed if the INLA `num.threads` option is altered, regardless of
+#'   the `quietly` argument. Default: TRUE.
 #' @export
 local_bru_safe_inla <- function(multicore = FALSE,
                                 quietly = TRUE,
@@ -149,7 +112,9 @@ local_bru_safe_inla <- function(multicore = FALSE,
       }
     )
     if (inherits(inla.call, "simpleError")) {
-      return(testthat::skip("inla.getOption('inla.call') failed, skip INLA tests."))
+      return(testthat::skip(
+        "inla.getOption('inla.call') failed, skip INLA tests."
+      ))
     }
 
     # Save the num.threads option so it can be restored
@@ -187,9 +152,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
     if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
       # Save the fmesher.evolution.warn option so it can be restored
-      old_fmesher_evolution_warn <- INLA::inla.getOption("fmesher.evolution.warn")
+      old_fmesher_evolution_warn <-
+        INLA::inla.getOption("fmesher.evolution.warn")
       withr::defer(
-        INLA::inla.setOption(fmesher.evolution.warn = old_fmesher_evolution_warn),
+        INLA::inla.setOption(
+          fmesher.evolution.warn = old_fmesher_evolution_warn
+        ),
         envir
       )
       INLA::inla.setOption(fmesher.evolution.warn = TRUE)
@@ -197,9 +165,12 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
     if ("fmesher.evolution.verbosity" %in% names(INLA::inla.getOption())) {
       # Save the fmesher.evolution.verbosity option so it can be restored
-      old_fmesher_evolution_verbosity <- INLA::inla.getOption("fmesher.evolution.verbosity")
+      old_fmesher_evolution_verbosity <-
+        INLA::inla.getOption("fmesher.evolution.verbosity")
       withr::defer(
-        INLA::inla.setOption(fmesher.evolution.verbosity = old_fmesher_evolution_verbosity),
+        INLA::inla.setOption(
+          fmesher.evolution.verbosity = old_fmesher_evolution_verbosity
+        ),
         envir
       )
       INLA::inla.setOption(fmesher.evolution.verbosity = "stop")
@@ -235,7 +206,14 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     inla.mode = "compact",
     envir = envir
   )
-  if (utils::compareVersion(getNamespaceVersion("sp"), "1.6-0") >= 0) {
+  sp_version <- tryCatch(
+    getNamespaceVersion("sp"),
+    error = function(e) {
+      NULL
+    }
+  )
+  if (!is.null(sp_version) &&
+    (utils::compareVersion(sp_version, "1.6-0") >= 0)) {
     old_sp_evolution_status <- tryCatch(
       sp::get_evolution_status(),
       error = function(e) {

@@ -3,22 +3,52 @@
 \name{summary.component}
 \alias{summary.component}
 \alias{summary.component_list}
+\alias{print.component}
+\alias{print.component_list}
+\alias{format.bru_subcomponent}
+\alias{summary.bru_subcomponent}
+\alias{print.bru_subcomponent}
+\alias{format.bru_input}
+\alias{summary.bru_input}
+\alias{print.bru_input}
 \alias{print.summary_component}
 \alias{print.summary_component_list}
+\alias{print.summary_bru_subcomponent}
+\alias{print.summary_bru_input}
 \title{Summarise components}
 \usage{
 \method{summary}{component}(object, ..., depth = Inf, verbose = TRUE)
 
 \method{summary}{component_list}(object, verbose = TRUE, ...)
 
+\method{print}{component}(x, ...)
+
+\method{print}{component_list}(x, ...)
+
+\method{format}{bru_subcomponent}(x, verbose = TRUE, ..., label.override = NULL)
+
+\method{summary}{bru_subcomponent}(object, verbose = TRUE, ..., label.override = NULL)
+
+\method{print}{bru_subcomponent}(x, verbose = TRUE, ..., label.override = NULL)
+
+\method{format}{bru_input}(x, verbose = TRUE, ..., label.override = NULL, type = NULL)
+
+\method{summary}{bru_input}(object, verbose = TRUE, ..., label.override = NULL)
+
+\method{print}{bru_input}(x, verbose = TRUE, ..., label.override = NULL)
+
 \method{print}{summary_component}(x, ...)
 
 \method{print}{summary_component_list}(x, ...)
+
+\method{print}{summary_bru_subcomponent}(x, ...)
+
+\method{print}{summary_bru_input}(x, ...)
 }
 \arguments{
-\item{object}{A \code{component} or \code{component_list}.}
+\item{object}{Object to be summarised.}
 
-\item{...}{passed on to other summary methods}
+\item{...}{Passed on to other summary methods.}
 
 \item{depth}{The depth of which to expand the component mapper.
 Default \code{Inf}, to traverse the entire mapper tree.}
@@ -28,6 +58,11 @@ component definitions. When \code{FALSE}, only show basic component
 definition information.  Default \code{TRUE}.}
 
 \item{x}{A summary object to be printed.}
+
+\item{label.override}{character; If not \code{NULL}, use this label instead of
+the object's label.}
+
+\item{type}{character; if non-NULL, added to the output'; \code{label = type(input)}.}
 }
 \description{
 Summarise components

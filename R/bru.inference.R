@@ -23,7 +23,10 @@ bru_check_object_bru <- function(object,
                                  new_version = getNamespaceVersion("inlabru")) {
   if (is.null(object[["bru_info"]])) {
     if (is.null(object[["sppa"]])) {
-      stop("bru object contains neither current `bru_info` or old `sppa` information")
+      stop(paste0(
+        "bru object contains neither current `bru_info` or old ",
+        "`sppa` information"
+      ))
     }
     object[["bru_info"]] <- object[["sppa"]]
     object[["sppa"]] <- NULL
@@ -46,11 +49,14 @@ bru_info_upgrade <- function(object,
   object_full <- object
   object <- object[["bru_info"]]
   if (!is.list(object)) {
-    stop("bru_info part of the object can't be converted to `bru_info`; not a list")
+    stop(paste0(
+      "bru_info part of the object can't be converted to `bru_info`; ",
+      "not a list"
+    ))
   }
   if (!inherits(object, "bru_info")) {
     old <- TRUE
-    class(object) <- c("bru_info", "list")
+    class(object) <- "bru_info"
     object_full[["bru_info"]] <- object
   }
   if (is.null(object[["inlabru_version"]])) {
@@ -154,7 +160,10 @@ bru_info_upgrade <- function(object,
         if (identical(deparse(cmp[["group"]][["input"]][["input"]]), "NULL")) {
           cmp[["group"]][["input"]][["input"]] <- expression(1L)
         }
-        if (identical(deparse(cmp[["replicate"]][["input"]][["input"]]), "NULL")) {
+        if (identical(
+          deparse(cmp[["replicate"]][["input"]][["input"]]),
+          "NULL"
+        )) {
           cmp[["replicate"]][["input"]][["input"]] <- expression(1L)
         }
         object[["model"]][["effects"]][[k]] <- cmp
@@ -231,7 +240,8 @@ bru_info_upgrade <- function(object,
       warning(
         paste0(
           "From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.",
-          "\n  Copying old elapsed time to both Elapsed and Time, setting System to zero;",
+          "\n  Copying old elapsed time to both Elapsed and Time, ",
+          "setting System to zero;",
           "  Do not over-interpret."
         ),
         immediate. = TRUE
@@ -271,65 +281,9 @@ bru_info_upgrade <- function(object,
 
 
 #' Methods for bru_info objects
-#' @export
-#' @method summary bru_info
-#' @param object Object to operate on
-#' @param verbose logical; If `TRUE`, include more details of the
-#' component definitions. If `FALSE`, only show basic component
-#' definition information. Default: `TRUE`
-#' @param \dots Arguments passed on to other methods
-#' @rdname bru_info
-summary.bru_info <- function(object, verbose = TRUE, ...) {
-  result <- list(
-    inlabru_version = object[["inlabru_version"]],
-    INLA_version = object[["INLA_version"]],
-    components = summary(object[["model"]], verbose = verbose, ...),
-    lhoods =
-      lapply(
-        object[["lhoods"]],
-        function(x) {
-          list(
-            family = x[["family"]],
-            data_class = class(x[["data"]]),
-            predictor = deparse(x[["formula"]])
-          )
-        }
-      )
-  )
-  class(result) <- c("summary_bru_info", "list")
-  result
-}
-
-#' @export
-#' @param x A `summary_bru_info` object to be printed
-#' @rdname bru_info
-print.summary_bru_info <- function(x, ...) {
-  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
-  cat(paste0("INLA version: ", x$INLA_version, "\n"))
-  cat(paste0("Components:\n"))
-  print(x$components)
-  cat(paste0("Likelihoods:\n"))
-  for (lh in x$lhoods) {
-    cat(sprintf(
-      "  Family: '%s'\n    Data class: %s\n    Predictor: %s\n",
-      lh$family,
-      paste0("'", lh$data_class, "'", collapse = ", "),
-      if (length(lh$predictor) > 1) {
-        paste0(
-          "\n        ",
-          paste0(
-            lh$predictor,
-            collapse = "\n        "
-          )
-        )
-      } else {
-        lh$predictor
-      }
-    ))
-  }
-  invisible(x)
-}
-
+#'
+#' The `bru_info` class is used to store metadata about `bru` models.
+#'
 #' @export
 #' @rdname bru_info
 bru_info <- function(...) {
@@ -338,11 +292,13 @@ bru_info <- function(...) {
 
 #' @export
 #' @param method character; The type of estimation method used
+#' @param \dots Additional arguments to be stored in the `bru_info` object. For
+#' `summary` and `print` methods, arguments passed on to submethods.
 #' @param inlabru_version character; inlabru package version. Default: NULL, for
 #' automatically detecting the version
 #' @param INLA_version character; INLA package version. Default: NULL, for
 #' automatically detecting the version
-#' @rdname bru_info
+#' @describeIn bru_info Create a `bru_info` object
 bru_info.character <- function(method,
                                ...,
                                inlabru_version = NULL,
@@ -369,22 +325,69 @@ bru_info.character <- function(method,
         }
       )
   }
-  object <- list(
-    method = method,
-    ...,
-    inlabru_version = inlabru_version,
-    INLA_version = INLA_version
+  object <- structure(
+    list(
+      method = method,
+      ...,
+      inlabru_version = inlabru_version,
+      INLA_version = INLA_version
+    ),
+    class = "bru_info"
   )
-  class(object) <- c("bru_info", "list")
   object
 }
 
 #' @export
-#' @rdname bru_info
+#' @describeIn bru_info Extract the `bru_info` object from an estimated [bru()]
+#'   result object. The default print method show information about model
+#'   components and observation models.
 bru_info.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
   object[["bru_info"]]
 }
+
+
+#' @export
+#' @method summary bru_info
+#' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
+#' @param \dots Arguments passed on to other `summary` methods
+#' @rdname bru_info
+summary.bru_info <- function(object, verbose = TRUE, ...) {
+  structure(
+    list(
+      inlabru_version = object[["inlabru_version"]],
+      INLA_version = object[["INLA_version"]],
+      components = summary(object[["model"]], verbose = verbose, ...),
+      lhoods = summary(object[["lhoods"]], verbose = verbose, ...)
+    ),
+    class = "summary_bru_info"
+  )
+}
+
+#' @export
+#' @param x An  object to be printed
+#' @rdname bru_info
+print.summary_bru_info <- function(x, ...) {
+  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
+  cat(paste0("INLA version: ", x$INLA_version, "\n"))
+  cat(paste0("Components:\n"))
+  print(x$components)
+  cat(paste0("Likelihoods:\n"))
+  print(x$lhoods)
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_info
+print.bru_info <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+
 
 
 #' @title Extract timing information from fitted [bru] object
@@ -407,381 +410,6 @@ bru_timings.bru <- function(object, ...) {
 
 
 
-
-# Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
-bru_used_upgrade <- function(lhoods, labels) {
-  for (k in seq_along(lhoods)) {
-    if (is.null(lhoods[[k]][["used"]]) &&
-      is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["include_components"]],
-        latent = lhoods[[k]][["include_latent"]],
-        effect_exclude = lhoods[[k]][["exclude_components"]],
-      )
-
-      lhoods[[k]][["include_components"]] <- NULL
-      lhoods[[k]][["exclude_components"]] <- NULL
-      lhoods[[k]][["include_latent"]] <- NULL
-    } else if (!is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["effect"]],
-        latent = lhoods[[k]][["latent"]]
-      )
-      lhoods[[k]][["used_components"]] <- NULL
-    } else {
-      used <- bru_used(lhoods[[k]])
-    }
-
-    used <- bru_used_update(used, labels = labels)
-    lhoods[[k]][["used"]] <- used
-  }
-  lhoods
-}
-
-
-#' Update used_component information objects
-#'
-#' Merge available component labels information with used components
-#' information.
-#'
-#' @param x Object to be updated
-#' @param labels character vector of component labels
-#' @param ... Unused
-#' @returns An updated version of `x`
-#' @keywords internal
-#' @export
-#' @family bru_used
-bru_used_update <- function(x, labels, ...) {
-  UseMethod("bru_used_update")
-}
-
-#' @rdname bru_used_update
-#' @export
-bru_used_update.bru_like_list <- function(x, labels, ...) {
-  for (k in seq_along(x)) {
-    x[[k]] <- bru_used_update(x[[k]], labels = labels, ...)
-  }
-  x
-}
-
-#' @rdname bru_used_update
-#' @export
-bru_used_update.bru_like <- function(x, labels, ...) {
-  x[["used"]] <-
-    bru_used_update(bru_used(x), labels = labels, ...)
-  x
-}
-
-#' @rdname bru_used_update
-#' @export
-bru_used_update.bru_used <- function(x, labels, ...) {
-  used <- x
-  used$effect <-
-    parse_inclusion(
-      labels,
-      include = used[["effect"]],
-      exclude = used[["effect_exclude"]]
-    )
-  used[["effect_exclude"]] <- NULL
-  used$latent <-
-    parse_inclusion(
-      labels,
-      include = used[["latent"]],
-      exclude = NULL
-    )
-  used
-}
-
-
-#' List components used in a model
-#'
-#' Create or extract information about which components are used by a model, or
-#' its individual observation models. If a non-NULL `labels` argument is
-#' supplied, also calls [bru_used_update()] on the `bru_used` objects.
-#'
-#' @param x An object that contains information about used components
-#' @param effect character; components used as effects. When `NULL`, auto-detect
-#' components to include or include all components.
-#' @param effect_exclude character; components to specifically exclude from
-#' effect evaluation. When `NULL`, do not specifically exclude any components.
-#' @param latent character; components used as `_latent` or `_eval()`. When
-#' `NULL`, auto-detect components.
-#' @param labels character; component labels passed on to
-#' [bru_used_update()]
-
-#' @param join Whether to join list output into a single object; Default
-#' may depend on the input object class
-#' @param ... Parameters passed on to the other methods
-#' @returns A `bru_used` object (a list with elements `effect`
-#' and `latent`), or a list of such objects
-#' (for methods with `join = FALSE`)
-#'
-#' @examples
-#' (used <- bru_used(~.))
-#' bru_used(used, labels = c("a", "c"))
-#' (used <- bru_used(~ a + b + c_latent + d_latent))
-#' bru_used(used, labels = c("a", "c"))
-#' (used <- bru_used(expression(a + b + c_latent + d_latent)))
-#' bru_used(used, labels = c("a", "c"))
-#'
-#' @export
-#' @keywords internal
-#' @family bru_used
-bru_used <- function(x = NULL, ...) {
-  # Need to specify the dispatch object explicitly to handle the NULL case:
-  UseMethod("bru_used", x)
-}
-
-#' @describeIn bru_used Create a `bru_used` object.
-#' @export
-bru_used.default <- function(x = NULL, ...,
-                             effect = NULL,
-                             effect_exclude = NULL,
-                             latent = NULL,
-                             labels = NULL) {
-  if (!is.null(x)) {
-    stop(paste0(
-      "bru_used input class not supported: ",
-      "'", paste0(class(x), collapse = "', '"), "'"
-    ))
-  }
-
-  used <- structure(
-    list(
-      effect = effect,
-      latent = latent
-    ),
-    class = "bru_used"
-  )
-  used[["effect_exclude"]] <- effect_exclude
-
-  if (!is.null(labels)) {
-    used <- bru_used_update(used, labels = labels)
-  }
-
-  used
-}
-
-
-# Function from
-# https://stackoverflow.com/questions/63580260/is-there-a-way-to-stop-all-vars-returning-names-from-the-right-hand-side-of
-# corrected to handle multiple $ correctly
-replace_dollar <- function(expr) {
-  if (!is.language(expr) || length(expr) == 1L) {
-    return(expr)
-  }
-  if (expr[[1]] == quote(`$`)) {
-    expr[[1]] <- quote(`[[`)
-    expr[[3]] <- as.character(expr[[3]])
-    expr[[2]] <- replace_dollar(expr[[2]])
-    expr[[3]] <- replace_dollar(expr[[3]])
-  } else {
-    for (i in seq_along(expr)[-1]) {
-      if (!is.null(expr[[i]])) {
-        expr[[i]] <- replace_dollar(expr[[i]])
-      }
-    }
-  }
-  expr
-}
-
-#' @title Extract basic variable names from expression
-#'
-#' @description
-#' Extracts the variable names from an R expression by pre- and post-processing
-#' around [all.vars()].
-#' First replaces `$` with `[[` indexing, so that internal column/variable names
-#' are ignored, then calls `all.vars()`.
-#'
-#' @param x A `formula`, `expression`, or `character`
-#' @param functions logical; if TRUE, include function names
-#'
-#' @returns If successful, a character vector, otherwise `NULL`
-#'
-#' @examples
-#' bru_used_vars(~.)
-#' bru_used_vars(~ a + b + c_latent + d_eval())
-#' bru_used_vars(expression(a + b + c_latent + d_eval()))
-#'
-#' bru_used_vars(~., functions = TRUE)
-#' bru_used_vars(~ a + b + c_latent + d_eval(), functions = TRUE)
-#' bru_used_vars(expression(a + b + c_latent + d_eval()), functions = TRUE)
-#'
-#' bru_used_vars(a ~ b)
-#' bru_used_vars(expression(a ~ b))
-#'
-#' @keywords internal
-#' @export
-#' @family bru_used
-bru_used_vars <- function(x, functions = FALSE) {
-  UseMethod("bru_used_vars")
-}
-
-#' @rdname bru_used_vars
-#' @export
-bru_used_vars.character <- function(x, functions = FALSE) {
-  ex <- paste0(x, collapse = "\n")
-  ex <- str2lang(ex)
-  ex <- replace_dollar(ex)
-  vars <- all.vars(ex, functions = functions, unique = TRUE)
-  if (identical(vars, ".") || identical(vars, character(0))) {
-    vars <- NULL
-  }
-  vars
-}
-
-#' @rdname bru_used_vars
-#' @export
-bru_used_vars.expression <- function(x, functions = FALSE) {
-  attributes(x) <- NULL
-  ex <- deparse1(x, collapse = "\n")
-  bru_used_vars(ex, functions = functions)
-}
-
-#' @describeIn bru_used_vars Only the right-hand side is used.
-#' @export
-bru_used_vars.formula <- function(x, functions = FALSE) {
-  form <- x[[length(x)]]
-  ex <- deparse1(form, collapse = "\n")
-  bru_used_vars(ex, functions = functions)
-}
-
-
-
-#' @describeIn bru_used Create a `bru_used` object from a `character`
-#' representation of an expression.
-#' @export
-bru_used.character <- function(x, ...,
-                               effect = NULL,
-                               effect_exclude = NULL,
-                               latent = NULL,
-                               labels = NULL) {
-  form <- x
-  if (is.null(effect)) {
-    effect <- bru_used_vars(form, functions = FALSE)
-    effect <- effect[
-      !grepl("^.*_latent$", effect) &
-        !grepl("^.*_eval$", effect)
-    ]
-  }
-  if (is.null(latent)) {
-    latent <- bru_used_vars(form, functions = TRUE)
-
-    include_latent <- latent[grepl("^.*_latent$", latent)]
-    include_latent <- gsub("_latent$", "", include_latent)
-    include_eval <- latent[grepl("^.*_eval$", latent)]
-    include_eval <- gsub("_eval$", "", include_eval)
-    latent <- union(include_latent, include_eval)
-    if (length(latent) == 0) {
-      include_latent <- character(0)
-    }
-  }
-
-  bru_used(
-    x = NULL,
-    ...,
-    effect = effect,
-    effect_exclude = effect_exclude,
-    latent = latent,
-    labels = labels
-  )
-}
-
-
-#' @describeIn bru_used Create a `bru_used` object from an expression object.
-#' @export
-bru_used.expression <- function(x, ...,
-                                effect = NULL,
-                                effect_exclude = NULL,
-                                latent = NULL,
-                                labels = NULL) {
-  attributes(x) <- NULL
-  y <- deparse1(x, collapse = "\n")
-  bru_used(
-    x = y,
-    ...,
-    effect = effect,
-    effect_exclude = effect_exclude,
-    latent = latent,
-    labels = labels
-  )
-}
-
-
-#' @describeIn bru_used Create a `bru_used` object from a formula (only the
-#' right-hand side is used).
-#' @export
-bru_used.formula <- function(x, ...,
-                             effect = NULL,
-                             effect_exclude = NULL,
-                             latent = NULL,
-                             labels = NULL) {
-  form <- x[[length(x)]]
-  ex <- deparse1(form, collapse = "\n")
-  bru_used(
-    x = ex,
-    ...,
-    effect = effect,
-    effect_exclude = effect_exclude,
-    latent = latent,
-    labels = labels
-  )
-}
-
-#' @rdname bru_used
-#' @export
-bru_used.bru <- function(x, ..., join = TRUE) {
-  bru_used(x[["bru_info"]][["lhoods"]], ..., join = join)
-}
-
-#' @rdname bru_used
-#' @export
-bru_used.list <- function(x, ..., join = TRUE) {
-  used <- lapply(x, function(y) bru_used(y, ...))
-  if (join) {
-    effect_exclude <- unique(unlist(lapply(used, function(y) y[["effect_exclude"]])))
-    if (length(effect_exclude) > 0) {
-      stop("Cannot join 'bru_used' objects with non-null 'effect_exclude' information.")
-    }
-    used <-
-      bru_used(
-        effect = unique(unlist(lapply(used, function(y) y[["effect"]]))),
-        latent = unique(unlist(lapply(used, function(y) y[["latent"]])))
-      )
-  }
-  used
-}
-
-#' @rdname bru_used
-#' @export
-bru_used.bru_like <- function(x, ...) {
-  bru_used(x[["used"]], ...)
-}
-
-#' @describeIn bru_used Convenience method that takes
-#' an existing `bru_used` object and calls [bru_used_update()]
-#' if `labels` is non-NULL.
-#' @export
-bru_used.bru_used <- function(x, labels = NULL, ...) {
-  if (!is.null(labels)) {
-    x <- bru_used_update(x, labels = labels)
-  }
-  x
-}
-
-
-#' @describeIn bru_used Print method for `bru_used` objects.
-#' @export
-print.bru_used <- function(x, ...) {
-  cat("Used effects : ", paste0(x$effect, collapse = ", "), "\n", sep = "")
-  cat("Used latent  : ", paste0(x$latent, collapse = ", "), "\n", sep = "")
-  if (!is.null(x$effect_exclude)) {
-    cat("Excluded     : ", paste0(x$effect_exclude, collapse = ", "), "\n", sep = "")
-  }
-  invisible(x)
-}
 
 #' @title Convenient model fitting using (iterated) INLA
 #'
@@ -806,21 +434,19 @@ print.bru_used <- function(x, ...) {
 #'       available by using the `cp` family or (even easier) by using the
 #'       [lgcp] function.
 #'   }
-#' @aliases bru
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 #' @param components A `formula`-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
-#'   [component()] for details.
-#' @param ... Likelihoods, each constructed by a calling [like()], or named
-#'   parameters that can be passed to a single [like()] call. Note that
-#'   all the arguments will be evaluated before calling [like()] in order
-#'   to detect if they are `like` objects. This means that
-#'   special arguments that need to be evaluated in the context of
-#'   `response_data` or `data` (such as Ntrials) may will only work that
-#'   way in direct calls to [like()].
+#'   [bru_component()] for details.
+#' @param ... Obervation models, each constructed by a calling [bru_obs()], or
+#'   named parameters that can be passed to a single [bru_obs()] call. Note that
+#'   all the arguments will be evaluated before calling [bru_obs()] in order to
+#'   detect if they are `like` objects. This means that special arguments that
+#'   need to be evaluated in the context of `response_data` or `data` (such as
+#'   `Ntrials`) may will only work that way in direct calls to [bru_obs()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
@@ -837,7 +463,7 @@ bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list(),
                 .envir = parent.frame()) {
-  stopifnot(bru_safe_inla())
+  stopifnot(bru_safe_inla(multicore = TRUE))
 
   timing_convert <- function(x) {
     if (!is.na(x[4])) {
@@ -868,10 +494,14 @@ bru <- function(components = ~ Intercept(1),
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
       stop(paste0(
-        "Cannot mix like() parameters with 'bru_like' and `bru_like_list` objects.",
+        "Cannot mix bru_obs() parameters with 'bru_like' ",
+        "and `bru_like_list` objects.",
         "\n  Check if the argument(s) ",
-        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'", collapse = ", "),
-        " were meant to be given to a call to 'like()',\n  or in the 'options' list argument instead."
+        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
+          collapse = ", "
+        ),
+        " were meant to be given to a call to 'bru_obs()',\n  or in the ",
+        "'options' list argument instead."
       ))
     }
   } else {
@@ -885,7 +515,7 @@ bru <- function(components = ~ Intercept(1),
       )
     }
     lhoods <- list(do.call(
-      like,
+      bru_obs,
       c(
         lhoods,
         list(
@@ -900,12 +530,12 @@ bru <- function(components = ~ Intercept(1),
   lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
 
   if (length(lhoods) == 0) {
-    stop("No response likelihood models provided.")
+    stop("No observation models provided.")
   }
 
   # Turn input into a list of components (from existing list, or a special
   # formula)
-  components <- component_list(components, .envir = .envir)
+  components <- bru_component_list(components, .envir = .envir)
 
   # Update include/exclude information to limit it to existing components
   lhoods <- bru_used_update(lhoods, labels = names(components))
@@ -944,9 +574,15 @@ bru <- function(components = ~ Intercept(1),
       data.frame(
         Task = c("Preprocess"),
         Iteration = 0L,
-        Time = as.difftime(c(timing_setup[1] - timing_start[1]), units = "secs"),
-        System = as.difftime(c(timing_setup[2] - timing_start[2]), units = "secs"),
-        Elapsed = as.difftime(c(timing_setup[3] - timing_start[3]), units = "secs")
+        Time = as.difftime(c(timing_setup[1] - timing_start[1]),
+          units = "secs"
+        ),
+        System = as.difftime(c(timing_setup[2] - timing_start[2]),
+          units = "secs"
+        ),
+        Elapsed = as.difftime(c(timing_setup[3] - timing_start[3]),
+          units = "secs"
+        )
       ),
       result[["bru_iinla"]][["timings"]]
     )
@@ -958,11 +594,11 @@ bru <- function(components = ~ Intercept(1),
 }
 
 
-#' @details
-#' * `bru_rerun` Continue the optimisation from a previously computed estimate.
+#' @describeIn bru
+#' Continue the optimisation from a previously computed estimate. The estimation
+#' `options` list can be given new values to override the original settings.
 #' @param result A previous estimation object of class `bru`
 #'
-#' @rdname bru
 #' @export
 bru_rerun <- function(result, options = list()) {
   result <- bru_check_object_bru(result)
@@ -1118,6 +754,8 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
 
 
 # Extend bind_rows to handle XY/XYZ mismatches in one or more sfc columns
+# TODO: detect non-point-data and either warn/stop or handle it properly.
+# E.g. POLYGON + POINT data combinations currently fail with obscure error.
 extended_bind_rows <- function(...) {
   dt <- list(...)
   names_ <- lapply(dt, names)
@@ -1152,7 +790,8 @@ extended_bind_rows <- function(...) {
     ncol_ <- vapply(
       sf_data_idx_,
       function(i) {
-        ncol(sf::st_coordinates(dt[[i]][[nm]]))
+        crds <- sf::st_coordinates(dt[[i]][[nm]])
+        length(intersect(colnames(crds), c("X", "Y", "Z")))
       },
       0L
     )
@@ -1164,14 +803,7 @@ extended_bind_rows <- function(...) {
         # Extend columns
         if (nrow(dt[[i]]) > 0) {
           dt[[i]][[nm]] <-
-            sf::st_as_sf(
-              as.data.frame(cbind(
-                sf::st_coordinates(dt[[i]][[nm]]),
-                matrix(0.0, nrow(dt[[i]]), ncol_max - ncol_[[i]])
-              )),
-              coords = seq_len(ncol_max),
-              crs = fm_crs(dt[[i]][[nm]])
-            )$geometry
+            sf::st_zm(dt[[i]][[nm]], drop = FALSE, what = "Z")
         } else {
           dt[[i]][[nm]] <-
             sf::st_as_sf(
@@ -1194,9 +826,17 @@ extended_bind_rows <- function(...) {
 }
 
 
-#' Observation model construction for usage with [bru()]
+#' @title Observation model construction for usage with [bru()]
 #'
-#' @aliases like
+#' @description Observation model construction for usage with [bru()].
+#'
+#' Note: Prior to version `2.12.0`, this function was called `like()`, and that
+#' alias will remain for a while until examples etc have been updated and users
+#' made aware of the change. The name change is to avoid issues with namespace
+#' clashes, e.g. with `data.table::like()`, and also to signal that the function
+#' defines observation models, not just likelihood functions.
+#'
+#' @rdname bru_obs
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
@@ -1216,83 +856,103 @@ extended_bind_rows <- function(...) {
 #' `SpatialPoints[DataFrame]`
 #'   object.
 #' @param response_data Likelihood-specific data for models that need different
-#'  size/format for inputs and response variables, as a `data.frame` or
-#' `SpatialPoints[DataFrame]`
-#'   object.
-#' @param mesh Deprecated.
-#' @param E Exposure parameter for family = 'poisson' passed on to
-#'   `INLA::inla`. Special case if family is 'cp': rescale all integration
-#'   weights by a scalar E. For sampler specific reweighting/effort, use a `weight`
-#'   column in the `samplers` object, see [fmesher::fm_int()].
-#'   Default taken from `options$E`, normally `1`.
+#'   size/format for inputs and response variables, as a `data.frame` or
+#'   `SpatialPoints[DataFrame]` object.
+#' @param E Exposure parameter for family = 'poisson' passed on to `INLA::inla`.
+#'   Special case if family is 'cp': rescale all integration weights by a scalar
+#'   E. For sampler specific reweighting/effort, use a `weight` column in the
+#'   `samplers` object, see [fmesher::fm_int()]. Default taken from `options$E`,
+#'   normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
-#'  likelihood. Default taken from `options$Ntrials`, normally `1`.
-#' @param weights Fixed (optional) weights parameters of the likelihood,
-#' so the log-likelihood`[i]` is changed into `weights[i] * log_likelihood[i]`.
-#' Default value is `1`. WARNING: The normalizing constant for the likelihood
-#' is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
-#' interpreted with great care.
+#'   likelihood. Default taken from `options$Ntrials`, normally `1`.
+#' @param weights Fixed (optional) weights parameters of the likelihood, so the
+#'   log-likelihood`[i]` is changed into `weights[i] * log_likelihood[i]`.
+#'   Default value is `1`. WARNING: The normalizing constant for the likelihood
+#'   is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+#'   interpreted with great care.
 #' @param scale Fixed (optional) scale parameters of the precision for several
-#'  models, such as Gaussian and student-t response models.
-#' @param samplers Integration domain for 'cp' family.
-#' @param ips Integration points for 'cp' family. Overrides `samplers`.
-#' @param domain Named list of domain definitions.
-#' @param include Character vector of component labels that are used as effects
-#'   by the
-#'   predictor expression; Default: the result of `[all.vars()]` on the
-#'   predictor expression, unless the expression is not ".", in which case
-#'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The [bru_used()] methods are used
-#'   to extract the variable names, followed by removal of non-component names
-#'   when the components are available.
-#' @param exclude Character vector of component labels that are not used by the
-#'   predictor expression. The exclusion list is applied to the list
-#'   as determined by the `include` parameter; Default: NULL (do not remove
-#'   any components from the inclusion list)
-#' @param include_latent character vector.
-#' Specifies which the latent state variables are
-#' directly available to the predictor expression, with a `_latent` suffix.
-#' This also makes evaluator functions with suffix `_eval` available, taking
-#' parameters `main`, `group`, and `replicate`, taking values for where to
-#' evaluate the component effect that are different than those defined in the
-#' component definition itself (see [component_eval()]). Default `NULL`
-#' auto-detects use of `_latent` and `_eval` in the predictor expression.
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include`,
-#'   `exclude`, and `include_latent`.
-#' @param allow_latent `r lifecycle::badge("deprecated")` logical, deprecated.
-#'   Use `include_latent` instead.
+#'   models, such as Gaussian and student-t response models.
+#' @param domain,samplers,ips Arguments used for `family="cp"`.
+#' \describe{
+#' \item{`domain`}{Named list of domain definitions.}
+#' \item{`samplers`}{Integration subdomain for 'cp' family.}
+#' \item{`ips`}{Integration points for 'cp' family. Defaults
+#'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
+#'   overrides `domain` and `samplers`.}
+#' }
+#' @param include,exclude,include_latent Arguments controlling what components
+#'   and effects are available for use in the predictor expression.
+#' \describe{
+#'   \item{`include`}{
+#'   Character vector of component labels that are used as effects
+#'   by the predictor expression; If `NULL` (default), the [bru_used()]
+#'   method is used to extract the variable names from the formula.
+#'   }
+#'   \item{`exclude`}{
+#'   Character vector of component labels to be excluded from the effect list
+#'   determined by the `include` argument. Default is `NULL`; do not remove
+#'   any components from the inclusion list.
+#'   }
+#'   \item{`include_latent`}{Character vector.
+#'   Specifies which latent state variables are directly available to the
+#'   predictor expression, with a `_latent` suffix. This also makes evaluator
+#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
+#'   and `replicate`, taking values for where to evaluate the component effect
+#'   that are different than those defined in the component definition itself
+#'   (see [bru_component_eval()]). If `NULL`, the [bru_used()] method
+#'   auto-detects use of `_latent` and `_eval` in the predictor expression.
+#'   }
+#' }
+#' @param used Wither `NULL` (default) or a [bru_used()] object, that overrides
+#' the `include`, `exclude`, `include_latent` arguments.
+#' When `used` is `NULL` (default), the information about what effects and
+#' latent vectors are made available to the predictor evaluation is defined by
+#' ```{r, eval=FALSE}
+#' used <- bru_used(
+#'   formula,
+#'   effect = include,
+#'   effect_exclude = exclude,
+#'   latent = include_latent
+#' )
+#' ```
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve
-#'   several rows of the input data to influence the same row. Default `FALSE`,
-#'   but forced to `TRUE` if `response_data` is non-`NULL`, `data` is a `list`,
-#'   or the likelihood construction requires it.
+#'   several rows of the input data to influence the same row. When `NULL`,
+#'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
+#'   `list`, or the likelihood construction requires it.
 #' @param control.family A optional `list` of `INLA::control.family` options
+#' @param tag character; Name that can be used to identify the relevant parts
+#' of INLA predictor vector output, via [bru_index()].
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The evaluation environment to use for special arguments (`E`,
-#'   `Ntrials`, `weights`, and `scale`) if not found in `response_data` or `data`.
-#'   Defaults to the calling environment.
+#'   `Ntrials`, `weights`, and `scale`) if not found in `response_data` or
+#'   `data`. Defaults to the calling environment.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
+#' @seealso [bru_response_size()], [bru_used()], [bru_component()],
+#' [bru_component_eval()]
 #'
-#' @example inst/examples/like.R
-
-like <- function(formula = . ~ ., family = "gaussian", data = NULL,
-                 response_data = NULL, # agg
-                 mesh = deprecated(),
-                 E = NULL,
-                 Ntrials = NULL,
-                 weights = NULL,
-                 scale = NULL,
-                 samplers = NULL, ips = NULL, domain = NULL,
-                 include = NULL,
-                 exclude = NULL,
-                 include_latent = NULL,
-                 used = NULL,
-                 allow_latent = deprecated(),
-                 allow_combine = NULL,
-                 control.family = NULL,
-                 options = list(),
-                 .envir = parent.frame()) {
+#' @example inst/examples/bru_obs.R
+bru_obs <- function(formula = . ~ .,
+                    family = "gaussian",
+                    data = NULL,
+                    response_data = NULL,
+                    E = NULL,
+                    Ntrials = NULL,
+                    weights = NULL,
+                    scale = NULL,
+                    domain = NULL,
+                    samplers = NULL,
+                    ips = NULL,
+                    include = NULL,
+                    exclude = NULL,
+                    include_latent = NULL,
+                    used = NULL,
+                    allow_combine = NULL,
+                    control.family = NULL,
+                    tag = NULL,
+                    options = list(),
+                    .envir = parent.frame()) {
   options <- bru_call_options(options)
 
   # Some defaults
@@ -1402,18 +1062,29 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
   # More on special bru likelihoods
   if (family == "cp") {
     if (is.null(response)) {
-      stop("You called like() with family='cp' but the evaluated response information is NULL")
+      stop(paste0(
+        "You called bru_obs() with family='cp' but the evaluated ",
+        "response information is NULL"
+      ))
     }
 
     if (is.null(ips)) {
       if (is.null(domain)) {
-        stop("The family='cp' model requires a 'domain' specification compatible with 'fmesher::fm_int()'")
+        stop(paste0(
+          "The family='cp' model requires a 'domain' specification compatible ",
+          "with 'fmesher::fm_int()'"
+        ))
       }
       if (!setequal(names(response), names(domain))) {
         stop(paste0(
-          "Mismatch between names of observed dimensions and the given domain names:\n",
-          "    names(response) = (", paste0(names(response), collapse = ", "), ")\n",
-          "    names(domain)   = (", paste0(names(domain), collapse = ", "), ")"
+          "Mismatch between names of observed dimensions and the given ",
+          "domain names:\n",
+          "    names(response) = (",
+          paste0(names(response), collapse = ", "),
+          ")\n",
+          "    names(domain)   = (",
+          paste0(names(domain), collapse = ", "),
+          ")"
         ))
       }
       ips <- fm_int(
@@ -1430,12 +1101,15 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     }
 
     if (length(E) > 1) {
-      warning("Exposure/effort parameter E should be a scalar for likelihood 'cp'.")
+      warning(
+        "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
+      )
     }
 
     # TODO!!! ####
     ips_is_Spatial <- inherits(ips, "Spatial")
     if (ips_is_Spatial) {
+      bru_safe_sp(force = TRUE)
       ips_coordnames <- sp::coordnames(ips)
       ips_crs <- fm_CRS(ips)
       # For backwards compatibility:
@@ -1449,7 +1123,10 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       } else {
         if (inherits(response, c("sf", "sfc")) ||
           (is.list(response) &&
-            any(vapply(response, function(x) inherits(x, c("sf", "sfc")), TRUE)))) {
+            any(vapply(
+              response,
+              function(x) inherits(x, c("sf", "sfc")), TRUE
+            )))) {
           ips <- sf::st_as_sf(ips)
           ips_is_Spatial <- FALSE
         }
@@ -1460,12 +1137,11 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
     # For non-Spatial models:
     # Use the response data list as the actual data object, since that's now the
     # canonical place where the point information is given.  This also allows
-    # response_data to be used when constructing the response list.
-    # This makes it a strict requirement that the predictor can be evaluated as
-    # a pure function of the domain data.  When implementing sf support, might
-    # be able to give explicit access to spatial coordinates, but otherwise the
-    # user can extract it from the geometry with st_coordinates(geometry)[,1] or
-    # similar.
+    # response_data to be used when constructing the response list. This makes
+    # it a strict requirement that the predictor can be evaluated as a pure
+    # function of the domain data.  When implementing sf support, might be able
+    # to give explicit access to spatial coordinates, but otherwise the user can
+    # extract it from the geometry with st_coordinates(geometry)[,1] or similar.
     # For Spatial models, keep the old behaviour for backwards compatibility for
     # now, but can likely realign that in the future after more testing.
     # Save general response data to add to response (precomputed covariates etc)
@@ -1529,13 +1205,23 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       if (!linear) {
         expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
-          "{BRU_eta <- ", expr_text, "\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+          "{\n",
+          "  BRU_eta <- ", expr_text, "\n",
+          "  if (length(BRU_eta) == 1L) {\n",
+          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
+          "  }\n",
+          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "}"
         )
       } else {
         expr_text <- paste0(
-          "{BRU_eta <- BRU_EXPRESSION\n",
-          " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
+          "{\n",
+          "  BRU_eta <- BRU_EXPRESSION\n",
+          "  if (length(BRU_eta) == 1L) {\n",
+          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
+          "  }\n",
+          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "}"
         )
       }
       expr <- parse(text = expr_text)
@@ -1573,15 +1259,24 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
 
     allow_combine <- TRUE
   } else {
-    allow_combine <-
-      if (!is.null(response_data) ||
-        (is.list(data) && !is.data.frame(data))) {
-        TRUE
-      } else if (is.null(allow_combine)) {
-        FALSE
+    if (!is.logical(allow_combine)) {
+      if (!is.null(response_data)) {
+        warning("Non-null response data supplied; guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning.",
+          immediate. = TRUE
+        )
+        allow_combine <- TRUE
+      } else if (is.list(data) && !is.data.frame(data)) {
+        warning("Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning.",
+          immediate. = TRUE
+        )
+        allow_combine <- TRUE
       } else {
-        allow_combine
+        allow_combine <- FALSE
       }
+    }
 
     # Need to make a list instead of data.frame, to allow inla.mdata responses
     response_data <- list(
@@ -1601,70 +1296,321 @@ like <- function(formula = . ~ ., family = "gaussian", data = NULL,
       latent = include_latent
     )
   }
-  if (lifecycle::is_present(allow_latent)) {
-    lifecycle::deprecate_stop(
-      "2.8.0",
-      "like(allow_latent = 'is deprecated')",
-      "like(include_latent)",
-      details = "The default `like(..., include_latent = NULL)` auto-detects use of `_latent` and `_eval`."
-    )
-    if (allow_latent && is.null(include_latent)) {
-      # Set to NULL so that later bru_used_update adds all components.
-      used[["latent"]] <- NULL
-    }
-  }
-
 
   # The likelihood object that will be returned
 
-  lh <- list(
-    family = family,
-    formula = formula,
-    response_data = response_data, # agg
-    data = data,
-    E = E,
-    Ntrials = Ntrials,
-    weights = weights,
-    scale = scale,
-    samplers = samplers,
-    linear = linear,
-    expr = expr,
-    response = response,
-    inla.family = inla.family,
-    domain = domain,
-    used = used,
-    allow_combine = allow_combine,
-    control.family = control.family
+  lh <- structure(
+    list(
+      family = family,
+      formula = formula,
+      response_data = response_data, # agg
+      data = data,
+      E = E,
+      Ntrials = Ntrials,
+      weights = weights,
+      scale = scale,
+      samplers = samplers,
+      linear = linear,
+      expr = expr,
+      response = response,
+      inla.family = inla.family,
+      domain = domain,
+      used = used,
+      allow_combine = allow_combine,
+      control.family = control.family,
+      tag = tag
+    ),
+    class = "bru_like"
   )
-
-  class(lh) <- c("bru_like", "list")
 
   # Return likelihood
   lh
 }
 
-# Placeholder for future modularised version of like()
-## @describeIn like
-## Alias for `like()`, with `obs` standing for "observation model"
-## @export
-# bru_obs <- like
-
-
-#' @describeIn like
-#' Combine `bru_like` likelihoods into a `bru_like_list` object
-#' @param \dots For `like_list.bru_like`, one or more `bru_like` objects
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
+#' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
+#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
 #' @export
-like_list <- function(...) {
-  UseMethod("like_list")
+like <- function(formula = . ~ .,
+                 family = "gaussian",
+                 data = NULL,
+                 response_data = NULL,
+                 E = NULL,
+                 Ntrials = NULL,
+                 weights = NULL,
+                 scale = NULL,
+                 domain = NULL,
+                 samplers = NULL,
+                 ips = NULL,
+                 include = NULL,
+                 exclude = NULL,
+                 include_latent = NULL,
+                 used = NULL,
+                 allow_combine = NULL,
+                 control.family = NULL,
+                 tag = NULL,
+                 options = list(),
+                 .envir = parent.frame(),
+                 mesh = deprecated()) {
+  # lifecycle::deprecate_soft(
+  #   "2.11.1.9026",
+  #   "like()",
+  #   "bru_obs()"
+  # )
+
+  options <- bru_call_options(options)
+
+  E <- eval_in_data_context(
+    substitute(E),
+    data = data,
+    response_data = response_data,
+    default = options[["E"]],
+    .envir = .envir
+  )
+  Ntrials <- eval_in_data_context(
+    substitute(Ntrials),
+    data = data,
+    response_data = response_data,
+    default = options[["Ntrials"]],
+    .envir = .envir
+  )
+  weights <- eval_in_data_context(
+    substitute(weights),
+    data = data,
+    response_data = response_data,
+    default = 1,
+    .envir = .envir
+  )
+  scale <- eval_in_data_context(
+    substitute(scale),
+    data = data,
+    response_data = response_data,
+    default = 1,
+    .envir = .envir
+  )
+
+  special_env <- new.env(parent = .envir)
+  assign("E", E, envir = special_env)
+  assign("Ntrials", Ntrials, envir = special_env)
+  assign("weights", weights, envir = special_env)
+  assign("scale", scale, envir = special_env)
+
+  bru_obs(
+    formula = formula,
+    family = family,
+    data = data,
+    response_data = response_data,
+    E = E,
+    Ntrials = Ntrials,
+    weights = weights,
+    scale = scale,
+    domain = domain,
+    samplers = samplers,
+    ips = ips,
+    include = include,
+    exclude = exclude,
+    include_latent = include_latent,
+    used = used,
+    allow_combine = allow_combine,
+    control.family = control.family,
+    tag = tag,
+    options = options,
+    .envir = special_env
+  )
 }
 
-#' @describeIn like
+#' @title Extract predictor index information
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#' Extract the index vector for a [bru_obs()] predictor,
+#' or the whole or a subset of a full [bru()] predictor.
+#'
+#' @param object A [bru()] or [bru_obs()] output object
+#' @param \dots Arguments passed on to sub-methods.
+#' @returns An `integer` vector.
+#' @examplesIf bru_safe_inla()
+#' fit <- bru(
+#'   ~ 0 + x,
+#'   bru_obs(
+#'     y ~ .,
+#'     data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
+#'     tag = "A"
+#'   ),
+#'   bru_obs(
+#'     y ~ .,
+#'     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
+#'     tag = "B"
+#'   )
+#' )
+#' bru_index(fit)
+#' bru_index(fit, "A")
+#' bru_index(fit, "B")
+#' bru_index(fit, c("B", "A"))
+#' bru_index(fit, what = "missing")
+#' @export
+bru_index <- function(object, ...) {
+  UseMethod("bru_index")
+}
+
+#' @describeIn bru_index Extract the index vector for the predictor vector for a
+#'   [bru_obs()] sub-model. The indices are relative to the sub-model, and need
+#'   to be appropriately offset to be used in the full model predictor.
+#' @param what `character` or `NULL`; One of `NULL`, "all", "observed", and
+#'   "missing". If `NULL` (default) or "all", gives the index vector for the
+#'   full sub-model predictor. If "observed", gives the index vector for the
+#'   observed part (response is not `NA`). If "missing", gives the index vector
+#'   for the missing part (response is `NA`) of the model.
+#' @export
+bru_index.bru_like <- function(object, what = NULL, ...) {
+  what <- match.arg(what, c("all", "observed", "missing"))
+  size <- bru_response_size(object)
+  idx <- seq_len(size)
+  if (identical(what, "all")) {
+    return(idx)
+  }
+  resp <- object[["response_data"]][[object[["response"]]]]
+  if (is.vector(resp)) {
+    miss <- is.na(resp)
+  } else {
+    # Should work for both inla.surv and inla.mdata objects:
+    miss <- is.na(resp[[1]])
+  }
+  if (identical(what, "observed")) {
+    return(idx[!miss])
+  }
+  return(idx[miss])
+}
+
+#' @describeIn bru_index Extract the index vector for "APredictor" for one or
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination
+#'   of `tag` and `what`.
+#' @param tag `character` or `integer`; Either a character vector identifying
+#'   the tags of one or more of the [bru_obs()] observation models, or an
+#'   integer vector identifying models by their [bru()] specification order. If
+#'   `NULL` (default) computes indices for all sub-models.
+#' @export
+bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
+  if (is.null(tag)) {
+    tag <- seq_len(length(object[["bru_info"]][["lhoods"]]))
+  }
+  if (length(tag) == 0L) {
+    return(integer(0))
+  }
+  size <- bru_response_size(object)
+  off <- c(0L, cumsum(size))
+  if (is.character(tag)) {
+    if (!all(tag %in% names(object[["bru_info"]][["lhoods"]]))) {
+      stop(paste0(
+        "Invalid tag(s) '", paste(tag, collapse = ", "), "' for ",
+        "bru object with tags '", paste(names(object[["bru_info"]][["lhoods"]]),
+          collapse = ", "
+        ), "'"
+      ))
+    }
+    unlist(lapply(tag, function(x) {
+      x_idx <- which(names(object$bru_info$lhoods) %in% x)
+      off[x_idx] + bru_index(object$bru_info$lhoods[[x_idx]], what = what)
+    }))
+  } else {
+    ok_tags <- (tag >= 1L) &
+      (tag <= length(object[["bru_info"]][["lhoods"]]))
+    if (any(!ok_tags)) {
+      stop(paste0(
+        "Invalid tag indices '", paste(tag[!ok_tags], collapse = ", "),
+        "' for bru object with tag indices '1, ..., ",
+        length(object[["bru_info"]][["lhoods"]]), "'"
+      ))
+    }
+    unlist(lapply(tag, function(x) {
+      off[x] + bru_index(object$bru_info$lhoods[[x]], what = what)
+    }))
+  }
+}
+
+
+
+
+#' @title Response size queries
+#'
+#' @description
+#' Extract the number of response values from `bru` and related objects.
+#' @return An `integer` vector.
+#' @param object An object from which to extract response size(s).
+#' @seealso [like()]
+#' @export
+#' @examples
+#' bru_response_size(
+#'   bru_obs(y ~ 1, data = data.frame(y = rnorm(10)), family = "gaussian")
+#' )
+bru_response_size <- function(object) {
+  UseMethod("bru_response_size")
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru_like` object.
+#' @export
+bru_response_size.bru_like <- function(object) {
+  resp <- object[["response_data"]][[object[["response"]]]]
+  if (inherits(resp, "inla.surv")) {
+    # This special case handling is needed because inla.surv objects are
+    # lists. When the INLA package changes representation of `inla.surv`
+    # to a tibble or data.frame, this special case won't be needed anymore.
+    NROW(resp[[1]])
+  } else {
+    NROW(resp)
+  }
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru_like_list` object.
+#' @export
+bru_response_size.bru_like_list <- function(object) {
+  vapply(object, bru_response_size, 1L)
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru_info` object.
+#' @export
+bru_response_size.bru_info <- function(object) {
+  bru_response_size(object[["lhoods"]])
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru` object.
+#' @export
+bru_response_size.bru <- function(object) {
+  bru_response_size(object[["bru_info"]])
+}
+
+
+#' @describeIn bru_obs
+#' Combine `bru_like` likelihoods into a `bru_like_list` object
+#' @param \dots For `bru_like_list.bru_like`, one or more `bru_like` objects
+#' @export
+bru_like_list <- function(...) {
+  UseMethod("bru_like_list")
+}
+
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like_list()`
+#'   alias. Use [bru_like_list()] instead.
+#' @export
+like_list <- function(...) {
+  # lifecycle::deprecate_soft(
+  #   "2.12.0",
+  #   "like_list()",
+  #   "bru_like_list()"
+  # )
+  UseMethod("bru_like_list")
+}
+
+#' @describeIn bru_obs
 #' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @param object A list of `bru_like` objects
 #' @param envir An optional environment for the new `bru_like_list` object
 #' @export
-like_list.list <- function(object, envir = NULL, ...) {
+bru_like_list.list <- function(object, envir = NULL, ...) {
   if (is.null(envir)) {
     envir <- environment(object)
   }
@@ -1680,18 +1626,35 @@ like_list.list <- function(object, envir = NULL, ...) {
 
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
+  orig_names <- names(object)
+  names(object) <- vapply(
+    object,
+    function(x) {
+      if (is.null(x[["tag"]])) {
+        NA_character_
+      } else {
+        x[["tag"]]
+      }
+    },
+    ""
+  )
+  # Preserve named elements for tag-less elements
+  na_names <- is.na(names(object))
+  if (any(na_names) && !is.null(orig_names)) {
+    names(object)[na_names] <- orig_names[na_names]
+  }
   object
 }
 
-#' @describeIn like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods
 #' into a `bru_like_list` object
 #' @export
-like_list.bru_like <- function(..., envir = NULL) {
+bru_like_list.bru_like <- function(..., envir = NULL) {
   do.call(c, list(..., envir = envir))
 }
 
-#' @describeIn like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1706,10 +1669,10 @@ c.bru_like <- function(..., envir = NULL) {
     }
   })
   lst <- do.call(c, lst)
-  like_list(lst, envir = envir)
+  bru_like_list(lst, envir = envir)
 }
 
-#' @describeIn like
+#' @describeIn bru_obs
 #' Combine several `bru_like` likelihoods and/or `bru_like_list`
 #' objects into a `bru_like_list` object
 #' @export
@@ -1734,7 +1697,7 @@ c.bru_like_list <- function(..., envir = NULL) {
     return(do.call("c", lst))
   }
   object <- NextMethod()
-  like_list(object, envir = envir)
+  bru_like_list(object, envir = envir)
 }
 
 
@@ -1742,7 +1705,8 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' @export
 #' @param x `bru_like_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
-#' @rdname like
+#' @rdname bru_obs
+#' @seealso [summary.bru_like()]
 `[.bru_like_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()
@@ -1752,12 +1716,116 @@ c.bru_like_list <- function(..., envir = NULL) {
 }
 
 
+#' Summary and print methods for observation models
+#'
+#' @rdname bru_like_print
+#' @seealso [bru_obs()]
+#' @param object Object to operate on
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `TRUE`
+#' @param \dots Arguments passed on to other `summary` methods
+#' @param x Object to be printed
+#' @method summary bru_like
+#' @export
+#' @examples
+#' obs <- bru_obs(y ~ ., data = data.frame(y = rnorm(10)))
+#' summary(obs)
+#' print(obs)
+#'
+summary.bru_like <- function(object, verbose = TRUE, ...) {
+  structure(
+    list(
+      family = object[["family"]],
+      data_class = class(object[["data"]]),
+      response_class = class(object[["response_data"]][[object[["response"]]]]),
+      predictor = deparse(object[["formula"]]),
+      used = object[["used"]],
+      tag = object[["tag"]]
+    ),
+    class = "summary_bru_like"
+  )
+}
+
+#' @rdname bru_like_print
+#' @method summary bru_like_list
+#' @export
+summary.bru_like_list <- function(object, verbose = TRUE, ...) {
+  structure(
+    lapply(
+      object,
+      function(x) {
+        summary(x, verbose = verbose, ...)
+      }
+    ),
+    class = "summary_bru_like_list"
+  )
+}
+
+#' @rdname bru_like_print
+#' @export
+print.summary_bru_like <- function(x, ...) {
+  lh <- x
+  cat(sprintf(
+    paste0(
+      "  Family: '%s'\n",
+      "    Tag: %s\n",
+      "    Data class: %s\n",
+      "    Response class: %s\n",
+      "    Predictor: %s\n",
+      "    Used components: %s\n"
+    ),
+    lh$family,
+    paste0("'", lh$tag, "'", collapse = ", "),
+    paste0("'", lh$data_class, "'", collapse = ", "),
+    paste0("'", lh$response_class, "'", collapse = ", "),
+    if (length(lh$predictor) > 1) {
+      paste0(
+        "\n        ",
+        paste0(
+          lh$predictor,
+          collapse = "\n        "
+        )
+      )
+    } else {
+      lh$predictor
+    },
+    format(lh$used)
+  ))
+  invisible(x)
+}
+
+#' @rdname bru_like_print
+#' @export
+print.summary_bru_like_list <- function(x, ...) {
+  for (lh in x) {
+    print(lh)
+  }
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_like_print
+print.bru_like <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_like_print
+print.bru_like_list <- function(x, ...) {
+  print(summary(x))
+  invisible(x)
+}
+
+
 #' Utility functions for bru likelihood objects
 #' @param x Object of `bru_like` or `bru_like_list` type
 #' @export
 #' @keywords internal
 #' @returns * `bru_like_inla_family()` returns a string or vector of strings
 #' @rdname bru_like_methods
+#' @seealso [summary.bru_like()]
 bru_like_inla_family <- function(x, ...) {
   UseMethod("bru_like_inla_family")
 }
@@ -1775,8 +1843,9 @@ bru_like_inla_family.bru_like_list <- function(x, ...) {
 #' @param control.family list of INLA `control.family` options to override
 #' @export
 #' @keywords internal
-#' @returns * `bru_like_control_family()` returns a list with `INLA::control.family` options,
-#' or a list of such lists, with one element per observation model
+#' @returns * `bru_like_control_family()` returns a list with
+#'   `INLA::control.family` options, or a list of such lists, with one element
+#'   per observation model
 #' @rdname bru_like_methods
 bru_like_control_family <- function(x, control.family = NULL, ...) {
   UseMethod("bru_like_control_family")
@@ -1794,11 +1863,16 @@ bru_like_control_family.bru_like <- function(x, control.family = NULL, ...) {
 }
 #' @export
 #' @rdname bru_like_methods
-bru_like_control_family.bru_like_list <- function(x, control.family = NULL, ...) {
+bru_like_control_family.bru_like_list <- function(x,
+                                                  control.family = NULL,
+                                                  ...) {
   # Extract the control.family information for each likelihood
   if (!is.null(control.family)) {
     if (length(control.family) != length(x)) {
-      stop("control.family supplied as option, but format doesn't match the number of likelihoods")
+      stop(paste0(
+        "control.family supplied as option, but format doesn't match ",
+        "the number of likelihoods"
+      ))
     }
     like_has_cf <- vapply(
       seq_along(x),
@@ -1806,13 +1880,15 @@ bru_like_control_family.bru_like_list <- function(x, control.family = NULL, ...)
       TRUE
     )
     if (any(like_has_cf)) {
-      warning("Global control.family option overrides settings in likelihood(s) ",
-        paste0(which(like_has_cf)),
-        collapse = ", "
+      warning(
+        "Global control.family option overrides settings in likelihood(s) ",
+        paste0(which(like_has_cf), collapse = ", ")
       )
     }
   } else {
     control.family <- lapply(x, bru_like_control_family)
+    # inla() requires a unnamed list of lists
+    names(control.family) <- NULL
   }
   control.family
 }
@@ -1864,32 +1940,19 @@ bru_like_expr <- function(lhood, components) {
 #' and can be provided via the respective parameter. If samplers is NULL it is
 #' assumed that all of the LGCP's dimensions have been observed completely.
 #'
-#' @aliases lgcp
 #' @export
-#' @param components A formula describing the latent components
-#' @param data A data frame or `SpatialPoints(DataFrame)` object
-#' @param samplers A data frame or `Spatial[Points/Lines/Polygons]DataFrame`
-#'   objects
-#' @param domain Named list of domain definitions
-#' @param ips Integration points (overrides `samplers`)
-#' @param formula If NULL, the linear combination implied by the `components` is
-#'   used as a predictor for the point location intensity. If a (possibly
-#'   non-linear) expression is provided the respective Taylor approximation is
-#'   used as a predictor. Multiple runs of INLA are then required for a better
-#'   approximation of the posterior.
-#' @param \dots Further arguments passed on to [like()]. In particular,
-#' optional `E`, a single numeric used rescale all integration weights by a fixed
-#'   factor.
-#' @param options See [bru_options_set()]
-#' @param .envir The evaluation environment to use for special arguments
-#' (`E`, `Ntrials`, `weights`, `scale`) if not found in response_data or data.
-#' Defaults to the calling environment.
+#' @inheritParams like
+#' @inheritParams bru
+#' @param \dots Further arguments passed on to [bru_obs()]. In particular,
+#'   optional `E`, a single numeric used rescale all integration weights by a
+#'   fixed factor.
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   require(fmesher, quietly = TRUE)) {
+#'   require(fmesher, quietly = TRUE) &&
+#'   require(sn, quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data <- gorillas_sf
 #'
@@ -1934,8 +1997,8 @@ bru_like_expr <- function(lhood, components) {
 #'
 lgcp <- function(components,
                  data,
-                 samplers = NULL,
                  domain = NULL,
+                 samplers = NULL,
                  ips = NULL,
                  formula = . ~ .,
                  ...,
@@ -1946,10 +2009,10 @@ lgcp <- function(components,
     response <- extract_response(components)
     formula <- auto_response(formula, response)
   }
-  lik <- like(
+  lik <- bru_obs(
     family = "cp",
-    formula = formula, data = data, samplers = samplers,
-    ips = ips, domain = domain,
+    formula = formula, data = data,
+    domain = domain, samplers = samplers, ips = ips,
     ...,
     options = options,
     .envir = .envir
@@ -1968,24 +2031,27 @@ expand_to_dataframe <- function(x, data = NULL) {
   if (length(only_x) < length(names(x))) {
     x <- x[!(names(x) %in% names(data))]
   }
-  if (inherits(x, "SpatialPixels") &&
-    !inherits(x, "SpatialPixelsDataFrame")) {
-    result <- sp::SpatialPixelsDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialGrid") &&
-    !inherits(x, "SpatialGridDataFrame")) {
-    result <- sp::SpatialGridDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialLines") &&
-    !inherits(x, "SpatialLinesDataFrame")) {
-    result <- sp::SpatialLinesDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialPolygons") &&
-    !inherits(x, "SpatialPolygonsDataFrame")) {
-    result <- sp::SpatialPolygonsDataFrame(x, data = data)
-  } else if (inherits(x, "SpatialPoints") &&
-    !inherits(x, "SpatialPointsDataFrame")) {
-    # Other classes inherit from SpatialPoints, so need to be handled first
-    result <- sp::SpatialPointsDataFrame(x, data = data)
-  } else if (inherits(x, "Spatial")) {
-    result <- sp::cbind.Spatial(x, data)
+  if (inherits(x, "Spatial")) {
+    bru_safe_sp(force = TRUE)
+    if (inherits(x, "SpatialPixels") &&
+      !inherits(x, "SpatialPixelsDataFrame")) {
+      result <- sp::SpatialPixelsDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialGrid") &&
+      !inherits(x, "SpatialGridDataFrame")) {
+      result <- sp::SpatialGridDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialLines") &&
+      !inherits(x, "SpatialLinesDataFrame")) {
+      result <- sp::SpatialLinesDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialPolygons") &&
+      !inherits(x, "SpatialPolygonsDataFrame")) {
+      result <- sp::SpatialPolygonsDataFrame(x, data = data)
+    } else if (inherits(x, "SpatialPoints") &&
+      !inherits(x, "SpatialPointsDataFrame")) {
+      # Other classes inherit from SpatialPoints, so need to be handled first
+      result <- sp::SpatialPointsDataFrame(x, data = data)
+    } else {
+      result <- sp::cbind.Spatial(x, data)
+    }
   } else if (is.data.frame(x)) {
     result <- cbind(x, data)
   } else {
@@ -2013,7 +2079,6 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' Internally, this method calls [generate.bru()] in order to draw samples from
 #' the model.
 #'
-#' @aliases predict.bru
 #' @export
 #' @param object An object obtained by calling [bru()] or [lgcp()].
 #' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates
@@ -2056,13 +2121,13 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_component_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
-#' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values and
-#'   other summary statistics attached. Non-S4 object outputs have the class
+#' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values
+#'   and other summary statistics attached. Non-S4 object outputs have the class
 #'   "bru_prediction" added at the front of the class list.
 #' @example inst/examples/predict.bru.R
 
@@ -2082,29 +2147,41 @@ predict.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
-        details = c("`data` provided but not `newdata`. Setting `newdata <- data`.")
+      lifecycle::deprecate_stop(
+        "2.8.0",
+        "predict(data)",
+        "predict(newdata)",
+        details =
+          "Only `data` provided and not `newdata`. Use `newdata` only."
       )
-      newdata <- data
     } else {
-      lifecycle::deprecate_warn("2.8.0", "predict(data)", "predict(newdata)",
-        details = c("Both `newdata` and `data` provided. `data` will be ignored.")
+      lifecycle::deprecate_stop(
+        "2.8.0",
+        "predict(data)",
+        "predict(newdata)",
+        details = "Both `newdata` and `data` provided. Use `newdata` only."
       )
     }
-    data <- NULL
   }
 
-  # Convert data into list, data.frame or a Spatial object if not provided as such
+  # Convert data into list, data.frame or a Spatial object if not provided as
+  # such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_stop(
       "2.8.0",
-      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
-      details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
+      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
+      details = paste0(
+        "Use 'newdata = fm_vertices(mesh, format = ...)' ",
+        "instead of 'newdata = mesh'"
+      )
     )
   } else if (inherits(newdata, "formula")) {
-    stop("Formula supplied as data to predict.bru(). Please check your argument order/names.")
+    stop(paste0(
+      "Formula supplied as data to predict.bru(). ",
+      "Please check your argument order/names."
+    ))
   }
 
   vals <- generate(
@@ -2209,7 +2286,6 @@ predict.bru <- function(object,
 #' that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
-#' @aliases generate.bru
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
@@ -2246,7 +2322,7 @@ predict.bru <- function(object,
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_component_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
@@ -2269,29 +2345,41 @@ generate.bru <- function(object,
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
-      lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
-        details = c("Both `data` provided but not `newdata`. Setting `newdata <- data`.")
+      lifecycle::deprecate_stop(
+        "2.8.0",
+        "generate(data)",
+        "generate(newdata)",
+        details =
+          "Only `data` provided and not `newdata`. Use `newdata` only."
       )
-      newdata <- data
     } else {
-      lifecycle::deprecate_warn("2.8.0", "generate(data)", "generate(newdata)",
-        details = c("Both `newdata` and `data` provided. `data` will be ignored.")
+      lifecycle::deprecate_stop(
+        "2.8.0",
+        "generate(data)",
+        "generate(newdata)",
+        details = "Both `newdata` and `data` provided. Use `newdata` only."
       )
     }
-    data <- NULL
   }
 
-  # Convert data into list, data.frame or a Spatial object if not provided as such
+  # Convert data into list, data.frame or a Spatial object if not provided as
+  # such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
   } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
     lifecycle::deprecate_stop(
       "2.8.0",
-      "predict(newdata = 'should not be an fm_mesh_2d/inla.mesh object')",
-      details = "Use 'newdata = fm_vertices(mesh, format = ...)' instead of 'newdata = mesh'"
+      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
+      details = paste0(
+        "Use 'newdata = fm_vertices(mesh, format = ...)' ",
+        "instead of 'newdata = mesh'"
+      )
     )
   } else if (inherits(newdata, "formula")) {
-    stop("Formula supplied as data to generate.bru(). Please check your argument order/names.")
+    stop(paste0(
+      "Formula supplied as data to generate.bru(). ",
+      "Please check your argument order/names."
+    ))
   }
 
 
@@ -2342,7 +2430,6 @@ generate.bru <- function(object,
 
 # Monte Carlo method for estimating posterior
 #
-# @aliases montecarlo.posterior
 # @export
 # @param dfun A function returning a density for given x
 # @param sfun A function providing samples from a posterior
@@ -2413,7 +2500,17 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 
     # Plot new density estimate versus old one (debugging)
     if (verbose) {
-      cat(paste0("hpd:", min(x), " ", max(x), ", err = ", err, ", n = ", n, "\n"))
+      cat(paste0(
+        "hpd:",
+        min(x),
+        " ",
+        max(x),
+        ", err = ",
+        err,
+        ", n = ",
+        n,
+        "\n"
+      ))
       # plot(x, lest, type = "l") ; lines(x, est, type = "l", col = "red")
     }
 
@@ -2444,20 +2541,25 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #' @param data A list of samples, each either numeric or a `data.frame`
 #' @param probs A numeric vector of probabilities with values in `[0, 1]`,
 #'   passed to `stats::quantile`
-#' @param x A `data.frame` of data columns that should be added to the summary data frame
-#' @param cbind.only If TRUE, only `cbind` the samples and return a matrix where each column is a sample
+#' @param x A `data.frame` of data columns that should be added to the summary
+#'   data frame
+#' @param cbind.only If TRUE, only `cbind` the samples and return a matrix where
+#'   each column is a sample
 #' @param max_moment integer, at least 2. Determines the largest moment
 #'   order information to include in the output. If `max_moment > 2`,
 #'   includes "skew" (skewness, `E[(x-m)^3/s^3]`), and
 #'   if `max_moment > 3`, includes
 #'   "ekurtosis" (excess kurtosis, `E[(x-m)^4/s^4] - 3`). Default 2.
-#'   Note that the Monte Carlo variability of the `ekurtois` estimate may be large.
-#' @return A `data.frame` or `Spatial[Points/Pixels]DataFrame` with summary statistics,
-#' "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err", "sd.mc_std_err"
+#'   Note that the Monte Carlo variability of the `ekurtois` estimate may be
+#'   large.
+#' @return A `data.frame` or `Spatial[Points/Pixels]DataFrame` with summary
+#'   statistics, "mean", "sd", `paste0("q", probs)`, "mean.mc_std_err",
+#'   "sd.mc_std_err"
 #'
 #' @examples
 #' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
 #'
+#' @keywords internal
 bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
                           x = NULL, cbind.only = FALSE,
                           max_moment = 2) {
@@ -2526,12 +2628,16 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     }
 
     # Add Monte Carlo standard errors
-    smy[["mean.mc_std_err"]] <- smy[["sd"]] / sqrt(N)
     # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
     # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
     smy[["sd.mc_std_err"]] <-
       sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
         smy[["sd"]] / sqrt(4 * N)
+    # Include sd MC error in estimate of mean MC error:
+    smy[["mean.mc_std_err"]] <- (
+      smy[["sd"]] +
+        smy[["sd.mc_std_err"]] * 2
+    ) / sqrt(N)
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
@@ -2570,7 +2676,8 @@ nonlin_predictor <- function(param, state) {
               param[["lhoods"]][[lh_idx]],
               param[["model"]][["effects"]]
             ),
-            format = "matrix"
+            format = "matrix",
+            n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
           )
         )
       }
@@ -2588,11 +2695,11 @@ scale_state <- function(state0, state1, scaling_factor) {
   new_state
 }
 
-line_search_optimisation_target <- function(x, param) {
+line_search_opt_target <- function(x, param) {
   (x - 1)^2 * param[1] + 2 * (x - 1) * x^2 * param[2] + x^4 * param[3]
 }
 
-line_search_optimisation_target_exact <- function(x, param, nonlin_param) {
+line_search_opt_target_exact <- function(x, param, nonlin_param) {
   state <- scale_state(param$state0, param$state1, x)
   nonlin <- nonlin_predictor(
     param = nonlin_param,
@@ -2688,7 +2795,8 @@ bru_line_search <- function(model,
     warning(
       paste0(
         "Please notify the inlabru package developer:",
-        "\nThe line search linear and nonlinear predictors have different lengths.",
+        "\nThe line search linear and nonlinear predictors have ",
+        "different lengths.",
         "\nThis should not happen!"
       ),
       immediate. = TRUE
@@ -2848,7 +2956,7 @@ bru_line_search <- function(model,
     delta_nonlin <- (nonlin_pred - lin_pred) / step_scaling^2
     alpha <-
       optimise(
-        line_search_optimisation_target,
+        line_search_opt_target,
         step_scaling * c(1 / fact^2, fact),
         param = c(
           pred_norm2(delta_lin),
@@ -2900,7 +3008,7 @@ bru_line_search <- function(model,
       identical(options$bru_method$line_opt_method, "full")) {
       alpha <-
         optimise(
-          line_search_optimisation_target_exact,
+          line_search_opt_target_exact,
           step_scaling * c(0, fact),
           param = list(
             lin = lin_pred1,
@@ -3042,12 +3150,26 @@ bru_line_search <- function(model,
     requireNamespace("ggplot2")
     requireNamespace("patchwork")
     pl1 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin0 - .data$lin1), col = "start")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$lin1 - .data$lin1), col = "inla")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlin1 - .data$lin1), col = "full")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, (.data$nonlinopt - .data$lin1), col = "opt")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        (.data$lin0 - .data$lin1),
+        col = "start"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        (.data$lin1 - .data$lin1),
+        col = "inla"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        (.data$nonlin1 - .data$lin1),
+        col = "full"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        (.data$nonlinopt - .data$lin1),
+        col = "opt"
+      )) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::scale_color_discrete(
+        breaks = c("start", "inla", "full", "opt")
+      ) +
       ggplot2::ylab("eta - lin1")
     pl2 <- ggplot2::ggplot(df_debug) +
       ggplot2::geom_point(ggplot2::aes(
@@ -3071,13 +3193,27 @@ bru_line_search <- function(model,
         col = "opt"
       )) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::scale_color_discrete(
+        breaks = c("start", "inla", "full", "opt")
+      ) +
       ggplot2::ylab("(eta - lin1) * sqrt(w)")
     pl3 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "inla")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlin1, col = "full")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$nonlinopt, col = "opt")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        .data$lin0,
+        col = "start"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        .data$lin1,
+        col = "inla"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        .data$nonlin1,
+        col = "full"
+      )) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx,
+        .data$nonlinopt,
+        col = "opt"
+      )) +
       ggplot2::geom_ribbon(
         ggplot2::aes(
           as.numeric(.data$idx),
@@ -3087,7 +3223,9 @@ bru_line_search <- function(model,
         alpha = 0.1
       ) +
       ggplot2::geom_abline(slope = 0, intercept = 0) +
-      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::scale_color_discrete(
+        breaks = c("start", "inla", "full", "opt")
+      ) +
       ggplot2::ylab("eta")
     pl4 <- ggplot2::ggplot(data.frame(
       idx = seq_along(unlist(state0)),
@@ -3095,18 +3233,29 @@ bru_line_search <- function(model,
       state1 = unlist(state1)[names(unlist(state0))],
       state = unlist(state)[names(unlist(state0))]
     )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state0, col = "start")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "inla")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state1, col = "full")) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$state, col = "opt")) +
-      ggplot2::scale_color_discrete(breaks = c("start", "inla", "full", "opt")) +
+      ggplot2::geom_point(
+        ggplot2::aes(.data$idx, .data$state0, col = "start")
+      ) +
+      ggplot2::geom_point(
+        ggplot2::aes(.data$idx, .data$state1, col = "inla")
+      ) +
+      ggplot2::geom_point(
+        ggplot2::aes(.data$idx, .data$state1, col = "full")
+      ) +
+      ggplot2::geom_point(
+        ggplot2::aes(.data$idx, .data$state, col = "opt")
+      ) +
+      ggplot2::scale_color_discrete(
+        breaks = c("start", "inla", "full", "opt")
+      ) +
       ggplot2::ylab("state")
     pl1234 <-
       ((pl1 | pl2) / (pl3 | pl4)) +
         patchwork::plot_layout(guides = "collect") &
         ggplot2::theme(legend.position = "right")
 
-    # Compute deviations in the delta = lin1-lin0 direction and the orthogonal direction
+    # Compute deviations in the delta = lin1-lin0 direction and the orthogonal
+    # direction
     # delta = lin1-lin0
     delta <- lin_pred1 - lin_pred0
     delta_norm <- norm01
@@ -3134,7 +3283,7 @@ bru_line_search <- function(model,
         nonlin_pred_ - lin_pred0 - delta * along[iii] / delta_norm
       )
       distance[iii] <-
-        line_search_optimisation_target_exact(
+        line_search_opt_target_exact(
           step_scaling_,
           param = list(
             lin = lin_pred1,
@@ -3220,10 +3369,9 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' `bru_compute_linearisation`, with a line search method between each
 #' iteration. The `INLA::inla.stack` information is setup by [bru_make_stack()].
 #'
-#' @aliases iinla
 #' @export
 #' @param model A [bru_model] object
-#' @param lhoods A list of likelihood objects from [like()]
+#' @param lhoods A list of likelihood objects from [bru_obs()]
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
@@ -3343,8 +3491,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   if (!is.null(inla.options[["offset"]])) {
     stop(paste0(
-      "An offset option was specified which may interfere with the inlabru model construction.\n",
-      "Please use an explicit offset component instead; e.g. ~ myoffset(value, model = 'offset')"
+      "An offset option was specified which may interfere with the ",
+      "inlabru model construction.\n",
+      "Please use an explicit offset component instead; ",
+      "e.g. ~ myoffset(value, model = 'offset')"
     ))
   }
 
@@ -3447,7 +3597,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   comp_lin <- evaluate_comp_lin(model,
     input = inputs,
     state = states[[length(states)]],
-    inla_f = TRUE
+    inla_f = TRUE,
+    options = options
   )
   bru_log_message(
     "iinla: Evaluate component simplifications",
@@ -3457,7 +3608,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   )
   comp_simple <- evaluate_comp_simple(model,
     input = inputs,
-    inla_f = TRUE
+    inla_f = TRUE,
+    options = options
   )
   bru_log_message(
     "iinla: Evaluate predictor linearisation",
@@ -3470,7 +3622,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     lhoods = lhoods,
     input = inputs,
     state = states[[length(states)]],
-    comp_simple = comp_simple
+    comp_simple = comp_simple,
+    options = options
   )
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
@@ -3494,6 +3647,34 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
   }
   inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+
+  N_response <- sum(bru_response_size(lhoods))
+  N_predictor <- NROW(inla.options$control.predictor$A)
+  if (N_response != N_predictor) {
+    msg <- paste0(
+      "The total number of response values (N=",
+      N_response,
+      ") and predictor values (N=",
+      N_predictor,
+      ") do not match.\n",
+      "  This is likely due to a mistake in the component or predictor ",
+      "constructions."
+    )
+    if ((N_response > 1L) && (N_predictor == 1L)) {
+      msg <- paste0(
+        msg,
+        "\nPerhaps you only have components with scalar inputs?"
+      )
+    }
+    bru_log_message(
+      msg,
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 1
+    )
+    stop(msg)
+  }
+
   bru_log_message(
     "iinla: Model initialisation completed",
     verbose = options$bru_verbose,
@@ -3512,7 +3693,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   if ((!is.null(result) && !is.null(result$mode))) {
     previous_x <- result$mode$x
   } else {
-    previous_x <- 0 # TODO: construct from the initial linearisation state instead
+    # TODO: construct from the initial linearisation state instead
+    previous_x <- 0
   }
 
   track_df <- NULL
@@ -3532,8 +3714,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
       inla.options[["control.mode"]]$restart <- TRUE
       inla.options[["control.mode"]]$theta <- result$mode$theta
-      inla.options[["control.mode"]]$x <-
-        previous_x + (result$mode$x - previous_x) * line_search[["step_scaling"]]
+      inla.options[["control.mode"]]$x <- (
+        previous_x +
+          (result$mode$x - previous_x) * line_search[["step_scaling"]]
+      )
       result_indexing <- inla_result_latent_idx(result)
       # Reset the predictor values, to avoid spurious iteration effects.
       inla.options[["control.mode"]]$x[result_indexing$APredictor] <- 0
@@ -3585,7 +3769,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       verbose_store = options$bru_verbose_store
     )
 
-    # Return previous result if inla crashes, e.g. when connection to server is lost
+    # Return previous result if inla crashes, e.g. when connection to server is
+    # lost
     old.result <- result
     result <- NULL
 
@@ -3676,14 +3861,17 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         immediate. = TRUE
       )
       bru_log_message(
-        paste0("iinla: Giving up and returning last successfully obtained result for diagnostic purposes."),
+        paste0(
+          "iinla: Giving up and returning last successfully obtained result ",
+          "for diagnostic purposes."
+        ),
         verbose = TRUE,
         verbose_store = options$bru_verbose_store
       )
       if (is.null(old.result)) {
         old.result <- list()
-        class(old.result) <- c("iinla", "list")
-      } else if (!inherits(old.result, "iinla")) {
+      }
+      if (!inherits(old.result, "iinla")) {
         class(old.result) <- c("iinla", class(old.result))
       }
 
@@ -3782,7 +3970,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         comp_lin <- evaluate_comp_lin(model,
           input = inputs,
           state = state,
-          inla_f = TRUE
+          inla_f = TRUE,
+          options = options
         )
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
@@ -3795,7 +3984,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           lhoods = lhoods,
           input = inputs,
           state = state,
-          comp_simple = comp_simple
+          comp_simple = comp_simple,
+          options = options
         )
 
         stk <- bru_make_stack(lhoods, lin, idx)
@@ -3803,9 +3993,38 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         if (utils::packageVersion("INLA") <= "24.06.02") {
           stk.data <- INLA::inla.stack.data(stk)
         } else {
-          stk.data <- INLA::inla.stack.data(stk, .response.name = "BRU.response")
+          stk.data <- INLA::inla.stack.data(stk,
+            .response.name = "BRU.response"
+          )
         }
         inla.options$control.predictor$A <- INLA::inla.stack.A(stk)
+
+        N_response <- sum(bru_response_size(lhoods))
+        N_predictor <- NROW(inla.options$control.predictor$A)
+        if (N_response != N_predictor) {
+          msg <- paste0(
+            "The total number of response values (N=",
+            N_response,
+            ") and predictor values (N=",
+            N_predictor,
+            ") do not match.\n",
+            "  This is likely due to a mistake in the component or predictor ",
+            "constructions."
+          )
+          if ((N_response > 1L) && (N_predictor == 1L)) {
+            msg <- paste0(
+              msg,
+              "\nPerhaps you only have components with scalar inputs?"
+            )
+          }
+          bru_log_message(
+            msg,
+            verbose = options$bru_verbose,
+            verbose_store = options$bru_verbose_store,
+            verbosity = 1
+          )
+          stop(msg)
+        }
       }
       # Store the state
       states <- c(states, list(state))
@@ -3818,9 +4037,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       max.dev <- options$bru_method$rel_tol
       dev <- abs(track[[k - 1]]$mode - track[[k]]$mode) / track[[k]]$sd
       ## do.call(c, lapply(by(do.call(rbind, track),
-      ##                           as.factor(do.call(rbind, track)$effect),
-      ##                           identity),
-      ##                        function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
+      ##   as.factor(do.call(rbind, track)$effect),
+      ##   identity),
+      ##   function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
       bru_log_message(
         paste0(
           "iinla: Max deviation from previous: ",
@@ -3960,24 +4179,26 @@ auto_response <- function(formula, response) {
 }
 
 
-# Returns a formula's environment as a list. Removes all variable that are of type
-# inla, function or formula. Also removes all variables that are not variables of the formula.
+# Returns a formula's environment as a list. Removes all variable that are of
+# type inla, function or formula. Also removes all variables that are not
+# variables of the formula.
 list.data <- function(formula) {
   # Formula environment as list
   elist <- as.list(environment(formula))
 
-  # Remove previous inla results. For some reason these slow down the next INLA call.
+  # Remove previous inla results. For some reason these slow down the next INLA
+  # call.
   elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "inla")))]
 
-  #  # Remove functions. This can cause problems as well.
-  #  # elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
+  # Remove functions. This can cause problems as well.
+  # elist <- elist[unlist(lapply(elist, function(x) !is.function(x)))]
 
-  #  # Remove formulae. This can cause problems as well.
-  #  # elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
+  # Remove formulae. This can cause problems as well.
+  # elist <- elist[unlist(lapply(elist, function(x) !inherits(x, "formula")))]
 
   # The formula expression is too general for this to be reliable:
-  #  # Keep only purse formula variables
-  #  # elist <- elist[names(elist) %in% all.vars(formula)]
+  # Keep only purse formula variables
+  # elist <- elist[names(elist) %in% all.vars(formula)]
 
   elist
 }
@@ -4015,17 +4236,26 @@ summary.bru <- function(object, verbose = FALSE, ...) {
     result[["inla"]][["call"]] <- NULL
   }
 
-  class(result) <- c("summary_bru", "list")
+  class(result) <- "summary_bru"
   return(result)
 }
 
 
 #' @export
-#' @param x A `summary_bru` object
+#' @param x An object to be printed
 #' @rdname summary.bru
 
 print.summary_bru <- function(x, ...) {
   print(x$bru_info, ...)
   print(x$inla, ...)
+  invisible(x)
+}
+
+#' @export
+#' @param x A `bru` object to be printed
+#' @describeIn bru Print a summary of a `bru` object.
+
+print.bru <- function(x, ...) {
+  print(summary(x, ...), ...)
   invisible(x)
 }

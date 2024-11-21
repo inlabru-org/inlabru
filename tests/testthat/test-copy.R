@@ -19,12 +19,22 @@ test_that("bru: inla copy feature", {
         )
       ) +
       myLin2(x, copy = "myLin1", fixed = FALSE)
-  cmps <- component_list(cmp)
+  cmps <- bru_component_list(cmp)
 
   fit <- bru(
     cmp,
-    like(y ~ Intercept + exp(myLin1), family = "gaussian", data = df1, exclude = "myLin2"),
-    like(y ~ Intercept + (myLin2), family = "gaussian", data = df2, exclude = "myLin1"),
+    bru_obs(
+      y ~ Intercept + exp(myLin1),
+      family = "gaussian",
+      data = df1,
+      exclude = "myLin2"
+    ),
+    bru_obs(
+      y ~ Intercept + (myLin2),
+      family = "gaussian",
+      data = df2,
+      exclude = "myLin1"
+    ),
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
@@ -78,13 +88,13 @@ test_that("bru: inla copy feature", {
 #     ) +
 #         myLin2(x, copy = "myLin1", fixed = FALSE, initial = 1)
 # #    myLin2(1)
-#   cmps <- component_list(cmp)
+#   cmps <- bru_component_list(cmp)
 #
 #   fit <- bru(
 #     cmp,
-#     like(y ~ I1 + myLin1, family = "gaussian", data = df1),
-# #    like(y ~ I2 + myLin2*myLin1, family = "poisson", data = df2),
-#     like(y ~ I2 + myLin2, family = "poisson", data = df2),
+#     bru_obs(y ~ I1 + myLin1, family = "gaussian", data = df1),
+# #    bru_obs(y ~ I2 + myLin2*myLin1, family = "poisson", data = df2),
+#     bru_obs(y ~ I2 + myLin2, family = "poisson", data = df2),
 #     options = list(control.inla = list(int.strategy = "eb"),
 #                    bru_initial = list(myLin2 = 1, myLin1 = rnorm(100)))
 #   )
@@ -180,8 +190,18 @@ test_that("Component copy feature with group", {
   })
 
   inlaform <- y ~ -1 + Intercept +
-    f(x1, model = "rw1", values = seq_len(n[1]), scale.model = TRUE, group = z) +
-    f(x2, copy = "x1", fixed = FALSE, group = z2)
+    f(
+      x1,
+      model = "rw1",
+      values = seq_len(n[1]),
+      scale.model = TRUE,
+      group = z
+    ) +
+    f(x2,
+      copy = "x1",
+      fixed = FALSE,
+      group = z2
+    )
   fit <- INLA::inla(
     formula = inlaform, data = mydata, family = "normal",
     control.inla = list(int.strategy = "eb"),

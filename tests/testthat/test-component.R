@@ -1,11 +1,11 @@
 test_that("Component construction: linear model", {
   df <- data.frame(x = 1:10, response = 1:10)
 
-  llik <- like_list(list(like(formula = response ~ ., data = df)))
+  llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = df)))
 
   # Using label as input:
-  cmp0 <- component_list(
-    list(component("x", x)),
+  cmp0 <- bru_component_list(
+    list(bru_component("x", x)),
     lhoods = llik
   )[["x"]]
 
@@ -14,7 +14,7 @@ test_that("Component construction: linear model", {
   expect_equal(as.character(cmp0$main$input$input), "x")
 
   # Using label as input:
-  cmp0 <- component_list(
+  cmp0 <- bru_component_list(
     ~x,
     lhoods = llik
   )[["x"]]
@@ -23,7 +23,7 @@ test_that("Component construction: linear model", {
   expect_equal(cmp0$main$model, "linear")
   expect_equal(as.character(cmp0$main$input$input), "x")
 
-  cmp <- component_list(
+  cmp <- bru_component_list(
     ~ beta(main = x, model = "linear", values = 1),
     lhoods = llik
   )[["beta"]]
@@ -69,7 +69,7 @@ test_that("Component construction: linear model", {
   v <- evaluate_effect_single_state(comp_lin, state = 2, A = A)
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
-  cmps <- component_list(list(cmp))
+  cmps <- bru_component_list(list(cmp))
   inps <- input_eval(cmps, data = df)
   v <- evaluate_effect_multi_state(
     cmps,
@@ -90,7 +90,7 @@ test_that("Component construction: linear model", {
 
 test_that("Component construction: duplicate detection", {
   expect_error(
-    component_list(
+    bru_component_list(
       ~ -1 +
         beta(main = x, model = "linear", values = 1) +
         beta(main = x, model = "linear", values = 2)
@@ -102,7 +102,7 @@ test_that("Component construction: duplicate detection", {
 
 
 test_that("Component construction: offset", {
-  cmp <- component_list(~ -1 + something(a, model = "offset"))
+  cmp <- bru_component_list(~ -1 + something(a, model = "offset"))
   inp <- input_eval(cmp, data = data.frame(a = 11:15))
   val <- evaluate_effect_single_state(cmp,
     input = inp,
@@ -136,9 +136,9 @@ test_that("Component construction: terra", {
 
   expect_equal(eval_spatial(r, data), 406)
 
-  llik <- like_list(list(like(formula = response ~ ., data = data)))
+  llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = data)))
 
-  cmp <- component_list(
+  cmp <- bru_component_list(
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
   )
@@ -157,7 +157,7 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- component_list(~ -1 + something(r, model = "linear"),
+  cmp <- bru_component_list(~ -1 + something(r, model = "linear"),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
@@ -175,7 +175,8 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = 1),
+  cmp <- bru_component_list(
+    ~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
@@ -193,7 +194,8 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- component_list(~ -1 + something(r, model = "linear", main_layer = "elevation"),
+  cmp <- bru_component_list(
+    ~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
@@ -212,14 +214,14 @@ test_that("Component construction: terra", {
   )
 
   expect_error(
-    component_list(~ something(r, model = "linear", main_layer = 2),
+    bru_component_list(~ something(r, model = "linear", main_layer = 2),
       lhoods = llik
     ),
     NULL
   )
 
   expect_error(
-    component_list(~ something(r, model = "linear", main_layer = "elev"),
+    bru_component_list(~ something(r, model = "linear", main_layer = "elev"),
       lhoods = llik
     ),
     NULL
@@ -233,14 +235,14 @@ test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  lik <- like("gaussian",
+  lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = c(1, 1.5, 2, NA, 4), y = 11:15),
     include = "effect"
   )
 
-  cmp1 <- component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -253,8 +255,8 @@ test_that("Component construction: default index/mesh/mapping construction", {
     c(11, 0, 14)
   )
 
-  cmp1 <- component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -264,31 +266,31 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
-    component_list(
+    bru_component_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
     ),
     regexp = "Unknown mapper"
   )
 
-  cmp1 <- component_list(
+  cmp1 <- bru_component_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  cmp1 <- component_list(
+  cmp1 <- bru_component_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(sort(unique(lik$data$x), na.last = NA))
@@ -300,16 +302,16 @@ test_that("Component construction: default index/mesh/mapping construction", {
 test_that("Component construction: main iid factor construction", {
   skip_on_cran()
 
-  lik <- like("gaussian",
+  lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
     include = "effect"
   )
 
-  cmp1 <- component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
+  cmp1 <- bru_component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
     model = "iid"
   ) - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     as.character(lik$data$x)
@@ -327,13 +329,13 @@ test_that("Component construction: main iid factor construction", {
 test_that("Component construction: group iid factor construction", {
   skip_on_cran()
 
-  lik <- like("gaussian",
+  lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
     include = "effect"
   )
 
-  cmp1 <- component_list(
+  cmp1 <- bru_component_list(
     ~ -1 +
       effect(rep(1, 5),
         group = x,
@@ -341,7 +343,7 @@ test_that("Component construction: group iid factor construction", {
         control.group = list(model = "iid")
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$group,
     as.numeric(lik$data$x)
@@ -362,20 +364,20 @@ test_that("Component construction: group iid factor construction", {
 test_that("Component construction: replicate iid factor construction", {
   skip_on_cran()
 
-  lik <- like("gaussian",
+  lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
     include = "effect"
   )
 
-  cmp1 <- component_list(
+  cmp1 <- bru_component_list(
     ~ -1 +
       effect(rep(1, 5),
         replicate = x,
         model = "iid"
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$replicate,
     as.numeric(lik$data$x)
@@ -396,12 +398,12 @@ test_that("Component construction: replicate iid factor construction", {
 
 
 test_that("Component construction: unsafe intercepts", {
-  cmp <- component_list(~ something_unknown - 1)
-  lik <- like(formula = response ~ ., data = data.frame(response = 1:5))
+  cmp <- bru_component_list(~ something_unknown - 1)
+  lik <- bru_obs(formula = response ~ ., data = data.frame(response = 1:5))
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_warning(
     object = {
-      model <- bru_model(cmp, like_list(list(lik)))
+      model <- bru_model(cmp, bru_like_list(list(lik)))
     },
     "All covariate evaluations for 'something_unknown' are NULL"
   )
@@ -409,7 +411,7 @@ test_that("Component construction: unsafe intercepts", {
 
 test_that("Component construction: deprecated arguments", {
   expect_warning(
-    component_list(~ something(map = a)),
+    bru_component_list(~ something(map = a)),
     "Use of 'map' is deprecated"
   )
   skip_on_cran()
@@ -428,10 +430,9 @@ test_that("Component inputs: non-numeric input detection", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  bnd <- spoly(data.frame(
-    x = c(-15, 15, 15, -15),
-    y = c(25, 25, 50, 50)
-  ))
+  bnd <- spoly(data.frame(x = c(-15, 15, 15, -15), y = c(25, 25, 50, 50)),
+    format = "sf"
+  )
   mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
   matern <-
     INLA::inla.spde2.pcmatern(mesh,
@@ -444,9 +445,10 @@ test_that("Component inputs: non-numeric input detection", {
     coords = c("x", "y")
   )
 
-  # No model specified (argument unnamed), geometry invalid for bru_mapper_linear:
-  cmp <- component_list(~ Intercept(1) + field(geometry, matern))
-  lk <- like(formula = obs ~ ., data = df, family = "gaussian")
+  # No model specified (argument unnamed), geometry invalid for
+  # bru_mapper_linear:
+  cmp <- bru_component_list(~ Intercept(1) + field(geometry, matern))
+  lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
 
@@ -455,8 +457,10 @@ test_that("Component inputs: non-numeric input detection", {
     "The input to a bru_mapper_linear evaluation must be numeric or logical."
   )
 
-  cmp <- component_list(~ Intercept(1) + field(geometry, matern, model = matern))
-  lk <- like(formula = obs ~ ., data = df, family = "gaussian")
+  cmp <- bru_component_list(
+    ~ Intercept(1) + field(geometry, matern, model = matern)
+  )
+  lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
   input <- input_eval(model$effects$field, data = df)

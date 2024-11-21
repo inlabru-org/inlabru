@@ -9,7 +9,6 @@ suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("lwgeom"))
 suppressPackageStartupMessages(library("patchwork"))
 suppressPackageStartupMessages(library("terra"))
-suppressPackageStartupMessages(library("data.table"))
 theme_set(theme_bw())
 
 
@@ -50,7 +49,11 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
-  idx <- sf::st_within(sf::st_as_sf(observations), sf::st_as_sf(samplers), sparse = TRUE)
+  idx <- sf::st_within(
+    sf::st_as_sf(observations),
+    sf::st_as_sf(samplers),
+    sparse = TRUE
+  )
   A_sum <- sparseMatrix(
     i = unlist(idx),
     j = rep(
@@ -64,8 +67,8 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
-  df <- SpatialPointsDataFrame(
-    coords = rbind(domain$loc[, 1:2], coordinates(observations)),
+  df <- sp::SpatialPointsDataFrame(
+    coords = rbind(domain$loc[, 1:2], sp::coordinates(observations)),
     data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
     proj4string = fm_CRS(domain)
   )
@@ -183,7 +186,9 @@ set_csc <- function(residuals, col_theme) {
           c(-1, 1)
     )
 
-  list("Scaling" = scaling_csc, "Inverse" = inverse_csc, "Pearson" = pearson_csc)
+  list("Scaling" = scaling_csc,
+       "Inverse" = inverse_csc,
+       "Pearson" = pearson_csc)
 }
 
 
@@ -270,15 +275,15 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- rast(terra::ext(samplers),
-      crs = proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       nrows = nrows, ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- rast(terra::ext(samplers),
-      crs = proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       resolution = resolution
     )
   }
@@ -286,7 +291,14 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   gridPolygon <- terra::as.polygons(grid)
 
   # Extract the boundary with subpolygons only
-  sf::as_Spatial(sf::st_as_sf(terra::intersect(gridPolygon, terra::vect(samplers))))
+  sf::as_Spatial(
+    sf::st_as_sf(
+      terra::intersect(
+        gridPolygon,
+        terra::vect(samplers)
+      )
+    )
+  )
 }
 
 
@@ -306,5 +318,5 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
 #'
 edit_df <- function(df, columns) {
   # Remove the columns that are not required
-  df[, !(colnames(df) %in% columns)]
+  df[, !(colnames(df) %in% columns), drop = FALSE]
 }

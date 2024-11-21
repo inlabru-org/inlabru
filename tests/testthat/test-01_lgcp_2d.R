@@ -1,6 +1,9 @@
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
 
   set.seed(123L)
 
@@ -11,13 +14,13 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  data(gorillas, package = "inlabru", envir = environment())
+  gorillas <- gorillas_sp()
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(5, 0.01)
   )
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) +
+  cmp <- coordinates ~ mySmooth(main = sp::coordinates, model = matern) +
     Intercept(1)
 
   fit <- lgcp(
@@ -66,7 +69,8 @@ test_that("2D LGCP fitting", {
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
-  loc <- SpatialPoints(gorillas$mesh$loc[, c(1, 2)],
+  loc <- sp::SpatialPoints(
+    gorillas$mesh$loc[, c(1, 2)],
     proj4string = fm_CRS(gorillas$nests)
   )
   set.seed(123L)

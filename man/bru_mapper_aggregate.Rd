@@ -55,15 +55,15 @@ Constructs a mapper
 that aggregates elements of the input state, so it can be used e.g.
 for weighted summation or integration over blocks of values.
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item For \code{bru_mapper_aggregate}, \code{input} should be a list with elements \code{block}
+\item \code{ibm_jacobian(bru_mapper_aggregate)}: \code{input} should be a list with elements \code{block}
 and \code{weights}. \code{block}
 should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
 equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
-}
-}
+
+}}
 \examples{
 m <- bru_mapper_aggregate()
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
@@ -80,6 +80,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -90,6 +91,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

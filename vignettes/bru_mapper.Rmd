@@ -162,7 +162,9 @@ This can be used to define components with latent marginal `N(0,1)` distribution
 effect.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_marginal(qfun = ..., pfun = ..., dfun = ..., ..., inverse = ...)
+mapper <- bru_mapper_marginal(
+  qfun = ..., pfun = ..., dfun = ..., ..., inverse = ...
+)
 ibm_eval(mapper,
   input = NULL, # If a list is given, it overrides the parameter specification
   state = ...
@@ -170,7 +172,9 @@ ibm_eval(mapper,
 
 # Examples:
 mapper <- bru_mapper_marginal(qfun = qexp, rate = 1 / 8)
-mapper <- bru_mapper_marginal(qfun = qexp, pfun = pexp, dfun = dexp, rate = 1 / 8)
+mapper <- bru_mapper_marginal(
+  qfun = qexp, pfun = pexp, dfun = dexp, rate = 1 / 8
+)
 ```
 
 #### aggregate
@@ -211,6 +215,7 @@ but can in some cases be a list of vectors.
 * `bru_mapper_collect(mappers, hidden)`
 * `bru_mapper_multi(mappers)`
 * `bru_mapper_pipe(mappers)`
+* `bru_mapper_repeat(mapper, n_rep)`
 
 #### collect
 
@@ -266,6 +271,21 @@ ibm_eval(mapper,
 )
 ```
 
+#### repeat
+
+Repeat mappers take a single mapper and repeats it, by defining the Jacobian
+as a Kronecker product of a row vector of ones, corresponding to a state vector
+of length `nrep * ibm_n(mapper, ...)`. The `ibm_` method inputs are
+passed on to the sub-mapper methods.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_repeat(mapper = ..., n_rep = ...)
+ibm_eval(mapper,
+  input = ...,
+  state = ...
+)
+```
+
 #### The core model component mapper
 
 All model component mappers are currently defined as a `pipe` mapper containing
@@ -293,8 +313,13 @@ For object with predefined mapper conversion methods, use `bru_mapper(object)`
 to obtain a suitable mapper object.
 Current predefined object mappers are defined for objects of these classes:
 
-* `fm_mesh_2d` and `inla.mesh`; Use `bru_mapper(object)`
-* `fm_mesh_1d` and `inla.mesh.1d`; Use `bru_mapper(object, indexed)`
+* `fm_mesh_2d` and `inla.mesh`; Use `bru_mapper(object)` or `bru_mapper_fmesher(object)`
+* `fm_mesh_1d` and `inla.mesh.1d`; Use `bru_mapper(object, indexed)` or,
+  if `indexed=TRUE`, `bru_mapper_fmesher(object)`.
+* Any object supporting the `fmesher::fm_dof()` and `fmesher::fm_basis()` methods;
+  Use `bru_mapper_fmesher(object)`. If `fmesher` in the future gains a common
+  base class for such objects, a corresponding `bru_mapper()` conversion method
+  will be added.
 
 More details are given below.
 

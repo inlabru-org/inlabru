@@ -106,31 +106,28 @@ of mappers in the multi-mapper x}
 }
 }
 \description{
-Constructs a rowwise Kronecker product mapping
-}
-\details{
-\itemize{
-\item \code{ibm_jacobian} for \code{bru_mapper_multi} accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-}
-
-\itemize{
-\item \code{ibm_invalid_output} for \code{bru_mapper_multi} accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-}
+Constructs a row-wise Kronecker product mapping of linear/affine
+mappers. Any offset in sub-mappers is added into a combined offset. Only
+linear/affine sub-mappers are allowed.
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{ibm_jacobian(bru_mapper_multi)}: Accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.
+
+\item \code{ibm_invalid_output(bru_mapper_multi)}: Accepts a list with
+named entries, or a list with unnamed but ordered elements.
+The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_multi]{ibm_names.bru_mapper_multi()}}.
+Each list element should take a format accepted by the corresponding
+sub-mapper. In case each element is a vector, the input can be given as a
+data.frame with named columns, a matrix with named columns, or a matrix
+with unnamed but ordered columns.
+
 \item \code{ibm_names(bru_mapper_multi)}: Returns the names from the sub-mappers list
 
 }}
@@ -154,6 +151,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -163,6 +161,7 @@ Other mappers:
 \code{\link{bru_mapper_matrix}()},
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

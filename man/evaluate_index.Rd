@@ -20,3 +20,4 @@ compatible index subsets.
 \description{
 Computes the index values matrices for included components
 }
+\keyword{internal}

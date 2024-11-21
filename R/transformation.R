@@ -3,15 +3,17 @@
 #' distributions in predictor expressions
 #' @param qfun A quantile function object, such as `qexp`
 #' @param x Values to be transformed
-#' @param ... Distribution parameters passed on to the `qfun` and `pfun` functions
-#' @param tail.split. For x-values larger than `tail.split.`, upper quantile calculations
-#' are used internally, and for smaller values lower quantile calculations are used. This
-#' can avoid lack of accuracy in the distribution tails. If `NULL`, forward calculations split at 0,
-#' and inverse calculations use lower tails only, potentially losing accuracy in the upper tails.
+#' @param ... Distribution parameters passed on to the `qfun` and `pfun`
+#'   functions
+#' @param tail.split. For x-values larger than `tail.split.`, upper quantile
+#'   calculations are used internally, and for smaller values lower quantile
+#'   calculations are used. This can avoid lack of accuracy in the distribution
+#'   tails. If `NULL`, forward calculations split at 0, and inverse calculations
+#'   use lower tails only, potentially losing accuracy in the upper tails.
 #' @return * For `bru_forward_transformation`, a numeric vector
 #' @export
 #' @rdname bru_transformation
-#' @aliases bru_transformation
+#' @name bru_transformation
 #' @examples
 #' u <- rnorm(5, 0, 1)
 #' y <- bru_forward_transformation(qexp, u, rate = 2)

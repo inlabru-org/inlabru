@@ -7,7 +7,8 @@
 bru_safe_sp(quietly = FALSE, force = FALSE, minimum_version = "1.4-5")
 }
 \arguments{
-\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default \code{FALSE}}
+\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default
+\code{FALSE}}
 
 \item{force}{logical; If \code{rgdal} is unavailable
 and evolution status is less that \code{2L}, return \code{FALSE} if \code{force} is \code{FALSE}.
@@ -20,12 +21,13 @@ Default 1.4-5 (should always match the requirement in the package
 DESCRIPTION)}
 }
 \value{
-Returns (invisibly) \code{FALSE} if a potential issue is detected, and give a
-message if \code{quietly} is \code{FALSE}. Otherwise returns \code{TRUE}
+Returns (invisibly) \code{FALSE} if a potential issue is detected, and
+give a message if \code{quietly} is \code{FALSE}. Otherwise returns \code{TRUE}
 }
 \description{
 Loads the sp package with \code{requireNamespace("sp", quietly = TRUE)}, and
-checks and optionally sets the \code{sp} evolution status flag if \code{rgdal} is unavailable.
+checks and optionally sets the \code{sp} evolution status flag if \code{rgdal} is
+unavailable.
 }
 \examples{
 \dontrun{
@@ -36,3 +38,4 @@ if (bru_safe_sp() &&
 }
 
 }
+\keyword{internal}

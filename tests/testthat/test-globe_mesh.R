@@ -22,16 +22,18 @@ test_that("2D modelling on the globe", {
       y <- rpois(nrow(data), exp(1 + sin(Lat / 180 * pi) * 2))
     }
   )
-  coordinates(data) <- c("Long", "Lat")
-  proj4string(data) <- fm_CRS("longlat_globe")
-  data <- fm_transform(data, crs = fm_CRS("sphere"))
+  data <- sf::st_as_sf(data,
+    coords = c("Long", "Lat"),
+    crs = fm_crs("longlat_globe")
+  )
+  data <- fm_transform(data, crs = fm_crs("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
     prior.range = c(0.1, 0.01),
     prior.sigma = c(0.1, 0.01)
   )
-  cmp <- y ~ mySmooth(main = coordinates, model = matern) - 1
+  cmp <- y ~ mySmooth(main = geometry, model = matern) - 1
 
   fit <- bru(
     cmp,
@@ -68,16 +70,17 @@ test_that("2D LGCP modelling on the globe", {
     )
   )
 
-  mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_CRS("sphere"))
+  mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_crs("sphere"))
 
   data <- data.frame(
     Long = seq(-179, 179, length.out = 100),
     Lat = seq(-89, 89, length.out = 100)
   )
-  coordinates(data) <- c("Long", "Lat")
-  proj4string(data) <- fm_CRS("longlat_globe")
-  data <- fm_transform(data, crs = fm_CRS("sphere"))
-  data <- sf::st_as_sf(data)
+  data <- sf::st_as_sf(data,
+    coords = c("Long", "Lat"),
+    crs = fm_crs("longlat_globe")
+  )
+  data <- fm_transform(data, crs = fm_crs("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,

@@ -9,7 +9,8 @@
 \arguments{
 \item{data}{A \code{matrix} object.}
 
-\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_tile}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed
+on to \code{geom_tile}.}
 
 \item{...}{Arguments passed on to \code{geom_tile}.}
 }
@@ -33,7 +34,6 @@ if (require("ggplot2", quietly = TRUE)) {
 Other geomes for inla and inlabru predictions: 
 \code{\link{gg}()},
 \code{\link{gg.bru_prediction}()},
-\code{\link{gg.data.frame}()},
-\code{\link{gm}()}
+\code{\link{gg.data.frame}()}
 }
 \concept{geomes for inla and inlabru predictions}

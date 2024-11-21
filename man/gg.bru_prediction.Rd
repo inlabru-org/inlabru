@@ -10,14 +10,16 @@
 \method{gg}{prediction}(data, ...)
 }
 \arguments{
-\item{data}{A prediction object, usually the result of a \code{\link[=predict.bru]{predict.bru()}} call.}
+\item{data}{A prediction object, usually the result of a \code{\link[=predict.bru]{predict.bru()}}
+call.}
 
-\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed on to \code{geom_line}.}
+\item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed
+on to \code{geom_line}.}
 
-\item{ribbon}{If TRUE, plot a ribbon around the line based on the smalles and largest
-quantiles present in the data, found by matching names starting with \code{q} and
-followed by a numerical value.  \code{inla()}-style \code{numeric+"quant"} names are converted
-to inlabru style before matching.}
+\item{ribbon}{If TRUE, plot a ribbon around the line based on the smallest
+and largest quantiles present in the data, found by matching names starting
+with \code{q} and followed by a numerical value.  \code{inla()}-style
+\code{numeric+"quant"} names are converted to inlabru style before matching.}
 
 \item{alpha}{The ribbons numeric alpha (transparency) level in \verb{[0,1]}.}
 
@@ -26,19 +28,21 @@ to inlabru style before matching.}
 \item{\dots}{Arguments passed on to \code{geom_line}.}
 }
 \value{
-Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon} value.
+Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon}
+value.
 }
 \description{
-This geom serves to visualize \code{prediction} objects which usually results from a call to
-\code{\link[=predict.bru]{predict.bru()}}. Predictions objects provide summary statistics (mean, median, sd, ...) for
-one or more random variables. For single variables (or if requested so by setting \code{bar = TRUE}),
-a boxplot-style geom is constructed to show the statistics. For multivariate predictions the
-mean of each variable (y-axis) is plotted agains the row number of the varriable in the prediction
-data frame (x-axis) using \code{geom_line}. In addition, a \code{geom_ribbon} is used to show
-the confidence interval.
+This geom serves to visualize \code{prediction} objects which usually results from
+a call to \code{\link[=predict.bru]{predict.bru()}}. Predictions objects provide summary statistics
+(mean, median, sd, ...) for one or more random variables. For single
+variables (or if requested so by setting \code{bar = TRUE}), a boxplot-style geom
+is constructed to show the statistics. For multivariate predictions the mean
+of each variable (y-axis) is plotted against the row number of the variable
+in the prediction data frame (x-axis) using \code{geom_line}. In addition, a
+\code{geom_ribbon} is used to show the confidence interval.
 
-Note: \code{gg.bru_prediction} also understands the format of INLA-style posterior summaries, e.g.
-\code{fit$summary.fixed} for an inla object \code{fit}
+Note: \code{gg.bru_prediction} also understands the format of INLA-style posterior
+summaries, e.g. \code{fit$summary.fixed} for an inla object \code{fit}
 
 Requires the \code{ggplot2} package.
 }
@@ -127,7 +131,6 @@ if (bru_safe_inla() &&
 Other geomes for inla and inlabru predictions: 
 \code{\link{gg}()},
 \code{\link{gg.data.frame}()},
-\code{\link{gg.matrix}()},
-\code{\link{gm}()}
+\code{\link{gg.matrix}()}
 }
 \concept{geomes for inla and inlabru predictions}

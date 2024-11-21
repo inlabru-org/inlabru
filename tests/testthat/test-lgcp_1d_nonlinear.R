@@ -1,7 +1,9 @@
 test_that("Mexdolphin: Hazard rate detection function", {
   skip_on_cran()
   local_bru_safe_inla()
-  data(mexdolphin, package = "inlabru", envir = environment())
+  skip_if_not(bru_safe_sp())
+
+  mexdolphin <- inlabru::mexdolphin_sp()
 
   sig <- function(x) bru_forward_transformation(qexp, x, rate = 1 / 8)
   hr <- function(distance, sigma) {
@@ -12,14 +14,15 @@ test_that("Mexdolphin: Hazard rate detection function", {
   }
   cmp <- ~ sig_theta(1, prec.linear = 1) + Intercept(1)
   form <- distance ~ log_hr(distance, sig(sig_theta)) + Intercept
-  form_list <- list(distance = distance) ~ log(hr(distance, sig(sig_theta))) + Intercept
+  form_list <- list(distance = distance) ~
+    log(hr(distance, sig(sig_theta))) + Intercept
 
   pts <-
     mexdolphin$points
 
   fit <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form,
       family = "cp",
       data = pts,
@@ -58,7 +61,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
 
   fit_list <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form_list,
       family = "cp",
       data = pts,
@@ -96,9 +99,10 @@ test_that("Mexdolphin: Hazard rate detection function", {
   )
 
   ##########
-  # pred <- predict(fit,
-  #                 newdata = data.frame(distance = seq(-8, 8, by = 0.01)),
-  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # pred <- predict(
+  #   fit,
+  #   newdata = data.frame(distance = seq(-8, 8, by = 0.01)),
+  #   formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
   # )
   #
   # library(ggplot2)
@@ -128,9 +132,10 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #                 exp(2.3))
   #   )
   #
-  # pred <- predict(fit,
-  #                 data = ips,
-  #                 formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
+  # pred <- predict(
+  #   fit,
+  #   data = ips,
+  #   formula = ~ exp(Intercept + log_hr(abs(distance), sig(sig_theta)))
   # )
   # ggplot(data.frame(pts)) +
   #   stat_ecdf(aes(distance)) +
@@ -172,7 +177,7 @@ test_that("Marginal parameter transformation", {
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- component_list(~
+  cmp <- bru_component_list(~
     sigma(
       1,
       prec.linear = 1,
@@ -189,7 +194,7 @@ test_that("Marginal parameter transformation", {
 
   fit <- bru(
     components = cmp,
-    like(
+    bru_obs(
       formula = form,
       family = "cp",
       data = pts,
@@ -200,7 +205,10 @@ test_that("Marginal parameter transformation", {
       bru_compress_cp = TRUE,
       bru_max_iter = 10,
       verbose = FALSE,
-      bru_initial = list(Intercept = 0, sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)),
+      bru_initial = list(
+        Intercept = 0,
+        sigma = ibm_eval(cmp$sigma$marginal, state = 1, inverse = TRUE)
+      ),
       inla.mode = "compact"
     )
   )

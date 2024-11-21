@@ -12,25 +12,39 @@ multiplot(..., plotlist = NULL, cols = 1, layout = NULL)
 \arguments{
 \item{...}{Comma-separated \code{ggplot} objects.}
 
-\item{plotlist}{A list of \code{ggplot} objects - an alternative to the comma-separated argument above.}
+\item{plotlist}{A list of \code{ggplot} objects - an alternative to the
+comma-separated argument above.}
 
 \item{cols}{Number of columns of plots on the page.}
 
-\item{layout}{A matrix specifying the layout. If present, 'cols' is ignored. If the layout is
-something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE), then plot 1 will go in the upper left,
-2 will go in the upper right, and 3 will go all the way across the bottom.}
+\item{layout}{A matrix specifying the layout. If present, \code{cols} is ignored.
+If the layout is something like \code{matrix(c(1,2,3,3), nrow=2, byrow=TRUE)},
+then plot 1 will go in the upper left, 2 will go in the upper right, and 3
+will go all the way across the bottom.}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of the \code{patchwork} package;
+see the example below.
+
 Renders multiple ggplots on a single page.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE)) {
-  df <- data.frame(x = 1:10, y = 1:10, z = 11:20)
+  df <- data.frame(x = 1:10, y = cos(1:10), z = sin(1:10))
   pl1 <- ggplot(data = df) +
     geom_line(mapping = aes(x, y), color = "red")
   pl2 <- ggplot(data = df) +
     geom_line(mapping = aes(x, z), color = "blue")
-  multiplot(pl1, pl2, cols = 2)
+  pl3 <- ggplot(data = df) +
+    geom_path(mapping = aes(y, z), color = "magenta")
+  multiplot(
+    pl1, pl2, pl3,
+    layout = rbind(c(1, 2), c(3, 3))
+  )
+
+  if (require("patchwork")) {
+    (pl1 + pl2) / pl3
+  }
 }
 }
 \author{

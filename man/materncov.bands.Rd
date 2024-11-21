@@ -17,8 +17,8 @@ materncov.bands(
 }
 \arguments{
 \item{manifold}{Either "R1", "S1", "R2", or "S2", from
-\code{mesh$manifold}, or a full \code{inla.mesh} or
-\code{inla.mesh.1d} object.}
+\code{fm_manifold(mesh)}, or a full \code{fm_mesh_2d} or
+\code{fm_mesh_1d} object.}
 
 \item{dist}{A vector of distances at which to calculate the
 covariances/correlations}
@@ -41,10 +41,11 @@ approximation. Default 64.}
 cyclic interval}
 }
 \value{
-A list with estimated covariance or correlation (when \code{log.variance} is
-\code{NULL}) functions:
+A list with estimated covariance or correlation (when \code{log.variance}
+is \code{NULL}) functions:
 \item{lower}{An approximate lower bound for the \code{quantile} credible region}
-\item{median}{The function for for the approximate median parameters quantile}
+\item{median}{The function for for the approximate median parameters
+quantile}
 \item{upper}{An approximate upper bound for the \code{quantile} credible region}
 }
 \description{
@@ -55,8 +56,8 @@ SPDE component. Can also plot Matern correlation or covariance
 function.
 }
 \details{
-Uses a Gaussian assumption for the internal model parameters, and finds a region in parameter
-space with approximately \code{quantile} probability.
+Uses a Gaussian assumption for the internal model parameters, and finds a
+region in parameter space with approximately \code{quantile} probability.
 }
 \author{
 Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}

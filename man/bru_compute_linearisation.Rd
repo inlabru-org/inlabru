@@ -21,10 +21,11 @@ bru_compute_linearisation(...)
   effects,
   pred0,
   used,
-  allow_latent,
   allow_combine,
   eps,
-  ...
+  n_pred = NULL,
+  ...,
+  options = NULL
 )
 
 \method{bru_compute_linearisation}{bru_like}(
@@ -44,7 +45,7 @@ bru_compute_linearisation(...)
   input,
   state,
   comp_simple,
-  eps = 0.00001,
+  eps = 1e-05,
   ...
 )
 
@@ -83,13 +84,16 @@ expression
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object for the predictor expression}
 
-\item{allow_latent}{logical. If \code{TRUE}, the latent state of each component is
-directly available to the predictor expression, with a \verb{_latent} suffix.}
-
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
 involve several rows of the input data to influence the same row.}
 
 \item{eps}{The finite difference step size}
+
+\item{n_pred}{The length of the predictor expression. If not \code{NULL}, scalar
+predictor evaluations are expanded to vectors of length \code{n_pred}.}
+
+\item{options}{A \code{bru_options} object. The log verbosity options
+are used.}
 
 \item{lhood}{A \code{bru_like} object}
 
@@ -98,3 +102,4 @@ involve several rows of the input data to influence the same row.}
 \description{
 Compute inlabru model linearisation information
 }
+\keyword{internal}

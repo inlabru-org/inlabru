@@ -1,8 +1,9 @@
 #' @name Poisson2_1D
 #' @title 1-Dimensional NonHomogeneous Poisson example.
 #' @docType data
-#' @description Point data and count data, together with intensity function and expected counts for
-#' a unimodal nonhomogeneous 1-dimensional Poisson process example.
+#' @description Point data and count data, together with intensity function and
+#'   expected counts for a unimodal nonhomogeneous 1-dimensional Poisson process
+#'   example.
 #'
 #' @aliases lambda2_1D cov2_1D E_nc2 pts2 countdata2
 #'
@@ -16,8 +17,10 @@
 #'    \item{`cov2_1D`:}{ A function that gives what we will call a
 #'    'habitat suitability' covariate in 1D space.}
 #'    \item{`E_nc2`}{ The expected counts of the gridded data.}
-#'    \item{`pts2`}{ The locations of the observed points (a data frame with one column, named `x`).}
-#'    \item{`countdata2`}{ A data frame with three columns, containing the count data:}
+#'    \item{`pts2`}{ The locations of the observed points (a data frame with
+#'      one column, named `x`).}
+#'    \item{`countdata2`}{ A data frame with three columns, containing the
+#'      count data:}
 #'    \describe{
 #'      \item{`x`}{ The grid cell midpoint.}
 #'      \item{`count`}{ The number of detections in the cell.}

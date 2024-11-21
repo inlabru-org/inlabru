@@ -6,7 +6,7 @@ template:
 navbar:
   structure:
     left: [home, intro, reference, general-articles, lgcp-articles, technical-articles, news]
-    right: [github]
+    right: [search, github]
   components:
     general-articles:
       text: General examples
@@ -53,7 +53,9 @@ navbar:
         href: articles/2d_lgcp_multilikelihood.html
       - text: LGCPs - An example in space and time
         href: articles/2d_lgcp_spatiotemporal.html
-      - text: LGCPs - Residuals
+      - text: LGCPs - Residuals (sf version)
+        href: articles/2d_lgcp_residuals_sf.html
+      - text: LGCPs - Residuals (sp version)
         href: articles/2d_lgcp_residuals.html
     technical-articles:
       text: Technical articles
@@ -85,6 +87,7 @@ redirects:
   - ["articles/web/2d_lgcp_plotsampling.html", "articles/2d_lgcp_plotsampling.html"]
   - ["articles/web/2d_lgcp_distancesampling.html", "articles/2d_lgcp_distancesampling.html"]
   - ["articles/web/2d_lgcp_covars.html", "articles/2d_lgcp_covars.html"]
+  - ["articles/web/2d_lgcp_residuals_sf.html", "articles/2d_lgcp_residuals_sf.html"]
   - ["articles/web/2d_lgcp_residuals.html", "articles/2d_lgcp_residuals.html"]
   - ["articles/web/random_fields.html", "articles/random_fields.html"]
   - ["articles/web/mesh_mapping.html", "articles/mesh_mapping.html"]
@@ -100,11 +103,14 @@ reference:
   contents:
   - matches("^inlabru-package$")
   - matches("^bru$")
+  - matches("^bru_like$")
   - matches("^bru_rerun$")
   - matches("^bru_options$")
-  - starts_with("component")
-  - starts_with("like")
+  - starts_with("bru_component")
   - starts_with("lgcp")
+  - starts_with("bru_response_size")
+  - starts_with("bru_index")
+  - starts_with("like")
 - title: "Posterior evaluation"
   desc: "Functions for evaluating posterior properties."
   contents:
@@ -160,28 +166,23 @@ reference:
   - matches("mexdolphin")
   - matches("mrsea")
   - matches("robins_subset")
-  - matches("seals")
   - matches("shrimp")
   - matches("toygroups")
   - matches("toypoints")
 - title: "Internal helper functions"
   desc: "Helper functions for more low level operations."
   contents:
-  - starts_with("evaluate_")
-  - starts_with("expand_labels")
-  - starts_with("bru_inla.stack.mjoin")
-  - starts_with("spatial.to.ppp")
-  - starts_with("bru_make_stack")
-  - starts_with("bru_summarise")
-  - starts_with("bru_standardise_names")
-  - starts_with("bru_safe_inla")
-  - starts_with("bru_safe_sp")
-  - starts_with("bru_call_options")
-  - starts_with("bru_compute_linearisation")
-- title: "Re-exported fmesher functions"
-  desc: "Functions that used to be part of inlabru but are now in the fmesher package, and re-exported by inlabru for backwards compatibility."
-  contents:
-  - starts_with("fm_")
+  - starts_with("evaluate_", internal = TRUE)
+  - starts_with("expand_labels", internal = TRUE)
+  - starts_with("bru_inla.stack.mjoin", internal = TRUE)
+  - starts_with("spatial.to.ppp", internal = TRUE)
+  - starts_with("bru_make_stack", internal = TRUE)
+  - starts_with("bru_summarise", internal = TRUE)
+  - starts_with("bru_standardise_names", internal = TRUE)
+  - starts_with("bru_safe_inla", internal = TRUE)
+  - starts_with("bru_safe_sp", internal = TRUE)
+  - starts_with("bru_call_options", internal = TRUE)
+  - starts_with("bru_compute_linearisation", internal = TRUE)
 - title: "Deprecated methods"
   desc: "Deprecated methods"
   contents:

@@ -115,9 +115,9 @@ sub-mappers list
 \description{
 Constructs a concatenated collection mapping
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item \code{ibm_jacobian} for \code{bru_mapper_collect} accepts a list with
+\item \code{ibm_jacobian(bru_mapper_collect)}: Accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_collect]{ibm_names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
@@ -126,18 +126,16 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns. When \code{inla_f=TRUE} and \code{hidden=TRUE} in
 the mapper definition, the input format should instead match that of
 the first, non-hidden, sub-mapper.
-}
 
-\itemize{
-\item \code{ibm_invalid_output} for \code{bru_mapper_collect} accepts a list with
+\item \code{ibm_invalid_output(bru_mapper_collect)}: Accepts a list with
 named entries, or a list with unnamed but ordered elements.
 The names must match the sub-mappers, see \code{\link[=ibm_names.bru_mapper_collect]{ibm_names.bru_mapper_collect()}}.
 Each list element should take a format accepted by the corresponding
 sub-mapper. In case each element is a vector, the input can be given as a
 data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
-}
-}
+
+}}
 \examples{
 (m <- bru_mapper_collect(list(
   a = bru_mapper_index(2),
@@ -156,6 +154,7 @@ Other mappers:
 \code{\link{bru_mapper_aggregate}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -166,6 +165,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

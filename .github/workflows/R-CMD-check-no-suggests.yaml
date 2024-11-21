@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-12, r: 'release'}
+          - {os: macOS-latest, r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest, r: 'release'}
@@ -43,7 +43,7 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          extra-repositories: "https://inla.r-inla-download.org/R/testing"
+          extra-repositories: 'https://inla.r-inla-download.org/R/testing https://inlabru-org.r-universe.dev'
 
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
@@ -78,6 +78,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"hard"'
+          cache: false
           extra-packages: |
              rcmdcheck
              testthat

@@ -1,5 +1,8 @@
-#' Load INLA safely for examples and tests
+#' @include deprecated.R
+
+#' @title Load INLA safely for examples and tests
 #'
+#' @description
 #' Loads the INLA package with `requireNamespace("INLA", quietly = TRUE)`, and
 #' optionally checks and sets the multicore `num.threads` INLA option.
 #'
@@ -8,7 +11,10 @@
 #' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
-#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default: FALSE.
+#' @param quietly logical; if `FALSE` and `multicore` is `FALSE`,
+#' prints a message if the `num.threads` option
+#' isn't already "1.1" to alert the user to the change.
+#' Default: FALSE.
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 23.1.31 (should always match the requirement in the package
 #' DESCRIPTION)
@@ -22,6 +28,7 @@
 #' }
 #' }
 #'
+#' @keywords internal
 bru_safe_inla <- function(multicore = NULL,
                           quietly = FALSE,
                           minimum_version = "23.1.31") {
@@ -43,15 +50,16 @@ bru_safe_inla <- function(multicore = NULL,
   )
   if (inherits(inla.call, "simpleError")) {
     if (!quietly) {
-      message("inla.getOption('inla.call') failed. INLA not installed correctly.")
+      message(
+        "inla.getOption('inla.call') failed. INLA not installed correctly."
+      )
     }
     return(FALSE)
   }
 
   if (is.null(multicore)) {
     multicore <-
-      !identical(Sys.getenv("TESTTHAT"), "true") ||
-        interactive()
+      interactive() && !identical(Sys.getenv("TESTTHAT"), "true")
   }
   if (!multicore) {
     n.t <- tryCatch(
@@ -66,21 +74,13 @@ bru_safe_inla <- function(multicore = NULL,
       }
       return(FALSE)
     }
-    if (!quietly) {
-      message(paste0("Current num.threads is '", n.t, "'."))
-    }
     if (!identical(n.t, "1:1")) {
       if (!quietly) {
         message(paste0(
-          "Setting INLA option num.threads to '1:1'.",
-          " Previous value '", n.t, "'."
+          "Changing INLA option num.threads from '", n.t, "' to '1:1'."
         ))
       }
       INLA::inla.setOption(num.threads = "1:1")
-    } else {
-      if (!quietly) {
-        message("No num.threads change needed.")
-      }
     }
   }
   return(TRUE)
@@ -123,9 +123,11 @@ check_package_version_and_load <-
 #' Check for potential `sp` version compatibility issues
 #'
 #' Loads the sp package with `requireNamespace("sp", quietly = TRUE)`, and
-#' checks and optionally sets the `sp` evolution status flag if `rgdal` is unavailable.
+#' checks and optionally sets the `sp` evolution status flag if `rgdal` is
+#' unavailable.
 #'
-#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default `FALSE`
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default
+#'   `FALSE`
 #' @param force logical; If `rgdal` is unavailable
 #' and evolution status is less that `2L`, return `FALSE` if `force` is `FALSE`.
 #' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
@@ -134,8 +136,8 @@ check_package_version_and_load <-
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 1.4-5 (should always match the requirement in the package
 #' DESCRIPTION)
-#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and give a
-#' message if `quietly` is `FALSE`. Otherwise returns `TRUE`
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and
+#'   give a message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
 #' @examples
 #' \dontrun{
@@ -145,6 +147,7 @@ check_package_version_and_load <-
 #' }
 #' }
 #'
+#' @keywords internal
 bru_safe_sp <- function(quietly = FALSE,
                         force = FALSE,
                         minimum_version = "1.4-5") {
@@ -156,6 +159,10 @@ bru_safe_sp <- function(quietly = FALSE,
     )
   if (is.na(sp_version)) {
     return(invisible(FALSE))
+  }
+
+  if (sp_version >= "2.1.4") {
+    return(invisible(TRUE))
   }
 
   if (sp_version >= "1.6-0") {
@@ -171,12 +178,16 @@ bru_safe_sp <- function(quietly = FALSE,
     )
     if ((evolution_status < 2L) && is.na(rgdal_version)) {
       if (!quietly) {
-        message("'sp' version >= 1.6-0 detected, rgdal isn't installed, and evolution status is < 2L.")
+        message(
+          "'sp' version >= 1.6-0 detected, rgdal isn't installed, and ",
+          "evolution status is < 2L."
+        )
       }
       if (!force) {
         if (!quietly) {
           message(
-            "This may cause issues with some CRS handling code. To avoid this, use 'sp::set_evolution_status(2L)'"
+            "This may cause issues with some CRS handling code. ",
+            "To avoid this, use 'sp::set_evolution_status(2L)'"
           )
         }
         return(invisible(FALSE))
@@ -185,7 +196,8 @@ bru_safe_sp <- function(quietly = FALSE,
       sp::set_evolution_status(2L)
       if (!quietly) {
         message(
-          "Ran 'sp::set_evolution_status(2L)' to avoid issues with some CRS handling code."
+          "Ran 'sp::set_evolution_status(2L)' to avoid ",
+          "issues with some CRS handling code."
         )
       }
     }
@@ -201,6 +213,7 @@ bru_safe_sp <- function(quietly = FALSE,
 #' @param expand character vector; subset of labels to expand
 #' @param suffix character; the suffix to add to the labels selected by `expand`
 #' @return a vector of labels with suffix appended to the selected labels
+#' @keywords internal
 expand_labels <- function(labels, expand, suffix) {
   labels[labels %in% expand] <- paste0(labels[labels %in% expand], suffix)
   labels
@@ -282,12 +295,15 @@ extract_selector <- function(where, selector) {
     return(NULL)
   }
   if (inherits(where, "SpatVector")) {
+    requireNamespace("terra")
     layer <- terra::values(where)[[selector]]
   } else {
     layer <- where[[selector]]
   }
   if (is.null(layer)) {
-    stop("'selector' is non-null, but no such label found in the 'where' object")
+    stop(
+      "'selector' is non-null, but no such label found in the 'where' object"
+    )
   }
   layer
 }
@@ -464,7 +480,11 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @export
 #' @rdname eval_spatial
-eval_spatial.SpatRaster <- function(data, where, layer = NULL, selector = NULL) {
+eval_spatial.SpatRaster <- function(data,
+                                    where,
+                                    layer = NULL,
+                                    selector = NULL) {
+  requireNamespace("terra")
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
@@ -552,12 +572,14 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' SpatialGridDataFrame, SpatRaster, Raster, or sf object
 #' containing data to use for filling
 #' @param where A, matrix, data.frame, or SpatialPoints or
-#' SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values
+#'   SpatialPointsDataFrame, or sf object, containing the locations of the
+#'   evaluated values
 #' @param values A vector of values to be filled in where `is.na(values)` is
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
-#' extract data, see [component()] for details.
-#' @param batch_size `r lifecycle::badge("deprecated")` due to improved algorithm.
+#' extract data, see [bru_component()] for details.
+#' @param batch_size `r lifecycle::badge("deprecated")` due to improved
+#'   algorithm.
 #' Size of nearest-neighbour calculation blocks, to limit the
 #' memory and computational complexity.
 #' @return An infilled vector of values
@@ -602,6 +624,7 @@ bru_fill_missing <- function(data, where, values,
   ))
   # Convert to sf and terra
   if (inherits(data, c("SpatialGrid", "SpatialPixelsDataFrame", "Raster"))) {
+    requireNamespace("terra")
     data <- terra::rast(data)
   } else if (inherits(data, "SpatialPointsDataFrame")) {
     data <- sf::st_as_sf(data)
@@ -640,6 +663,7 @@ bru_fill_missing <- function(data, where, values,
 
   data_crs <- fm_crs(data)
   if (inherits(data, "SpatRaster")) {
+    requireNamespace("terra")
     data_values <- terra::values(
       data[[layer]],
       dataframe = TRUE,
@@ -674,11 +698,10 @@ bru_fill_missing <- function(data, where, values,
 # Resave data
 resave_package_data <- function() {
   name_list <- c(
-    "gorillas", "mexdolphin",
     "gorillas_sf", "mexdolphin_sf",
     "mrsea",
     "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-    "seals_sp", "shrimp", "toygroups",
+    "shrimp", "toygroups",
     "robins_subset",
     "toypoints"
   )
@@ -686,26 +709,24 @@ resave_package_data <- function() {
 
   do_compress <- function(env, compress, the_path) {
     if (length(names(env)) == 1) {
-      eval(
-        parse(text = paste0(
-          "usethis::use_data(",
-          paste0(names(env), collapse = ", "),
-          ", compress = '", compress, "', overwrite = TRUE)"
-        )),
-        envir = env
+      thetext <- paste0(
+        "usethis::use_data(",
+        paste0(names(env), collapse = ", "),
+        ", compress = '", compress, "', overwrite = TRUE)"
       )
     } else {
-      eval(
-        parse(text = paste0(
-          "save(",
-          paste0(names(env), collapse = ", "),
-          ", file = '",
-          the_path,
-          "', compress = '", compress, "')"
-        )),
-        envir = env
+      thetext <- paste0(
+        "save(",
+        paste0(names(env), collapse = ", "),
+        ", file = '",
+        the_path,
+        "', compress = '", compress, "')"
       )
     }
+    eval(
+      parse(text = thetext),
+      envir = env
+    )
   }
 
   new_info <- NULL
@@ -734,26 +755,33 @@ resave_package_data <- function() {
 
     do_compress(env, smallest_compress, the_path)
 
-    new_info <- rbind(new_info, file.info(the_path))
+    new_info <- rbind(
+      new_info,
+      cbind(
+        file.info(the_path),
+        method = smallest_compress
+      )
+    )
   }
   df <- data.frame(
     path = rownames(old_info),
     size_old = old_info$size,
-    size_new = new_info$size
+    size_new = new_info$size,
+    method = new_info$method
   )
   df$"new/old" <- round(df$size_new / df$size_old * 1000) / 10
   df
 }
 
 
-#' @title Row-wise Kronecker products
-#'
-#' @description
+#' @describeIn inlabru-deprecated Row-wise Kronecker products
 #' `r lifecycle::badge("deprecated")` in favour of [fmesher::fm_row_kron()].
 #'
 #' Takes two Matrices and computes the row-wise Kronecker product.  Optionally
 #' applies row-wise weights and/or applies an additional 0/1 row-wise Kronecker
 #' matrix product.
+#'
+#' Returns a `Matrix::sparseMatrix` object.
 #'
 #' @param M1 A matrix that can be transformed into a sparse Matrix.
 #' @param M2 A matrix that can be transformed into a sparse Matrix.
@@ -764,10 +792,14 @@ resave_package_data <- function() {
 #' `INLA::inla.spde.make.A()`.
 #' @param weights Optional scaling weights to be applied row-wise to the
 #' resulting matrix.
-#' @return A `Matrix::sparseMatrix` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @export row_kron
 #' @keywords internal
 row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
+  lifecycle::deprecate_warn(
+    "2.10.0",
+    "row_kron()",
+    "fmesher::fm_row_kron()"
+  )
   fm_row_kron(M1 = M1, M2 = M2, repl = repl, n.repl = n.repl, weights = weights)
 }

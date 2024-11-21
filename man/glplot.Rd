@@ -23,27 +23,29 @@ glplot(object, ...)
 
 \item{...}{Parameters passed on to plot_rgl.fm_mesh_2d()}
 
-\item{add}{If TRUE, add the points to an existing plot. If FALSE, create new plot.}
+\item{add}{If TRUE, add the points to an existing plot. If FALSE, create new
+plot.}
 
 \item{color}{vector of R color characters. See material3d() for details.}
 
-\item{col}{Color specification. A single named color, a vector of scalar values, or a matrix of RGB values.}
+\item{col}{Color specification. A single named color, a vector of scalar
+values, or a matrix of RGB values.}
 }
 \description{
-\code{glplot()} is a generic function for renders various kinds of spatial objects, i.e. \verb{Spatial*} data
-and \code{fm_mesh_2d} objects. The function invokes particular methods which depend on the class of
-the first argument.
+\code{glplot()} is a generic function for renders various kinds of spatial
+objects, i.e. \verb{Spatial*} data and \code{fm_mesh_2d} objects. The function invokes
+particular methods which depend on the class of the first argument.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{glplot(SpatialPoints)}: This function will calculate the cartesian coordinates of the points provided
-and use points3d() in order to render them.
+\item \code{glplot(SpatialPoints)}: This function will calculate the cartesian coordinates of
+the points provided and use points3d() in order to render them.
 
-\item \code{glplot(SpatialLines)}: This function will calculate a cartesian representation of the lines provided
-and use lines3d() in order to render them.
+\item \code{glplot(SpatialLines)}: This function will calculate a cartesian representation of
+the lines provided and use \code{lines3d()} in order to render them.
 
-\item \code{glplot(fm_mesh_2d)}: This function transforms the mesh to 3D cartesian coordinates and uses
-inla.plot.mesh() with \code{rgl=TRUE} to plot the result.
+\item \code{glplot(fm_mesh_2d)}: This function transforms the mesh to 3D cartesian
+coordinates and uses \code{inla.plot.mesh()} with \code{rgl=TRUE} to plot the result.
 
 }}
 \examples{
@@ -57,7 +59,7 @@ if (interactive() &&
   globe()
 
   # Load pantropoical dolphin data
-  data("mexdolphin", package = "inlabru")
+  mexdolphin <- inlabru::mexdolphin_sp()
 
   # Add mesh, ship transects and dolphin sightings stored
   # as inla.mesh, SpatialLines and SpatialPoints objects, respectively

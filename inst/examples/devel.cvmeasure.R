@@ -2,11 +2,13 @@
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE) &&
     bru_safe_sp() &&
-    require("sp")) {
+    require("sn") &&
+    require("terra", quietly = TRUE) &&
+    require("sf", quietly = TRUE)) {
 
   # Load Gorilla data
 
-  data("gorillas", package = "inlabru")
+  gorillas <- gorillas_sp()
 
   # Use RColorBrewer
 

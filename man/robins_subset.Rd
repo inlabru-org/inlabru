@@ -48,10 +48,11 @@ robins_subset
 }
 \description{
 This is the \code{robins_subset} dataset, which is a subset of the
-full robins data set used to demonstrate a spatially varying trend coefficient
-model in Meehan et al. 2019. The dataset includes American Robin counts,
-along with time, location, and effort information, from Audubon Christimas Bird
-Counts (CBC) conducted in six US states between 1987 and 2016.
+full robins data set used to demonstrate a spatially varying trend
+coefficient model in Meehan et al. 2019. The dataset includes American
+Robin counts, along with time, location, and effort information, from
+Audubon Christimas Bird Counts (CBC) conducted in six US states between
+1987 and 2016.
 }
 \examples{
 if (require(ggplot2, quietly = TRUE)) {

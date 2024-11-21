@@ -24,8 +24,8 @@ bincount(
 
 \item{breaks}{A vector of bin boundaries}
 
-\item{nint}{Number of integration points per bin. Increase this if the bins
-are wide and}
+\item{nint}{Number of integration intervals per bin. Increase this if the
+bins are wide and the LGCP is not smooth.}
 
 \item{probs}{numeric vector of probabilities with values in \verb{[0,1]}}
 
@@ -47,7 +47,7 @@ testing problem which the function does not solve for you.
 }
 \examples{
 \dontrun{
-if (require(ggplot2) && require(fmesher)) {
+if (require(ggplot2) && require(fmesher) && bru_safe_inla()) {
   # Load a point pattern
   data(Poisson2_1D)
 
@@ -67,8 +67,13 @@ if (require(ggplot2) && require(fmesher)) {
   # Fit an LGCP model
   x <- seq(0, 55, length.out = 50)
   mesh1D <- fm_mesh_1d(x, boundary = "free")
-  mdl <- x ~ spde1D(x, model = inla.spde2.matern(mesh1D)) + Intercept(1)
-  fit.spde <- lgcp(mdl, pts2, domain = list(x = c(0, 55)))
+  matern <- INLA::inla.spde2.pcmatern(mesh1D,
+    prior.range = c(1, 0.01),
+    prior.sigma = c(1, 0.01),
+    constr = TRUE
+  )
+  mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
+  fit.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
 
   # Calculate bin statistics
   bc <- bincount(
@@ -77,7 +82,6 @@ if (require(ggplot2) && require(fmesher)) {
     breaks = seq(0, max(pts2), length.out = 12),
     predictor = x ~ exp(spde1D + Intercept)
   )
-
 
   # Plot them!
   attributes(bc)$ggp

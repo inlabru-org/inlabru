@@ -1,7 +1,5 @@
 # Construct a covariate (function) returning region identifiers of locations
 #
-# @aliases shapefile.to.covariate
-# @name shapefile.to.covariate
 # @export
 # @param shapefile Either a character array identifying the shapefile or a shapefile
 # @param coords Coordinates to to be extracted from the location data provided to the constructed covariate
@@ -15,6 +13,6 @@ shapefile.to.covariate <- function(shapefile, coords = c("x", "y")) {
   }
 
   fun <- function(loc) {
-    sp::over(SpatialPoints(as.data.frame(loc[, coords])), shapefile, fn = NULL)[, 1]
+    sp::over(sp::SpatialPoints(as.data.frame(loc[, coords])), shapefile, fn = NULL)[, 1]
   }
 }

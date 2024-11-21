@@ -4,7 +4,7 @@
 \alias{evaluate_comp_lin}
 \title{Compute all component linearisations}
 \usage{
-evaluate_comp_lin(model, input, state, inla_f = FALSE)
+evaluate_comp_lin(model, input, state, inla_f = FALSE, options = NULL)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
@@ -14,13 +14,17 @@ evaluate_comp_lin(model, input, state, inla_f = FALSE)
 \item{state}{A named list of component states}
 
 \item{inla_f}{Controls the input data interpretations}
+
+\item{options}{A \code{bru_options} object. The log verbosity options
+are used.}
 }
 \value{
-A list (class 'comp_simple') of named lists (class 'comp_simple_list')
-of \code{bru_mapper_taylor} objects,
-one for each included component
+A list (class 'comp_simple') of named lists (class
+'comp_simple_list') of \code{bru_mapper_taylor} objects, one for each included
+component
 }
 \description{
 Computes individual \code{bru_mapper_taylor} objects for included components
 for each model likelihood
 }
+\keyword{internal}

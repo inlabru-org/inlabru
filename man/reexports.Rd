@@ -3,69 +3,11 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{fm_crs_oblique<-}
-\alias{fm_ellipsoid_radius<-}
-\alias{fm_length_unit<-}
-\alias{fm_CRS}
-\alias{fm_CRS_as_list}
-\alias{fm_CRSargs}
-\alias{fm_CRSargs_as_list}
-\alias{fm_as_fm}
-\alias{fm_as_mesh_2d}
-\alias{fm_as_mesh_1d}
-\alias{fm_as_lattice_2d}
-\alias{fm_as_segm}
-\alias{fm_mesh_2d}
-\alias{fm_mesh_1d}
-\alias{fm_lattice_2d}
-\alias{fm_segm}
-\alias{fm_as_sfc}
-\alias{fm_as_sp_crs}
-\alias{fm_contains}
+\alias{fm_sp2segment}
 \alias{fm_cprod}
 \alias{fm_crs}
-\alias{fm_crs_get_ellipsoid_radius}
-\alias{fm_crs_get_lengthunit}
-\alias{fm_crs_get_wkt}
-\alias{fm_crs_is_geocent}
-\alias{fm_crs_oblique}
-\alias{fm_crs_set_ellipsoid_radius}
-\alias{fm_crs_set_lengthunit}
-\alias{fm_ellipsoid_radius}
-\alias{fm_evaluate}
-\alias{fm_evaluator}
-\alias{fm_evaluator_lattice}
-\alias{fm_has_PROJ6}
-\alias{fm_crs_is_identical}
-\alias{fm_identical_CRS}
 \alias{fm_int}
-\alias{fm_int_multi_sampler}
-\alias{fm_length_unit}
-\alias{fm_list_as_CRS}
-\alias{fm_proj4string}
-\alias{fm_sp2segment}
-\alias{fm_spTransform}
-\alias{fm_sp_get_crs}
-\alias{fm_transform}
-\alias{fm_wkt}
-\alias{fm_wkt_as_wkt_tree}
-\alias{fm_wkt_get_ellipsoid_radius}
-\alias{fm_wkt_get_lengthunit}
-\alias{fm_wkt_is_geocent}
-\alias{fm_wkt_predef}
-\alias{fm_wkt_set_ellipsoid_radius}
-\alias{fm_wkt_set_lengthunit}
-\alias{fm_wkt_tree_as_wkt}
-\alias{fm_wkt_tree_get_item}
-\alias{fm_wkt_tree_set_item}
-\alias{fm_wkt_unit_params}
-\alias{fm_centroids}
 \alias{fm_pixels}
-\alias{fm_store_points}
-\alias{fm_vertices}
-\alias{fm_is_within}
-\alias{fm_as_inla_mesh}
-\alias{fm_as_inla_mesh_segment}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -73,6 +15,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{fmesher}{\code{\link[fmesher]{fm_as_fm}}, \code{\link[fmesher:fmesher-deprecated]{fm_as_inla_mesh}}, \code{\link[fmesher:fmesher-deprecated]{fm_as_inla_mesh_segment}}, \code{\link[fmesher]{fm_as_lattice_2d}}, \code{\link[fmesher]{fm_as_mesh_1d}}, \code{\link[fmesher]{fm_as_mesh_2d}}, \code{\link[fmesher]{fm_as_segm}}, \code{\link[fmesher]{fm_as_sfc}}, \code{\link[fmesher:fmesher-deprecated]{fm_as_sp_crs}}, \code{\link[fmesher]{fm_centroids}}, \code{\link[fmesher]{fm_contains}}, \code{\link[fmesher]{fm_cprod}}, \code{\link[fmesher]{fm_crs}}, \code{\link[fmesher:fm_CRS_sp]{fm_CRS}}, \code{\link[fmesher:fm_CRSargs]{fm_CRS_as_list}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_get_ellipsoid_radius}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_get_lengthunit}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_get_wkt}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_is_geocent}}, \code{\link[fmesher]{fm_crs_is_identical}}, \code{\link[fmesher:fm_crs]{fm_crs_oblique}}, \code{\link[fmesher:fm_crs-set]{fm_crs_oblique<-}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_set_ellipsoid_radius}}, \code{\link[fmesher:fm_crs_wkt]{fm_crs_set_lengthunit}}, \code{\link[fmesher]{fm_CRSargs}}, \code{\link[fmesher:fm_CRSargs]{fm_CRSargs_as_list}}, \code{\link[fmesher:fm_crs_wkt]{fm_ellipsoid_radius}}, \code{\link[fmesher:fm_crs_wkt]{fm_ellipsoid_radius<-}}, \code{\link[fmesher]{fm_evaluate}}, \code{\link[fmesher:fm_evaluate]{fm_evaluator}}, \code{\link[fmesher:fm_evaluate]{fm_evaluator_lattice}}, \code{\link[fmesher:fmesher-deprecated]{fm_has_PROJ6}}, \code{\link[fmesher:fm_crs_is_identical]{fm_identical_CRS}}, \code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_int_multi_sampler}}, \code{\link[fmesher]{fm_is_within}}, \code{\link[fmesher]{fm_lattice_2d}}, \code{\link[fmesher:fm_crs_wkt]{fm_length_unit}}, \code{\link[fmesher:fm_crs_wkt]{fm_length_unit<-}}, \code{\link[fmesher:fm_CRSargs]{fm_list_as_CRS}}, \code{\link[fmesher]{fm_mesh_1d}}, \code{\link[fmesher]{fm_mesh_2d}}, \code{\link[fmesher]{fm_pixels}}, \code{\link[fmesher:fm_crs_wkt]{fm_proj4string}}, \code{\link[fmesher]{fm_segm}}, \code{\link[fmesher:fmesher-deprecated]{fm_sp_get_crs}}, \code{\link[fmesher:fmesher-deprecated]{fm_sp2segment}}, \code{\link[fmesher:fmesher-deprecated]{fm_spTransform}}, \code{\link[fmesher]{fm_store_points}}, \code{\link[fmesher]{fm_transform}}, \code{\link[fmesher]{fm_vertices}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt}}, \code{\link[fmesher:wkt_tree]{fm_wkt_as_wkt_tree}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_get_ellipsoid_radius}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_get_lengthunit}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_is_geocent}}, \code{\link[fmesher:fm_crs]{fm_wkt_predef}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_set_ellipsoid_radius}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_set_lengthunit}}, \code{\link[fmesher:wkt_tree]{fm_wkt_tree_as_wkt}}, \code{\link[fmesher:wkt_tree]{fm_wkt_tree_get_item}}, \code{\link[fmesher:wkt_tree]{fm_wkt_tree_set_item}}, \code{\link[fmesher:fm_crs_wkt]{fm_wkt_unit_params}}}
+  \item{fmesher}{\code{\link[fmesher]{fm_cprod}}, \code{\link[fmesher]{fm_crs}}, \code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_pixels}}, \code{\link[fmesher:fmesher-deprecated]{fm_sp2segment}}}
 }}
 

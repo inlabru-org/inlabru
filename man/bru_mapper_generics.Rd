@@ -141,7 +141,11 @@ The linearisation information includes \code{offset}, \code{jacobian}, and \code
 The state information indicates for which state the \code{offset} was evaluated,
 with \code{NULL} meaning all-zero.
 The linearised mapper output is defined as
-\code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{effect(input, state) =
+  offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)
+}\if{html}{\out{</div>}}
+
 The default method calls \code{ibm_eval()} and \code{ibm_jacobian()} to generate
 the needed information.
 
@@ -159,8 +163,9 @@ The \code{input} contents must
 be in a format accepted by \code{ibm_jacobian(...)}
 for the mapper.
 
-\item \code{ibm_names()}: Implementations must return a character vector of sub-mapper names, or \code{NULL}.
-Intended for providing information about multi-mappers and mapper collections.
+\item \code{ibm_names()}: Implementations must return a character vector of sub-mapper names, or
+\code{NULL}. Intended for providing information about multi-mappers and mapper
+collections.
 
 \item \code{ibm_names(mapper) <- value}: Set mapper names.
 
@@ -196,7 +201,10 @@ it doesn't exist.
 and returns a \code{bru_mapper_taylor} object.
 The \code{state0} information in the affine mapper indicates for which state
 the \code{offset} was evaluated; The affine mapper output is defined as
-\code{effect(input, state) = offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{effect(input, state) =
+  offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)
+}\if{html}{\out{</div>}}
 
 \item \code{ibm_simplify(default)}: Calls \code{ibm_linear()} for linear mappers, and returns the original mapper
 for non-linear mappers.
@@ -208,8 +216,8 @@ a zero vector of length \code{ibm_n_output(...)} is returned.
 
 \item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and
 \code{offset <- ibm_eval(..., jacobian = jacobian)}
-and returns a list with elements \code{offset} and \code{jacobian}, as needed
-by \code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
+and returns a list with elements \code{offset} and \code{jacobian}, as needed by
+\code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
 their own \code{ibm_eval2} method if joint construction of evaluation and Jacobian
 is more efficient than separate or sequential construction.
 
@@ -249,6 +257,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
 \code{\link{bru_mapper_linear}()},
@@ -258,6 +267,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

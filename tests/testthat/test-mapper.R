@@ -334,15 +334,67 @@ test_that("Multi-mapper bru input", {
     x = 1,
     dims = c(3, 12)
   )
+  set.seed(123L)
+  state <- rnorm(12)
+  val <- as.vector(A %*% state)
+  expect_equal(ibm_eval(mapper, list_data, state = state), val)
+  expect_equal(ibm_eval(mapper, olist_data, state = state), val)
+  expect_equal(ibm_eval(mapper, df_data, state = state), val)
+  expect_equal(ibm_eval(mapper, matrix_data, state = state), val)
+  expect_equal(ibm_eval(mapper, omatrix_data, state = state), val)
+
   expect_equal(ibm_jacobian(mapper, list_data), A)
   expect_equal(ibm_jacobian(mapper, olist_data), A)
   expect_equal(ibm_jacobian(mapper, df_data), A)
   expect_equal(ibm_jacobian(mapper, matrix_data), A)
   expect_equal(ibm_jacobian(mapper, omatrix_data), A)
-
-  data <- cbind(df_data, y = 1:3)
 })
 
+test_that("Multi-mapper bru input with offset", {
+  mapper <- bru_mapper_multi(
+    list(
+      space = bru_mapper_pipe(
+        list(mapper = bru_mapper_index(4), offset = bru_mapper_shift())
+      ),
+      time = bru_mapper_index(3)
+    )
+  )
+  expect_equal(ibm_n(mapper), 12)
+  expect_equal(ibm_n(mapper, multi = 1), list(space = 4, time = 3))
+  expect_equal(ibm_values(mapper), seq_len(12))
+  expect_equal(
+    as.data.frame(ibm_values(mapper, multi = 1)),
+    expand.grid(space = seq_len(4), time = seq_len(3)),
+    ignore_attr = TRUE
+  )
+
+  list_data <- list(time = 1:3, space = list(mapper = 2:4, offset = 3:5))
+  olist_data <- list(space = list(mapper = 2:4, offset = 3:5), time = 1:3)
+  A <- Matrix::sparseMatrix(
+    i = 1:3,
+    j = c(2, 7, 12),
+    x = 1,
+    dims = c(3, 12)
+  )
+  set.seed(123L)
+  state <- rnorm(12)
+  val <- list_data$space$offset + as.vector(A %*% state)
+  expect_equal(ibm_eval(mapper, list_data, state = state), val)
+  expect_equal(ibm_eval(mapper, olist_data, state = state), val)
+  expect_equal(
+    ibm_eval(mapper, list_data, state = NULL),
+    list_data$space$offset
+  )
+  expect_equal(
+    ibm_eval(mapper, olist_data, state = NULL),
+    list_data$space$offset
+  )
+
+  expect_equal(ibm_jacobian(mapper, list_data), A)
+  expect_equal(ibm_jacobian(mapper, olist_data), A)
+  expect_equal(ibm_jacobian(mapper, list_data, state = NULL), A)
+  expect_equal(ibm_jacobian(mapper, olist_data, state = NULL), A)
+})
 
 
 
@@ -482,11 +534,11 @@ test_that("Collect mapper, automatic construction", {
     )
   # fm_mesh_1d mapper
 
-  lik <- like(formula = y ~ ., data = data)
+  lik <- bru_obs(formula = y ~ ., data = data)
 
   # These tests do not trigger INLA:inla.mesh.1d usage:
-  cmp1 <- component_list(cmp1, lhoods = like_list(list(lik)))
-  cmp2 <- component_list(cmp2, lhoods = like_list(list(lik)))
+  cmp1 <- bru_component_list(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- bru_component_list(cmp2, lhoods = bru_like_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
     expect_identical(
@@ -575,7 +627,11 @@ test_that("Marginal mapper", {
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
 
-  dqexp <- function(p, rate = 1, lower.tail = TRUE, log.p = FALSE, log = FALSE) {
+  dqexp <- function(p,
+                    rate = 1,
+                    lower.tail = TRUE,
+                    log.p = FALSE,
+                    log = FALSE) {
     if (log.p) {
       if (lower.tail) {
         val <- log1p(-exp(p)) + log(rate)
@@ -633,4 +689,61 @@ test_that("Mesh 2d mapper", {
   loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 9)
+})
+
+
+
+test_that("Repeat mapper, direct construction", {
+  set.seed(1234L)
+
+  mapper <- bru_mapper_repeat(
+    bru_mapper_index(4),
+    n_rep = 3
+  )
+  expect_equal(ibm_n(mapper), 12)
+  expect_equal(ibm_values(mapper), seq_len(12))
+
+  data <- 3:1
+  A <- Matrix::sparseMatrix(
+    i = 1:3,
+    j = data,
+    x = 1,
+    dims = c(3, 4)
+  )
+  A <- cbind(A, A, A)
+  A <- as(as(as(A, "dMatrix"), "generalMatrix"), "CsparseMatrix")
+  expect_equal(ibm_jacobian(mapper, data), A)
+})
+
+
+
+
+test_that("Repeat mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  set.seed(12345L)
+  data <- data.frame(
+    y = 4 + rnorm(6),
+    x = c(1, 2, 3, 2, 3, 4)
+  )
+
+  expect_error(
+    {
+      fit_bru <-
+        bru(
+          y ~ Intercept(1) + field(
+            x,
+            model = "iid",
+            mapper = bru_mapper_repeat(bru_mapper_index(4), n_rep = 2)
+          ),
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          ))),
+          options = list(bru_initial = list(field = rep(10, 8)))
+        )
+    },
+    NA
+  )
 })

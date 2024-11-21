@@ -180,7 +180,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   fit1 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ .,
       family = "cp",
       data = pts2,
@@ -190,7 +190,7 @@ test_that("1D LGCP fitting, compressed format", {
   )
   fit2 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ .,
       family = "cp",
       data = pts2,
@@ -201,25 +201,33 @@ test_that("1D LGCP fitting, compressed format", {
 
   # newdata <- data.frame(x = seq(0, 55, by = 1))
   # pred0 <- data.frame(x = newdata$x, mean = lambda2_1D(newdata$x))
-  # pred1 <- predict(fit1, newdata, formula = ~ exp(spde1D + Intercept), n.samples = 1000)
-  # pred2 <- predict(fit2, newdata, formula = ~ exp(spde1D + Intercept), n.samples = 1000)
+  # pred1 <- predict(fit1, newdata, formula = ~ exp(spde1D + Intercept),
+  # n.samples = 1000)
+  # pred2 <- predict(fit2, newdata, formula = ~ exp(spde1D + Intercept),
+  # n.samples = 1000)
   # library(ggplot2)
   # ggplot() +
   #   geom_line(aes(x = x, y = mean), color = "black", data = pred0) +
   #   geom_line(aes(x = x, y = mean), color = "red", data = pred1) +
-  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "red", alpha = 0.2, data = pred1) +
+  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "red", alpha
+  #   = 0.2, data = pred1) +
   #   geom_line(aes(x = x, y = mean), color = "blue", data = pred2) +
-  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "blue", alpha = 0.2, data = pred2)
+  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "blue", alpha
+  #   = 0.2, data = pred2)
   #
   # pred0 <- data.frame(x = newdata$x, mean = log(lambda2_1D(newdata$x)))
-  # pred1 <- predict(fit1, newdata, formula = ~ (spde1D + Intercept), n.samples = 1000)
-  # pred2 <- predict(fit2, newdata, formula = ~ (spde1D + Intercept), n.samples = 1000)
+  # pred1 <- predict(fit1, newdata, formula = ~ (spde1D + Intercept), n.samples
+  # = 1000)
+  # pred2 <- predict(fit2, newdata, formula = ~ (spde1D + Intercept), n.samples
+  # = 1000)
   # ggplot() +
   #   geom_line(aes(x = x, y = mean), color = "black", data = pred0) +
   #   geom_line(aes(x = x, y = mean), color = "red", data = pred1) +
-  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "red", alpha = 0.2, data = pred1) +
+  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "red", alpha
+  #   = 0.2, data = pred1) +
   #   geom_line(aes(x = x, y = mean), color = "blue", data = pred2) +
-  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "blue", alpha = 0.2, data = pred2)
+  #   geom_ribbon(aes(x = x, ymin = q0.025, ymax = q0.975), fill = "blue", alpha
+  #   = 0.2, data = pred2)
 
   expect_equal(
     fit1$summary.hyperpar,
@@ -239,7 +247,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   fit3 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ spde1D + Intercept,
       family = "cp",
       data = pts2,
@@ -249,7 +257,7 @@ test_that("1D LGCP fitting, compressed format", {
   )
   fit4 <- bru(
     mdl,
-    like(
+    bru_obs(
       formula = x ~ spde1D + Intercept,
       family = "cp",
       data = pts2,

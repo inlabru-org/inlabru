@@ -7,7 +7,6 @@
 \alias{local_bru_options_set}
 \alias{local_basic_intercept_testdata}
 \alias{local_basic_fixed_effect_testdata}
-\alias{local_mrsea_convert}
 \alias{local_bru_safe_inla}
 \alias{local_bru_testthat_setup}
 \title{Unit test helpers}
@@ -15,7 +14,7 @@
 local_bru_testthat_assign(x, values, envir = parent.frame())
 
 local_bru_testthat_tolerances(
-  tolerances = c(0.0001, 0.01, 0.1),
+  tolerances = c(1e-04, 0.01, 0.1),
   envir = parent.frame()
 )
 
@@ -24,8 +23,6 @@ local_bru_options_set(..., .reset = FALSE, envir = parent.frame())
 local_basic_intercept_testdata()
 
 local_basic_fixed_effect_testdata()
-
-local_mrsea_convert(x, use_km = FALSE)
 
 local_bru_safe_inla(multicore = FALSE, quietly = TRUE, envir = parent.frame())
 
@@ -43,13 +40,13 @@ local_bru_testthat_setup(envir = parent.frame())
 \item{.reset}{For \code{local_bru_options_set}, logical indicating if the global
 override options list should be emptied before setting the new option(s).}
 
-\item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
-INLA \code{num.threads} option is not checked or altered. Default: \code{FALSE}, multicore
+\item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the INLA
+\code{num.threads} option is not checked or altered. Default: \code{FALSE}, multicore
 not allowed (used for examples and unit tests).}
 
 \item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. A message is
-always printed if the INLA \code{num.threads} option is altered, regardless of the
-\code{quietly} argument. Default: TRUE.}
+always printed if the INLA \code{num.threads} option is altered, regardless of
+the \code{quietly} argument. Default: TRUE.}
 }
 \value{
 \code{local_bru_options_set()} returns a copy of the global override
@@ -75,8 +72,8 @@ interactively.
 \item \code{local_bru_options_set()}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
 
 \item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
-within-system repeatability by calling \code{local_bru_safe_inla()};
-see also \code{\link[=bru_safe_inla]{bru_safe_inla()}}
+within-system repeatability by calling \code{local_bru_safe_inla()}; see also
+\code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
 \item \code{local_bru_testthat_setup()}: Initialise environment for tests.
 Assigns tolerance variables.

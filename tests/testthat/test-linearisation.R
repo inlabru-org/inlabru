@@ -11,15 +11,18 @@ test_that("Linearisation", {
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
   lhoods <-
-    like_list(
-      like(
-        formula = y ~ exp(x) + Int_y_latent, data = data
+    bru_like_list(
+      bru_obs(
+        formula = y ~ exp(x) + Int_y_latent,
+        data = data
       ),
-      like(
-        formula = z ~ log(exp(x) + exp(Int_z_latent)), data = data, family = "poisson"
+      bru_obs(
+        formula = z ~ log(exp(x) + exp(Int_z_latent)),
+        data = data,
+        family = "poisson"
       )
     )
-  lhoods <- bru_used_update(lhoods, names(component_list(cmp)))
+  lhoods <- bru_used_update(lhoods, names(bru_component_list(cmp)))
 
   used <- bru_used(lhoods[[1]])
   expect_equal(used[["effect"]], "x")
@@ -33,7 +36,7 @@ test_that("Linearisation", {
   expect_equal(used[["effect"]], "x")
   expect_equal(used[["latent"]], c("Int_y", "Int_z"))
 
-  model <- bru_model(component_list(cmp, lhoods), lhoods)
+  model <- bru_model(bru_component_list(cmp, lhoods), lhoods)
 
   idx <- evaluate_index(model, lhoods)
   inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)

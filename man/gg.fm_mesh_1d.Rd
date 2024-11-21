@@ -22,11 +22,13 @@
 )
 }
 \arguments{
-\item{data}{An inla.mesh.1d object.}
+\item{data}{An \link[fmesher:fm_mesh_1d]{fmesher::fm_mesh_1d} object.}
 
-\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to \code{geom_point}.}
+\item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to
+\code{geom_point}.}
 
-\item{y}{Single or vector numeric defining the y-coordinates of the mesh knots to plot.}
+\item{y}{Single or vector numeric defining the y-coordinates of the mesh
+knots to plot.}
 
 \item{shape}{Shape of the knot markers.}
 
@@ -70,7 +72,6 @@ if (require("fmesher", quietly = TRUE) &&
 \seealso{
 Other geomes for meshes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_2d}()},
-\code{\link{gm}()}
+\code{\link{gg.fm_mesh_2d}()}
 }
 \concept{geomes for meshes}

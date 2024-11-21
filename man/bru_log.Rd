@@ -37,11 +37,13 @@ bru_log(x = NULL, verbosity = NULL)
 \item{x}{An object that is, contains, or can be converted to,
 a \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
 
-\item{verbosity}{integer value for limiting the highest verbosity level being returned.}
+\item{verbosity}{integer value for limiting the highest verbosity level being
+returned.}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{timestamp}{If \code{TRUE}, include the timestamp of each message. Default \code{TRUE}.}
+\item{timestamp}{If \code{TRUE}, include the timestamp of each message. Default
+\code{TRUE}.}
 
 \item{i}{indices specifying elements to extract. If \code{character}, denotes
 the sequence between bookmark \code{i} and the next bookmark (or the end of the
@@ -53,9 +55,10 @@ character vector of log messages, and potentially a vector of bookmarks.
 }
 \description{
 Access method for \code{bru_log} objects.
-Note: Up to version \verb{2.8.0}, \code{bru_log()} was a deprecated alias for \code{bru_log_message()}.
-When running on \verb{2.8.0} or earlier, use \code{bru_log_get()} to access the global
-log, and \code{cat(fit$bru_iinla$log, sep = "\\n")} to print a stored estimation object log.
+Note: Up to version \verb{2.8.0}, \code{bru_log()} was a deprecated alias for
+\code{bru_log_message()}. When running on \verb{2.8.0} or earlier, use \code{bru_log_get()}
+to access the global log, and \code{cat(fit$bru_iinla$log, sep = "\\n")} to print a
+stored estimation object log.
 After version \verb{2.8.0}, use \code{bru_log()} to access the global log, and
 \code{bru_log(fit)} to access a stored estimation log.
 }
@@ -77,8 +80,9 @@ into a \code{bru_log} object.
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_log()}: Extract stored log messages. If non-\code{NULL}, the \code{verbosity} argument
-determines the maximum verbosity level of the messages to extract.
+\item \code{bru_log()}: Extract stored log messages. If non-\code{NULL}, the
+\code{verbosity} argument determines the maximum verbosity level of the messages
+to extract.
 
 }}
 \examples{

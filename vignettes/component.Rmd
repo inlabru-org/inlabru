@@ -112,7 +112,7 @@ This keyword allows code to be written that works with arbitrarily named input d
 
 If the objects required to evaluate the R expression cannot be found in the data, then the global environment is searched.  This allows users to access objects in the global environment, such as other data-structures that may be of a different dimension to the response data.  This avoids the need to pre-process everything into a single `data.frame`.
 
-The functionality of allowing general `R` expressions can be used to extend the types of data that can be passed to the `bru()`, `like()` and `lgcp()` functions.  It is the basis for the support of spatial data structures such as `sp` objects, and there is also experimental support to allow users to pass data as a list.  `inlabru` is thus readily extendible, given appropriate functions to extract the relevant information for each component, and associated mappers that convert this information into a component design matrix.
+The functionality of allowing general `R` expressions can be used to extend the types of data that can be passed to the `bru()`, `bru_obs()` and `lgcp()` functions.  It is the basis for the support of spatial data structures such as `sp` objects, and there is also experimental support to allow users to pass data as a list.  `inlabru` is thus readily extendible, given appropriate functions to extract the relevant information for each component, and associated mappers that convert this information into a component design matrix.
 
 In addition to the three main inputs, the optional `weights` argument also takes an R expression, and
 the result is used to scale the component. This can be used for spatially varying coefficient models,
@@ -153,7 +153,7 @@ where `n` is the length of the predictor vector.  Note that this shortcut makes 
 
 ### Spatial covariates
 
-If `main`, `group`, or `replicate`, is the name of an `sf`, `SpatRaster`, or `Spatial*` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `like()`.  This **requires that this data is a `sf` or `SpatialPoints*` object**. `inlabru` does this by calling the `inlabru::eval_spatial()` method, which supports several covariate storage types.
+If `main`, `group`, or `replicate`, is the name of an `sf`, `SpatRaster`, or `Spatial*` object stored in the global `R` environment, then `inlabru` attempts to do something intelligent by extracting the covariate information at the locations of the data passed to `bru()` or `bru_obs()`.  This **requires that this data is a `sf` or `SpatialPoints*` object**. `inlabru` does this by calling the `inlabru::eval_spatial()` method, which supports several covariate storage types.
 
 The shortcut
 ```{r eval=FALSE}

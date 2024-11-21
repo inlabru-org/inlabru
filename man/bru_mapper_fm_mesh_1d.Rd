@@ -5,21 +5,18 @@
 \alias{ibm_n.bru_mapper_fm_mesh_1d}
 \alias{ibm_values.bru_mapper_fm_mesh_1d}
 \alias{ibm_jacobian.bru_mapper_fm_mesh_1d}
-\alias{bru_mapper.inla.mesh.1d}
 \alias{ibm_n.bru_mapper_inla_mesh_1d}
 \alias{ibm_values.bru_mapper_inla_mesh_1d}
 \alias{ibm_jacobian.bru_mapper_inla_mesh_1d}
 \title{Mapper for \code{fm_mesh_1d}}
 \usage{
-\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = NULL, ...)
+\method{bru_mapper}{fm_mesh_1d}(mesh, indexed = TRUE, ...)
 
 \method{ibm_n}{bru_mapper_fm_mesh_1d}(mapper, ...)
 
 \method{ibm_values}{bru_mapper_fm_mesh_1d}(mapper, ...)
 
 \method{ibm_jacobian}{bru_mapper_fm_mesh_1d}(mapper, input, ...)
-
-\method{bru_mapper}{inla.mesh.1d}(mesh, indexed = NULL, ...)
 
 \method{ibm_n}{bru_mapper_inla_mesh_1d}(mapper, ...)
 
@@ -28,14 +25,12 @@
 \method{ibm_jacobian}{bru_mapper_inla_mesh_1d}(mapper, input, ...)
 }
 \arguments{
-\item{mesh}{An \code{fm_mesh_1d} or \code{inla.mesh.1d} object to use as a mapper}
+\item{mesh}{An \code{fm_mesh_1d} object to use as a mapper}
 
-\item{indexed}{logical; If \code{TRUE}, the \code{ibm_values()} output will be the
-integer indexing sequence for the latent variables (needed for \code{spde} models).
-If \code{FALSE}, the knot
-locations are returned (useful as an interpolator for \code{rw2} models
-and similar).
-Default: \code{NULL}, to force user specification of this parameter}
+\item{indexed}{logical; If \code{TRUE} (default), the \code{ibm_values()} output will
+be the integer indexing sequence for the latent variables (needed for
+\code{spde} models). If \code{FALSE}, the knot locations are returned (useful as an
+interpolator for \code{rw2} models and similar).}
 
 \item{...}{Arguments passed on to other methods}
 
@@ -43,20 +38,21 @@ Default: \code{NULL}, to force user specification of this parameter}
 
 \item{input}{Data input for the mapper.}
 }
+\value{
+A \code{bru_mapper_fm_mesh_1d} or \code{fm_mapper_fmesher} object. The the
+general \code{\link[=bru_mapper_fmesher]{bru_mapper_fmesher()}} mapper handles all indexed \code{fmesher}
+objects, except that \code{NA} inputs for \code{fm_mesh_1d} requires \code{fmesher}
+version \verb{0.2.0.9002} or later. The \code{fmesher} version is detected, and an
+appropriate mapper is created.
+}
 \description{
 Create mapper for an \code{fm_mesh_1d} object
 }
-\section{Functions}{
-\itemize{
-\item \code{bru_mapper(inla.mesh.1d)}: Create mapper for an \code{inla.mesh.1d} object; converts
-the mesh fo \code{fm_mesh_1d} first.
-
-}}
 \examples{
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = TRUE)
+m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
@@ -72,6 +68,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -82,6 +79,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

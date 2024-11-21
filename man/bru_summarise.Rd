@@ -18,20 +18,24 @@ bru_summarise(
 \item{probs}{A numeric vector of probabilities with values in \verb{[0, 1]},
 passed to \code{stats::quantile}}
 
-\item{x}{A \code{data.frame} of data columns that should be added to the summary data frame}
+\item{x}{A \code{data.frame} of data columns that should be added to the summary
+data frame}
 
-\item{cbind.only}{If TRUE, only \code{cbind} the samples and return a matrix where each column is a sample}
+\item{cbind.only}{If TRUE, only \code{cbind} the samples and return a matrix where
+each column is a sample}
 
 \item{max_moment}{integer, at least 2. Determines the largest moment
 order information to include in the output. If \code{max_moment > 2},
 includes "skew" (skewness, \code{E[(x-m)^3/s^3]}), and
 if \code{max_moment > 3}, includes
 "ekurtosis" (excess kurtosis, \code{E[(x-m)^4/s^4] - 3}). Default 2.
-Note that the Monte Carlo variability of the \code{ekurtois} estimate may be large.}
+Note that the Monte Carlo variability of the \code{ekurtois} estimate may be
+large.}
 }
 \value{
-A \code{data.frame} or \verb{Spatial[Points/Pixels]DataFrame} with summary statistics,
-"mean", "sd", \code{paste0("q", probs)}, "mean.mc_std_err", "sd.mc_std_err"
+A \code{data.frame} or \verb{Spatial[Points/Pixels]DataFrame} with summary
+statistics, "mean", "sd", \code{paste0("q", probs)}, "mean.mc_std_err",
+"sd.mc_std_err"
 }
 \description{
 Summarise and annotate data
@@ -40,3 +44,4 @@ Summarise and annotate data
 bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
 
 }
+\keyword{internal}

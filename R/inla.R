@@ -9,11 +9,12 @@
 #' @examples
 #' bru_standardise_names("Precision for the Gaussian observations")
 #' @export
+#' @keywords internal
 bru_standardise_names <- function(x) {
   new_names <- vapply(
     x,
     function(x) {
-      gsub("[-() ]", "_", x = x, fixed = FALSE)
+      gsub("\\[|\\]|[-() ]", "_", x = x, fixed = FALSE)
     },
     "name"
   )
@@ -140,7 +141,8 @@ extract_property <- function(result, property,
   # from random effects into fixed effects
   #
   # Old code:
-  # For factors we add a data.frame with column names equivalent to the factor levels
+  # For factors we add a data.frame with column names equivalent to the
+  # factor levels
   #    for (name in fac.names) {
   #      tmp <- unlist(ret[startsWith(names(ret), name)])
   #      names(tmp) <- lapply(names(tmp), function(nm) {
@@ -164,8 +166,8 @@ extract_property <- function(result, property,
 ##          in the first sample
 ##
 
-inla.posterior.sample.structured <- function(result, n, seed = NULL,
-                                             num.threads = NULL, ...) {
+post.sample.structured <- function(result, n, seed = NULL,
+                                   num.threads = NULL, ...) {
   if (!is.null(seed) && (seed != 0L)) {
     num.threads <- "1:1"
   }
@@ -220,7 +222,10 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
         name <- names(result$summary.random)[k]
         #        model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
-        vals[[name]] <- extract_entries(name, smpl.latent, .contents = .contents)
+        vals[[name]] <- extract_entries(name,
+          smpl.latent,
+          .contents = .contents
+        )
         #        }
         #        else {
         #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
@@ -228,7 +233,8 @@ inla.posterior.sample.structured <- function(result, n, seed = NULL,
       }
     }
 
-    # For effects that were modeled via factors we attach an extra vector holding the samples
+    # For effects that were modeled via factors we attach an extra vector
+    # holding the samples
     fac.names <- names(result$bru_info$model$effects)[
       vapply(
         result$bru_info$model$effects,
@@ -272,23 +278,27 @@ extract_entries <- function(name, smpl, .contents = NULL) {
     warning(paste0("Element '", name, "' not found in posterior sample."))
     return(numeric(0L))
   }
-  vals <- smpl[.contents[["start"]][idx] + seq_len(.contents[["length"]][idx]) - 1L]
+  vals <- smpl[.contents[["start"]][idx] +
+    seq_len(.contents[["length"]][idx]) - 1L]
   return(vals)
 }
 
 #' Backwards compatibility to handle mexpand for INLA <= 24.06.02
 #'
-#' Expand observation vectors/matrices in stacks into to a multicolumn matrix for multiple likelihoods
+#' Expand observation vectors/matrices in stacks into to a multicolumn matrix
+#' for multiple likelihoods
 #'
 #' @export
-#' @param ... List of stacks that contain vector observations
-#'            (existing multilikelihood observation matrices are also permitted)
-#' @param old.names A vector of strings with the names of the observation vector/matrix for each stack.
-#'        If a single string, this is assumed for all the stacks. (default "BRU.response")
+#' @param \dots List of stacks that contain vector observations (existing
+#'   multilikelihood observation matrices are also permitted)
+#' @param old.names A vector of strings with the names of the observation
+#'   vector/matrix for each stack. If a single string, this is assumed for all
+#'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
 #' @return a list of modified stacks with multicolumn observations
-#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren
+#'   \email{finn.lindgren@@gmail.com}
 #'
 #' @keywords internal
 #' @rdname bru_inla.stack.mexpand
@@ -321,7 +331,8 @@ bru_inla.stack.mexpand <- function(...,
       effects = stacks[[j]]$effects$index
     )
 
-    # Expand the observation vector/matrix into a multilikelihood observation matrix:
+    # Expand the observation vector/matrix into a multilikelihood observation
+    # matrix:
     y.rows <- NROW(A)
     if (!is.null(LHS[[old.names[j]]])) {
       LHS[[new.name]] <-
@@ -332,7 +343,8 @@ bru_inla.stack.mexpand <- function(...,
         )
     }
 
-    # Create the modified stack, with model compression disabled to prevent modifications:
+    # Create the modified stack, with model compression disabled to prevent
+    # modifications:
     if (utils::packageVersion("INLA") <= "24.06.02") {
       stacks[[j]] <-
         INLA::inla.stack.sum(
@@ -367,16 +379,17 @@ bru_inla.stack.mexpand <- function(...,
 #' @description
 #' Helper functions for multi-likelihood models
 #'
-#' @param ... List of stacks that contain vector observations
-#'            (existing multi-likelihood observation matrices are also permitted)
+#' @param \dots List of stacks that contain vector observations (existing
+#'   multi-likelihood observation matrices are also permitted)
 #' @param compress If `TRUE`, compress the model by removing duplicated rows of
 #' effects, replacing the corresponding A-matrix columns with a single column
 #' containing the sum.
 #' @param remove.unused	If `TRUE`, compress the model by removing rows of
-#' effects corresponding to all-zero columns in the A matrix (and removing those columns).
+#'   effects corresponding to all-zero columns in the A matrix (and removing
+#'   those columns).
 #' @param old.names A vector of strings with the names of the observation
-#'   vector/matrix for each stack.
-#'   If a single string, this is assumed for all the stacks. (default "BRU.response")
+#'   vector/matrix for each stack. If a single string, this is assumed for all
+#'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
 #' @export
@@ -384,10 +397,16 @@ bru_inla.stack.mexpand <- function(...,
 #' @rdname bru_inla.stack.mjoin
 #'
 
-bru_inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
-                                 old.names = "BRU.response", new.name = "BRU.response") {
+bru_inla.stack.mjoin <- function(...,
+                                 compress = TRUE,
+                                 remove.unused = TRUE,
+                                 old.names = "BRU.response",
+                                 new.name = "BRU.response") {
   if (utils::packageVersion("INLA") <= "24.06.02") {
-    stacks <- bru_inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
+    stacks <- bru_inla.stack.mexpand(...,
+      old.names = old.names,
+      new.name = new.name
+    )
     do.call(INLA::inla.stack.join, c(
       stacks,
       list(
@@ -396,7 +415,10 @@ bru_inla.stack.mjoin <- function(..., compress = TRUE, remove.unused = TRUE,
       )
     ))
   } else {
-    stacks <- bru_inla.stack.mexpand(..., old.names = old.names, new.name = new.name)
+    stacks <- bru_inla.stack.mexpand(...,
+      old.names = old.names,
+      new.name = new.name
+    )
     do.call(INLA::inla.stack.join, c(
       stacks,
       list(
@@ -440,7 +462,10 @@ plotmarginal.inla <- function(result,
       vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     } else if (varname %in% names(result$summary.random)) {
-      marg <- INLA::inla.tmarginal(link, result$marginals.random[[varname]][[index]])
+      marg <- INLA::inla.tmarginal(
+        link,
+        result$marginals.random[[varname]][[index]]
+      )
       ovarname <- paste0(ovarname, " ", index)
       if (ovarname %in% rownames(vars)) {
         if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
@@ -457,10 +482,16 @@ plotmarginal.inla <- function(result,
     lq <- INLA::inla.qmarginal(0.025, marg)
     lqy <- INLA::inla.dmarginal(lq, marg)
     inner.x <- seq(lq, uq, length.out = 100)
-    inner.marg <- data.frame(x = inner.x, y = INLA::inla.dmarginal(inner.x, marg))
+    inner.marg <- data.frame(
+      x = inner.x,
+      y = INLA::inla.dmarginal(inner.x, marg)
+    )
 
     df <- data.frame(marg)
-    ggplot2::ggplot(data = df, ggplot2::aes(x = .data[["x"]], y = .data[["y"]])) +
+    ggplot2::ggplot(
+      data = df,
+      ggplot2::aes(x = .data[["x"]], y = .data[["y"]])
+    ) +
       ggplot2::geom_path() +
       ggplot2::geom_ribbon(
         ymin = 0,
@@ -477,10 +508,13 @@ plotmarginal.inla <- function(result,
       ggplot2::ylab("pdf")
   } else {
     df <- result$summary.random[[varname]]
-    colnames(df) <- c("ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld")
+    colnames(df) <- c(
+      "ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld"
+    )
     df$mean <- link(df$mean)
     h <- 1e-6
-    df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) / (2 * h))
+    df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) /
+      (2 * h))
     df$lower <- link(df$lower)
     df$mid <- link(df$mid)
     df$upper <- link(df$upper)

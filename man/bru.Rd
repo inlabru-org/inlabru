@@ -3,24 +3,26 @@
 \name{bru}
 \alias{bru}
 \alias{bru_rerun}
+\alias{print.bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
 bru(components = ~Intercept(1), ..., options = list(), .envir = parent.frame())
 
 bru_rerun(result, options = list())
+
+\method{print}{bru}(x, ...)
 }
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\code{\link[=component]{component()}} for details.}
+\code{\link[=bru_component]{bru_component()}} for details.}
 
-\item{...}{Likelihoods, each constructed by a calling \code{\link[=like]{like()}}, or named
-parameters that can be passed to a single \code{\link[=like]{like()}} call. Note that
-all the arguments will be evaluated before calling \code{\link[=like]{like()}} in order
-to detect if they are \code{like} objects. This means that
-special arguments that need to be evaluated in the context of
-\code{response_data} or \code{data} (such as Ntrials) may will only work that
-way in direct calls to \code{\link[=like]{like()}}.}
+\item{...}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
+named parameters that can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. Note that
+all the arguments will be evaluated before calling \code{\link[=bru_obs]{bru_obs()}} in order to
+detect if they are \code{like} objects. This means that special arguments that
+need to be evaluated in the context of \code{response_data} or \code{data} (such as
+\code{Ntrials}) may will only work that way in direct calls to \code{\link[=bru_obs]{bru_obs()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
@@ -29,6 +31,8 @@ on to \code{\link[=bru_options]{bru_options()}}}
 specification is used)}
 
 \item{result}{A previous estimation object of class \code{bru}}
+
+\item{x}{A \code{bru} object to be printed}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
@@ -58,46 +62,56 @@ available by using the \code{cp} family or (even easier) by using the
 \link{lgcp} function.
 }
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item \code{bru_rerun} Continue the optimisation from a previously computed estimate.
-}
-}
+\item \code{print(bru)}: Print a summary of a \code{bru} object.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate. The estimation
+\code{options} list can be given new values to override the original settings.
+
+}}
 \examples{
 \donttest{
-if (bru_safe_inla(multicore = FALSE)) {
-
+if (bru_safe_inla()) {
   # Simulate some covariates x and observations y
   input.df <- data.frame(x = cos(1:10))
-  input.df <- within(input.df, y <- 5 + 2 * x + rnorm(10, mean = 0, sd = 0.1))
+  input.df <- within(input.df, {
+    y <- 5 + 2 * x + rnorm(10, mean = 0, sd = 0.1)
+  })
 
   # Fit a Gaussian likelihood model
-  fit <- bru(y ~ x + Intercept, family = "gaussian", data = input.df)
+  fit <- bru(y ~ x + Intercept(1), family = "gaussian", data = input.df)
 
   # Obtain summary
   fit$summary.fixed
 }
 
 
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla()) {
+  # Alternatively, we can use the bru_obs() function to construct the likelihood:
 
-  # Alternatively, we can use the like() function to construct the likelihood:
-
-  lik <- like(family = "gaussian", formula = y ~ x + Intercept, data = input.df)
+  lik <- bru_obs(family = "gaussian",
+              formula = y ~ x + Intercept,
+              data = input.df)
   fit <- bru(~ x + Intercept(1), lik)
   fit$summary.fixed
 }
 
 # An important addition to the INLA methodology is bru's ability to use
-# non-linear predictors. Such a predictor can be formulated via like()'s
+# non-linear predictors. Such a predictor can be formulated via bru_obs()'s
 # \code{formula} parameter. The z(1) notation is needed to ensure that
 # the z component should be interpreted as single latent variable and not
 # a covariate:
 
-if (bru_safe_inla(multicore = FALSE)) {
+if (bru_safe_inla()) {
   z <- 2
-  input.df <- within(input.df, y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1))
-  lik <- like(
+  input.df <- within(input.df, {
+    y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1)
+  })
+  lik <- bru_obs(
     family = "gaussian", data = input.df,
     formula = y ~ exp(z) * x + Intercept
   )

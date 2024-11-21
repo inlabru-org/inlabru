@@ -49,24 +49,24 @@ fit <- inla(formula = list(inla.stack.LHS(stk1), inla.stack.LHS(stk2)) ~ 0 + Int
 
 fitb1 <- bru(
   components = ~ 0 + Intercept(1),
-  like(formula = dat1_ ~ .,
+  bru_obs(formula = dat1_ ~ .,
        family = "exponentialsurv",
        response_data = list(dat1_ = dat1_)),
   options = list(safe = FALSE)
 )
 fitb2 <- bru(
   components = ~ 0 + Intercept(1),
-  like(formula = dat2_ ~ .,
+  bru_obs(formula = dat2_ ~ .,
        family = "agaussian",
        data = dat2),
   options = list(safe = FALSE)
 )
 fitb <- bru(
   components = ~ 0 + Intercept(1),
-  like(formula = as.data.frame(unclass(inla.surv(time = time_to_event, event = event_type, cure = cure_covar))[-7]) ~ .,
+  bru_obs(formula = as.data.frame(unclass(inla.surv(time = time_to_event, event = event_type, cure = cure_covar))[-7]) ~ .,
        family = "exponentialsurv",
        data = dat1),
-  like(formula = inla.mdata(time_to_event, cure_covar) ~ .,
+  bru_obs(formula = inla.mdata(time_to_event, cure_covar) ~ .,
        family = "agaussian",
        data = dat2),
   options = list(safe = FALSE)

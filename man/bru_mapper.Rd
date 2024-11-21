@@ -7,18 +7,17 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, ..., methods = deprecated())
+bru_mapper_define(mapper, new_class = NULL, ...)
 }
 \arguments{
-\item{\dots}{Arguments passed on to sub-methods, or used for special purposes,
-see details for each function below.}
+\item{\dots}{Arguments passed on to sub-methods, or used for special
+purposes, see details for each function below.}
 
-\item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see Details.
-For \code{bru_mapper_scale}, a mapper to be scaled.}
+\item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see
+Details. For \code{bru_mapper_scale}, a mapper to be scaled.}
 
-\item{new_class}{If non-\code{NULL}, this is added at the front of the class definition}
-
-\item{methods}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated.}
+\item{new_class}{If non-\code{NULL}, this is added at the front of the class
+definition}
 }
 \value{
 \itemize{
@@ -35,8 +34,8 @@ mappers for special objects. See below for details of the
 default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
 new mappers in user code.
 
-\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class
-names to the inheritance list for the input \code{mapper} object, unless the object
+\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class names to
+the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
 
 To register mapper classes and methods in scripts, use \code{.S3method()}
@@ -78,6 +77,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -88,6 +88,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

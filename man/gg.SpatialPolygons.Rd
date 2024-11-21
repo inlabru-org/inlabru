@@ -12,7 +12,8 @@
 \item{mapping}{Aesthetic mappings created by \code{aes} used to update the default
 mapping.}
 
-\item{crs}{A \code{CRS} object defining the coordinate system to project the data to before plotting.}
+\item{crs}{A \code{CRS} object defining the coordinate system to project the data
+to before plotting.}
 
 \item{...}{Arguments passed on to \code{geom_sf}.
 Unless specified by the user,
@@ -22,43 +23,51 @@ the argument \code{alpha = 0.2} (alpha level for polygon filling) is added.}
 A \code{geom_sf} object.
 }
 \description{
-Uses the \code{ggplot2::fortify()} function to turn the \code{SpatialPolygons} objects into a
-\code{data.frame}. Then
-calls \code{geom_polygon} to plot the polygons. Requires the \code{ggplot2} package.
+Uses the \code{ggplot2::fortify()} function to turn the \code{SpatialPolygons} objects
+into a \code{data.frame}. Then calls \code{geom_polygon} to plot the polygons. Requires
+the \code{ggplot2} package.
 }
 \details{
 Up to version \verb{2.10.0}, the \code{ggpolypath} package was used to ensure
 proper plotting, since the \code{ggplot2::geom_polygon} function doesn't always
-handle geometries with holes properly. After \verb{2.10.0}, the object is converted
-to \code{sf} format and passed on to \code{\link[=gg.sf]{gg.sf()}} instead, as \code{ggplot2} version \verb{3.4.4}
-deprecated the intenrally used \code{ggplot2::fortify()} method for
-\code{SpatialPolygons/DataFrame} objects.
+handle geometries with holes properly. After \verb{2.10.0}, the object is
+converted to \code{sf} format and passed on to \code{\link[=gg.sf]{gg.sf()}} instead, as \code{ggplot2}
+version \verb{3.4.4} deprecated the intenrally used \code{ggplot2::fortify()} method
+for \code{SpatialPolygons/DataFrame} objects.
 }
 \examples{
 \donttest{
-  if (require(ggplot2, quietly = TRUE) &&
+  if (require("ggplot2", quietly = TRUE) &&
+      requireNamespace("terra", quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data
 
-    data("gorillas", package = "inlabru")
+    gorillas <- inlabru::gorillas_sf
+
+    gcov <- gorillas_sf_gcov()
+    elev <- terra::as.data.frame(gcov$elevation, xy = TRUE)
+    elev <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
+
+    # Turn elevation covariate into SpatialGridDataFrame
+    elev <- sp::SpatialPixelsDataFrame(elev, data = as.data.frame(elev))
 
     # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
     # The same syntax applies to SpatialGridDataFrame objects.
 
     ggplot() +
-      gg(gorillas$gcov$elevation)
+      gg(elev)
 
     # Add Gorilla survey boundary and nest sightings
 
     ggplot() +
-      gg(gorillas$gcov$elevation) +
-      gg(gorillas$boundary) +
+      gg(elev) +
+      gg(gorillas$boundary, alpha = 0.0, col = "red") +
       gg(gorillas$nests)
 
     # Load pantropical dolphin data
 
-    data("mexdolphin", package = "inlabru")
+    mexdolphin <- inlabru::mexdolphin_sp()
 
     # Plot the pantropical survey boundary, ship transects and dolphin sightings
 
@@ -98,7 +107,6 @@ Other geomes for spatial data:
 \code{\link{gg.SpatialPixels}()},
 \code{\link{gg.SpatialPixelsDataFrame}()},
 \code{\link{gg.SpatialPoints}()},
-\code{\link{gg.sf}()},
-\code{\link{gm}()}
+\code{\link{gg.sf}()}
 }
 \concept{geomes for spatial data}

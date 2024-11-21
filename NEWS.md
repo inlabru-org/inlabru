@@ -1,3 +1,67 @@
+# inlabru 2.12.0
+
+## General changes
+
+* Introduce `bru_obs()` as a replacement to `like()`, to help avoid namespace
+  clashes with e.g. `data.table::like()` (version `2.11.1.9026`)
+* Change logic for `like`/`bru_obs(allow_combine)` to allow user override, and
+  add warnings for ambiguous cases (version `2.11.1.9011`)
+* Add `bru_response_size()` method for extracting the response size for each
+  observation `bru_like` object (version `2.11.1.9013`)
+* Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
+* Add `[` and `]` to special character set in `bru_standardise_names()`
+  (version `2.11.1.9012`)
+* Add `bru_index()` method for accessing predictor index information for
+  sub-models, and a `tag` argument for `bru_obs()` to identify individual
+  sub-models by name, which is also propagated to lists of `bru_like` objects
+  (version `2.11.1.9017` and `2.12.0`)
+* Allow `bru_mapper_multi()` sub-mappers to have non-zero offsets, that are
+  added to generate the combined offset (version `2.11.1.9019`)
+* Add general `bru_mapper_fmesher()` mapper, for indexed mapping of
+  all objects supporting `fm_dof()` and `fm_basis()` (version `2.11.1.9021`)
+* Add `bru_mapper_repeat()` mapper, for automated single-mapper sums
+  (version `2.11.1.9022`)
+
+## Data set updates
+
+* Convert `mrsea` to `sf` format (version `2.11.1.9009`)
+* Convert the `shrimp` data set to `sf` format (version `2.11.1.9007`)
+* Remove `seals_sp` data set due to excessive size (version `2.11.1.9010`)
+* Replace the `mexdolphin` dataset with a function `mexdolphin_sp()`
+  to avoid `sp` data objects in the package (version `2.11.1.9015`)
+* Replace the `gorillas` dataset with a function `gorillas_sp()`
+  to avoid `sp` data objects in the package (version `2.11.1.9016`)
+
+## Namespace changes
+
+* Move `sp` from `Imports` to `Suggests`. Component definitions using
+  `coordinates` as input require either `sp::coordinates` or `sp` having been
+  already loaded with e.g. `library(sp)` (version `2.11.1.9003`)
+* Remove `ggmap` support (version `2.11.1.9002`)
+* Remove unnecessary `INLA` namespace loading in `ggplot` methods
+  (version `2.11.1.9008`)
+* Move `terra` from `Imports` to `Suggests` (version `2.11.1.9014`)
+* Stop re-exporting `fmesher` methods (version `2.11.1.9020`)
+
+## Deprecated methods
+
+* Deprecated (since 2.8.0) method `is.inside()` have been removed.
+  Use `fmesher::fm_is_within()` instead.
+* Deprecated (since 2.7.0) `bru_mapper.default()` to define new mapper classes
+  has been removed. Use `bru_mapper_define()` instead.
+* Deprecated (since 2.6.0) `bru_mapper_offset()` method has been removed.
+  Use `bru_mapper_const()` instead.
+
+## Internal changes
+
+* Remove unneeded `"list"` class inheritance from solitary classes
+  (version `2.11.1.9001`)
+* Expand the `summary` and `print` method class coverage (version `2.11.1.9002`)
+* Reduced the amount of diagnostic messages in `bru_safe_inla()`
+  (version `2.11.1.9005`)
+* Change name of `component` and `component_list` methods to `bru_component`
+  and `bru_component_list` (version `2.11.1.9026`)
+
 # inlabru 2.11.1
 
 ## Bug fixes

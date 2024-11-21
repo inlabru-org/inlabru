@@ -36,37 +36,38 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
 
-\item{log}{logical; control \code{log} output. Default \code{TRUE}, see the \code{ibm_eval()} details
-for \code{logsumexp} mappers.}
+\item{log}{logical; control \code{log} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logsumexp} mappers.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 }
 \description{
 Constructs a mapper
-that aggregates elements of \code{exp(state)}, with optional non-negative weighting,
-and then takes the \code{log()}, so it can be used e.g.
-for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]}{log(blocksum(w*exp(state)))}
-and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]}{log(blocksum(w*exp(state)/blocksum(w)))}
-calculations.  Relies on the input handling methods for \code{bru_mapper_aggregate},
-but also allows the weights to be supplied on a logarithmic scale as \code{log_weights}.
-To avoid numerical overflow, it uses the common method of internally
-shifting the state blockwise;
-\eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]}{log(blocksum(w*exp(state)))},
-where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the shift for block \eqn{k}{k}.
-}
-\details{
-\itemize{
-\item For \code{bru_mapper_logsumexp}, \code{input} should be a list with elements \code{block}
-and \code{weights}. \code{block}
-should be a vector of the same length as the \code{state}, or \code{NULL}, with \code{NULL}
-equivalent to all-1.
-If \code{weights} is \code{NULL}, it's interpreted as all-1.
-}
+that aggregates elements of \code{exp(state)}, with optional non-negative
+weighting, and then takes the \code{log()}, so it can be used e.g.
+for  \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i)]
+}{log(blocksum(w*exp(state)))}
+and \eqn{v_k=\log[\sum_{i\in I_k} w_i \exp(u_i) / \sum_{i\in I_k} w_i]
+}{log(blocksum(w*exp(state)/blocksum(w)))}
+calculations.  Relies on the input handling methods for
+\code{bru_mapper_aggregate}, but also allows the weights to be supplied on a
+logarithmic scale as \code{log_weights}. To avoid numerical overflow, it uses the
+common method of internally shifting the state blockwise;
+\eqn{v_k=s_k+\log[\sum_{i\in I_k} \exp(u_i + \log(w_i)- s_k)]
+}{log(blocksum(w*exp(state)))},
+where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the
+shift for block \eqn{k}{k}.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()} for \code{logsumexp} returns
-the log-sum-weight-exp value. If \code{FALSE}, the \code{sum-weight-exp} value is returned.
+\item \code{ibm_jacobian(bru_mapper_logsumexp)}: \code{input} should be a list with elements
+\code{block} and \code{weights}. \code{block} should be a vector of the same length as the
+\code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
+If \code{weights} is \code{NULL}, it's interpreted as all-1.
+
+\item \code{ibm_eval(bru_mapper_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()}
+for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
+\code{sum-weight-exp} value is returned.
 
 }}
 \examples{
@@ -86,6 +87,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -95,6 +97,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

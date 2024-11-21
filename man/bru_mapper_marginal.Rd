@@ -29,8 +29,8 @@ bru_mapper_marginal(
 \method{ibm_eval}{bru_mapper_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 }
 \arguments{
-\item{qfun}{A quantile function, supporting \code{lower.tail} and \code{log.p} arguments,
-like \code{\link[stats:Normal]{stats::qnorm()}}.}
+\item{qfun}{A quantile function, supporting \code{lower.tail} and \code{log.p}
+arguments, like \code{\link[stats:Normal]{stats::qnorm()}}.}
 
 \item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
 like \code{\link[stats:Normal]{stats::pnorm()}}.  Only needed and used when
@@ -41,8 +41,8 @@ Default \code{NULL}}
 like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
 differences on \code{qfun} or \code{pfun} instead.}
 
-\item{dqfun}{A function evaluating the reciprocal of the derivative of \code{qfun}.
-If \code{NULL} (default), uses \code{dfun(qfun(...),...)} or finite
+\item{dqfun}{A function evaluating the reciprocal of the derivative of
+\code{qfun}. If \code{NULL} (default), uses \code{dfun(qfun(...),...)} or finite
 differences on \code{qfun} or \code{pfun} instead.}
 
 \item{...}{Arguments passed on to other methods}
@@ -62,9 +62,9 @@ that have state dependent output size.}
 
 \item{input}{Data input for the mapper.}
 
-\item{reverse}{logical; control \code{bru_mapper_marginal} evaluation. Default \code{FALSE}.
-When \code{TRUE}, reverses the direction of the mapping, see details for \code{marginal}
-mappers.}
+\item{reverse}{logical; control \code{bru_mapper_marginal} evaluation. Default
+\code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
+for \code{marginal} mappers.}
 }
 \description{
 Constructs a mapper that transforms the marginal distribution \code{state} from
@@ -72,12 +72,11 @@ Constructs a mapper that transforms the marginal distribution \code{state} from
 quantile function. The \code{...} arguments are used as parameter arguments to
 \code{qfun}, \code{pfun}, \code{dfun}, and \code{dqfun}.
 }
-\details{
-For \code{bru_mapper_marginal}, non-NULL \code{input} values are interpreted
-as a parameter list for \code{qfun}, overriding that of the mapper itself.
-}
 \section{Methods (by generic)}{
 \itemize{
+\item \code{ibm_jacobian(bru_mapper_marginal)}: Non-NULL \code{input} values are interpreted
+as a parameter list for \code{qfun}, overriding that of the mapper itself.
+
 \item \code{ibm_eval(bru_mapper_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
 \code{FALSE}, \code{ibm_eval()}
 for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically
@@ -104,6 +103,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -113,6 +113,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
 \code{\link{bru_mapper_taylor}()}

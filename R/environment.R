@@ -1,13 +1,16 @@
 #' @include 0_inlabru_envir.R
 
 #' @title Get access to the internal environment
-#' @details The environment is defined in 0_inlabru_envir.R which is loaded first.
+#' @details The environment is defined in `0_inlabru_envir.R` which is loaded
+#'   first.
 #' @keywords internal
 bru_env_get <- function() {
   pkg_envir <- parent.env(environment())
   envir <- get0(".inlabru_envir", envir = pkg_envir)
   if (!is.environment(envir)) {
-    stop("Something went wrong: cannot find internal .inlabru_envir environment.")
+    stop(
+      "Something went wrong: cannot find internal .inlabru_envir environment."
+    )
   }
   envir
 }
@@ -46,7 +49,8 @@ bru_env_get <- function() {
 #' converted/extracted to a `bru_log` object. `NULL` denotes the global
 #' `inlabru` log object.
 #' @inheritParams bru_log_offset
-#' @returns Returns (invisibly) the modified `bru_log` object, or `NULL` (when `x` is `NULL`)
+#' @returns Returns (invisibly) the modified `bru_log` object, or `NULL` (when
+#'   `x` is `NULL`)
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
@@ -146,7 +150,8 @@ bru_log_new <- function(x = NULL, bookmarks = NULL) {
 #' from tail of the log. When `bookmark` is non-NULL, the `offset` applies a
 #' shift (forwards or backwards) to the bookmark list.
 #' @param x A `bru_log` object. If `NULL`, the global `inlabru` log is used.
-#' @returns `bru_log_bookmark()`: Returns the modified `bru_log` object if `x` is non-NULL.
+#' @returns `bru_log_bookmark()`: Returns the modified `bru_log` object if `x`
+#'   is non-NULL.
 #' @export
 #' @describeIn bru_log_bookmark
 #' Set a log bookmark. If `offset` is `NULL` (the default),
@@ -174,10 +179,11 @@ bru_log_bookmark <- function(bookmark = "", offset = NULL, x = NULL) {
 }
 
 #' @export
-#' @describeIn bru_log_bookmark Return a integer vector with named elements being
-#' bookmarks into the global `inlabru` log with associated log
-#' position offsets.
-#' @returns `bru_log_bookmarks()`: Returns the bookmark vector associated with `x`
+#' @describeIn bru_log_bookmark Return a integer vector with named elements
+#'   being bookmarks into the global `inlabru` log with associated log position
+#'   offsets.
+#' @returns `bru_log_bookmarks()`: Returns the bookmark vector associated with
+#'   `x`
 bru_log_bookmarks <- function(x = NULL) {
   if (is.null(x)) {
     bru_env_get()[["log"]][["bookmarks"]]
@@ -225,7 +231,11 @@ bru_log_offset <- function(x = NULL,
     which_found <- max(which(found))
     found <- marks[[which_found]]
   } else {
-    warning(paste0("Log bookmark '", bookmark, "' not found; assuming start of log."))
+    warning(paste0(
+      "Log bookmark '",
+      bookmark,
+      "' not found; assuming start of log."
+    ))
     marks <- c(0L, log_length)
     which_found <- 1L
   }
@@ -239,7 +249,8 @@ bru_log_offset <- function(x = NULL,
 #' @param i indices specifying elements to extract. If `character`, denotes
 #' the sequence between bookmark `i` and the next bookmark (or the end of the
 #' log if `i` is the last bookmark)
-#' @param verbosity integer value for limiting the highest verbosity level being returned.
+#' @param verbosity integer value for limiting the highest verbosity level being
+#'   returned.
 bru_log_index <- function(x = NULL, i, verbosity = NULL) {
   if (is.null(x)) {
     x <- bru_env_get()[["log"]]
@@ -268,20 +279,23 @@ bru_log_index <- function(x = NULL, i, verbosity = NULL) {
 
 #' @title Access methods for `bru_log` objects
 #' @description Access method for `bru_log` objects.
-#' Note: Up to version `2.8.0`, `bru_log()` was a deprecated alias for `bru_log_message()`.
-#' When running on `2.8.0` or earlier, use `bru_log_get()` to access the global
-#' log, and `cat(fit$bru_iinla$log, sep = "\n")` to print a stored estimation object log.
+#' Note: Up to version `2.8.0`, `bru_log()` was a deprecated alias for
+#' `bru_log_message()`. When running on `2.8.0` or earlier, use `bru_log_get()`
+#' to access the global log, and `cat(fit$bru_iinla$log, sep = "\n")` to print a
+#' stored estimation object log.
 #' After version `2.8.0`, use `bru_log()` to access the global log, and
 #' `bru_log(fit)` to access a stored estimation log.
 #' @param x An object that is, contains, or can be converted to,
 #' a `bru_log` object. If `NULL`, refers to the global `inlabru` log.
-#' @param verbosity integer value for limiting the highest verbosity level being returned.
+#' @param verbosity integer value for limiting the highest verbosity level being
+#'   returned.
 #' @return `bru_log` A `bru_log` object, containing a
 #' character vector of log messages, and potentially a vector of bookmarks.
 #' @export
 #' @family inlabru log methods
-#' @describeIn bru_log Extract stored log messages. If non-`NULL`, the `verbosity` argument
-#' determines the maximum verbosity level of the messages to extract.
+#' @describeIn bru_log Extract stored log messages. If non-`NULL`, the
+#'   `verbosity` argument determines the maximum verbosity level of the messages
+#'   to extract.
 bru_log <- function(x = NULL, verbosity = NULL) {
   if (is.null(x)) {
     x <- bru_env_get()[["log"]]
@@ -339,7 +353,8 @@ bru_log.bru <- function(x, verbosity = NULL) {
 #' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
 #' @param ... further arguments passed to or from other methods.
-#' @param timestamp If `TRUE`, include the timestamp of each message. Default `TRUE`.
+#' @param timestamp If `TRUE`, include the timestamp of each message. Default
+#'   `TRUE`.
 #' @export
 #' @examples
 #' bru_log(verbosity = 2L)
@@ -444,11 +459,11 @@ as.character.bru_log <- function(x, ...) {
 #' output. If `NULL`, the global option `bru_verbose` or default value is used.
 #' If `FALSE`, no messages are printed. If `TRUE`, messages with `verbosity`
 #' \eqn{\le 1}{<=1}
-#' are printed. If numeric, messages with `verbosity` \eqn{\le}{<=} `verbose` are
-#' printed.
+#' are printed. If numeric, messages with `verbosity` \eqn{\le}{<=} `verbose`
+#' are printed.
 #' @param verbose_store Same as `verbose`, but controlling what messages are
-#' stored in the global log object. Can be controlled via the `bru_verbose_store`
-#' with [bru_options_set()].
+#'   stored in the global log object. Can be controlled via the
+#'   `bru_verbose_store` with [bru_options_set()].
 #' @param x A `bru_log` object. If `NULL`, refers to the global `inlabru` log.
 #' @return
 #' `bru_log_message` returns `invisible(x)`, where `x` is the updated `bru_log`
@@ -505,7 +520,9 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
   if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
     !allow_verbose ||
     (is.null(verbose_store) &&
-      bru_options_get("bru_verbose_store", include_default = TRUE) >= verbosity)) {
+      (bru_options_get("bru_verbose_store",
+        include_default = TRUE
+      ) >= verbosity))) {
     if (is.null(x)) {
       envir <- bru_env_get()
       envir[["log"]][["log"]] <- rbind(envir[["log"]][["log"]], new_x)
@@ -532,7 +549,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #'   package options override object. In many cases, setting options in
 #'   specific calls to [bru()] is recommended instead.
 #' @param ... A collection of named options, optionally including one or more
-#' [`bru_options`] objects. Options specified later override the previous options.
+#'   [`bru_options`] objects. Options specified later override the previous
+#'   options.
 #' @return `bru_options()` returns a `bru_options` object.
 #' @section Valid options:
 #' For `bru_options` and `bru_options_set`, recognised options are:
@@ -545,9 +563,10 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' Default: 0, to not print any messages}
 #' \item{bru_verbose_store}{logical or numeric; if `TRUE`, log messages of
 #' `verbosity` \eqn{\le 1} are stored by [bru_log_message()]. If numeric,
-#' log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all messages.}
-#' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration needed
-#'   to run inference.}
+#' log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all
+#' messages.}
+#' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration
+#' needed to run inference.}
 #' \item{bru_max_iter}{maximum number of inla iterations, default 10.
 #'  Also see the `bru_method$rel_tol` and related options below.}
 #' \item{bru_initial}{An `inla` object returned from previous calls of
@@ -559,9 +578,12 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' \describe{
 #' \item{method}{"stable" or "direct". For "stable" (default) integration points
 #' are aggregated to mesh vertices.}
-#' \item{nsub1}{Number of integration points per knot interval in 1D. Default 30.}
-#' \item{nsub2}{Number of integration points along a triangle edge for 2D. Default 9.}
-#' \item{nsub}{Deprecated parameter that overrides `nsub1` and `nsub2` if set. Default `NULL`.}
+#' \item{nsub1}{Number of integration points per knot interval in 1D.
+#'   Default 30.}
+#' \item{nsub2}{Number of integration points along a triangle edge for 2D.
+#'   Default 9.}
+#' \item{nsub}{Deprecated parameter that overrides `nsub1` and `nsub2` if set.
+#'   Default `NULL`.}
 #' }
 #' }
 #' \item{bru_method}{List of arguments controlling the iterative inlabru method:
@@ -580,12 +602,14 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' available for `taylor="legacy"`.}
 #' \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
 #' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
-#' \item{rel_tol}{Stop the iterations when the largest change in linearisation point
+#' \item{rel_tol}{Stop the iterations when the largest change in linearisation
+#' point
 #' (the conditional latent state mode) in relation to the estimated posterior
 #' standard deviation is less than `rel_tol`. Default 0.1 (ten percent).}
 #' \item{max_step}{The largest allowed line search step factor. Factor 1 is the
 #' full INLA step. Default is 2.}
-#' \item{line_opt_method}{Which method to use for the line search optimisation step.
+#' \item{line_opt_method}{Which method to use for the line search optimisation
+#' step.
 #' Default "onestep", using a quadratic approximation based on the value and
 #' gradient at zero, and the value at the current best step length guess.
 #' The method "full" does line optimisation on the full nonlinear predictor;
@@ -594,8 +618,8 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' }
 #' \item{bru_compress_cp}{logical; when `TRUE`, compress the
 #' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
-#' part of the Poisson process likelihood (`family="cp"`) into a single term, with \eqn{y=n}{y=n},
-#' and predictor `mean(eta)`. Default: `TRUE`}
+#' part of the Poisson process likelihood (`family="cp"`) into a single term,
+#' with \eqn{y=n}{y=n}, and predictor `mean(eta)`. Default: `TRUE`}
 #' \item{bru_debug}{logical; when `TRUE`, activate temporary debug features for
 #' package development. Default: `FALSE`}
 #' \item{`inla()` options}{
@@ -718,7 +742,9 @@ bru_options_deprecated <- function(args) {
     if (any(nzchar(names(deprecated_args)) == 0)) {
       warning(paste0(
         "Ignoring deprecated global options '",
-        paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0], collapse = "', '"),
+        paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0],
+          collapse = "', '"
+        ),
         "'."
       ))
       names_args <- setdiff(
@@ -769,7 +795,6 @@ bru_options_deprecated <- function(args) {
 #'
 #' @param \dots Options passed on to [as.bru_options()]
 #'
-#' @aliases bru_call_options
 #' @export
 #' @returns A `bru_options` object
 #'
@@ -784,6 +809,7 @@ bru_options_deprecated <- function(args) {
 #' opts
 #' }
 #'
+#' @keywords internal
 bru_call_options <- function(...) {
   opt <- as.bru_options(...)
   opt <- bru_options_deprecated(opt)
@@ -899,8 +925,8 @@ bru_options_get <- function(name = NULL, include_default = TRUE) {
 #' @return `bru_options_set()` returns a copy of the global override options,
 #' invisibly (as `bru_options_get(include_default = FALSE)`).
 #' @seealso [bru_options()], [bru_options_default()], [bru_options_get()]
-#' @param .reset For `bru_options_set`, logical indicating if the global override
-#' options list should be emptied before setting the new option(s).
+#' @param .reset For `bru_options_set`, logical indicating if the global
+#'   override options list should be emptied before setting the new option(s).
 #'
 #' @examples
 #' \dontrun{
@@ -1024,11 +1050,13 @@ summary.bru_options <- function(object,
   } else {
     legend <- NULL
   }
-  result <- list(
-    legend = legend,
-    value = traverse(combined, default, global, object)
+  result <- structure(
+    list(
+      legend = legend,
+      value = traverse(combined, default, global, object)
+    ),
+    class = "summary_bru_options"
   )
-  class(result) <- c("summary_bru_options", "list")
   result
 }
 
@@ -1064,10 +1092,3 @@ print.summary_bru_options <- function(x, ...) {
   traverse(x[["value"]], prefix = "  ")
   invisible(x)
 }
-
-
-
-
-
-
-# Utils ----

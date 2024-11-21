@@ -1,8 +1,8 @@
 #' @name Poisson1_1D
 #' @title 1-Dimensional Homogeneous Poisson example.
 #' @docType data
-#' @description Point data and count data, together with intensity function and expected counts for
-#' a homogeneous 1-dimensional Poisson process example.
+#' @description Point data and count data, together with intensity function and
+#'   expected counts for a homogeneous 1-dimensional Poisson process example.
 #'
 #' @aliases lambda1_1D E_nc1 pts1 countdata1
 #'
@@ -10,12 +10,14 @@
 #'
 #' @format The data contain the following `R` objects:
 #'  \describe{
-#'    \item{`lambda1_1D`:}{ A function defining the intensity function of a
+#'    \item{`lambda1_1D`}{ A function defining the intensity function of a
 #'    nonhomogeneous Poisson process. Note that this function is only defined on
 #'    the interval (0,55).}
 #'    \item{`E_nc1`}{ The expected counts of the gridded data.}
-#'    \item{`pts1`}{ The locations of the observed points (a data frame with one column, named `x`).}
-#'    \item{`countdata1`}{ A data frame with three columns, containing the count data:}
+#'    \item{`pts1`}{ The locations of the observed points (a data frame with
+#'      one column, named `x`).}
+#'    \item{`countdata1`}{ A data frame with three columns, containing the
+#'      count data:}
 #'    \describe{
 #'      \item{`x`}{ The grid cell midpoint.}
 #'      \item{`count`}{ The number of detections in the cell.}

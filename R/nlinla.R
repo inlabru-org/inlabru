@@ -5,6 +5,7 @@
 #' @param \dots Parameters passed on to other methods
 #' @export
 #' @rdname bru_compute_linearisation
+#' @keywords internal
 bru_compute_linearisation <- function(...) {
   UseMethod("bru_compute_linearisation")
 }
@@ -26,10 +27,14 @@ bru_compute_linearisation <- function(...) {
 #' expression
 #' @param pred0 Precomputed predictor for the given state
 #' @param used A [bru_used()] object for the predictor expression
-#' @param allow_latent logical. If `TRUE`, the latent state of each component is
-#' directly available to the predictor expression, with a `_latent` suffix.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
+#' @param eps The finite difference step size
+#' @param n_pred The length of the predictor expression. If not `NULL`, scalar
+#' predictor evaluations are expanded to vectors of length `n_pred`.
+#' @param options A `bru_options` object. The log verbosity options
+#' are used.
+#'
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.component <- function(cmp,
@@ -42,11 +47,30 @@ bru_compute_linearisation.component <- function(cmp,
                                                 effects,
                                                 pred0,
                                                 used,
-                                                allow_latent,
                                                 allow_combine,
                                                 eps,
-                                                ...) {
+                                                n_pred = NULL,
+                                                ...,
+                                                options = NULL) {
   label <- cmp[["label"]]
+  bru_log_message(
+    paste0("Linearise with respect to component '", label, "'"),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 4
+  )
+
+  if (cmp[["main"]][["type"]] %in% c("offset", "const")) {
+    # Zero-column matrix, since a const/offset has no latent state variables.
+    return(Matrix::sparseMatrix(
+      i = c(),
+      j = c(),
+      x = c(1),
+      dims = c(NROW(pred0), 0)
+    ))
+  }
+
+  allow_latent <- label %in% used[["latent"]]
 
   if (is.null(comp_simple)) {
     A <- NULL
@@ -59,27 +83,23 @@ bru_compute_linearisation.component <- function(cmp,
     )
 
     assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
-  }
 
-  if (assume_rowwise) {
-    if (NROW(A) == 1) {
-      if (NROW(pred0) > 1) {
+    if (assume_rowwise) {
+      if (!is.null(n_pred) && (NROW(pred0) != n_pred)) {
+        stop(
+          "Number of rows (",
+          NROW(pred0),
+          ") in the predictor for component '",
+          label,
+          "' does not match the length implied by the response data (",
+          n_pred,
+          ")."
+        )
+      }
+      if (NROW(A) == 1L) {
         A <- Matrix::kronecker(rep(1, NROW(pred0)), A)
-      } else if (is.data.frame(data)) {
-        A <- Matrix::kronecker(rep(1, NROW(data)), A)
-        pred0 <- rep(pred0, NROW(A))
       }
     }
-  }
-
-  if (cmp[["main"]][["type"]] %in% c("offset", "const")) {
-    # Zero-column matrix, since a const/offset has no latent state variables.
-    return(Matrix::sparseMatrix(
-      i = c(),
-      j = c(),
-      x = c(1),
-      dims = c(NROW(pred0), 0)
-    ))
   }
 
   triplets <- list(
@@ -134,12 +154,16 @@ bru_compute_linearisation.component <- function(cmp,
                 effects_eps[[2]][[label_loop]] <-
                   rep(effects[[label_loop]], length(row_subset))
               } else {
-                effects_eps[[1]][[label_loop]] <- effects[[label_loop]][row_subset]
-                effects_eps[[2]][[label_loop]] <- effects[[label_loop]][row_subset]
+                effects_eps[[1]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
+                effects_eps[[2]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
               }
             }
-            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak[row_subset] * eps
-            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak[row_subset] * eps
+            effects_eps[[1]][[label]] <-
+              effects_eps[[1]][[label]] - Ak[row_subset] * eps
+            effects_eps[[2]][[label]] <-
+              effects_eps[[2]][[label]] + Ak[row_subset] * eps
           } else {
             for (label_loop in names(effects)) {
               if (NROW(effects[[label_loop]]) == 1) {
@@ -183,7 +207,13 @@ bru_compute_linearisation.component <- function(cmp,
           },
         predictor = lhood_expr,
         used = used,
-        format = "matrix"
+        format = "matrix",
+        n_pred =
+          if (assume_rowwise) {
+            length(row_subset)
+          } else {
+            n_pred
+          }
       )
       # Store sparse triplet information
       if (symmetric_diffs) {
@@ -210,7 +240,8 @@ bru_compute_linearisation.component <- function(cmp,
       nonzero <- is.finite(values)
       if (any(!nonzero)) {
         warning(
-          "Non-finite (-Inf/Inf/NaN) entries detected in predictor derivatives for '",
+          "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
+          "derivatives for '",
           label,
           "'; treated as 0.0.\n",
           immediate. = TRUE
@@ -232,6 +263,18 @@ bru_compute_linearisation.component <- function(cmp,
     x = triplets$x,
     dims = c(NROW(pred0), NROW(state[[label]]))
   )
+  if (NROW(B) != NROW(pred0)) {
+    stop(
+      "Jacobian matrix for component '",
+      label,
+      "' has ",
+      NROW(B),
+      " rows, but expected ",
+      NROW(pred0),
+      " rows based on the predictor length."
+    )
+  }
+  B
 }
 
 #' @param lhood A `bru_like` object
@@ -255,6 +298,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
+  n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(
     model,
@@ -263,22 +307,9 @@ bru_compute_linearisation.bru_like <- function(lhood,
     effects = list(effects),
     predictor = lhood_expr,
     used = used,
-    format = "matrix"
+    format = "matrix",
+    n_pred = n_pred
   )
-  if (lhood[["linear"]]) {
-    # If linear, can check if the predictor is a scalar or vector,
-    # and possibly expand to full size
-    if (length(pred0) == 1) {
-      if (is.data.frame(data) ||
-        inherits(data, c(
-          "SpatialPointsDataFrame",
-          "SpatialPolygonsDataFrame",
-          "SpatialLinesDataFrame"
-        ))) {
-        pred0 <- rep(pred0, NROW(data))
-      }
-    }
-  }
 
   # Compute derivatives for each non-const/offset component
   B <- list()
@@ -317,11 +348,14 @@ bru_compute_linearisation.bru_like <- function(lhood,
             effects = effects,
             pred0 = pred0,
             used = used,
-            allow_latent = label %in% used[["latent"]],
             allow_combine = lhood[["allow_combine"]],
             eps = eps,
+            n_pred = n_pred,
             ...
           )
+      }
+      if ((NROW(offset) == 1L) && (NROW(B[[label]]) > 1L)) {
+        offset <- matrix(offset, NROW(B[[label]]), 1)
       }
       offset <- offset - B[[label]] %*% state[[label]]
     }
@@ -331,7 +365,6 @@ bru_compute_linearisation.bru_like <- function(lhood,
 }
 
 #' @param lhoods A `bru_like_list` object
-#' @param eps The finite difference step size
 #' @export
 #' @rdname bru_compute_linearisation
 bru_compute_linearisation.bru_like_list <- function(lhoods,
@@ -339,8 +372,9 @@ bru_compute_linearisation.bru_like_list <- function(lhoods,
                                                     input,
                                                     state,
                                                     comp_simple,
-                                                    eps = 1e-5, # TODO: set more intelligently
+                                                    eps = 1e-5,
                                                     ...) {
+  # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
     bru_compute_linearisation(

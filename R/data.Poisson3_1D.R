@@ -1,9 +1,10 @@
 #' @name Poisson3_1D
 #' @title 1-Dimensional NonHomogeneous Poisson example.
 #' @docType data
-#' @description Point data and count data, together with intensity function and expected counts for
-#' a multimodal nonhomogeneous 1-dimensional Poisson process example. Counts are given for two
-#' different gridded data interval widths.
+#' @description Point data and count data, together with intensity function and
+#'   expected counts for a multimodal nonhomogeneous 1-dimensional Poisson
+#'   process example. Counts are given for two different gridded data interval
+#'   widths.
 #'
 #' @aliases lambda3_1D E_nc3a E_nc3b pts3 countdata3a countdata3b
 #'
@@ -11,18 +12,21 @@
 #'
 #' @format The data contain the following `R` objects:
 #'  \describe{
-#'    \item{`lambda3_1D`:}{ A function defining the intensity function of a
+#'    \item{`lambda3_1D`}{A function defining the intensity function of a
 #'    nonhomogeneous Poisson process. Note that this function is only defined on
 #'    the interval (0,55).}
-#'    \item{`E_nc3a`}{ The expected counts of gridded data for the wider bins (10 bins).}
-#'    \item{`E_nc3b`}{ The expected counts of gridded data for the wider bins (20 bins).}
-#'    \item{`pts3`}{ The locations of the observed points (a data frame with one column, named `x`).}
-#'    \item{`countdata3a`}{ A data frame with three columns, containing the count data for the
-#'    10-interval case:}
-#'    \item{`countdata3b`}{ A data frame with three columns, containing the count data for the
-#'    20-interval case:}
+#'    \item{`E_nc3a`}{The expected counts of gridded data for the wider bins
+#'      (10 bins).}
+#'    \item{`E_nc3b`}{The expected counts of gridded data for the wider bins
+#'      (20 bins).}
+#'    \item{`pts3`}{The locations of the observed points (a data frame with one
+#'      column, named `x`).}
+#'    \item{`countdata3a`}{A data frame with three columns, containing the
+#'      count data for the 10-interval case:}
+#'    \item{`countdata3b`}{A data frame with three columns, containing the
+#'      count data for the 20-interval case:}
 #'    \describe{
-#'      \item{`x`}{ The grid cell midpoint.}
+#'      \item{`x`}{The grid cell midpoint.}
 #'      \item{`count`}{ The number of detections in the cell.}
 #'      \item{`exposure`}{ The width of the cell.}
 #'    }

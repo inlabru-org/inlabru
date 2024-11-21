@@ -29,9 +29,11 @@ A \link{bru_model} object
 \description{
 The \link{inlabru} syntax for model formulae is different from what
 \code{INLA::inla} considers a valid.
-In inla most of the effects are defined by adding an \code{f(...)} expression to the formula.
-In \link{inlabru} the \code{f} is replaced by an arbitrary (exceptions: \code{const} and \code{offset})
-string that will determine the label of the effect. See Details for further information.
+In inla most of the effects are defined by adding an \code{f(...)} expression to
+the formula.
+In \link{inlabru} the \code{f} is replaced by an arbitrary (exceptions: \code{const} and
+\code{offset}) string that will determine the label of the effect. See Details for
+further information.
 }
 \details{
 For instance
@@ -44,11 +46,13 @@ in INLA is equivalent to
 
 in inlabru.
 
-A disadvantage of the inla way is that there is no clear separation between the name of the covariate
-and the label of the effect. Furthermore, for some models like SPDE it is much more natural to
-use spatial coordinates as covariates rather than an index into the SPDE vertices. For this purpose
-\link{inlabru} provides the \code{main} argument. For convenience, the \code{main} argument can be used
-like the first argument of the f function, e.g., and is the first argument of the component definition.
+A disadvantage of the inla way is that there is no clear separation between
+the name of the covariate and the label of the effect. Furthermore, for some
+models like SPDE it is much more natural to use spatial coordinates as
+covariates rather than an index into the SPDE vertices. For this purpose
+\link{inlabru} provides the \code{main} argument. For convenience, the \code{main} argument
+can be used like the first argument of the f function, e.g., and is the first
+argument of the component definition.
 The \code{INLA} model formula
 
 \code{y ~ f(temperature, model = 'linear')}
@@ -62,18 +66,19 @@ as well as
 \code{y ~ temperature(model = 'linear')}
 which sets \code{main = temperature}.
 
-On the other hand, \code{main} can also be a function mapping, e.g the \code{\link[sp:coordinates]{sp::coordinates()}} function:
+On the other hand, \code{main} can also be a function mapping, e.g the
+\code{sp::coordinates()} function:
 
 \code{y ~ mySPDE(coordinates, ...)}
 
 This extracts the coordinates from the data object, and maps it to the latent
 field via the information given in the \code{mapper}, which by default is
-extracted from the \code{model} object, in the case of \code{spde} model
-objects.
+extracted from the \code{model} object, in the case of \code{spde} model objects.
 
-Morevover, \code{main} can be any expression that evaluates within your data as an environment.
-For instance, if your data has columns 'a' and 'b', you can create a fixed effect of 'sin(a+b)' by
-setting \code{map} in the following way:
+Morevover, \code{main} can be any expression that evaluates within your data as an
+environment.
+For instance, if your data has columns 'a' and 'b', you can create a fixed
+effect of 'sin(a+b)' by setting \code{map} in the following way:
 
 \code{y ~ myEffect(sin(a+b))}
 }

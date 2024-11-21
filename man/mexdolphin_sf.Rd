@@ -3,6 +3,7 @@
 \docType{data}
 \name{mexdolphin_sf}
 \alias{mexdolphin_sf}
+\alias{mexdolphin_sp}
 \title{Pan-tropical spotted dolphins in the Gulf of Mexico}
 \format{
 A list of objects:
@@ -12,12 +13,15 @@ detected dolphin groups, with their size as an attribute.}
 \item{\code{samplers}:}{ An \code{sf} object containing the transect lines
 that were surveyed.}
 \item{\code{mesh}:}{ An \code{fm_mesh_2d} object containing a Delaunay triangulation
-mesh (a type of discretization of continuous space) covering the survey region.}
+mesh (a type of discretization of continuous space) covering the survey
+region.}
 \item{\code{ppoly}:}{ An \code{sf} object defining the boundary of the
 survey region.}
 \item{\code{simulated}:}{ A \code{sf} object containing the locations of a
-\emph{simulated} population of dolphin groups. The population was simulated from a \code{inlabru}
-model fitted to the actual survey data. Note that the simulated data do not have any associated
+\emph{simulated} population of dolphin groups. The population was simulated
+from a \code{inlabru}
+model fitted to the actual survey data. Note that the simulated data
+do not have any associated
 size information.}
 }
 }
@@ -26,20 +30,29 @@ Library \code{dsm}.
 }
 \usage{
 mexdolphin_sf
+
+mexdolphin_sp()
 }
 \description{
-This a version of the \code{mexdolphins} dataset from the package \code{dsm}, reformatted
-as point process data for use with \code{inlabru}, with the parts stored in \code{sf} format.
-The data are from a combination of several NOAA
-shipboard surveys conducted on pan-tropical spotted dolphins in the Gulf of Mexico. 47 observations
-of groups of dolphins were detected. The group size was recorded, as well as the Beaufort sea state at
-the time of the observation. Transect width is 16 km, i.e. maximal detection
-distance 8 km (transect half-width 8 km).
+This a version of the \code{mexdolphins} dataset from the package
+\code{dsm}, reformatted as point process data for use with \code{inlabru}, with the
+parts stored in \code{sf} format. The data are from a combination of several
+NOAA shipboard surveys conducted on pan-tropical spotted dolphins in the
+Gulf of Mexico. 47 observations of groups of dolphins were detected. The
+group size was recorded, as well as the Beaufort sea state at the time of
+the observation. Transect width is 16 km, i.e. maximal detection distance 8
+km (transect half-width 8 km).
 }
+\section{Functions}{
+\itemize{
+\item \code{mexdolphin_sp()}: Convert \code{mexdolphin_sf} to \code{sp} format. Replaces
+the old \code{mexdolphin} dataset.
+
+}}
 \examples{
 \donttest{
 if (require("ggplot2", quietly = TRUE)) {
-  data(mexdolphin_sf, package = "inlabru")
+  data(mexdolphin_sf, package = "inlabru", envir = environment())
   ggplot() +
     gg(mexdolphin_sf$mesh) +
     gg(mexdolphin_sf$ppoly, color = "blue", alpha = 0, linewidth = 1) +
@@ -48,18 +61,41 @@ if (require("ggplot2", quietly = TRUE)) {
     scale_size_area()
 
   ggplot() +
-    gg(mexdolphin_sf$mesh, color = mexdolphin_sf$lambda, mask = mexdolphin_sf$ppoly)
+    gg(mexdolphin_sf$mesh,
+      color = mexdolphin_sf$lambda,
+      mask = mexdolphin_sf$ppoly
+    )
+}
+}
+\donttest{
+if (require("ggplot2", quietly = TRUE) &&
+  require("sp", quietly = TRUE)) {
+  mexdolphin <- mexdolphin_sp()
+  ggplot() +
+    gg(mexdolphin$mesh) +
+    gg(mexdolphin$ppoly, color = "blue") +
+    gg(mexdolphin$samplers) +
+    gg(mexdolphin$points, aes(size = size), color = "red") +
+    scale_size_area() +
+    coord_equal()
+
+  ggplot() +
+    gg(mexdolphin$mesh,
+      col = mexdolphin$lambda,
+      mask = mexdolphin$ppoly
+    ) +
+    coord_equal()
 }
 }
 }
 \references{
-Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K. Urian,
-E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D. Hyrenbach. 2009.
-OBIS-SEAMAP: The world data center for marine mammal, sea bird, and sea turtle distributions.
-Oceanography 22(2):104-115
+Halpin, P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C.
+Kot, K. Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder,
+and K.D. Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine
+mammal, sea bird, and sea turtle distributions. Oceanography 22(2):104-115
 
-NOAA Southeast Fisheries Science Center. 1996. Report of a Cetacean Survey of Oceanic and
-Selected Continental Shelf Waters of the Northern Gulf of Mexico aboard NOAA Ship Oregon II
-(Cruise 220)
+NOAA Southeast Fisheries Science Center. 1996. Report of a Cetacean Survey of
+Oceanic and Selected Continental Shelf Waters of the Northern Gulf of Mexico
+aboard NOAA Ship Oregon II (Cruise 220)
 }
 \keyword{datasets}

@@ -10,20 +10,21 @@ test_that("sf gorillas lgcp vignette", {
 
   # All sp objects in the example are replaced with sf equivalents.
 
-  data(gorillas, package = "inlabru", envir = environment())
-  gorillas_sf <- list()
-  gorillas_sf$nests <- sf::st_as_sf(gorillas$nests)
+  data(gorillas_sf, package = "inlabru", envir = environment())
 
-  # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as st_as_sfc.SpatialPolygons
-  # ignores it. To get around it, need to convert to sfc_POLYGON first, and then do a separate
-  # st_sfc call, which does use check_ring_dir.
-  # No effect:
-  b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
-  # st_sfc gives the proper effect:
-  b2 <- b1
-  b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry), check_ring_dir = TRUE)
-
-  gorillas_sf$boundary <- b2
+  # ## Not needed anymore for this test, but kept for future reference
+  # # Bug in st_as_sf making check_ring_dir=TRUE have no effect, as
+  # # st_as_sfc.SpatialPolygons ignores it. To get around it, need to convert to
+  # # sfc_POLYGON first, and then do a separate st_sfc call, which does use
+  # # check_ring_dir.
+  # # No effect:
+  # b1 <- sf::st_as_sf(gorillas$boundary, check_ring_dir = TRUE)
+  # # st_sfc gives the proper effect:
+  # b2 <- b1
+  # b2$geometry <- sf::st_sfc(sf::st_geometry(b2$geometry),
+  #   check_ring_dir = TRUE)
+  #
+  # gorillas_sf$boundary <- b2
 
   ## Build boundary information:
   boundary <- list(
@@ -45,7 +46,7 @@ test_that("sf gorillas lgcp vignette", {
     ## Offset for extra boundaries, if needed.
     offset = c(0.73, 1.55),
     ## Build mesh in this crs:
-    crs = fm_CRS(gorillas$nests)
+    crs = fm_crs(gorillas_sf$nests)
   )
 
   # library(ggplot2)
@@ -61,20 +62,13 @@ test_that("sf gorillas lgcp vignette", {
   cmp <- geometry ~ mySmooth(geometry, model = matern) +
     Intercept(1)
 
-  # Check integration construction
-  ips_sp <- fm_int(mesh_sf, gorillas$boundary)
-  ips_sf <- fm_int(mesh_sf, gorillas_sf$boundary)
-
-  expect_equal(
-    ips_sp$weight,
-    ips_sf$weight,
-    tolerance = 1e-3
-  )
-
-  fit <- lgcp(
-    cmp,
-    data = gorillas_sf$nests,
-    samplers = gorillas_sf$boundary,
-    domain = list(geometry = mesh_sf)
+  expect_error(
+    fit <- lgcp(
+      cmp,
+      data = gorillas_sf$nests,
+      samplers = gorillas_sf$boundary,
+      domain = list(geometry = mesh_sf)
+    ),
+    NA
   )
 })

@@ -20,9 +20,9 @@
 an object of class \code{gg}
 }
 \description{
-Generates a base ggplot2 using \code{ggplot()} and adds a geom for input \code{x} using \link{gg}.
-}
-\details{
+Generates a base ggplot2 using \code{ggplot()} and adds a geom for input \code{x} using
+\link{gg}.
+
 Requires the \code{ggplot2} package.
 }
 \examples{

@@ -1,13 +1,18 @@
 test_that("2D LGCP fitting and prediction: Plot sampling", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
+  skip_if_not(bru_safe_sp())
 
   options <- list(
     control.inla = list(
       int.strategy = "eb"
     )
   )
-  data(gorillas, package = "inlabru", envir = environment())
+  skip_if_not_installed("terra")
+  skip_if_not_installed("sf")
+  gorillas <- gorillas_sp()
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),

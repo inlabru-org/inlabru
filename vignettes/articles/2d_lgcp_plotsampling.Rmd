@@ -37,7 +37,6 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
-bru_safe_sp(force = TRUE)
 ```
 
 Get the data
@@ -47,7 +46,7 @@ Get the data
 data(gorillas_sf, package = "inlabru")
 ```
 
-This dataset is a list (see `help(gorillas)` for details. Extract the the objects 
+This dataset is a list (see `help(gorillas_sf)` for details. Extract the the objects 
 you need from the list, for convenience:
 
 ```{r }
@@ -57,7 +56,7 @@ boundary <- gorillas_sf$boundary
 gcov <- gorillas_sf_gcov()
 ```
 
-The `gorillas` data also contains a plot sample subset which covers 60% of the survey region.
+The `gorillas_sf` data also contains a plot sample subset which covers 60% of the survey region.
 
 ```{r }
 sample <- gorillas_sf$plotsample
@@ -99,8 +98,8 @@ plot(plotwithall)
 
 Inference
 ------------------------------------
-The observed nest locations are in the SpatialPointsDataFrame `sample$nests`, and the 
-plots are in the SpatialPolygonsDataFrame `sample$plots`. Again, we are using the following SPDE
+The observed nest locations are in the `sf` `sample$nests`, and the 
+plots are in the `sf` `sample$plots`. Again, we are using the following SPDE
 setup:
 
 
@@ -119,7 +118,11 @@ the function `lgcp( )`:
 ```{r results="hide",warning=FALSE,message=FALSE}
 cmp <- geometry ~ my.spde(geometry, model = matern)
 
-fit <- lgcp(cmp, sample$nests, samplers = sample$plots, domain = list(geometry = mesh))
+fit <- lgcp(cmp,
+  sample$nests,
+  samplers = sample$plots,
+  domain = list(geometry = mesh)
+)
 ```
 
 
@@ -142,10 +145,14 @@ lambda.sample.plot
 
 Estimate the integrated intensity lambda. We compute both the overall integrated
 intensity, representative of an imagined new realisation of the point process,
-and the conditional expectation that takes the actually observed nests into account,
-by recognising that we have complete information in the surveyed plots. 
+and the conditional expectation that takes the actually observed nests into
+account, by recognising that we have complete information in the surveyed plots.
 ```{r results="hide",warning=FALSE,message=FALSE}
-Lambda <- predict(fit, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda <- predict(
+  fit,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(my.spde + Intercept))
+)
 Lambda.empirical <- predict(
   fit,
   rbind(
@@ -163,8 +170,9 @@ rbind(
 ```
 
 
-Fit the same model to the full dataset (the points in `gorillas_sf$nests`), or get your previous 
-fit, if you kept it. Plot the intensity surface and estimate the integrated intensity
+Fit the same model to the full dataset (the points in `gorillas_sf$nests`), or
+get your previous fit, if you kept it. Plot the intensity surface and estimate
+the integrated intensity
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 fit.all <- lgcp(cmp, nests,
@@ -172,7 +180,11 @@ fit.all <- lgcp(cmp, nests,
   domain = list(geometry = mesh)
 )
 lambda.all <- predict(fit.all, pxl, ~ exp(my.spde + Intercept))
-Lambda.all <- predict(fit.all, fm_int(mesh, boundary), ~ sum(weight * exp(my.spde + Intercept)))
+Lambda.all <- predict(
+  fit.all,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(my.spde + Intercept))
+)
 ```
 
 Your plot should look like this:
@@ -196,7 +208,12 @@ rbind(
   Plots = Lambda,
   PlotsEmp = Lambda.empirical,
   All = Lambda.all,
-  AllEmp = c(nrow(gorillas$nests), 0, rep(nrow(gorillas$nests), 3), rep(NA, 3))
+  AllEmp = c(
+    nrow(gorillas_sf$nests),
+    0,
+    rep(nrow(gorillas_sf$nests), 3),
+    rep(NA, 3)
+  )
 )
 ```
 
@@ -211,4 +228,5 @@ lambda.sample.plot + lambda.all.plot +
   scale_fill_continuous(limits = range(c(0, 340)))
 ```
 
-Do you understand the reason for the differences in the posteriors of the abundance estimates?
+Do you understand the reason for the differences in the posteriors of the
+abundance estimates?

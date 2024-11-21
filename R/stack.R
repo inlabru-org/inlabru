@@ -15,7 +15,8 @@ bru_make_stack <- function(...) {
 #' * For `.bru_like`, a `bru_mapper_taylor` object
 #' * For `.bru_like_list`, a list of `bru_mapper_taylor` objects
 #' @param idx Output from `evaluate_index(...)`
-#' @param family_index integer specifying the family sequence index of the observation model
+#' @param family_index integer specifying the family sequence index of the
+#'   observation model
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_like <- function(lhood, lin, idx, ..., family_index = 1L) {
@@ -88,7 +89,8 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
   # model="linear" input in INLA::f(), making it unable to handle all-NA linear
   # effect specifications (arguably, that check is wrong, since it doesn't need
   # that information for linear components), or remove all-but one unused value
-  # above or in bru_make_stack.bru_like, and keep using remove.unused=FALSE here.
+  # above or in bru_make_stack.bru_like, and keep using remove.unused=FALSE
+  # here.
   stk <-
     do.call(
       bru_inla.stack.mjoin,

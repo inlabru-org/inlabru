@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.11.1
+Version: 2.12.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -52,7 +52,7 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.1.2),
+    fmesher (>= 0.2.0),
     methods,
     R (>= 3.6),
     stats
@@ -65,14 +65,11 @@ Imports:
     plyr,
     rlang,
     sf,
-    sp (>= 1.4-5),
-    terra,
     tibble,
     utils,
     withr
 Suggests:
     covr,
-    ggmap,
     ggplot2,
     graphics,
     INLA (>= 23.01.31),
@@ -87,10 +84,12 @@ Suggests:
     scales,
     shiny,
     sn,
+    sp (>= 2.1),
     spatstat.geom,
     spatstat.data,
     sphereplot,
     splancs,
+    terra,
     tidyterra,
     testthat,
     tidyr,
@@ -104,8 +103,7 @@ Collate:
     '0_inlabru_envir.R'
     'bru.gof.R'
     'bru.inference.R'
-    'bru.integration.R'
-    'bru.spatial.R'
+    'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
     'data.Poisson3_1D.R'
@@ -113,7 +111,6 @@ Collate:
     'data.mexdolphin.R'
     'data.mrsea.R'
     'data.robins_subset.R'
-    'data.seals.R'
     'data.shrimp.R'
     'data.toygroups.R'
     'data.toypoints.R'
@@ -125,10 +122,9 @@ Collate:
     'ggplot.R'
     'inla.R'
     'inlabru-package.R'
-    'integration.R'
     'local_testthat.R'
     'mappers.R'
-    'mesh.R'
+    'mapper_repeat.R'
     'model.R'
     'nlinla.R'
     'plotsample.R'
@@ -139,6 +135,7 @@ Collate:
     'stack.R'
     'track_plotting.R'
     'transformation.R'
+    'used.R'
     'utils.R'
 VignetteBuilder: knitr
 BuildVignettes: true

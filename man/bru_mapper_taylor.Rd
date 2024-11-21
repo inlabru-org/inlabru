@@ -66,21 +66,22 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \description{
 Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.
-The \code{state0} information indicates for which state the \code{offset} was evaluated;
+The \code{state0} information indicates for which state the \code{offset} was
+evaluated;
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 }
-\details{
+\section{Methods (by generic)}{
 \itemize{
-\item The \code{ibm_eval.bru_mapper_taylor()} evaluates linearised
+\item \code{ibm_eval(bru_mapper_taylor)}: Evaluates linearised
 mapper information at the given \code{state}. The \code{input} argument is ignored,
 so that the usual argument order
 \code{ibm_eval(mapper, input, state)} syntax can be used, but also
 \code{ibm_eval(mapper, state = state)}.  For a mapper with a named jacobian list,
 the \code{state} argument must also be a named list.  If \code{state} is \code{NULL},
 all-zero is assumed.
-}
-}
+
+}}
 \examples{
 m <- bru_mapper_taylor(
   offset = rep(2, 3),
@@ -101,6 +102,7 @@ Other mappers:
 \code{\link{bru_mapper_collect}()},
 \code{\link{bru_mapper_const}()},
 \code{\link{bru_mapper_factor}()},
+\code{\link{bru_mapper_fmesher}()},
 \code{\link{bru_mapper_generics}},
 \code{\link{bru_mapper_harmonics}()},
 \code{\link{bru_mapper_index}()},
@@ -111,6 +113,7 @@ Other mappers:
 \code{\link{bru_mapper_mesh_B}()},
 \code{\link{bru_mapper_multi}()},
 \code{\link{bru_mapper_pipe}()},
+\code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()}
 }

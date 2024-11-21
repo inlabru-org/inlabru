@@ -37,7 +37,7 @@ jobs:
         with:
           use-public-rspm: true
           r-version: "release"
-          extra-repositories: "https://inla.r-inla-download.org/R/testing"
+          extra-repositories: 'https://inla.r-inla-download.org/R/testing https://inlabru-org.r-universe.dev'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -51,7 +51,6 @@ jobs:
             any::tmaptools
             any::patchwork
             any::raster
-            any::data.table
           needs: website
 
       - name: Session info
@@ -84,7 +83,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
+        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'devel' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: false

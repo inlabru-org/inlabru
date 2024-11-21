@@ -13,7 +13,10 @@ If \code{FALSE}, forces \code{num.threads="1:1"}. Default: NULL, checks
 if running in testthat or non-interactively, in which case sets
 \code{multicore=FALSE}, otherwise \code{TRUE}.}
 
-\item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default: FALSE.}
+\item{quietly}{logical; if \code{FALSE} and \code{multicore} is \code{FALSE},
+prints a message if the \code{num.threads} option
+isn't already "1.1" to alert the user to the change.
+Default: FALSE.}
 
 \item{minimum_version}{character; the minimum required INLA version.
 Default 23.1.31 (should always match the requirement in the package
@@ -34,3 +37,4 @@ if (bru_safe_inla()) {
 }
 
 }
+\keyword{internal}

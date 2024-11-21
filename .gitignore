@@ -11,3 +11,4 @@ inla.model
 inla.model-*
 /doc/
 /Meta/
+*_cache

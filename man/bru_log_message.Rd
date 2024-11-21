@@ -33,12 +33,12 @@ until the options object has been initialised.}
 output. If \code{NULL}, the global option \code{bru_verbose} or default value is used.
 If \code{FALSE}, no messages are printed. If \code{TRUE}, messages with \code{verbosity}
 \eqn{\le 1}{<=1}
-are printed. If numeric, messages with \code{verbosity} \eqn{\le}{<=} \code{verbose} are
-printed.}
+are printed. If numeric, messages with \code{verbosity} \eqn{\le}{<=} \code{verbose}
+are printed.}
 
 \item{verbose_store}{Same as \code{verbose}, but controlling what messages are
-stored in the global log object. Can be controlled via the \code{bru_verbose_store}
-with \code{\link[=bru_options_set]{bru_options_set()}}.}
+stored in the global log object. Can be controlled via the
+\code{bru_verbose_store} with \code{\link[=bru_options_set]{bru_options_set()}}.}
 
 \item{x}{A \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
 }

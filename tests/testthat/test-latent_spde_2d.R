@@ -1,6 +1,7 @@
 test_that("Georeferenced data with sp", {
   skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not(bru_safe_sp())
 
   set.seed(123)
   mydata <- expand.grid(
@@ -9,7 +10,7 @@ test_that("Georeferenced data with sp", {
     KEEP.OUT.ATTRS = FALSE
   )
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
-  coordinates(mydata) <- c("Easting", "Northing")
+  sp::coordinates(mydata) <- c("Easting", "Northing")
 
   mesh <- fm_mesh_2d_inla(
     loc = mydata,
@@ -25,13 +26,13 @@ test_that("Georeferenced data with sp", {
   )
 
   # Check that mistaken empty or unnamed arguments are detected
-  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern, )
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern, )
   expect_error(
-    component_list(cmp),
+    bru_component_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
   )
 
-  cmp <- obs ~ Intercept(1) + field(coordinates, model = matern)
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern)
 
   fit <- bru(
     cmp,
@@ -59,7 +60,7 @@ test_that("Georeferenced data with sp", {
 
 
   # Check that explicit access to the data object works
-  cmp <- obs ~ Intercept(1) + field(coordinates(.data.), model = matern)
+  cmp <- obs ~ Intercept(1) + field(sp::coordinates(.data.), model = matern)
 
   fit <- bru(
     cmp,
@@ -120,7 +121,7 @@ test_that("Georeferenced data with sp", {
   )
 
   pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sp")
-  coordnames(pred_df) <- coordnames(mydata)
+  sp::coordnames(pred_df) <- sp::coordnames(mydata)
   expect_s4_class(pred_df, "SpatialPixelsDataFrame")
 
   skip_if_not_installed("sn")

@@ -19,15 +19,17 @@ SpatialGridDataFrame, SpatRaster, Raster, or sf object
 containing data to use for filling}
 
 \item{where}{A, matrix, data.frame, or SpatialPoints or
-SpatialPointsDataFrame, or sf object, containing the locations of the evaluated values}
+SpatialPointsDataFrame, or sf object, containing the locations of the
+evaluated values}
 
 \item{values}{A vector of values to be filled in where \code{is.na(values)} is
 \code{TRUE}}
 
 \item{layer, selector}{Specifies what data column or columns from which to
-extract data, see \code{\link[=component]{component()}} for details.}
+extract data, see \code{\link[=bru_component]{bru_component()}} for details.}
 
-\item{batch_size}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} due to improved algorithm.
+\item{batch_size}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} due to improved
+algorithm.
 Size of nearest-neighbour calculation blocks, to limit the
 memory and computational complexity.}
 }
