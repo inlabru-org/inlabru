@@ -1,4 +1,4 @@
-# inlabru (development version)
+# inlabru 2.12.0
 
 ## General changes
 
