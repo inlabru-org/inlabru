@@ -1,5 +1,3 @@
-#' @import fmesher
-#'
 #' @export
 fmesher::fm_sp2segment
 #' @export
