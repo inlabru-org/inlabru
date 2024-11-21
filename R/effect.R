@@ -230,8 +230,8 @@ component <- function(...) {
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
-#' @details The `bru_component.character` method is inlabru's equivalent to INLA's
-#' `f` function but adds functionality that is unique to inlabru.
+#' @details The `bru_component.character` method is inlabru's equivalent to
+#'   `INLA`'s `f()` function but adds functionality that is unique to inlabru.
 #'
 #' Deprecated parameters:
 #' * map: Use `main` instead.
@@ -264,40 +264,40 @@ component <- function(...) {
 #' }
 #'
 bru_component.character <- function(object,
-                                # Main model parameters
-                                main = NULL, # This must be kept as 1st arg.
-                                weights = NULL, # This must be kept as 2nd arg.
-                                ..., # Prevent partial matching
-                                model = NULL,
-                                mapper = NULL,
-                                main_layer = NULL,
-                                main_selector = NULL,
-                                n = NULL,
-                                values = NULL,
-                                season.length = NULL,
-                                # Copy feature
-                                copy = NULL,
-                                # Weights
-                                weights_layer = NULL,
-                                weights_selector = NULL,
-                                # Group model parameters
-                                group = 1L,
-                                group_mapper = NULL,
-                                group_layer = NULL,
-                                group_selector = NULL,
-                                ngroup = NULL,
-                                control.group = NULL,
-                                # Replicate model parameters
-                                replicate = 1L,
-                                replicate_mapper = NULL,
-                                replicate_layer = NULL,
-                                replicate_selector = NULL,
-                                nrep = NULL,
-                                # Marginal transformation
-                                marginal = NULL,
-                                A.msk = deprecated(),
-                                .envir = parent.frame(),
-                                envir_extra = NULL) {
+                                    # Main model parameters
+                                    main = NULL, # This must be kept as 1st arg.
+                                    weights = NULL, # This must be 2nd arg.
+                                    ..., # Prevent partial matching
+                                    model = NULL,
+                                    mapper = NULL,
+                                    main_layer = NULL,
+                                    main_selector = NULL,
+                                    n = NULL,
+                                    values = NULL,
+                                    season.length = NULL,
+                                    # Copy feature
+                                    copy = NULL,
+                                    # Weights
+                                    weights_layer = NULL,
+                                    weights_selector = NULL,
+                                    # Group model parameters
+                                    group = 1L,
+                                    group_mapper = NULL,
+                                    group_layer = NULL,
+                                    group_selector = NULL,
+                                    ngroup = NULL,
+                                    control.group = NULL,
+                                    # Replicate model parameters
+                                    replicate = 1L,
+                                    replicate_mapper = NULL,
+                                    replicate_layer = NULL,
+                                    replicate_selector = NULL,
+                                    nrep = NULL,
+                                    # Marginal transformation
+                                    marginal = NULL,
+                                    A.msk = deprecated(),
+                                    .envir = parent.frame(),
+                                    envir_extra = NULL) {
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag,
   # besag2, bym, bym2, besagproper, besagproper2, fgn, fgn2, ar1, ar1c, ar, ou,
@@ -608,9 +608,9 @@ bru_component.character <- function(object,
 #' @rdname bru_component_list
 #' @aliases component_list
 bru_component_list <- function(object,
-                           lhoods = NULL,
-                           .envir = parent.frame(),
-                           ...) {
+                               lhoods = NULL,
+                               .envir = parent.frame(),
+                               ...) {
   UseMethod("bru_component_list")
 }
 
@@ -636,8 +636,8 @@ bru_component_list <- function(object,
 #' # Individual component
 #' eff <- bru_component("myLinearEffectOfX", main = x, model = "linear")
 bru_component_list.formula <- function(object,
-                                   lhoods = NULL,
-                                   .envir = parent.frame(), ...) {
+                                       lhoods = NULL,
+                                       .envir = parent.frame(), ...) {
   if (!is.null(environment(object))) {
     .envir <- environment(object)
   }
@@ -667,9 +667,9 @@ bru_component_list.formula <- function(object,
 #'   formulas into a `component_list` object
 #' @export
 bru_component_list.list <- function(object,
-                                lhoods = NULL,
-                                .envir = parent.frame(),
-                                ...) {
+                                    lhoods = NULL,
+                                    .envir = parent.frame(),
+                                    ...) {
   # Maybe the list has been given an environment?
   if (!is.null(environment(object))) {
     .envir <- environment(object)
@@ -2005,8 +2005,8 @@ comp_lin_eval.component_list <- function(components, input, state, ...,
 #' setting up the components. The third example provides the function
 #' `myOtherSquareFun`. In this case, inlabru will call the function as
 #' `myOtherSquareFun(.data.)`, where `.data.` is the data provided via the
-#' [bru_obs()] `data` parameter. The function needs to know what parts of the data
-#' to use to construct the needed output. For example,
+#' [bru_obs()] `data` parameter. The function needs to know what parts of the
+#' data to use to construct the needed output. For example,
 #' ```
 #' myOtherSquareFun <- function(data) {
 #'   data[ ,"x"]^2

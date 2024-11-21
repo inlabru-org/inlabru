@@ -682,10 +682,10 @@ evaluate_predictor <- function(model,
 #' }
 #' }
 bru_component_eval <- function(main,
-                           group = NULL,
-                           replicate = NULL,
-                           weights = NULL,
-                           .state = NULL) {
+                               group = NULL,
+                               replicate = NULL,
+                               weights = NULL,
+                               .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",
     "'bru_component_eval(...)'.  See ?bru_component_eval for more information."

@@ -175,7 +175,8 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- bru_component_list(~ -1 + something(r, model = "linear", main_layer = 1),
+  cmp <- bru_component_list(
+    ~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)

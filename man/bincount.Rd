@@ -68,9 +68,10 @@ if (require(ggplot2) && require(fmesher) && bru_safe_inla()) {
   x <- seq(0, 55, length.out = 50)
   mesh1D <- fm_mesh_1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(mesh1D,
-                                      prior.range = c(1, 0.01),
-                                      prior.sigma = c(1, 0.01),
-                                      constr = TRUE)
+    prior.range = c(1, 0.01),
+    prior.sigma = c(1, 0.01),
+    constr = TRUE
+  )
   mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
   fit.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
 

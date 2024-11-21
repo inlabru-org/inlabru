@@ -47,9 +47,10 @@
 #'   x <- seq(0, 55, length.out = 50)
 #'   mesh1D <- fm_mesh_1d(x, boundary = "free")
 #'   matern <- INLA::inla.spde2.pcmatern(mesh1D,
-#'                                       prior.range = c(1, 0.01),
-#'                                       prior.sigma = c(1, 0.01),
-#'                                       constr = TRUE)
+#'     prior.range = c(1, 0.01),
+#'     prior.sigma = c(1, 0.01),
+#'     constr = TRUE
+#'   )
 #'   mdl <- x ~ spde1D(x, model = matern) + Intercept(1)
 #'   fit.spde <- lgcp(mdl, pts2, domain = list(x = mesh1D))
 #'
@@ -94,27 +95,35 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
         breaks[rep(seq_len(nbins) + 1, each = nsub)] * u,
       breaks[length(breaks)]
     )
-  points <- fmesher::fm_int(samplers = cbind(breaks[1:(length(breaks) - 1)],
-                                             breaks[2:(length(breaks))]),
-                            domain = fmesher::fm_mesh_1d(domain_breaks),
-                            int.args = list(method = "stable",
-                                            nsub1 = 1L),
-                            name = as.character(predictor)[2])
+  points <- fmesher::fm_int(
+    samplers = cbind(
+      breaks[1:(length(breaks) - 1)],
+      breaks[2:(length(breaks))]
+    ),
+    domain = fmesher::fm_mesh_1d(domain_breaks),
+    int.args = list(
+      method = "stable",
+      nsub1 = 1L
+    ),
+    name = as.character(predictor)[2]
+  )
 
   # Sampler
   smp <- generate(result,
-                  newdata = points,
-                  formula = predictor,
-                  ...,
-                  format = "matrix")
+    newdata = points,
+    formula = predictor,
+    ...,
+    format = "matrix"
+  )
 
   # Integrate per bin
   qq <- matrix(0.0, nrow = nbins, ncol(smp))
   for (k in seq_len(ncol(smp))) {
     qq[, k] <- fmesher::fm_block_logsumexp_eval(points$.block,
-                                                weights = points$weight,
-                                                values = log(smp[, k]),
-                                                log = TRUE)
+      weights = points$weight,
+      values = log(smp[, k]),
+      log = TRUE
+    )
     # Normalize bin probabilities
     qq[, k] <- qq[, k] - max(qq[, k])
     qq[, k] <- exp(qq[, k] - log(sum(exp(qq[, k]))))

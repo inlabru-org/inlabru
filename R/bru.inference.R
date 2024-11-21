@@ -1451,9 +1451,9 @@ bru_index <- function(object, ...) {
   UseMethod("bru_index")
 }
 
-#' @describeIn bru_index Extract the index vector for the predictor vector
-#' for a [bru_obs()] sub-model. The indices are relative to the sub-model, and need
-#' to be appropriately offset to be used in the full model predictor.
+#' @describeIn bru_index Extract the index vector for the predictor vector for a
+#'   [bru_obs()] sub-model. The indices are relative to the sub-model, and need
+#'   to be appropriately offset to be used in the full model predictor.
 #' @param what `character` or `NULL`; One of `NULL`, "all", "observed", and
 #'   "missing". If `NULL` (default) or "all", gives the index vector for the
 #'   full sub-model predictor. If "observed", gives the index vector for the
@@ -1481,12 +1481,12 @@ bru_index.bru_like <- function(object, what = NULL, ...) {
 }
 
 #' @describeIn bru_index Extract the index vector for "APredictor" for one or
-#'   more specified observation [bru_obs()] sub-models. Accepts any combination of
-#'   `tag` and `what`.
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination
+#'   of `tag` and `what`.
 #' @param tag `character` or `integer`; Either a character vector identifying
-#'   the tags of one or more of the [bru_obs()] observation models, or an integer
-#'   vector identifying models by their [bru()] specification order. If `NULL`
-#'   (default) computes indices for all sub-models.
+#'   the tags of one or more of the [bru_obs()] observation models, or an
+#'   integer vector identifying models by their [bru()] specification order. If
+#'   `NULL` (default) computes indices for all sub-models.
 #' @export
 bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
   if (is.null(tag)) {
@@ -1923,9 +1923,9 @@ bru_like_expr <- function(lhood, components) {
 #' @export
 #' @inheritParams like
 #' @inheritParams bru
-#' @param \dots Further arguments passed on to [bru_obs()]. In particular, optional
-#'   `E`, a single numeric used rescale all integration weights by a fixed
-#'   factor.
+#' @param \dots Further arguments passed on to [bru_obs()]. In particular,
+#'   optional `E`, a single numeric used rescale all integration weights by a
+#'   fixed factor.
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
