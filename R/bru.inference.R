@@ -1350,11 +1350,11 @@ like <- function(formula = . ~ .,
                  tag = NULL,
                  options = list(),
                  .envir = parent.frame()) {
-  lifecycle::deprecate_soft(
-    "2.11.1.9026",
-    "like()",
-    "bru_obs()"
-  )
+  # lifecycle::deprecate_soft(
+  #   "2.11.1.9026",
+  #   "like()",
+  #   "bru_obs()"
+  # )
 
   options <- bru_call_options(options)
 
