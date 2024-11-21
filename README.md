@@ -126,8 +126,7 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> Loading required package: sp
-#> This is INLA_24.06.27 built 2024-06-27 02:36:04 UTC.
+#> This is INLA_24.11.17 built 2024-11-17 09:15:42 UTC.
 #>  - See www.r-inla.org/contact-us for how to get help.
 #>  - List available models/likelihoods/etc with inla.list.models()
 #>  - Use inla.doc(<NAME>) to access documentation
@@ -147,7 +146,7 @@ cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
 # This particular bru/like combination has a shortcut function lgcp() as well
 fit <- bru(
   cmp,
-  like(
+  bru_obs(
     formula = geometry ~ .,
     family = "cp",
     data = gorillas_sf$nests,
@@ -170,7 +169,7 @@ lambda <- predict(
 ggplot() +
   geom_fm(data = gorillas_sf$mesh) +
   gg(lambda, geom = "tile") +
-  gg(gorillas$nests, color = "red", size = 0.5, alpha = 0.5) +
+  gg(gorillas_sf$nests, color = "red", size = 0.5, alpha = 0.5) +
   ggtitle("Nest intensity per km squared") +
   xlab("") +
   ylab("")
