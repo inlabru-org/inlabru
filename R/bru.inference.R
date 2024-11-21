@@ -1626,6 +1626,7 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
 
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
+  orig_names <- names(object)
   names(object) <- vapply(
     object,
     function(x) {
@@ -1637,6 +1638,11 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
     },
     ""
   )
+  # Preserve named elements for tag-less elements
+  na_names <- is.na(names(object))
+  if (any(na_names) && !is.null(orig_names)) {
+    names(object)[na_names] <- orig_names[na_names]
+  }
   object
 }
 

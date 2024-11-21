@@ -12,7 +12,9 @@
 * Add `[` and `]` to special character set in `bru_standardise_names()`
   (version `2.11.1.9012`)
 * Add `bru_index()` method for accessing predictor index information for
-  sub-models (version `2.11.1.9017`)
+  sub-models, and a `tag` argument for `bru_obs()` to identify individual
+  sub-models by name, which is also propagated to lists of `bru_like` objects
+  (version `2.11.1.9017` and `2.12.0`)
 * Allow `bru_mapper_multi()` sub-mappers to have non-zero offsets, that are
   added to generate the combined offset (version `2.11.1.9019`)
 * Add general `bru_mapper_fmesher()` mapper, for indexed mapping of
