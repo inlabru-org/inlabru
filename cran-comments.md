@@ -1,10 +1,6 @@
 ## Submission notes
 
-* Resubmission of 2.11.0 as 2.11.1, with additional bugfixes
-* Fixes issue with package cross references in documentation; these had gone
-  undetected by all local and github testing, but were caught by CRAN checks.
-  I was unable to get any R version check (including the very latest devel version)
-  to generate the actual NOTE, but the problem was clear and quickly fixed.
+* Feature and bugfix release 2.12.0
 
 ## R CMD check results and comments
 
@@ -21,7 +17,7 @@ Availability using Additional_repositories specification:
 
 ## revdepcheck results
 
-We checked 6 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 8 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 0 new problems
  * We failed to check 0 packages
