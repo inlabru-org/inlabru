@@ -1329,6 +1329,7 @@ bru_obs <- function(formula = . ~ .,
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
+#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
 #' @export
 like <- function(formula = . ~ .,
                  family = "gaussian",
@@ -1349,7 +1350,8 @@ like <- function(formula = . ~ .,
                  control.family = NULL,
                  tag = NULL,
                  options = list(),
-                 .envir = parent.frame()) {
+                 .envir = parent.frame(),
+                 mesh = deprecated()) {
   # lifecycle::deprecate_soft(
   #   "2.11.1.9026",
   #   "like()",
@@ -1590,6 +1592,18 @@ bru_like_list <- function(...) {
   UseMethod("bru_like_list")
 }
 
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like_list()`
+#'   alias. Use [bru_like_list()] instead.
+#' @export
+like_list <- function(...) {
+  # lifecycle::deprecate_soft(
+  #   "2.12.0",
+  #   "like_list()",
+  #   "bru_like_list()"
+  # )
+  UseMethod("bru_like_list")
+}
+
 #' @describeIn bru_obs
 #' Combine a list of `bru_like` likelihoods
 #' into a `bru_like_list` object
@@ -1612,6 +1626,7 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
 
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
+  orig_names <- names(object)
   names(object) <- vapply(
     object,
     function(x) {
@@ -1623,6 +1638,11 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
     },
     ""
   )
+  # Preserve named elements for tag-less elements
+  na_names <- is.na(names(object))
+  if (any(na_names) && !is.null(orig_names)) {
+    names(object)[na_names] <- orig_names[na_names]
+  }
   object
 }
 
