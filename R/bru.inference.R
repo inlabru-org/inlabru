@@ -1329,6 +1329,7 @@ bru_obs <- function(formula = . ~ .,
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
+#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
 #' @export
 like <- function(formula = . ~ .,
                  family = "gaussian",
@@ -1349,7 +1350,8 @@ like <- function(formula = . ~ .,
                  control.family = NULL,
                  tag = NULL,
                  options = list(),
-                 .envir = parent.frame()) {
+                 .envir = parent.frame(),
+                 mesh = deprecated()) {
   # lifecycle::deprecate_soft(
   #   "2.11.1.9026",
   #   "like()",

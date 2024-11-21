@@ -55,7 +55,8 @@ like(
   control.family = NULL,
   tag = NULL,
   options = list(),
-  .envir = parent.frame()
+  .envir = parent.frame(),
+  mesh = deprecated()
 )
 
 bru_like_list(...)
@@ -173,6 +174,8 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \item{.envir}{The evaluation environment to use for special arguments (\code{E},
 \code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
 \code{data}. Defaults to the calling environment.}
+
+\item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
 
 \item{\dots}{For \code{bru_like_list.bru_like}, one or more \code{bru_like} objects}
 
