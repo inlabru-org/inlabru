@@ -115,6 +115,7 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
-\code{\link{bru_mapper_shift}()}
+\code{\link{bru_mapper_shift}()},
+\code{\link{bru_mapper_sum}()}
 }
 \concept{mappers}

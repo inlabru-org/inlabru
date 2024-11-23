@@ -215,7 +215,8 @@ but can in some cases be a list of vectors.
 * `bru_mapper_collect(mappers, hidden)`
 * `bru_mapper_multi(mappers)`
 * `bru_mapper_pipe(mappers)`
-* `bru_mapper_repeat(mapper, n_rep)`
+* `bru_mapper_sum(mappers, single_input)`
+* `bru_mapper_repeat(mapper, n_rep, interleaved)`
 
 #### collect
 
@@ -271,15 +272,42 @@ ibm_eval(mapper,
 )
 ```
 
-#### repeat
+#### sum (from version `2.12.0.9001`)
 
-Repeat mappers take a single mapper and repeats it, by defining the Jacobian
-as a Kronecker product of a row vector of ones, corresponding to a state vector
-of length `nrep * ibm_n(mapper, ...)`. The `ibm_` method inputs are
-passed on to the sub-mapper methods.
+Sum mappers take a list of mappers and adds their effects, based on a state
+vector with the individual mapper states combined in sequence.
+The `ibm_` method inputs are passed on to the sub-mapper methods.
+When `single_input` is `TRUE`, the same input is passed to all sub-mappers.
+Otherwise, the `input` must be a `list`, `data.frame`, or `matrix`, whose
+elements/columns are passed on to the respective sub-mappers.
 
 ```{r, eval=FALSE}
-mapper <- bru_mapper_repeat(mapper = ..., n_rep = ...)
+mapper <- bru_mapper_sum(mappers = ..., single_input = ...)
+ibm_eval(mapper,
+  input = ...,
+  state = ...
+)
+```
+
+#### repeat
+
+Repeat mappers take a single mapper and repeats it,
+corresponding to a state vector
+of length `sum(n_rep) * ibm_n(mapper, ...)`. The `ibm_` method inputs are
+passed on to the sub-mapper methods.
+
+If `interleaved` is `TRUE` (from version `2.12.0.9001`),
+the repeated mappers are interleaved, e.g. if
+the state vectors for two individual mappers were `x1` and `x2`, interleaved
+mappers have state vector `c(x1[1], x2[1], ..., x1[2], x2[2], ...)`, whereas
+ordinary non-interleaved mappers have state vector `c(x1, x2, ...)`.
+
+For version `2.12.0.9001`, `n_rep` and `interleaved` may be vectors, for grouped
+repetition and interleaving. Non-interleaved repeats are combined, so that
+the resulting internal mapper structure is a compact as possible.
+
+```{r, eval=FALSE}
+mapper <- bru_mapper_repeat(mapper = ..., n_rep = ..., interleaved = ...)
 ibm_eval(mapper,
   input = ...,
   state = ...

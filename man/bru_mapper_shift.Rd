@@ -78,6 +78,7 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_repeat}()},
 \code{\link{bru_mapper_scale}()},
+\code{\link{bru_mapper_sum}()},
 \code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

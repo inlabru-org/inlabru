@@ -5,6 +5,7 @@
 \alias{summary.bru_mapper_multi}
 \alias{summary.bru_mapper_pipe}
 \alias{summary.bru_mapper_collect}
+\alias{summary.bru_mapper_sum}
 \alias{summary.bru_mapper_repeat}
 \alias{print.summary_bru_mapper}
 \alias{print.bru_mapper}
@@ -17,6 +18,8 @@
 \method{summary}{bru_mapper_pipe}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{summary}{bru_mapper_collect}(object, ..., prefix = "", initial = prefix, depth = 1)
+
+\method{summary}{bru_mapper_sum}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{summary}{bru_mapper_repeat}(object, ..., prefix = "", initial = prefix, depth = 1)
 

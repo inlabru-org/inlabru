@@ -11,7 +11,7 @@
 \alias{ibm_invalid_output.bru_mapper_repeat}
 \title{Mapper for repeating a mapper}
 \usage{
-bru_mapper_repeat(mapper, n_rep)
+bru_mapper_repeat(mapper, n_rep, interleaved = FALSE)
 
 \method{ibm_n}{bru_mapper_repeat}(mapper, ...)
 
@@ -19,9 +19,17 @@ bru_mapper_repeat(mapper, n_rep)
 
 \method{ibm_values}{bru_mapper_repeat}(mapper, ...)
 
-\method{ibm_jacobian}{bru_mapper_repeat}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_jacobian}{bru_mapper_repeat}(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+)
 
-\method{ibm_eval}{bru_mapper_repeat}(mapper, input, state, ..., sub_lin = NULL)
+\method{ibm_eval}{bru_mapper_repeat}(mapper, input, state, multi = FALSE, ..., sub_lin = NULL)
 
 \method{ibm_linear}{bru_mapper_repeat}(mapper, input, state, ...)
 
@@ -30,7 +38,19 @@ bru_mapper_repeat(mapper, n_rep)
 \arguments{
 \item{mapper}{The mapper to be repeated.}
 
-\item{n_rep}{The number of times to repeat the mapper.}
+\item{n_rep}{The number of times to repeat the mapper. If a vector, the
+non-interleaved repeats are combined into a single repeat mapping,
+and combined with interleaved repeats via a \code{\link[=bru_mapper_sum]{bru_mapper_sum()}} of mappers.}
+
+\item{interleaved}{logical; if \code{TRUE}, the repeated mapping columns are
+interleaved; \verb{(x1[1], x2[1], ..., x1[2], x2[2], ...)}.
+If \code{FALSE} (default), the repeated
+mapping columns are contiguous, \verb{(x1[1], x1[2], ..., x2[1], x2[2], ...)},
+and the Jacobian is a \code{cbind()} of the Jacobians of the repeated mappers.
+
+If \code{n_rep} is a vector, \code{interleaved} should either be a single logical,
+or a vector of the same length. Each element applies to the corresponding
+\code{n_rep} repetition specification.}
 
 \item{...}{Arguments passed on to other methods}
 
@@ -39,10 +59,22 @@ bru_mapper_repeat(mapper, n_rep)
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
+\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
+result must be compatible with the \code{INLA::f(...)} and corresponding
+\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
+the \code{input} interpretation may be different.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bru_mapper_collect}.}
+
+\item{multi}{logical;
+If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 }
 \value{
-A \code{bru_mapper_repeat} object.
+A \code{bru_mapper_repeat} or \code{bru_mapper_sum} object, or the original
+input \code{mapper}.
 }
 \description{
 Defines a repeated-space mapper that sums the contributions for
@@ -58,7 +90,15 @@ repeated submapper.
 
 }}
 \examples{
-m <- bru_mapper_repeat(bru_mapper_index(3), 4)
+(m0 <- bru_mapper_index(3))
+(m <- bru_mapper_repeat(m0, 5))
+ibm_n(m)
+ibm_values(m)
+ibm_jacobian(m, 1:3)
+ibm_eval(m, 1:3, seq_len(ibm_n(m)))
+
+# Interleaving and grouping
+(m <- bru_mapper_repeat(m0 , c(2, 1, 2), c(TRUE, FALSE, FALSE)))
 ibm_n(m)
 ibm_values(m)
 ibm_jacobian(m, 1:3)
@@ -90,6 +130,7 @@ Other mappers:
 \code{\link{bru_mapper_pipe}()},
 \code{\link{bru_mapper_scale}()},
 \code{\link{bru_mapper_shift}()},
+\code{\link{bru_mapper_sum}()},
 \code{\link{bru_mapper_taylor}()}
 }
 \concept{mappers}

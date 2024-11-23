@@ -1,5 +1,10 @@
 # inlabru (development version)
 
+* Add `bru_mapper_sum()` mapper, for automated adding the output of
+  multiple mappers, optionally with a single common input (version `2.12.0.9001`)
+* Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
+  states for summation of a repeated mapper (version `2.12.0.9001`)
+
 # inlabru 2.12.0
 
 ## General changes
