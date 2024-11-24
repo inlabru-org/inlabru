@@ -129,7 +129,7 @@ bm_repeat_sub_lin <- function(mapper, input, state,
   # We need all the sub_lin objects even for linear mappers
   n <- ibm_n(mapper[["mapper"]])
   if (mapper[["interleaved"]]) {
-    n_offset <- seq_len(n) - 1L
+    n_offset <- seq_len(mapper[["n_rep"]]) - 1L
   } else {
     n_offset <- n * (seq_len(mapper[["n_rep"]]) - 1L)
   }
