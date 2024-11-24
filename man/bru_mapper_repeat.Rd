@@ -98,7 +98,7 @@ ibm_jacobian(m, 1:3)
 ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 
 # Interleaving and grouping
-(m <- bru_mapper_repeat(m0 , c(2, 1, 2), c(TRUE, FALSE, FALSE)))
+(m <- bru_mapper_repeat(m0, c(2, 1, 2), c(TRUE, FALSE, FALSE)))
 ibm_n(m)
 ibm_values(m)
 ibm_jacobian(m, 1:3)

@@ -28,7 +28,8 @@
 #' ibm_n(m)
 #' ibm_values(m)
 #' ibm_jacobian(m, list(a = 1:3, b = c(1, 1, 2)))
-#' ibm_eval(m,
+#' ibm_eval(
+#'   m,
 #'   list(a = 1:3, b = c(1, 1, 2)),
 #'   seq_len(ibm_n(m))
 #' )
@@ -104,7 +105,8 @@ ibm_n_output.bru_mapper_sum <- function(mapper, input, state = NULL, ...) {
       input[[nm]]
     },
     state = state[seq_len(ibm_n(mapper[["mappers"]][[nm]]))],
-    ...)
+    ...
+  )
 }
 
 #' @export
@@ -214,7 +216,7 @@ ibm_eval.bru_mapper_sum <- function(mapper, input, state,
 #' @export
 #' @rdname bru_mapper_sum
 ibm_linear.bru_mapper_sum <- function(mapper, input, state,
-                                         ...) {
+                                      ...) {
   sub_lin <-
     bm_sum_sub_lin(
       mapper, input, state,

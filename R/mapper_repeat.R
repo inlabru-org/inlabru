@@ -38,7 +38,7 @@
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
 #' # Interleaving and grouping
-#' (m <- bru_mapper_repeat(m0 , c(2, 1, 2), c(TRUE, FALSE, FALSE)))
+#' (m <- bru_mapper_repeat(m0, c(2, 1, 2), c(TRUE, FALSE, FALSE)))
 #' ibm_n(m)
 #' ibm_values(m)
 #' ibm_jacobian(m, 1:3)
@@ -127,22 +127,16 @@ ibm_values.bru_mapper_repeat <- function(mapper, ...) {
 bm_repeat_sub_lin <- function(mapper, input, state,
                               ...) {
   # We need all the sub_lin objects even for linear mappers
-  n <- ibm_n(mapper[["mapper"]])
-  if (mapper[["interleaved"]]) {
-    n_offset <- seq_len(mapper[["n_rep"]]) - 1L
-  } else {
-    n_offset <- n * (seq_len(mapper[["n_rep"]]) - 1L)
-  }
+  idx <- bm_repeat_indexing(
+    n_map = ibm_n(mapper[["mapper"]]),
+    n_rep = mapper[["n_rep"]],
+    interleaved = mapper[["interleaved"]]
+  )
   sub_lin <-
     lapply(
       seq_len(mapper[["n_rep"]]),
       function(x) {
-        if (mapper[["interleaved"]]) {
-          idx <- (seq_len(n) - 1L) * mapper[["n_rep"]] + 1L
-        } else {
-          idx <- seq_len(n)
-        }
-        state_subset <- state[n_offset[x] + idx]
+        state_subset <- state[idx$offsets[x] + idx$index]
         ibm_linear(
           mapper[["mapper"]],
           input = input,
@@ -175,8 +169,10 @@ ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
   # Combine the matrices (A1, A2, A3, ...) -> permuted cbind(A1, A2, A3, ...)
   A <- do.call(cbind, A)
   if (isTRUE(mapper[["interleaved"]])) {
-    A <- A %*% bm_interleave_matrix(n_map = ibm_n(mapper[["mapper"]]),
-                                    n_rep = mapper[["n_rep"]])
+    A <- A %*% bm_repeat_indexing_matrix(
+      n_map = ibm_n(mapper[["mapper"]]),
+      n_rep = mapper[["n_rep"]]
+    )
   }
   return(A)
 }
@@ -235,33 +231,73 @@ ibm_linear.bru_mapper_repeat <- function(mapper, input, state,
 #' @export
 ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
                                                  ...) {
+  idx <- bm_repeat_indexing(
+    n_map = ibm_n(mapper[["mapper"]]),
+    n_rep = mapper[["n_rep"]],
+    interleaved = mapper[["interleaved"]]
+  )
   return(
     ibm_invalid_output(
       mapper[["mapper"]],
       input = input,
-      state = state[seq_len(ibm_n(mapper[["mapper"]]))]
+      state = state[idx$offsets[1] + idx$index]
     )
   )
 }
 
 # Interleaving ####
 
-#' @title Interleaving matrix
-#' @description Creates a sparse matrix `A` such that `z <- A %*% x` constructs
+#' @title Re-indexing matrix for repeated mappers
+#' @name bm_repeat_indexing
+#' @rdname bm_repeat_indexing
+#' @description Helper methods for regular and interleaved state vector
+#'   indexing, meant for use in [bru_mapper_repeat] mappers.
+#' @keywords internal
+NULL
+
+#' @describeIn bm_repeat_indexing Construct the offsets and within-block
+#' index vectors for a repeated mapper, with or without interleaving.
+#' @param n_map The block mapper size
+#' @param n_rep The number of times the block is repeated
+#' @param interleaved logical; if `TRUE`, the state vector indexing is
+#'   interleaved.
+#' @returns `bm_repeat_indexing`: Returns a list with a vector of offsets,
+#'   `offsets`, and a vector of relative index values, `index`; block `k`
+#'   indexing is given by `offsets[k] + index`.
+#' @export
+#' @examples
+#' (idx <- bm_repeat_indexing(3, 2, FALSE))
+#' (idx <- bm_repeat_indexing(3, 2, TRUE))
+bm_repeat_indexing <- function(n_map,
+                               n_rep = 1L,
+                               interleaved = FALSE) {
+  if (isTRUE(interleaved)) {
+    list(
+      offsets = seq_len(n_rep) - 1L,
+      index = n_rep * (seq_len(n_map) - 1L) + 1L
+    )
+  } else {
+    list(
+      offset = n_map * (seq_len(n_rep) - 1L),
+      index = seq_len(n_map)
+    )
+  }
+}
+#' @describeIn bm_repeat_indexing Creates a sparse matrix `A` such that `z <- A %*% x` constructs
 #'   a blockwise version `z = c(x1, x2, ..., xn)` of an interleaved state vector
 #'   `x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)`. Each block is
 #'   of size `n_map`, and there are `n_rep` blocks. The reverse operation,
-#'   taking `z = c(x1, x2, ..., xn)` to an interleaved vector is
+#'   taking a blockwise `z = c(x1, x2, ..., xn)` to an interleaved vector is
 #'   `x <- Matrix::t(A) %*% z`.
-#' @returns A `sparseMatrix` object.
-#' @keywords internal
+#' @returns `bm_repeat_indexing_matrix`: A `sparseMatrix` object.
+#' @export
 #' @examples
-#' (A <- bm_interleave_matrix(3, 2))
+#' (A <- bm_repeat_indexing_matrix(3, 2))
 #' (x_interleaved <- 1:6)
 #' (x_blockwise <- as.vector(A %*% x_interleaved))
 #' (x_recovered <- as.vector(Matrix::t(A) %*% x_blockwise))
 #'
-bm_interleave_matrix <- function(n_map, n_rep) {
+bm_repeat_indexing_matrix <- function(n_map, n_rep) {
   Matrix::sparseMatrix(
     i = rep((seq_len(n_rep) - 1L) * n_map, times = n_map) +
       rep(seq_len(n_map), each = n_rep),

@@ -136,7 +136,8 @@ with unnamed but ordered columns.
 ibm_n(m)
 ibm_values(m)
 ibm_jacobian(m, list(a = 1:3, b = c(1, 1, 2)))
-ibm_eval(m,
+ibm_eval(
+  m,
   list(a = 1:3, b = c(1, 1, 2)),
   seq_len(ibm_n(m))
 )
