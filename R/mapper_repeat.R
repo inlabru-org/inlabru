@@ -260,7 +260,7 @@ NULL
 #' @param n_map The block mapper size
 #' @param n_rep The number of times the block is repeated
 #' @param interleaved logical; if `TRUE`, the state vector indexing is
-#'   interleaved.
+#'   interleaved. Default is `FALSE`, for blockwise indexing.
 #' @returns `bm_repeat_indexing`: Returns a list with a vector of offsets,
 #'   `offsets`, and a vector of relative index values, `index`; block `k`
 #'   indexing is given by `offsets[k] + index`.
@@ -269,7 +269,7 @@ NULL
 #' (idx <- bm_repeat_indexing(3, 2, FALSE))
 #' (idx <- bm_repeat_indexing(3, 2, TRUE))
 bm_repeat_indexing <- function(n_map,
-                               n_rep = 1L,
+                               n_rep,
                                interleaved = FALSE) {
   if (isTRUE(interleaved)) {
     list(
@@ -283,12 +283,12 @@ bm_repeat_indexing <- function(n_map,
     )
   }
 }
-#' @describeIn bm_repeat_indexing Creates a sparse matrix `A` such that `z <- A %*% x` constructs
-#'   a blockwise version `z = c(x1, x2, ..., xn)` of an interleaved state vector
-#'   `x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)`. Each block is
-#'   of size `n_map`, and there are `n_rep` blocks. The reverse operation,
-#'   taking a blockwise `z = c(x1, x2, ..., xn)` to an interleaved vector is
-#'   `x <- Matrix::t(A) %*% z`.
+#' @describeIn bm_repeat_indexing Creates a sparse matrix `A` such that
+#'   `z <- A %*% x` constructs a blockwise version `z = c(x1, x2, ..., xn)` of
+#'   an interleaved state vector `x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)`.
+#'   Each block is of size `n_map`, and there are `n_rep` blocks. The reverse
+#'   operation, taking a blockwise `z = c(x1, x2, ..., xn)` to an interleaved
+#'   vector is `x <- Matrix::t(A) %*% z`.
 #' @returns `bm_repeat_indexing_matrix`: A `sparseMatrix` object.
 #' @export
 #' @examples

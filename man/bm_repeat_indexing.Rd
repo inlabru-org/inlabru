@@ -5,7 +5,7 @@
 \alias{bm_repeat_indexing_matrix}
 \title{Re-indexing matrix for repeated mappers}
 \usage{
-bm_repeat_indexing(n_map, n_rep = 1L, interleaved = FALSE)
+bm_repeat_indexing(n_map, n_rep, interleaved = FALSE)
 
 bm_repeat_indexing_matrix(n_map, n_rep)
 }
@@ -15,7 +15,7 @@ bm_repeat_indexing_matrix(n_map, n_rep)
 \item{n_rep}{The number of times the block is repeated}
 
 \item{interleaved}{logical; if \code{TRUE}, the state vector indexing is
-interleaved.}
+interleaved. Default is \code{FALSE}, for blockwise indexing.}
 }
 \value{
 \code{bm_repeat_indexing}: Returns a list with a vector of offsets,
@@ -33,12 +33,12 @@ indexing, meant for use in \link{bru_mapper_repeat} mappers.
 \item \code{bm_repeat_indexing()}: Construct the offsets and within-block
 index vectors for a repeated mapper, with or without interleaving.
 
-\item \code{bm_repeat_indexing_matrix()}: Creates a sparse matrix \code{A} such that \code{z <- A \%*\% x} constructs
-a blockwise version \code{z = c(x1, x2, ..., xn)} of an interleaved state vector
-\code{x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)}. Each block is
-of size \code{n_map}, and there are \code{n_rep} blocks. The reverse operation,
-taking a blockwise \code{z = c(x1, x2, ..., xn)} to an interleaved vector is
-\code{x <- Matrix::t(A) \%*\% z}.
+\item \code{bm_repeat_indexing_matrix()}: Creates a sparse matrix \code{A} such that
+\code{z <- A \%*\% x} constructs a blockwise version \code{z = c(x1, x2, ..., xn)} of
+an interleaved state vector \code{x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)}.
+Each block is of size \code{n_map}, and there are \code{n_rep} blocks. The reverse
+operation, taking a blockwise \code{z = c(x1, x2, ..., xn)} to an interleaved
+vector is \code{x <- Matrix::t(A) \%*\% z}.
 
 }}
 \examples{
