@@ -175,16 +175,8 @@ ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
   # Combine the matrices (A1, A2, A3, ...) -> permuted cbind(A1, A2, A3, ...)
   A <- do.call(cbind, A)
   if (isTRUE(mapper[["interleaved"]])) {
-    n_map <- ibm_n(mapper[["mapper"]])
-    n_rep <- mapper[["n_rep"]]
-    A <- A %*%
-      Matrix::sparseMatrix(
-        i = rep((seq_len(n_rep) - 1L) * n_map, times = n_map) +
-          rep(seq_len(n_map), each = n_rep),
-        j = seq_len(n_map * n_rep),
-        x = 1,
-        dims = c(1L, 1L) * n_map * n_rep
-      )
+    A <- A %*% bm_interleave_matrix(n_map = ibm_n(mapper[["mapper"]]),
+                                    n_rep = mapper[["n_rep"]])
   }
   return(A)
 }
@@ -249,5 +241,32 @@ ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
       input = input,
       state = state[seq_len(ibm_n(mapper[["mapper"]]))]
     )
+  )
+}
+
+# Interleaving ####
+
+#' @title Interleaving matrix
+#' @description Creates a sparse matrix `A` such that `z <- A %*% x` constructs
+#'   a blockwise version `z = c(x1, x2, ..., xn)` of an interleaved state vector
+#'   `x = c(x1[1], x2[1], ..., x1[2], x2[2], ...)`. Each block is
+#'   of size `n_map`, and there are `n_rep` blocks. The reverse operation,
+#'   taking `z = c(x1, x2, ..., xn)` to an interleaved vector is
+#'   `x <- Matrix::t(A) %*% z`.
+#' @returns A `sparseMatrix` object.
+#' @keywords internal
+#' @examples
+#' (A <- bm_interleave_matrix(3, 2))
+#' (x_interleaved <- 1:6)
+#' (x_blockwise <- as.vector(A %*% x_interleaved))
+#' (x_recovered <- as.vector(Matrix::t(A) %*% x_blockwise))
+#'
+bm_interleave_matrix <- function(n_map, n_rep) {
+  Matrix::sparseMatrix(
+    i = rep((seq_len(n_rep) - 1L) * n_map, times = n_map) +
+      rep(seq_len(n_map), each = n_rep),
+    j = seq_len(n_map * n_rep),
+    x = 1,
+    dims = c(1L, 1L) * n_map * n_rep
   )
 }
