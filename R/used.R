@@ -124,20 +124,14 @@ bru_used <- function(x = NULL, ...) {
   UseMethod("bru_used", x)
 }
 
-#' @describeIn bru_used Create a `bru_used` object.
+#' @describeIn bru_used Create a `bru_used` object from effect name character
+#'   vectors.
 #' @export
-bru_used.default <- function(x = NULL, ...,
+bru_used.NULL <- function(x = NULL, ...,
                              effect = NULL,
                              effect_exclude = NULL,
                              latent = NULL,
                              labels = NULL) {
-  if (!is.null(x)) {
-    stop(paste0(
-      "bru_used input class not supported: ",
-      "'", paste0(class(x), collapse = "', '"), "'"
-    ))
-  }
-
   used <- structure(
     list(
       effect = effect,
@@ -321,13 +315,15 @@ bru_used.formula <- function(x, ...,
   )
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru` object.
 #' @export
 bru_used.bru <- function(x, ..., join = TRUE) {
   bru_used(x[["bru_info"]][["lhoods"]], ..., join = join)
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for each element
+#'   of a list, and optionally join into a single `bru_used` object.
 #' @export
 bru_used.list <- function(x, ..., join = TRUE) {
   used <- lapply(x, function(y) bru_used(y, ...))
@@ -350,7 +346,8 @@ bru_used.list <- function(x, ..., join = TRUE) {
   used
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru` observation model `bru_like` object.
 #' @export
 bru_used.bru_like <- function(x, ...) {
   bru_used(x[["used"]], ...)
@@ -381,7 +378,7 @@ format.bru_used <- function(x, ...) {
   } else {
     s <- paste0(s, ", latent[", paste0(x$latent, collapse = ", "), "]")
   }
-  if (!is.null(x$effect_exclude)) {
+  if (!is.null(x[["effect_exclude"]])) {
     s <- paste0(s, ", exclude[", paste0(x$effect_exclude, collapse = ", "), "]")
   }
   s

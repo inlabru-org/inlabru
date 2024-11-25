@@ -2,7 +2,7 @@
 % Please edit documentation in R/used.R
 \name{bru_used}
 \alias{bru_used}
-\alias{bru_used.default}
+\alias{bru_used.NULL}
 \alias{bru_used.character}
 \alias{bru_used.expression}
 \alias{bru_used.formula}
@@ -17,7 +17,7 @@
 \usage{
 bru_used(x = NULL, ...)
 
-\method{bru_used}{default}(
+\method{bru_used}{`NULL`}(
   x = NULL,
   ...,
   effect = NULL,
@@ -99,7 +99,8 @@ supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \c
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_used(default)}: Create a \code{bru_used} object.
+\item \code{bru_used(`NULL`)}: Create a \code{bru_used} object from effect name character
+vectors.
 
 \item \code{bru_used(character)}: Create a \code{bru_used} object from a \code{character}
 representation of an expression.
@@ -108,6 +109,15 @@ representation of an expression.
 
 \item \code{bru_used(formula)}: Create a \code{bru_used} object from a formula (only the
 right-hand side is used).
+
+\item \code{bru_used(bru)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru} object.
+
+\item \code{bru_used(list)}: Extract the \code{bru_used} information for each element
+of a list, and optionally join into a single \code{bru_used} object.
+
+\item \code{bru_used(bru_like)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru} observation model \code{bru_like} object.
 
 \item \code{bru_used(bru_used)}: Convenience method that takes
 an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_used_update()}}
