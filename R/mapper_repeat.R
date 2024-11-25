@@ -278,7 +278,7 @@ bm_repeat_indexing <- function(n_map,
     )
   } else {
     list(
-      offset = n_map * (seq_len(n_rep) - 1L),
+      offsets = n_map * (seq_len(n_rep) - 1L),
       index = seq_len(n_map)
     )
   }
