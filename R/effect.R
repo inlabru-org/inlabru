@@ -332,29 +332,19 @@ bru_component.character <- function(object,
   }
 
   if ("map" %in% names(sys.call())) {
-    #    if (!is.null(substitute(map))) {
-    if (is.null(substitute(main))) {
-      main <- sys.call()[["map"]]
-      warning(
-        "Use of 'map' is deprecated and may be disabled; use 'main' instead.",
-        immediate. = TRUE
-      )
-    } else {
-      warning("Deprecated 'map' overridden by 'main'.",
-        immediate. = TRUE
-      )
-    }
+    lifecycle::deprecate_stop(
+      "2.3.0",
+      "bru_component(map)",
+      "bru_component(main)"
+    )
   }
 
   if ("mesh" %in% names(sys.call())) {
-    if (is.null(mapper)) {
-      mapper <- list(...)[["mesh"]]
-      warning(
-        "Use of 'mesh' is deprecated and may be disabled; use 'mapper' instead."
-      )
-    } else {
-      warning("Deprecated 'mesh' overridden by 'mapper'.")
-    }
+    lifecycle::deprecate_stop(
+      "2.3.0",
+      "bru_component(mesh)",
+      "bru_component(mapper)"
+    )
   }
 
   if (is.null(envir_extra)) {
