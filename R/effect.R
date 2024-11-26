@@ -1240,6 +1240,25 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
 }
 
 
+make_values <- function(subcomp_n, subcomp_values, input_values, label) {
+  if (!is.null(subcomp_n)) {
+    if (!is.null(subcomp_values)) {
+      warning(
+        "Both 'n' and 'values' provided. Ignoring 'values'",
+        immediate. = TRUE
+      )
+    }
+    return(seq_len(subcomp_n))
+  }
+  if (!is.null(subcomp_values)) {
+    return(subcomp_values)
+  }
+  if (!is.null(input_values)) {
+    return(input_values)
+  }
+
+  stop(paste0("No mapper, no n, and no values given for ", label))
+}
 
 make_submapper <- function(subcomp_n,
                            subcomp_values,
@@ -1249,61 +1268,48 @@ make_submapper <- function(subcomp_n,
                            subcomp_factor_mapping,
                            require_indexed,
                            allow_interpolation = TRUE) {
-  if (!is.null(subcomp_n)) {
-    if (!is.null(subcomp_values)) {
-      warning(
-        "Both 'n' and 'values' provided. Ignoring 'values'",
-        immediate. = TRUE
-      )
-    }
-    values <- seq_len(subcomp_n)
-  } else if (!is.null(subcomp_values)) {
-    values <- subcomp_values
-  } else if (!is.null(input_values)) {
-    values <- input_values
-  } else {
-    stop(paste0("No mapper, no n, and no values given for ", label))
-  }
+  values <- make_values(subcomp_n, subcomp_values, input_values, label)
 
   if (is.factor(values) ||
-    is.character(values) ||
-    (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
-    mapper <- bru_mapper_factor(
-      values,
-      factor_mapping = subcomp_factor_mapping,
-      indexed = require_indexed
+      is.character(values) ||
+      (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
+    return(
+      bru_mapper_factor(
+        values,
+        factor_mapping = subcomp_factor_mapping,
+        indexed = require_indexed
+      )
     )
-  } else {
-    values <- sort(unique(values), na.last = NA)
-    if (length(values) > 1) {
-      if (allow_interpolation) {
-        mapper <-
-          bru_mapper(
-            fm_mesh_1d(values),
-            indexed = require_indexed
-          )
-      } else {
-        mapper <- bru_mapper_index(n = ceiling(max(values)))
-      }
-    } else if (all(values == 1)) {
-      if (require_indexed) {
-        mapper <- bru_mapper_index(n = 1)
-      } else {
-        mapper <- bru_mapper_linear()
-      }
-    } else {
-      if (require_indexed) {
-        mapper <- bru_mapper_factor(values,
-          factor_mapping = "full",
-          indexed = TRUE
+  }
+  values <- sort(unique(values), na.last = NA)
+  if (length(values) > 1) {
+    if (allow_interpolation) {
+      return(
+        bru_mapper(
+          fm_mesh_1d(values),
+          indexed = require_indexed
         )
-      } else {
-        mapper <- bru_mapper_linear()
-      }
+      )
     }
+    mapper <- bru_mapper_index(n = ceiling(max(values)))
+    return(mapper)
+  }
+  if (all(values == 1)) {
+    if (require_indexed) {
+      return(bru_mapper_index(n = 1L))
+    }
+    return(bru_mapper_linear())
+  }
+  if (require_indexed) {
+      return(
+        bru_mapper_factor(values,
+                          factor_mapping = "full",
+                          indexed = TRUE
+        )
+      )
   }
 
-  mapper
+  return(bru_mapper_linear())
 }
 
 
