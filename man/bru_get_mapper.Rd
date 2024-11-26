@@ -32,9 +32,8 @@ for the given latent model.
 \section{Methods (by class)}{
 \itemize{
 \item \code{bru_get_mapper(inla.spde)}: Extract an indexed mapper for
-the \code{model$mesh} object contained in the model object.
-It returns \code{NULL} gives a warning
-if no known mesh type is found in the model object.
+the \code{model$mesh} object contained in the model object,
+which is assumed to be of a class supporting relevant \code{fmesher} methods.
 
 \item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a call to
 \code{model$f$rgeneric$definition("mapper")}. To support this for your own

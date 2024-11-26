@@ -1344,26 +1344,11 @@ bru_get_mapper <- function(model, ...) {
 
 
 #' @describeIn bru_get_mapper Extract an indexed mapper for
-#' the `model$mesh` object contained in the model object.
-#' It returns `NULL` gives a warning
-#' if no known mesh type is found in the model object.
+#' the `model$mesh` object contained in the model object,
+#' which is assumed to be of a class supporting relevant `fmesher` methods.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  if (inherits(model$mesh, c("fm_mesh_2d", "fm_mesh_1d"))) {
-    mapper <- bru_mapper_fmesher(model$mesh)
-  } else {
-    mapper <- NULL
-    warning(
-      paste0(
-        "Unknown SPDE mesh class '",
-        paste0(class(model$mesh), collapse = ", "),
-        "' for bru_get_mapper.inla.spde. Please specify ",
-        "a mapper manually instead."
-      ),
-      immediate. = TRUE
-    )
-  }
-  mapper
+  return(bru_mapper_fmesher(model[["mesh"]]))
 }
 
 #' @describeIn bru_get_mapper Returns the mapper given by a call to
