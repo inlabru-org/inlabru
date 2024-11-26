@@ -1140,7 +1140,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
     }
   } else if (is.null(subcomp[["input"]][["input"]])) {
     # Used for automatic group and replicate mappers
-    subcomp <- make_mapper(subcomp,
+    subcomp[["mapper"]] <- make_mapper(
+      subcomp,
       label,
       input_values = 1,
       strict = TRUE,
@@ -1213,7 +1214,8 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
         subcomp$values <- NULL
         inp_values <- NULL
       }
-      subcomp <- make_mapper(subcomp,
+      subcomp[["mapper"]] <- make_mapper(
+        subcomp,
         label,
         input_values = unique_inputs$inp_values,
         strict = TRUE,
@@ -1405,24 +1407,27 @@ make_mapper <- function(subcomp,
                         input_values = NULL,
                         strict = TRUE,
                         require_indexed = FALSE) {
-  if (is.null(subcomp[["mapper"]])) {
-    if (!inherits(subcomp[["model"]], "character")) {
-      subcomp[["mapper"]] <- bru_get_mapper_safely(subcomp[["model"]])
-    }
+  mapper <- subcomp[["mapper"]]
+  if (is.null(mapper) && !inherits(subcomp[["model"]], "character")) {
+    mapper <- bru_get_mapper_safely(subcomp[["model"]])
   }
-  if (!is.null(subcomp[["mapper"]])) {
-    if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
-      stop(paste0(
-        "Unknown mapper of type '",
-        paste0(class(subcomp[["mapper"]]), collapse = ", "),
-        "' for ", label
-      ))
+  if (!is.null(mapper)) {
+    if (inherits(mapper, "bru_mapper")) {
+      return(mapper)
     }
-  } else if (subcomp[["type"]] %in% c("linear", "clinear")) {
-    subcomp[["mapper"]] <- bru_mapper_linear()
-  } else if (subcomp[["type"]] %in% c("offset", "const")) {
-    subcomp[["mapper"]] <- bru_mapper_const()
-  } else if (subcomp[["type"]] %in% c("fixed")) {
+    stop(paste0(
+      "Unknown mapper of type '",
+      paste0(class(mapper), collapse = ", "),
+      "' for ", label
+    ))
+  }
+  if (subcomp[["type"]] %in% c("linear", "clinear")) {
+    return(bru_mapper_linear())
+  }
+  if (subcomp[["type"]] %in% c("offset", "const")) {
+    return(bru_mapper_const())
+  }
+  if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
     } else if (!is.null(input_values)) {
@@ -1440,8 +1445,9 @@ make_mapper <- function(subcomp,
         "' of component '", label, "'."
       ))
     }
-    subcomp[["mapper"]] <- bru_mapper_matrix(labels)
-  } else if (subcomp[["model"]] %in% c("bym", "bym2")) {
+    return(bru_mapper_matrix(labels))
+  }
+  if (subcomp[["model"]] %in% c("bym", "bym2")) {
     # No mapper; construct based on input values
     # Default mapper will be integer or factor indexed, not
     # interpolated
@@ -1459,24 +1465,23 @@ make_mapper <- function(subcomp,
     )
     mappers[[2]] <- mappers[[1]]
     names(mappers) <- c("u", "v")
-    subcomp[["mapper"]] <-
-      bru_mapper_collect(mappers, hidden = TRUE)
-  } else {
-    # No mapper; construct based on input values
-    # Interpolation on by default
-    subcomp[["mapper"]] <-
-      make_submapper(
-        subcomp_n = subcomp[["n"]],
-        subcomp_values = subcomp[["values"]],
-        input_values = input_values,
-        label = subcomp[["label"]],
-        subcomp_type = subcomp[["type"]],
-        subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed,
-        allow_interpolation = TRUE
-      )
+    return(bru_mapper_collect(mappers, hidden = TRUE))
   }
-  subcomp
+
+  # No mapper; construct based on input values
+  # Interpolation on by default
+  mapper<-
+    make_submapper(
+      subcomp_n = subcomp[["n"]],
+      subcomp_values = subcomp[["values"]],
+      input_values = input_values,
+      label = subcomp[["label"]],
+      subcomp_type = subcomp[["type"]],
+      subcomp_factor_mapping = subcomp[["factor_mapping"]],
+      require_indexed = require_indexed,
+      allow_interpolation = TRUE
+    )
+  return(mapper)
 }
 
 #' Convert components to R code
