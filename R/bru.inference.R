@@ -465,7 +465,7 @@ bru <- function(components = ~ Intercept(1),
                 .envir = parent.frame()) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
-  timing_convert <- function(x) {
+  timings_convert <- function(x) {
     if (!is.na(x[4])) {
       x[1] <- x[1] + x[4]
     }
@@ -475,7 +475,17 @@ bru <- function(components = ~ Intercept(1),
     x[1:3]
   }
 
-  timing_start <- timing_convert(proc.time())
+  timings_collect <- function(Task, Iteration, time_diff) {
+    data.frame(
+      Task = Task,
+      Iteration = Iteration,
+      Time = as.difftime(time_diff[1], units = "secs"),
+      System = as.difftime(time_diff[2], units = "secs"),
+      Elapsed = as.difftime(time_diff[3], units = "secs")
+    )
+  }
+
+  timing <- list(start = timings_convert(proc.time()))
 
   # Update default options
   options <- bru_call_options(options)
@@ -555,7 +565,7 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
-  timing_setup <- timing_convert(proc.time())
+  timing$setup <- timings_convert(proc.time())
 
   # Run iterated INLA
   if (options$bru_run) {
@@ -568,22 +578,10 @@ bru <- function(components = ~ Intercept(1),
     result <- list()
   }
 
-  timing_end <- timing_convert(proc.time())
+  timing$end <- timings_convert(proc.time())
   result$bru_timings <-
     rbind(
-      data.frame(
-        Task = c("Preprocess"),
-        Iteration = 0L,
-        Time = as.difftime(c(timing_setup[1] - timing_start[1]),
-          units = "secs"
-        ),
-        System = as.difftime(c(timing_setup[2] - timing_start[2]),
-          units = "secs"
-        ),
-        Elapsed = as.difftime(c(timing_setup[3] - timing_start[3]),
-          units = "secs"
-        )
-      ),
+      timings_collect("Preprocess", 0L, timing$setup - timing$start),
       result[["bru_iinla"]][["timings"]]
     )
 
