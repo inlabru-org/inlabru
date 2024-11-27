@@ -128,10 +128,10 @@ bru_used <- function(x = NULL, ...) {
 #'   vectors.
 #' @export
 bru_used.NULL <- function(x = NULL, ...,
-                             effect = NULL,
-                             effect_exclude = NULL,
-                             latent = NULL,
-                             labels = NULL) {
+                          effect = NULL,
+                          effect_exclude = NULL,
+                          latent = NULL,
+                          labels = NULL) {
   used <- structure(
     list(
       effect = effect,

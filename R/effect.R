@@ -1271,8 +1271,8 @@ make_submapper <- function(subcomp_n,
   values <- make_values(subcomp_n, subcomp_values, input_values, label)
 
   if (is.factor(values) ||
-      is.character(values) ||
-      (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
+    is.character(values) ||
+    (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     return(
       bru_mapper_factor(
         values,
@@ -1301,12 +1301,12 @@ make_submapper <- function(subcomp_n,
     return(bru_mapper_linear())
   }
   if (require_indexed) {
-      return(
-        bru_mapper_factor(values,
-                          factor_mapping = "full",
-                          indexed = TRUE
-        )
+    return(
+      bru_mapper_factor(values,
+        factor_mapping = "full",
+        indexed = TRUE
       )
+    )
   }
 
   return(bru_mapper_linear())
@@ -1461,7 +1461,7 @@ make_mapper <- function(subcomp,
 
   # No mapper; construct based on input values
   # Interpolation on by default
-  mapper<-
+  mapper <-
     make_submapper(
       subcomp_n = subcomp[["n"]],
       subcomp_values = subcomp[["values"]],
