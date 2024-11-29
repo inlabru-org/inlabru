@@ -3850,12 +3850,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
     if (inherits(result, "try-error")) {
       bru_log_message(
-        paste0("iinla: Problem in inla: ", result),
+        paste0("iinla: Problem in inla:\n", result),
         verbose = FALSE,
         verbose_store = options$bru_verbose_store
       )
       warning(
-        paste0("iinla: Problem in inla: ", result),
+        paste0("iinla: Problem in inla:\n", result),
         immediate. = TRUE
       )
       bru_log_message(
