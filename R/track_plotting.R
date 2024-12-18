@@ -14,6 +14,9 @@
 #' Default `from = 1` (start from the first iteration) and `to = NULL` (end at
 #' the last iteration).
 #' Set `from = 0` to include the initial linearisation point in the track plot.
+#' @param type `r lifecycle::badge("experimental")` character; "bru" (default)
+#'   for iterative nonlinear inlabru convergence diagnostics plots, or "inla"
+#'   for INLA optimiser trace plots.
 #' @return A ggplot object with four panels of convergence diagnostics:
 #' - `Tracks`: Mode and linearisation values for each effect
 #' - `Mode - Lin`: Difference between mode and linearisation values for each
@@ -35,14 +38,20 @@
 #' fit <- bru(...)
 #' bru_convergence_plot(fit)
 #' }
-bru_convergence_plot <- function(x, from = 1, to = NULL) {
+bru_convergence_plot <- function(x, from = 1, to = NULL, type = NULL) {
   stopifnot(inherits(x, "bru"))
   x <- bru_check_object_bru(x)
-  make_track_plots(x, from = from, to = to)[["default"]]
+
+  type <- match.arg(type, c("bru", "inla"))
+  if (identical(type, "bru")) {
+    make_bru_track_plots(x, from = from, to = to)[["default"]]
+  } else if (identical(type, "inla")) {
+    make_inla_track_plots(x, from = from, to = to)[["default"]]
+  }
 }
 
 
-make_track_plots <- function(fit, from = 1, to = NULL) {
+make_bru_track_plots <- function(fit, from = 1, to = NULL) {
   needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
   are_installed <-
     vapply(
@@ -637,6 +646,141 @@ make_track_plots <- function(fit, from = 1, to = NULL) {
     relative_change = pl_relative_change,
     change = pl_change,
     default = pl_combined
+  )
+}
+
+make_inla_track_plots <- function(fit, from = 1, to = NULL) {
+  needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
+  are_installed <-
+    vapply(
+      needed,
+      function(x) {
+        requireNamespace(x, quietly = TRUE)
+      },
+      TRUE
+    )
+  if (any(!are_installed)) {
+    stop(
+      paste0(
+        "Needed package(s) ",
+        paste0("'", needed[!are_installed], "'", collapse = ", "),
+        " not installed, but are needed by make_track_plots()"
+      )
+    )
+  }
+
+  track_data <- fit$bru_iinla$inla_track
+  if (!is.null(from)) {
+    stopifnot(is.numeric(from))
+    stopifnot(from >= 0)
+  } else {
+    from <- min(track_data$iteration)
+  }
+  if (!is.null(to)) {
+    stopifnot(is.numeric(to))
+    stopifnot(to >= 0)
+  } else {
+    to <- max(track_data$iteration)
+  }
+
+  colnames(track_data$theta) <- paste0("theta", seq_len(ncol(track_data$theta)))
+  rownames(track_data$theta) <- NULL
+
+  alpha_value_lin_scale <- 0.8
+
+  pl_trace1a <-
+    ggplot2::ggplot(
+      track_data %>%
+        dplyr::filter(.data$iteration >= from, .data$iteration <= to),
+      ggplot2::aes(
+        .data$nfunc_total,
+        .data$f,
+        col = as.factor(.data$iteration)
+      )
+    ) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle("target function value")
+
+  tracks <- cbind(
+    track_data %>%
+      dplyr::select(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+    tibble::as_tibble(track_data$theta)
+  )
+  tracks <- tracks %>%
+    tidyr::pivot_longer(
+      cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+      names_to = "theta",
+      values_to = "value"
+    )
+  pl_trace1b <-
+    ggplot2::ggplot(
+      tracks %>% dplyr::filter(.data$iteration >= from, .data$iteration <= to),
+      ggplot2::aes(
+        .data$nfunc_total,
+        .data$value,
+        col = .data$theta,
+        lty = .data$theta
+      )
+    ) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle("theta values")
+
+  pl_trace1b <-
+    ggplot2::ggplot(
+      tracks,
+      ggplot2::aes(
+        .data$nfunc_total,
+        .data$value,
+        col = .data$theta,
+        lty = .data$theta
+      )
+    ) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle("theta values")
+
+  pl_trace_combined <-
+    (
+      pl_trace1a | pl_trace1b
+      #        ggplot2::guides(linetype = "none", color = "none")
+    ) +
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "bottom")
+
+
+  tr <- track_data %>%
+    dplyr::select(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total)
+  th <- tibble::as_tibble(track_data$theta)
+  tr1 <- cbind(tr[-nrow(tr), ], theta = th[-nrow(tr), ])
+  tr2 <- cbind(tr[-nrow(tr), ], theta = th[-1, ])
+
+  track1 <- tr1 %>% tidyr::pivot_longer(
+    cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+    names_to = "theta",
+    values_to = "value"
+  )
+  track2 <- tr2 %>% tidyr::pivot_longer(
+    cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+    names_to = "theta",
+    values_to = "value"
+  )
+  track1$value_next <- track2$value
+
+  pl_trace2 <-
+    ggplot2::ggplot(
+      track1 %>% dplyr::filter(.data$iteration >= from, .data$iteration <= to)
+    ) +
+    ggplot2::geom_path(ggplot2::aes(.data$value, .data$value_next)) +
+    ggplot2::facet_wrap(~ .data$theta) +
+    ggplot2::ggtitle("theta")
+
+  list(
+    trace1a = pl_trace1a,
+    trace1b = pl_trace1b,
+    trace2 = pl_trace2,
+    default = pl_trace_combined
   )
 }
 

@@ -609,7 +609,7 @@ bru_rerun <- function(result, options = list()) {
     )
   )
 
-  original_timings <- result[["bru_timings"]]
+  orig_timings <- result[["bru_timings"]]
 
   result <- iinla(
     model = info[["model"]],
@@ -619,10 +619,10 @@ bru_rerun <- function(result, options = list()) {
   )
 
   new_timings <- result[["bru_iinla"]][["timings"]]$Iteration >
-    max(original_timings$Iteration)
+    max(orig_timings$Iteration)
   result$bru_timings <-
     rbind(
-      original_timings,
+      orig_timings,
       result[["bru_iinla"]][["timings"]][new_timings, , drop = FALSE]
     )
 
@@ -3412,11 +3412,11 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   inla.options <- bru_options_inla(options)
 
   bru_log_bookmark("iinla")
-  original_timings <- NULL
+  orig_timings <- NULL
   original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
-    if (is.null(original_track)) {
+    if (is.null(orig_track)) {
       track_df <- list()
       for (label in names(states[[1]])) {
         if (length(states[[1]][[label]]) > 0) {
@@ -3431,7 +3431,19 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             )
         }
       }
-      original_track <- do.call(rbind, track_df)
+      orig_track <- do.call(rbind, track_df)
+    }
+
+    if (is.null(orig_inla_track)) {
+      orig_inla_track <- tibble::tibble(
+        iteration = integer(0),
+        f = numeric(0),
+        nfunc = integer(0),
+        nfunc_total = integer(0)
+      )
+      nfunc_offset <- 0L
+    } else {
+      nfunc_offset <- max(orig_inla_track$nfunc_total)
     }
 
     track_names <- if (length(track) > 0) {
@@ -3451,29 +3463,49 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       log = c(original_log, bru_log()["iinla"]),
       states = states,
       inla_stack = stk,
-      track = if (is.null(original_track) ||
-        setequal(names(original_track), track_names)) {
-        do.call(dplyr::bind_rows, c(list(original_track), track))
+      track = if (is.null(orig_track) ||
+        setequal(names(orig_track), track_names)) {
+        do.call(dplyr::bind_rows, c(list(orig_track), track))
       } else {
         track <- do.call(dplyr::bind_rows, track)
-        original_names <- names(original_track)
+        original_names <- names(orig_track)
         new_names <- names(track)
         for (nn in setdiff(new_names, original_names)) {
-          original_track[[nn]] <- NA
+          orig_track[[nn]] <- NA
         }
         for (nn in setdiff(original_names, new_names)) {
           track[[nn]] <- NA
         }
-        dplyr::bind_rows(original_track, track)
+        dplyr::bind_rows(orig_track, track)
+      },
+      inla_track = {
+        offsets <- cumsum(vapply(
+          seq_along(inla_track),
+          function(k) {
+            if (nrow(inla_track[[k]]) > 0) {
+              max(inla_track[[k]]$nfunc)
+            } else {
+              0L
+            }
+          },
+          0L
+        ))
+        offsets <- nfunc_offset + c(0, offsets)
+        for (k in seq_along(inla_track)) {
+          if (nrow(inla_track[[k]]) > 0) {
+            inla_track[[k]]$nfunc_total <- inla_track[[k]]$nfunc + offsets[k]
+          }
+        }
+        dplyr::bind_rows(orig_inla_track, inla_track)
       },
       timings = {
-        iteration_offset <- if (is.null(original_timings)) {
+        iteration_offset <- if (is.null(orig_timings)) {
           0
         } else {
-          max(c(0, original_timings$Iteration), na.rm = TRUE)
+          max(c(0, orig_timings$Iteration), na.rm = TRUE)
         }
         rbind(
-          original_timings,
+          orig_timings,
           data.frame(
             Task = timings$Task[-1],
             Iteration = timings$Iteration[-1] + iteration_offset,
@@ -3567,16 +3599,25 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   # Track variables
   track <- list()
   if (is.null(old.result[["bru_iinla"]][["track"]])) {
-    original_track <- NULL
+    orig_track <- NULL
     track_size <- 0
   } else {
-    original_track <- old.result[["bru_iinla"]][["track"]]
-    track_size <- max(original_track[["iteration"]])
+    orig_track <- old.result[["bru_iinla"]][["track"]]
+    track_size <- max(orig_track[["iteration"]])
+  }
+  inla_track <- list()
+  if (is.null(old.result[["bru_iinla"]][["inla_track"]]) ||
+    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0)) {
+    orig_inla_track <- NULL
+    inla_track_size <- 0
+  } else {
+    orig_inla_track <- old.result[["bru_iinla"]][["inla_track"]]
+    inla_track_size <- max(orig_inla_track[["iteration"]])
   }
 
   # Preserve old timings
   if (!is.null(old.result[["bru_iinla"]][["timings"]])) {
-    original_timings <- old.result[["bru_iinla"]][["timings"]]
+    orig_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
   bru_log_message(
@@ -3924,6 +3965,23 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         sd = Inf
       )
     track[[k]] <- do.call(rbind, track_df)
+
+    if (is.null(result[["misc"]][["opt.trace"]])) {
+      inla_track[[k]] <-
+        tibble::tibble(
+          iteration = integer(0),
+          f = numeric(0),
+          nfunc = integer(0)
+        )
+    } else {
+      inla_track[[k]] <-
+        tibble::tibble(
+          iteration = inla_track_size + k,
+          f = result[["misc"]][["opt.trace"]][["f"]],
+          nfunc = result[["misc"]][["opt.trace"]][["nfunc"]],
+          theta = result[["misc"]][["opt.trace"]][["theta"]]
+        )
+    }
 
     # Only update the linearisation state after the non-final "eb" iterations:
     if (!do_final_integration) {
