@@ -1438,41 +1438,42 @@ make_mapper <- function(subcomp,
     }
     return(bru_mapper_matrix(labels))
   }
-  if (subcomp[["model"]] %in% c("bym", "bym2")) {
-    # No mapper; construct based on input values
-    # Default mapper will be integer or factor indexed, not
-    # interpolated
-    mappers <- list(
-      make_submapper(
-        subcomp_n = subcomp[["n"]],
-        subcomp_values = subcomp[["values"]],
-        input_values = input_values,
-        label = paste0(subcomp[["label"]], " part 1"),
-        subcomp_type = subcomp[["type"]],
-        subcomp_factor_mapping = subcomp[["factor_mapping"]],
-        require_indexed = require_indexed,
-        allow_interpolation = FALSE
-      )
-    )
-    mappers[[2]] <- mappers[[1]]
-    names(mappers) <- c("u", "v")
-    return(bru_mapper_collect(mappers, hidden = TRUE))
+  allow_interpolation <- TRUE
+  inla_model <- INLA::inla.models()[["latent"]][[subcomp[["model"]]]]
+  if (is.null(inla_model) ||
+      !is.integer(inla_model[["aug.factor"]]) ||
+      (inla_model[["aug.factor"]] == 1L)) {
+    mapper_names <- subcomp[["input"]][["label"]]
+    labels <- subcomp[["input"]][["label"]]
+  } else {
+    if (subcomp[["model"]] %in% c("bym", "bym2")) {
+      mapper_names <- c("u", "v")
+      allow_interpolation <- FALSE
+    } else {
+      mapper_names <- paste0("u", seq_len(inla_model[["aug.factor"]]))
+    }
+    labels <- paste0(subcomp[["input"]][["label"]], "_", mapper_names)
   }
 
-  # No mapper; construct based on input values
-  # Interpolation on by default
-  mapper <-
-    make_submapper(
-      subcomp_n = subcomp[["n"]],
-      subcomp_values = subcomp[["values"]],
-      input_values = input_values,
-      label = subcomp[["label"]],
-      subcomp_type = subcomp[["type"]],
-      subcomp_factor_mapping = subcomp[["factor_mapping"]],
-      require_indexed = require_indexed,
-      allow_interpolation = TRUE
-    )
-  return(mapper)
+  mappers <- lapply(labels,
+                    function(lab) {
+                      make_submapper(
+                        subcomp_n = subcomp[["n"]],
+                        subcomp_values = subcomp[["values"]],
+                        input_values = input_values,
+                        label = lab,
+                        subcomp_type = subcomp[["type"]],
+                        subcomp_factor_mapping = subcomp[["factor_mapping"]],
+                        require_indexed = require_indexed,
+                        allow_interpolation = allow_interpolation
+                      )
+                    })
+
+  if (length(mapper_names) > 1L) {
+    names(mappers) <- mapper_names
+    return(bru_mapper_collect(mappers, hidden = TRUE))
+  }
+  return(mappers[[1]])
 }
 
 #' Convert components to R code

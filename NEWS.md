@@ -4,6 +4,8 @@
   multiple mappers, optionally with a single common input (version `2.12.0.9001`)
 * Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
   states for summation of a repeated mapper (version `2.12.0.9001`)
+* Add automated support for INLA models with hidden states, beyond the "bym" and
+  "bym2" models (version `2.12.0.9002`)
 
 # inlabru 2.12.0
 
