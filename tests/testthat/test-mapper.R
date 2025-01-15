@@ -505,6 +505,7 @@ test_that("Collect mapper, direct construction", {
 
 test_that("Collect mapper, automatic construction", {
   skip_on_cran()
+  local_bru_safe_inla()
 
   data <- data.frame(val = 1:3, y = 1:3)
 

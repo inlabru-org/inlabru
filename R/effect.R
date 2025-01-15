@@ -769,7 +769,7 @@ bru_component_list.list <- function(object,
 #' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
-#' if (interactive()) {
+#' if (interactive() && bru_safe_inla()) {
 #' }
 #' }
 #' @rdname add_mappers
@@ -1439,6 +1439,7 @@ make_mapper <- function(subcomp,
     return(bru_mapper_matrix(labels))
   }
   allow_interpolation <- TRUE
+  stopifnot(bru_safe_inla(multicore = TRUE))
   inla_model <- INLA::inla.models()[["latent"]][[subcomp[["model"]]]]
   if (is.null(inla_model) ||
     !is.integer(inla_model[["aug.factor"]]) ||

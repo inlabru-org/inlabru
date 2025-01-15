@@ -1,4 +1,6 @@
 test_that("Component construction: linear model", {
+  local_bru_safe_inla()
+
   df <- data.frame(x = 1:10, response = 1:10)
 
   llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = df)))
@@ -301,6 +303,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
 
 test_that("Component construction: main iid factor construction", {
   skip_on_cran()
+  local_bru_safe_inla()
 
   lik <- bru_obs("gaussian",
     formula = y ~ .,
@@ -328,6 +331,7 @@ test_that("Component construction: main iid factor construction", {
 
 test_that("Component construction: group iid factor construction", {
   skip_on_cran()
+  local_bru_safe_inla()
 
   lik <- bru_obs("gaussian",
     formula = y ~ .,
@@ -363,6 +367,7 @@ test_that("Component construction: group iid factor construction", {
 
 test_that("Component construction: replicate iid factor construction", {
   skip_on_cran()
+  local_bru_safe_inla()
 
   lik <- bru_obs("gaussian",
     formula = y ~ .,
@@ -398,6 +403,8 @@ test_that("Component construction: replicate iid factor construction", {
 
 
 test_that("Component construction: unsafe intercepts", {
+  local_bru_safe_inla()
+
   cmp <- bru_component_list(~ something_unknown - 1)
   lik <- bru_obs(formula = response ~ ., data = data.frame(response = 1:5))
   lik <- bru_used_update(lik, labels = names(cmp))
