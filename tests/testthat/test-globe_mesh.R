@@ -73,7 +73,7 @@ test_that("2D LGCP modelling on the globe", {
   mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_crs("sphere"))
 
   data <- data.frame(
-    Long = rep(seq(0, 360-36, length.out = 10), times = 10),
+    Long = rep(seq(0, 360 * 9 / 10, length.out = 10), times = 10),
     Lat = 180 / pi * asin(rep(
       seq(1 / 90, 89 / 90, length.out = 10)^0.5,
       each = 10
