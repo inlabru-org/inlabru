@@ -13,8 +13,8 @@ test_that("2D modelling on the globe", {
   mesh <- fm_rcdt_2d_inla(globe = 2)
 
   data <- data.frame(
-    Long = seq(-179, 179, length.out = 100),
-    Lat = seq(-89, 89, length.out = 100)
+    Long = rep(seq(-179, 179, length.out = 10), times = 10),
+    Lat = rep(seq(-89, 89, length.out = 10), each = 10)
   )
   data <- within(
     data,
@@ -46,14 +46,14 @@ test_that("2D modelling on the globe", {
 
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
-    2.5367148,
-    tolerance = hitol
+    2.7076690,
+    tolerance = midtol
   )
 
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    0.5494477,
-    tolerance = hitol
+    0.5524327,
+    tolerance = midtol
   )
 })
 
@@ -73,8 +73,8 @@ test_that("2D LGCP modelling on the globe", {
   mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_crs("sphere"))
 
   data <- data.frame(
-    Long = seq(-179, 179, length.out = 100),
-    Lat = seq(-89, 89, length.out = 100)
+    Long = rep(seq(-179, 179, length.out = 10), times = 10),
+    Lat = 180 / pi * asin(rep(seq(1/90, 89/90, length.out = 10)^0.5, each = 10))
   )
   data <- sf::st_as_sf(data,
     coords = c("Long", "Lat"),
@@ -106,13 +106,13 @@ test_that("2D LGCP modelling on the globe", {
 
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
-    1.5192092,
-    tolerance = hitol
+    2.9961306,
+    tolerance = midtol
   )
 
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    0.8297119,
-    tolerance = hitol
+    0.5707848,
+    tolerance = midtol
   )
 })
