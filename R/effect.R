@@ -1441,8 +1441,8 @@ make_mapper <- function(subcomp,
   allow_interpolation <- TRUE
   inla_model <- INLA::inla.models()[["latent"]][[subcomp[["model"]]]]
   if (is.null(inla_model) ||
-      !is.integer(inla_model[["aug.factor"]]) ||
-      (inla_model[["aug.factor"]] == 1L)) {
+    !is.integer(inla_model[["aug.factor"]]) ||
+    (inla_model[["aug.factor"]] == 1L)) {
     mapper_names <- subcomp[["input"]][["label"]]
     labels <- subcomp[["input"]][["label"]]
   } else {
@@ -1455,19 +1455,21 @@ make_mapper <- function(subcomp,
     labels <- paste0(subcomp[["input"]][["label"]], "_", mapper_names)
   }
 
-  mappers <- lapply(labels,
-                    function(lab) {
-                      make_submapper(
-                        subcomp_n = subcomp[["n"]],
-                        subcomp_values = subcomp[["values"]],
-                        input_values = input_values,
-                        label = lab,
-                        subcomp_type = subcomp[["type"]],
-                        subcomp_factor_mapping = subcomp[["factor_mapping"]],
-                        require_indexed = require_indexed,
-                        allow_interpolation = allow_interpolation
-                      )
-                    })
+  mappers <- lapply(
+    labels,
+    function(lab) {
+      make_submapper(
+        subcomp_n = subcomp[["n"]],
+        subcomp_values = subcomp[["values"]],
+        input_values = input_values,
+        label = lab,
+        subcomp_type = subcomp[["type"]],
+        subcomp_factor_mapping = subcomp[["factor_mapping"]],
+        require_indexed = require_indexed,
+        allow_interpolation = allow_interpolation
+      )
+    }
+  )
 
   if (length(mapper_names) > 1L) {
     names(mappers) <- mapper_names
