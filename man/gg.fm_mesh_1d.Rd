@@ -2,18 +2,9 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.fm_mesh_1d}
 \alias{gg.fm_mesh_1d}
-\alias{gg.inla.mesh.1d}
 \title{Geom for fm_mesh_1d objects}
 \usage{
 \method{gg}{fm_mesh_1d}(
-  data,
-  mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
-  y = 0,
-  shape = 4,
-  ...
-)
-
-\method{gg}{inla.mesh.1d}(
   data,
   mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
   y = 0,
@@ -42,12 +33,6 @@ This function generates a \code{geom_point} object showing the knots (vertices)
 of a 1D mesh.
 Requires the \code{ggplot2} package.
 }
-\section{Functions}{
-\itemize{
-\item \code{gg(inla.mesh.1d)}: Alias for \code{gg.fm_mesh_1d}, supporting
-\code{inla.mesh.1d} objects.
-
-}}
 \examples{
 \donttest{
 if (require("fmesher", quietly = TRUE) &&

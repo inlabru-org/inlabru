@@ -5,7 +5,6 @@
 \alias{glplot.SpatialPoints}
 \alias{glplot.SpatialLines}
 \alias{glplot.fm_mesh_2d}
-\alias{glplot.inla.mesh}
 \title{Render objects using RGL}
 \usage{
 glplot(object, ...)
@@ -15,13 +14,11 @@ glplot(object, ...)
 \method{glplot}{SpatialLines}(object, add = TRUE, ...)
 
 \method{glplot}{fm_mesh_2d}(object, add = TRUE, col = NULL, ...)
-
-\method{glplot}{inla.mesh}(object, add = TRUE, col = NULL, ...)
 }
 \arguments{
 \item{object}{an object used to select a method.}
 
-\item{...}{Parameters passed on to plot_rgl.fm_mesh_2d()}
+\item{...}{Parameters passed on to \code{plot_rgl.fm_mesh_2d()}}
 
 \item{add}{If TRUE, add the points to an existing plot. If FALSE, create new
 plot.}
@@ -45,7 +42,7 @@ the points provided and use points3d() in order to render them.
 the lines provided and use \code{lines3d()} in order to render them.
 
 \item \code{glplot(fm_mesh_2d)}: This function transforms the mesh to 3D cartesian
-coordinates and uses \code{inla.plot.mesh()} with \code{rgl=TRUE} to plot the result.
+coordinates and uses \code{\link[fmesher:plot_rgl]{fmesher::plot_rgl()}} to plot the result.
 
 }}
 \examples{
@@ -62,7 +59,7 @@ if (interactive() &&
   mexdolphin <- inlabru::mexdolphin_sp()
 
   # Add mesh, ship transects and dolphin sightings stored
-  # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
+  # as fm_mesh_2d, SpatialLines and SpatialPoints objects, respectively
 
   glplot(mexdolphin$mesh, alpha = 0.2)
   glplot(mexdolphin$samplers, lwd = 5)

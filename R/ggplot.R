@@ -998,17 +998,6 @@ gg.fm_mesh_1d <- function(data,
   ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
 
-#' @describeIn gg.fm_mesh_2d Alias for `gg.fm_mesh_2d`, supporting `inla.mesh`
-#' objects.
-#' @export
-gg.inla.mesh <- gg.fm_mesh_2d
-
-#' @describeIn gg.fm_mesh_1d Alias for `gg.fm_mesh_1d`, supporting
-#' `inla.mesh.1d` objects.
-#' @export
-gg.inla.mesh.1d <- gg.fm_mesh_1d
-
-
 
 #' Geom for RasterLayer objects
 #'
