@@ -72,18 +72,18 @@ add_mappers <- function(...) {
 #' fixed effect models. For instance, the components specification `y ~ x` will
 #' define the linear combination of an effect named `x` and an intercept to the
 #' response `y` with respect to the likelihood family stated when calling
-#' [bru()]. Mathematically, the linear predictor \eqn{\eta} would be written
-#' down as
+#' [bru()]. Mathematically, the linear predictor \eqn{\eta}{eta} would be
+#' written as
 #'
-#' \deqn{\eta = \beta * x + c,}
+#' \deqn{\eta = \beta x + c,}{eta = beta * x + c,}
 #'
 #' where:
 #'
 #' \describe{
-#' \item{\eqn{c}}{is the *intercept*}
-#' \item{\eqn{x}}{is a *covariate*}
-#' \item{\eqn{\beta}}{is a *latent variable* associated with \eqn{x} and}
-#' \item{\eqn{\psi = \beta * x}}{ is called the *effect* of \eqn{x}}
+#' \item{\eqn{c}{c}}{is the *intercept*}
+#' \item{\eqn{x}{x}}{is a *covariate*}
+#' \item{\eqn{\beta}{beta}}{is a *latent variable* associated with \eqn{x}{x} and}
+#' \item{\eqn{\psi = \beta x}{psi = beta * x}}{ is called the *effect* of \eqn{x}{x}}
 #' }
 #'
 #' A problem that arises when using this kind of R formula is that it does not

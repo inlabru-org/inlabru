@@ -132,18 +132,18 @@ As shorthand, \code{\link[=bru]{bru()}} will understand basic additive formulae 
 fixed effect models. For instance, the components specification \code{y ~ x} will
 define the linear combination of an effect named \code{x} and an intercept to the
 response \code{y} with respect to the likelihood family stated when calling
-\code{\link[=bru]{bru()}}. Mathematically, the linear predictor \eqn{\eta} would be written
-down as
+\code{\link[=bru]{bru()}}. Mathematically, the linear predictor \eqn{\eta}{eta} would be
+written as
 
-\deqn{\eta = \beta * x + c,}
+\deqn{\eta = \beta x + c,}{eta = beta * x + c,}
 
 where:
 
 \describe{
-\item{\eqn{c}}{is the \emph{intercept}}
-\item{\eqn{x}}{is a \emph{covariate}}
-\item{\eqn{\beta}}{is a \emph{latent variable} associated with \eqn{x} and}
-\item{\eqn{\psi = \beta * x}}{ is called the \emph{effect} of \eqn{x}}
+\item{\eqn{c}{c}}{is the \emph{intercept}}
+\item{\eqn{x}{x}}{is a \emph{covariate}}
+\item{\eqn{\beta}{beta}}{is a \emph{latent variable} associated with \eqn{x}{x} and}
+\item{\eqn{\psi = \beta x}{psi = beta * x}}{ is called the \emph{effect} of \eqn{x}{x}}
 }
 
 A problem that arises when using this kind of R formula is that it does not

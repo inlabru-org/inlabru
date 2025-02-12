@@ -145,7 +145,7 @@ auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
 }
 }}
 
-\item{used}{Wither \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
+\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
 the \code{include}, \code{exclude}, \code{include_latent} arguments.
 When \code{used} is \code{NULL} (default), the information about what effects and
 latent vectors are made available to the predictor evaluation is defined by

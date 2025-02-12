@@ -93,7 +93,7 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #'
 #' @param x An object that contains information about used components
 #' @param effect character; components used as effects. When `NULL`, auto-detect
-#' components to include or include all components.
+#' components to include all components in a predictor expression.
 #' @param effect_exclude character; components to specifically exclude from
 #' effect evaluation. When `NULL`, do not specifically exclude any components.
 #' @param latent character; components used as `_latent` or `_eval()`. When
@@ -107,6 +107,31 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' @returns A `bru_used` object (a list with elements `effect`
 #' and `latent`), or a list of such objects
 #' (for methods with `join = FALSE`)
+#'
+#' @details
+#' The arguments `effect`, `effect_exclude`, and `latent` control what
+#' components and effects are available for use in predictor expressions.
+#' \describe{
+#'   \item{`effect`}{
+#'   Character vector of component labels that are used as effects
+#'   by the predictor expression; If `NULL` (default), the names
+#'   are extracted from the formula.
+#'   }
+#'   \item{`exclude`}{
+#'   Character vector of component labels to be excluded from the effect list
+#'   even if they have been auto-detected as being necessary.
+#'   Default is `NULL`; do not remove any components from the inclusion list.
+#'   }
+#'   \item{`include_latent`}{Character vector.
+#'   Specifies which latent state variables need to be directly available to the
+#'   predictor expression, with a `_latent` suffix. This also makes evaluator
+#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
+#'   and `replicate`, taking values for where to evaluate the component effect
+#'   that are different than those defined in the component definition itself
+#'   (see [bru_component_eval()]). If `NULL`, the use of `_latent` and `_eval`
+#'   in the predictor expression is detected automatically.
+#'   }
+#' }
 #'
 #' @examples
 #' (used <- bru_used(~.))

@@ -73,7 +73,7 @@ bru_used(x = NULL, ...)
 \item{...}{Parameters passed on to the other methods}
 
 \item{effect}{character; components used as effects. When \code{NULL}, auto-detect
-components to include or include all components.}
+components to include all components in a predictor expression.}
 
 \item{effect_exclude}{character; components to specifically exclude from
 effect evaluation. When \code{NULL}, do not specifically exclude any components.}
@@ -96,6 +96,31 @@ and \code{latent}), or a list of such objects
 Create or extract information about which components are used by a model, or
 its individual observation models. If a non-NULL \code{labels} argument is
 supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \code{bru_used} objects.
+}
+\details{
+The arguments \code{effect}, \code{effect_exclude}, and \code{latent} control what
+components and effects are available for use in predictor expressions.
+\describe{
+\item{\code{effect}}{
+Character vector of component labels that are used as effects
+by the predictor expression; If \code{NULL} (default), the names
+are extracted from the formula at a later stage.
+}
+\item{\code{exclude}}{
+Character vector of component labels to be excluded from the effect list
+even if they have been auto-detected as being necessary.
+Default is \code{NULL}; do not remove any components from the inclusion list.
+}
+\item{\code{include_latent}}{Character vector.
+Specifies which latent state variables need to be directly available to the
+predictor expression, with a \verb{_latent} suffix. This also makes evaluator
+functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
+and \code{replicate}, taking values for where to evaluate the component effect
+that are different than those defined in the component definition itself
+(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
+in the predictor expression is detected automatically at a later stage.
+}
+}
 }
 \section{Methods (by class)}{
 \itemize{

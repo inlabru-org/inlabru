@@ -901,7 +901,7 @@ extended_bind_rows <- function(...) {
 #'   auto-detects use of `_latent` and `_eval` in the predictor expression.
 #'   }
 #' }
-#' @param used Wither `NULL` (default) or a [bru_used()] object, that overrides
+#' @param used Either `NULL` (default) or a [bru_used()] object, that overrides
 #' the `include`, `exclude`, `include_latent` arguments.
 #' When `used` is `NULL` (default), the information about what effects and
 #' latent vectors are made available to the predictor evaluation is defined by
