@@ -878,29 +878,6 @@ extended_bind_rows <- function(...) {
 #'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
 #'   overrides `domain` and `samplers`.}
 #' }
-#' @param include,exclude,include_latent Arguments controlling what components
-#'   and effects are available for use in the predictor expression.
-#' \describe{
-#'   \item{`include`}{
-#'   Character vector of component labels that are used as effects
-#'   by the predictor expression; If `NULL` (default), the [bru_used()]
-#'   method is used to extract the variable names from the formula.
-#'   }
-#'   \item{`exclude`}{
-#'   Character vector of component labels to be excluded from the effect list
-#'   determined by the `include` argument. Default is `NULL`; do not remove
-#'   any components from the inclusion list.
-#'   }
-#'   \item{`include_latent`}{Character vector.
-#'   Specifies which latent state variables are directly available to the
-#'   predictor expression, with a `_latent` suffix. This also makes evaluator
-#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
-#'   and `replicate`, taking values for where to evaluate the component effect
-#'   that are different than those defined in the component definition itself
-#'   (see [bru_component_eval()]). If `NULL`, the [bru_used()] method
-#'   auto-detects use of `_latent` and `_eval` in the predictor expression.
-#'   }
-#' }
 #' @param used Either `NULL` (default) or a [bru_used()] object, that overrides
 #' the `include`, `exclude`, `include_latent` arguments.
 #' When `used` is `NULL` (default), the information about what effects and
@@ -925,6 +902,32 @@ extended_bind_rows <- function(...) {
 #' @param .envir The evaluation environment to use for special arguments (`E`,
 #'   `Ntrials`, `weights`, and `scale`) if not found in `response_data` or
 #'   `data`. Defaults to the calling environment.
+#' @param include,exclude,include_latent `r lifecycle::badge("deprecated")`, use
+#'   `used` instead.
+#'
+#'   Arguments controlling what components
+#'   and effects are available for use in the predictor expression.
+#' \describe{
+#'   \item{`include`}{
+#'   Character vector of component labels that are used as effects
+#'   by the predictor expression; If `NULL` (default), the [bru_used()]
+#'   method is used to extract the variable names from the formula.
+#'   }
+#'   \item{`exclude`}{
+#'   Character vector of component labels to be excluded from the effect list
+#'   determined by the `include` argument. Default is `NULL`; do not remove
+#'   any components from the inclusion list.
+#'   }
+#'   \item{`include_latent`}{Character vector.
+#'   Specifies which latent state variables are directly available to the
+#'   predictor expression, with a `_latent` suffix. This also makes evaluator
+#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
+#'   and `replicate`, taking values for where to evaluate the component effect
+#'   that are different than those defined in the component definition itself
+#'   (see [bru_component_eval()]). If `NULL`, the [bru_used()] method
+#'   auto-detects use of `_latent` and `_eval` in the predictor expression.
+#'   }
+#' }
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #' @seealso [bru_response_size()], [bru_used()], [bru_component()],
@@ -942,15 +945,15 @@ bru_obs <- function(formula = . ~ .,
                     domain = NULL,
                     samplers = NULL,
                     ips = NULL,
-                    include = NULL,
-                    exclude = NULL,
-                    include_latent = NULL,
                     used = NULL,
                     allow_combine = NULL,
                     control.family = NULL,
                     tag = NULL,
                     options = list(),
-                    .envir = parent.frame()) {
+                    .envir = parent.frame(),
+                    include = deprecated(),
+                    exclude = deprecated(),
+                    include_latent = deprecated()) {
   options <- bru_call_options(options)
 
   # Some defaults
@@ -1287,12 +1290,54 @@ bru_obs <- function(formula = . ~ .,
   }
 
   if (is.null(used)) {
-    used <- bru_used(
-      formula,
-      effect = include,
-      effect_exclude = exclude,
-      latent = include_latent
-    )
+    if (lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)) {
+      if (!lifecycle::is_present(include)) {
+        include <- NULL
+      } else {
+        lifecycle::deprecate_warn(
+          "2.11.0",
+          "bru_obs(include)",
+          "bru_obs(used)",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      }
+      if (!lifecycle::is_present(exclude)) {
+        exclude <- NULL
+      } else {
+        lifecycle::deprecate_warn(
+          "2.11.0",
+          "bru_obs(exclude)",
+          "bru_obs(used)",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      }
+      if (!lifecycle::is_present(include_latent)) {
+        include_latent <- NULL
+      } else {
+        lifecycle::deprecate_warn(
+          "2.11.0",
+          "bru_obs(include_latent)",
+          "bru_obs(used)",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      }
+      used <- bru_used(
+        formula,
+        effect = include,
+        effect_exclude = exclude,
+        latent = include_latent
+      )
+    } else {
+      used <- bru_used(formula)
+    }
   }
 
   # The likelihood object that will be returned
@@ -1340,16 +1385,16 @@ like <- function(formula = . ~ .,
                  domain = NULL,
                  samplers = NULL,
                  ips = NULL,
-                 include = NULL,
-                 exclude = NULL,
-                 include_latent = NULL,
                  used = NULL,
                  allow_combine = NULL,
                  control.family = NULL,
                  tag = NULL,
                  options = list(),
                  .envir = parent.frame(),
-                 mesh = deprecated()) {
+                 mesh = deprecated(),
+                 include = deprecated(),
+                 exclude = deprecated(),
+                 include_latent = deprecated()) {
   # lifecycle::deprecate_soft(
   #   "2.11.1.9026",
   #   "like()",
@@ -2094,24 +2139,15 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
-#' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: the result of `[all.vars()]` on the
-#'   predictor expression, unless the expression is not ".", in which case
-#'   `include=NULL`, to include all components that are not
-#'   explicitly excluded. The [bru_used()] methods are used
-#'   to extract the variable names, followed by removal of non-component names
-#'   when the components are available.
-#' @param exclude Character vector of component labels that are not used by the
-#'   predictor expression. The exclusion list is applied to the list
-#'   as determined by the `include` parameter; Default: NULL (do not remove
-#'   any components from the inclusion list)
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and
-#'   `exclude`. Default `NULL`
+#' @param used Either `NULL` or a [bru_used()] object.
+#'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and
 #'   the prediciton summary has the same number of rows as `newdata`, then the
 #'   output is a `Spatial*DataFrame` object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample()`
 #' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
+#' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
+#' of used variables fails, use `used` instead.
 #' @details
 #' In addition to the component names (that give the effect of each component
 #' evaluated for the input data), the suffix `_latent` variable name can be used
@@ -2136,12 +2172,12 @@ predict.bru <- function(object,
                         seed = 0L,
                         probs = c(0.025, 0.5, 0.975),
                         num.threads = NULL,
-                        include = NULL,
-                        exclude = NULL,
                         used = NULL,
                         drop = FALSE,
                         ...,
-                        data = deprecated()) {
+                        data = deprecated(),
+                        include = deprecated(),
+                        exclude = deprecated()) {
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
@@ -2301,18 +2337,12 @@ predict.bru <- function(object,
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
 #' When seed != 0, overridden to "1:1"
-#' @param include Character vector of component labels that are needed by the
-#'   predictor expression; Default: NULL (include all components that are not
-#'   explicitly excluded) if `newdata` is provided, otherwise `character(0)`.
-#' @param exclude Character vector of component labels that are not used by the
-#'   predictor expression. The exclusion list is applied to the list
-#'   as determined by the `include` parameter; Default: NULL (do not remove
-#'   any components from the inclusion list)
-#' @param used Either `NULL` or a [bru_used()] object, overriding `include` and
-#'   `exclude`.
+#' @param used Either `NULL` or a [bru_used()] object.
+#'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param ... additional, unused arguments.
-#' @param data Deprecated. Use `newdata` instead.
-#' sampling.
+#' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
+#' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
+#' of used variables fails, use `used` instead.
 #' @details
 #' In addition to the component names (that give the effect of each component
 #' evaluated for the input data), the suffix `_latent` variable name can be used
@@ -2335,11 +2365,11 @@ generate.bru <- function(object,
                          n.samples = 100,
                          seed = 0L,
                          num.threads = NULL,
-                         include = NULL,
-                         exclude = NULL,
                          used = NULL,
                          ...,
-                         data = deprecated()) {
+                         data = deprecated(),
+                         include = deprecated(),
+                         exclude = deprecated()) {
   object <- bru_check_object_bru(object)
   if (lifecycle::is_present(data)) {
     if (is.null(newdata)) {
@@ -2396,11 +2426,32 @@ generate.bru <- function(object,
     # TODO: clarify the output format, and use the format parameter
 
     if (is.null(used)) {
-      if (is.null(include)) {
-        include <- bru_used_vars(formula)
+      if (lifecycle::is_present(include)) {
+        lifecycle::deprecate_soft(
+          "2.12.0.9003",
+          "bru_obs(include)",
+          "bru_obs(used)",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      } else {
+        include <- NULL
+      }
+      if (lifecycle::is_present(exclude)) {
+        lifecycle::deprecate_soft(
+          "2.12.0.9003",
+          "bru_obs(include)",
+          "bru_obs(used)",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      } else {
+        exclude <- NULL
       }
       used <-
         bru_used(
+          formula,
           effect = if (is.null(newdata) &&
             is.null(include)) {
             character(0)
@@ -2408,10 +2459,10 @@ generate.bru <- function(object,
             include
           },
           effect_exclude = exclude,
-          latent = NULL,
-          labels = names(object$bru_info$model$effects)
+          latent = NULL
         )
     }
+    used <- bru_used_update(used, labels = names(object$bru_info$model$effects))
 
     vals <- evaluate_model(
       model = object$bru_info$model,

@@ -142,8 +142,9 @@ where:
 \describe{
 \item{\eqn{c}{c}}{is the \emph{intercept}}
 \item{\eqn{x}{x}}{is a \emph{covariate}}
-\item{\eqn{\beta}{beta}}{is a \emph{latent variable} associated with \eqn{x}{x} and}
-\item{\eqn{\psi = \beta x}{psi = beta * x}}{ is called the \emph{effect} of \eqn{x}{x}}
+\item{\eqn{\beta}{beta}}{is a \emph{latent variable} associated with \eqn{x}{x}
+and} \item{\eqn{\psi = \beta x}{psi = beta * x}}{ is called the \emph{effect} of
+\eqn{x}{x}}
 }
 
 A problem that arises when using this kind of R formula is that it does not

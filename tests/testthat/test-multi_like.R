@@ -10,7 +10,7 @@ test_that("Multiple likelihoods: basic model", {
       x = rep(c(1, 1.5, 2, 3, 4), 2),
       y = rep(c(11, 12, 13, 14, 12), 2) + rnorm(10, sd = 0.05)
     ),
-    include = c("int1", "effect"),
+    used = bru_used(effect = c("int1", "effect")),
     # Checks that control.family is handled
     control.family = list(hyper = list(prec = list(fixed = TRUE)))
   )
@@ -20,7 +20,7 @@ test_that("Multiple likelihoods: basic model", {
       x = c(2, 2.5, 3, 4, 5),
       y = ceiling(exp(c(13, 13.5, 14, 12, 12) - 10))
     ),
-    include = c("int2", "effect")
+    used = bru_used(effect = c("int2", "effect"))
   )
 
   cmp1 <- bru_component_list(~ effect(x, model = "rw2", scale.model = TRUE) - 1)

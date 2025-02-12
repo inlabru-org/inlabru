@@ -237,10 +237,11 @@ test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  lik <- bru_obs("gaussian",
+  lik <- bru_obs(
+    "gaussian",
     formula = y ~ .,
     data = data.frame(x = c(1, 1.5, 2, NA, 4), y = 11:15),
-    include = "effect"
+    used = bru_used(effect = "effect")
   )
 
   cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
@@ -308,7 +309,7 @@ test_that("Component construction: main iid factor construction", {
   lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
-    include = "effect"
+    used = bru_used(effect = "effect")
   )
 
   cmp1 <- bru_component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
@@ -336,7 +337,7 @@ test_that("Component construction: group iid factor construction", {
   lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
-    include = "effect"
+    used = bru_used(effect = "effect")
   )
 
   cmp1 <- bru_component_list(
@@ -372,7 +373,7 @@ test_that("Component construction: replicate iid factor construction", {
   lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = data.frame(x = as.factor(c(1, 1.5, 2, 3, 4)), y = 11:15),
-    include = "effect"
+    used = bru_used(effect = "effect")
   )
 
   cmp1 <- bru_component_list(

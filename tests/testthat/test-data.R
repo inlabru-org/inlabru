@@ -8,7 +8,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
   lik <- bru_obs("gaussian",
     formula = y ~ .,
     data = list(x = c(1, 1.5, 2, NA, 3, 4), y = 11:15),
-    include = "effect",
+    used = bru_used(effect = "effect"),
     allow_combine = TRUE
   )
 

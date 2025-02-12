@@ -75,6 +75,9 @@ bru_used_update.bru_used <- function(x, labels, ...) {
       exclude = used[["effect_exclude"]]
     )
   used[["effect_exclude"]] <- NULL
+  if (is.null(used[["latent"]])) {
+    used$latent <- character(0)
+  }
   used$latent <-
     parse_inclusion(
       labels,

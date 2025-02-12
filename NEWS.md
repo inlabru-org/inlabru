@@ -6,6 +6,8 @@
   states for summation of a repeated mapper (version `2.12.0.9001`)
 * Add automated support for INLA models with hidden states, beyond the "bym" and
   "bym2" models (version `2.12.0.9002`)
+* Deprecate the `include` and `exclude` arguments to `predict()` and
+  `generate()` (version `2.12.0.9003`)
 
 # inlabru 2.12.0
 

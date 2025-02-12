@@ -24,15 +24,15 @@ bru_obs(
   domain = NULL,
   samplers = NULL,
   ips = NULL,
-  include = NULL,
-  exclude = NULL,
-  include_latent = NULL,
   used = NULL,
   allow_combine = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
-  .envir = parent.frame()
+  .envir = parent.frame(),
+  include = deprecated(),
+  exclude = deprecated(),
+  include_latent = deprecated()
 )
 
 like(
@@ -47,16 +47,16 @@ like(
   domain = NULL,
   samplers = NULL,
   ips = NULL,
-  include = NULL,
-  exclude = NULL,
-  include_latent = NULL,
   used = NULL,
   allow_combine = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
-  mesh = deprecated()
+  mesh = deprecated(),
+  include = deprecated(),
+  exclude = deprecated(),
+  include_latent = deprecated()
 )
 
 bru_like_list(...)
@@ -121,30 +121,6 @@ to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}
 
-\item{include, exclude, include_latent}{Arguments controlling what components
-and effects are available for use in the predictor expression.
-\describe{
-\item{\code{include}}{
-Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
-method is used to extract the variable names from the formula.
-}
-\item{\code{exclude}}{
-Character vector of component labels to be excluded from the effect list
-determined by the \code{include} argument. Default is \code{NULL}; do not remove
-any components from the inclusion list.
-}
-\item{\code{include_latent}}{Character vector.
-Specifies which latent state variables are directly available to the
-predictor expression, with a \verb{_latent} suffix. This also makes evaluator
-functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
-and \code{replicate}, taking values for where to evaluate the component effect
-that are different than those defined in the component definition itself
-(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
-auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
-}
-}}
-
 \item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
 the \code{include}, \code{exclude}, \code{include_latent} arguments.
 When \code{used} is \code{NULL} (default), the information about what effects and
@@ -174,6 +150,33 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \item{.envir}{The evaluation environment to use for special arguments (\code{E},
 \code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
 \code{data}. Defaults to the calling environment.}
+
+\item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
+\code{used} instead.
+
+Arguments controlling what components
+and effects are available for use in the predictor expression.
+\describe{
+\item{\code{include}}{
+Character vector of component labels that are used as effects
+by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
+method is used to extract the variable names from the formula.
+}
+\item{\code{exclude}}{
+Character vector of component labels to be excluded from the effect list
+determined by the \code{include} argument. Default is \code{NULL}; do not remove
+any components from the inclusion list.
+}
+\item{\code{include_latent}}{Character vector.
+Specifies which latent state variables are directly available to the
+predictor expression, with a \verb{_latent} suffix. This also makes evaluator
+functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
+and \code{replicate}, taking values for where to evaluate the component effect
+that are different than those defined in the component definition itself
+(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
+auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
+}
+}}
 
 \item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
 

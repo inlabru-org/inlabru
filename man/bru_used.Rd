@@ -104,7 +104,7 @@ components and effects are available for use in predictor expressions.
 \item{\code{effect}}{
 Character vector of component labels that are used as effects
 by the predictor expression; If \code{NULL} (default), the names
-are extracted from the formula at a later stage.
+are extracted from the formula.
 }
 \item{\code{exclude}}{
 Character vector of component labels to be excluded from the effect list
@@ -118,7 +118,7 @@ functions with suffix \verb{_eval} available, taking parameters \code{main}, \co
 and \code{replicate}, taking values for where to evaluate the component effect
 that are different than those defined in the component definition itself
 (see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
-in the predictor expression is detected automatically at a later stage.
+in the predictor expression is detected automatically.
 }
 }
 }

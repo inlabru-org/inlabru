@@ -26,14 +26,12 @@ test_that("bru: inla copy feature", {
     bru_obs(
       y ~ Intercept + exp(myLin1),
       family = "gaussian",
-      data = df1,
-      exclude = "myLin2"
+      data = df1
     ),
     bru_obs(
       y ~ Intercept + (myLin2),
       family = "gaussian",
-      data = df2,
-      exclude = "myLin1"
+      data = df2
     ),
     options = list(control.inla = list(int.strategy = "eb"))
   )

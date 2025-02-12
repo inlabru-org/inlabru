@@ -12,12 +12,12 @@
   seed = 0L,
   probs = c(0.025, 0.5, 0.975),
   num.threads = NULL,
-  include = NULL,
-  exclude = NULL,
   used = NULL,
   drop = FALSE,
   ...,
-  data = deprecated()
+  data = deprecated(),
+  include = deprecated(),
+  exclude = deprecated()
 )
 }
 \arguments{
@@ -44,21 +44,8 @@ passed to \code{stats::quantile}}
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
-\item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: the result of \verb{[all.vars()]} on the
-predictor expression, unless the expression is not ".", in which case
-\code{include=NULL}, to include all components that are not
-explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
-to extract the variable names, followed by removal of non-component names
-when the components are available.}
-
-\item{exclude}{Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)}
-
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and
-\code{exclude}. Default \code{NULL}}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
+Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 
 \item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and
 the prediciton summary has the same number of rows as \code{newdata}, then the
@@ -67,6 +54,9 @@ output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 
 \item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
+
+\item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
+of used variables fails, use \code{used} instead.}
 }
 \value{
 a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values
