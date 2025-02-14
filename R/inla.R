@@ -553,10 +553,9 @@ variables.inla <- function(result, include.random = TRUE) {
       df <- as.data.frame(matrix(NA, nrow(data), length(missing.names),
         dimnames = list(NULL, missing.names)
       ))
-      return(cbind(data, df))
-    } else {
-      return(data)
+      data <- dplyr::bind_cols(data, df)
     }
+    data
   }
 
   handle.data.frame <- function(data, type, model, col.names) {

@@ -51,7 +51,7 @@ import.shrimp <- function() {
   # Final shrimp object
   shrimp <- list(hauls = gamba1, mesh = mesh)
 
-  return(shrimp)
+  shrimp
 }
 
 # shrimp <- import.shrimp()

@@ -23,7 +23,7 @@ makepoly <- function(start, width, height) {
     ),
     ncol = 2, byrow = TRUE
   )
-  return(sp::Polygon(poly))
+  sp::Polygon(poly)
 }
 
 #' @title Create a plot sample.
@@ -216,5 +216,5 @@ point2count <- function(plots, dets) {
     data = data.frame(n = count, area = plotarea),
     proj4string = sp::CRS(as.character(sp::proj4string(plots)))
   )
-  return(plotcounts)
+  plotcounts
 }

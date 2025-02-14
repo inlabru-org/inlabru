@@ -424,7 +424,7 @@ f.elev <- function(where) {
   # if (any(is.na(v))) {
   #   v <- bru_fill_missing(elev, where, v)
   # }
-  return(v)
+  v
 }
 ```
 

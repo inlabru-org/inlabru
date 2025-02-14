@@ -236,12 +236,10 @@ ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
     n_rep = mapper[["n_rep"]],
     interleaved = mapper[["interleaved"]]
   )
-  return(
-    ibm_invalid_output(
-      mapper[["mapper"]],
-      input = input,
-      state = state[idx$offsets[1] + idx$index]
-    )
+  ibm_invalid_output(
+    mapper[["mapper"]],
+    input = input,
+    state = state[idx$offsets[1] + idx$index]
   )
 }
 

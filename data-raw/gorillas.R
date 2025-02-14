@@ -109,7 +109,7 @@ import_gorillas_sp <- function() {
     gorillas$gcov[[k]] <- pxl
   }
 
-  return(gorillas)
+  gorillas
 }
 
 

@@ -1349,7 +1349,7 @@ bru_get_mapper <- function(model, ...) {
 #' which is assumed to be of a class supporting relevant `fmesher` methods.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  return(bru_mapper_fmesher(model[["mesh"]]))
+  bru_mapper_fmesher(model[["mesh"]])
 }
 
 #' @describeIn bru_get_mapper Returns the mapper given by a call to
@@ -2232,9 +2232,8 @@ input_eval.bru_input <- function(input, data, env = NULL,
           immediate. = TRUE
         )
       }
-      return(val)
     }
-    return(val)
+    val
   }
 
   e_input <- handle_problems(e_input)

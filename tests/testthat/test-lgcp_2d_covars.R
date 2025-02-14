@@ -79,7 +79,7 @@ test_that("2D LGCP fitting", {
     )
     v <- sp::over(spp, elev)
     v[is.na(v)] <- 0 # NAs are a problem! Remove them
-    return(v$elevation)
+    v$elevation
   }
 
   mdl3 <- coordinates ~ beta.elev(

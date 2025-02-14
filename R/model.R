@@ -96,7 +96,7 @@ bru_model <- function(components, lhoods) {
     list(effects = components, formula = formula),
     class = "bru_model"
   )
-  return(mdl)
+  mdl
 }
 
 
