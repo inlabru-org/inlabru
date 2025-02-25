@@ -206,6 +206,8 @@ component <- function(...) {
 #' (Default: NULL, for auto-determination)
 #' @param season.length Passed on to `INLA::f()` for model `"seasonal"`
 #' (TODO: check if this parameter is still fully handled)
+#' @param nrow,ncol Number of rows and columns for `model` types
+#'  "rw2d", "rw2diid", and "matern2d". Default is `NULL`.
 # Copy feature
 #' @param copy character; label of other component that this component should
 #' be a copy of. If the `fixed = FALSE`, a scaling constant is estimated, via a
@@ -276,6 +278,8 @@ bru_component.character <- function(object,
                                     n = NULL,
                                     values = NULL,
                                     season.length = NULL,
+                                    nrow = NULL,
+                                    ncol = NULL,
                                     # Copy feature
                                     copy = NULL,
                                     # Weights
@@ -383,7 +387,9 @@ bru_component.character <- function(object,
       model = model,
       n = n,
       values = values,
-      season.length = season.length
+      season.length = season.length,
+      nrow = nrow,
+      ncol = ncol
     ),
     group = bru_subcomponent(
       input = bru_input(
@@ -527,13 +533,18 @@ bru_component.character <- function(object,
       # These values were previously initialised by an INLA::f call, but ::f
       # should only be called by INLA, and never by inlabru, since it sets up
       # temporary files that will not be removed, and also requires data not
-      # available at this point!  Until multi-stage model initialisation is
-      # implemented, require the user to explicitly provide these values.
-      if (!is.null(component$main$n)) {
+      # available at this point!
+      if (!is.null(component$main[["n"]])) {
         fcall[["n"]] <- component$main$n
       }
       if (!is.null(season.length)) {
         fcall[["season.length"]] <- season.length
+      }
+      if (!is.null(component$main[["nrow"]])) {
+        fcall[["nrow"]] <- component$main$nrow
+      }
+      if (!is.null(component$main[["ncol"]])) {
+        fcall[["ncol"]] <- component$main$ncol
       }
 
       # Make sure 'values' is setup properly.
@@ -927,7 +938,9 @@ bru_subcomponent <- function(input = NULL,
                              model = NULL,
                              n = NULL,
                              values = NULL,
-                             season.length = NULL) {
+                             season.length = NULL,
+                             nrow = NULL,
+                             ncol = NULL) {
   type <- model
   factor_mapping <- NULL
   if (inherits(model, "inla.spde")) {
@@ -936,14 +949,6 @@ bru_subcomponent <- function(input = NULL,
     type <- "rgeneric"
   } else if (inherits(model, "inla.cgeneric")) {
     type <- "cgeneric"
-  } else if (inherits(
-    model,
-    c(
-      "clinear", "sigm", "revsigm",
-      "log1exp", "logdist"
-    )
-  )) {
-    type <- "specialnonlinear"
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
       model <- "factor_contrast"
@@ -956,7 +961,39 @@ bru_subcomponent <- function(input = NULL,
         immediate. = TRUE
       )
     }
-    if (identical(model, "factor_full")) {
+    if (model %in%
+      c(
+        "clinear", "sigm", "revsigm",
+        "log1exp", "logdist"
+      )
+    ) {
+      type <- "specialnonlinear"
+    } else if (model %in%
+      c(
+        "rw2d", "rw2diid", "matern2d"
+      )
+    ) {
+      type <- "inlalattice"
+      if (is.null(n)) {
+        n <- nrow * ncol
+      } else {
+        if (n != nrow * ncol) {
+          stop(
+            "n = ",
+            n,
+            " must be equal to nrow * ncol = ",
+            nrow,
+            " * ",
+            ncol,
+            " = ",
+            nrow * ncol,
+            " for inla lattice model '",
+            model,
+            "'."
+          )
+        }
+      }
+    } else if (identical(model, "factor_full")) {
       model <- "iid"
       type <- "factor"
       factor_mapping <- "full"
@@ -993,6 +1030,8 @@ bru_subcomponent <- function(input = NULL,
         model = model,
         type = type,
         n = n,
+        nrow = nrow,
+        ncol = ncol,
         values = values,
         season.length = season.length,
         factor_mapping = factor_mapping
@@ -1262,6 +1301,7 @@ make_values <- function(subcomp_n, subcomp_values, input_values, label) {
 }
 
 make_submapper <- function(subcomp_n,
+                           subcomp_nrow_ncol,
                            subcomp_values,
                            input_values,
                            label,
@@ -1269,6 +1309,24 @@ make_submapper <- function(subcomp_n,
                            subcomp_factor_mapping,
                            require_indexed,
                            allow_interpolation = TRUE) {
+  if (identical(subcomp_type, "inlalattice")) {
+    if (is.null(subcomp_nrow_ncol)) {
+      stop(
+        "nrow and ncol must be provided for inla lattice model '",
+        label,
+        "'."
+      )
+    }
+    n <- prod(subcomp_nrow_ncol)
+    if (!is.null(subcomp_n)) {
+      stopifnot(n == subcomp_n)
+    }
+    subcomp_n <- n
+    return(
+      bru_mapper_index(n = subcomp_n)
+    )
+  }
+
   values <- make_values(subcomp_n, subcomp_values, input_values, label)
 
   if (is.factor(values) ||
@@ -1282,6 +1340,7 @@ make_submapper <- function(subcomp_n,
       )
     )
   }
+
   values <- sort(unique(values), na.last = NA)
   if (length(values) > 1) {
     if (allow_interpolation) {
@@ -1413,7 +1472,7 @@ make_mapper <- function(subcomp,
       "' for ", label
     ))
   }
-  if (subcomp[["type"]] %in% c("linear", "clinear")) {
+  if (subcomp[["type"]] %in% c("linear", "specialnonlinear")) {
     return(bru_mapper_linear())
   }
   if (subcomp[["type"]] %in% c("offset", "const")) {
@@ -1462,6 +1521,7 @@ make_mapper <- function(subcomp,
     function(lab) {
       make_submapper(
         subcomp_n = subcomp[["n"]],
+        subcomp_nrow_ncol = c(subcomp[["nrow"]], subcomp[["ncol"]]),
         subcomp_values = subcomp[["values"]],
         input_values = input_values,
         label = lab,

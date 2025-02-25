@@ -88,3 +88,47 @@ test_that("Response and predictor mismatch handling", {
     )
   )
 })
+
+
+test_that("Complex list data handling", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  set.seed(12345L)
+  n <- 6
+  m <- 3
+  data <- list(
+    x1 = rnorm(m * n),
+    weight = runif(m * n),
+    .block = rep(1:n, m),
+    x2 = rnorm(n)
+  )
+  agg <- bru_mapper_logsumexp()
+  resp_data <- with(data, data.frame(Y = rpois(n, lambda = exp(
+    1 +
+      ibm_eval(
+        agg,
+        input = list(weight = weight, block = .block),
+        state = x1
+      ) + x2
+  ))))
+  cmpA <- ~ 0 + Intercept(1) + x1 + x2
+
+  lik1 <- bru_obs(
+    "poisson",
+    formula = Y ~ Intercept + ibm_eval(
+      agg,
+      input = list(weight = weight, block = .block),
+      state = x1
+    ) + x2,
+    data = data,
+    allow_combine = TRUE,
+    response_data = resp_data
+  )
+
+  expect_error(
+    {
+      fit <- bru(components = cmpA, lik1)
+    },
+    NA
+  )
+})

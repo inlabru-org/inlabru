@@ -20,6 +20,8 @@ bru_component(...)
   n = NULL,
   values = NULL,
   season.length = NULL,
+  nrow = NULL,
+  ncol = NULL,
   copy = NULL,
   weights_layer = NULL,
   weights_selector = NULL,
@@ -86,6 +88,9 @@ the latent model. Normally generated internally based on the mapping details.
 
 \item{season.length}{Passed on to \code{INLA::f()} for model \code{"seasonal"}
 (TODO: check if this parameter is still fully handled)}
+
+\item{nrow, ncol}{Number of rows and columns for \code{model} types
+"rw2d", "rw2diid", and "matern2d". Default is \code{NULL}.}
 
 \item{copy}{character; label of other component that this component should
 be a copy of. If the \code{fixed = FALSE}, a scaling constant is estimated, via a

@@ -8,6 +8,8 @@
   "bym2" models (version `2.12.0.9002`)
 * Deprecate the `include` and `exclude` arguments to `predict()` and
   `generate()` (version `2.12.0.9003`)
+* Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
+  "matern2d" (version `2.12.0.9004`)
 
 # inlabru 2.12.0
 
