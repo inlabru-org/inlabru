@@ -1851,7 +1851,8 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #'   integration weights. If the weights are `NULL` or all ones, this is
 #'   the same as dividing by the number of entries in each block.
 #' @param n_block Predetermined number of output blocks. If `NULL`, overrides
-#' the maximum block index in the inputs.
+#' the maximum block index in the inputs. The priority order is `input$n_block`,
+#' the mapper definition `n_block`, then `max(input$block)`.
 #' @description
 #' Constructs a mapper
 #' that aggregates elements of the input state, so it can be used e.g.
@@ -1864,6 +1865,7 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #' @examples
 #' m <- bru_mapper_aggregate()
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
 bru_mapper_aggregate <- function(rescale = FALSE,
                                  n_block = NULL) {
@@ -1903,17 +1905,29 @@ ibm_n.bru_mapper_aggregate <- function(mapper, ...,
     NA_integer_
   }
 }
+
+bm_aggregate_n_block <- function(mapper, input = NULL) {
+  if (is.null(input[["n_block"]])) {
+    # Note: Allowed to be NULL
+    n_block <- mapper[["n_block"]]
+  } else {
+    n_block <- input[["n_block"]]
+  }
+  if (is.null(n_block) && !is.null(input[["block"]])) {
+    n_block <- max(input[["block"]])
+  }
+  n_block
+}
+
 #' @export
 #' @rdname bru_mapper_aggregate
 ibm_n_output.bru_mapper_aggregate <- function(mapper,
                                               input = NULL, ...) {
-  if (!is.null(mapper[["n_block"]])) {
-    mapper[["n_block"]]
-  } else if (!is.null(input)) {
-    max(input[["block"]])
-  } else {
-    NA_integer_
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
+  if (is.null(n_block)) {
+    return(NA_integer_)
   }
+  n_block
 }
 #' @export
 #' @rdname bru_mapper_aggregate
@@ -1942,11 +1956,12 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper,
                                               input,
                                               state = NULL,
                                               ...) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   fm_block(
     block = input[["block"]],
     weights = input[["weights"]],
     log_weights = input[["log_weights"]],
-    n_block = mapper[["n_block"]],
+    n_block = n_block,
     rescale = mapper[["rescale"]]
   )
 }
@@ -1956,13 +1971,14 @@ ibm_jacobian.bru_mapper_aggregate <- function(mapper,
 #' @rdname bru_mapper_aggregate
 ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
                                           sub_lin = NULL) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
     fm_block_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
       rescale = mapper[["rescale"]],
-      n_block = mapper[["n_block"]],
+      n_block = n_block,
       values = state
     )
   val
@@ -2001,6 +2017,7 @@ ibm_eval.bru_mapper_aggregate <- function(mapper, input, state = NULL, ...,
 #' @examples
 #' m <- bru_mapper_logsumexp()
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
 bru_mapper_logsumexp <- function(rescale = FALSE,
                                  n_block = NULL) {
@@ -2028,13 +2045,14 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper,
                                               input,
                                               state = NULL,
                                               ...) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   input <- fm_block_prep(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
     force_log = TRUE,
     values = state,
-    n_block = mapper[["n_block"]]
+    n_block = n_block
   )
 
   n_state <- length(input$block)
@@ -2075,8 +2093,6 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper,
   )
 }
 
-
-
 #' @export
 #' @param log logical; control `log` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logsumexp` mappers.
@@ -2085,13 +2101,14 @@ ibm_jacobian.bru_mapper_logsumexp <- function(mapper,
 #'   `sum-weight-exp` value is returned.
 ibm_eval.bru_mapper_logsumexp <- function(mapper, input, state = NULL,
                                           log = TRUE, ..., sub_lin = NULL) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
     fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
       rescale = mapper[["rescale"]],
-      n_block = mapper[["n_block"]],
+      n_block = n_block,
       values = state,
       log = log
     )

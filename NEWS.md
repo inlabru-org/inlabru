@@ -10,6 +10,9 @@
   `generate()` (version `2.12.0.9003`)
 * Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
   "matern2d" (version `2.12.0.9004`)
+* Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
+  `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
+  object setting (version `2.12.0.9005`)
 
 # inlabru 2.12.0
 

@@ -25,7 +25,8 @@ the same as dividing by the number of entries in each block.
 }}
 
 \item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
-the maximum block index in the inputs.}
+the maximum block index in the inputs. The priority order is \code{input$n_block},
+the mapper definition \code{n_block}, then \code{max(input$block)}.}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
@@ -73,6 +74,7 @@ for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
 \examples{
 m <- bru_mapper_logsumexp()
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 
 }
 \seealso{
