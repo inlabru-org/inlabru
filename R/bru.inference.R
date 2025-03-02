@@ -868,6 +868,11 @@ extended_bind_rows <- function(...) {
 #'   Default value is `1`. WARNING: The normalizing constant for the likelihood
 #'   is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
 #'   interpreted with great care.
+#'
+#'   For `family = "cp"`, the weights are applied as `sum(weights * eta)` in
+#'   the point location contribution part of the log-likelihood, where `eta` is
+#'   the linear predictor, and do not affect the integration part of the
+#'   likelihood.
 #' @param scale Fixed (optional) scale parameters of the precision for several
 #'   models, such as Gaussian and student-t response models.
 #' @param domain,samplers,ips Arguments used for `family="cp"`.
@@ -1191,6 +1196,15 @@ bru_obs <- function(formula = . ~ .,
       }
     }
 
+    # Use 'weights' for per-point weighting of eta
+    if (length(weights) == 1L) {
+      point_weights <- rep(weights, N_data)
+    } else {
+      stopifnot(length(weights) == N_data)
+      point_weights <- weights
+    }
+    weights <- 1L
+
     if (identical(options[["bru_compress_cp"]], TRUE)) {
       allow_combine <- TRUE
       response_data <- data.frame(
@@ -1207,31 +1221,44 @@ bru_obs <- function(formula = . ~ .,
         expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
           "{\n",
-          "  BRU_eta <- ", expr_text, "\n",
+          "  BRU_eta <- {", expr_text, "}\n",
           "  if (length(BRU_eta) == 1L) {\n",
           "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
           "  }\n",
-          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
+          "         BRU_eta[BRU_aggregate]),\n",
+          "    BRU_eta[!BRU_aggregate])\n",
           "}"
         )
       } else {
         expr_text <- paste0(
           "{\n",
-          "  BRU_eta <- BRU_EXPRESSION\n",
+          "  BRU_eta <- {BRU_EXPRESSION}\n",
           "  if (length(BRU_eta) == 1L) {\n",
           "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
           "  }\n",
-          "  c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])\n",
+          "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
+          "         BRU_eta[BRU_aggregate]),\n",
+          "    BRU_eta[!BRU_aggregate])\n",
           "}"
         )
       }
       expr <- parse(text = expr_text)
 
       data <- extended_bind_rows(
-        dplyr::bind_cols(data, BRU_aggregate = TRUE),
-        dplyr::bind_cols(ips, BRU_aggregate = FALSE)
+        dplyr::bind_cols(data,
+                         BRU_aggregate = TRUE,
+                         BRU_point_weights = point_weights),
+        dplyr::bind_cols(ips,
+                         BRU_aggregate = FALSE,
+                         BRU_point_weights = 0.0)
       )
     } else {
+      if (!all(point_weights == 1)) {
+        stop(
+          "Point 'weights' are not supported for non-compressed Cox processes."
+        )
+      }
       response_data <- data.frame(
         BRU_E = c(
           rep(0, N_data),

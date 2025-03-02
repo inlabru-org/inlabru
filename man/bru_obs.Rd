@@ -107,7 +107,12 @@ likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
 log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
 Default value is \code{1}. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
-interpreted with great care.}
+interpreted with great care.
+
+For \code{family = "cp"}, the weights are applied as \code{sum(weights * eta)} in
+the point location contribution part of the log-likelihood, where \code{eta} is
+the linear predictor, and do not affect the integration part of the
+likelihood.}
 
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}

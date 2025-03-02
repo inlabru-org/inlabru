@@ -13,6 +13,10 @@
 * Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
   `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
   object setting (version `2.12.0.9005`)
+* Allow `bru_obs(family = "cp")`/`lgcp()` optional `weights` argument to contain
+  individual point observation weights, so that the `eta` contribution to
+  the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
+  `2.12.0.9006`)
 
 # inlabru 2.12.0
 
