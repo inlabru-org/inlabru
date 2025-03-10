@@ -2350,8 +2350,8 @@ predict.bru <- function(object,
 #' @export
 #' @family sample generators
 #' @param object A `bru` object obtained by calling [bru()].
-#' @param newdata A data.frame or SpatialPointsDataFrame of covariates needed
-#'   for sampling.
+#' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates
+#'   needed for sampling.
 #' @param formula A formula where the right hand side defines an R expression
 #' to evaluate for each generated sample. If `NULL`, the latent and
 #' hyperparameter states are returned as named list elements.
@@ -2479,8 +2479,7 @@ generate.bru <- function(object,
       used <-
         bru_used(
           formula,
-          effect = if (is.null(newdata) &&
-            is.null(include)) {
+          effect = if (is.null(formula)) {
             character(0)
           } else {
             include

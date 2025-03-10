@@ -17,6 +17,8 @@
   individual point observation weights, so that the `eta` contribution to
   the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
   `2.12.0.9006`)
+* Bugfix for `generate.bru()` for evaluation of expressions in the absence of
+  `newdata` (version `2.12.0.9007`)
 
 # inlabru 2.12.0
 

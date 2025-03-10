@@ -26,8 +26,8 @@ generate(object, ...)
 
 \item{...}{additional, unused arguments.}
 
-\item{newdata}{A data.frame or SpatialPointsDataFrame of covariates needed
-for sampling.}
+\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
+needed for sampling.}
 
 \item{formula}{A formula where the right hand side defines an R expression
 to evaluate for each generated sample. If \code{NULL}, the latent and
