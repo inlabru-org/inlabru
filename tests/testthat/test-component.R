@@ -140,6 +140,7 @@ test_that("Component construction: terra", {
 
   llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = data)))
 
+  local_bru_safe_inla()
   cmp <- bru_component_list(
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
