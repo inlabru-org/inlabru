@@ -239,7 +239,9 @@ bru_used_vars.character <- function(x, functions = FALSE) {
   ex <- str2lang(ex)
   ex <- replace_dollar(ex)
   vars <- all.vars(ex, functions = functions, unique = TRUE)
-  if (identical(vars, ".") || identical(vars, character(0))) {
+  # Map '.' to NULL, to defer decision until later
+  # Do not map character(0) to NULL, as it is a valid result
+  if (identical(vars, ".")) {
     vars <- NULL
   }
   vars
