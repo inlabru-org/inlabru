@@ -651,58 +651,90 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-#' Evaluate expressions in the data context
+#' @title Evaluate expressions in data contexts
+#' @description Evaluate an expression in a series of data contexts, also making
+#'   the objects directly available as names surrounded by ".", stopping when
+#'   the expression evaluation completes with no error.
+#'
+#'   This is an internal inlabru method, not intended for general use.
 #' @param input An expression to be evaluated
-#' @param data Likelihood-specific data, as a `data.frame` or
-#' `SpatialPoints[DataFrame]`
-#'   object.
-#' @param response_data Likelihood-specific data for models that need different
-#'  size/format for inputs and response variables, as a `data.frame` or
-#' `SpatialPoints[DataFrame]`
-#'   object.
+#' @param data list of data objects in priority order. Named elements will
+#' be available as `.name.` in the evaluation. The `input` expression is
+#' evaluated with each non-NULL `data` object as `envir`, in order,
+#' until success. If there are no non-NULL data objects, the expression is
+#' evaluated in an empty environment, potentially falling back to enclosing
+#' environment variables.
 #' @param default Value used if the expression is evaluated as NULL. Default
 #' NULL
 #' @param .envir The evaluation environment
 #' @return The result of expression evaluation
 #' @keywords internal
-
+#' @export
+#' @examples
+#' # The A values come from the 'data' element, and the B values come from
+#' # the 'response_data' element, as that is listed first.
+#' eval_in_data_context(
+#'   quote(
+#'     list(A = .data.$x, B = x)
+#'   ),
+#'   list(
+#'     response_data = tibble::tibble(x = 1:5),
+#'     data = tibble::tibble(x = 1:10)
+#'   )
+#' )
+#' # Both A and B come from the 'data' element, as 'x' is found there,
+#' # terminating the evaluation attempt.
+#' eval_in_data_context(
+#'   quote(
+#'     list(A = .data.$x, B = x)
+#'   ),
+#'   list(
+#'     data = tibble::tibble(x = 1:10),
+#'     response_data = tibble::tibble(x = 1:5)
+#'   )
+#' )
+#'
 eval_in_data_context <- function(input,
                                  data = NULL,
-                                 response_data = NULL,
                                  default = NULL,
                                  .envir = parent.frame()) {
-  response_data_orig <- response_data
-  if (!is.null(response_data)) {
-    if (is.list(response_data) && !is.data.frame(response_data)) {
-    } else {
-    response_data <- as.data.frame(response_data)
+  data_orig <- data
+  data <- lapply(data, function(x) {
+    if (!is.null(x) && !is.list(x)) {
+      x <- tibble::as_tibble(x)
     }
+    x
+  })
+  enclos_envir <- new.env(parent = .envir)
+  nms <- names(data)
+  for (nm in setdiff(nms, "")) {
+    assign(paste0(".", nm, "."), data_orig[[nm]], envir = enclos_envir)
   }
-  if (!is.null(response_data)) {
-    enclos_envir <- new.env(parent = .envir)
-#    assign(".response_data.", response_data_orig, envir = enclos_envir)
-    assign(".data.", response_data_orig, envir = enclos_envir)
+  success <- FALSE
+  result <- NULL
+  for (k in seq_along(data)) {
+    if (is.null(data[[k]])) {
+      next
+    }
     result <- try(
-      eval(input, envir = response_data, enclos = enclos_envir),
+      eval(input, envir = data[[k]], enclos = enclos_envir),
       silent = TRUE
     )
-  }
-  if (is.null(response_data) || inherits(result, "try-error")) {
-    data_orig <- data
-    if (!is.null(data)) {
-      if (is.list(data) && !is.data.frame(data)) {
-      } else {
-        data <- as.data.frame(data)
-      }
+    if (!inherits(result, "try-error")) {
+      success <- TRUE
+      break
     }
-    enclos_envir <- new.env(parent = .envir)
-    assign(".data.", data_orig, envir = enclos_envir)
+  }
+  if (all(vapply(data, is.null, TRUE))) {
     result <- try(
-      eval(input, envir = data, enclos = enclos_envir),
+      eval(input, envir = NULL, enclos = enclos_envir),
       silent = TRUE
     )
+    if (!inherits(result, "try-error")) {
+      success <- TRUE
+    }
   }
-  if (inherits(result, "try-error")) {
+  if (!success) {
     stop(paste0(
       "Input '",
       deparse(input),
@@ -903,10 +935,12 @@ extended_bind_rows <- function(...) {
 #' @param aggregation character ("none", "sum", "average", "logsumexp", or
 #'   "logaverageexp") or an aggregation `bru_mapper` object
 #'   ([bru_mapper_aggregate()] or [bru_mapper_logsumexp()]). Default `NULL`,
-#'   interpreted as "none".
-#' @param aggregation_input `NULL` or an optional input list to the mapper defined by
-#' non-NULL `aggregation`, overriding the default,
-#'   `list(block = .block, weights = weight, n_block = NROW(response_data))`
+#'   interpreted as "none". `r lifecycle::badge("experimental")`, available
+#'   from version `2.12.0.9008`.
+#' @param aggregation_input `NULL` or an optional input list to the mapper
+#'   defined by non-NULL `aggregation`, overriding the default,
+#'   `list(block = .block, weights = weight, n_block = NROW(.response_data.))`,
+#'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9008`.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
@@ -994,8 +1028,7 @@ bru_obs <- function(formula = . ~ .,
   response <- tryCatch(
     expr = eval_in_data_context(
       substitute(response_expr),
-      data = data,
-      response_data = response_data,
+      data = list(response_data = response_data, data = data),
       default = NULL,
       .envir = .envir
     ),
@@ -1031,8 +1064,7 @@ bru_obs <- function(formula = . ~ .,
     response <- tryCatch(
       expr = eval_in_data_context(
         substitute(response_expr),
-        data = data,
-        response_data = response_data,
+        data = list(response_data = response_data, data = data),
         default = NULL,
         .envir = .envir
       ),
@@ -1048,29 +1080,25 @@ bru_obs <- function(formula = . ~ .,
 
   E <- eval_in_data_context(
     substitute(E),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
   Ntrials <- eval_in_data_context(
     substitute(Ntrials),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
   weights <- eval_in_data_context(
     substitute(weights),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
   scale <- eval_in_data_context(
     substitute(scale),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
@@ -1257,11 +1285,13 @@ bru_obs <- function(formula = . ~ .,
 
       data <- extended_bind_rows(
         dplyr::bind_cols(data,
-                         BRU_aggregate = TRUE,
-                         BRU_point_weights = point_weights),
+          BRU_aggregate = TRUE,
+          BRU_point_weights = point_weights
+        ),
         dplyr::bind_cols(ips,
-                         BRU_aggregate = FALSE,
-                         BRU_point_weights = 0.0)
+          BRU_aggregate = FALSE,
+          BRU_point_weights = 0.0
+        )
       )
     } else {
       if (!all(point_weights == 1)) {
@@ -1442,29 +1472,25 @@ like <- function(formula = . ~ .,
 
   E <- eval_in_data_context(
     substitute(E),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
   Ntrials <- eval_in_data_context(
     substitute(Ntrials),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
   weights <- eval_in_data_context(
     substitute(weights),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
   scale <- eval_in_data_context(
     substitute(scale),
-    data = data,
-    response_data = response_data,
+    data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )

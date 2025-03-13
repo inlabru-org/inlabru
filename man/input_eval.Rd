@@ -39,7 +39,7 @@ Obtain component inputs
 \item If \code{eval()} failed, return NULL or map everything to 1
 (see the \code{null.on.fail} argument). This should normally not
 happen, unless the component use logic is incorrect,
-(e.g. via \code{include}/\code{exclude})
+(e.g. via \code{used} or \code{include}/\code{exclude})
 leading to missing columns for a certain likelihood in a
 multi-\code{bru_obs()} model.
 \item If we obtain a function, apply the function to the data object
