@@ -26,6 +26,8 @@ bru_obs(
   ips = NULL,
   used = NULL,
   allow_combine = NULL,
+  aggregation = NULL,
+  aggregation_input = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
@@ -143,6 +145,15 @@ latent vectors are made available to the predictor evaluation is defined by
 several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
+
+\item{aggregation}{character ("none", "sum", "average", "logsumexp", or
+"logaverageexp") or an aggregation \code{bru_mapper} object
+(\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
+interpreted as "none".}
+
+\item{aggregation_input}{\code{NULL} or an optional input list to the mapper defined by
+non-NULL \code{aggregation}, overriding the default,
+\code{list(block = .block, weights = weight, n_block = NROW(response_data))}}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 

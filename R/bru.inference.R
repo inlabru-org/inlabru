@@ -675,11 +675,12 @@ eval_in_data_context <- function(input,
   if (!is.null(response_data)) {
     if (is.list(response_data) && !is.data.frame(response_data)) {
     } else {
-      response_data <- as.data.frame(response_data)
+    response_data <- as.data.frame(response_data)
     }
   }
   if (!is.null(response_data)) {
     enclos_envir <- new.env(parent = .envir)
+#    assign(".response_data.", response_data_orig, envir = enclos_envir)
     assign(".data.", response_data_orig, envir = enclos_envir)
     result <- try(
       eval(input, envir = response_data, enclos = enclos_envir),
@@ -899,6 +900,13 @@ extended_bind_rows <- function(...) {
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
+#' @param aggregation character ("none", "sum", "average", "logsumexp", or
+#'   "logaverageexp") or an aggregation `bru_mapper` object
+#'   ([bru_mapper_aggregate()] or [bru_mapper_logsumexp()]). Default `NULL`,
+#'   interpreted as "none".
+#' @param aggregation_input `NULL` or an optional input list to the mapper defined by
+#' non-NULL `aggregation`, overriding the default,
+#'   `list(block = .block, weights = weight, n_block = NROW(response_data))`
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
@@ -952,6 +960,8 @@ bru_obs <- function(formula = . ~ .,
                     ips = NULL,
                     used = NULL,
                     allow_combine = NULL,
+                    aggregation = NULL,
+                    aggregation_input = NULL,
                     control.family = NULL,
                     tag = NULL,
                     options = list(),
