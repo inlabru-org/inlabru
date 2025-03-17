@@ -19,6 +19,9 @@
   `2.12.0.9006`)
 * Bugfix for `generate.bru()` for evaluation of expressions in the absence of
   `newdata` (version `2.12.0.9007`)
+* Allow `character` block information in `bru_mapper_aggregate` and
+  `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
+  (version `2.12.0.9008`)
 
 # inlabru 2.12.0
 
