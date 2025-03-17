@@ -1,24 +1,35 @@
 # inlabru (development version)
 
-* Add `bru_mapper_sum()` mapper, for automated adding the output of
-  multiple mappers, optionally with a single common input (version `2.12.0.9001`)
-* Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
-  states for summation of a repeated mapper (version `2.12.0.9001`)
+## General features
+
 * Add automated support for INLA models with hidden states, beyond the "bym" and
   "bym2" models (version `2.12.0.9002`)
-* Deprecate the `include` and `exclude` arguments to `predict()` and
-  `generate()` (version `2.12.0.9003`)
 * Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
   "matern2d" (version `2.12.0.9004`)
-* Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
-  `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
-  object setting (version `2.12.0.9005`)
 * Allow `bru_obs(family = "cp")`/`lgcp()` optional `weights` argument to contain
   individual point observation weights, so that the `eta` contribution to
   the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
   `2.12.0.9006`)
+
+## New and updated mapper features
+
+* Add `bru_mapper_sum()` mapper, for automated adding the output of
+  multiple mappers, optionally with a single common input (version `2.12.0.9001`)
+* Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
+  states for summation of a repeated mapper (version `2.12.0.9001`)
+* Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
+  `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
+  object setting (version `2.12.0.9005`)
+* Allow `character` block information in `bru_mapper_aggregate` and
+  `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
+  (version `2.12.0.9008`)
+
+## Bugfixes and deprecations
+  
 * Bugfix for `generate.bru()` for evaluation of expressions in the absence of
   `newdata` (version `2.12.0.9007`)
+* Deprecate the `include` and `exclude` arguments to `predict()` and
+  `generate()` (version `2.12.0.9003`)
 
 # inlabru 2.12.0
 

@@ -1936,7 +1936,11 @@ bm_aggregate_n_block <- function(mapper, input = NULL) {
     n_block <- input[["n_block"]]
   }
   if (is.null(n_block) && !is.null(input[["block"]])) {
-    n_block <- max(input[["block"]])
+    if (is.character(input[["block"]])) {
+      n_block <- max(as.integer(factor(input[["block"]])))
+    } else {
+      n_block <- max(input[["block"]])
+    }
   }
   n_block
 }
