@@ -932,13 +932,14 @@ extended_bind_rows <- function(...) {
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
-#' @param aggregation character ("none", "sum", "average", "logsumexp", or
-#'   "logaverageexp") or an aggregation `bru_mapper` object
+#' @param aggregate character ("none", "sum", "average", "logsumexp", or
+#'   "logaverageexp", as defined by `bru_mapper_aggregate(type = aggregate)`)
+#'   or an aggregation `bru_mapper` object
 #'   ([bru_mapper_aggregate()] or [bru_mapper_logsumexp()]). Default `NULL`,
 #'   interpreted as "none". `r lifecycle::badge("experimental")`, available
 #'   from version `2.12.0.9008`.
-#' @param aggregation_input `NULL` or an optional input list to the mapper
-#'   defined by non-NULL `aggregation`, overriding the default,
+#' @param aggregate_input `NULL` or an optional input list to the mapper
+#'   defined by non-NULL `aggregate`, overriding the default,
 #'   `list(block = .block, weights = weight, n_block = NROW(.response_data.))`,
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9008`.
 #' @param control.family A optional `list` of `INLA::control.family` options
@@ -994,8 +995,8 @@ bru_obs <- function(formula = . ~ .,
                     ips = NULL,
                     used = NULL,
                     allow_combine = NULL,
-                    aggregation = NULL,
-                    aggregation_input = NULL,
+                    aggregate = NULL,
+                    aggregate_input = NULL,
                     control.family = NULL,
                     tag = NULL,
                     options = list(),

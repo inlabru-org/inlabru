@@ -26,8 +26,8 @@ bru_obs(
   ips = NULL,
   used = NULL,
   allow_combine = NULL,
-  aggregation = NULL,
-  aggregation_input = NULL,
+  aggregate = NULL,
+  aggregate_input = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
@@ -146,14 +146,15 @@ several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
 
-\item{aggregation}{character ("none", "sum", "average", "logsumexp", or
-"logaverageexp") or an aggregation \code{bru_mapper} object
+\item{aggregate}{character ("none", "sum", "average", "logsumexp", or
+"logaverageexp", as defined by \code{bru_mapper_aggregate(type = aggregate)})
+or an aggregation \code{bru_mapper} object
 (\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
 interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
 from version \verb{2.12.0.9008}.}
 
-\item{aggregation_input}{\code{NULL} or an optional input list to the mapper
-defined by non-NULL \code{aggregation}, overriding the default,
+\item{aggregate_input}{\code{NULL} or an optional input list to the mapper
+defined by non-NULL \code{aggregate}, overriding the default,
 \code{list(block = .block, weights = weight, n_block = NROW(.response_data.))},
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9008}.}
 
