@@ -9,6 +9,7 @@ evaluate_model(
   model,
   state,
   data = NULL,
+  data_extra = NULL,
   input = NULL,
   comp_simple = NULL,
   predictor = NULL,
@@ -36,6 +37,8 @@ evaluate_state(
 
 \item{data}{A \code{list}, \code{data.frame}, or \code{Spatial*DataFrame}, with coordinates
 and covariates needed to evaluate the predictor.}
+
+\item{data_extra}{Additional data for the predictor evaluation}
 
 \item{input}{Precomputed inputs list for the components}
 

@@ -15,6 +15,7 @@ bru_compute_linearisation(...)
   model,
   lhood_expr,
   data,
+  data_extra,
   input,
   state,
   comp_simple,
@@ -61,6 +62,8 @@ bru_compute_linearisation(...)
 \item{lhood_expr}{A predictor expression}
 
 \item{data}{Input data}
+
+\item{data_extra}{Additional data for the predictor}
 
 \item{input}{Precomputed component inputs from \code{evaluate_inputs()}}
 

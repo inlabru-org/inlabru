@@ -1145,6 +1145,24 @@ bru_obs <- function(formula = . ~ .,
   }
 
   data_extra <- as.list(data_extra)
+  if (!is.null(aggregate)) {
+    if (!linear) {
+      expr_text <- formula_char[length(formula_char)]
+      expr_text <- paste0(
+        "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+        " state = {", expr_text, "})}"
+      )
+    } else {
+      expr_text <- paste0(
+        "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+        " state = {BRU_EXPRESSION})}"
+      )
+    }
+    expr <- parse(text = expr_text)
+    data_extra[["BRU_aggregate_mapper"]] <- aggregate
+    data_extra[["BRU_aggregate_input"]] <- aggregate_input
+    allow_combine <- TRUE
+  }
 
   # More on special bru likelihoods
   if (family == "cp") {
@@ -1451,24 +1469,6 @@ bru_obs <- function(formula = . ~ .,
     } else {
       used <- bru_used(formula)
     }
-  }
-
-  if (!is.null(aggregate)) {
-    if (!linear) {
-      expr_text <- formula_char[length(formula_char)]
-      expr_text <- paste0(
-        "{ibm_eval(BRU_aggregate, input = BRU_aggregate_input,",
-        " state = {", expr_text, "})}"
-      )
-    } else {
-      expr_text <- paste0(
-        "{ibm_eval(BRU_aggregate, input = BRU_aggregate_input,",
-        " state = {BRU_EXPRESSION})}"
-      )
-    }
-    expr <- parse(text = expr_text)
-    data_extra[["BRU_aggregate"]] <- aggregate
-    data_extra[["BRU_aggregate_input"]] <- aggregate_input
   }
 
   # The likelihood object that will be returned
@@ -2845,6 +2845,7 @@ nonlin_predictor <- function(param, state) {
           evaluate_model(
             model = param[["model"]],
             data = param[["lhoods"]][[lh_idx]][["data"]],
+            data_extra = param[["lhoods"]][[lh_idx]][["data_extra"]],
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],

@@ -17,6 +17,7 @@ bru_obs(
   family = "gaussian",
   data = NULL,
   response_data = NULL,
+  data_extra = NULL,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -95,6 +96,9 @@ object.}
 \item{response_data}{Likelihood-specific data for models that need different
 size/format for inputs and response variables, as a \code{data.frame} or
 \code{SpatialPoints[DataFrame]} object.}
+
+\item{data_extra}{object convertible with \code{as.list()} with additional
+variables to be made available in predictor evaluations.}
 
 \item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
 Special case if family is 'cp': rescale all integration weights by a scalar
