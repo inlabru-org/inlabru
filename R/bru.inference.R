@@ -889,6 +889,8 @@ extended_bind_rows <- function(...) {
 #' @param response_data Likelihood-specific data for models that need different
 #'   size/format for inputs and response variables, as a `data.frame` or
 #'   `SpatialPoints[DataFrame]` object.
+#' @param data_extra object convertible with `as.list()` with additional
+#'   variables to be made available in predictor evaluations.
 #' @param E Exposure parameter for family = 'poisson' passed on to `INLA::inla`.
 #'   Special case if family is 'cp': rescale all integration weights by a scalar
 #'   E. For sampler specific reweighting/effort, use a `weight` column in the
@@ -940,7 +942,11 @@ extended_bind_rows <- function(...) {
 #'   from version `2.12.0.9008`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
 #'   defined by non-NULL `aggregate`, overriding the default,
-#'   `list(block = .block, weights = weight, n_block = NROW(.response_data.))`,
+#'   ```
+#'   list(block = .data.[[".block"]],
+#'        weights = .data.[["weight"]],
+#'        n_block = NROW(.response_data.))
+#'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9008`.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
@@ -986,6 +992,7 @@ bru_obs <- function(formula = . ~ .,
                     family = "gaussian",
                     data = NULL,
                     response_data = NULL,
+                    data_extra = NULL,
                     E = NULL,
                     Ntrials = NULL,
                     weights = NULL,
@@ -1103,9 +1110,47 @@ bru_obs <- function(formula = . ~ .,
     default = 1,
     .envir = .envir
   )
+  if (!is.null(aggregate) && is.character(aggregate)) {
+    aggregate <- match.arg(
+      aggregate,
+      c("none", "sum", "average", "logsumexp", "logaverageexp")
+    )
+    aggregate <- switch(aggregate,
+      "none" = NULL,
+      bru_mapper_aggregate(type = aggregate)
+    )
+  }
+  if (!is.null(aggregate)) {
+    aggregate_input <- eval_in_data_context(
+      substitute(aggregate_input),
+      data = list(data = data, response_data = response_data),
+      default = NULL,
+      .envir = .envir
+    )
+    if (is.null(aggregate_input)) {
+      aggregate_input <- eval_in_data_context(
+        quote(list(
+          block = .data.[[".block"]],
+          weights = .data.[["weight"]],
+          n_block = NROW(.response_data.)
+        )),
+        data = list(data = data, response_data = response_data),
+        default = NULL,
+        .envir = .envir
+      )
+    }
+    if (is.null(aggregate_input)) {
+      stop("Aggregation requested, but `aggregate_input` evaluates to NULL.")
+    }
+  }
+
+  data_extra <- as.list(data_extra)
 
   # More on special bru likelihoods
   if (family == "cp") {
+    if (!is.null(aggregate)) {
+      stop("The 'aggregate' feature cannot be used with family='cp'.")
+    }
     if (is.null(response)) {
       stop(paste0(
         "You called bru_obs() with family='cp' but the evaluated ",
@@ -1408,6 +1453,24 @@ bru_obs <- function(formula = . ~ .,
     }
   }
 
+  if (!is.null(aggregate)) {
+    if (!linear) {
+      expr_text <- formula_char[length(formula_char)]
+      expr_text <- paste0(
+        "{ibm_eval(BRU_aggregate, input = BRU_aggregate_input,",
+        " state = {", expr_text, "})}"
+      )
+    } else {
+      expr_text <- paste0(
+        "{ibm_eval(BRU_aggregate, input = BRU_aggregate_input,",
+        " state = {BRU_EXPRESSION})}"
+      )
+    }
+    expr <- parse(text = expr_text)
+    data_extra[["BRU_aggregate"]] <- aggregate
+    data_extra[["BRU_aggregate_input"]] <- aggregate_input
+  }
+
   # The likelihood object that will be returned
 
   lh <- structure(
@@ -1416,6 +1479,7 @@ bru_obs <- function(formula = . ~ .,
       formula = formula,
       response_data = response_data, # agg
       data = data,
+      data_extra = data_extra,
       E = E,
       Ntrials = Ntrials,
       weights = weights,

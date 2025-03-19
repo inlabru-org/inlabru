@@ -155,7 +155,12 @@ from version \verb{2.12.0.9008}.}
 
 \item{aggregate_input}{\code{NULL} or an optional input list to the mapper
 defined by non-NULL \code{aggregate}, overriding the default,
-\code{list(block = .block, weights = weight, n_block = NROW(.response_data.))},
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
+     weights = .data.[["weight"]],
+     n_block = NROW(.response_data.))
+}\if{html}{\out{</div>}}
+
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9008}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
