@@ -599,15 +599,14 @@ test_that("Collect mapper works", {
     data = data
   )
 
-  expect_error(
+  expect_no_error(
     {
       fit_bru <-
         bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
           data = data,
           options = list(bru_initial = list(field = rep(10, 8)))
         )
-    },
-    NA
+    }
   )
 })
 
@@ -729,7 +728,7 @@ test_that("Repeat mapper works", {
     x = c(1, 2, 3, 2, 3, 4)
   )
 
-  expect_error(
+  expect_no_error(
     {
       fit_bru <-
         bru(
@@ -744,7 +743,6 @@ test_that("Repeat mapper works", {
           ))),
           options = list(bru_initial = list(field = rep(10, 8)))
         )
-    },
-    NA
+    }
   )
 })
