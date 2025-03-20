@@ -129,29 +129,27 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     tolerance = midtol
   )
 
-  expect_no_error(
-    {
-      bru_obs(
-        z ~ Intercept + x,
-        family = "normal",
-        response_data = obs,
-        data = pred,
-        aggregate = "average",
-        aggregate_input = list(
-          weights = weights,
-          block = grp
-        ),
-        control.family = list(
-          hyper = list(
-            prec = list(
-              initial = 6,
-              fixed = TRUE
-            )
+  expect_no_error({
+    bru_obs(
+      z ~ Intercept + x,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      aggregate_input = list(
+        weights = weights,
+        block = grp
+      ),
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
           )
         )
       )
-    }
-  )
+    )
+  })
 
   expect_error(
     {
@@ -175,7 +173,10 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
         )
       )
     },
-    "Aggregation requested, but `aggregate_input[['block']]` evaluates to NULL.",
+    paste0(
+      "Aggregation requested, but `aggregate_input[['block']]` ",
+      "evaluates to NULL."
+    ),
     fixed = TRUE
   )
 })

@@ -599,15 +599,13 @@ test_that("Collect mapper works", {
     data = data
   )
 
-  expect_no_error(
-    {
-      fit_bru <-
-        bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
-          data = data,
-          options = list(bru_initial = list(field = rep(10, 8)))
-        )
-    }
-  )
+  expect_no_error({
+    fit_bru <-
+      bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
+        data = data,
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
 })
 
 
@@ -728,21 +726,19 @@ test_that("Repeat mapper works", {
     x = c(1, 2, 3, 2, 3, 4)
   )
 
-  expect_no_error(
-    {
-      fit_bru <-
-        bru(
-          y ~ Intercept(1) + field(
-            x,
-            model = "iid",
-            mapper = bru_mapper_repeat(bru_mapper_index(4), n_rep = 2)
-          ),
-          data = data,
-          control.family = list(hyper = list(prec = list(
-            initial = log(1e8), fixed = TRUE
-          ))),
-          options = list(bru_initial = list(field = rep(10, 8)))
-        )
-    }
-  )
+  expect_no_error({
+    fit_bru <-
+      bru(
+        y ~ Intercept(1) + field(
+          x,
+          model = "iid",
+          mapper = bru_mapper_repeat(bru_mapper_index(4), n_rep = 2)
+        ),
+        data = data,
+        control.family = list(hyper = list(prec = list(
+          initial = log(1e8), fixed = TRUE
+        ))),
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
 })
