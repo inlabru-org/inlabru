@@ -1128,19 +1128,40 @@ bru_obs <- function(formula = . ~ .,
       .envir = .envir
     )
     if (is.null(aggregate_input)) {
-      aggregate_input <- eval_in_data_context(
-        quote(list(
-          block = .data.[[".block"]],
-          weights = .data.[["weight"]],
-          n_block = NROW(.response_data.)
-        )),
+      aggregate_input <- list()
+    }
+    if (is.null(aggregate_input[["block"]])) {
+      aggregate_input[["block"]] <- eval_in_data_context(
+        quote(.data.[[".block"]]),
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
       )
     }
-    if (is.null(aggregate_input)) {
-      stop("Aggregation requested, but `aggregate_input` evaluates to NULL.")
+    if (is.null(aggregate_input[["weights"]])) {
+      aggregate_input[["weights"]] <- eval_in_data_context(
+        quote(.data.[["weight"]]),
+        data = list(data = data, response_data = response_data),
+        default = NULL,
+        .envir = .envir
+      )
+    }
+    if (is.null(aggregate_input[["n_block"]])) {
+      aggregate_input[["n_block"]] <- eval_in_data_context(
+        quote(NROW(.response_data.)),
+        data = list(data = data, response_data = response_data),
+        default = NULL,
+        .envir = .envir
+      )
+    }
+    if (is.null(aggregate_input[["block"]])) {
+      stop("Aggregation requested, but `aggregate_input[['block']]` evaluates to NULL.")
+    }
+    if (is.null(aggregate_input[["weights"]])) {
+      stop("Aggregation requested, but `aggregate_input[['weights']]` evaluates to NULL.")
+    }
+    if (is.null(aggregate_input[["n_block"]])) {
+      stop("Aggregation requested, but `aggregate_input[['n_block']]` evaluates to NULL.")
     }
   }
 
