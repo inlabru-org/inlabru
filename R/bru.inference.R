@@ -1247,11 +1247,13 @@ bru_obs <- function(formula = . ~ .,
 
       data <- extended_bind_rows(
         dplyr::bind_cols(data,
-                         BRU_aggregate = TRUE,
-                         BRU_point_weights = point_weights),
+          BRU_aggregate = TRUE,
+          BRU_point_weights = point_weights
+        ),
         dplyr::bind_cols(ips,
-                         BRU_aggregate = FALSE,
-                         BRU_point_weights = 0.0)
+          BRU_aggregate = FALSE,
+          BRU_point_weights = 0.0
+        )
       )
     } else {
       if (!all(point_weights == 1)) {

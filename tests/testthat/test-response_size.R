@@ -12,33 +12,25 @@ test_that("Response and predictor mismatch handling", {
     data = df
   )
 
-  expect_no_error(
-    {
-      fit1A <- bru(components = cmpA, lik1)
-    }
-  )
+  expect_no_error({
+    fit1A <- bru(components = cmpA, lik1)
+  })
 
-  expect_no_error(
-    {
-      fit1B <- bru(components = cmpB, lik1)
-    }
-  )
+  expect_no_error({
+    fit1B <- bru(components = cmpB, lik1)
+  })
 
   lik2 <- bru_obs("poisson",
     formula = Y ~ beta,
     data = df
   )
 
-  expect_no_error(
-    {
-      fit2A <- bru(components = cmpA, lik2)
-    }
-  )
-  expect_no_error(
-    {
-      fit2B <- bru(components = cmpB, lik2)
-    }
-  )
+  expect_no_error({
+    fit2A <- bru(components = cmpA, lik2)
+  })
+  expect_no_error({
+    fit2B <- bru(components = cmpB, lik2)
+  })
 
   lik3 <- bru_obs("poisson",
     formula = Y ~ c(beta, beta),
@@ -121,9 +113,7 @@ test_that("Complex list data handling", {
     response_data = resp_data
   )
 
-  expect_no_error(
-    {
-      fit <- bru(components = cmpA, lik1)
-    }
-  )
+  expect_no_error({
+    fit <- bru(components = cmpA, lik1)
+  })
 })
