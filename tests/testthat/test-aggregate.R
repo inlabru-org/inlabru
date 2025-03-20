@@ -129,7 +129,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     tolerance = midtol
   )
 
-  expect_error(
+  expect_no_error(
     {
       bru_obs(
         z ~ Intercept + x,
@@ -150,8 +150,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
           )
         )
       )
-    },
-    NA
+    }
   )
 
   expect_error(
