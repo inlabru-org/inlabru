@@ -91,7 +91,7 @@ Suggests:
     splancs,
     terra,
     tidyterra,
-    testthat,
+    testthat (>= 3.2.0),
     tidyr,
     DiagrammeR
 Enhances:

@@ -118,7 +118,7 @@ test_that("Linearisation", {
 
   expect_s3_class(stk0, "inla.data.stack")
 
-  expect_error(
+  expect_no_error(
     object = {
       fit <- bru(
         components = cmp,
@@ -135,7 +135,6 @@ test_that("Linearisation", {
           )
         )
       )
-    },
-    NA
+    }
   )
 })
