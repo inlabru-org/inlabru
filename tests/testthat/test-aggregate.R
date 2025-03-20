@@ -129,53 +129,55 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     tolerance = midtol
   )
 
-  expect_error({
-    bru_obs(
-      z ~ Intercept + x,
-      family = "normal",
-      response_data = obs,
-      data = pred,
-      aggregate = "average",
-      aggregate_input = list(
-        weights = weights,
-        block = grp
-      ),
-      control.family = list(
-        hyper = list(
-          prec = list(
-            initial = 6,
-            fixed = TRUE
+  expect_error(
+    {
+      bru_obs(
+        z ~ Intercept + x,
+        family = "normal",
+        response_data = obs,
+        data = pred,
+        aggregate = "average",
+        aggregate_input = list(
+          weights = weights,
+          block = grp
+        ),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = 6,
+              fixed = TRUE
+            )
           )
         )
       )
-    )
-  },
-  NA
+    },
+    NA
   )
 
-  expect_error({
-    bru_obs(
-      z ~ Intercept + x,
-      family = "normal",
-      response_data = obs,
-      data = pred,
-      aggregate = "average",
-      aggregate_input = list(
-        weights = weights,
-        n_block = NROW(.response_data.)
-      ),
-      control.family = list(
-        hyper = list(
-          prec = list(
-            initial = 6,
-            fixed = TRUE
+  expect_error(
+    {
+      bru_obs(
+        z ~ Intercept + x,
+        family = "normal",
+        response_data = obs,
+        data = pred,
+        aggregate = "average",
+        aggregate_input = list(
+          weights = weights,
+          n_block = NROW(.response_data.)
+        ),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = 6,
+              fixed = TRUE
+            )
           )
         )
       )
-    )
-  },
-  "Aggregation requested, but `aggregate_input[['block']]` evaluates to NULL.",
-  fixed = TRUE
+    },
+    "Aggregation requested, but `aggregate_input[['block']]` evaluates to NULL.",
+    fixed = TRUE
   )
 })
 

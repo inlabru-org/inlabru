@@ -1155,13 +1155,22 @@ bru_obs <- function(formula = . ~ .,
       )
     }
     if (is.null(aggregate_input[["block"]])) {
-      stop("Aggregation requested, but `aggregate_input[['block']]` evaluates to NULL.")
+      stop(paste0(
+        "Aggregation requested, but `aggregate_input[['block']]` ",
+        "evaluates to NULL."
+      ))
     }
     if (is.null(aggregate_input[["weights"]])) {
-      stop("Aggregation requested, but `aggregate_input[['weights']]` evaluates to NULL.")
+      stop(paste0(
+        "Aggregation requested, but `aggregate_input[['weights']]` ",
+        "evaluates to NULL."
+      ))
     }
     if (is.null(aggregate_input[["n_block"]])) {
-      stop("Aggregation requested, but `aggregate_input[['n_block']]` evaluates to NULL.")
+      stop(paste0(
+        "Aggregation requested, but `aggregate_input[['n_block']]` ",
+        "evaluates to NULL."
+      ))
     }
   }
 
