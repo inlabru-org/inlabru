@@ -247,7 +247,7 @@ $$
 S_\text{CRPS}(F_i,y_i) = \sum_{k=0}^\infty [\pP(Y_i \leq k |\text{data}) - I(y_i \leq k)]^2
 $$
 For this, one would first need to get $\pP(Y \leq k | \text{data})$ from a
-predict call with `ppois(k, rate = exp(eta))`, for
+predict call with `ppois(k, lambda = exp(eta))`, for
 a vector $k=0,1\dots,K$, for each $y_i$, for some sufficiently large $K>\max_i{y_i}$
 for the remainder to be negligible.
 However, to avoid repeated `predict()` calls for each $y_i$,
@@ -291,7 +291,7 @@ pred <- generate(fit, newdata,
       lapply(
         seq_along(y),
         function(i) {
-          Fpred <- ppois(k, rate = lambda[i])
+          Fpred <- ppois(k, lambda = lambda[i])
           data.frame(
             k = c(k, k),
             i = c(i, i),
@@ -438,7 +438,7 @@ pred <- predict(fit, newdata,
           function(i) {
             data.frame(
               i = i,
-              F = ppois(seq(0, max_K), rate = lambda[i])
+              F = ppois(seq(0, max_K), lambda = lambda[i])
             )
           }
         )
