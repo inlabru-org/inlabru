@@ -231,7 +231,7 @@ so we can estimate it using `predict()`:
 ```{r eval=FALSE}
 pred <- predict(fit,
   newdata,
-  formula = ~ dpois(y, rate = exp(eta)),
+  formula = ~ dpois(y, lambda = exp(eta)),
   n.samples = 2000
 )
 log_score <- log(pred$mean)
