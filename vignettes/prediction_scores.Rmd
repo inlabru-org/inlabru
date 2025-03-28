@@ -237,7 +237,11 @@ pred <- predict(fit,
 log_score <- log(pred$mean)
 ```
 to estimate the log_score (increase `n.samples` if needed for
-sufficiently small Monte Carlo error).
+sufficiently small Monte Carlo error). Approximate Monte Carlo confidence
+intervals for the scores can be obtained via the Monte Carlo standard errors:
+```{r eval=FALSE}
+log(pred$mean + pred$mean.mc_std_err * c(-2, 2))
+```
 
 ### CRPS
 
