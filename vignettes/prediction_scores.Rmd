@@ -458,4 +458,6 @@ crps_score <-
     summarise(F_var = sum(sd^2), groups = "drop") %>%
     pull(F_var))
 ```
-Formulas and functions for Poisson CRPS, as well as for other distributions, can be found at http://cran.nexr.com/web/packages/scoringRules/vignettes/crpsformulas.html#poisson-distribution-pois
+Formulas and functions for Poisson CRPS, as well as for other distributions, can be found via
+https://cran.r-project.org/web/packages/scoringRules/vignettes/article.pdf and
+the references in `?scoringRules::crps.numeric`.
