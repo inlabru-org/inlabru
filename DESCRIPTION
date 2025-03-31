@@ -82,6 +82,7 @@ Suggests:
     rgl,
     rmarkdown,
     scales,
+    scoringRules,
     shiny,
     sn,
     sp (>= 2.1),
