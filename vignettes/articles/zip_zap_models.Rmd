@@ -558,7 +558,7 @@ scores <- df %>%
   group_by(Model) %>%
   summarise(
     MAE = mean(AE),
-    MSE = sqrt(mean(SE)),
+    RMSE = sqrt(mean(SE)),
     MDS = mean(DS),
     MLG = mean(LG)
   ) %>%

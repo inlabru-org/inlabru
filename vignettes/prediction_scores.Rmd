@@ -1,6 +1,7 @@
 ---
 title: "Prediction scores"
 author: "Finn Lindgren"
+date: "Corrections and code updates 2025-03-31"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Prediction scores}
@@ -27,11 +28,18 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+inla_available <- inlabru::bru_safe_inla(
+  multicore = interactive(),
+  quietly = TRUE
+)
 ```
 
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE, eval=inla_available}
 library(inlabru)
+library(magrittr)
+library(dplyr)
+library(scoringRules)
 ```
 
 ## Proper posterior prediction scores
@@ -190,6 +198,24 @@ linear expression in latent variables.
 The posterior predictive distributions are Poisson mixture distributions
 across the posterior distribution of $\lambda$, $p(\lambda|\text{data})$.
 
+For illustration purposes, consider a simple Poisson model with a single
+covariate $x$ and a linear predictor $\eta = \beta_0 + \beta_1 x$.
+```{r, eval=inla_available}
+df <- tibble::tibble(
+  x = rnorm(50),
+  y = rpois(length(x), exp(2 + 1 * x))
+)
+fit <- bru(
+  y ~ Intercept(1) + x,
+  family = "poisson",
+  data = df
+)
+newdata <- tibble::tibble(
+  x = rnorm(100),
+  y = rpois(100, exp(2 + 1 * x))
+)
+```
+
 ### Moment scores
 
 For the Squared Error and Dawid-Sebastiani scores, we'll need
@@ -208,14 +234,18 @@ i.e. the sum of the posterior mean and variance for lambda.
 The SE and DS scores are therefore relatively easy to compute after estimating
 a model with `inlabru`. You just need
 to estimate the posterior mean and variance with `predict()` for each
-test data point. If `eta` is an expression for the linear predictor, and `newdata`
+test data point. If `Intercept+x` is the expression for the linear predictor,
+and `newdata`
 holds the covariate information for the prediction points, run
-```{r eval=FALSE}
-pred <- predict(fit, newdata, formula = ~ exp(eta), n.samples = 2000)
+```{r, eval=inla_available}
+pred <- predict(fit, newdata, formula = ~ exp(Intercept + x), n.samples = 2000)
 post_E <- pred$mean
 post_Var <- pred$mean + pred$sd^2
-SE_score <- (newdata$y - post_E)^2
-DS_score <- (newdata$y - post_E)^2 / post_Var + log(post_Var)
+scores <- data.frame(
+  SE = (newdata$y - post_E)^2,
+  DS = (newdata$y - post_E)^2 / post_Var + log(post_Var)
+)
+summary(scores)
 ```
 
 ### Log-Probability and log-density scores
@@ -228,16 +258,27 @@ $$
   \pP(Y = y | \text{data}) = \pE[\pP(Y = y | \lambda, \text{data}) | \text{data}],
 $$
 so we can estimate it using `predict()`:
-```{r eval=FALSE}
+```{r, eval=inla_available}
 pred <- predict(fit,
   newdata,
-  formula = ~ dpois(y, rate = exp(eta)),
+  formula = ~ dpois(y, lambda = exp(Intercept + x)),
   n.samples = 2000
 )
 log_score <- log(pred$mean)
+summary(log_score)
 ```
 to estimate the log_score (increase `n.samples` if needed for
-sufficiently small Monte Carlo error).
+sufficiently small Monte Carlo error). Approximate Monte Carlo confidence
+intervals for the scores can be obtained via the Monte Carlo standard errors:
+```{r, eval=inla_available}
+head(
+  data.frame(
+    log_S = log_score,
+    lower = log_score - 2 * pred$mean.mc_std_err,
+    upper = log_score + 2 * pred$mean.mc_std_err
+  )
+)
+```
 
 ### CRPS
 
@@ -247,7 +288,7 @@ $$
 S_\text{CRPS}(F_i,y_i) = \sum_{k=0}^\infty [\pP(Y_i \leq k |\text{data}) - I(y_i \leq k)]^2
 $$
 For this, one would first need to get $\pP(Y \leq k | \text{data})$ from a
-predict call with `ppois(k, rate = exp(eta))`, for
+predict call with `ppois(k, lambda = exp(eta))`, for
 a vector $k=0,1\dots,K$, for each $y_i$, for some sufficiently large $K>\max_i{y_i}$
 for the remainder to be negligible.
 However, to avoid repeated `predict()` calls for each $y_i$,
@@ -262,11 +303,12 @@ above $K$ to be negligible. Perhaps a value like $K=K_0+4\sqrt{K_0}$ might be su
 You can check afterwards, and change if needed.
 
 1. Simulate samples from $\lambda^{(j)}\sim p(\lambda|\text{data})$ using `generate()` (size $N\times N_\text{samples}$).
-2. For each $i=1,\dots,N$, use the samples to estimate the residuals $r_{ik}=\pP(Y\leq k|\text{data})-I(y_i\leq k)$,
+2. For each $i=1,\dots,N$, use the samples to estimate the residuals
+$r_{ik}=\pP(Y\leq k|\text{data})-I(y_i\leq k)$,
   for $k\in 0,1,2,\dots,K$, with
 
   $$
-  \wh{p}_{ik} = \frac{1}{N_\text{samples}} \sum_{j=1}^{N_\text{samples}}
+  \wh{r}_{ik} = \frac{1}{N_\text{samples}} \sum_{j=1}^{N_\text{samples}}
   \{
   \pP(Y\leq k|\lambda^{(j)}_i)
   -
@@ -276,49 +318,38 @@ You can check afterwards, and change if needed.
 3. Compute
 
   $$
-S_\text{CRPS}(F_i,y_i) \approx \sum_{k=0}^{K} r_{ik}^2
+\wh{S}_\text{CRPS}(F_i,y_i) = \sum_{k=0}^{K} \wh{r}_{ik}^2
   $$
 
-```{r eval=FALSE}
+```{r, eval=inla_available}
 # some large value, so that 1-F(K) is small
-max_K <- ceiling(max(y)) + 4 * sqrt(max(y))
+max_K <- ceiling(max(newdata$y) + 4 * sqrt(max(newdata$y)))
+k <- seq(0, max_K)
+kk <- rep(k, times = length(newdata$y))
+i <- seq_along(newdata$y)
 pred <- generate(fit, newdata,
   formula = ~ {
-    lambda <- exp(eta)
-    k <- seq(0, max_K)
-    do.call(
-      cbind,
-      lapply(
-        seq_along(y),
-        function(i) {
-          Fpred <- ppois(k, rate = lambda[i])
-          data.frame(
-            k = c(k, k),
-            i = c(i, i),
-            type = rep(c("F", "residual"), each = length(Fpred)),
-            value = c(Fpred, Fpred - (y[i] <= k))
-          )
-        }
-      )
-    )
+    lambda <- exp(Intercept + x)
+    ppois(kk, lambda = rep(lambda, each = length(k)))
   },
   n.samples = 2000
 )
-F_estimate <-
-  (pred %>%
-    filter(type == "F") %>%
-    group_by(i) %>%
-    summarise(F = sum(mean), groups = "drop") %>%
-    pull("F"))
-crps_score <-
-  (pred %>%
-    filter(type == "residual") %>%
-    group_by(i) %>%
-    summarise(crps = sum(mean^2), groups = "drop") %>%
-    pull(crps))
+results <- data.frame(
+  i = rep(i, each = length(k)),
+  k = kk,
+  Fpred = rowMeans(pred),
+  residuals = rowMeans(pred) - (rep(newdata$y, each = length(k)) <= kk)
+)
 # Check that the cutoff point K has nearly probability mass 1 below it,
 # for all i:
-min(F_estimate)
+min(results %>% dplyr::filter(k == max_K) %>% pull(Fpred))
+
+crps_scores <-
+  (results %>%
+    group_by(i) %>%
+    summarise(crps = sum(residuals^2), .groups = "drop") %>%
+    pull(crps))
+summary(crps_scores)
 ```
 
 
@@ -355,9 +386,9 @@ $$
 $$
 with the averaging over the samples inside the quadratic expression, and we can
 use
-```{r eval=FALSE}
-pred <- predict(fit, newdata, formula = ~ exp(eta))
-scores <- (y - pred$mean)^2
+```{r, eval=inla_available}
+pred <- predict(fit, newdata, formula = ~ exp(Intercept + x))
+scores <- (newdata$y - pred$mean)^2
 ```
 
 If we instead take advantage of the new expression above, we have
@@ -369,18 +400,25 @@ $$
 \pVar(\lambda|\text{data})
 $$
 so the score can be estimated by
-```{r eval=FALSE}
-pred <- predict(fit, newdata, formula = ~ list(
-  cond_scores = (y - exp(eta))^2,
-  lambda = exp(eta)
-))
+```{r, eval=inla_available}
+pred <- predict(fit, newdata,
+  formula = ~ {
+    lambda <- exp(Intercept + x)
+    list(
+      cond_scores = (y - lambda)^2,
+      lambda = lambda
+    )
+  },
+  n.samples = 2000
+)
 scores <- pred$cond_scores$mean - pred$lambda$sd^2
+summary(scores)
 ```
 For this particular case, this approach is unlikely to be an improvement or more
 accurate than the basic estimator.However, for other scores there may
 potentially be practical benefits.
 
-### An alternative estimator for CRSP
+### An alternative estimator for CRPS
 For the CRPS score, there are closed form expressions available for some distributions,
 conditionally on their parameters, but not for the full predictive mixture distribution.
 We take a similar approach as for SE,
@@ -414,32 +452,25 @@ Brier scores for predicting event indicators of the form $z=I(y\leq x)$, with pr
 
 In the Poisson case, we can now estimate the CRPS scores like this, that makes
 the code a bit easier than the previous version that needed `generate()`.
+We can use the Poisson CRPS implementation
+`crps_pois()` from the [`scoringRules`](https://cran.r-project.org/package=scoringRules) package.
+
 However, it can be shown that the two approaches have nearly identical Monte Carlo variance,
 so the previous version is likely preferable as it doesn't require knowing
 a closed form CRPS expression.
-```{r eval=FALSE}
-poisson_crps <- function(y, rate) {
-  # compute the CRPS score for a single y, for the given rate paramter.
-}
+```{r, eval=inla_available}
 max_K <- 100 # some large value, so that 1-F(K) is small
 pred <- predict(fit, newdata,
   formula = ~ {
-    lambda <- exp(eta)
+    lambda <- exp(Intercept + x)
     list(
-      crps = vapply(
-        seq_along(y),
-        function(i) poisson_crps(y[i], lambda[i]),
-        0.0
-      ),
+      crps = scoringRules::crps_pois(y, lambda),
       F = do.call(
-        cbind,
+        c,
         lapply(
           seq_along(y),
           function(i) {
-            data.frame(
-              i = i,
-              F = ppois(seq(0, max_K), rate = lambda[i])
-            )
+            ppois(seq(0, max_K), lambda = lambda[i])
           }
         )
       )
@@ -448,10 +479,14 @@ pred <- predict(fit, newdata,
   n.samples = 2000
 )
 crps_score <-
-  pred$crsp$mean -
+  pred$crps$mean -
   (pred$F %>%
+    mutate(i = rep(seq_along(newdata$y), each = max_K + 1)) %>%
     group_by(i) %>%
-    summarise(F_var = sum(sd^2), groups = "drop") %>%
+    summarise(F_var = sum(sd^2), .groups = "drop") %>%
     pull(F_var))
+summary(crps_score)
 ```
-Formulas and functions for Poisson CRPS, as well as for other distributions, can be found at http://cran.nexr.com/web/packages/scoringRules/vignettes/crpsformulas.html#poisson-distribution-pois
+Formulas and functions for Poisson CRPS, as well as for other distributions, can be found via
+https://cran.r-project.org/web/packages/scoringRules/vignettes/article.pdf and
+the references in `?scoringRules::crps.numeric`.

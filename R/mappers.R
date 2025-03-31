@@ -953,8 +953,9 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' @title Mapper for `fm_mesh_1d`
 #' @param indexed logical; If `TRUE` (default), the `ibm_values()` output will
 #'   be the integer indexing sequence for the latent variables (needed for
-#'   `spde` models). If `FALSE`, the knot locations are returned (useful as an
-#'   interpolator for `rw2` models and similar).
+#'   `spde` models). If `FALSE`, points representative of the basis centres
+#'   are returned (useful for an interpolator for `rw2` models and similar,
+#'   for `fmesher` versions `>= 0.3.0.9002`).
 #' @returns A `bru_mapper_fm_mesh_1d` or `fm_mapper_fmesher` object. The the
 #'   general [bru_mapper_fmesher()] mapper handles all indexed `fmesher`
 #'   objects, except that `NA` inputs for `fm_mesh_1d` requires `fmesher`
@@ -972,10 +973,17 @@ ibm_jacobian.bru_mapper_inla_mesh_2d <- function(mapper, input, ...) {
 #' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:5)
+#'
 #' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:5)
 #'
+#' m <- bru_mapper(
+#'   fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
+#'   indexed = FALSE
+#' )
+#' ibm_values(m)
+#' ibm_eval(m, 1:7, 1:6)
 bru_mapper.fm_mesh_1d <- function(mesh, indexed = TRUE, ...) {
   if (indexed && utils::packageVersion("fmesher") >= "0.2.0.9002") {
     mapper <- bru_mapper_fmesher(mesh)
@@ -998,6 +1006,8 @@ ibm_n.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
 ibm_values.bru_mapper_fm_mesh_1d <- function(mapper, ...) {
   if (mapper[["indexed"]]) {
     seq_len(fmesher::fm_dof(mapper[["mesh"]]))
+  } else if (!is.null(mapper[["mesh"]][["mid"]])) {
+    mapper[["mesh"]]$mid
   } else {
     mapper[["mesh"]]$loc
   }

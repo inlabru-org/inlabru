@@ -29,8 +29,9 @@
 
 \item{indexed}{logical; If \code{TRUE} (default), the \code{ibm_values()} output will
 be the integer indexing sequence for the latent variables (needed for
-\code{spde} models). If \code{FALSE}, the knot locations are returned (useful as an
-interpolator for \code{rw2} models and similar).}
+\code{spde} models). If \code{FALSE}, points representative of the basis centres
+are returned (useful for an interpolator for \code{rw2} models and similar,
+for \code{fmesher} versions \verb{>= 0.3.0.9002}).}
 
 \item{...}{Arguments passed on to other methods}
 
@@ -52,10 +53,17 @@ Create mapper for an \code{fm_mesh_1d} object
 m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
+
 m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
+m <- bru_mapper(
+  fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
+  indexed = FALSE
+)
+ibm_values(m)
+ibm_eval(m, 1:7, 1:6)
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
