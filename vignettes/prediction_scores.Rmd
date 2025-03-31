@@ -313,13 +313,13 @@ F_estimate <-
   (pred %>%
     filter(type == "F") %>%
     group_by(i) %>%
-    summarise(F = sum(mean), groups = "drop") %>%
+    summarise(F = sum(mean), .groups = "drop") %>%
     pull("F"))
 crps_score <-
   (pred %>%
     filter(type == "residual") %>%
     group_by(i) %>%
-    summarise(crps = sum(mean^2), groups = "drop") %>%
+    summarise(crps = sum(mean^2), .groups = "drop") %>%
     pull(crps))
 # Check that the cutoff point K has nearly probability mass 1 below it,
 # for all i:
@@ -452,7 +452,7 @@ crps_score <-
   pred$crps$mean -
   (pred$F %>%
     group_by(i) %>%
-    summarise(F_var = sum(sd^2), groups = "drop") %>%
+    summarise(F_var = sum(sd^2), .groups = "drop") %>%
     pull(F_var))
 ```
 Formulas and functions for Poisson CRPS, as well as for other distributions, can be found via
