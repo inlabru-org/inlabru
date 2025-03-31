@@ -28,7 +28,10 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-inla_available <- bru_safe_inla(multicore = interactive(), quietly = TRUE)
+inla_available <- inlabru::bru_safe_inla(
+  multicore = interactive(),
+  quietly = TRUE
+)
 ```
 
 
