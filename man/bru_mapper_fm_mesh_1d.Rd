@@ -29,8 +29,9 @@
 
 \item{indexed}{logical; If \code{TRUE} (default), the \code{ibm_values()} output will
 be the integer indexing sequence for the latent variables (needed for
-\code{spde} models). If \code{FALSE}, the knot locations are returned (useful as an
-interpolator for \code{rw2} models and similar).}
+\code{spde} models). If \code{FALSE}, points representative of the basis centres
+are returned (useful for an interpolator for \code{rw2} models and similar,
+for \code{fmesher} versions \verb{>= 0.3.0.9002}).}
 
 \item{...}{Arguments passed on to other methods}
 
