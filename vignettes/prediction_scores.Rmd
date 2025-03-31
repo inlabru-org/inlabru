@@ -342,10 +342,10 @@ results <- data.frame(
 min(results %>% dplyr::filter(k == max_K) %>% pull(Fpred))
 
 crps_scores <-
-  (results  %>%
-   group_by(i) %>%
-   summarise(crps = sum(residuals^2), .groups = "drop") %>%
-   pull(crps))
+  (results %>%
+    group_by(i) %>%
+    summarise(crps = sum(residuals^2), .groups = "drop") %>%
+    pull(crps))
 summary(crps_scores)
 ```
 
@@ -398,14 +398,16 @@ $$
 $$
 so the score can be estimated by
 ```{r, eval=inla_available}
-pred <- predict(fit, newdata, formula = ~ {
-    lambda = exp(Intercept + x)
+pred <- predict(fit, newdata,
+  formula = ~ {
+    lambda <- exp(Intercept + x)
     list(
       cond_scores = (y - lambda)^2,
       lambda = lambda
     )
   },
-n.samples = 2000)
+  n.samples = 2000
+)
 scores <- pred$cond_scores$mean - pred$lambda$sd^2
 summary(scores)
 ```
