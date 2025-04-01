@@ -479,9 +479,9 @@ bru <- function(components = ~ Intercept(1),
     data.frame(
       Task = Task,
       Iteration = Iteration,
-      Time = as.difftime(time_diff[1], units = "secs"),
-      System = as.difftime(time_diff[2], units = "secs"),
-      Elapsed = as.difftime(time_diff[3], units = "secs")
+      Time = as.difftime(unname(time_diff[1]), units = "secs"),
+      System = as.difftime(unname(time_diff[2]), units = "secs"),
+      Elapsed = as.difftime(unname(time_diff[3]), units = "secs")
     )
   }
 
@@ -3503,7 +3503,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             data.frame(
               effect = label,
               index = seq_along(states[[1]][[label]]),
-              iteration = 0,
+              iteration = 0L,
               mode = NA_real_,
               sd = NA_real_,
               new_linearisation = states[[1]][[label]]
@@ -3579,9 +3579,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       },
       timings = {
         iteration_offset <- if (is.null(orig_timings)) {
-          0
+          0L
         } else {
-          max(c(0, orig_timings$Iteration), na.rm = TRUE)
+          max(c(0L, orig_timings$Iteration), na.rm = TRUE)
         }
         rbind(
           orig_timings,
@@ -3686,9 +3686,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   }
   inla_track <- list()
   if (is.null(old.result[["bru_iinla"]][["inla_track"]]) ||
-    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0)) {
+    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0L)) {
     orig_inla_track <- NULL
-    inla_track_size <- 0
+    inla_track_size <- 0L
   } else {
     orig_inla_track <- old.result[["bru_iinla"]][["inla_track"]]
     inla_track_size <- max(orig_inla_track[["iteration"]])
@@ -3800,7 +3800,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     verbosity = 3
   )
 
-  k <- 1
+  k <- 1L
   interrupt <- FALSE
   line_search <- list(
     active = FALSE,
@@ -4038,7 +4038,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     track_df[[label]] <-
       data.frame(
         effect = label,
-        index = 1,
+        index = 1L,
         iteration = track_size + k,
         mode = result[["misc"]][["configs"]][["max.log.posterior"]],
         sd = Inf
@@ -4204,7 +4204,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         unlist(states[[length(states)]][[label]])
     }
 
-    k <- k + 1
+    k <- k + 1L
   }
 
   result[["bru_iinla"]] <- collect_misc_info()
