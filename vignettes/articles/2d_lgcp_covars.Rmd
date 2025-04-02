@@ -712,9 +712,10 @@ comp <- x ~
   Intercept(1)
 
 fitcov1D <- lgcp(comp,
-                 pts2,
-                 domain = list(x = mesh),
-                 samplers = tibble::tibble(x = cbind(0, 55)))
+  pts2,
+  domain = list(x = mesh),
+  samplers = tibble::tibble(x = cbind(0, 55))
+)
 pr.df <- data.frame(x = x)
 prcov1D <- predict(
   fitcov1D,
@@ -728,9 +729,21 @@ prcov1D <- predict(
 )
 
 ggplot() +
-  gg(prcov1D$Intensity, aes(colour = "Intensity", fill = "Intensity"), alpha = 0.2, lwd = 1.25) +
-  gg(prcov1D$smooth, aes(colour = "Smooth", fill = "Smooth"), alpha = 0.2, lwd = 1.25) +
-  gg(prcov1D$z, aes(colour = "z-effect", fill = "z-effect"), alpha = 0.2, lwd = 1.25) +
+  gg(prcov1D$Intensity,
+    aes(colour = "Intensity", fill = "Intensity"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  gg(prcov1D$smooth,
+    aes(colour = "Smooth", fill = "Smooth"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  gg(prcov1D$z,
+    aes(colour = "z-effect", fill = "z-effect"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
   geom_line(aes(x, lambda2_1D(x), colour = "True intensity"), lwd = 1.25) +
   geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
   xlab(quote(bold(s))) +
