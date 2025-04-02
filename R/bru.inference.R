@@ -464,6 +464,8 @@ bru <- function(components = ~ Intercept(1),
                 options = list(),
                 .envir = parent.frame()) {
   stopifnot(bru_safe_inla(multicore = TRUE))
+  bru_log_bookmark("bru")
+  bru_log_message("bru: Preprocessing", verbosity = 1L)
 
   timings_convert <- function(x) {
     if (!is.na(x[4])) {
@@ -565,6 +567,7 @@ bru <- function(components = ~ Intercept(1),
     model = bru.model,
     inputs = inputs,
     lhoods = lhoods,
+    log = bru_log()["bru"],
     options = options
   )
 

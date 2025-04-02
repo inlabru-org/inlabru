@@ -344,10 +344,17 @@ bru_log.iinla <- function(x, verbosity = NULL) {
 #' @export
 bru_log.bru <- function(x, verbosity = NULL) {
   x <- bru_check_object_bru(x)
-  if (is.null(x[["bru_iinla"]][["log"]])) {
-    return(bru_log_new(character(0)))
+
+  if (is.null(x[["bru_info"]][["log"]])) {
+    result <- bru_log_new(character(0))
+  } else {
+    result <- bru_log(x[["bru_info"]][["log"]], verbosity = verbosity)
   }
-  bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity)
+
+  if (is.null(x[["bru_iinla"]][["log"]])) {
+    return(result)
+  }
+  c(result, bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity))
 }
 
 #' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
