@@ -359,13 +359,15 @@ gg.bru_prediction <- function(data,
       if (!is.null(mapping)) {
         ribbon.map <- utils::modifyList(ribbon.map, mapping)
       }
-      geom <- c(geom,
-                ggplot2::geom_ribbon(
-                  data = data,
-                  ribbon.map,
-                  alpha = alpha,
-                  colour = NA
-                ))
+      geom <- c(
+        geom,
+        ggplot2::geom_ribbon(
+          data = data,
+          ribbon.map,
+          alpha = alpha,
+          colour = NA
+        )
+      )
     }
   }
   geom
