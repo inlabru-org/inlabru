@@ -491,15 +491,17 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-e.int <- predict(efit, pred.df, ~ exp(mySmooth + elev + Intercept))
-e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
+e.pred <- predict(efit,
+                  pred.df,
+                  ~ list(int = exp(mySmooth + elev + Intercept),
+                         int.log = mySmooth + elev + Intercept))
 
 p1 <- ggplot() +
-  gg(e.int, aes(fill = log(sd)), geom = "tile") +
+  gg(e.pred$int, aes(fill = log(sd)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 p2 <- ggplot() +
-  gg(e.int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
+  gg(e.pred$int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 library(patchwork)
@@ -715,6 +717,24 @@ prcov1D <- predict(
 
 ggplot() +
   gg(prcov1D$total, color = "red") +
+  geom_ribbon(
+    aes(
+      x = prcov1D$spde$x,
+      ymin = prcov1D$spde$q0.025,
+      ymax = prcov1D$spde$q0.975
+    ),
+    alpha = 0.2,
+    fill = "blue"
+  ) +
+  geom_ribbon(
+    aes(
+      x = prcov1D$spde$x,
+      ymin = prcov1D$fx$q0.025,
+      ymax = prcov1D$fx$q0.975
+    ),
+    alpha = 0.2,
+    fill = "green"
+  ) +
   geom_line(aes(x = prcov1D$spde$x, y = prcov1D$spde$median),
     col = "blue", lwd = 1.25
   ) +
