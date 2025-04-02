@@ -59,11 +59,13 @@
 #' @export
 #' @param components A [component_list] object
 #' @param lhoods A list of one or more `lhood` objects
+#' @param inputs A list of component input evaluations, from
+#'   [input_eval.bru_like_list()].
 #' @return A [bru_model] object
 #' @keywords internal
 
-bru_model <- function(components, lhoods) {
-  stopifnot(inherits(components, "component_list"))
+bru_model <- function(components, lhoods, inputs = NULL) {
+  components <- bru_component_list(components)
 
   # Back up environment
   env <- environment(components)
@@ -77,8 +79,16 @@ bru_model <- function(components, lhoods) {
   linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
   # TODO: detect pure effect additivity (allowing nonlinear components)
 
+  if (is.null(inputs)) {
+    inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+  }
+
   # Complete the used component definitions based on data
-  components <- bru_component_list(components[included], lhoods)
+  components <- bru_component_list(
+    components[included],
+    lhoods = lhoods,
+    inputs = inputs
+  )
 
   for (cmp in included) {
     if (linear ||
@@ -180,8 +190,7 @@ evaluate_model <- function(model,
   if (is.null(input)) {
     input <- input_eval(
       components = model$effects[used$effect],
-      data = data,
-      inla_f = TRUE
+      data = data
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
@@ -836,23 +845,11 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
 #'
 #' @param model A `bru_model` object
 #' @param lhoods A `bru_like_list` object
-#' @param inla_f logical
 #' @rdname evaluate_inputs
 #' @keywords internal
-evaluate_inputs <- function(model, lhoods, inla_f) {
+evaluate_inputs <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  lapply(
-    lhoods,
-    function(lh) {
-      included <- bru_used(lh)[["effect"]]
-
-      input_eval(
-        model$effects[included],
-        data = lh[["data"]],
-        inla_f = inla_f
-      )
-    }
-  )
+  input_eval(lhoods, components = model[["effects"]])
 }
 
 #' Compute all index values

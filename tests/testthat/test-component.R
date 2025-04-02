@@ -410,11 +410,14 @@ test_that("Component construction: unsafe intercepts", {
   cmp <- bru_component_list(~ something_unknown - 1)
   lik <- bru_obs(formula = response ~ ., data = data.frame(response = 1:5))
   lik <- bru_used_update(lik, labels = names(cmp))
-  expect_warning(
+  expect_error(
     object = {
       model <- bru_model(cmp, bru_like_list(list(lik)))
     },
-    "All covariate evaluations for 'something_unknown' are NULL"
+    paste0(
+      "The input evaluation 'something_unknown' for 'something_unknown' ",
+      "failed. Perhaps the data object doesn't contain the needed variables?"
+    )
   )
 })
 

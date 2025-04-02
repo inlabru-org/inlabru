@@ -4,7 +4,7 @@
 \alias{iinla}
 \title{Iterated INLA}
 \usage{
-iinla(model, lhoods, initial = NULL, options)
+iinla(model, lhoods, inputs = NULL, initial = NULL, options)
 }
 \arguments{
 \item{model}{A \link{bru_model} object}

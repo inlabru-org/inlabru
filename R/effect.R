@@ -604,7 +604,7 @@ bru_component.character <- function(object,
 #' @param \dots Parameters passed on to other methods. Also see Details.
 #' @family component constructors
 #' @param object The object to operate on
-#' @param lhoods A `bru_like_list` object
+#' @param lhoods A [bru_like_list] object
 #' @param .envir An evaluation environment for non-formula input
 #' @export
 #' @rdname bru_component_list
@@ -667,10 +667,13 @@ bru_component_list.formula <- function(object,
 
 #' @describeIn bru_component_list Combine a list of components and/or component
 #'   formulas into a `component_list` object
+#' @param inputs A tree-like list of component input evaluations,
+#' from [input_eval.bru_like_list()].
 #' @export
 bru_component_list.list <- function(object,
                                     lhoods = NULL,
                                     .envir = parent.frame(),
+                                    inputs = NULL,
                                     ...) {
   # Maybe the list has been given an environment?
   if (!is.null(environment(object))) {
@@ -712,7 +715,7 @@ bru_component_list.list <- function(object,
   environment(object) <- .envir
   if (!is.null(lhoods)) {
     lhoods <- bru_used_update(lhoods, names(object))
-    object <- add_mappers(object, lhoods = lhoods)
+    object <- add_mappers(object, lhoods = lhoods, inputs = inputs)
   }
   object
 }
@@ -776,7 +779,7 @@ bru_component_list.list <- function(object,
 #' @description Equip component(s) with mappers for subcomponents that do not
 #'   have predefined mappers. When needed, the data in `lhoods` is used to
 #'   determine the appropriate mapper(s).
-#' @param component A `component` object
+#' @param component A [component] object
 #' @param lhoods A `bru_like_list` object
 #' @return A `component` object with completed mapper information
 #' @examples
@@ -788,7 +791,7 @@ bru_component_list.list <- function(object,
 #' @keywords internal
 #' @export
 
-add_mappers.component <- function(component, lhoods, ...) {
+add_mappers.component <- function(component, lhoods, inputs = NULL, ...) {
   # Filter out lhoods that don't use/support the component
   keep_lh <-
     vapply(lhoods,
@@ -799,11 +802,16 @@ add_mappers.component <- function(component, lhoods, ...) {
       label = component$label
     )
   lh <- lhoods[keep_lh]
+  inputs <- inputs[keep_lh]
 
   component$main <- add_mapper(
     component$main,
     label = component$label,
     lhoods = lh,
+    inputs = lapply(
+      inputs,
+      function(x) x[[component$label]][["mapper"]][["main"]]
+    ),
     env = component$env,
     require_indexed = FALSE
   )
@@ -811,6 +819,10 @@ add_mappers.component <- function(component, lhoods, ...) {
     component$group,
     label = component$label,
     lhoods = lh,
+    inputs = lapply(
+      inputs,
+      function(x) x[[component$label]][["mapper"]][["group"]]
+    ),
     env = component$env,
     require_indexed = TRUE
   )
@@ -818,6 +830,10 @@ add_mappers.component <- function(component, lhoods, ...) {
     component$replicate,
     label = component$label,
     lhoods = lh,
+    inputs = lapply(
+      inputs,
+      function(x) x[[component$label]][["mapper"]][["replicate"]]
+    ),
     env = component$env,
     require_indexed = TRUE
   )
@@ -893,10 +909,13 @@ add_mappers.component <- function(component, lhoods, ...) {
 #' @param components A `component_list` object
 #' @export
 #' @rdname add_mappers
-add_mappers.component_list <- function(components, lhoods, ...) {
+add_mappers.component_list <- function(components, lhoods, inputs = NULL, ...) {
+  if (is.null(inputs)) {
+    inputs <- input_eval(lhoods, components = components)
+  }
   is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
   for (k in which(!is_copy)) {
-    components[[k]] <- add_mappers(components[[k]], lhoods)
+    components[[k]] <- add_mappers(components[[k]], lhoods, inputs = inputs)
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
@@ -1163,7 +1182,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 }
 
 
+# @param inputs list with the subcomponent inputs, for each lhoods element;
+# lapply(full_inputs,
+#        function(x) x[[component$label]][["mapper"]][[subcomponent_label]])
 add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
+                       inputs = NULL,
                        require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["model"]], "character")) {
@@ -1190,23 +1213,26 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
   } else {
     if (!is.null(lhoods)) {
       if (length(lhoods) > 0) {
-        inp <- lapply(
-          lhoods,
-          function(lh) {
-            input_eval(subcomp$input,
-              data = lh$data,
-              env = env,
-              label = subcomp$input$label,
-              null.on.fail = TRUE
-            )
-          }
-        )
+        if (is.null(inputs)) {
+          inputs <- lapply(
+            lhoods,
+            function(lh) {
+              input_eval(
+                subcomp$input,
+                data = lh$data,
+                env = env,
+                label = subcomp$input$label,
+                null.on.fail = TRUE
+              )
+            }
+          )
+        }
       } else {
         # Component not directly used in any likelihood.
         # Attempt to evaluate with no data;
         # useful for intercept-like components only used via the
         # *_latent technique.
-        inp <- list(
+        inputs <- list(
           input_eval(subcomp$input,
             data = NULL,
             env = env,
@@ -1220,7 +1246,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       #              intercepts should be notated explicitly with label(1)
       # 2) Some NULL; exclude NULL results
       # TODO: Check for vector/matrix/coordinate inconsistency
-      null.results <- vapply(inp, function(x) is.null(x), TRUE)
+      null.results <- vapply(inputs, function(x) is.null(x), TRUE)
       if (all(null.results)) {
         warning(
           paste0(
@@ -1242,9 +1268,9 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
         )
       } else {
         if (any(null.results)) {
-          inp_ <- inp[!null.results]
+          inp_ <- inputs[!null.results]
         } else {
-          inp_ <- inp
+          inp_ <- inputs
         }
 
         unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
@@ -1972,7 +1998,7 @@ print.summary_bru_input <- function(x, ...) {
 
 #' @export
 #' @keywords internal
-#' @param component A component.
+#' @param component A [component].
 #' @param input Component inputs, from `input_eval()`
 #' @param state linearisation evaluation state
 #' @param ... Optional parameters passed on to `ibm_eval`
@@ -2113,7 +2139,7 @@ comp_lin_eval.component_list <- function(components, input, state, ...,
 #'
 #' @export
 #' @keywords internal
-#' @param component A component.
+#' @param component A [component].
 #' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
 #' covariates and/or point locations.
 #' If `NULL`, return the component's map.
@@ -2126,10 +2152,20 @@ comp_lin_eval.component_list <- function(components, input, state, ...,
 input_eval.component <- function(component,
                                  data,
                                  ...) {
-  stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
+  bru_log_message(
+    paste0("input_eval.component(", component$label, ")"),
+    verbosity = 5,
+    verbose = 0
+  )
 
-  # The names should be a subset of main, group, replicate
-  part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
+  if (is.null(component[["mapper"]])) {
+    part_names <- c("main", "group", "replicate")
+  } else {
+    stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
+
+    # The names should be a subset of main, group, replicate
+    part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
+  }
   mapper_val <- list()
   for (part in part_names) {
     mapper_val[[part]] <-
@@ -2158,6 +2194,7 @@ input_eval.component <- function(component,
   list(mapper = mapper_val, scale = scale_val)
 }
 
+#' @param components A [component_list].
 #' @export
 #' @rdname input_eval
 
@@ -2165,9 +2202,29 @@ input_eval.component_list <-
   function(components,
            data,
            ...) {
+    bru_log_message("input_eval.component_list", verbosity = 5, verbose = 0)
     lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
+#' @describeIn input_eval Computes the component inputs for included components
+#' for each model likelihood
+#'
+#' @param lhoods A [bru_like_list] object
+#' @export
+input_eval.bru_like_list <- function(lhoods, components, ...) {
+  lapply(
+    lhoods,
+    function(lh) {
+      included <- bru_used(lh)[["effect"]]
+
+      input_eval(
+        components[included],
+        data = lh[["data"]],
+        ...
+      )
+    }
+  )
+}
 
 
 input_eval_layer <- function(layer, selector = NULL, envir, enclos,
@@ -2215,6 +2272,11 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 #' @export
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
+  bru_log_message(
+    paste0("input_eval.bru_input(", input$label, ")"),
+    verbosity = 5,
+    verbose = 0
+  )
   # Evaluate the map with the data in an environment
   enclos <-
     if (is.null(env)) {
@@ -2280,16 +2342,14 @@ input_eval.bru_input <- function(input, data, env = NULL,
           ...
         ))
       } else {
-        warning(
+        stop(
           paste0(
             "The input evaluation '",
             input_string,
             "' for '", input$label,
             "' failed. Perhaps the data object doesn't contain ",
-            "the needed variables?",
-            " Falling back to '1'."
-          ),
-          immediate. = TRUE
+            "the needed variables?"
+          )
         )
       }
     }
@@ -2452,7 +2512,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
 
 #' @export
 #' @keywords internal
-#' @param component A component.
+#' @param component A [component].
 #' @param inla_f logical; when `TRUE`, must result in
 #' values compatible with `INLA::f(...)`
 #' an specification and corresponding `INLA::inla.stack(...)` constructions.

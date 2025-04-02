@@ -550,8 +550,10 @@ bru <- function(components = ~ Intercept(1),
   # Update include/exclude information to limit it to existing components
   lhoods <- bru_used_update(lhoods, labels = names(components))
 
+  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+
   # Turn model components into internal bru model
-  bru.model <- bru_model(components, lhoods)
+  bru.model <- bru_model(components, lhoods, inputs = inputs)
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
@@ -561,6 +563,7 @@ bru <- function(components = ~ Intercept(1),
   info <- bru_info(
     method = "bru",
     model = bru.model,
+    inputs = inputs,
     lhoods = lhoods,
     options = options
   )
@@ -572,6 +575,7 @@ bru <- function(components = ~ Intercept(1),
     result <- iinla(
       model = info[["model"]],
       lhoods = info[["lhoods"]],
+      inputs = info[["inputs"]],
       options = info[["options"]]
     )
   } else {
@@ -614,6 +618,7 @@ bru_rerun <- function(result, options = list()) {
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
+    inputs = info[["inputs"]],
     initial = result,
     options = info[["options"]]
   )
@@ -3449,6 +3454,8 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @export
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [bru_obs()]
+#' @param inputs Optional pre-computed  list of per-likelihood component
+#'   evaluations, from [input_eval.bru_like_list()].
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
@@ -3466,7 +3473,7 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, initial = NULL, options) {
+iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   add_timing <- function(timings, task, iteration = NA_integer_) {
     AbsTime <- proc.time()
     if (!is.na(AbsTime[4])) {
@@ -3674,6 +3681,12 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       old.result
     }
   )
+  bru_log_message(
+    "iinla: Start",
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
 
   # Track variables
   track <- list()
@@ -3699,13 +3712,15 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     orig_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
-  bru_log_message(
-    "iinla: Evaluate component inputs",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
-    verbosity = 3
-  )
-  inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
+  if (is.null(inputs)) {
+    bru_log_message(
+      "iinla: Evaluate component inputs",
+      verbose = options$bru_verbose,
+      verbose_store = options$bru_verbose_store,
+      verbosity = 3
+    )
+    inputs <- evaluate_inputs(model, lhoods = lhoods)
+  }
   bru_log_message(
     "iinla: Evaluate component linearisations",
     verbose = options$bru_verbose,

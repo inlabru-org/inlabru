@@ -6,7 +6,7 @@
 \alias{print.summary_bru_model}
 \title{Create an inlabru model object from model components}
 \usage{
-bru_model(components, lhoods)
+bru_model(components, lhoods, inputs = NULL)
 
 \method{summary}{bru_model}(object, ...)
 
@@ -16,6 +16,9 @@ bru_model(components, lhoods)
 \item{components}{A \link{component_list} object}
 
 \item{lhoods}{A list of one or more \code{lhood} objects}
+
+\item{inputs}{A list of component input evaluations, from
+\code{\link[=input_eval.bru_like_list]{input_eval.bru_like_list()}}.}
 
 \item{object}{Object to operate on}
 

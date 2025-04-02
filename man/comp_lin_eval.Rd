@@ -16,7 +16,7 @@ comp_lin_eval(...)
 \item{...}{Optional parameters passed on to \code{ibm_eval}
 and `ibm_jacobian.}
 
-\item{component}{A component.}
+\item{component}{A \link{component}.}
 
 \item{input}{Component inputs, from \code{input_eval()}}
 

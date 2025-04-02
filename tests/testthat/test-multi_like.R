@@ -23,8 +23,10 @@ test_that("Multiple likelihoods: basic model", {
     used = bru_used(effect = c("int2", "effect"))
   )
 
-  cmp1 <- bru_component_list(~ effect(x, model = "rw2", scale.model = TRUE) - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik1, lik2))
+  cmp1 <- bru_component_list(
+    ~ effect(x, model = "rw2", scale.model = TRUE) + int1(1) + int2(1) - 1
+  )
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik1, lik2)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(union(lik1$data$x, lik2$data$x))
