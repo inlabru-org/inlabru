@@ -893,7 +893,8 @@ add_mappers.component <- function(component, lhoods, inputs = NULL, ...) {
       as.formula(
         paste0(
           "~ . + ",
-          paste0(deparse(fcall),
+          paste0(
+            deparse(fcall),
             collapse = "\n"
           )
         ),
@@ -1885,14 +1886,14 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
     text <-
       paste0(
         lab, " = ",
-        deparse(inp)
+        paste0(deparse(inp), collapse = "\n")
       )
   } else {
     text <-
       paste0(
         lab, " = ",
         type, "(",
-        deparse(inp),
+        paste0(deparse(inp), collapse = "\n"),
         ")"
       )
   }
@@ -2239,7 +2240,7 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
   if (inherits(input_layer, "error")) {
     stop(paste0(
       "Failed to evaluate 'layer' input '",
-      deparse(layer),
+      paste0(deparse(layer), collapse = "\n"),
       "' for '",
       paste0(label, ":layer"),
       "'."
@@ -2320,7 +2321,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
       }
 
       val <- 1
-      input_string <- deparse(input$input)
+      input_string <- paste0(deparse(input$input), collapse = "\n")
       if (identical(input_string, "coordinates")) {
         warning(
           paste0(
@@ -2468,7 +2469,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
     warning(
       paste0(
         "Model input '",
-        deparse(input$input),
+        paste0(deparse(input$input), collapse = "\n"),
         "' for '", input$label,
         "' returned some NA values.\n",
         "Attempting to fill in spatially by nearest available value.\n",

@@ -709,7 +709,7 @@ eval_in_data_context <- function(input,
   if (inherits(result, "try-error")) {
     stop(paste0(
       "Input '",
-      deparse(input),
+      paste0(deparse(input), collapse = "\n"),
       "' could not be evaluated."
     ))
   }
