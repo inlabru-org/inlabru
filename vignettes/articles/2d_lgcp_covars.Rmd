@@ -693,14 +693,18 @@ specification.)
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 data(Poisson2_1D)
-ss <- seq(0, 55, length = 200)
-z <- cov2_1D(ss)
-x <- seq(1, 55, length = 100)
-mesh <- fm_mesh_1d(x, degree = 1)
+x <- seq(0, 55, length.out = 50)
+mesh <- fm_mesh_1d(x, degree = 2, boundary = "free")
 
+process_model <- inla.spde2.pcmatern(
+  mesh,
+  prior.sigma = c(1, 0.01),
+  prior.range = c(2, 0.01),
+  constr = TRUE
+)
 comp <- x ~
   beta_z(cov2_1D(x), model = "linear") +
-  spde1D(x, model = inla.spde2.matern(mesh)) +
+  spde1D(x, model = process_model) +
   Intercept(1)
 
 fitcov1D <- lgcp(comp, pts2, domain = list(x = mesh))
@@ -712,7 +716,8 @@ prcov1D <- predict(
     total = exp(beta_z + spde1D + Intercept),
     fx = exp(beta_z + Intercept),
     spde = exp(spde1D)
-  )
+  ),
+  n.samples = 2000
 )
 
 ggplot() +
