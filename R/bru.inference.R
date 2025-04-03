@@ -3612,8 +3612,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     stop(paste0(
       "An offset option was specified which may interfere with the ",
       "inlabru model construction.\n",
-      "Please use an explicit offset component instead; ",
-      "e.g. ~ myoffset(value, model = 'offset')"
+      "Please use an explicit constant component instead; ",
+      "e.g. ~ myoffset(value, model = 'const')"
     ))
   }
 
@@ -3680,8 +3680,12 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   original_log <- bru_log(
     if (is.null(old.result)) {
       character(0)
+    } else if (is.null(old.result[["bru_iinla"]])) {
+      character(0)
+    } else if (is.null(old.result[["bru_iinla"]][["log"]])) {
+      character(0)
     } else {
-      old.result
+      old.result[["bru_iinla"]][["log"]]
     }
   )
   bru_log_message(

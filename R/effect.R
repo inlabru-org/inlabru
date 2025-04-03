@@ -2032,6 +2032,12 @@ comp_lin_eval.component <- function(component,
 
 comp_lin_eval.component_list <- function(components, input, state, ...,
                                          options = NULL) {
+  bru_log_message(
+    paste0("Linearise components"),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   # Note: Make sure the list element names carry over!
   mappers <-
     lapply(
@@ -2155,7 +2161,7 @@ input_eval.component <- function(component,
                                  ...) {
   bru_log_message(
     paste0("input_eval.component(", component$label, ")"),
-    verbosity = 5,
+    verbosity = 4,
     verbose = 0
   )
 
@@ -2203,7 +2209,7 @@ input_eval.component_list <-
   function(components,
            data,
            ...) {
-    bru_log_message("input_eval.component_list", verbosity = 5, verbose = 0)
+    bru_log_message("input_eval.component_list", verbosity = 4, verbose = 0)
     lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
@@ -2213,6 +2219,10 @@ input_eval.component_list <-
 #' @param lhoods A [bru_like_list] object
 #' @export
 input_eval.bru_like_list <- function(lhoods, components, ...) {
+  bru_log_message(
+    "Evaluate component inputs for each observation model",
+    verbosity = 3L
+  )
   lapply(
     lhoods,
     function(lh) {

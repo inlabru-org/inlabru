@@ -725,6 +725,12 @@ bru_component_eval <- function(main,
 evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
                               options = NULL) {
   stopifnot(inherits(model, "bru_model"))
+  bru_log_message(
+    paste0("Linearise components for each observation model"),
+    verbose = options$bru_verbose,
+    verbose_store = options$bru_verbose_store,
+    verbosity = 3
+  )
   mappers <-
     lapply(
       input,
@@ -804,6 +810,10 @@ evaluate_comp_simple.component_list <- function(components, input,
 #' @export
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.bru_model <- function(model, input, ...) {
+  bru_log_message(
+    paste0("Simplify model components"),
+    verbosity = 3
+  )
   mappers <-
     lapply(
       input,
