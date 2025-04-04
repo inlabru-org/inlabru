@@ -4,7 +4,7 @@
 \alias{evaluate_comp_lin}
 \title{Compute all component linearisations}
 \usage{
-evaluate_comp_lin(model, input, state, inla_f = FALSE, options = deprecated())
+evaluate_comp_lin(model, input, state, inla_f = FALSE)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
@@ -14,10 +14,6 @@ evaluate_comp_lin(model, input, state, inla_f = FALSE, options = deprecated())
 \item{state}{A named list of component states}
 
 \item{inla_f}{Controls the input data interpretations}
-
-\item{options}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} as of \verb{2.12.0.9011}
-No longer used. Top-level functions should use \code{bru_options_set_local()}
-to override the global verbosity options, if necessary.}
 }
 \value{
 A list (class 'comp_simple') of named lists (class

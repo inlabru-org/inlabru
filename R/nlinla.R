@@ -32,9 +32,6 @@ bru_compute_linearisation <- function(...) {
 #' @param eps The finite difference step size
 #' @param n_pred The length of the predictor expression. If not `NULL`, scalar
 #' predictor evaluations are expanded to vectors of length `n_pred`.
-#' @param options `r lifecycle::badge("deprecated")` as of `2.12.0.9011`.
-#' No longer used. Top-level functions should use [bru_options_set_local()]
-#' to override the global verbosity options, if necessary.
 #'
 #' @export
 #' @rdname bru_compute_linearisation
@@ -51,17 +48,7 @@ bru_compute_linearisation.component <- function(cmp,
                                                 allow_combine,
                                                 eps,
                                                 n_pred = NULL,
-                                                ...,
-                                                options = deprecated()) {
-  if (lifecycle::is_present(options)) {
-    lifecycle::deprecate_warn(
-      when = "2.12.0.9011",
-      what = "bru_compute_linerisation(options)",
-      details =
-        "Use bru_options_set_local() to override the global verbosity options."
-    )
-  }
-
+                                                ...) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),

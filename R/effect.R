@@ -1994,9 +1994,6 @@ print.summary_bru_input <- function(x, ...) {
 #' @param state linearisation evaluation state
 #' @param ... Optional parameters passed on to `ibm_eval`
 #' and `ibm_jacobian.
-#' @param options `r lifecycle::badge("deprecated")` as of `2.12.0.9011`.
-#' No longer used. Top-level functions should use [bru_options_set_local()]
-#' to override the global verbosity options, if necessary.
 #' @return A `bru_mapper_taylor` or `comp_simple_list` object.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname comp_lin_eval
@@ -2004,16 +2001,7 @@ print.summary_bru_input <- function(x, ...) {
 comp_lin_eval.component <- function(component,
                                     input = NULL,
                                     state = NULL,
-                                    ...,
-                                    options = deprecated()) {
-  if (lifecycle::is_present(options)) {
-    lifecycle::deprecate_warn(
-      when = "2.12.0.9011",
-      what = "comp_lin_eval(options)",
-      details =
-        "Use bru_options_set_local() to override the global verbosity options."
-    )
-  }
+                                    ...) {
   bru_log_message(
     paste0("Linearise component '", component[["label"]], "'"),
     verbosity = 4
@@ -2027,16 +2015,7 @@ comp_lin_eval.component <- function(component,
 #' @export
 #' @rdname comp_lin_eval
 
-comp_lin_eval.component_list <- function(components, input, state, ...,
-                                         options = deprecated()) {
-  if (lifecycle::is_present(options)) {
-    lifecycle::deprecate_warn(
-      when = "2.12.0.9011",
-      what = "evaluate_comp_simple(options)",
-      details =
-        "Use bru_options_set_local() to override the global verbosity options."
-    )
-  }
+comp_lin_eval.component_list <- function(components, input, state, ...) {
   bru_log_message(
     paste0("Linearise components"),
     verbosity = 3

@@ -24,8 +24,7 @@ bru_compute_linearisation(...)
   allow_combine,
   eps,
   n_pred = NULL,
-  ...,
-  options = deprecated()
+  ...
 )
 
 \method{bru_compute_linearisation}{bru_like}(
@@ -91,10 +90,6 @@ involve several rows of the input data to influence the same row.}
 
 \item{n_pred}{The length of the predictor expression. If not \code{NULL}, scalar
 predictor evaluations are expanded to vectors of length \code{n_pred}.}
-
-\item{options}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} as of \verb{2.12.0.9011}.
-No longer used. Top-level functions should use \code{\link[=bru_options_set_local]{bru_options_set_local()}}
-to override the global verbosity options, if necessary.}
 
 \item{lhood}{A \code{bru_like} object}
 
