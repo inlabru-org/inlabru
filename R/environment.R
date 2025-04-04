@@ -357,7 +357,7 @@ bru_log.bru <- function(x, verbosity = NULL) {
   c(result, bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity))
 }
 
-#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
+#' @describeIn bru_log Format a `bru_log` object for printing.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
 #' @param ... further arguments passed to or from other methods.
 #' @param timestamp If `TRUE`, include the timestamp of each message. Default
@@ -365,9 +365,9 @@ bru_log.bru <- function(x, verbosity = NULL) {
 #' @export
 #' @examples
 #' bru_log(verbosity = 2L)
-#' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+#' format(bru_log())
 #'
-print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
+format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   msg <- x[["log"]][["message"]]
   if (timestamp) {
     msg <- paste0(
@@ -379,7 +379,25 @@ print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
       msg, " (level ", x[["log"]][["verbosity"]], ")"
     )
   }
-  cat(msg, sep = "\n")
+  msg
+}
+
+#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
+#' If `verbosity` is `TRUE`, include the verbosity level of each message.
+#' @export
+#' @examples
+#' bru_log(verbosity = 2L)
+#' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+#'
+print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
+  cat(
+    format(x,
+           ...,
+           timestamp = timestamp,
+           verbosity = verbosity
+    ),
+    sep = "\n"
+  )
   invisible(x)
 }
 
@@ -543,6 +561,7 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
     invisible(x)
   }
 }
+
 
 
 
@@ -963,6 +982,32 @@ bru_options_reset <- function() {
   envir <- bru_env_get()
   envir$options <- bru_options()
   invisible(bru_options_get(include_default = FALSE))
+}
+
+
+#' @describeIn bru_options Sets local option overrides, that are
+#'   automatically reset using `withr::defer()`.
+#' @param .envir The environment in which to set the options.
+#'   Default: `parent.frame()`
+#' @examples
+#' my_fun <- function(val) {
+#'   bru_options_set_local(bru_verbose = val)
+#'   bru_options_get("bru_verbose")
+#' }
+#' # Inside the function, the bru_verbose option is changed.
+#' # Outside the function, the bru_verbose option is unchanged.
+#' print(my_fun(TRUE))
+#' print(bru_options_get("bru_verbose"))
+#' print(my_fun(FALSE))
+#' print(bru_options_get("bru_verbose"))
+#' @export
+bru_options_set_local <- function(..., .reset = FALSE, .envir = parent.frame()) {
+  original_options <- bru_options_get(include_default = FALSE)
+  withr::defer(
+    bru_options_set(original_options, .reset = TRUE),
+    envir = .envir
+  )
+  invisible(bru_options_set(..., .reset = .reset))
 }
 
 

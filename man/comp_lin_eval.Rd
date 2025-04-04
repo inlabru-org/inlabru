@@ -8,9 +8,15 @@
 \usage{
 comp_lin_eval(...)
 
-\method{comp_lin_eval}{component}(component, input = NULL, state = NULL, ..., options = NULL)
+\method{comp_lin_eval}{component}(
+  component,
+  input = NULL,
+  state = NULL,
+  ...,
+  options = deprecated()
+)
 
-\method{comp_lin_eval}{component_list}(components, input, state, ..., options = NULL)
+\method{comp_lin_eval}{component_list}(components, input, state, ..., options = deprecated())
 }
 \arguments{
 \item{...}{Optional parameters passed on to \code{ibm_eval}
@@ -22,8 +28,9 @@ and `ibm_jacobian.}
 
 \item{state}{linearisation evaluation state}
 
-\item{options}{A \code{bru_options} object. The log verbosity options
-are used.}
+\item{options}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} as of \verb{2.12.0.9011}.
+No longer used. Top-level functions should use \code{\link[=bru_options_set_local]{bru_options_set_local()}}
+to override the global verbosity options, if necessary.}
 }
 \value{
 A \code{bru_mapper_taylor} or \code{comp_simple_list} object.

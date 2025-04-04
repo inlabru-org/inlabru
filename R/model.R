@@ -715,20 +715,27 @@ bru_component_eval <- function(main,
 #' @param input A list of named lists of component inputs
 #' @param state A named list of component states
 #' @param inla_f Controls the input data interpretations
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
+#' @param options `r lifecycle::badge("deprecated")` as of `2.12.0.9011`
+#' No longer used. Top-level functions should use `bru_options_set_local()`
+#' to override the global verbosity options, if necessary.
 #' @return A list (class 'comp_simple') of named lists (class
 #'   'comp_simple_list') of `bru_mapper_taylor` objects, one for each included
 #'   component
 #' @rdname evaluate_comp_lin
 #' @keywords internal
 evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
-                              options = NULL) {
+                              options = deprecated()) {
+  if (lifecycle::is_present(options)) {
+    lifecycle::deprecate_warn(
+      when = "2.12.0.9011",
+      what = "evaluate_comp_lin(options)",
+      details =
+        "Use bru_options_set_local() to override the global verbosity options."
+    )
+  }
   stopifnot(inherits(model, "bru_model"))
   bru_log_message(
     paste0("Linearise components for each observation model"),
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
   mappers <-
@@ -745,8 +752,7 @@ evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
           model[["effects"]][included],
           input = inp[included],
           state = state[included],
-          inla_f = inla_f,
-          options = options
+          inla_f = inla_f
         )
 
         class(mappers) <- c("comp_simple_list", class(mappers))
@@ -778,20 +784,27 @@ evaluate_comp_simple <- function(...) {
 }
 
 #' @export
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
+#' @param options `r lifecycle::badge("deprecated")` as of `2.12.0.9011`
+#' No longer used. Top-level functions should use [bru_options_set_local()]
+#' to override the global verbosity options, if necessary.
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
                                                 inla_f = FALSE, ...,
-                                                options = NULL) {
+                                                options = deprecated()) {
+  if (lifecycle::is_present(options)) {
+    lifecycle::deprecate_warn(
+      when = "2.12.0.9011",
+      what = "evaluate_comp_simple(options)",
+      details =
+        "Use bru_options_set_local() to override the global verbosity options."
+    )
+  }
   mappers <- lapply(
     components,
     function(x) {
       label <- x[["label"]]
       bru_log_message(
         paste0("Simplify component '", label, "'"),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 4
       )
       ibm_simplify(

@@ -6,6 +6,7 @@
 \alias{bru_log.bru_log}
 \alias{bru_log.iinla}
 \alias{bru_log.bru}
+\alias{format.bru_log}
 \alias{print.bru_log}
 \alias{as.character.bru_log}
 \alias{[.bru_log}
@@ -22,6 +23,8 @@ bru_log(x = NULL, verbosity = NULL)
 \method{bru_log}{iinla}(x, verbosity = NULL)
 
 \method{bru_log}{bru}(x, verbosity = NULL)
+
+\method{format}{bru_log}(x, ..., timestamp = TRUE, verbosity = FALSE)
 
 \method{print}{bru_log}(x, ..., timestamp = TRUE, verbosity = FALSE)
 
@@ -64,6 +67,9 @@ After version \verb{2.8.0}, use \code{bru_log()} to access the global log, and
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{format(bru_log)}: Format a \code{bru_log} object for printing.
+If \code{verbosity} is \code{TRUE}, include the verbosity level of each message.
+
 \item \code{print(bru_log)}: Print a \code{bru_log} object with \code{cat(x, sep = "\\n")}.
 If \code{verbosity} is \code{TRUE}, include the verbosity level of each message.
 
@@ -86,6 +92,9 @@ to extract.
 
 }}
 \examples{
+bru_log(verbosity = 2L)
+format(bru_log())
+
 bru_log(verbosity = 2L)
 print(bru_log(), timestamp = TRUE, verbosity = TRUE)
 

@@ -8,6 +8,7 @@
 \alias{bru_options_get}
 \alias{bru_options_set}
 \alias{bru_options_reset}
+\alias{bru_options_set_local}
 \title{Create or update an options objects}
 \usage{
 bru_options(...)
@@ -23,6 +24,8 @@ bru_options_get(name = NULL, include_default = TRUE)
 bru_options_set(..., .reset = FALSE)
 
 bru_options_reset()
+
+bru_options_set_local(..., .reset = FALSE, .envir = parent.frame())
 }
 \arguments{
 \item{...}{A collection of named options, optionally including one or more
@@ -44,6 +47,9 @@ together with the global override options. Default: \code{TRUE}}
 
 \item{.reset}{For \code{bru_options_set}, logical indicating if the global
 override options list should be emptied before setting the new option(s).}
+
+\item{.envir}{The environment in which to set the options.
+Default: \code{parent.frame()}}
 }
 \value{
 \code{bru_options()} returns a \code{bru_options} object.
@@ -89,6 +95,9 @@ object, and produces warnings for invalid options.
 \item \code{bru_options_set()}: Used to set global package options.
 
 \item \code{bru_options_reset()}: Clears the global option overrides.
+
+\item \code{bru_options_set_local()}: Sets local option overrides, that are
+automatically reset using \code{withr::defer()}.
 
 }}
 \section{Valid options}{
@@ -202,6 +211,16 @@ if (interactive()) {
   )
 }
 }
+my_fun <- function(val) {
+  bru_options_set_local(bru_verbose = val)
+  bru_options_get("bru_verbose")
+}
+# Inside the function, the bru_verbose option is changed.
+# Outside the function, the bru_verbose option is unchanged.
+print(my_fun(TRUE))
+print(bru_options_get("bru_verbose"))
+print(my_fun(FALSE))
+print(bru_options_get("bru_verbose"))
 }
 \seealso{
 \code{\link[=bru_options]{bru_options()}}, \code{\link[=bru_options_default]{bru_options_default()}}, \code{\link[=bru_options_get]{bru_options_get()}}
