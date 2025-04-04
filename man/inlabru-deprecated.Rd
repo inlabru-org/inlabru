@@ -40,8 +40,8 @@ in a future version.
 }
 \section{Functions}{
 \itemize{
-\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy \code{like_list()}
-alias. Use \code{\link[=bru_like_list]{bru_like_list()}} instead.
+\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy
+\code{like_list()} alias. Use \code{\link[=bru_like_list]{bru_like_list()}} instead.
 
 \item \code{gmap()}: Plot a map using extent of a spatial object
 

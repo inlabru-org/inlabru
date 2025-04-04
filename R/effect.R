@@ -962,13 +962,12 @@ bru_subcomponent <- function(input = NULL,
   } else if (is.character(model)) {
     if (identical(model, "factor")) {
       model <- "factor_contrast"
-      warning(
+      bru_log_warn(
         paste0(
           "Deprecated model 'factor'. Please use 'factor_full' or ",
           "'factor_contrast' instead.\n",
           "Defaulting to 'factor_contrast' that matches the old 'factor' model."
-        ),
-        immediate. = TRUE
+        )
       )
     }
     if (model %in%
@@ -1239,20 +1238,18 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inputs, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        warning(
-          paste0(
-            "All covariate evaluations for '", label,
-            "' are NULL; an intercept component was likely intended.\n",
-            "  Implicit latent intercept component specification is ",
-            "deprecated since version 2.1.14.\n",
-            "  Use explicit notation '+ ", label, "(1)' instead",
-            if (identical(label, "Intercept")) {
-              " (or '+1' for '+ Intercept(1)')"
-            },
-            "."
-          ),
-          immediate. = TRUE
+        msg <- paste0(
+          "All covariate evaluations for '", label,
+          "' are NULL; an intercept component was likely intended.\n",
+          "  Implicit latent intercept component specification is ",
+          "deprecated since version 2.1.14.\n",
+          "  Use explicit notation '+ ", label, "(1)' instead",
+          if (identical(label, "Intercept")) {
+            " (or '+1' for '+ Intercept(1)')"
+          },
+          "."
         )
+        bru_log_message(msg)
         unique_inputs <- list(
           inp_values = 1,
           n_values = 1
@@ -2455,17 +2452,15 @@ input_eval.bru_input <- function(input, data, env = NULL,
     "SpatRaster"
   ))) &&
     any(is.na(as.data.frame(val)))) {
-    warning(
-      paste0(
-        "Model input '",
-        paste0(deparse(input$input), collapse = "\n"),
-        "' for '", input$label,
-        "' returned some NA values.\n",
-        "Attempting to fill in spatially by nearest available value.\n",
-        "To avoid this basic covariate imputation, supply complete data."
-      ),
-      immediate. = TRUE
+    msg <- paste0(
+      "Model input '",
+      paste0(deparse(input$input), collapse = "\n"),
+      "' for '", input$label,
+      "' returned some NA values.\n",
+      "Attempting to fill in spatially by nearest available value.\n",
+      "To avoid this basic covariate imputation, supply complete data."
     )
+    bru_log_warn(msg)
 
     val <- bru_fill_missing(
       data = e_input, where = data, values = val,

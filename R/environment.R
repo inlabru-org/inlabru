@@ -392,9 +392,9 @@ format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
 print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   cat(
     format(x,
-           ...,
-           timestamp = timestamp,
-           verbosity = verbosity
+      ...,
+      timestamp = timestamp,
+      verbosity = verbosity
     ),
     sep = "\n"
   )
@@ -472,8 +472,9 @@ as.character.bru_log <- function(x, ...) {
 
 #' @title Add a log message
 #' @description Adds a log message.
-#' @param ... For `bru_log_message()`, zero or more objects passed on to
-#' [`base::.makeMessage()`]
+#' @param \dots For `bru_log_message()`, zero or more objects passed on to
+#'   [`base::.makeMessage()`]. For `bru_log_abort()` and `bru_log_warn()`,
+#'   passed on to `rlang::abort()` and `rlang::warn()`.
 #' @param domain Domain for translations, passed on to [`base::.makeMessage()`]
 #' @param appendLF logical; whether to add a newline to the message. Only
 #'   used for verbose output.
@@ -563,6 +564,62 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 }
 
 
+#' @describeIn bru_log_message Store a log message and throw an error.
+#' @param msg character; passed to [`base::.makeMessage()`]
+#' @param call The calling environment.
+#' @param .frame The throwing context, for when `.internal` is `TRUE`
+#' @export
+#' @keywords internal
+bru_log_abort <- function(
+    msg,
+    ...,
+    domain = NULL,
+    appendLF = TRUE,
+    verbosity = 1L,
+    allow_verbose = TRUE,
+    verbose = FALSE,
+    verbose_store = NULL,
+    call = rlang::caller_env(),
+    .frame = rlang::caller_env()) {
+  bru_log_message(
+    msg,
+    domain = domain,
+    appendLF = appendLF,
+    verbosity = verbosity,
+    allow_verbose = allow_verbose,
+    verbose = verbose,
+    verbose_store = verbose_store
+  )
+  rlang::abort(msg, call = call, .frame = .frame, ...)
+}
+
+#' @describeIn bru_log_message Store a log message and throw a warning.
+#' @export
+#' @keywords internal
+bru_log_warn <- function(
+    msg,
+    ...,
+    domain = NULL,
+    appendLF = TRUE,
+    verbosity = 1L,
+    allow_verbose = TRUE,
+    verbose = FALSE,
+    verbose_store = NULL,
+    call = rlang::caller_env(),
+    .frame = rlang::caller_env()) {
+  bru_log_message(
+    msg,
+    domain = domain,
+    appendLF = appendLF,
+    verbosity = verbosity,
+    allow_verbose = allow_verbose,
+    verbose = verbose,
+    verbose_store = verbose_store
+  )
+  ## Need to solve inla swallowing warnings before this works:
+  ## rlang::warn(msg, call = call, .frame = .frame, ...)
+  warning(msg, immediate. = TRUE)
+}
 
 
 # Options methods ----
@@ -1001,12 +1058,11 @@ bru_options_reset <- function() {
 #' print(my_fun(FALSE))
 #' print(bru_options_get("bru_verbose"))
 #' @export
-bru_options_set_local <- function(..., .reset = FALSE, .envir = parent.frame()) {
+bru_options_set_local <- function(...,
+                                  .reset = FALSE,
+                                  .envir = parent.frame()) {
   original_options <- bru_options_get(include_default = FALSE)
-  withr::defer(
-    bru_options_set(original_options, .reset = TRUE),
-    envir = .envir
-  )
+  withr::defer(bru_options_set(original_options, .reset = TRUE), envir = .envir)
   invisible(bru_options_set(..., .reset = .reset))
 }
 

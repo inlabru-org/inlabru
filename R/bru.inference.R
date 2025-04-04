@@ -1119,11 +1119,7 @@ bru_obs <- function(formula = . ~ .,
     }
 
     if (length(E) > 1) {
-      bru_log_message(
-        "Exposure/effort parameter E should be a scalar for likelihood 'cp'.",
-        verbosity = 1L
-      )
-      warning(
+      bru_log_warn(
         "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
       )
     }
@@ -1307,16 +1303,21 @@ bru_obs <- function(formula = . ~ .,
   } else {
     if (!is.logical(allow_combine)) {
       if (!is.null(response_data)) {
-        warning("Non-null response data supplied; guessing allow_combine=TRUE.",
-          "\n  Specify allow_combine explicitly to avoid this warning.",
-          immediate. = TRUE
+        bru_log_warn(
+          paste0(
+            "Non-null response data supplied; ",
+            "guessing allow_combine=TRUE.",
+            "\n  Specify allow_combine explicitly to avoid this warning."
+          )
         )
         allow_combine <- TRUE
       } else if (is.list(data) && !is.data.frame(data)) {
-        warning("Non data-frame list-like data supplied; ",
-          "guessing allow_combine=TRUE.",
-          "\n  Specify allow_combine explicitly to avoid this warning.",
-          immediate. = TRUE
+        bru_log_warn(
+          paste0(
+            "Non data-frame list-like data supplied; ",
+            "guessing allow_combine=TRUE.",
+            "\n  Specify allow_combine explicitly to avoid this warning."
+          )
         )
         allow_combine <- TRUE
       } else {
@@ -1714,8 +1715,8 @@ bru_like_list <- function(...) {
   UseMethod("bru_like_list")
 }
 
-#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` Legacy `like_list()`
-#'   alias. Use [bru_like_list()] instead.
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` Legacy
+#'   `like_list()` alias. Use [bru_like_list()] instead.
 #' @export
 like_list <- function(...) {
   lifecycle::deprecate_warn(
@@ -2002,9 +2003,11 @@ bru_like_control_family.bru_like_list <- function(x,
       TRUE
     )
     if (any(like_has_cf)) {
-      warning(
-        "Global control.family option overrides settings in likelihood(s) ",
-        paste0(which(like_has_cf), collapse = ", ")
+      bru_log_warn(
+        paste0(
+          "Global control.family option overrides settings in likelihood(s) ",
+          paste0(which(like_has_cf), collapse = ", "),
+        )
       )
     }
   } else {
@@ -2354,7 +2357,9 @@ predict.bru <- function(object,
   } else if (is.list(vals[[1]])) {
     vals.names <- names(vals[[1]])
     if (any(vals.names == "")) {
-      warning("Some generated list elements are unnamed")
+      bru_log_warn(
+        "Some generated list elements are unnamed"
+      )
     }
     smy <- list()
     for (nm in vals.names) {
@@ -2911,8 +2916,11 @@ bru_line_search <- function(model,
 
   # Initialise ----
   if (is.null(weights)) {
-    warning("NULL weights detected for line search. Using weights = 1 instead.",
-      immediate. = TRUE
+    bru_log_warn(
+      paste0(
+        "NULL weights detected for line search. Using weights = 1 instead.",
+        "\n\tThis is a bug in the inlabru package. Please notify the developer."
+      )
     )
     weights <- 1
   }
@@ -2935,14 +2943,13 @@ bru_line_search <- function(model,
   )
 
   if (length(lin_pred1) != length(nonlin_pred)) {
-    warning(
+    bru_log_warn(
       paste0(
         "Please notify the inlabru package developer:",
-        "\nThe line search linear and nonlinear predictors have ",
+        "\n\tThe line search linear and nonlinear predictors have ",
         "different lengths.",
-        "\nThis should not happen!"
-      ),
-      immediate. = TRUE
+        "\n\tThis should not happen!"
+      )
     )
   }
 
@@ -4008,14 +4015,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     timings <- add_timing(timings, "Run inla()", k)
 
     if (inherits(result, "try-error")) {
-      bru_log_message(
-        paste0("iinla: Problem in inla:\n", result),
-        verbosity = 1L,
-        verbose = FALSE
-      )
-      warning(
-        paste0("iinla: Problem in inla:\n", result),
-        immediate. = TRUE
+      bru_log_warn(
+        paste0("iinla: Problem in inla:\n", result)
       )
       bru_log_message(
         paste0(

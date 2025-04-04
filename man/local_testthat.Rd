@@ -81,6 +81,7 @@ should be called inside each test that relies on INLA.
 
 }}
 \seealso{
-\code{\link[=bru_options_set_local]{bru_options_set_local()}}, \code{\link[=bru_options_default]{bru_options_default()}}, \code{\link[=bru_options_get]{bru_options_get()}}
+\code{\link[=bru_options_set_local]{bru_options_set_local()}}, \code{\link[=bru_options_default]{bru_options_default()}},
+\code{\link[=bru_options_get]{bru_options_get()}}
 }
 \keyword{internal}

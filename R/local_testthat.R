@@ -42,7 +42,8 @@ local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
 #' to locally override the global package options.
 #' @return `local_bru_options_set()` returns a copy of the global override
 #' options (not including the defaults), invisibly.
-#' @seealso [bru_options_set_local()], [bru_options_default()], [bru_options_get()]
+#' @seealso [bru_options_set_local()], [bru_options_default()],
+#'   [bru_options_get()]
 #' @param .reset For `local_bru_options_set`, logical indicating if the global
 #' override options list should be emptied before setting the new option(s).
 #'
