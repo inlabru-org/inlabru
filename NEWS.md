@@ -14,6 +14,8 @@
   can be pre-evaluated before automated mapper construction, and avoiding
   duplicate evaluation in `iinla()`. This can halve the pre-processing
   time for large spatial and spatio-temporal models (version `2.12.0.9010`)
+* Add `bru_log()` data for warnings and errors reported by inlabru (version
+  `2.12.0.9011`)
 
 ## New and updated mapper features
 

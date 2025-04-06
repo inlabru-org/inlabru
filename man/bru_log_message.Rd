@@ -94,7 +94,7 @@ Adds a log message.
 \examples{
 if (interactive()) {
   code_runner <- function() {
-    local_bru_options_set(
+    bru_options_set_local(
       # Show messages up to and including level 2 (default 0)
       bru_verbose = 2,
       # Store messages to an including level 3 (default Inf, storing all)
@@ -127,4 +127,3 @@ Other inlabru log methods:
 \code{\link{bru_log_reset}()}
 }
 \concept{inlabru log methods}
-\keyword{internal}

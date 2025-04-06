@@ -498,7 +498,7 @@ as.character.bru_log <- function(x, ...) {
 #' @examples
 #' if (interactive()) {
 #'   code_runner <- function() {
-#'     local_bru_options_set(
+#'     bru_options_set_local(
 #'       # Show messages up to and including level 2 (default 0)
 #'       bru_verbose = 2,
 #'       # Store messages to an including level 3 (default Inf, storing all)
@@ -569,7 +569,6 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' @param call The calling environment.
 #' @param .frame The throwing context, for when `.internal` is `TRUE`
 #' @export
-#' @keywords internal
 bru_log_abort <- function(
     msg,
     ...,
@@ -595,7 +594,6 @@ bru_log_abort <- function(
 
 #' @describeIn bru_log_message Store a log message and throw a warning.
 #' @export
-#' @keywords internal
 bru_log_warn <- function(
     msg,
     ...,
