@@ -274,8 +274,8 @@ intervals for the scores can be obtained via the Monte Carlo standard errors:
 head(
   data.frame(
     log_S = log_score,
-    lower = log_score - 2 * pred$mean.mc_std_err,
-    upper = log_score + 2 * pred$mean.mc_std_err
+    lower = log(pred$mean - 2 * pred$mean.mc_std_err),
+    upper = log(pred$mean + 2 * pred$mean.mc_std_err)
   )
 )
 ```
