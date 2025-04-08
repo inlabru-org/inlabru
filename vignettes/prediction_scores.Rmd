@@ -28,6 +28,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(inlabru)
 inla_available <- inlabru::bru_safe_inla(
   multicore = interactive(),
   quietly = TRUE
@@ -36,7 +37,6 @@ inla_available <- inlabru::bru_safe_inla(
 
 
 ```{r setup, include=TRUE, eval=inla_available}
-library(inlabru)
 library(magrittr)
 library(dplyr)
 library(scoringRules)
