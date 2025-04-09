@@ -491,15 +491,21 @@ Predict and plot the density
 
 
 ```{r results="hide",warning=FALSE,message=FALSE}
-e.int <- predict(efit, pred.df, ~ exp(mySmooth + elev + Intercept))
-e.int.log <- predict(efit, pred.df, ~ (mySmooth + elev + Intercept))
+e.pred <- predict(
+  efit,
+  pred.df,
+  ~ list(
+    int = exp(mySmooth + elev + Intercept),
+    int.log = mySmooth + elev + Intercept
+  )
+)
 
 p1 <- ggplot() +
-  gg(e.int, aes(fill = log(sd)), geom = "tile") +
+  gg(e.pred$int, aes(fill = log(sd)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 p2 <- ggplot() +
-  gg(e.int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
+  gg(e.pred$int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 library(patchwork)
@@ -691,43 +697,56 @@ specification.)
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 data(Poisson2_1D)
-ss <- seq(0, 55, length = 200)
-z <- cov2_1D(ss)
-x <- seq(1, 55, length = 100)
-mesh <- fm_mesh_1d(x, degree = 1)
+x <- seq(0, 55, length.out = 50)
+mesh <- fm_mesh_1d(x, degree = 2, boundary = "free")
 
+process_model <- inla.spde2.pcmatern(
+  mesh,
+  prior.sigma = c(1, 0.01),
+  prior.range = c(5, 0.01),
+  constr = TRUE
+)
 comp <- x ~
-  beta_z(cov2_1D(x), model = "linear") +
-  spde1D(x, model = inla.spde2.matern(mesh)) +
+  z(cov2_1D(x), model = "linear") +
+  smooth(x, model = process_model) +
   Intercept(1)
 
-fitcov1D <- lgcp(comp, pts2, domain = list(x = mesh))
+fitcov1D <- lgcp(comp,
+  pts2,
+  domain = list(x = mesh),
+  samplers = tibble::tibble(x = cbind(0, 55))
+)
 pr.df <- data.frame(x = x)
 prcov1D <- predict(
   fitcov1D,
   pr.df,
   ~ list(
-    total = exp(beta_z + spde1D + Intercept),
-    fx = exp(beta_z + Intercept),
-    spde = exp(spde1D)
-  )
+    Intensity = exp(z + smooth + Intercept),
+    z = exp(z + Intercept),
+    smooth = exp(smooth)
+  ),
+  n.samples = 2000
 )
 
 ggplot() +
-  gg(prcov1D$total, color = "red") +
-  geom_line(aes(x = prcov1D$spde$x, y = prcov1D$spde$median),
-    col = "blue", lwd = 1.25
+  gg(prcov1D$Intensity,
+    aes(colour = "Intensity", fill = "Intensity"),
+    alpha = 0.2,
+    lwd = 1.25
   ) +
-  geom_line(aes(x = prcov1D$fx$x, y = prcov1D$fx$median),
-    col = "green", lwd = 1.25
+  gg(prcov1D$smooth,
+    aes(colour = "Smooth", fill = "Smooth"),
+    alpha = 0.2,
+    lwd = 1.25
   ) +
+  gg(prcov1D$z,
+    aes(colour = "z-effect", fill = "z-effect"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  geom_line(aes(x, lambda2_1D(x), colour = "True intensity"), lwd = 1.25) +
   geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
-  xlab(expression(bold(s))) +
-  ylab(expression(hat(lambda)(bold(s)) ~ ~"and its components")) +
-  annotate(geom = "text", x = 40, y = 6, label = "Intensity", color = "red") +
-  annotate(
-    geom = "text", x = 40, y = 5.5, label = "z-effect",
-    color = "green"
-  ) +
-  annotate(geom = "text", x = 40, y = 5, label = "SPDE", color = "blue")
+  xlab(quote(bold(s))) +
+  ylab(quote(hat(lambda)(bold(s)) ~ ~"and its components")) +
+  guides(colour = guide_legend("Quantity"), fill = "none")
 ```

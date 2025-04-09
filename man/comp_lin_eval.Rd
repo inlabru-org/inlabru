@@ -8,22 +8,19 @@
 \usage{
 comp_lin_eval(...)
 
-\method{comp_lin_eval}{component}(component, input = NULL, state = NULL, ..., options = NULL)
+\method{comp_lin_eval}{component}(component, input = NULL, state = NULL, ...)
 
-\method{comp_lin_eval}{component_list}(components, input, state, ..., options = NULL)
+\method{comp_lin_eval}{component_list}(components, input, state, ...)
 }
 \arguments{
 \item{...}{Optional parameters passed on to \code{ibm_eval}
 and `ibm_jacobian.}
 
-\item{component}{A component.}
+\item{component}{A \link{component}.}
 
 \item{input}{Component inputs, from \code{input_eval()}}
 
 \item{state}{linearisation evaluation state}
-
-\item{options}{A \code{bru_options} object. The log verbosity options
-are used.}
 }
 \value{
 A \code{bru_mapper_taylor} or \code{comp_simple_list} object.

@@ -161,7 +161,7 @@ test_that("1D LGCP fitting, discrete point domain", {
 test_that("1D LGCP fitting, compressed format", {
   skip_on_cran()
   local_bru_safe_inla()
-  local_bru_options_set(
+  bru_options_set_local(
     control.inla = list(int.strategy = "eb"),
     control.compute = list(dic = FALSE, waic = FALSE)
   )

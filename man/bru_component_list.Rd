@@ -14,7 +14,13 @@ bru_component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 
 \method{bru_component_list}{formula}(object, lhoods = NULL, .envir = parent.frame(), ...)
 
-\method{bru_component_list}{list}(object, lhoods = NULL, .envir = parent.frame(), ...)
+\method{bru_component_list}{list}(
+  object,
+  lhoods = NULL,
+  .envir = parent.frame(),
+  inputs = NULL,
+  ...
+)
 
 \method{c}{component_list}(...)
 
@@ -25,11 +31,14 @@ bru_component_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 \arguments{
 \item{object}{The object to operate on}
 
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \link{bru_like_list} object}
 
 \item{.envir}{An evaluation environment for non-formula input}
 
 \item{\dots}{Parameters passed on to other methods. Also see Details.}
+
+\item{inputs}{A tree-like list of component input evaluations,
+from \code{\link[=input_eval.bru_like_list]{input_eval.bru_like_list()}}.}
 
 \item{x}{\code{component_list} object from which to extract a sub-list}
 

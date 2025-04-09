@@ -4,14 +4,12 @@
 \alias{evaluate_inputs}
 \title{Compute all component inputs}
 \usage{
-evaluate_inputs(model, lhoods, inla_f)
+evaluate_inputs(model, lhoods)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
 
 \item{lhoods}{A \code{bru_like_list} object}
-
-\item{inla_f}{logical}
 }
 \description{
 Computes the component inputs for included components

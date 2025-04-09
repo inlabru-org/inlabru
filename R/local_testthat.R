@@ -38,34 +38,21 @@ local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
 
 
 
-#' @details `local_bru_options_set()` is used to set global package options.
+#' @describeIn local_testthat Wrapper for [bru_options_set_local()],
+#' to locally override the global package options.
 #' @return `local_bru_options_set()` returns a copy of the global override
 #' options (not including the defaults), invisibly.
-#' @seealso [bru_options_set()], [bru_options_default()], [bru_options_get()]
+#' @seealso [bru_options_set_local()], [bru_options_default()],
+#'   [bru_options_get()]
 #' @param .reset For `local_bru_options_set`, logical indicating if the global
 #' override options list should be emptied before setting the new option(s).
 #'
-#' @examples
-#' my_fun <- function(val) {
-#'   local_bru_options_set(bru_verbose = val)
-#'   bru_options_get("bru_verbose")
-#' }
-#' # Inside the function, the bru_verbose option is changed.
-#' # Outside the function, the bru_verbose option is unchanged.
-#' print(my_fun(TRUE))
-#' print(bru_options_get("bru_verbose"))
-#' print(my_fun(FALSE))
-#' print(bru_options_get("bru_verbose"))
 #' @export
-#' @describeIn local_testthat Calls [bru_options_set()] in a reversible way
 
 local_bru_options_set <- function(...,
                                   .reset = FALSE,
                                   envir = parent.frame()) {
-  old_opt <- bru_options_get(include_default = FALSE)
-  withr::defer(bru_options_set(old_opt, .reset = TRUE), envir = envir)
-  bru_options_set(..., .reset = .reset)
-  invisible(old_opt)
+  bru_options_set_local(..., .reset = .reset, .envir = envir)
 }
 
 

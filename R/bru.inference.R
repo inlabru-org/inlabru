@@ -465,6 +465,13 @@ bru <- function(components = ~ Intercept(1),
                 .envir = parent.frame()) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
+  # Update default options
+  options <- bru_call_options(options)
+  bru_options_set_local(options, .reset = TRUE)
+
+  bru_log_bookmark("bru")
+  bru_log_message("bru: Preprocessing", verbosity = 1L)
+
   timings_convert <- function(x) {
     if (!is.na(x[4])) {
       x[1] <- x[1] + x[4]
@@ -479,16 +486,13 @@ bru <- function(components = ~ Intercept(1),
     data.frame(
       Task = Task,
       Iteration = Iteration,
-      Time = as.difftime(time_diff[1], units = "secs"),
-      System = as.difftime(time_diff[2], units = "secs"),
-      Elapsed = as.difftime(time_diff[3], units = "secs")
+      Time = as.difftime(unname(time_diff[1]), units = "secs"),
+      System = as.difftime(unname(time_diff[2]), units = "secs"),
+      Elapsed = as.difftime(unname(time_diff[3]), units = "secs")
     )
   }
 
   timing <- list(start = timings_convert(proc.time()))
-
-  # Update default options
-  options <- bru_call_options(options)
 
   lhoods <- list(...)
   dot_is_lhood <- vapply(
@@ -550,8 +554,10 @@ bru <- function(components = ~ Intercept(1),
   # Update include/exclude information to limit it to existing components
   lhoods <- bru_used_update(lhoods, labels = names(components))
 
+  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+
   # Turn model components into internal bru model
-  bru.model <- bru_model(components, lhoods)
+  bru.model <- bru_model(components, lhoods, inputs = inputs)
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
@@ -561,7 +567,9 @@ bru <- function(components = ~ Intercept(1),
   info <- bru_info(
     method = "bru",
     model = bru.model,
+    inputs = inputs,
     lhoods = lhoods,
+    log = bru_log()["bru"],
     options = options
   )
 
@@ -572,6 +580,7 @@ bru <- function(components = ~ Intercept(1),
     result <- iinla(
       model = info[["model"]],
       lhoods = info[["lhoods"]],
+      inputs = info[["inputs"]],
       options = info[["options"]]
     )
   } else {
@@ -608,12 +617,14 @@ bru_rerun <- function(result, options = list()) {
       as.bru_options(options)
     )
   )
+  bru_options_set_local(info[["options"]], .reset = TRUE)
 
   orig_timings <- result[["bru_timings"]]
 
   result <- iinla(
     model = info[["model"]],
     lhoods = info[["lhoods"]],
+    inputs = info[["inputs"]],
     initial = result,
     options = info[["options"]]
   )
@@ -737,7 +748,7 @@ eval_in_data_context <- function(input,
   if (!success) {
     stop(paste0(
       "Input '",
-      deparse(input),
+      paste0(deparse(input), collapse = "\n"),
       "' could not be evaluated."
     ))
   }
@@ -1012,6 +1023,7 @@ bru_obs <- function(formula = . ~ .,
                     exclude = deprecated(),
                     include_latent = deprecated()) {
   options <- bru_call_options(options)
+  bru_options_set_local(options, .reset = TRUE)
 
   # Some defaults
   inla.family <- family
@@ -1239,7 +1251,7 @@ bru_obs <- function(formula = . ~ .,
     }
 
     if (length(E) > 1) {
-      warning(
+      bru_log_warn(
         "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
       )
     }
@@ -1423,16 +1435,21 @@ bru_obs <- function(formula = . ~ .,
   } else {
     if (!is.logical(allow_combine)) {
       if (!is.null(response_data)) {
-        warning("Non-null response data supplied; guessing allow_combine=TRUE.",
-          "\n  Specify allow_combine explicitly to avoid this warning.",
-          immediate. = TRUE
+        bru_log_warn(
+          paste0(
+            "Non-null response data supplied; ",
+            "guessing allow_combine=TRUE.",
+            "\n  Specify allow_combine explicitly to avoid this warning."
+          )
         )
         allow_combine <- TRUE
       } else if (is.list(data) && !is.data.frame(data)) {
-        warning("Non data-frame list-like data supplied; ",
-          "guessing allow_combine=TRUE.",
-          "\n  Specify allow_combine explicitly to avoid this warning.",
-          immediate. = TRUE
+        bru_log_warn(
+          paste0(
+            "Non data-frame list-like data supplied; ",
+            "guessing allow_combine=TRUE.",
+            "\n  Specify allow_combine explicitly to avoid this warning."
+          )
         )
         allow_combine <- TRUE
       } else {
@@ -1457,6 +1474,15 @@ bru_obs <- function(formula = . ~ .,
       if (!lifecycle::is_present(include)) {
         include <- NULL
       } else {
+        bru_log_message(
+          paste0(
+            "The `include` argument of `bru_obs()` is deprecated ",
+            "since inlabru 2.11.0.\n\t",
+            "If auto-detection doesn't work, use ",
+            "`used = bru_used(effect = include)` instead."
+          ),
+          verbosity = 1L
+        )
         lifecycle::deprecate_warn(
           "2.11.0",
           "bru_obs(include)",
@@ -1467,6 +1493,15 @@ bru_obs <- function(formula = . ~ .,
       if (!lifecycle::is_present(exclude)) {
         exclude <- NULL
       } else {
+        bru_log_message(
+          paste0(
+            "The `exclude` argument of `bru_obs()` is deprecated ",
+            "since inlabru 2.11.0.\n\t",
+            "If auto-detection doesn't work, use ",
+            "`used = bru_used(effect_exclude = include)` instead."
+          ),
+          verbosity = 1L
+        )
         lifecycle::deprecate_warn(
           "2.11.0",
           "bru_obs(exclude)",
@@ -1480,6 +1515,15 @@ bru_obs <- function(formula = . ~ .,
       if (!lifecycle::is_present(include_latent)) {
         include_latent <- NULL
       } else {
+        bru_log_message(
+          paste0(
+            "The `include_latent` argument of `bru_obs()` is deprecated ",
+            "since inlabru 2.11.0.\n\t",
+            "If auto-detection doesn't work, use ",
+            "`used = bru_used(latent = include_latent)` instead."
+          ),
+          verbosity = 1L
+        )
         lifecycle::deprecate_warn(
           "2.11.0",
           "bru_obs(include_latent)",
@@ -1557,13 +1601,20 @@ like <- function(formula = . ~ .,
                  include = deprecated(),
                  exclude = deprecated(),
                  include_latent = deprecated()) {
+  options <- bru_call_options(options)
+  bru_options_set_local(options, .reset = TRUE)
+  bru_log_message(
+    paste0(
+      "The `like()` function has been deprecated in favour of `bru_obs()`, ",
+      "since inlabru 2.12.0."
+    ),
+    verbosity = 1L
+  )
   # lifecycle::deprecate_soft(
   #   "2.11.1.9026",
   #   "like()",
   #   "bru_obs()"
   # )
-
-  options <- bru_call_options(options)
 
   E <- eval_in_data_context(
     substitute(E),
@@ -1793,16 +1844,16 @@ bru_like_list <- function(...) {
   UseMethod("bru_like_list")
 }
 
-#' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like_list()`
-#'   alias. Use [bru_like_list()] instead.
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` Legacy
+#'   `like_list()` alias. Use [bru_like_list()] instead.
 #' @export
 like_list <- function(...) {
-  # lifecycle::deprecate_soft(
-  #   "2.12.0",
-  #   "like_list()",
-  #   "bru_like_list()"
-  # )
-  UseMethod("bru_like_list")
+  lifecycle::deprecate_warn(
+    "2.12.0",
+    "like_list()",
+    "bru_like_list()"
+  )
+  bru_like_list(...)
 }
 
 #' @describeIn bru_obs
@@ -2081,9 +2132,11 @@ bru_like_control_family.bru_like_list <- function(x,
       TRUE
     )
     if (any(like_has_cf)) {
-      warning(
-        "Global control.family option overrides settings in likelihood(s) ",
-        paste0(which(like_has_cf), collapse = ", ")
+      bru_log_warn(
+        paste0(
+          "Global control.family option overrides settings in likelihood(s) ",
+          paste0(which(like_has_cf), collapse = ", "),
+        )
       )
     }
   } else {
@@ -2433,7 +2486,9 @@ predict.bru <- function(object,
   } else if (is.list(vals[[1]])) {
     vals.names <- names(vals[[1]])
     if (any(vals.names == "")) {
-      warning("Some generated list elements are unnamed")
+      bru_log_warn(
+        "Some generated list elements are unnamed"
+      )
     }
     smy <- list()
     for (nm in vals.names) {
@@ -2585,20 +2640,36 @@ generate.bru <- function(object,
 
     if (is.null(used)) {
       if (lifecycle::is_present(include)) {
+        bru_log_message(
+          paste0(
+            "The `include` argument to `generate.bru()` is deprecated. ",
+            "If auto-detection doesn't work, use ",
+            "`used = bru_used(effect = include)`."
+          ),
+          verbosity = 1L
+        )
         lifecycle::deprecate_soft(
           "2.12.0.9003",
-          "bru_obs(include)",
-          "bru_obs(used)",
+          "generate(include)",
+          "generate(used)",
           "If auto-detection doesn't work, use `bru_used(effect = include)`"
         )
       } else {
         include <- NULL
       }
       if (lifecycle::is_present(exclude)) {
+        bru_log_message(
+          paste0(
+            "The `exclude` argument to `generate.bru()` is deprecated. ",
+            "If auto-detection doesn't work, use ",
+            "`used = bru_used(effect_exclude = exclude)`."
+          ),
+          verbosity = 1L
+        )
         lifecycle::deprecate_soft(
           "2.12.0.9003",
-          "bru_obs(include)",
-          "bru_obs(used)",
+          "generate(include)",
+          "generate(used)",
           paste0(
             "If auto-detection doesn't work, ",
             "use `bru_used(effect_exclude = exclude)`"
@@ -2975,8 +3046,11 @@ bru_line_search <- function(model,
 
   # Initialise ----
   if (is.null(weights)) {
-    warning("NULL weights detected for line search. Using weights = 1 instead.",
-      immediate. = TRUE
+    bru_log_warn(
+      paste0(
+        "NULL weights detected for line search. Using weights = 1 instead.",
+        "\n\tThis is a bug in the inlabru package. Please notify the developer."
+      )
     )
     weights <- 1
   }
@@ -2999,14 +3073,13 @@ bru_line_search <- function(model,
   )
 
   if (length(lin_pred1) != length(nonlin_pred)) {
-    warning(
+    bru_log_warn(
       paste0(
         "Please notify the inlabru package developer:",
-        "\nThe line search linear and nonlinear predictors have ",
+        "\n\tThe line search linear and nonlinear predictors have ",
         "different lengths.",
-        "\nThis should not happen!"
-      ),
-      immediate. = TRUE
+        "\n\tThis should not happen!"
+      )
     )
   }
 
@@ -3073,8 +3146,6 @@ bru_line_search <- function(model,
           ", norm01 = ", signif(norm01, 4),
           ")"
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
 
@@ -3117,8 +3188,6 @@ bru_line_search <- function(model,
           ", norm01 = ", signif(norm01, 4),
           ")"
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
 
@@ -3149,8 +3218,6 @@ bru_line_search <- function(model,
           ", norm01 = ", signif(norm01, 4),
           ")"
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
     }
@@ -3192,8 +3259,6 @@ bru_line_search <- function(model,
         ", norm01 = ", signif(norm01, 4),
         ")"
       ),
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store,
       verbosity = 3
     )
 
@@ -3205,8 +3270,6 @@ bru_line_search <- function(model,
           " > ",
           signif(norm01, 4)
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
     }
@@ -3246,8 +3309,6 @@ bru_line_search <- function(model,
           ", norm01 = ", signif(norm01, 4),
           ")"
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
 
@@ -3259,8 +3320,6 @@ bru_line_search <- function(model,
             " > ",
             signif(norm01, 4)
           ),
-          verbose = options$bru_verbose,
-          verbose_store = options$bru_verbose_store,
           verbosity = 3
         )
       }
@@ -3277,8 +3336,6 @@ bru_line_search <- function(model,
     } else {
       bru_log_message(
         paste0("iinla: Optimisation did not improve on previous solution."),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 3
       )
     }
@@ -3296,8 +3353,6 @@ bru_line_search <- function(model,
         pred_scalprod(lin_pred1 - lin_pred0, nonlin_pred - lin_pred0) /
         pred_norm2(lin_pred1 - lin_pred0)), 4)
     ),
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 4
   )
 
@@ -3323,8 +3378,6 @@ bru_line_search <- function(model,
         ", norm01 = ", signif(norm01, 4),
         ")"
       ),
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store,
       verbosity = 3
     )
   }
@@ -3345,8 +3398,6 @@ bru_line_search <- function(model,
         ", norm01 = ", signif(norm01, 4),
         ")"
       ),
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store,
       verbosity = 2
     )
   }
@@ -3579,6 +3630,8 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @export
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [bru_obs()]
+#' @param inputs Optional pre-computed  list of per-likelihood component
+#'   evaluations, from [input_eval.bru_like_list()].
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
@@ -3596,7 +3649,7 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @keywords internal
 
 
-iinla <- function(model, lhoods, initial = NULL, options) {
+iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   add_timing <- function(timings, task, iteration = NA_integer_) {
     AbsTime <- proc.time()
     if (!is.na(AbsTime[4])) {
@@ -3616,6 +3669,10 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       )
     ))
   }
+
+  options <- bru_call_options(options)
+  bru_options_set_local(options, .reset = TRUE)
+
   timings <- add_timing(NULL, "Start")
 
   inla.options <- bru_options_inla(options)
@@ -3633,7 +3690,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
             data.frame(
               effect = label,
               index = seq_along(states[[1]][[label]]),
-              iteration = 0,
+              iteration = 0L,
               mode = NA_real_,
               sd = NA_real_,
               new_linearisation = states[[1]][[label]]
@@ -3709,9 +3766,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       },
       timings = {
         iteration_offset <- if (is.null(orig_timings)) {
-          0
+          0L
         } else {
-          max(c(0, orig_timings$Iteration), na.rm = TRUE)
+          max(c(0L, orig_timings$Iteration), na.rm = TRUE)
         }
         rbind(
           orig_timings,
@@ -3732,8 +3789,8 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     stop(paste0(
       "An offset option was specified which may interfere with the ",
       "inlabru model construction.\n",
-      "Please use an explicit offset component instead; ",
-      "e.g. ~ myoffset(value, model = 'offset')"
+      "Please use an explicit constant component instead; ",
+      "e.g. ~ myoffset(value, model = 'const')"
     ))
   }
 
@@ -3800,9 +3857,17 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   original_log <- bru_log(
     if (is.null(old.result)) {
       character(0)
+    } else if (is.null(old.result[["bru_iinla"]])) {
+      character(0)
+    } else if (is.null(old.result[["bru_iinla"]][["log"]])) {
+      character(0)
     } else {
-      old.result
+      old.result[["bru_iinla"]][["log"]]
     }
+  )
+  bru_log_message(
+    "iinla: Start",
+    verbosity = 3
   )
 
   # Track variables
@@ -3816,9 +3881,9 @@ iinla <- function(model, lhoods, initial = NULL, options) {
   }
   inla_track <- list()
   if (is.null(old.result[["bru_iinla"]][["inla_track"]]) ||
-    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0)) {
+    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0L)) {
     orig_inla_track <- NULL
-    inla_track_size <- 0
+    inla_track_size <- 0L
   } else {
     orig_inla_track <- old.result[["bru_iinla"]][["inla_track"]]
     inla_track_size <- max(orig_inla_track[["iteration"]])
@@ -3829,40 +3894,32 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     orig_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
-  bru_log_message(
-    "iinla: Evaluate component inputs",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
-    verbosity = 3
-  )
-  inputs <- evaluate_inputs(model, lhoods = lhoods, inla_f = TRUE)
+  if (is.null(inputs)) {
+    bru_log_message(
+      "iinla: Evaluate component inputs",
+      verbosity = 3
+    )
+    inputs <- evaluate_inputs(model, lhoods = lhoods)
+  }
   bru_log_message(
     "iinla: Evaluate component linearisations",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
   comp_lin <- evaluate_comp_lin(model,
     input = inputs,
     state = states[[length(states)]],
-    inla_f = TRUE,
-    options = options
+    inla_f = TRUE
   )
   bru_log_message(
     "iinla: Evaluate component simplifications",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
   comp_simple <- evaluate_comp_simple(model,
     input = inputs,
-    inla_f = TRUE,
-    options = options
+    inla_f = TRUE
   )
   bru_log_message(
     "iinla: Evaluate predictor linearisation",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
   lin <- bru_compute_linearisation(
@@ -3881,8 +3938,6 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
   bru_log_message(
     "iinla: Construct inla stack",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
   # Initial stack
@@ -3914,23 +3969,16 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         "\nPerhaps you only have components with scalar inputs?"
       )
     }
-    bru_log_message(
-      msg,
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store,
-      verbosity = 1
-    )
+    bru_log_message(msg, verbosity = 1)
     stop(msg)
   }
 
   bru_log_message(
     "iinla: Model initialisation completed",
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 3
   )
 
-  k <- 1
+  k <- 1L
   interrupt <- FALSE
   line_search <- list(
     active = FALSE,
@@ -3953,8 +4001,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
       do_final_integration <- TRUE
       bru_log_message(
         "iinla: Maximum iterations reached, running final INLA integration.",
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store
+        verbosity = 1
       )
     }
 
@@ -4013,8 +4060,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
     bru_log_message(
       paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
-      verbose = options$bru_verbose,
-      verbose_store = options$bru_verbose_store
+      verbosity = 1L
     )
 
     # Return previous result if inla crashes, e.g. when connection to server is
@@ -4099,22 +4145,16 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     timings <- add_timing(timings, "Run inla()", k)
 
     if (inherits(result, "try-error")) {
-      bru_log_message(
-        paste0("iinla: Problem in inla:\n", result),
-        verbose = FALSE,
-        verbose_store = options$bru_verbose_store
-      )
-      warning(
-        paste0("iinla: Problem in inla:\n", result),
-        immediate. = TRUE
+      bru_log_warn(
+        paste0("iinla: Problem in inla:\n", result)
       )
       bru_log_message(
         paste0(
           "iinla: Giving up and returning last successfully obtained result ",
           "for diagnostic purposes."
         ),
-        verbose = TRUE,
-        verbose_store = options$bru_verbose_store
+        verbosity = 1L,
+        verbose = TRUE
       )
       if (is.null(old.result)) {
         old.result <- list()
@@ -4168,7 +4208,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
     track_df[[label]] <-
       data.frame(
         effect = label,
-        index = 1,
+        index = 1L,
         iteration = track_size + k,
         mode = result[["misc"]][["configs"]][["max.log.posterior"]],
         sd = Inf
@@ -4228,20 +4268,15 @@ iinla <- function(model, lhoods, initial = NULL, options) {
 
         bru_log_message(
           "iinla: Evaluate component linearisations",
-          verbose = options$bru_verbose,
-          verbose_store = options$bru_verbose_store,
           verbosity = 3
         )
         comp_lin <- evaluate_comp_lin(model,
           input = inputs,
           state = state,
-          inla_f = TRUE,
-          options = options
+          inla_f = TRUE
         )
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
-          verbose = options$bru_verbose,
-          verbose_store = options$bru_verbose_store,
           verbosity = 3
         )
         lin <- bru_compute_linearisation(
@@ -4282,12 +4317,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
               "\nPerhaps you only have components with scalar inputs?"
             )
           }
-          bru_log_message(
-            msg,
-            verbose = options$bru_verbose,
-            verbose_store = options$bru_verbose_store,
-            verbosity = 1
-          )
+          bru_log_message(msg, verbosity = 1L)
           stop(msg)
         }
       }
@@ -4313,9 +4343,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
           if (line_search[["active"]]) "active" else "inactive",
           "\n       [stop if: <", 100 * max.dev, "% and line search inactive]"
         ),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
-        verbosity = 1
+        verbosity = 1L
       )
       do_final_integration <- all(dev < max.dev) && (!line_search[["active"]])
       if (do_final_integration) {
@@ -4323,8 +4351,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         bru_log_message(
           "iinla: Convergence criterion met.",
           "\n       Running final INLA integration step with known theta mode.",
-          verbose = options$bru_verbose,
-          verbose_store = options$bru_verbose_store
+          verbosity = 1L
         )
       }
     }
@@ -4334,7 +4361,7 @@ iinla <- function(model, lhoods, initial = NULL, options) {
         unlist(states[[length(states)]][[label]])
     }
 
-    k <- k + 1
+    k <- k + 1L
   }
 
   result[["bru_iinla"]] <- collect_misc_info()
@@ -4406,7 +4433,7 @@ auto_additive_formula <- function(formula, components) {
     formula,
     paste0(
       ". ~ ",
-      paste0(names(component), collapse = " + ")
+      paste0(names(components), collapse = " + ")
     )
   )
   environment(formula) <- env

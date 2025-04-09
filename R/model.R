@@ -59,11 +59,13 @@
 #' @export
 #' @param components A [component_list] object
 #' @param lhoods A list of one or more `lhood` objects
+#' @param inputs A list of component input evaluations, from
+#'   [input_eval.bru_like_list()].
 #' @return A [bru_model] object
 #' @keywords internal
 
-bru_model <- function(components, lhoods) {
-  stopifnot(inherits(components, "component_list"))
+bru_model <- function(components, lhoods, inputs = NULL) {
+  components <- bru_component_list(components)
 
   # Back up environment
   env <- environment(components)
@@ -77,8 +79,16 @@ bru_model <- function(components, lhoods) {
   linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
   # TODO: detect pure effect additivity (allowing nonlinear components)
 
+  if (is.null(inputs)) {
+    inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+  }
+
   # Complete the used component definitions based on data
-  components <- bru_component_list(components[included], lhoods)
+  components <- bru_component_list(
+    components[included],
+    lhoods = lhoods,
+    inputs = inputs
+  )
 
   for (cmp in included) {
     if (linear ||
@@ -182,8 +192,7 @@ evaluate_model <- function(model,
   if (is.null(input)) {
     input <- input_eval(
       components = model$effects[used$effect],
-      data = data,
-      inla_f = TRUE
+      data = data
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
@@ -716,16 +725,17 @@ bru_component_eval <- function(main,
 #' @param input A list of named lists of component inputs
 #' @param state A named list of component states
 #' @param inla_f Controls the input data interpretations
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
 #' @return A list (class 'comp_simple') of named lists (class
 #'   'comp_simple_list') of `bru_mapper_taylor` objects, one for each included
 #'   component
 #' @rdname evaluate_comp_lin
 #' @keywords internal
-evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
-                              options = NULL) {
+evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
   stopifnot(inherits(model, "bru_model"))
+  bru_log_message(
+    paste0("Linearise components for each observation model"),
+    verbosity = 3
+  )
   mappers <-
     lapply(
       input,
@@ -740,8 +750,7 @@ evaluate_comp_lin <- function(model, input, state, inla_f = FALSE,
           model[["effects"]][included],
           input = inp[included],
           state = state[included],
-          inla_f = inla_f,
-          options = options
+          inla_f = inla_f
         )
 
         class(mappers) <- c("comp_simple_list", class(mappers))
@@ -773,20 +782,15 @@ evaluate_comp_simple <- function(...) {
 }
 
 #' @export
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.component_list <- function(components, input,
-                                                inla_f = FALSE, ...,
-                                                options = NULL) {
+                                                inla_f = FALSE, ...) {
   mappers <- lapply(
     components,
     function(x) {
       label <- x[["label"]]
       bru_log_message(
         paste0("Simplify component '", label, "'"),
-        verbose = options$bru_verbose,
-        verbose_store = options$bru_verbose_store,
         verbosity = 4
       )
       ibm_simplify(
@@ -805,6 +809,10 @@ evaluate_comp_simple.component_list <- function(components, input,
 #' @export
 #' @rdname evaluate_comp_simple
 evaluate_comp_simple.bru_model <- function(model, input, ...) {
+  bru_log_message(
+    paste0("Simplify model components"),
+    verbosity = 3
+  )
   mappers <-
     lapply(
       input,
@@ -846,23 +854,11 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
 #'
 #' @param model A `bru_model` object
 #' @param lhoods A `bru_like_list` object
-#' @param inla_f logical
 #' @rdname evaluate_inputs
 #' @keywords internal
-evaluate_inputs <- function(model, lhoods, inla_f) {
+evaluate_inputs <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  lapply(
-    lhoods,
-    function(lh) {
-      included <- bru_used(lh)[["effect"]]
-
-      input_eval(
-        model$effects[included],
-        data = lh[["data"]],
-        inla_f = inla_f
-      )
-    }
-  )
+  input_eval(lhoods, components = model[["effects"]])
 }
 
 #' Compute all index values

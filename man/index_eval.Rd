@@ -15,7 +15,7 @@ index_eval(...)
 \arguments{
 \item{...}{Unused.}
 
-\item{component}{A component.}
+\item{component}{A \link{component}.}
 
 \item{inla_f}{logical; when \code{TRUE}, must result in
 values compatible with \code{INLA::f(...)}

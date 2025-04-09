@@ -2,6 +2,8 @@
 % Please edit documentation in R/environment.R
 \name{bru_log_message}
 \alias{bru_log_message}
+\alias{bru_log_abort}
+\alias{bru_log_warn}
 \title{Add a log message}
 \usage{
 bru_log_message(
@@ -14,10 +16,37 @@ bru_log_message(
   verbose_store = NULL,
   x = NULL
 )
+
+bru_log_abort(
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+)
+
+bru_log_warn(
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+)
 }
 \arguments{
-\item{...}{For \code{bru_log_message()}, zero or more objects passed on to
-\code{\link[base:message]{base::.makeMessage()}}}
+\item{\dots}{For \code{bru_log_message()}, zero or more objects passed on to
+\code{\link[base:message]{base::.makeMessage()}}. For \code{bru_log_abort()} and \code{bru_log_warn()},
+passed on to \code{rlang::abort()} and \code{rlang::warn()}.}
 
 \item{domain}{Domain for translations, passed on to \code{\link[base:message]{base::.makeMessage()}}}
 
@@ -41,6 +70,12 @@ stored in the global log object. Can be controlled via the
 \code{bru_verbose_store} with \code{\link[=bru_options_set]{bru_options_set()}}.}
 
 \item{x}{A \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
+
+\item{msg}{character; passed to \code{\link[base:message]{base::.makeMessage()}}}
+
+\item{call}{The calling environment.}
+
+\item{.frame}{The throwing context, for when \code{.internal} is \code{TRUE}}
 }
 \value{
 \code{bru_log_message} returns \code{invisible(x)}, where \code{x} is the updated \code{bru_log}
@@ -49,10 +84,17 @@ object, or \code{NULL}.
 \description{
 Adds a log message.
 }
+\section{Functions}{
+\itemize{
+\item \code{bru_log_abort()}: Store a log message and throw an error.
+
+\item \code{bru_log_warn()}: Store a log message and throw a warning.
+
+}}
 \examples{
 if (interactive()) {
   code_runner <- function() {
-    local_bru_options_set(
+    bru_options_set_local(
       # Show messages up to and including level 2 (default 0)
       bru_verbose = 2,
       # Store messages to an including level 3 (default Inf, storing all)

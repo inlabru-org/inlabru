@@ -36,10 +36,10 @@ test_that("Linearisation", {
   expect_equal(used[["effect"]], "x")
   expect_equal(used[["latent"]], c("Int_y", "Int_z"))
 
-  model <- bru_model(bru_component_list(cmp, lhoods), lhoods)
+  model <- bru_model(bru_component_list(cmp), lhoods)
 
   idx <- evaluate_index(model, lhoods)
-  inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)
+  inp <- evaluate_inputs(model, lhoods)
   comp_lin <- evaluate_comp_lin(model, input = inp, state = NULL)
   lin0 <- bru_compute_linearisation.bru_model(
     model,

@@ -72,11 +72,14 @@ test_that("Component construction: unsafe intercepts, data is list", {
     allow_combine = TRUE
   )
   lik <- bru_used_update(lik, labels = names(cmp))
-  expect_warning(
+  expect_error(
     object = {
       model <- bru_model(cmp, bru_like_list(list(lik)))
     },
-    "All covariate evaluations for 'something_unknown' are NULL"
+    paste0(
+      "The input evaluation 'something_unknown' for 'something_unknown' ",
+      "failed. Perhaps the data object doesn't contain the needed variables?"
+    )
   )
 })
 
@@ -108,7 +111,7 @@ test_that("Component construction: separate response_data input", {
 
 
   cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik2))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik2)))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik2$data$x)
 
   mesh1 <- fm_mesh_1d(lik1$data$x)
@@ -125,7 +128,7 @@ test_that("Component construction: separate response_data input", {
       mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik1)))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik1$data$x)
 
   cmp1 <- bru_component_list(
@@ -134,12 +137,12 @@ test_that("Component construction: separate response_data input", {
       mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik1))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik1)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(lik1$data$x)
   )
-  cmp2 <- add_mappers(cmp1, lhoods = list(lik2))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik2)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(lik2$data$x)

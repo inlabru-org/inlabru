@@ -8,14 +8,14 @@
 \usage{
 add_mappers(...)
 
-\method{add_mappers}{component}(component, lhoods, ...)
+\method{add_mappers}{component}(component, lhoods, inputs = NULL, ...)
 
-\method{add_mappers}{component_list}(components, lhoods, ...)
+\method{add_mappers}{component_list}(components, lhoods, inputs = NULL, ...)
 }
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
 
-\item{component}{A \code{component} object}
+\item{component}{A \link{component} object}
 
 \item{lhoods}{A \code{bru_like_list} object}
 

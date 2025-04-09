@@ -25,8 +25,7 @@ bru_compute_linearisation(...)
   allow_combine,
   eps,
   n_pred = NULL,
-  ...,
-  options = NULL
+  ...
 )
 
 \method{bru_compute_linearisation}{bru_like}(
@@ -94,9 +93,6 @@ involve several rows of the input data to influence the same row.}
 
 \item{n_pred}{The length of the predictor expression. If not \code{NULL}, scalar
 predictor evaluations are expanded to vectors of length \code{n_pred}.}
-
-\item{options}{A \code{bru_options} object. The log verbosity options
-are used.}
 
 \item{lhood}{A \code{bru_like} object}
 

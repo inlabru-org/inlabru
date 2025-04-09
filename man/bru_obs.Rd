@@ -4,7 +4,6 @@
 \alias{bru_obs}
 \alias{like}
 \alias{bru_like_list}
-\alias{like_list}
 \alias{bru_like_list.list}
 \alias{bru_like_list.bru_like}
 \alias{c.bru_like}
@@ -63,8 +62,6 @@ like(
 )
 
 bru_like_list(...)
-
-like_list(...)
 
 \method{bru_like_list}{list}(object, envir = NULL, ...)
 
@@ -236,9 +233,6 @@ defines observation models, not just likelihood functions.
 method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_obs]{bru_obs()}} instead.
 
 \item \code{bru_like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
-
-\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy \code{like_list()}
-alias. Use \code{\link[=bru_like_list]{bru_like_list()}} instead.
 
 \item \code{bru_like_list(list)}: Combine a list of \code{bru_like} likelihoods
 into a \code{bru_like_list} object

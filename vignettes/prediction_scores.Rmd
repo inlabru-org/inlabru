@@ -28,6 +28,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(inlabru)
 inla_available <- inlabru::bru_safe_inla(
   multicore = interactive(),
   quietly = TRUE
@@ -36,7 +37,6 @@ inla_available <- inlabru::bru_safe_inla(
 
 
 ```{r setup, include=TRUE, eval=inla_available}
-library(inlabru)
 library(magrittr)
 library(dplyr)
 library(scoringRules)
@@ -274,8 +274,8 @@ intervals for the scores can be obtained via the Monte Carlo standard errors:
 head(
   data.frame(
     log_S = log_score,
-    lower = log_score - 2 * pred$mean.mc_std_err,
-    upper = log_score + 2 * pred$mean.mc_std_err
+    lower = log(pred$mean - 2 * pred$mean.mc_std_err),
+    upper = log(pred$mean + 2 * pred$mean.mc_std_err)
   )
 )
 ```

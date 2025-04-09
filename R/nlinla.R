@@ -33,8 +33,6 @@ bru_compute_linearisation <- function(...) {
 #' @param eps The finite difference step size
 #' @param n_pred The length of the predictor expression. If not `NULL`, scalar
 #' predictor evaluations are expanded to vectors of length `n_pred`.
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
 #'
 #' @export
 #' @rdname bru_compute_linearisation
@@ -52,13 +50,10 @@ bru_compute_linearisation.component <- function(cmp,
                                                 allow_combine,
                                                 eps,
                                                 n_pred = NULL,
-                                                ...,
-                                                options = NULL) {
+                                                ...) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
     verbosity = 4
   )
 
