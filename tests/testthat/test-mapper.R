@@ -520,36 +520,57 @@ test_that("Collect mapper, automatic construction", {
   cmp1 <- y ~
     -1 +
     indep(val,
-      model = "bym",
+      model = "bym2",
       mapper = mapper,
       graph = Matrix::Diagonal(4) + 1
     )
-  # index mapper
 
   cmp2 <- y ~
     -1 +
     indep(val,
-      model = "bym",
+      model = "bym2",
       n = 4,
       graph = Matrix::Diagonal(4) + 1
     )
-  # fm_mesh_1d mapper
+
+  cmp3 <- y ~
+    -1 +
+    indep(val,
+      model = "bym2",
+      graph = Matrix::Diagonal(4) + 1
+    )
 
   lik <- bru_obs(formula = y ~ ., data = data)
 
-  # These tests do not trigger INLA:inla.mesh.1d usage:
   cmp1 <- bru_component_list(cmp1, lhoods = bru_like_list(list(lik)))
   cmp2 <- bru_component_list(cmp2, lhoods = bru_like_list(list(lik)))
+  cmp3 <- bru_component_list(cmp3, lhoods = bru_like_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
+    n <- ibm_n(cmp1$indep$mapper, inla_f = inla_f)
     expect_identical(
-      ibm_n(cmp1$indep$mapper, inla_f = inla_f),
-      ibm_n(cmp2$indep$mapper, inla_f = inla_f)
+      n,
+      if (inla_f) 4 else 8
     )
     expect_identical(
-      ibm_values(cmp1$indep$mapper, inla_f = inla_f),
-      ibm_values(cmp2$indep$mapper, inla_f = inla_f)
+      ibm_n(cmp2$indep$mapper, inla_f = inla_f),
+      n
     )
+    expect_identical(
+      ibm_n(cmp3$indep$mapper, inla_f = inla_f),
+      n
+    )
+
+    values <- ibm_values(cmp1$indep$mapper, inla_f = inla_f)
+    expect_identical(
+      ibm_values(cmp2$indep$mapper, inla_f = inla_f),
+      values
+    )
+    expect_identical(
+      ibm_values(cmp3$indep$mapper, inla_f = inla_f),
+      values
+    )
+
     if (inla_f) {
       input <- list(mapper = list(
         main = data$val,
@@ -563,15 +584,26 @@ test_that("Collect mapper, automatic construction", {
         replicate = rep(1, 3)
       ))
     }
+
+    J <- as.matrix(ibm_jacobian(
+      cmp1$indep$mapper,
+      input = input,
+      inla_f = inla_f
+    ))
+
     expect_identical(
-      as.matrix(ibm_jacobian(cmp1$indep$mapper,
-        input = input,
-        inla_f = inla_f
-      )),
       as.matrix(ibm_jacobian(cmp2$indep$mapper,
         input = input,
         inla_f = inla_f
-      ))
+      )),
+      J
+    )
+    expect_identical(
+      as.matrix(ibm_jacobian(cmp3$indep$mapper,
+        input = input,
+        inla_f = inla_f
+      )),
+      J
     )
   }
 })
@@ -595,13 +627,15 @@ test_that("Collect mapper works", {
     x = c(1, 2, 3, 2, 3, 4)
   )
 
-  fit_inla <- INLA::inla(y ~ 1 + f(x, model = "bym", graph = graph),
+  fit_inla <- INLA::inla(
+    y ~ 1 + f(x, model = "bym", graph = graph),
     data = data
   )
 
   expect_no_error({
     fit_bru <-
-      bru(y ~ Intercept(1) + field(x, model = "bym", graph = graph),
+      bru(~ Intercept(1) + field(x, model = "bym", graph = graph),
+        formula = y ~ Intercept + field,
         data = data,
         options = list(bru_initial = list(field = rep(10, 8)))
       )

@@ -410,9 +410,10 @@ test data point. If `Intercept+x` is the expression for the linear predictor,
 and `newdata`
 holds the covariate information for the prediction points, run
 ```{r, eval=inla_available}
-pred_normal <- predict(fit_normal, newdata_normal, formula = ~ {
+pred_normal <- predict(fit_normal, newdata_normal,
+  formula = ~ {
     E <- Intercept + x
-    V = 1 / Precision_for_the_Gaussian_observations
+    V <- 1 / Precision_for_the_Gaussian_observations
     list(
       eta = E,
       sigma_y_2 = V,

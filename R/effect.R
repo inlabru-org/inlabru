@@ -189,8 +189,9 @@ bru_component <- function(...) {
 #' whose contents determines which layer to extract from a covariate for each
 #' data point. (Default: NULL)
 #' @param n The number of latent variables in the model. Should be auto-detected
-#' for most or all models (Default: NULL, for auto-detection).
-#' An error is given if it can't figure it out by itself.
+#' for most or all models. Default: NULL, for auto-detection. Models with
+#' matrix input for `Cmatrix` or `graph` will use the matrix size.
+#' An error is given if it realises it can't figure it out by itself.
 #' @param values Specifies for what covariate/index values INLA should build
 #' the latent model. Normally generated internally based on the mapping details.
 #' (Default: NULL, for auto-determination)
@@ -344,6 +345,18 @@ bru_component.character <- function(object,
 
   if (is.null(envir_extra)) {
     envir_extra <- new.env(parent = .envir)
+  }
+
+  if (is.null(n)) {
+    arg_names <- names(list(...))
+    if ("Cmatrix" %in% arg_names) {
+      if (is.matrix(list(...)[["Cmatrix"]]) ||
+        inherits(list(...)[["Cmatrix"]], "Matrix")) {
+        n <- nrow(list(...)[["Cmatrix"]])
+      }
+    } else if ("graph" %in% arg_names) {
+      n <- INLA::inla.read.graph(list(...)[["graph"]], size.only = TRUE)
+    }
   }
 
   # Convert ngroup and nrep to bru_mapper info

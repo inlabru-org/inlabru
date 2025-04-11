@@ -55,7 +55,7 @@ ibm_n.bru_mapper_collect <- function(mapper,
 }
 
 
-# Only for inla_f = FALSE
+# Only for inla_f = FALSE or not hidden
 bm_collect_indexing <- function(mapper, input) {
   if (is.matrix(input)) {
     nms <- colnames(input)
