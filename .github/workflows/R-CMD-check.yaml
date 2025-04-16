@@ -23,8 +23,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest, r: 'release'}
+#          - {os: macos-latest, r: 'devel', http-user-agent: 'release'}
+          - {os: macos-latest, r: 'release'}
+          - {os: macos-latest, r: 'oldrel-1'}
+#          - {os: windows-latest, r: 'devel', http-user-agent: 'release'}
           - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: 'oldrel-1'}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest, r: 'release'}
           - {os: ubuntu-latest, r: 'oldrel-1'}
@@ -48,10 +52,15 @@ jobs:
       - name: Install system dependencies on MacOS (X11, gdal)
         if: runner.os == 'macOS'
         run: |
+          brew install libsm
+          brew install libxrender
+          brew install cairo
           brew install --cask xquartz
           brew install pkg-config
           brew install proj@9
           brew install gdal
+          brew install gsl
+          brew install udunits
 
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
@@ -63,14 +72,15 @@ jobs:
           dependencies: '"all"'
           extra-packages: |
              rcmdcheck
+             Cairo
              remotes
              stars
              starsdata=?ignore
 
-      - name: Fix temporary out-of-sync binary packages
-        run: |
-          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
-        shell: Rscript {0}
+#      - name: Fix temporary out-of-sync binary packages
+#        run: |
+#          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+#        shell: Rscript {0}
 
       - name: Limit INLA version to 24.05.10 on old R version
         run: |
