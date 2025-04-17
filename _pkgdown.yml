@@ -1,6 +1,7 @@
 url: https://inlabru-org.github.io/inlabru/
 
 template:
+  bootswatch: cosmo
   bootstrap: 5
 
 navbar:
