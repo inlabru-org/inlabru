@@ -701,8 +701,9 @@ evaluate_predictor <- function(model,
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
 #' @examples
-#' if (bru_safe_inla(multicore = interactive()) &&
-#'     require("sf", quietly = TRUE)) {
+#' if (bru_safe_inla() &&
+#'     require("sf", quietly = TRUE) &&
+#'     requireNamespace("sn", quietly = TRUE)) {
 #'   mesh <- fmesher::fm_mesh_2d_inla(
 #'     cbind(0, 0),
 #'     offset = 2,
@@ -727,14 +728,12 @@ evaluate_predictor <- function(model,
 #'     family = "gaussian", data = data,
 #'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
-#'   if (requireNamespace("sp", quietly = TRUE)) {
-#'     pred <- generate(
-#'       fit,
-#'       newdata = data.frame(A = 0.5, B = 0.5),
-#'       formula = ~ field_eval(cbind(A, B)),
-#'       n.samples = 1L
-#'     )
-#'   }
+#'   pred <- generate(
+#'     fit,
+#'     newdata = data.frame(A = 0.5, B = 0.5),
+#'     formula = ~ field_eval(cbind(A, B)),
+#'     n.samples = 1L
+#'   )
 #' }
 bru_component_eval <- function(main,
                                group = NULL,

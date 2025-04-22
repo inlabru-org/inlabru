@@ -29,9 +29,9 @@ introduced by Yuan et al. (2017).
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-  require(ggplot2, quietly = TRUE) &&
-  require(patchwork, quietly = TRUE) &&
-  require("sn") &&
+  require("ggplot2", quietly = TRUE) &&
+  require("patchwork", quietly = TRUE) &&
+  require("sn", quietly = TRUE) &&
   require("terra", quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
