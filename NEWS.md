@@ -16,6 +16,10 @@
   time for large spatial and spatio-temporal models (version `2.12.0.9010`)
 * Add `bru_log()` data for warnings and errors reported by inlabru (version
   `2.12.0.9011`)
+* Add experimental predictor aggregation helper feature
+  `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
+  specification of models with aggregation as the final step of the predictor
+  evaluation (version `2.12.0.9013`)
 
 ## New and updated mapper features
 
@@ -28,7 +32,7 @@
   object setting (version `2.12.0.9005`)
 * Allow `character` block information in `bru_mapper_aggregate` and
   `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
-  (version `2.12.0.9008`)
+  (version `2.12.0.9013`)
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 

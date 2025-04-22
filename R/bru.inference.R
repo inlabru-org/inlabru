@@ -953,7 +953,7 @@ extended_bind_rows <- function(...) {
 #'   or an aggregation `bru_mapper` object
 #'   ([bru_mapper_aggregate()] or [bru_mapper_logsumexp()]). Default `NULL`,
 #'   interpreted as "none". `r lifecycle::badge("experimental")`, available
-#'   from version `2.12.0.9008`.
+#'   from version `2.12.0.9013`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
 #'   defined by non-NULL `aggregate`, overriding the default,
 #'   ```
@@ -961,7 +961,7 @@ extended_bind_rows <- function(...) {
 #'        weights = .data.[["weight"]],
 #'        n_block = bru_response_size(.response_data.))
 #'   ```
-#'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9008`.
+#'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
