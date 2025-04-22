@@ -155,7 +155,7 @@ defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \co
 or an aggregation \code{bru_mapper} object
 (\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
 interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
-from version \verb{2.12.0.9008}.}
+from version \verb{2.12.0.9013}.}
 
 \item{aggregate_input}{\code{NULL} or an optional input list to the mapper
 defined by non-NULL \code{aggregate}, overriding the default,
@@ -165,7 +165,7 @@ defined by non-NULL \code{aggregate}, overriding the default,
      n_block = bru_response_size(.response_data.))
 }\if{html}{\out{</div>}}
 
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9008}.}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 

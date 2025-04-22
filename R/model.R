@@ -694,14 +694,14 @@ evaluate_predictor <- function(model,
 #'       scale = weights)
 #'  ```
 #'  NOTE: If you have model component with the same name as a data variable you
-#'  want to supply as input to `name_eval()`, you need to use `.data[["myvar"]]`
-#'  to access it. Otherwise, it will try to use the other component effect as
-#'  input, which is ill-defined.
+#'  want to supply as input to `name_eval()`, you need to use
+#'  `.data.[["myvar"]]` to access it. Otherwise, it will try to use the other
+#'  component effect as input, which is ill-defined.
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
 #' @examples
-#' if (bru_safe_inla() &&
+#' if (bru_safe_inla(multicore = interactive()) &&
 #'     require("sf", quietly = TRUE)) {
 #'   mesh <- fmesher::fm_mesh_2d_inla(
 #'     cbind(0, 0),
@@ -713,6 +713,7 @@ evaluate_predictor <- function(model,
 #'     prior.range = c(1, NA),
 #'     prior.sigma = c(0.2, NA)
 #'   )
+#'   set.seed(12345L)
 #'   data <- sf::st_as_sf(
 #'     data.frame(
 #'       x = runif(50),
@@ -726,12 +727,14 @@ evaluate_predictor <- function(model,
 #'     family = "gaussian", data = data,
 #'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
-#'   pred <- generate(
-#'     fit,
-#'     newdata = data.frame(A = 0.5, B = 0.5),
-#'     formula = ~ field_eval(cbind(A, B)),
-#'     n.samples = 1L
-#'   )
+#'   if (requireNamespace("sp", quietly = TRUE)) {
+#'     pred <- generate(
+#'       fit,
+#'       newdata = data.frame(A = 0.5, B = 0.5),
+#'       formula = ~ field_eval(cbind(A, B)),
+#'       n.samples = 1L
+#'     )
+#'   }
 #' }
 bru_component_eval <- function(main,
                                group = NULL,
