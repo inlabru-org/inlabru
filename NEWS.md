@@ -29,6 +29,8 @@
 * Allow `character` block information in `bru_mapper_aggregate` and
   `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
   (version `2.12.0.9008`)
+* Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
+  arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 
 ## Bugfixes and deprecations
   

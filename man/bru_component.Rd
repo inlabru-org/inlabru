@@ -79,8 +79,9 @@ whose contents determines which layer to extract from a covariate for each
 data point. (Default: NULL)}
 
 \item{n}{The number of latent variables in the model. Should be auto-detected
-for most or all models (Default: NULL, for auto-detection).
-An error is given if it can't figure it out by itself.}
+for most or all models. Default: NULL, for auto-detection. Models with
+matrix input for \code{Cmatrix} or \code{graph} will use the matrix size.
+An error is given if it realises it can't figure it out by itself.}
 
 \item{values}{Specifies for what covariate/index values INLA should build
 the latent model. Normally generated internally based on the mapping details.
