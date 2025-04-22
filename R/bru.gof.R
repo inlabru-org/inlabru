@@ -204,8 +204,8 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 #' @param joint A joint `prediction` of two latent model components.
 #' @param prediction1 A `prediction` of the first component.
 #' @param prediction2 A `prediction` of the second component.
-#' @param samplers A SpatialPolygon object describing the area for which to
-#'   compute the cumulative variance measure.
+#' @param samplers An `sf` or `SpatialPolygon` object describing the area for
+#'   which to compute the cumulative variance measure.
 #' @param mesh The [fmesher::fm_mesh_2d] for which the prediction was performed
 #'   (required for cumulative Vmeasure).
 #' @return Variance and correlations measures.

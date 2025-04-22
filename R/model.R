@@ -415,7 +415,9 @@ evaluate_effect_multi_state.component_list <- function(components,
 #'
 #' @param data A `list`, `data.frame`, or `Spatial*DataFrame`, with coordinates
 #' and covariates needed to evaluate the model.
-#' @param data_extra Additional data for the predictor evaluation
+#' @param data_extra Additional data for the predictor evaluation. Variables
+#' with the same name as in `data` will be ignored, unless accessed via
+#' `.data_extra.[["name"]]` or `.data_extra.$name`.
 #' @param state A list where each element is a list of named latent state
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
@@ -469,6 +471,7 @@ evaluate_predictor <- function(model,
 
   used <- bru_used(used, labels = names(model$effects))
 
+  # General evaluation environment
   envir <- new.env(parent = enclos)
   # Find .data. first,
   # then data variables,
@@ -480,15 +483,28 @@ evaluate_predictor <- function(model,
   #
   # Note: Since 2.7.0.9019, no longer converts Spatial*DataFrame to data frame
   # here; coordinates must be accessed via sp::coordinates() if needed.
-  for (nm in names(data)) {
-    assign(nm, data[[nm]], envir = envir)
+  if (!is.null(data)) {
+    if (inherits(data, "Spatial")) {
+      for (nm in names(data)) {
+        assign(nm, data[[nm]], envir = envir)
+      }
+    } else {
+      list2env(data, envir = envir)
+    }
   }
   assign(".data.", data, envir = envir)
 
-  for (nm in names(data_extra)) {
-    assign(nm, data_extra[[nm]], envir = envir)
+  nms <- setdiff(names(data_extra), names(data))
+  if (!is.null(data_extra[nms])) {
+    if (inherits(data_extra, "Spatial")) {
+      for (nm in nms) {
+        assign(nm, data_extra[[nm]], envir = envir)
+      }
+    } else {
+      list2env(data_extra[nms], envir = envir)
+    }
   }
-  assign(".data_extra.", data, envir = envir)
+  assign(".data_extra.", data_extra, envir = envir)
 
   # Rename component states from label to label_latent
   state_names <- as.list(expand_labels(
@@ -603,8 +619,13 @@ evaluate_predictor <- function(model,
       eval_fun
     }
   for (nm in names(eval_names)) {
-    assign(eval_names[[nm]],
-      eval_fun_factory(model$effects[[nm]], .envir = envir, .enclos = enclos),
+    assign(
+      eval_names[[nm]],
+      eval_fun_factory(
+        model$effects[[nm]],
+        .envir = envir,
+        .enclos = enclos
+      ),
       envir = envir
     )
   }
@@ -672,33 +693,45 @@ evaluate_predictor <- function(model,
 #'         replicate = replicate),
 #'       scale = weights)
 #'  ```
+#'  NOTE: If you have model component with the same name as a data variable you
+#'  want to supply as input to `name_eval()`, you need to use `.data[["myvar"]]`
+#'  to access it. Otherwise, it will try to use the other component effect as
+#'  input, which is ill-defined.
 #' @param .state The internal component state. Normally supplied automatically
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
 #' @examples
-#' \dontrun{
-#' if (bru_safe_inla()) {
+#' if (bru_safe_inla() &&
+#'     require("sf", quietly = TRUE)) {
 #'   mesh <- fmesher::fm_mesh_2d_inla(
 #'     cbind(0, 0),
-#'     offset = 2, max.edge = 0.25
+#'     offset = 2,
+#'     max.edge = 2.5
 #'   )
-#'   spde <- INLA::inla.spde2.pcmatern(mesh,
-#'     prior.range = c(0.1, 0.01),
-#'     prior.sigma = c(2, 0.01)
+#'   spde <- INLA::inla.spde2.pcmatern(
+#'     mesh,
+#'     prior.range = c(1, NA),
+#'     prior.sigma = c(0.2, NA)
 #'   )
-#'   data <- sp::SpatialPointsDataFrame(
-#'     matrix(runif(10), 5, 2),
-#'     data = data.frame(z = rnorm(5))
+#'   data <- sf::st_as_sf(
+#'     data.frame(
+#'       x = runif(50),
+#'       y = runif(50),
+#'       z = rnorm(50)
+#'     ),
+#'     coords = c("x", "y")
 #'   )
-#'   fit <- bru(z ~ -1 + field(coordinates, model = spde),
-#'     family = "gaussian", data = data
+#'   fit <- bru(
+#'     z ~ -1 + field(geometry, model = spde),
+#'     family = "gaussian", data = data,
+#'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
-#'   pred <- predict(
+#'   pred <- generate(
 #'     fit,
-#'     data = data.frame(x = 0.5, y = 0.5),
-#'     formula = ~ field_eval(cbind(x, y))
+#'     newdata = data.frame(A = 0.5, B = 0.5),
+#'     formula = ~ field_eval(cbind(A, B)),
+#'     n.samples = 1L
 #'   )
-#' }
 #' }
 bru_component_eval <- function(main,
                                group = NULL,

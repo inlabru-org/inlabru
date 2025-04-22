@@ -680,11 +680,10 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param .envir The evaluation environment
 #' @return The result of expression evaluation
 #' @keywords internal
-#' @export
 #' @examples
 #' # The A values come from the 'data' element, and the B values come from
 #' # the 'response_data' element, as that is listed first.
-#' eval_in_data_context(
+#' bru_eval_in_data_context(
 #'   quote(
 #'     list(A = .data.$x, B = x)
 #'   ),
@@ -695,7 +694,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' )
 #' # Both A and B come from the 'data' element, as 'x' is found there,
 #' # terminating the evaluation attempt.
-#' eval_in_data_context(
+#' bru_eval_in_data_context(
 #'   quote(
 #'     list(A = .data.$x, B = x)
 #'   ),
@@ -705,10 +704,11 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   )
 #' )
 #'
-eval_in_data_context <- function(input,
-                                 data = NULL,
-                                 default = NULL,
-                                 .envir = parent.frame()) {
+#' @export
+bru_eval_in_data_context <- function(input,
+                                     data = NULL,
+                                     default = NULL,
+                                     .envir = parent.frame()) {
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
@@ -894,19 +894,21 @@ extended_bind_rows <- function(...) {
 #'   processes via `family = "cp"`.
 #'   As an alternative to [bru()], the [lgcp()] function provides
 #'   a convenient interface to fitting Cox processes.
-#' @param data Likelihood-specific data, as a `data.frame` or
+#' @param data Predictor expression-specific data, as a `data.frame`, `sf`, or
 #' `SpatialPoints[DataFrame]`
 #'   object.
-#' @param response_data Likelihood-specific data for models that need different
-#'   size/format for inputs and response variables, as a `data.frame` or
-#'   `SpatialPoints[DataFrame]` object.
+#' @param response_data Observation/response-specific data for models that need
+#'   different size/format for inputs and response variables, as a `data.frame`,
+#'   `sf`, or `SpatialPoints[DataFrame]` object.
 #' @param data_extra object convertible with `as.list()` with additional
-#'   variables to be made available in predictor evaluations.
-#' @param E Exposure parameter for family = 'poisson' passed on to `INLA::inla`.
-#'   Special case if family is 'cp': rescale all integration weights by a scalar
-#'   E. For sampler specific reweighting/effort, use a `weight` column in the
-#'   `samplers` object, see [fmesher::fm_int()]. Default taken from `options$E`,
-#'   normally `1`.
+#'   variables to be made available in predictor evaluations. Variables with
+#'   the same names as the data object will be ignored, unless accessed via
+#'   `.data_extra.[["name"]]` or `.data_extra.$name` in the formula.
+#' @param E Exposure/effort parameter for family = 'poisson' passed on to
+#'   `INLA::inla`. Special case if family is 'cp': rescale all integration
+#'   weights by a scalar `E`. For sampler specific reweighting/effort, use a
+#'   `weight` column in the `samplers` object instead, see [fmesher::fm_int()].
+#'   Default taken from `options$E`, normally `1`.
 #' @param Ntrials A vector containing the number of trials for the 'binomial'
 #'   likelihood. Default taken from `options$Ntrials`, normally `1`.
 #' @param weights Fixed (optional) weights parameters of the likelihood, so the
@@ -918,7 +920,8 @@ extended_bind_rows <- function(...) {
 #'   For `family = "cp"`, the weights are applied as `sum(weights * eta)` in
 #'   the point location contribution part of the log-likelihood, where `eta` is
 #'   the linear predictor, and do not affect the integration part of the
-#'   likelihood.
+#'   likelihood. This can be used to implement approximative methods for point
+#'   location uncertainty.
 #' @param scale Fixed (optional) scale parameters of the precision for several
 #'   models, such as Gaussian and student-t response models.
 #' @param domain,samplers,ips Arguments used for `family="cp"`.
@@ -956,7 +959,7 @@ extended_bind_rows <- function(...) {
 #'   ```
 #'   list(block = .data.[[".block"]],
 #'        weights = .data.[["weight"]],
-#'        n_block = NROW(.response_data.))
+#'        n_block = bru_response_size(.response_data.))
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9008`.
 #' @param control.family A optional `list` of `INLA::control.family` options
@@ -1046,7 +1049,7 @@ bru_obs <- function(formula = . ~ .,
   }
   response_expr <- parse(text = formula_char[2])
   response <- tryCatch(
-    expr = eval_in_data_context(
+    expr = bru_eval_in_data_context(
       substitute(response_expr),
       data = list(response_data = response_data, data = data),
       default = NULL,
@@ -1082,7 +1085,7 @@ bru_obs <- function(formula = . ~ .,
       response_expr <- parse(text = domain_expr)
     }
     response <- tryCatch(
-      expr = eval_in_data_context(
+      expr = bru_eval_in_data_context(
         substitute(response_expr),
         data = list(response_data = response_data, data = data),
         default = NULL,
@@ -1098,25 +1101,25 @@ bru_obs <- function(formula = . ~ .,
     stop("Response variable missing or could not be evaluated")
   }
 
-  E <- eval_in_data_context(
+  E <- bru_eval_in_data_context(
     substitute(E),
     data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
-  Ntrials <- eval_in_data_context(
+  Ntrials <- bru_eval_in_data_context(
     substitute(Ntrials),
     data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
-  weights <- eval_in_data_context(
+  weights <- bru_eval_in_data_context(
     substitute(weights),
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
-  scale <- eval_in_data_context(
+  scale <- bru_eval_in_data_context(
     substitute(scale),
     data = list(response_data = response_data, data = data),
     default = 1,
@@ -1133,7 +1136,7 @@ bru_obs <- function(formula = . ~ .,
     )
   }
   if (!is.null(aggregate)) {
-    aggregate_input <- eval_in_data_context(
+    aggregate_input <- bru_eval_in_data_context(
       substitute(aggregate_input),
       data = list(data = data, response_data = response_data),
       default = NULL,
@@ -1143,7 +1146,7 @@ bru_obs <- function(formula = . ~ .,
       aggregate_input <- list()
     }
     if (is.null(aggregate_input[["block"]])) {
-      aggregate_input[["block"]] <- eval_in_data_context(
+      aggregate_input[["block"]] <- bru_eval_in_data_context(
         quote(.data.[[".block"]]),
         data = list(data = data, response_data = response_data),
         default = NULL,
@@ -1151,7 +1154,7 @@ bru_obs <- function(formula = . ~ .,
       )
     }
     if (is.null(aggregate_input[["weights"]])) {
-      aggregate_input[["weights"]] <- eval_in_data_context(
+      aggregate_input[["weights"]] <- bru_eval_in_data_context(
         quote(.data.[["weight"]]),
         data = list(data = data, response_data = response_data),
         default = NULL,
@@ -1159,8 +1162,8 @@ bru_obs <- function(formula = . ~ .,
       )
     }
     if (is.null(aggregate_input[["n_block"]])) {
-      aggregate_input[["n_block"]] <- eval_in_data_context(
-        quote(NROW(.response_data.)),
+      aggregate_input[["n_block"]] <- bru_eval_in_data_context(
+        quote(bru_response_size(.response_data.)),
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
@@ -1616,25 +1619,25 @@ like <- function(formula = . ~ .,
   #   "bru_obs()"
   # )
 
-  E <- eval_in_data_context(
+  E <- bru_eval_in_data_context(
     substitute(E),
     data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
-  Ntrials <- eval_in_data_context(
+  Ntrials <- bru_eval_in_data_context(
     substitute(Ntrials),
     data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
-  weights <- eval_in_data_context(
+  weights <- bru_eval_in_data_context(
     substitute(weights),
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
-  scale <- eval_in_data_context(
+  scale <- bru_eval_in_data_context(
     substitute(scale),
     data = list(response_data = response_data, data = data),
     default = 1,
@@ -1799,37 +1802,46 @@ bru_response_size <- function(object) {
   UseMethod("bru_response_size")
 }
 
+#' @describeIn bru_response_size Extract the number of observations from an
+#'   object supporting `NROW()`.
+#' @export
+bru_response_size.default <- function(object) {
+  NROW(object)
+}
+
+#' @describeIn bru_response_size Extract the number of observations from an
+#' `inla.surv` object.
+#' @export
+bru_response_size.inla.surv <- function(object) {
+  # This special case handling is needed because inla.surv objects are
+  # lists. When the INLA package changes representation of `inla.surv`
+  # to a tibble or data.frame, this special case won't be needed anymore.
+  NROW(object[[1]])
+}
+
 #' @describeIn bru_response_size Extract the number of observations from a
 #' `bru_like` object.
 #' @export
 bru_response_size.bru_like <- function(object) {
-  resp <- object[["response_data"]][[object[["response"]]]]
-  if (inherits(resp, "inla.surv")) {
-    # This special case handling is needed because inla.surv objects are
-    # lists. When the INLA package changes representation of `inla.surv`
-    # to a tibble or data.frame, this special case won't be needed anymore.
-    NROW(resp[[1]])
-  } else {
-    NROW(resp)
-  }
+  bru_response_size(object[["response_data"]][[object[["response"]]]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a
-#' `bru_like_list` object.
+#' `bru_like_list` object, as a vector with one value per observation model.
 #' @export
 bru_response_size.bru_like_list <- function(object) {
   vapply(object, bru_response_size, 1L)
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a
-#' `bru_info` object.
+#' `bru_info` object, as a vector with one value per observation model.
 #' @export
 bru_response_size.bru_info <- function(object) {
   bru_response_size(object[["lhoods"]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a
-#' `bru` object.
+#' `bru` object, as a vector with one value per observation model.
 #' @export
 bru_response_size.bru <- function(object) {
   bru_response_size(object[["bru_info"]])

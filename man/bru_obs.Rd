@@ -86,22 +86,24 @@ processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{sf}, or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{response_data}{Likelihood-specific data for models that need different
-size/format for inputs and response variables, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]} object.}
+\item{response_data}{Observation/response-specific data for models that need
+different size/format for inputs and response variables, as a \code{data.frame},
+\code{sf}, or \code{SpatialPoints[DataFrame]} object.}
 
 \item{data_extra}{object convertible with \code{as.list()} with additional
-variables to be made available in predictor evaluations.}
+variables to be made available in predictor evaluations. Variables with
+the same names as the data object will be ignored, unless accessed via
+\code{.data_extra.[["name"]]} or \code{.data_extra.$name} in the formula.}
 
-\item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
-Special case if family is 'cp': rescale all integration weights by a scalar
-E. For sampler specific reweighting/effort, use a \code{weight} column in the
-\code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}. Default taken from \code{options$E},
-normally \code{1}.}
+\item{E}{Exposure/effort parameter for family = 'poisson' passed on to
+\code{INLA::inla}. Special case if family is 'cp': rescale all integration
+weights by a scalar \code{E}. For sampler specific reweighting/effort, use a
+\code{weight} column in the \code{samplers} object instead, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
@@ -115,7 +117,8 @@ interpreted with great care.
 For \code{family = "cp"}, the weights are applied as \code{sum(weights * eta)} in
 the point location contribution part of the log-likelihood, where \code{eta} is
 the linear predictor, and do not affect the integration part of the
-likelihood.}
+likelihood. This can be used to implement approximative methods for point
+location uncertainty.}
 
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}
@@ -159,7 +162,7 @@ defined by non-NULL \code{aggregate}, overriding the default,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
      weights = .data.[["weight"]],
-     n_block = NROW(.response_data.))
+     n_block = bru_response_size(.response_data.))
 }\if{html}{\out{</div>}}
 
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9008}.}

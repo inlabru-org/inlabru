@@ -22,7 +22,12 @@ component, as
        group = group,
        replicate = replicate),
      scale = weights)
-}\if{html}{\out{</div>}}}
+}\if{html}{\out{</div>}}
+
+NOTE: If you have model component with the same name as a data variable you
+want to supply as input to \code{name_eval()}, you need to use \code{.data[["myvar"]]}
+to access it. Otherwise, it will try to use the other component effect as
+input, which is ill-defined.}
 
 \item{.state}{The internal component state. Normally supplied automatically
 by the internal methods for evaluating inlabru predictor expressions.}
@@ -35,28 +40,36 @@ In predictor expressions, \code{name_eval(...)} can be used to evaluate
 the effect of a component called "name".
 }
 \examples{
-\dontrun{
-if (bru_safe_inla()) {
+if (bru_safe_inla() &&
+    require("sf", quietly = TRUE)) {
   mesh <- fmesher::fm_mesh_2d_inla(
     cbind(0, 0),
-    offset = 2, max.edge = 0.25
+    offset = 2,
+    max.edge = 2.5
   )
-  spde <- INLA::inla.spde2.pcmatern(mesh,
-    prior.range = c(0.1, 0.01),
-    prior.sigma = c(2, 0.01)
+  spde <- INLA::inla.spde2.pcmatern(
+    mesh,
+    prior.range = c(1, NA),
+    prior.sigma = c(0.2, NA)
   )
-  data <- sp::SpatialPointsDataFrame(
-    matrix(runif(10), 5, 2),
-    data = data.frame(z = rnorm(5))
+  data <- sf::st_as_sf(
+    data.frame(
+      x = runif(50),
+      y = runif(50),
+      z = rnorm(50)
+    ),
+    coords = c("x", "y")
   )
-  fit <- bru(z ~ -1 + field(coordinates, model = spde),
-    family = "gaussian", data = data
+  fit <- bru(
+    z ~ -1 + field(geometry, model = spde),
+    family = "gaussian", data = data,
+    options = list(control.inla = list(int.strategy = "eb"))
   )
-  pred <- predict(
+  pred <- generate(
     fit,
-    data = data.frame(x = 0.5, y = 0.5),
-    formula = ~ field_eval(cbind(x, y))
+    newdata = data.frame(A = 0.5, B = 0.5),
+    formula = ~ field_eval(cbind(A, B)),
+    n.samples = 1L
   )
-}
 }
 }

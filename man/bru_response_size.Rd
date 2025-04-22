@@ -2,6 +2,8 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru_response_size}
 \alias{bru_response_size}
+\alias{bru_response_size.default}
+\alias{bru_response_size.inla.surv}
 \alias{bru_response_size.bru_like}
 \alias{bru_response_size.bru_like_list}
 \alias{bru_response_size.bru_info}
@@ -9,6 +11,10 @@
 \title{Response size queries}
 \usage{
 bru_response_size(object)
+
+\method{bru_response_size}{default}(object)
+
+\method{bru_response_size}{inla.surv}(object)
 
 \method{bru_response_size}{bru_like}(object)
 
@@ -29,17 +35,23 @@ Extract the number of response values from \code{bru} and related objects.
 }
 \section{Methods (by class)}{
 \itemize{
+\item \code{bru_response_size(default)}: Extract the number of observations from an
+object supporting \code{NROW()}.
+
+\item \code{bru_response_size(inla.surv)}: Extract the number of observations from an
+\code{inla.surv} object.
+
 \item \code{bru_response_size(bru_like)}: Extract the number of observations from a
 \code{bru_like} object.
 
 \item \code{bru_response_size(bru_like_list)}: Extract the number of observations from a
-\code{bru_like_list} object.
+\code{bru_like_list} object, as a vector with one value per observation model.
 
 \item \code{bru_response_size(bru_info)}: Extract the number of observations from a
-\code{bru_info} object.
+\code{bru_info} object, as a vector with one value per observation model.
 
 \item \code{bru_response_size(bru)}: Extract the number of observations from a
-\code{bru} object.
+\code{bru} object, as a vector with one value per observation model.
 
 }}
 \examples{

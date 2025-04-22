@@ -110,7 +110,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
       aggregate_input = list(
         weights = weights,
         block = grp,
-        n_block = NROW(.response_data.)
+        n_block = bru_response_size(.response_data.)
       ),
       control.family = list(
         hyper = list(
@@ -161,7 +161,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
         aggregate = "average",
         aggregate_input = list(
           weights = weights,
-          n_block = NROW(.response_data.)
+          n_block = bru_response_size(.response_data.)
         ),
         control.family = list(
           hyper = list(

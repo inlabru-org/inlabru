@@ -155,7 +155,8 @@ test_that("bru: predict with _eval", {
     formula = ~ data.frame(
       A = fun,
       B = fun_eval(u)
-    )
+    ),
+    n.samples = 10L
   )
 
   expect_equal(pred$B, pred$A)
