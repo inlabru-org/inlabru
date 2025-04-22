@@ -2260,7 +2260,7 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 #' 1. If `eval()` failed, return NULL or map everything to 1
 #'    (see the `null.on.fail` argument). This should normally not
 #'    happen, unless the component use logic is incorrect,
-#'    (e.g. via `include`/`exclude`)
+#'    (e.g. via `used` or `include`/`exclude`)
 #'    leading to missing columns for a certain likelihood in a
 #'    multi-`bru_obs()` model.
 #' 2. If we obtain a function, apply the function to the data object

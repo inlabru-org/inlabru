@@ -9,7 +9,7 @@
 \alias{ibm_eval.bru_mapper_aggregate}
 \title{Mapper for aggregation}
 \usage{
-bru_mapper_aggregate(rescale = FALSE, n_block = NULL)
+bru_mapper_aggregate(rescale = FALSE, n_block = NULL, type = NULL)
 
 \method{ibm_n}{bru_mapper_aggregate}(mapper, ..., input = NULL, state = NULL, n_state = NULL)
 
@@ -36,6 +36,10 @@ the same as dividing by the number of entries in each block.
 \item{n_block}{Predetermined number of output blocks. If \code{NULL}, overrides
 the maximum block index in the inputs. The priority order is \code{input$n_block},
 the mapper definition \code{n_block}, then \code{max(input$block)}.}
+
+\item{type}{character; if non-NULL, overrides the \code{rescale} argument, and
+constructs an aggregation mapper of the given type instead. Supported
+values are "sum", "average", "logsumexp", and "logaverageexp".}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 

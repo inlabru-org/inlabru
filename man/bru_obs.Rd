@@ -16,6 +16,7 @@ bru_obs(
   family = "gaussian",
   data = NULL,
   response_data = NULL,
+  data_extra = NULL,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -25,6 +26,8 @@ bru_obs(
   ips = NULL,
   used = NULL,
   allow_combine = NULL,
+  aggregate = NULL,
+  aggregate_input = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
@@ -83,19 +86,24 @@ processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{sf}, or
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{response_data}{Likelihood-specific data for models that need different
-size/format for inputs and response variables, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]} object.}
+\item{response_data}{Observation/response-specific data for models that need
+different size/format for inputs and response variables, as a \code{data.frame},
+\code{sf}, or \code{SpatialPoints[DataFrame]} object.}
 
-\item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
-Special case if family is 'cp': rescale all integration weights by a scalar
-E. For sampler specific reweighting/effort, use a \code{weight} column in the
-\code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}. Default taken from \code{options$E},
-normally \code{1}.}
+\item{data_extra}{object convertible with \code{as.list()} with additional
+variables to be made available in predictor evaluations. Variables with
+the same names as the data object will be ignored, unless accessed via
+\code{.data_extra.[["name"]]} or \code{.data_extra.$name} in the formula.}
+
+\item{E}{Exposure/effort parameter for family = 'poisson' passed on to
+\code{INLA::inla}. Special case if family is 'cp': rescale all integration
+weights by a scalar \code{E}. For sampler specific reweighting/effort, use a
+\code{weight} column in the \code{samplers} object instead, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
@@ -109,7 +117,8 @@ interpreted with great care.
 For \code{family = "cp"}, the weights are applied as \code{sum(weights * eta)} in
 the point location contribution part of the log-likelihood, where \code{eta} is
 the linear predictor, and do not affect the integration part of the
-likelihood.}
+likelihood. This can be used to implement approximative methods for point
+location uncertainty.}
 
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}
@@ -140,6 +149,23 @@ latent vectors are made available to the predictor evaluation is defined by
 several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
+
+\item{aggregate}{character ("none", "sum", "average", "logsumexp", or
+"logaverageexp", as defined by \code{bru_mapper_aggregate(type = aggregate)})
+or an aggregation \code{bru_mapper} object
+(\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
+interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
+from version \verb{2.12.0.9008}.}
+
+\item{aggregate_input}{\code{NULL} or an optional input list to the mapper
+defined by non-NULL \code{aggregate}, overriding the default,
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
+     weights = .data.[["weight"]],
+     n_block = bru_response_size(.response_data.))
+}\if{html}{\out{</div>}}
+
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9008}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 

@@ -1863,6 +1863,9 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #' @param n_block Predetermined number of output blocks. If `NULL`, overrides
 #' the maximum block index in the inputs. The priority order is `input$n_block`,
 #' the mapper definition `n_block`, then `max(input$block)`.
+#' @param type character; if non-NULL, overrides the `rescale` argument, and
+#' constructs an aggregation mapper of the given type instead. Supported
+#' values are "sum", "average", "logsumexp", and "logaverageexp".
 #' @description
 #' Constructs a mapper
 #' that aggregates elements of the input state, so it can be used e.g.
@@ -1878,7 +1881,26 @@ ibm_eval.bru_mapper_scale <- function(mapper, input, state = NULL, ...,
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
 bru_mapper_aggregate <- function(rescale = FALSE,
-                                 n_block = NULL) {
+                                 n_block = NULL,
+                                 type = NULL) {
+  if (!is.null(type)) {
+    type <- match.arg(type, c("sum", "average", "logsumexp", "logaverageexp"))
+    if (type == "sum") {
+      rescale <- FALSE
+    } else if (type == "average") {
+      rescale <- TRUE
+    } else if (type == "logsumexp") {
+      return(bru_mapper_logsumexp(
+        rescale = FALSE,
+        n_block = n_block
+      ))
+    } else if (type == "logaverageexp") {
+      return(bru_mapper_logsumexp(
+        rescale = TRUE,
+        n_block = n_block
+      ))
+    }
+  }
   bru_mapper_define(
     list(
       rescale = rescale,

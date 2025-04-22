@@ -21,7 +21,7 @@ lgcp(
 Also used to define a default linear additive predictor.  See
 \code{\link[=bru_component]{bru_component()}} for details.}
 
-\item{data}{Likelihood-specific data, as a \code{data.frame} or
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{sf}, or
 \code{SpatialPoints[DataFrame]}
 object.}
 

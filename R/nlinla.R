@@ -14,6 +14,7 @@ bru_compute_linearisation <- function(...) {
 #' @param model A [bru_model] object
 #' @param lhood_expr A predictor expression
 #' @param data Input data
+#' @param data_extra Additional data for the predictor
 #' @param input Precomputed component inputs from `evaluate_inputs()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
@@ -39,6 +40,7 @@ bru_compute_linearisation.component <- function(cmp,
                                                 model,
                                                 lhood_expr,
                                                 data,
+                                                data_extra,
                                                 input,
                                                 state,
                                                 comp_simple,
@@ -194,6 +196,7 @@ bru_compute_linearisation.component <- function(cmp,
           } else {
             data
           },
+        data_extra = data_extra,
         effects =
           if (symmetric_diffs) {
             effects_eps
@@ -299,6 +302,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
     model,
     state = list(state),
     data = data,
+    data_extra = lhood[["data_extra"]],
     effects = list(effects),
     predictor = lhood_expr,
     used = used,
@@ -337,6 +341,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             model = model,
             lhood_expr = lhood_expr,
             data = data,
+            data_extra = lhood[["data_extra"]],
             input = input,
             state = state,
             comp_simple = comp_simple[[label]],
