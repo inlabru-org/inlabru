@@ -20,6 +20,7 @@
   `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
   specification of models with aggregation as the final step of the predictor
   evaluation (version `2.12.0.9013`)
+* Automatically detect purely additive linear models (version `2.12.0.9014`)
 
 ## New and updated mapper features
 

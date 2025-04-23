@@ -41,8 +41,8 @@ the effect of a component called "name".
 }
 \examples{
 if (bru_safe_inla() &&
-    require("sf", quietly = TRUE) &&
-    requireNamespace("sn", quietly = TRUE)) {
+  require("sf", quietly = TRUE) &&
+  requireNamespace("sn", quietly = TRUE)) {
   mesh <- fmesher::fm_mesh_2d_inla(
     cbind(0, 0),
     offset = 2,

@@ -59,8 +59,33 @@ bru_used_update.bru_like_list <- function(x, labels, ...) {
 #' @rdname bru_used_update
 #' @export
 bru_used_update.bru_like <- function(x, labels, ...) {
-  x[["used"]] <-
-    bru_used_update(bru_used(x), labels = labels, ...)
+  pre_used <- bru_used(x)
+  used <- bru_used_update(pre_used, labels = labels, ...)
+  if (isTRUE(x[["is_additive"]])) {
+    if ((length(used$latent) > 0) ||
+      (length(setdiff(pre_used$effect, used$effect)) > 0)) {
+      x[["is_additive"]] <- FALSE
+      x[["linear"]] <- FALSE
+
+      if (is.null(x[["expr"]])) {
+        expr_text <- paste0(pre_used$effect, collapse = " + ")
+        if (length(pre_used$latent) > 0) {
+          expr_text <- paste(
+            expr_text,
+            paste0(pre_used$latent, "_latent", collapse = " + "),
+            sep = " + "
+          )
+        }
+        x[["expr"]] <- parse(text = expr_text)
+      }
+    } else {
+      if (is.null(x[["expr"]])) {
+        expr_text <- paste0(used$effect, collapse = " + ")
+        x[["expr"]] <- parse(text = expr_text)
+      }
+    }
+  }
+  x[["used"]] <- used
   x
 }
 

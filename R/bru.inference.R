@@ -560,7 +560,7 @@ bru <- function(components = ~ Intercept(1),
   bru.model <- bru_model(components, lhoods, inputs = inputs)
 
   # Set max iterations to 1 if all likelihood formulae are linear
-  if (all(vapply(lhoods, function(lh) lh$linear, TRUE))) {
+  if (all(vapply(lhoods, function(lh) isTRUE(lh[["linear"]]), TRUE))) {
     options$bru_max_iter <- 1
   }
 
@@ -868,6 +868,145 @@ extended_bind_rows <- function(...) {
 }
 
 
+bru_get_parse_data <- function(x) {
+  withr::with_options(
+    list(keep.parse.data = TRUE),
+    {
+      utils::getParseData(parse(text = x, keep.source = TRUE))
+    }
+  )
+}
+
+#' @title Check for predictor expression additivity
+#' @description Checks if a predictor expression is additive or not
+#' @param x A predictor `expression`, `formula`, or parse information
+#'   `data.frame`.
+#' @param \dots Arguments passed on recursively.
+#' @param verbose logical; if `TRUE`, print diagnostic parsing information.
+#' @return `TRUE` if the expression is detected to be additive, `FALSE`
+#'   otherwise.
+#' @keywords internal
+#' @export
+bru_is_additive <- function(x, ...) {
+  UseMethod("bru_is_additive")
+}
+
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
+  if (root_id == 0) {
+    root_id <- x$id[x$parent == 0]
+    if (length(root_id) != 1L) {
+      stop("Cannot determine parser root id")
+    }
+  }
+
+  x_root <- x[x$id == root_id, , drop = FALSE]
+  if (x_root$token == "SYMBOL") {
+    if (verbose) {
+      message("SYMBOL found")
+    }
+    return(TRUE)
+  }
+  if (x_root$token == "expr") {
+    if (verbose) {
+      message("expr found, may be additive")
+    }
+    x_terms <- x[x$parent == root_id, , drop = FALSE]
+    if (nrow(x_terms) < 1L) {
+      if (verbose) {
+        message("No terms found, assuming non-additive")
+      }
+      return(FALSE)
+    }
+    if (nrow(x_terms) == 1L) {
+      if (verbose) {
+        message("Only one term, checking for symbol")
+      }
+      add <- x_terms$token[1] == "SYMBOL"
+      if (add && verbose) {
+        message("SYMBOL found")
+      }
+      return(add)
+    }
+    if (nrow(x_terms) == 2L) {
+      if (x_terms$token[1] != "'+'") {
+        if (verbose) {
+          message("Only two terms and no '+' found, assuming non-additive")
+        }
+        return(FALSE)
+      }
+      if (verbose) {
+        message("'+' found, may be additive")
+      }
+      add <- bru_is_additive(x = x, root_id = x_terms$id[2], ..., verbose = verbose)
+      return(all(add))
+    }
+    if (nrow(x_terms) >= 4L) {
+      if (verbose) {
+        message("More than 3 terms, assuming non-additive")
+      }
+      return(FALSE)
+    }
+    if (x_terms$token[2] == "'+'") {
+      if (verbose) {
+        message("'+' found, may be additive")
+      }
+      add <- c(
+        bru_is_additive(x = x, root_id = x_terms$id[1], verbose = verbose),
+        bru_is_additive(x = x, root_id = x_terms$id[3], verbose = verbose)
+      )
+      return(all(add))
+    }
+    if ((x_terms$token[1] == "'('") && (x_terms$token[3] == "')'")) {
+      if (x_terms$token[2] == "expr") {
+        if (verbose) {
+          message("(expr) found, may be additive")
+        }
+        add <- bru_is_additive(x = x, root_id = x_terms$id[2], verbose = verbose)
+        return(add)
+      }
+    }
+  }
+
+  if (verbose) {
+    message("No known additive structure found, assuming non-additive")
+  }
+
+  return(FALSE)
+}
+
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.character <- function(x, ...) {
+  bru_is_additive(
+    bru_get_parse_data(x),
+    root_id = 0,
+    ...
+  )
+}
+
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.expression <- function(x, ...) {
+  bru_is_additive(
+    bru_get_parse_data(as.character(x)),
+    root_id = 0,
+    ...
+  )
+}
+
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.formula <- function(x, ...) {
+  bru_is_additive(
+    bru_get_parse_data(as.character(x)[length(x)]),
+    root_id = 0,
+    ...
+  )
+}
+
+
 #' @title Observation model construction for usage with [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
@@ -1033,11 +1172,12 @@ bru_obs <- function(formula = . ~ .,
 
   formula_char <- as.character(formula)
 
-  # Does the likelihood formula imply a linear predictor?
-  linear <- formula_char[length(formula_char)] == "."
+  # Does the likelihood formula imply an additive predictor?
+  is_additive <- bru_is_additive(formula_char[length(formula_char)])
+  is_additive_dot <- formula_char[length(formula_char)] == "."
 
-  # If not linear, set predictor expression according to the formula's RHS
-  if (!linear) {
+  # If not additive, set predictor expression according to the formula's RHS
+  if (!is_additive) {
     expr <- parse(text = formula_char[length(formula_char)])
   } else {
     expr <- NULL
@@ -1191,7 +1331,7 @@ bru_obs <- function(formula = . ~ .,
 
   data_extra <- as.list(data_extra)
   if (!is.null(aggregate)) {
-    if (!linear) {
+    if (!is_additive) {
       expr_text <- formula_char[length(formula_char)]
       expr_text <- paste0(
         "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
@@ -1364,7 +1504,7 @@ bru_obs <- function(formula = . ~ .,
           rep(0, NROW(ips))
         )
       )
-      if (!linear) {
+      if (!is_additive) {
         expr_text <- formula_char[length(formula_char)]
         expr_text <- paste0(
           "{\n",
@@ -1562,7 +1702,8 @@ bru_obs <- function(formula = . ~ .,
       weights = weights,
       scale = scale,
       samplers = samplers,
-      linear = linear,
+      is_additive = is_additive,
+      linear = is_additive, # Not quite correct, as depends on component defs
       expr = expr,
       response = response,
       inla.family = inla.family,
@@ -2161,6 +2302,9 @@ bru_like_control_family.bru_like_list <- function(x,
 
 bru_like_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
+    # Only needed pre-2.12.0.9014
+    # Later versions construct expressions for all models,
+    # when calling bru_used_update.bru_like()
     expr_text <- "BRU_EXPRESSION"
   } else {
     expr_text <- as.character(lhood[["expr"]])
