@@ -290,14 +290,14 @@ The expectation and variance are computed as follows:
 
 $$
 \begin{aligned}
-E(count)&=\frac{1}{1-\exp(-\lambda)}p\lambda \\
-Var(count)&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
+E(\text{count})&=\frac{1}{1-\exp(-\lambda)}p\lambda \\
+Var(\text{count})&= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p \lambda^2)-
 \left(\frac{1}{1-\exp(-\lambda)}p\lambda\right)^2 \\
-&= E(count) (1+p\lambda) - E(count)^2 \\
-&= E(count) (1+p\lambda-E(count)) \\
-&= E(count) \left(1+p\lambda\left(1-\frac{1}{1-\exp(-\lambda)}\right)\right) \\
-&= E(count) \left(1-p\lambda\frac{\exp(-\lambda)}{1-\exp(-\lambda)}\right) \\
-&= E(count) \left(1-\exp(-\lambda) E(count)\right)
+&= E(\text{count}) (1+p\lambda) - E(\text{count})^2 \\
+&= E(\text{count}) (1+p\lambda-E(\text{count})) \\
+&= E(\text{count}) \left(1+p\lambda\left(1-\frac{1}{1-\exp(-\lambda)}\right)\right) \\
+&= E(\text{count}) \left(1-p\lambda\frac{\exp(-\lambda)}{1-\exp(-\lambda)}\right) \\
+&= E(\text{count}) \left(1-\exp(-\lambda) E(\text{count})\right)
 \end{aligned}
 $$
 
@@ -496,11 +496,6 @@ df <- data.frame(
     expect_zip$pred_var,
     expect_zap$pred_var
   ),
-  pred_median = c(
-    expect_poi$median,
-    expect_zip$median,
-    expect_zap$median
-  ),
   log_score = c(
     expect_poi$log_score,
     expect_zip$log_score,
@@ -528,11 +523,10 @@ patchwork::wrap_plots(p1, p2, nrow = 1, guides = "collect")
 
 ### Prediction scores
 
-We use four distinct prediction scores to evaluate model performance:
+We use three distinct prediction scores to evaluate model performance:
 
 $$
 \begin{aligned}
-\text{AE}_i&=|y_i-\text{median}_i|,\\
 \text{SE}_i&=[y_i-E(X_i|\text{data})]^2, \text{ and}\\
 \text{DS}_i&=\frac{[y_i-E(X_i|\text{data})]^2}{V(X_i|\text{data})} +
   \log[V(X_i|\text{data})], \\
@@ -540,14 +534,23 @@ $$
 \end{aligned}
 $$
 The Dawid-Sebastiani score is a proper scoring rule for the predictive mean
-$E(X_i)$ and variance $V(X_i)$. AE and SE are proper scores for the median and
-expectation, respectively. The (negated) Log score is a strictly proper score
-[@gneiting2007StrictlyProperScoring]
+$E(X_i)$ and variance $V(X_i)$. SE is a proper score for the expectation.
+The (negated) Log score is a strictly proper score
+[@gneiting2007StrictlyProperScoring].
+
+Ideally, one might want to also compute
+the proper version of the Absolute Error score,
+$\text{AE}_i&=|y_i-\text{median}_i|$, but unfortunately the $\text{median}_i$
+value isn't as computationally efficient as the mean, variance, and log-score.
+The code use for computing the mean and variance would make it easy to calculate
+the posterior expectation of the _conditional_ median given the hyperparameters,
+but for the actual prediction median, one would need to sample from the full
+posterior count model.
+
 
 ```{r, out.width="100%", fig.width=15, fig.height=5, fig.align='center'}
 df <- df %>%
   mutate(
-    AE = abs(count - pred_median),
     SE = (count - pred_mean)^2,
     DS = (count - pred_mean)^2 / pred_var + log(pred_var),
     LG = log_score
@@ -556,7 +559,6 @@ df <- df %>%
 scores <- df %>%
   group_by(Model) %>%
   summarise(
-    MAE = mean(AE),
     RMSE = sqrt(mean(SE)),
     MDS = mean(DS),
     MLG = mean(LG)
@@ -589,7 +591,6 @@ df_ <- df %>%
     df %>%
       filter(Model == "Poisson") %>%
       select(geometry,
-        AE_Poisson = AE,
         SE_Poisson = SE,
         DS_Poisson = DS,
         LG_Poisson = LG

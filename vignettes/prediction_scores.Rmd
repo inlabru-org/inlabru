@@ -124,10 +124,13 @@ but a useless one (an ideal prediction is no better than any other prediction).
   Note that $|y-\pE_F(Y)|$, the absolute error with respect to the _expectation_,
   is _not_ a proper score!  Another way of expressing this is that if $|y-m_F|$
   is a proper score _with respect to the median_, i.e. it is proper when $m_F$
-  is taken to be the median of $F$, and not some other point prediction.
+  is taken to be the median of $F$, and not some other point prediction. Unfortunately,
+  the predictive median is not readily available, and typically requires sampling
+  from the observation level predictive distribution, or estimating the median
+  of the a mixture distribution.
   In the applied literature, this distinction is often overlooked, and the predictive
   mean is inserted into both the SE and AE scores, making the resulting AE score
-  comparisons less clear than they could be.
+  comparisons less clear than they could be. 
 * CRPS (Continuous Ranked Probability Score):
   
   $$
