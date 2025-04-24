@@ -225,6 +225,11 @@ bru_info_upgrade <- function(object,
       message("Upgrading bru_info to 2.7.0.9021")
       # Make sure 'used' components format is properly stored
 
+      if (is.null(object[["lhoods"]][["is_additive"]])) {
+        object[["lhoods"]][["is_additive"]] <-
+          object[["lhoods"]][["linear"]]
+      }
+
       object[["lhoods"]] <-
         bru_used_upgrade(
           object[["lhoods"]],
@@ -269,6 +274,23 @@ bru_info_upgrade <- function(object,
         )
 
       object[["inlabru_version"]] <- "2.10.1.9012"
+    }
+
+    if (utils::compareVersion("2.12.0.9014", old_ver) > 0) {
+      message("Upgrading bru_info to 2.12.0.9014")
+      # Update is_additive/linear storage
+
+      object[["lhoods"]][["is_additive"]] <-
+        object[["lhoods"]][["linear"]]
+
+      # Update predictor expression
+      object[["lhoods"]] <-
+        bru_used_upgrade(
+          object[["lhoods"]],
+          labels = names(object[["model"]][["effects"]])
+        )
+
+      object[["inlabru_version"]] <- "2.12.0.9014"
     }
 
     object[["inlabru_version"]] <- new_version
