@@ -397,7 +397,7 @@ print.summary_bru_info <- function(x, ...) {
   cat(paste0("INLA version: ", x$INLA_version, "\n"))
   cat(paste0("Components:\n"))
   print(x$components)
-  cat(paste0("Likelihoods:\n"))
+  cat(paste0("Observation models:\n"))
   print(x$lhoods)
   invisible(x)
 }
@@ -2189,6 +2189,8 @@ summary.bru_like <- function(object, verbose = TRUE, ...) {
       data_class = class(object[["data"]]),
       response_class = class(object[["response_data"]][[object[["response"]]]]),
       predictor = deparse(object[["formula"]]),
+      is_additive = object[["is_additive"]],
+      is_linear = object[["linear"]],
       used = object[["used"]],
       tag = object[["tag"]]
     ),
@@ -2222,6 +2224,7 @@ print.summary_bru_like <- function(x, ...) {
       "    Data class: %s\n",
       "    Response class: %s\n",
       "    Predictor: %s\n",
+      "    Additive/Linear: %s/%s\n",
       "    Used components: %s\n"
     ),
     lh$family,
@@ -2239,6 +2242,8 @@ print.summary_bru_like <- function(x, ...) {
     } else {
       lh$predictor
     },
+    as.character(lh$is_additive),
+    as.character(lh$is_linear),
     format(lh$used)
   ))
   invisible(x)
