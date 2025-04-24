@@ -184,6 +184,7 @@ reference:
   - starts_with("bru_safe_sp", internal = TRUE)
   - starts_with("bru_call_options", internal = TRUE)
   - starts_with("bru_compute_linearisation", internal = TRUE)
+  - starts_with("bru_is_additive", internal = TRUE)
 - title: "Deprecated methods"
   desc: "Deprecated methods"
   contents:
