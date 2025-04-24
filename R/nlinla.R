@@ -317,8 +317,8 @@ bru_compute_linearisation.bru_like <- function(lhood,
   # can in principle be parallelised.
   for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
-      if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
-        # If linear and no combinations allowed, just need to copy the
+      if (lhood[["is_additive"]] && !lhood[["allow_combine"]]) {
+        # If additive and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
           comp_simple[[label]],

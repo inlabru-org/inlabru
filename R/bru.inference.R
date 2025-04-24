@@ -574,12 +574,25 @@ bru <- function(components = ~ Intercept(1),
   components <- bru_component_list(components, .envir = .envir)
 
   # Update include/exclude information to limit it to existing components
+  # and check additivity
   lhoods <- bru_used_update(lhoods, labels = names(components))
 
   inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
 
   # Turn model components into internal bru model
   bru.model <- bru_model(components, lhoods, inputs = inputs)
+
+  # Check linearity
+  for (lh in seq_along(lhoods)) {
+    if (lhoods[[lh]][["linear"]]) {
+      used_lh <- bru_used(lhoods[[lh]])
+      used_lh <- unique(c(used_lh$effect, used_lh$latent))
+      lhoods[[lh]][["linear"]] <-
+        all(vapply(bru.model$effects[used_lh], function(cmp) {
+          ibm_is_linear(cmp$mapper)
+        }, TRUE))
+    }
+  }
 
   # Set max iterations to 1 if all likelihood formulae are linear
   if (all(vapply(lhoods, function(lh) isTRUE(lh[["linear"]]), TRUE))) {

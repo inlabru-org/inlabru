@@ -75,10 +75,6 @@ bru_model <- function(components, lhoods, inputs = NULL) {
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
 
-  # Detect linearity
-  linear <- all(vapply(lhoods, function(lh) lh[["linear"]], TRUE))
-  # TODO: detect pure effect additivity (allowing nonlinear components)
-
   if (is.null(inputs)) {
     inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
   }
@@ -91,8 +87,7 @@ bru_model <- function(components, lhoods, inputs = NULL) {
   )
 
   for (cmp in included) {
-    if (linear ||
-      !(components[[cmp]][["main"]][["type"]] %in% c("offset", "const"))) {
+    if (!(components[[cmp]][["main"]][["type"]] %in% c("offset", "const"))) {
       formula <- update.formula(formula, components[[cmp]]$inla.formula)
     }
   }
