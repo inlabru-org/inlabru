@@ -961,7 +961,12 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
       if (verbose) {
         message("'+' found, may be additive")
       }
-      add <- bru_is_additive(x = x, root_id = x_terms$id[2], ..., verbose = verbose)
+      add <- bru_is_additive(
+        x = x,
+        root_id = x_terms$id[2],
+        ...,
+        verbose = verbose
+      )
       return(all(add))
     }
     if (nrow(x_terms) >= 4L) {
@@ -985,7 +990,11 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
         if (verbose) {
           message("(expr) found, may be additive")
         }
-        add <- bru_is_additive(x = x, root_id = x_terms$id[2], verbose = verbose)
+        add <- bru_is_additive(
+          x = x,
+          root_id = x_terms$id[2],
+          verbose = verbose
+        )
         return(add)
       }
     }
