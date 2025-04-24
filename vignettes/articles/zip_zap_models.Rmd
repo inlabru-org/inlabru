@@ -317,7 +317,7 @@ comps <- ~
 ## Alternative with a shared field component:
 #  field_count(geometry, copy = "field_present", fixed = FALSE)
 
-truncated_poisson_like <-
+truncated_poisson_obs <-
   if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
     bru_obs(
       family = "zeroinflatedpoisson0",
@@ -337,7 +337,7 @@ truncated_poisson_like <-
     )
   }
 
-present_like <- bru_obs(
+present_obs <- bru_obs(
   family = "binomial",
   data = counts_df,
   formula = present ~ # vegetation +
@@ -347,9 +347,8 @@ present_like <- bru_obs(
 
 fit_zap <- bru(
   comps,
-  present_like,
-  truncated_poisson_like,
-  options = list(bru_verbose = 4)
+  present_obs,
+  truncated_poisson_obs
 )
 
 summary(fit_zap)
