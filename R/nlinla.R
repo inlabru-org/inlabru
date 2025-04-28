@@ -292,7 +292,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
     input = input[used[["effect"]]],
-    state = state[used[["effect"]]],
+    state = state[used[["effect"]]]
   )
 
   lhood_expr <- bru_like_expr(lhood, model[["effects"]])
