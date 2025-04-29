@@ -530,11 +530,15 @@ evaluate_predictor <- function(model,
                            replicate = NULL,
                            weights = NULL,
                            .state = NULL) {
+        n_input <- ibm_n_output(
+          .mapper[["mappers"]][["mapper"]][["mappers"]][["main"]],
+          input = main
+        )
         if (is.null(group)) {
-          group <- rep(1, NROW(main))
+          group <- rep(1, n_input)
         }
         if (is.null(replicate)) {
-          replicate <- rep(1, NROW(main))
+          replicate <- rep(1, n_input)
         }
         if (!.is_offset && is.null(.state)) {
           .state <- eval(
