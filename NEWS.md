@@ -47,7 +47,7 @@
   `generate()` (version `2.12.0.9003`)
 * Assumed that `NROW()` on the main component gave the correct size for `group`
   and `replicate` in the component `_eval()` feature.
-  Now uses `ibm_n_output()` instead. Fixes #172 (version `2.12.0.9015`)
+  Now uses `ibm_n_output()` instead. Fixes #171 (version `2.12.0.9015`)
 
 # inlabru 2.12.0
 
