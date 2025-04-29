@@ -2014,7 +2014,7 @@ comp_lin_eval.component <- function(component,
                                     ...) {
   bru_log_message(
     paste0("Linearise component '", component[["label"]], "'"),
-    verbosity = 4
+    verbosity = 5
   )
   if (is.null(state)) {
     state <- rep(0, ibm_n(component[["mapper"]]))
@@ -2028,7 +2028,7 @@ comp_lin_eval.component <- function(component,
 comp_lin_eval.component_list <- function(components, input, state, ...) {
   bru_log_message(
     paste0("Linearise components"),
-    verbosity = 3
+    verbosity = 5
   )
   # Note: Make sure the list element names carry over!
   mappers <-

@@ -54,7 +54,7 @@ bru_compute_linearisation.component <- function(cmp,
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
-    verbosity = 4
+    verbosity = 5
   )
 
   if (cmp[["main"]][["type"]] %in% c("offset", "const")) {
