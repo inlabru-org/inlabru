@@ -10,6 +10,13 @@ on:
   pull_request:
     branches:
       - devel
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 name: R-CMD-check
 
@@ -95,6 +102,14 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
+
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      # https://mxschmitt.github.io/action-tmate/
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          limit-access-to-actor: true
 
       - uses: r-lib/actions/check-r-package@v2
         env:
