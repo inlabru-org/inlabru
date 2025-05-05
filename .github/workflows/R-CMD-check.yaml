@@ -74,7 +74,7 @@ jobs:
              rcmdcheck
              Cairo
              remotes
-             stars
+             stars=?ignore
              starsdata=?ignore
 
 #      - name: Fix temporary out-of-sync binary packages
