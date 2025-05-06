@@ -755,10 +755,11 @@ test_that("Repeat mapper works", {
   local_bru_safe_inla()
 
   set.seed(12345L)
+  u <- rnorm(8)
   data <- data.frame(
-    y = 4 + rnorm(6),
     x = c(1, 2, 3, 2, 3, 4)
   )
+  data$y <- 4 + u[data$x] + u[data$x + 4L]
 
   expect_no_error({
     fit_bru <-

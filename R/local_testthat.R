@@ -78,6 +78,49 @@ local_basic_fixed_effect_testdata <- function() {
 }
 
 
+# @returns logical; If the option setting was successful, `TRUE` is returned,
+# otherwise `FALSE`.
+local_inla_options_set <- function(...,
+                                   envir = parent.frame(),
+                                   .save_only = FALSE) {
+  # Set INLA options
+  inla_options <- list(...)
+  old_inla_options <- list()
+  if (length(inla_options) > 0) {
+    for (name in names(inla_options)) {
+      old_inla_options[[name]] <- tryCatch(
+        INLA::inla.getOption(name),
+        error = function(e) {
+          e
+        }
+      )
+
+      if (inherits(old_inla_options[[name]], "simpleError")) {
+        return(FALSE)
+      }
+
+      if (!.save_only) {
+        e <- tryCatch(
+          INLA::inla.setOption(name, inla_options[[name]]),
+          error = function(e) {
+            e
+          }
+        )
+        if (inherits(e, "simpleError")) {
+          return(FALSE)
+        }
+      }
+
+      withr::defer(
+        INLA::inla.setOption(name, old_inla_options[[name]]),
+        envir
+      )
+    }
+  }
+  TRUE
+}
+
+
 #' @describeIn local_testthat Tests should set num.threads = "1:1" to ensure
 #'   within-system repeatability by calling `local_bru_safe_inla()`; see also
 #'   [bru_safe_inla()]
@@ -105,63 +148,20 @@ local_bru_safe_inla <- function(multicore = FALSE,
     }
 
     # Save the num.threads option so it can be restored
-    old_threads <- tryCatch(
-      INLA::inla.getOption("num.threads"),
-      error = function(e) {
-        e
-      }
+    local_inla_options_set(num.threads = NULL,
+                           envir = envir,
+                           .save_only = TRUE)
+
+    local_inla_options_set(
+      inla.timeout = 60,
+      fmesher.timeout = 30,
+      fmesher.evolution = 2L,
+      fmesher.evolution.warn = TRUE,
+      fmesher.evolution.verbosity = "stop",
+      envir = envir,
+      .save_only = FALSE
     )
-    if (inherits(old_threads, "simpleError")) {
-      return(testthat::skip("inla.getOption() failed, skip INLA tests."))
-    }
-    withr::defer(
-      INLA::inla.setOption(num.threads = old_threads),
-      envir
-    )
 
-    # Save the fmesher.timeout option so it can be restored
-    old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
-    withr::defer(
-      INLA::inla.setOption(fmesher.timeout = old_fmesher_timeout),
-      envir
-    )
-    INLA::inla.setOption(fmesher.timeout = 30)
-
-    if ("fmesher.evolution" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution option so it can be restored
-      old_fmesher_evolution <- INLA::inla.getOption("fmesher.evolution")
-      withr::defer(
-        INLA::inla.setOption(fmesher.evolution = old_fmesher_evolution),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
-    }
-
-    if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution.warn option so it can be restored
-      old_fmesher_evolution_warn <-
-        INLA::inla.getOption("fmesher.evolution.warn")
-      withr::defer(
-        INLA::inla.setOption(
-          fmesher.evolution.warn = old_fmesher_evolution_warn
-        ),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution.warn = TRUE)
-    }
-
-    if ("fmesher.evolution.verbosity" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution.verbosity option so it can be restored
-      old_fmesher_evolution_verbosity <-
-        INLA::inla.getOption("fmesher.evolution.verbosity")
-      withr::defer(
-        INLA::inla.setOption(
-          fmesher.evolution.verbosity = old_fmesher_evolution_verbosity
-        ),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution.verbosity = "stop")
-    }
     # withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
   }
 
