@@ -130,15 +130,17 @@ test_that("Component copy feature", {
   set.seed(123L)
 
   mydata <- data.frame(
-    x1 = rep(1:4, times = 2),
-    x2 = rep(c(1, 2), each = 4)
+    x0 = 1,
+    x1 = rep(1:20, times = 2) / 10,
+    x2 = rep(1:10, each = 4) / 10
   )
   mydata <- within(mydata, {
-    y <- rpois(8, exp(x1^0.5 + x2^0.5 * 2 - 1))
+    y <- rpois(nrow(mydata),
+               exp(x1^0.5 + x2^0.5 * 2 + x0 * 3))
   })
 
-  inlaform <- y ~ -1 +
-    f(x1, model = "rw2", values = 1:4, scale.model = TRUE) +
+  inlaform <- y ~ 0 + x0 +
+    f(x1, model = "rw2", values = sort(unique(mydata$x1)), scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(
     formula = inlaform,
@@ -148,7 +150,7 @@ test_that("Component copy feature", {
     control.inla = list(int.strategy = "eb")
   )
 
-  cmp <- y ~ -1 +
+  cmp <- y ~ 0 + x0 +
     x1(x1, model = "rw2", scale.model = TRUE) +
     x2(x2, copy = "x1", fixed = FALSE)
   fit_bru <- bru(
@@ -159,9 +161,24 @@ test_that("Component copy feature", {
   )
 
   expect_equal(
-    fit_bru$summary.hyperpar,
-    fit$summary.hyperpar,
-    tolerance = midtol
+    fit_bru$summary.hyperpar$x1$mean,
+    fit$summary.hyperpar$x1$mean,
+    tolerance = lowtol
+  )
+  expect_equal(
+    fit_bru$summary.hyperpar$x2$mean,
+    fit$summary.hyperpar$x2$mean,
+    tolerance = lowtol
+  )
+  expect_equal(
+    fit_bru$summary.hyperpar$x1$sd,
+    fit$summary.hyperpar$x1$sd,
+    tolerance = hitol
+  )
+  expect_equal(
+    fit_bru$summary.hyperpar$x2$sd,
+    fit$summary.hyperpar$x2$sd,
+    tolerance = hitol
   )
 })
 
