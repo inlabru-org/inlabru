@@ -18,6 +18,11 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.height = 5
 )
+library(inlabru)
+inla_available <- inlabru::bru_safe_inla(
+  multicore = interactive(),
+  quietly = TRUE
+)
 ```
 
 
@@ -30,6 +35,7 @@ library(inlabru)
 library(mgcv)
 library(ggplot2)
 library(fmesher)
+library(patchwork)
 ```
 
 Make a shortcut to a nicer colour scale:
@@ -46,13 +52,11 @@ colsc <- function(...) {
 Get the data
 -----------------------------------
 
-```{r results="hide",warning=FALSE,message=FALSE}
+Load the data and rename the countdata object to `cd` (just because '`cd`'
+is less to type than '`countdata2`'.):
+
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 data(Poisson2_1D)
-```
-
-Put the count data in `cd` (just because '`cd`' is less to type than '`countdata2`'.)
-
-```{r }
 cd <- countdata2
 ```
 
@@ -86,9 +90,9 @@ The term `s(x,k=10)` just specifies that as nonparametric smooth function is to
 be fitted to the data, with _no more than_ 10 degrees of freedom (df). (The
 larger the df, the more wiggly the fitted curve (recall from the lecture that
 this is an effect of how some spline methods are defined, without discretisation
-dependent penalty); `gam` selects the 'best' df.)  Notice the use of `offset=`.
-(Refer to slides for an explanation of `offset`.) The variable `exposure` in
-data frame `cd` is the size of the bin in which each count was made.
+dependent penalty); `gam` selects the 'best' df.)  Notice the use of `offset=`
+to incorporate the variable `exposure` in `cd` is the size of the bin in which
+each count was made.
 
 You can look at the fitted model using `summary( )` as below if you want to, but
 you do not need to understand this output, or the code that makes the
@@ -141,7 +145,7 @@ x <- seq(-10, 65, by = 1) # this sets mesh points - try others if you like
 mesh1D <- fm_mesh_1d(x, boundary = "free")
 ```
 
-... and see where the mesh points are:
+... and see where the mesh knots are:
 
 
 ```{r fig.show="hide"}
@@ -173,11 +177,11 @@ The user gets to name the GRF function. The syntax is
   `INLA` function `inla.spde2.pcmatern( )`, which requires a mesh to be passed
   to it, so we pass it the 1D mesh that we created above, `mesh1D`.
 
-For models that only adds the model components, we don't need to specify the
+For models that only sums all the model components, we don't need to specify the
 full predictor formula. Instead, we can provide the name of the output to the
 left of the `~` in the component specification, and "." on the right hand side,
 which will cause it to add all components (unless a subset is selected via the
-`include`/`exclude` arguments to `bru_obs()`).
+`used` argument to `bru_obs()`).
 
 ```{r }
 the_spde <- inla.spde2.pcmatern(mesh1D,
@@ -189,7 +193,8 @@ comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1 / 2^2)
 
 fit2.bru <- bru(
   comp,
-  bru_obs(count ~ .,
+  bru_obs(
+    count ~ .,
     data = cd,
     family = "poisson",
     E = exposure
@@ -292,13 +297,14 @@ spde.logvar <- spde.posterior(fit2.bru, "field", what = "log.variance")
 
 range.plot <- plot(spde.range)
 var.plot <- plot(spde.logvar)
-multiplot(range.plot, var.plot)
+
+(range.plot | var.plot)
 ```
 
 We can look at the posterior distributions of the Matern correlation and
 covariance functions as follows:
 
-```{r warning=FALSE,message=FALSE}
-plot(spde.posterior(fit2.bru, "field", what = "matern.correlation"))
-plot(spde.posterior(fit2.bru, "field", what = "matern.covariance"))
+```{r warning=FALSE,message=FALSE,eval=inla_available}
+(plot(spde.posterior(fit2.bru, "field", what = "matern.correlation")) /
+ plot(spde.posterior(fit2.bru, "field", what = "matern.covariance")))
 ```
