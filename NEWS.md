@@ -41,7 +41,7 @@
   
 * Bugfix for `generate.bru()` for evaluation of expressions in the absence of
   `newdata` (version `2.12.0.9007`)
-* Use `mid` locations for `ibm_values for non-indexed `fm_mesh_1d` mapper
+* Use `mid` locations for `ibm_values()` for non-indexed `fm_mesh_1d` mapper
   (version `2.12.0.9009`)
 * Deprecate the `include` and `exclude` arguments to `predict()` and
   `generate()` (version `2.12.0.9003`)
