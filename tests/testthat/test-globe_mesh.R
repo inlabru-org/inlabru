@@ -2,7 +2,7 @@ test_that("2D modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   options <- list(
     control.inla = list(
@@ -62,7 +62,7 @@ test_that("2D LGCP modelling on the globe", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   options <- list(
     control.inla = list(

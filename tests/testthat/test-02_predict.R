@@ -3,7 +3,7 @@ test_that("bru: factor component", {
   local_bru_safe_inla()
 
   # Required for reproducible predict() and generate() output.
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) +
@@ -130,7 +130,7 @@ test_that("bru: predict with _eval", {
   local_bru_safe_inla()
 
   # Required for reproducible predict() and generate() output.
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   data <- data.frame(
     z = rnorm(5),

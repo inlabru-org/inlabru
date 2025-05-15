@@ -5,7 +5,7 @@ test_that("2D LGCP fitting", {
   skip_if_not_installed("terra")
   skip_if_not_installed("sf")
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   options <- list(
     control.inla = list(
@@ -73,7 +73,7 @@ test_that("2D LGCP fitting", {
     gorillas$mesh$loc[, c(1, 2)],
     proj4string = fm_CRS(gorillas$nests)
   )
-  set.seed(123L)
+  withr::local_seed(123L)
   skip_if_not_installed("sn")
   pr <- predict(fit, loc, ~mySmooth,
     n.samples = 5, seed = 5657L,
@@ -94,7 +94,7 @@ test_that("2D LGCP fitting", {
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
   ips <- fm_int(gorillas$mesh, gorillas$boundary)
-  set.seed(123L)
+  withr::local_seed(123L)
   Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
     n.samples = 10, seed = 5657L
   )

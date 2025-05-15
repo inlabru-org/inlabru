@@ -33,7 +33,7 @@ test_that("1D LGCP fitting", {
   fit <- result$fit
 
   # Needed for reproducible predict
-  set.seed(123L)
+  withr::local_seed(123L)
 
   expect_s3_class(fit, "bru")
 
@@ -113,7 +113,7 @@ test_that("1D LGCP fitting, discrete point domain", {
   fit <- result$fit
 
   # Needed for reproducible predict
-  set.seed(123L)
+  withr::local_seed(123L)
 
   expect_s3_class(fit, "bru")
 

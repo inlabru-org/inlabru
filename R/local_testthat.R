@@ -60,7 +60,7 @@ local_bru_options_set <- function(...,
 #' @export
 #' @rdname local_testthat
 local_basic_intercept_testdata <- function() {
-  set.seed(123)
+  withr::local_seed(123)
   data.frame(
     Intercept = 1,
     y = rnorm(100)
@@ -70,7 +70,7 @@ local_basic_intercept_testdata <- function() {
 #' @export
 #' @rdname local_testthat
 local_basic_fixed_effect_testdata <- function() {
-  set.seed(123)
+  withr::local_seed(123)
   cbind(
     local_basic_intercept_testdata(),
     data.frame(x1 = rnorm(100))

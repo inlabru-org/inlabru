@@ -100,7 +100,7 @@ test_that("interaction fixed effect model", {
   local_bru_safe_inla()
   options <- list()
   mydata <- local_basic_fixed_effect_testdata()
-  set.seed(123L)
+  withr::local_seed(123L)
   mydata <- cbind(mydata, x2 = sample(
     x = factor(c("A", "B")),
     size = nrow(mydata),

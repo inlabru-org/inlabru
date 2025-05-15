@@ -81,7 +81,7 @@ test_that("Response and predictor mismatch handling", {
 test_that("Complex list data handling", {
   skip_on_cran()
   local_bru_safe_inla()
-  set.seed(12345L)
+  withr::local_seed(12345L)
   n <- 6
   m <- 3
   data <- list(

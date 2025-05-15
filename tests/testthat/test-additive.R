@@ -2,7 +2,7 @@ test_that("Additivity: Additive predictor with nonlinear components", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(12345L)
+  withr::local_seed(12345L)
 
   df <- tibble::tibble(
     u = 2,

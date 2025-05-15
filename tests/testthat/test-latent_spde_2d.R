@@ -3,7 +3,7 @@ test_that("Georeferenced data with sp", {
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
 
-  set.seed(123)
+  withr::local_seed(123)
   mydata <- expand.grid(
     Easting = seq(5, 45, by = 20),
     Northing = seq(10, 30, by = 10),
@@ -134,7 +134,7 @@ test_that("Georeferenced data with sf, with groups", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123)
+  withr::local_seed(123)
   mydata <- expand.grid(
     Easting = seq(5, 45, by = 20),
     Northing = seq(10, 30, by = 10),

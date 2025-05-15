@@ -182,7 +182,7 @@ test_that("Aggregate mapper", {
   expect_equal(ibm_eval(mapper, input = input, state = state), val)
   expect_equal(ibm_jacobian(mapper, input = input, state = state), A)
 
-  set.seed(123L)
+  withr::local_seed(123L)
   delta <- (runif(length(state)) * 2 - 1) * 1e-6
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
@@ -292,7 +292,7 @@ test_that("logsumexp mapper", {
     tolerance = midtol
   )
 
-  set.seed(123L)
+  withr::local_seed(123L)
   delta <- (runif(length(state)) * 2 - 1) * 1e-6
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
@@ -334,7 +334,7 @@ test_that("Multi-mapper bru input", {
     x = 1,
     dims = c(3, 12)
   )
-  set.seed(123L)
+  withr::local_seed(123L)
   state <- rnorm(12)
   val <- as.vector(A %*% state)
   expect_equal(ibm_eval(mapper, list_data, state = state), val)
@@ -376,7 +376,7 @@ test_that("Multi-mapper bru input with offset", {
     x = 1,
     dims = c(3, 12)
   )
-  set.seed(123L)
+  withr::local_seed(123L)
   state <- rnorm(12)
   val <- list_data$space$offset + as.vector(A %*% state)
   expect_equal(ibm_eval(mapper, list_data, state = state), val)
@@ -449,7 +449,7 @@ test_that("User defined mappers", {
 
 test_that("Collect mapper, direct construction", {
   skip_on_cran()
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   mapper <- bru_mapper_collect(
     list(
@@ -621,7 +621,7 @@ test_that("Collect mapper works", {
     dims = c(4, 4)
   )
 
-  set.seed(12345L)
+  withr::local_seed(12345L)
   data <- data.frame(
     y = 4 + rnorm(6),
     x = c(1, 2, 3, 2, 3, 4)
@@ -726,7 +726,7 @@ test_that("Mesh 2d mapper", {
 
 
 test_that("Repeat mapper, direct construction", {
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   mapper <- bru_mapper_repeat(
     bru_mapper_index(4),
@@ -754,7 +754,7 @@ test_that("Repeat mapper works", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(12345L)
+  withr::local_seed(12345L)
   u <- rnorm(8)
   data <- data.frame(
     x = c(1, 2, 3, 2, 3, 4)

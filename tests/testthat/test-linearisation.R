@@ -2,7 +2,7 @@ test_that("Linearisation", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(12345L)
+  withr::local_seed(12345L)
   data <- data.frame(x = seq_len(10) / 1)
   data <- within(data, {
     y <- exp(x / 5) - 2 + rnorm(length(x), sd = 0.1)

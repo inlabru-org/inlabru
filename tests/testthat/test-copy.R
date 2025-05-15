@@ -3,7 +3,7 @@ test_that("bru: inla copy feature", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123L)
+  withr::local_seed(123L)
 
   df1 <- data.frame(x = cos(1:100))
   df2 <- data.frame(x = sin(1:100))
@@ -66,7 +66,7 @@ test_that("bru: inla copy feature", {
 #   local_bru_safe_inla()
 #
 #   # Seed influences data as well as predict()!
-#   set.seed(123L)
+#   withr::local_seed(123L)
 #
 #   df1 <- data.frame(x = cos(1:100))
 #   df2 <- data.frame(x = sin(1:100))
@@ -127,7 +127,7 @@ test_that("Component copy feature", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123L)
+  withr::local_seed(123L)
 
   mydata <- data.frame(
     x0 = 1,
@@ -187,7 +187,7 @@ test_that("Component copy feature with group", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123L)
+  withr::local_seed(123L)
 
   n <- c(16, 8)
   mydata <- data.frame(

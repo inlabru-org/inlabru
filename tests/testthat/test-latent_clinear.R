@@ -3,7 +3,7 @@ test_that("bru: clinear component", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123)
+  withr::local_seed(123)
 
   input.df <- data.frame(x = cos(1:100))
   input.df <- within(input.df, y <- 5 + 2 * x + rnorm(100, mean = 0, sd = 0.1))

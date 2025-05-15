@@ -2,7 +2,7 @@ test_that("Multiple likelihoods: basic model", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   lik1 <- bru_obs("gaussian",
     formula = y ~ .,
