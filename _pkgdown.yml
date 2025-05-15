@@ -3,6 +3,7 @@ url: https://inlabru-org.github.io/inlabru/
 template:
   bootswatch: cosmo
   bootstrap: 5
+  math-rendering: "mathjax"
 
 navbar:
   structure:
