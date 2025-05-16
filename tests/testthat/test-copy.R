@@ -135,8 +135,10 @@ test_that("Component copy feature", {
     x2 = rep(1:10, each = 4) / 10
   )
   mydata <- within(mydata, {
-    y <- rpois(nrow(mydata),
-               exp(x1^0.5 + x2^0.5 * 2 + x0 * 3))
+    y <- rpois(
+      nrow(mydata),
+      exp(x1^0.5 + x2^0.5 * 2 + x0 * 3)
+    )
   })
 
   inlaform <- y ~ 0 + x0 +

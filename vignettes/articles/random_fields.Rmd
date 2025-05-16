@@ -306,5 +306,5 @@ covariance functions as follows:
 
 ```{r warning=FALSE,message=FALSE,eval=inla_available}
 (plot(spde.posterior(fit2.bru, "field", what = "matern.correlation")) /
- plot(spde.posterior(fit2.bru, "field", what = "matern.covariance")))
+  plot(spde.posterior(fit2.bru, "field", what = "matern.covariance")))
 ```

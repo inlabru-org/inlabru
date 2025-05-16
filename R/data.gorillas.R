@@ -105,10 +105,9 @@
 #' `terra::rast()` object.
 #' @export
 #' @examples
-#' \dontrun{
-#' if (requireNamespace("terra", quietly = TRUE)) {
+#' if (interactive() &&
+#'   requireNamespace("terra", quietly = TRUE)) {
 #'   gorillas_sf$gcov <- gorillas_sf_gcov()
-#' }
 #' }
 gorillas_sf_gcov <- function() {
   requireNamespace("terra")

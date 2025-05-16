@@ -112,10 +112,9 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$plotsample$plots) +
     geom_sf(data = gorillas_sf$plotsample$nests)
 }
-\dontrun{
-if (requireNamespace("terra", quietly = TRUE)) {
+if (interactive() &&
+  requireNamespace("terra", quietly = TRUE)) {
   gorillas_sf$gcov <- gorillas_sf_gcov()
-}
 }
 }
 \references{

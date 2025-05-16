@@ -148,9 +148,11 @@ local_bru_safe_inla <- function(multicore = FALSE,
     }
 
     # Save the num.threads option so it can be restored
-    local_inla_options_set(num.threads = NULL,
-                           envir = envir,
-                           .save_only = TRUE)
+    local_inla_options_set(
+      num.threads = NULL,
+      envir = envir,
+      .save_only = TRUE
+    )
 
     local_inla_options_set(
       inla.timeout = 60,
