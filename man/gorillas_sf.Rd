@@ -90,11 +90,9 @@ objects. Requires the \code{sp}, \code{sf}, and \code{terra} packages to be inst
 }}
 \examples{
 if (interactive() &&
-  bru_safe_inla() &&
-  bru_safe_sp() &&
-  require("sp") &&
   require(ggplot2, quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE)) {
+  requireNamespace("terra", quietly = TRUE) &&
+  requireNamespace("tidyterra", quietly = TRUE)) {
   # plot all the nests, mesh and boundary
   ggplot() +
     gg(gorillas_sf$mesh) +
@@ -105,10 +103,9 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$nests)
 
   # Plot the elevation covariate
-  gorillas_sf$gcov <- terra::rast(
-    system.file(gorillas_sf$gcov_file, package = "inlabru")
-  )
-  plot(gorillas_sf$gcov$elevation)
+  gorillas_sf$gcov <- gorillas_sf_gcov()
+  ggplot() +
+    tidyterra::geom_spatraster(data = gorillas_sf$gcov$elevation)
 
   # Plot the plot sample
   ggplot() +
