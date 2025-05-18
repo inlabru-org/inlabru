@@ -1391,6 +1391,7 @@ bru_obs <- function(formula = . ~ .,
     data_extra[["BRU_aggregate_mapper"]] <- aggregate
     data_extra[["BRU_aggregate_input"]] <- aggregate_input
     allow_combine <- TRUE
+    is_additive <- FALSE
   }
 
   # More on special bru likelihoods
