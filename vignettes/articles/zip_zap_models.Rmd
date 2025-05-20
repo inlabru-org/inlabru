@@ -540,7 +540,7 @@ The (negated) Log score is a strictly proper score
 
 Ideally, one might want to also compute
 the proper version of the Absolute Error score,
-$\text{AE}_i&=|y_i-\text{median}_i|$, but unfortunately the $\text{median}_i$
+$\text{AE}_i=|y_i-\text{median}_i|$, but unfortunately the $\text{median}_i$
 value isn't as computationally efficient as the mean, variance, and log-score.
 The code use for computing the mean and variance would make it easy to calculate
 the posterior expectation of the _conditional_ median given the hyperparameters,
