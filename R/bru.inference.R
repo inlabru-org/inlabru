@@ -1377,16 +1377,13 @@ bru_obs <- function(formula = . ~ .,
   if (!is.null(aggregate)) {
     if (!is_additive) {
       expr_text <- formula_char[length(formula_char)]
-      expr_text <- paste0(
-        "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-        " state = {", expr_text, "})}"
-      )
     } else {
-      expr_text <- paste0(
-        "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-        " state = {BRU_EXPRESSION})}"
-      )
+      expr_text <- "BRU_EXPRESSION"
     }
+    expr_text <- paste0(
+      "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+      " state = {", expr_text, "})}"
+    )
     expr <- parse(text = expr_text)
     data_extra[["BRU_aggregate_mapper"]] <- aggregate
     data_extra[["BRU_aggregate_input"]] <- aggregate_input
@@ -1551,30 +1548,20 @@ bru_obs <- function(formula = . ~ .,
       )
       if (!is_additive) {
         expr_text <- formula_char[length(formula_char)]
-        expr_text <- paste0(
-          "{\n",
-          "  BRU_eta <- {", expr_text, "}\n",
-          "  if (length(BRU_eta) == 1L) {\n",
-          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
-          "  }\n",
-          "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
-          "         BRU_eta[BRU_aggregate]),\n",
-          "    BRU_eta[!BRU_aggregate])\n",
-          "}"
-        )
       } else {
-        expr_text <- paste0(
-          "{\n",
-          "  BRU_eta <- {BRU_EXPRESSION}\n",
-          "  if (length(BRU_eta) == 1L) {\n",
-          "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
-          "  }\n",
-          "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
-          "         BRU_eta[BRU_aggregate]),\n",
-          "    BRU_eta[!BRU_aggregate])\n",
-          "}"
-        )
+        expr_text <- "BRU_EXPRESSION"
       }
+      expr_text <- paste0(
+        "{\n",
+        "  BRU_eta <- {", expr_text, "}\n",
+        "  if (length(BRU_eta) == 1L) {\n",
+        "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
+        "  }\n",
+        "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
+        "         BRU_eta[BRU_aggregate]),\n",
+        "    BRU_eta[!BRU_aggregate])\n",
+        "}"
+      )
       expr <- parse(text = expr_text)
 
       data <- extended_bind_rows(
@@ -2356,6 +2343,15 @@ bru_like_expr <- function(lhood, components) {
     # Later versions construct expressions for all models,
     # when calling bru_used_update.bru_like()
     expr_text <- "BRU_EXPRESSION"
+    if (utils::packageVersion("inlabru") >= "2.12.0.9014") {
+      warning(
+        paste0(
+          "Code comment in `bru_like_expr` claims lhood[['expr']] cannot ",
+          "be null, but it is null."
+        ),
+        immediate. = TRUE
+      )
+    }
   } else {
     expr_text <- as.character(lhood[["expr"]])
   }
