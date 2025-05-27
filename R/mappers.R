@@ -1145,6 +1145,9 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
   if (is.null(state0)) {
     n_state <- 0
   } else if (is.list(state0)) {
+    if (is.null(names(state0))) {
+      stop("`bru_mapper_taylor(..., state0)` lists must have named elements.")
+    }
     n_state <- vapply(
       state0,
       function(x) {
@@ -1206,6 +1209,7 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
         state0[idx]
       }
     )
+    names(state0) <- names(jacobian)
     n_state <- n_multi
   }
   if (!is.null(state0)) {
@@ -1213,7 +1217,11 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
   }
 
   if (is.null(offset)) {
-    offset <- numeric(nrow(jacobian))
+    if (is.list(jacobian)) {
+      offset <- numeric(nrow(jacobian[[1]]))
+    } else {
+      offset <- numeric(nrow(jacobian))
+    }
   }
   bru_mapper_define(
     list(
