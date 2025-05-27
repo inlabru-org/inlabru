@@ -431,6 +431,67 @@ bru_timings.bru <- function(object, ...) {
 }
 
 
+# Inputs: One or more bru_like and bru_like_list objects,
+# or arguments for one bru_obs() call.
+# Returns: A bru_like_list object.
+bru_obs_list_construct <- function(..., options, .envir = parent.frame(),
+                                   .response = . ~ .,
+                                   .components = NULL) {
+  lhoods <- list(...)
+  dot_is_lhood <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like"),
+    TRUE
+  )
+  dot_is_lhood_list <- vapply(
+    lhoods,
+    function(lh) inherits(lh, "bru_like_list"),
+    TRUE
+  )
+  if (any(dot_is_lhood | dot_is_lhood_list)) {
+    if (!all(dot_is_lhood | dot_is_lhood_list)) {
+      stop(paste0(
+        "Cannot mix bru_obs() parameters with 'bru_like' ",
+        "and `bru_like_list` objects.",
+        "\n  Check if the argument(s) ",
+        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
+          collapse = ", "
+        ),
+        " were meant to be given to a call to 'bru_obs()',\n  or in the ",
+        "'options' list argument instead."
+      ))
+    }
+  } else {
+    if (is.null(lhoods[["formula"]])) {
+      lhoods[["formula"]] <- . ~ .
+    }
+    lhoods[["formula"]] <- auto_response(
+      lhoods[["formula"]],
+      .response
+    )
+    lhoods <- list(do.call(
+      bru_obs,
+      c(
+        lhoods,
+        list(
+          options = options,
+          .envir = .envir
+        )
+      )
+    ))
+    dot_is_lhood <- TRUE
+    dot_is_lhood_list <- FALSE
+  }
+  lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
+
+  # Update include/exclude information to limit it to existing components
+  # and check additivity
+  lhoods <- bru_used_update(lhoods, labels = names(.components))
+
+  lhoods
+}
+
+
 
 
 #' @title Convenient model fitting using (iterated) INLA
@@ -516,66 +577,22 @@ bru <- function(components = ~ Intercept(1),
 
   timing <- list(start = timings_convert(proc.time()))
 
-  lhoods <- list(...)
-  dot_is_lhood <- vapply(
-    lhoods,
-    function(lh) inherits(lh, "bru_like"),
-    TRUE
-  )
-  dot_is_lhood_list <- vapply(
-    lhoods,
-    function(lh) inherits(lh, "bru_like_list"),
-    TRUE
-  )
-  if (any(dot_is_lhood | dot_is_lhood_list)) {
-    if (!all(dot_is_lhood | dot_is_lhood_list)) {
-      stop(paste0(
-        "Cannot mix bru_obs() parameters with 'bru_like' ",
-        "and `bru_like_list` objects.",
-        "\n  Check if the argument(s) ",
-        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
-          collapse = ", "
-        ),
-        " were meant to be given to a call to 'bru_obs()',\n  or in the ",
-        "'options' list argument instead."
-      ))
-    }
-  } else {
-    if (is.null(lhoods[["formula"]])) {
-      lhoods[["formula"]] <- . ~ .
-    }
-    if (inherits(components, "formula")) {
-      lhoods[["formula"]] <- auto_response(
-        lhoods[["formula"]],
-        extract_response(components)
-      )
-    }
-    lhoods <- list(do.call(
-      bru_obs,
-      c(
-        lhoods,
-        list(
-          options = options,
-          .envir = .envir
-        )
-      )
-    ))
-    dot_is_lhood <- TRUE
-    dot_is_lhood_list <- FALSE
-  }
-  lhoods <- do.call(c, lhoods[dot_is_lhood | dot_is_lhood_list])
-
-  if (length(lhoods) == 0) {
-    stop("No observation models provided.")
-  }
-
+  .response <- extract_response(components)
   # Turn input into a list of components (from existing list, or a special
   # formula)
   components <- bru_component_list(components, .envir = .envir)
 
-  # Update include/exclude information to limit it to existing components
-  # and check additivity
-  lhoods <- bru_used_update(lhoods, labels = names(components))
+  lhoods <- bru_obs_list_construct(
+    ...,
+    options = options,
+    .envir = .envir,
+    .response = .response,
+    .components = components
+  )
+
+  if (length(lhoods) == 0) {
+    stop("No observation models provided.")
+  }
 
   inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
 
@@ -4644,8 +4661,8 @@ auto_additive_formula <- function(formula, components) {
 
 # Extract the LHS of a formula, as response ~ .
 extract_response <- function(formula) {
-  stopifnot(inherits(formula, "formula"))
-  if (length(as.character(formula)) == 3) {
+  if (inherits(formula, "formula") &&
+    (length(as.character(formula)) == 3)) {
     as.formula(paste0(as.character(formula)[2], " ~ ."))
   } else {
     . ~ .
