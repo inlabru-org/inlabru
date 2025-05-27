@@ -27,8 +27,8 @@ bru_mapper_taylor(
 \method{ibm_eval}{bru_mapper_taylor}(mapper, input = NULL, state = NULL, ...)
 }
 \arguments{
-\item{offset}{For \code{bru_mapper_taylor}, an offset vector evaluated
-at \code{state0}.
+\item{offset}{For \code{bru_mapper_taylor}, an offset vector giving the value of
+the linearisation at \code{state0}.
 May be \code{NULL}, interpreted as an all-zero vector of length determined by
 a non-null Jacobian.}
 
@@ -36,8 +36,8 @@ a non-null Jacobian.}
 evaluated at \code{state0}, or, a named list of such matrices.
 May be \code{NULL} or an empty list, for a constant mapping.}
 
-\item{state0}{For \code{bru_mapper_taylor}, the state the linearisation
-was evaluated at, or a list of length matching the \code{jacobian} list.
+\item{state0}{For \code{bru_mapper_taylor}, the reference \code{state} for the
+linearisation, or a list of such states matching the \code{jacobian} list.
 \code{NULL} is interpreted as 0.}
 
 \item{values_mapper}{mapper object to be used for \code{ibm_n} and

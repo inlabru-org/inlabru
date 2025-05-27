@@ -1107,15 +1107,15 @@ ibm_jacobian.bru_mapper_index <- function(mapper, input, state, ...) {
 
 ## _taylor ####
 
-#' @param offset For `bru_mapper_taylor`, an offset vector evaluated
-#' at `state0`.
+#' @param offset For `bru_mapper_taylor`, an offset vector giving the value of
+#' the linearisation at `state0`.
 #' May be `NULL`, interpreted as an all-zero vector of length determined by
 #' a non-null Jacobian.
 #' @param jacobian For `bru_mapper_taylor()`, the Jacobian matrix,
 #' evaluated at `state0`, or, a named list of such matrices.
 #' May be `NULL` or an empty list, for a constant mapping.
-#' @param state0 For `bru_mapper_taylor`, the state the linearisation
-#' was evaluated at, or a list of length matching the `jacobian` list.
+#' @param state0 For `bru_mapper_taylor`, the reference `state` for the
+#' linearisation, or a list of such states matching the `jacobian` list.
 #' `NULL` is interpreted as 0.
 #' @param values_mapper mapper object to be used for `ibm_n` and
 #' `ibm_values` for `inla_f=TRUE` (experimental, currently unused)
@@ -1162,6 +1162,9 @@ bru_mapper_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
   if (is.null(jacobian)) {
     n_jacobian <- 0
   } else if (is.list(jacobian)) {
+    if (is.null(names(jacobian))) {
+      stop("`bru_mapper_taylor(..., jacobian)` lists must have named elements.")
+    }
     n_jacobian <- vapply(
       jacobian,
       function(x) {
@@ -1306,6 +1309,13 @@ ibm_eval.bru_mapper_taylor <- function(mapper,
     stopifnot(is.null(state) || is.list(state))
     val <- mapper[["offset"]]
     if (is.null(mapper[["state0"]])) {
+      missing_names <- setdiff(names(mapper[["jacobian"]]), names(state))
+      if (length(missing_names) > 0) {
+        stop(
+          "Names in jacobian list missing from state list: ",
+          paste0(missing_names, collapse = ", ")
+        )
+      }
       for (nm in names(mapper[["jacobian"]])) {
         val <- val + mapper[["jacobian"]][[nm]] %*% state[[nm]]
       }
