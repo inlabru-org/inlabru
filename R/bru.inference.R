@@ -1858,7 +1858,11 @@ like <- function(formula = . ~ .,
     used = used,
     allow_combine = allow_combine,
     control.family = control.family,
-    tag = tag,
+    tag = if (is.null(tag) || identical(tag, "")) {
+      NA_character_
+    } else {
+      tag
+    },
     options = options,
     .envir = special_env
   )
@@ -2081,10 +2085,26 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
   class(object) <- c("bru_like_list", "list")
   environment(object) <- envir
   orig_names <- names(object)
-  names(object) <- vapply(
+  if (is.null(orig_names)) {
+    orig_names <- rep(NA_character_, length(object))
+  } else {
+    orig_names <- vapply(
+      orig_names,
+      function(x) {
+        if (identical(x, "")) {
+          NA_character_
+        } else {
+          x
+        }
+      },
+      ""
+    )
+  }
+  tag_names <- vapply(
     object,
     function(x) {
-      if (is.null(x[["tag"]])) {
+      if (is.null(x[["tag"]]) ||
+          identical(x[["tag"]], "")) {
         NA_character_
       } else {
         x[["tag"]]
@@ -2092,10 +2112,31 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
     },
     ""
   )
-  # Preserve named elements for tag-less elements
-  na_names <- is.na(names(object))
-  if (any(na_names) && !is.null(orig_names)) {
-    names(object)[na_names] <- orig_names[na_names]
+  new_names <- vapply(
+    seq_along(object),
+    function(k) {
+      if (is.na(tag_names[k])) {
+        return(orig_names[k])
+      }
+      if (is.na(orig_names[k])) {
+        return(tag_names[k])
+      }
+      if (identical(tag_names[k], orig_names[k])) {
+        return(orig_names[k])
+      }
+      stop(paste0(
+        "Cannot combine 'bru_like' objects with different tags and names:\n",
+        "  Tag: ", tag_names[k], "\n",
+        "  Name: ", orig_names[k], "\n",
+        "  Use `NA` for either the tag or name, or use matching tags and names."
+      ))
+    },
+    ""
+  )
+  names(object) <- new_names
+  # Set tags on missing tags
+  for (k in which(is.na(tag_names))) {
+    object[[k]][["tag"]] <- new_names[k]
   }
   object
 }
@@ -2233,7 +2274,11 @@ print.summary_bru_like <- function(x, ...) {
       "    Used components: %s\n"
     ),
     lh$family,
-    paste0("'", lh$tag, "'", collapse = ", "),
+    if (is.null(lh$tag) || is.na(lh$tag)) {
+      "<No tag>"
+    } else {
+      paste0("'", lh$tag, "'", collapse = ", ")
+    },
     paste0("'", lh$data_class, "'", collapse = ", "),
     paste0("'", lh$response_class, "'", collapse = ", "),
     if (length(lh$predictor) > 1) {
