@@ -74,6 +74,14 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
 
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      # https://mxschmitt.github.io/action-tmate/
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          limit-access-to-actor: true
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"all"'
@@ -102,14 +110,6 @@ jobs:
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
-
-      # Enable tmate debugging of manually-triggered workflows if the input option was provided
-      # https://mxschmitt.github.io/action-tmate/
-      - name: Setup tmate debugging session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        with:
-          limit-access-to-actor: true
 
       - uses: r-lib/actions/check-r-package@v2
         env:
