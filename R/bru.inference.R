@@ -21,51 +21,35 @@ generate <- function(object, ...) {
 
 bru_check_object_bru <- function(object,
                                  new_version = getNamespaceVersion("inlabru")) {
-  if (is.null(object[["bru_info"]])) {
-    if (is.null(object[["sppa"]])) {
-      stop(paste0(
-        "bru object contains neither current `bru_info` or old ",
-        "`sppa` information"
-      ))
-    }
-    object[["bru_info"]] <- object[["sppa"]]
-    object[["sppa"]] <- NULL
-    old <- TRUE
-  } else {
-    old <- FALSE
-  }
   object <-
     bru_info_upgrade(
       object,
-      old = old,
       new_version = new_version
     )
   object
 }
 
 bru_info_upgrade <- function(object,
-                             old = FALSE,
                              new_version = getNamespaceVersion("inlabru")) {
   object_full <- object
   object <- object[["bru_info"]]
+  msg <- NULL
   if (!is.list(object)) {
+    msg <- "Not a list"
+  } else if (!inherits(object, "bru_info")) {
+    msg <- "Not a bru_info object"
+  } else if (is.null(object[["inlabru_version"]])) {
+    msg <- "`inlabru_version` is missing"
+  }
+  if (!is.null(msg)) {
     stop(paste0(
       "bru_info part of the object can't be converted to `bru_info`; ",
-      "not a list"
+      msg
     ))
   }
-  if (!inherits(object, "bru_info")) {
-    old <- TRUE
-    class(object) <- "bru_info"
-    object_full[["bru_info"]] <- object
-  }
-  if (is.null(object[["inlabru_version"]])) {
-    object[["inlabru_version"]] <- "0.0.0"
-    old <- TRUE
-    object_full[["bru_info"]] <- object
-  }
+
   old_ver <- object[["inlabru_version"]]
-  if (old || (utils::compareVersion(new_version, old_ver) > 0)) {
+  if (utils::compareVersion(new_version, old_ver) > 0) {
     warning(
       "Old bru_info object version ",
       old_ver,
