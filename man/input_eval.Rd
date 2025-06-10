@@ -4,7 +4,7 @@
 \alias{input_eval}
 \alias{input_eval.component}
 \alias{input_eval.component_list}
-\alias{input_eval.bru_like_list}
+\alias{input_eval.bru_obs_list}
 \alias{input_eval.bru_input}
 \title{Obtain component inputs}
 \usage{
@@ -14,7 +14,7 @@ input_eval(...)
 
 \method{input_eval}{component_list}(components, data, ...)
 
-\method{input_eval}{bru_like_list}(lhoods, components, ...)
+\method{input_eval}{bru_obs_list}(lhoods, components, ...)
 
 \method{input_eval}{bru_input}(input, data, env = NULL, null.on.fail = FALSE, ...)
 }
@@ -29,7 +29,7 @@ If \code{NULL}, return the component's map.}
 
 \item{components}{A \link{component_list}.}
 
-\item{lhoods}{A \link{bru_like_list} object}
+\item{lhoods}{A \link{bru_obs_list} object}
 }
 \value{
 An list of mapper input values, formatted for the full component
@@ -40,7 +40,7 @@ Obtain component inputs
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{input_eval(bru_like_list)}: Computes the component inputs for included components
+\item \code{input_eval(bru_obs_list)}: Computes the component inputs for included components
 for each model likelihood
 
 \item \code{input_eval(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},

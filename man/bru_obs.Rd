@@ -3,12 +3,12 @@
 \name{bru_obs}
 \alias{bru_obs}
 \alias{like}
-\alias{bru_like_list}
-\alias{bru_like_list.list}
-\alias{bru_like_list.bru_like}
-\alias{c.bru_like}
-\alias{c.bru_like_list}
-\alias{[.bru_like_list}
+\alias{bru_obs_list}
+\alias{bru_obs_list.list}
+\alias{bru_obs_list.bru_obs_list}
+\alias{c.bru_obs}
+\alias{c.bru_obs_list}
+\alias{[.bru_obs_list}
 \title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
@@ -61,17 +61,17 @@ like(
   include_latent = deprecated()
 )
 
-bru_like_list(...)
+bru_obs_list(...)
 
-\method{bru_like_list}{list}(object, envir = NULL, ...)
+\method{bru_obs_list}{list}(object, ..., .envir = NULL)
 
-\method{bru_like_list}{bru_like}(..., envir = NULL)
+\method{bru_obs_list}{bru_obs_list}(..., .envir = NULL)
 
-\method{c}{bru_like}(..., envir = NULL)
+\method{c}{bru_obs}(..., .envir = NULL)
 
-\method{c}{bru_like_list}(..., envir = NULL)
+\method{c}{bru_obs_list}(..., .envir = NULL)
 
-\method{[}{bru_like_list}(x, i)
+\method{[}{bru_obs_list}(x, i)
 }
 \arguments{
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -208,13 +208,11 @@ auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
 
 \item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
 
-\item{\dots}{For \code{bru_like_list.bru_like}, one or more \code{bru_like} objects}
+\item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
-\item{object}{A list of \code{bru_like} objects}
+\item{object}{A list of \code{bru_obs} objects}
 
-\item{envir}{An optional environment for the new \code{bru_like_list} object}
-
-\item{x}{\code{bru_like_list} object from which to extract element(s)}
+\item{x}{\code{bru_obs_list} object from which to extract element(s)}
 
 \item{i}{indices specifying elements to extract}
 }
@@ -230,24 +228,25 @@ made aware of the change. The name change is to avoid issues with namespace
 clashes, e.g. with \code{data.table::like()}, and also to signal that the function
 defines observation models, not just likelihood functions.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{c(bru_obs)}: Combine several \code{bru_obs} objects into a \code{bru_obs_list} object
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{like()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy \code{like()}
 method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_obs]{bru_obs()}} instead.
 
-\item \code{bru_like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
+\item \code{bru_obs_list()}: Combine \code{bru_obs} observation model object into a \code{bru_obs_list} object
 
-\item \code{bru_like_list(list)}: Combine a list of \code{bru_like} likelihoods
-into a \code{bru_like_list} object
+\item \code{bru_obs_list(list)}: Combine one or more lists of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
 
-\item \code{bru_like_list(bru_like)}: Combine several \code{bru_like} likelihoods
-into a \code{bru_like_list} object
+\item \code{bru_obs_list(bru_obs_list)}: Combine a list of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
 
-\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
-objects into a \code{bru_like_list} object
-
-\item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
-objects into a \code{bru_like_list} object
+\item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
 }}
 \examples{
@@ -334,7 +333,7 @@ if (bru_safe_inla() &&
 \code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_component]{bru_component()}},
 \code{\link[=bru_component_eval]{bru_component_eval()}}
 
-\code{\link[=summary.bru_like]{summary.bru_like()}}
+\code{\link[=summary.bru_obs]{summary.bru_obs()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

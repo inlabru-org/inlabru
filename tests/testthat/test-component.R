@@ -3,7 +3,7 @@ test_that("Component construction: linear model", {
 
   df <- data.frame(x = 1:10, response = 1:10)
 
-  llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = df)))
+  llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = df)))
 
   # Using label as input:
   cmp0 <- bru_component_list(
@@ -138,7 +138,7 @@ test_that("Component construction: terra", {
 
   expect_equal(eval_spatial(r, data), 406)
 
-  llik <- bru_like_list(list(bru_obs(formula = response ~ ., data = data)))
+  llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = data)))
 
   local_bru_safe_inla()
   cmp <- bru_component_list(
@@ -246,7 +246,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -260,7 +260,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -282,7 +282,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
       mapper = bru_mapper(mesh1, indexed = FALSE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
@@ -294,7 +294,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
       mapper = bru_mapper(mesh1, indexed = TRUE)
     ) - 1
   )
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     seq_along(sort(unique(lik$data$x), na.last = NA))
@@ -316,7 +316,7 @@ test_that("Component construction: main iid factor construction", {
   cmp1 <- bru_component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
     model = "iid"
   ) - 1)
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     as.character(lik$data$x)
@@ -349,7 +349,7 @@ test_that("Component construction: group iid factor construction", {
         control.group = list(model = "iid")
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$group,
     as.numeric(lik$data$x)
@@ -384,7 +384,7 @@ test_that("Component construction: replicate iid factor construction", {
         model = "iid"
       )
   )
-  cmp2 <- add_mappers(cmp1, lhoods = bru_like_list(list(lik)))
+  cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$replicate,
     as.numeric(lik$data$x)
@@ -412,7 +412,7 @@ test_that("Component construction: unsafe intercepts", {
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_error(
     object = {
-      model <- bru_model(cmp, bru_like_list(list(lik)))
+      model <- bru_model(cmp, bru_obs_list(list(lik)))
     },
     paste0(
       "The input evaluation 'something_unknown' for 'something_unknown' ",

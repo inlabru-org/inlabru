@@ -21,6 +21,7 @@
   specification of models with aggregation as the final step of the predictor
   evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`)
 * Automatically detect purely additive linear models (version `2.12.0.9014`)
+* Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
 
 ## New and updated mapper features
 
@@ -55,10 +56,10 @@
 
 * Introduce `bru_obs()` as a replacement to `like()`, to help avoid namespace
   clashes with e.g. `data.table::like()` (version `2.11.1.9026`)
-* Change logic for `like`/`bru_obs(allow_combine)` to allow user override, and
+* Change logic for `bru_obs(allow_combine)`/`like()` to allow user override, and
   add warnings for ambiguous cases (version `2.11.1.9011`)
 * Add `bru_response_size()` method for extracting the response size for each
-  observation `bru_like` object (version `2.11.1.9013`)
+  observation `bru_obs` object (version `2.11.1.9013`)
 * Add `sf` output format support for `sline` and `spoly` (version `2.11.1.9006`)
 * Add `[` and `]` to special character set in `bru_standardise_names()`
   (version `2.11.1.9012`)

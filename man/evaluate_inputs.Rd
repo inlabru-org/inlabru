@@ -9,7 +9,7 @@ evaluate_inputs(model, lhoods)
 \arguments{
 \item{model}{A \code{bru_model} object}
 
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \code{bru_obs_list} object}
 }
 \description{
 Computes the component inputs for included components

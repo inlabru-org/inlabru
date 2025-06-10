@@ -3,8 +3,8 @@
 \name{bru_compute_linearisation}
 \alias{bru_compute_linearisation}
 \alias{bru_compute_linearisation.component}
-\alias{bru_compute_linearisation.bru_like}
-\alias{bru_compute_linearisation.bru_like_list}
+\alias{bru_compute_linearisation.bru_obs}
+\alias{bru_compute_linearisation.bru_obs_list}
 \alias{bru_compute_linearisation.bru_model}
 \title{Compute inlabru model linearisation information}
 \usage{
@@ -28,7 +28,7 @@ bru_compute_linearisation(...)
   ...
 )
 
-\method{bru_compute_linearisation}{bru_like}(
+\method{bru_compute_linearisation}{bru_obs}(
   lhood,
   model,
   data,
@@ -39,7 +39,7 @@ bru_compute_linearisation(...)
   ...
 )
 
-\method{bru_compute_linearisation}{bru_like_list}(
+\method{bru_compute_linearisation}{bru_obs_list}(
   lhoods,
   model,
   input,
@@ -71,9 +71,9 @@ bru_compute_linearisation(...)
 \item{comp_simple}{Component evaluation information
 \itemize{
 \item For \code{bru_component}: \code{bru_mapper_taylor} object
-\item For \code{bru_like}: A \code{comp_simple_list} object
+\item For \code{bru_obs}: A \code{comp_simple_list} object
 for the components in the likelihood
-\item For \code{bru_like_list}: A \code{comp_simple_list_list} object
+\item For \code{bru_obs_list}: A \code{comp_simple_list_list} object
 }}
 
 \item{effects}{\itemize{
@@ -94,9 +94,9 @@ involve several rows of the input data to influence the same row.}
 \item{n_pred}{The length of the predictor expression. If not \code{NULL}, scalar
 predictor evaluations are expanded to vectors of length \code{n_pred}.}
 
-\item{lhood}{A \code{bru_like} object}
+\item{lhood}{A \code{bru_obs} object}
 
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \code{bru_obs_list} object}
 }
 \description{
 Compute inlabru model linearisation information

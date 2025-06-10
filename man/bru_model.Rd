@@ -6,7 +6,7 @@
 \alias{print.summary_bru_model}
 \title{Create an inlabru model object from model components}
 \usage{
-bru_model(components, lhoods, inputs = NULL)
+bru_model(components, lhoods, options = list(), .envir = parent.frame())
 
 \method{summary}{bru_model}(object, ...)
 
@@ -15,10 +15,13 @@ bru_model(components, lhoods, inputs = NULL)
 \arguments{
 \item{components}{A \link{component_list} object}
 
-\item{lhoods}{A list of one or more \code{lhood} objects}
+\item{lhoods}{A list of one or more \code{\link[=bru_obs]{bru_obs()}} or \code{\link[=bru_obs_list]{bru_obs_list()}} objects,
+or arguments for a call to \code{\link[=bru_obs]{bru_obs()}}}
 
-\item{inputs}{A list of component input evaluations, from
-\code{\link[=input_eval.bru_like_list]{input_eval.bru_like_list()}}.}
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{.envir}{The environment in which the components are evaluated.}
 
 \item{object}{Object to operate on}
 

@@ -49,7 +49,7 @@ bru_used_update <- function(x, labels, ...) {
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_like_list <- function(x, labels, ...) {
+bru_used_update.bru_obs_list <- function(x, labels, ...) {
   for (k in seq_along(x)) {
     x[[k]] <- bru_used_update(x[[k]], labels = labels, ...)
   }
@@ -58,7 +58,7 @@ bru_used_update.bru_like_list <- function(x, labels, ...) {
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_like <- function(x, labels, ...) {
+bru_used_update.bru_obs <- function(x, labels, ...) {
   pre_used <- bru_used(x)
   used <- bru_used_update(pre_used, labels = labels, ...)
   if (isTRUE(x[["is_additive"]])) {
@@ -402,9 +402,9 @@ bru_used.list <- function(x, ..., join = TRUE) {
 }
 
 #' @describeIn bru_used Extract the `bru_used` information for the collection
-#' of observation models used in a `bru` observation model `bru_like` object.
+#' of observation models used in a `bru` observation model `bru_obs` object.
 #' @export
-bru_used.bru_like <- function(x, ...) {
+bru_used.bru_obs <- function(x, ...) {
   bru_used(x[["used"]], ...)
 }
 

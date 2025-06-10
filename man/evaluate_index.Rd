@@ -4,12 +4,12 @@
 \alias{evaluate_index}
 \title{Compute all index values}
 \usage{
-evaluate_index(model, lhoods)
+evaluate_index(model, used)
 }
 \arguments{
 \item{model}{A \code{bru_model} object}
 
-\item{lhoods}{A \code{bru_like_list} object. Deprecated and ignored}
+\item{used}{A \code{\link[=bru_used]{bru_used()}} object}
 }
 \value{
 A named list of \code{idx_full} and \code{idx_inla},

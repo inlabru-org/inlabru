@@ -277,6 +277,22 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.12.0.9014"
     }
 
+    if (utils::compareVersion("2.12.0.9017", old_ver) > 0) {
+      message("Upgrading bru_info to 2.12.0.9017")
+
+      # Update bru_like class names to bru_obs
+      if (!is.null(object[["lhoods"]])) {
+        object[["lhoods"]] <-
+          lapply(object[["lhoods"]], function(x) {
+            class(x) <- "bru_obs"
+            x
+          })
+        class(object[["lhoods"]]) <- c("bru_obs_list", "list")
+      }
+
+      object[["inlabru_version"]] <- "2.12.0.9017"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(paste0("Upgraded bru_info to ", new_version))
 
@@ -415,34 +431,40 @@ bru_timings.bru <- function(object, ...) {
 }
 
 
-# Inputs: One or more bru_like and bru_like_list objects,
+# Inputs: One or more bru_obs, or one or more bru_obs_list objects,
 # or arguments for one bru_obs() call.
-# Returns: A bru_like_list object.
-bru_obs_list_construct <- function(..., options, .envir = parent.frame(),
+# Returns: A bru_obs_list object.
+bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
                                    .response = . ~ .,
                                    .components = NULL) {
-  lhoods <- list(...)
+  lhoods <- args
   dot_is_lhood <- vapply(
     lhoods,
-    function(lh) inherits(lh, "bru_like"),
+    function(lh) inherits(lh, "bru_obs"),
     TRUE
   )
   dot_is_lhood_list <- vapply(
     lhoods,
-    function(lh) inherits(lh, "bru_like_list"),
+    function(lh) inherits(lh, "bru_obs_list"),
     TRUE
   )
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
       stop(paste0(
-        "Cannot mix bru_obs() parameters with 'bru_like' ",
-        "and `bru_like_list` objects.",
+        "Cannot mix `bru_obs()` parameters with `bru_obs` ",
+        "and `bru_obs_list` objects.",
         "\n  Check if the argument(s) ",
         paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
           collapse = ", "
         ),
         " were meant to be given to a call to 'bru_obs()',\n  or in the ",
         "'options' list argument instead."
+      ))
+    }
+    if (!all(dot_is_lhood) && !all(dot_is_lhood_list)) {
+      stop(paste0(
+        "Cannot mix `bru_obs` and `bru_obs_list` objects in the `...` ",
+        "argument of `bru()`."
       ))
     }
   } else {
@@ -561,44 +583,28 @@ bru <- function(components = ~ Intercept(1),
 
   timing <- list(start = timings_convert(proc.time()))
 
-  .response <- extract_response(components)
-  # Turn input into a list of components (from existing list, or a special
-  # formula)
-  components <- bru_component_list(components, .envir = .envir)
-
-  lhoods <- bru_obs_list_construct(
-    ...,
+  # Turn model components and bru_obs objects into internal bru model
+  bru.model <- bru_model(
+    components,
+    lhoods = list(...),
     options = options,
-    .envir = .envir,
-    .response = .response,
-    .components = components
+    .envir = .envir
   )
 
-  if (length(lhoods) == 0) {
-    stop("No observation models provided.")
-  }
-
-  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
-
-  # Turn model components into internal bru model
-  bru.model <- bru_model(components, lhoods, inputs = inputs)
-
-  # Check linearity
-  for (lh in seq_along(lhoods)) {
-    if (lhoods[[lh]][["linear"]]) {
-      used_lh <- bru_used(lhoods[[lh]])
-      used_lh <- unique(c(used_lh$effect, used_lh$latent))
-      lhoods[[lh]][["linear"]] <-
-        all(vapply(bru.model$effects[used_lh], function(cmp) {
-          ibm_is_linear(cmp$mapper)
-        }, TRUE))
-    }
-  }
-
   # Set max iterations to 1 if all likelihood formulae are linear
-  if (all(vapply(lhoods, function(lh) isTRUE(lh[["linear"]]), TRUE))) {
+  if (all(vapply(
+    bru.model[["lhoods"]],
+    function(lh) isTRUE(lh[["linear"]]), TRUE
+  ))) {
     options$bru_max_iter <- 1
   }
+
+  # Until the storage format is changed in a backwards incompatible way,
+  # move lhoods and inputs out of bru.model:
+  lhoods <- bru.model[["lhoods"]]
+  inputs <- bru.model[["inputs"]]
+  bru.model[["lhoods"]] <- NULL
+  bru.model[["inputs"]] <- NULL
 
   info <- bru_info(
     method = "bru",
@@ -1746,7 +1752,7 @@ bru_obs <- function(formula = . ~ .,
       control.family = control.family,
       tag = tag
     ),
-    class = "bru_like"
+    class = "bru_obs"
   )
 
   # Return likelihood
@@ -1895,7 +1901,7 @@ bru_index <- function(object, ...) {
 #'   observed part (response is not `NA`). If "missing", gives the index vector
 #'   for the missing part (response is `NA`) of the model.
 #' @export
-bru_index.bru_like <- function(object, what = NULL, ...) {
+bru_index.bru_obs <- function(object, what = NULL, ...) {
   what <- match.arg(what, c("all", "observed", "missing"))
   size <- bru_response_size(object)
   idx <- seq_len(size)
@@ -1998,16 +2004,16 @@ bru_response_size.inla.surv <- function(object) {
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a
-#' `bru_like` object.
+#' `bru_obs` object.
 #' @export
-bru_response_size.bru_like <- function(object) {
+bru_response_size.bru_obs <- function(object) {
   bru_response_size(object[["response_data"]][[object[["response"]]]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a
-#' `bru_like_list` object, as a vector with one value per observation model.
+#' `bru_obs_list` object, as a vector with one value per observation model.
 #' @export
-bru_response_size.bru_like_list <- function(object) {
+bru_response_size.bru_obs_list <- function(object) {
   vapply(object, bru_response_size, 1L)
 }
 
@@ -2027,47 +2033,47 @@ bru_response_size.bru <- function(object) {
 
 
 #' @describeIn bru_obs
-#' Combine `bru_like` likelihoods into a `bru_like_list` object
-#' @param \dots For `bru_like_list.bru_like`, one or more `bru_like` objects
+#' Combine `bru_obs` observation model object into a `bru_obs_list` object
+#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
 #' @export
-bru_like_list <- function(...) {
-  UseMethod("bru_like_list")
-}
-
-#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` Legacy
-#'   `like_list()` alias. Use [bru_like_list()] instead.
-#' @export
-like_list <- function(...) {
-  lifecycle::deprecate_warn(
-    "2.12.0",
-    "like_list()",
-    "bru_like_list()"
-  )
-  bru_like_list(...)
+bru_obs_list <- function(...) {
+  UseMethod("bru_obs_list")
 }
 
 #' @describeIn bru_obs
-#' Combine a list of `bru_like` likelihoods
-#' into a `bru_like_list` object
-#' @param object A list of `bru_like` objects
-#' @param envir An optional environment for the new `bru_like_list` object
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param object A list of `bru_obs` objects
 #' @export
-bru_like_list.list <- function(object, envir = NULL, ...) {
-  if (is.null(envir)) {
-    envir <- environment(object)
-  }
-  if (any(vapply(object, function(x) !inherits(x, "bru_like"), TRUE))) {
-    if (any(vapply(object, function(x) inherits(x, "bru_like_list"), TRUE))) {
-      stop(paste0(
-        "All list elements must be of class 'bru_like'.\n",
-        "To combine with 'bru_like_list' objects, use c(...)."
-      ))
-    }
-    stop("All list elements must be of class 'bru_like'.")
+bru_obs_list.list <- function(object, ..., .envir = NULL) {
+  object <- lapply(object, as_bru_obs)
+  class(object) <- c("bru_obs_list", "list")
+  bru_obs_list(object, .envir = .envir)
+}
+
+#' @describeIn bru_obs
+#' Combine a list of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param object A list of `bru_obs` objects
+#' @export
+bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
+  if (length(list(...)) > 1) {
+    # If multiple objects are given, combine them into a single list
+    # and then recall the method
+    object <- lapply(list(...), as_bru_obs_list)
+    object <- structure(
+      unlist(object, recursive = FALSE),
+      class = c("bru_obs_list", "list")
+    )
+  } else {
+    object <- list(...)[[1]]
   }
 
-  class(object) <- c("bru_like_list", "list")
-  environment(object) <- envir
+  if (is.null(.envir)) {
+    .envir <- environment(object)
+  }
+
+  environment(object) <- .envir
   orig_names <- names(object)
   if (is.null(orig_names)) {
     orig_names <- rep(NA_character_, length(object))
@@ -2088,7 +2094,7 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
     object,
     function(x) {
       if (is.null(x[["tag"]]) ||
-          identical(x[["tag"]], "")) {
+        identical(x[["tag"]], "")) {
         NA_character_
       } else {
         x[["tag"]]
@@ -2109,7 +2115,7 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
         return(orig_names[k])
       }
       stop(paste0(
-        "Cannot combine 'bru_like' objects with different tags and names:\n",
+        "Cannot combine 'bru_obs' objects with mismatching tags and names:\n",
         "  Tag: ", tag_names[k], "\n",
         "  Name: ", orig_names[k], "\n",
         "  Use `NA` for either the tag or name, or use matching tags and names."
@@ -2125,71 +2131,34 @@ bru_like_list.list <- function(object, envir = NULL, ...) {
   object
 }
 
-#' @describeIn bru_obs
-#' Combine several `bru_like` likelihoods
-#' into a `bru_like_list` object
-#' @export
-bru_like_list.bru_like <- function(..., envir = NULL) {
-  do.call(c, list(..., envir = envir))
-}
+
 
 #' @describeIn bru_obs
-#' Combine several `bru_like` likelihoods and/or `bru_like_list`
-#' objects into a `bru_like_list` object
+#' Combine several `bru_obs` objects into a `bru_obs_list` object
 #' @export
-c.bru_like <- function(..., envir = NULL) {
-  lst <- lapply(list(...), function(x) {
-    if (inherits(x, "bru_like")) {
-      list(x)
-    } else if (inherits(x, "bru_like_list")) {
-      x
-    } else {
-      stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
-    }
-  })
-  lst <- do.call(c, lst)
-  bru_like_list(lst, envir = envir)
+c.bru_obs <- function(..., .envir = NULL) {
+  bru_obs_list(list(...), .envir = .envir)
 }
 
+
 #' @describeIn bru_obs
-#' Combine several `bru_like` likelihoods and/or `bru_like_list`
-#' objects into a `bru_like_list` object
+#' Combine several `bru_obs_list` objects into a `bru_obs_list` object
 #' @export
-c.bru_like_list <- function(..., envir = NULL) {
-  if (!all(vapply(
-    list(...),
-    function(xx) is.null(xx) || inherits(xx, "bru_like_list"),
-    TRUE
-  ))) {
-    lst <- lapply(list(...), function(x) {
-      if (inherits(x, "bru_like")) {
-        structure(
-          list(x),
-          class = "bru_like_list"
-        )
-      } else if (inherits(x, "bru_like_list")) {
-        x
-      } else {
-        stop("Can only combine 'bru_like' and 'bru_like_list' objects.")
-      }
-    })
-    return(do.call("c", lst))
-  }
-  object <- NextMethod()
-  bru_like_list(object, envir = envir)
+c.bru_obs_list <- function(..., .envir = NULL) {
+  bru_obs_list(..., .envir = .envir)
 }
 
 
 
 #' @export
-#' @param x `bru_like_list` object from which to extract element(s)
+#' @param x `bru_obs_list` object from which to extract element(s)
 #' @param i indices specifying elements to extract
 #' @rdname bru_obs
-#' @seealso [summary.bru_like()]
-`[.bru_like_list` <- function(x, i) {
+#' @seealso [summary.bru_obs()]
+`[.bru_obs_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()
-  class(object) <- c("bru_like_list", "list")
+  class(object) <- c("bru_obs_list", "list")
   environment(object) <- env
   object
 }
@@ -2197,7 +2166,7 @@ c.bru_like_list <- function(..., envir = NULL) {
 
 #' Summary and print methods for observation models
 #'
-#' @rdname bru_like_print
+#' @rdname bru_obs_print
 #' @seealso [bru_obs()]
 #' @param object Object to operate on
 #' @param verbose logical; If `TRUE`, include more details of the
@@ -2205,14 +2174,14 @@ c.bru_like_list <- function(..., envir = NULL) {
 #' definition information. Default: `TRUE`
 #' @param \dots Arguments passed on to other `summary` methods
 #' @param x Object to be printed
-#' @method summary bru_like
+#' @method summary bru_obs
 #' @export
 #' @examples
 #' obs <- bru_obs(y ~ ., data = data.frame(y = rnorm(10)))
 #' summary(obs)
 #' print(obs)
 #'
-summary.bru_like <- function(object, verbose = TRUE, ...) {
+summary.bru_obs <- function(object, verbose = TRUE, ...) {
   structure(
     list(
       family = object[["family"]],
@@ -2224,14 +2193,14 @@ summary.bru_like <- function(object, verbose = TRUE, ...) {
       used = object[["used"]],
       tag = object[["tag"]]
     ),
-    class = "summary_bru_like"
+    class = "summary_bru_obs"
   )
 }
 
-#' @rdname bru_like_print
-#' @method summary bru_like_list
+#' @rdname bru_obs_print
+#' @method summary bru_obs_list
 #' @export
-summary.bru_like_list <- function(object, verbose = TRUE, ...) {
+summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
   structure(
     lapply(
       object,
@@ -2239,13 +2208,15 @@ summary.bru_like_list <- function(object, verbose = TRUE, ...) {
         summary(x, verbose = verbose, ...)
       }
     ),
-    class = "summary_bru_like_list"
+    class = "summary_bru_obs_list"
   )
 }
 
-#' @rdname bru_like_print
+
+
+#' @rdname bru_obs_print
 #' @export
-print.summary_bru_like <- function(x, ...) {
+print.summary_bru_obs <- function(x, ...) {
   lh <- x
   cat(sprintf(
     paste0(
@@ -2283,9 +2254,9 @@ print.summary_bru_like <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname bru_like_print
+#' @rdname bru_obs_print
 #' @export
-print.summary_bru_like_list <- function(x, ...) {
+print.summary_bru_obs_list <- function(x, ...) {
   for (lh in x) {
     print(lh)
   }
@@ -2293,54 +2264,55 @@ print.summary_bru_like_list <- function(x, ...) {
 }
 
 #' @export
-#' @rdname bru_like_print
-print.bru_like <- function(x, ...) {
+#' @rdname bru_obs_print
+print.bru_obs <- function(x, ...) {
   print(summary(x))
   invisible(x)
 }
 
 #' @export
-#' @rdname bru_like_print
-print.bru_like_list <- function(x, ...) {
+#' @rdname bru_obs_print
+print.bru_obs_list <- function(x, ...) {
   print(summary(x))
   invisible(x)
 }
 
 
-#' Utility functions for bru likelihood objects
-#' @param x Object of `bru_like` or `bru_like_list` type
+#' Utility functions for bru observation model objects
+#' @param x Object of `bru_obs` or `bru_obs_list` type
 #' @export
 #' @keywords internal
-#' @returns * `bru_like_inla_family()` returns a string or vector of strings
-#' @rdname bru_like_methods
-#' @seealso [summary.bru_like()]
-bru_like_inla_family <- function(x, ...) {
-  UseMethod("bru_like_inla_family")
+#' @returns * `bru_obs_inla_family()` returns a string or vector of strings
+#' @rdname bru_obs_methods
+#' @seealso [summary.bru_obs()]
+bru_obs_inla_family <- function(x, ...) {
+  UseMethod("bru_obs_inla_family")
 }
 #' @export
-#' @rdname bru_like_methods
-bru_like_inla_family.bru_like <- function(x, ...) {
+#' @rdname bru_obs_methods
+bru_obs_inla_family.bru_obs <- function(x, ...) {
   x[["inla.family"]]
 }
 #' @export
-#' @rdname bru_like_methods
-bru_like_inla_family.bru_like_list <- function(x, ...) {
-  vapply(x, bru_like_inla_family, "")
+#' @rdname bru_obs_methods
+bru_obs_inla_family.bru_obs_list <- function(x, ...) {
+  vapply(x, bru_obs_inla_family, "")
 }
 
 #' @param control.family list of INLA `control.family` options to override
 #' @export
 #' @keywords internal
-#' @returns * `bru_like_control_family()` returns a list with
+#' @returns * `bru_obs_control_family()` returns a list with
 #'   `INLA::control.family` options, or a list of such lists, with one element
 #'   per observation model
-#' @rdname bru_like_methods
-bru_like_control_family <- function(x, control.family = NULL, ...) {
-  UseMethod("bru_like_control_family")
+#' @rdname bru_obs_methods
+bru_obs_control_family <- function(x, control.family = NULL, ...) {
+  UseMethod("bru_obs_control_family")
 }
+
 #' @export
-#' @rdname bru_like_methods
-bru_like_control_family.bru_like <- function(x, control.family = NULL, ...) {
+#' @rdname bru_obs_methods
+bru_obs_control_family.bru_obs <- function(x, control.family = NULL, ...) {
   if (!is.null(control.family)) {
     control.family
   } else if (is.null(x[["control.family"]])) {
@@ -2349,11 +2321,12 @@ bru_like_control_family.bru_like <- function(x, control.family = NULL, ...) {
     x[["control.family"]]
   }
 }
+
 #' @export
-#' @rdname bru_like_methods
-bru_like_control_family.bru_like_list <- function(x,
-                                                  control.family = NULL,
-                                                  ...) {
+#' @rdname bru_obs_methods
+bru_obs_control_family.bru_obs_list <- function(x,
+                                                control.family = NULL,
+                                                ...) {
   # Extract the control.family information for each likelihood
   if (!is.null(control.family)) {
     if (length(control.family) != length(x)) {
@@ -2376,23 +2349,23 @@ bru_like_control_family.bru_like_list <- function(x,
       )
     }
   } else {
-    control.family <- lapply(x, bru_like_control_family)
+    control.family <- lapply(x, bru_obs_control_family)
     # inla() requires a unnamed list of lists
     names(control.family) <- NULL
   }
   control.family
 }
 
-bru_like_expr <- function(lhood, components) {
+bru_obs_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
     # Only needed pre-2.12.0.9014
     # Later versions construct expressions for all models,
-    # when calling bru_used_update.bru_like()
+    # when calling bru_used_update.bru_obs()
     expr_text <- "BRU_EXPRESSION"
     if (utils::packageVersion("inlabru") >= "2.12.0.9014") {
       warning(
         paste0(
-          "Code comment in `bru_like_expr` claims lhood[['expr']] cannot ",
+          "Code comment in `bru_obs_expr` claims lhood[['expr']] cannot ",
           "be null, but it is null."
         ),
         immediate. = TRUE
@@ -3198,7 +3171,7 @@ nonlin_predictor <- function(param, state) {
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_like_expr(
+            predictor = bru_obs_expr(
               param[["lhoods"]][[lh_idx]],
               param[["model"]][["effects"]]
             ),
@@ -3879,7 +3852,7 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [bru_obs()]
 #' @param inputs Optional pre-computed  list of per-likelihood component
-#'   evaluations, from [input_eval.bru_like_list()].
+#'   evaluations, from [input_eval.bru_obs_list()].
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
@@ -4052,11 +4025,11 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   )
 
   # Extract the family of each likelihood
-  family <- bru_like_inla_family(lhoods)
+  family <- bru_obs_inla_family(lhoods)
 
   # Extract the control.family information for each likelihood
   inla.options[["control.family"]] <-
-    bru_like_control_family(lhoods, inla.options[["control.family"]])
+    bru_obs_control_family(lhoods, inla.options[["control.family"]])
 
   initial <-
     if (is.null(initial)) {
@@ -4189,7 +4162,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     verbosity = 3
   )
   # Initial stack
-  idx <- evaluate_index(model, lhoods)
+  idx <- evaluate_index(model, used = bru_used(lhoods))
   stk <- bru_make_stack(lhoods, lin, idx)
 
   if (utils::packageVersion("INLA") <= "24.06.02") {

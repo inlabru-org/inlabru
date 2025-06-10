@@ -58,14 +58,38 @@
 #'
 #' @export
 #' @param components A [component_list] object
-#' @param lhoods A list of one or more `lhood` objects
-#' @param inputs A list of component input evaluations, from
-#'   [input_eval.bru_like_list()].
+#' @param lhoods A list of one or more [bru_obs()] or [bru_obs_list()] objects,
+#'   or arguments for a call to [bru_obs()]
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
+#' @param .envir The environment in which the components are evaluated.
+#'
 #' @return A [bru_model] object
 #' @keywords internal
 
-bru_model <- function(components, lhoods, inputs = NULL) {
-  components <- bru_component_list(components)
+bru_model <- function(components,
+                      lhoods,
+                      options = list(),
+                      .envir = parent.frame()) {
+  .response <- extract_response(components)
+
+  # Turn input into a list of components (from existing list, or a special
+  # formula)
+  components <- bru_component_list(components, .envir = .envir)
+
+  lhoods <- bru_obs_list_construct(
+    lhoods,
+    options = options,
+    .envir = .envir,
+    .response = .response,
+    .components = components
+  )
+
+  if (length(lhoods) == 0) {
+    stop("No observation models provided.")
+  }
+
+  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
 
   # Back up environment
   env <- environment(components)
@@ -74,10 +98,6 @@ bru_model <- function(components, lhoods, inputs = NULL) {
   formula <- BRU_response ~ -1
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
-
-  if (is.null(inputs)) {
-    inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
-  }
 
   # Complete the used component definitions based on data
   components <- bru_component_list(
@@ -96,11 +116,29 @@ bru_model <- function(components, lhoods, inputs = NULL) {
   environment(components) <- env
   environment(formula) <- env
 
+  # Check linearity
+  for (lh in seq_along(lhoods)) {
+    if (lhoods[[lh]][["linear"]]) {
+      used_lh <- bru_used(lhoods[[lh]])
+      used_lh <- unique(c(used_lh$effect, used_lh$latent))
+      lhoods[[lh]][["linear"]] <-
+        all(vapply(components[used_lh], function(cmp) {
+          ibm_is_linear(cmp$mapper)
+        }, TRUE))
+    }
+  }
+
   # Make model
   mdl <- structure(
-    list(effects = components, formula = formula),
+    list(
+      effects = components,
+      lhoods = lhoods,
+      inputs = inputs,
+      formula = formula
+    ),
     class = "bru_model"
   )
+
   mdl
 }
 
@@ -887,7 +925,7 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
 #' for each model likelihood
 #'
 #' @param model A `bru_model` object
-#' @param lhoods A `bru_like_list` object
+#' @param lhoods A `bru_obs_list` object
 #' @rdname evaluate_inputs
 #' @keywords internal
 evaluate_inputs <- function(model, lhoods) {
@@ -900,17 +938,16 @@ evaluate_inputs <- function(model, lhoods) {
 #' Computes the index values matrices for included components
 #'
 #' @param model A `bru_model` object
-#' @param lhoods A `bru_like_list` object. Deprecated and ignored
+#' @param used A [bru_used()] object
 #' @return A named list of `idx_full` and `idx_inla`,
 #' named list of indices, and `inla_subset`, and `inla_subset`,
 #' a named list of logical subset specifications for extracting the `INLA::f()`
 #' compatible index subsets.
 #' @rdname evaluate_index
 #' @keywords internal
-evaluate_index <- function(model, lhoods) {
+evaluate_index <- function(model, used) {
   stopifnot(inherits(model, "bru_model"))
-  included <- bru_used(lhoods)
-  included <- union(included[["effect"]], included[["latent"]])
+  included <- union(used[["effect"]], used[["latent"]])
 
   list(
     idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),

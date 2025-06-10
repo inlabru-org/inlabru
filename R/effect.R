@@ -607,7 +607,7 @@ bru_component.character <- function(object,
 #' @param \dots Parameters passed on to other methods. Also see Details.
 #' @family component constructors
 #' @param object The object to operate on
-#' @param lhoods A [bru_like_list] object
+#' @param lhoods A [bru_obs_list] object
 #' @param .envir An evaluation environment for non-formula input
 #' @export
 #' @rdname bru_component_list
@@ -671,7 +671,7 @@ bru_component_list.formula <- function(object,
 #' @describeIn bru_component_list Combine a list of components and/or component
 #'   formulas into a `component_list` object
 #' @param inputs A tree-like list of component input evaluations,
-#' from [input_eval.bru_like_list()].
+#' from [input_eval.bru_obs_list()].
 #' @export
 bru_component_list.list <- function(object,
                                     lhoods = NULL,
@@ -783,7 +783,7 @@ bru_component_list.list <- function(object,
 #'   have predefined mappers. When needed, the data in `lhoods` is used to
 #'   determine the appropriate mapper(s).
 #' @param component A [component] object
-#' @param lhoods A `bru_like_list` object
+#' @param lhoods A [bru_obs_list] object
 #' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
@@ -2206,9 +2206,9 @@ input_eval.component_list <-
 #' @describeIn input_eval Computes the component inputs for included components
 #' for each model likelihood
 #'
-#' @param lhoods A [bru_like_list] object
+#' @param lhoods A [bru_obs_list] object
 #' @export
-input_eval.bru_like_list <- function(lhoods, components, ...) {
+input_eval.bru_obs_list <- function(lhoods, components, ...) {
   bru_log_message(
     "Evaluate component inputs for each observation model",
     verbosity = 3L

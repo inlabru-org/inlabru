@@ -17,7 +17,7 @@ add_mappers(...)
 
 \item{component}{A \link{component} object}
 
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \link{bru_obs_list} object}
 
 \item{components}{A \code{component_list} object}
 }

@@ -105,7 +105,7 @@ reference:
   contents:
   - matches("^inlabru-package$")
   - matches("^bru$")
-  - matches("^bru_like$")
+  - matches("^bru_obs$")
   - matches("^bru_rerun$")
   - matches("^bru_options$")
   - starts_with("bru_component")

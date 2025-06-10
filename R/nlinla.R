@@ -19,9 +19,9 @@ bru_compute_linearisation <- function(...) {
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
 #' * For `bru_component`: `bru_mapper_taylor` object
-#' * For `bru_like`: A `comp_simple_list` object
+#' * For `bru_obs`: A `comp_simple_list` object
 #'   for the components in the likelihood
-#' * For `bru_like_list`: A `comp_simple_list_list` object
+#' * For `bru_obs_list`: A `comp_simple_list_list` object
 #' @param effects
 #' * For `bru_component`:
 #' Precomputed effect list for all components involved in the likelihood
@@ -275,18 +275,18 @@ bru_compute_linearisation.component <- function(cmp,
   B
 }
 
-#' @param lhood A `bru_like` object
+#' @param lhood A `bru_obs` object
 #' @param model A `bru_model` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like <- function(lhood,
-                                               model,
-                                               data,
-                                               input,
-                                               state,
-                                               comp_simple,
-                                               eps,
-                                               ...) {
+bru_compute_linearisation.bru_obs <- function(lhood,
+                                              model,
+                                              data,
+                                              input,
+                                              state,
+                                              comp_simple,
+                                              eps,
+                                              ...) {
   used <- bru_used(lhood)
   allow_combine <- lhood[["allow_combine"]]
   effects <- evaluate_effect_single_state(
@@ -295,7 +295,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
     state = state[used[["effect"]]]
   )
 
-  lhood_expr <- bru_like_expr(lhood, model[["effects"]])
+  lhood_expr <- bru_obs_expr(lhood, model[["effects"]])
   n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(
@@ -364,16 +364,16 @@ bru_compute_linearisation.bru_like <- function(lhood,
   bru_mapper_taylor(offset = offset, jacobian = B, state0 = NULL)
 }
 
-#' @param lhoods A `bru_like_list` object
+#' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like_list <- function(lhoods,
-                                                    model,
-                                                    input,
-                                                    state,
-                                                    comp_simple,
-                                                    eps = 1e-5,
-                                                    ...) {
+bru_compute_linearisation.bru_obs_list <- function(lhoods,
+                                                   model,
+                                                   input,
+                                                   state,
+                                                   comp_simple,
+                                                   eps = 1e-5,
+                                                   ...) {
   # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]

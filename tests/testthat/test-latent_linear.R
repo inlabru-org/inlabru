@@ -48,7 +48,7 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_like_expr(
+    as.character(bru_obs_expr(
       fit$bru_info$lhoods[[1]],
       fit$bru_info$effects
     )),
@@ -76,7 +76,7 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_like_expr(
+    as.character(bru_obs_expr(
       fit$bru_info$lhoods[[1]],
       fit$bru_info$effects
     )),
@@ -105,7 +105,7 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_like_expr(
+    as.character(bru_obs_expr(
       fit$bru_info$lhoods[[1]],
       fit$bru_info$effects
     )),
@@ -136,7 +136,7 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_like_expr(
+    as.character(bru_obs_expr(
       fit$bru_info$lhoods[[1]],
       fit$bru_info$effects
     )),

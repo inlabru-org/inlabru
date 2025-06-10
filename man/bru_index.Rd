@@ -2,13 +2,13 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru_index}
 \alias{bru_index}
-\alias{bru_index.bru_like}
+\alias{bru_index.bru_obs}
 \alias{bru_index.bru}
 \title{Extract predictor index information}
 \usage{
 bru_index(object, ...)
 
-\method{bru_index}{bru_like}(object, what = NULL, ...)
+\method{bru_index}{bru_obs}(object, what = NULL, ...)
 
 \method{bru_index}{bru}(object, tag = NULL, what = NULL, ...)
 }
@@ -38,7 +38,7 @@ or the whole or a subset of a full \code{\link[=bru]{bru()}} predictor.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_index(bru_like)}: Extract the index vector for the predictor vector for a
+\item \code{bru_index(bru_obs)}: Extract the index vector for the predictor vector for a
 \code{\link[=bru_obs]{bru_obs()}} sub-model. The indices are relative to the sub-model, and need
 to be appropriately offset to be used in the full model predictor.
 

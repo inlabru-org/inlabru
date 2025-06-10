@@ -10,16 +10,16 @@ bru_make_stack <- function(...) {
   UseMethod("bru_make_stack")
 }
 
-#' @param lhood A `bru_like` object
+#' @param lhood A `bru_obs` object
 #' @param lin Linearisation information
-#' * For `.bru_like`, a `bru_mapper_taylor` object
-#' * For `.bru_like_list`, a list of `bru_mapper_taylor` objects
+#' * For `.bru_obs`, a `bru_mapper_taylor` object
+#' * For `.bru_obs_list`, a list of `bru_mapper_taylor` objects
 #' @param idx Output from `evaluate_index(...)`
 #' @param family_index integer specifying the family sequence index of the
 #'   observation model
 #' @export
 #' @rdname bru_make_stack
-bru_make_stack.bru_like <- function(lhood, lin, idx, ..., family_index = 1L) {
+bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
   stopifnot(inherits(lin, "bru_mapper_taylor"))
   stopifnot(!is.null(lin[["offset"]]))
   stopifnot(is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]))
@@ -68,10 +68,13 @@ bru_make_stack.bru_like <- function(lhood, lin, idx, ..., family_index = 1L) {
   }
 }
 
-#' @param lhoods A `bru_like_list` object
+
+
+
+#' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_make_stack
-bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
+bru_make_stack.bru_obs_list <- function(lhoods, lin, idx, ...) {
   stks <-
     lapply(
       seq_along(lhoods),
@@ -89,7 +92,7 @@ bru_make_stack.bru_like_list <- function(lhoods, lin, idx, ...) {
   # model="linear" input in INLA::f(), making it unable to handle all-NA linear
   # effect specifications (arguably, that check is wrong, since it doesn't need
   # that information for linear components), or remove all-but one unused value
-  # above or in bru_make_stack.bru_like, and keep using remove.unused=FALSE
+  # above or in bru_make_stack.bru_obs, and keep using remove.unused=FALSE
   # here.
   stk <-
     do.call(
