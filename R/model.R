@@ -58,8 +58,9 @@
 #'
 #' @export
 #' @param components A [component_list] object
-#' @param lhoods A list of one or more [bru_obs()] or [bru_obs_list()] objects,
-#'   or arguments for a call to [bru_obs()]
+#' @param lhoods Either a [bru_obs()] object, a [bru_obs_list()] object, or
+#'   a list of one or more [bru_obs()] or [bru_obs_list()] objects,
+#'   or a list of arguments for a call to [bru_obs()].
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
 #' @param .envir The environment in which the components are evaluated.
@@ -71,6 +72,8 @@ bru_model <- function(components,
                       lhoods,
                       options = list(),
                       .envir = parent.frame()) {
+  options <- bru_call_options(options)
+
   .response <- extract_response(components)
 
   # Turn input into a list of components (from existing list, or a special

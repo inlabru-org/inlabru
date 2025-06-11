@@ -431,13 +431,17 @@ bru_timings.bru <- function(object, ...) {
 }
 
 
-# Inputs: One or more bru_obs, or one or more bru_obs_list objects,
-# or arguments for one bru_obs() call.
+# @param args Either a [bru_obs()] object, a [bru_obs_list()] object, or
+#   a list of one or more [bru_obs()] or [bru_obs_list()] objects,
+#   or a list of arguments for a call to [bru_obs()].
 # Returns: A bru_obs_list object.
 bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
                                    .response = . ~ .,
                                    .components = NULL) {
   lhoods <- args
+  if (inherits(lhoods, c("bru_obs", "bru_obs_list"))) {
+    lhoods <- list(lhoods)
+  }
   dot_is_lhood <- vapply(
     lhoods,
     function(lh) inherits(lh, "bru_obs"),

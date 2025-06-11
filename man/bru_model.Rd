@@ -15,8 +15,9 @@ bru_model(components, lhoods, options = list(), .envir = parent.frame())
 \arguments{
 \item{components}{A \link{component_list} object}
 
-\item{lhoods}{A list of one or more \code{\link[=bru_obs]{bru_obs()}} or \code{\link[=bru_obs_list]{bru_obs_list()}} objects,
-or arguments for a call to \code{\link[=bru_obs]{bru_obs()}}}
+\item{lhoods}{Either a \code{\link[=bru_obs]{bru_obs()}} object, a \code{\link[=bru_obs_list]{bru_obs_list()}} object, or
+a list of one or more \code{\link[=bru_obs]{bru_obs()}} or \code{\link[=bru_obs_list]{bru_obs_list()}} objects,
+or a list of arguments for a call to \code{\link[=bru_obs]{bru_obs()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
