@@ -277,7 +277,7 @@ hulls around the count sites, and then build a triangular mesh by
 specifying minimum and maximum edge lengths within the inner hull,
 and within the slightly larger outer hull.
 
-```{r mesh, warning=F, message=F, fig.pos='t', fig.align='center'}
+```{r mesh, warning=F, message=F}
 # make a two extension hulls and mesh for spatial model
 hull <- fm_extensions(
   count_dat,
@@ -285,11 +285,16 @@ hull <- fm_extensions(
   concave = c(350, 500)
 )
 mesh <- fm_mesh_2d_inla(
-  boundary = hull, max.edge = c(100, 600), # km inside and outside
-  cutoff = 50, offset = c(100, 300),
+  fm_hexagon_lattice(hull[[1]], edge_len = 70),
+  boundary = hull,
+  max.edge = c(100, 600), # km inside and outside
+  cutoff = 25,
+  offset = c(100, 300),
   crs = fm_crs(count_dat)
 ) # cutoff is min edge
+```
 
+```{r mesh-plot, fig.pos='t', fig.align='center'}
 # plot it
 ggplot() +
   gg(data = mesh) +
@@ -385,6 +390,7 @@ svc_components <- ~ -1 +
   alpha(geometry, model = spde) +
   eps(geometry, weights = log_hrs, model = spde) +
   tau(geometry, weights = std_yr, model = spde)
+
 # formula, with "." meaning "add all the model components":
 svc_formula <- count ~ .
 ```
@@ -573,7 +579,8 @@ make_plot_field <- function(data_stk, scale_label) {
     coord_sf(datum = NA) +
     geom_spatraster(data = data_stk) +
     labs(x = "", y = "") +
-    scale_fill_distiller(scale_label,
+    scale_fill_distiller(
+      scale_label,
       palette = "Spectral",
       na.value = "transparent"
     ) +
