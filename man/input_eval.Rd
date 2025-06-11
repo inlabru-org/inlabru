@@ -2,17 +2,17 @@
 % Please edit documentation in R/effect.R
 \name{input_eval}
 \alias{input_eval}
-\alias{input_eval.component}
-\alias{input_eval.component_list}
+\alias{input_eval.bru_comp}
+\alias{input_eval.bru_comp_list}
 \alias{input_eval.bru_obs_list}
 \alias{input_eval.bru_input}
 \title{Obtain component inputs}
 \usage{
 input_eval(...)
 
-\method{input_eval}{component}(component, data, ...)
+\method{input_eval}{bru_comp}(component, data, ...)
 
-\method{input_eval}{component_list}(components, data, ...)
+\method{input_eval}{bru_comp_list}(components, data, ...)
 
 \method{input_eval}{bru_obs_list}(lhoods, components, ...)
 
@@ -27,7 +27,7 @@ input_eval(...)
 covariates and/or point locations.
 If \code{NULL}, return the component's map.}
 
-\item{components}{A \link{component_list}.}
+\item{components}{A \link{bru_comp_list}.}
 
 \item{lhoods}{A \link{bru_obs_list} object}
 }
@@ -120,7 +120,7 @@ at your data locations when using code like
 }\if{html}{\out{</div>}}
 
 For more precise control, use the the \code{layer} and \code{selector} arguments (see
-\code{\link[=bru_component]{bru_component()}}), or call \code{eval_spatial()} directly, e.g.:
+\code{\link[=bru_comp]{bru_comp()}}), or call \code{\link[=eval_spatial]{eval_spatial()}} directly, e.g.:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.),
                      model = "linear")
@@ -156,7 +156,7 @@ to be built on a different CRS than the observation data.
 }
 
 \seealso{
-\code{\link[=bru_component]{bru_component()}}
+\code{\link[=bru_comp]{bru_comp()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren

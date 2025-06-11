@@ -542,9 +542,9 @@ test_that("Collect mapper, automatic construction", {
 
   lik <- bru_obs(formula = y ~ ., data = data)
 
-  cmp1 <- bru_component_list(cmp1, lhoods = bru_obs_list(list(lik)))
-  cmp2 <- bru_component_list(cmp2, lhoods = bru_obs_list(list(lik)))
-  cmp3 <- bru_component_list(cmp3, lhoods = bru_obs_list(list(lik)))
+  cmp1 <- bru_comp_list(cmp1, lhoods = bru_obs_list(list(lik)))
+  cmp2 <- bru_comp_list(cmp2, lhoods = bru_obs_list(list(lik)))
+  cmp3 <- bru_comp_list(cmp3, lhoods = bru_obs_list(list(lik)))
 
   for (inla_f in c(FALSE, TRUE)) {
     n <- ibm_n(cmp1$indep$mapper, inla_f = inla_f)

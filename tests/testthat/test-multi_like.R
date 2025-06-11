@@ -24,7 +24,7 @@ test_that("Multiple likelihoods: basic model", {
     tag = "B"
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x, model = "rw2", scale.model = TRUE) + int1(1) + int2(1) - 1
   )
   cmp2 <- add_mappers(cmp1, lhoods = c(lik1, lik2))
@@ -33,7 +33,7 @@ test_that("Multiple likelihoods: basic model", {
     sort(union(lik1$data$x, lik2$data$x))
   )
 
-  cmp <- bru_component_list(~ -1 +
+  cmp <- bru_comp_list(~ -1 +
     effect(x,
       model = "rw2",
       values = seq(1, 5, by = 0.25),

@@ -12,14 +12,14 @@ test_that("Component construction: default mesh/mapping, data is list", {
     allow_combine = TRUE
   )
 
-  cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
+  cmp1 <- bru_comp_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
+  cmp1 <- bru_comp_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
@@ -30,13 +30,13 @@ test_that("Component construction: default mesh/mapping, data is list", {
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
-    bru_component_list(
+    bru_comp_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
     ),
     regexp = "Unknown mapper"
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = FALSE)
@@ -48,7 +48,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = TRUE)
@@ -66,7 +66,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
 test_that("Component construction: unsafe intercepts, data is list", {
   local_bru_safe_inla()
 
-  cmp <- bru_component_list(~ something_unknown - 1)
+  cmp <- bru_comp_list(~ something_unknown - 1)
   lik <- bru_obs(
     formula = response ~ ., data = list(response = 1:5),
     allow_combine = TRUE
@@ -104,25 +104,25 @@ test_that("Component construction: separate response_data input", {
   )
 
 
-  cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
+  cmp1 <- bru_comp_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
 
   fit1 <- bru(components = cmp1, lik1)
   fit2 <- bru(components = cmp1, lik2)
 
 
-  cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
+  cmp1 <- bru_comp_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik2)))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik2$data$x)
 
   mesh1 <- fm_mesh_1d(lik1$data$x)
   expect_error(
-    bru_component_list(
+    bru_comp_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
     ),
     regexp = "Unknown mapper"
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = FALSE)
@@ -131,7 +131,7 @@ test_that("Component construction: separate response_data input", {
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik1)))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik1$data$x)
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = TRUE)

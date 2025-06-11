@@ -6,8 +6,8 @@
 \alias{evaluate_effect_single_state.bru_mapper}
 \alias{evaluate_effect_single_state.comp_simple_list}
 \alias{evaluate_effect_multi_state.comp_simple_list}
-\alias{evaluate_effect_single_state.component_list}
-\alias{evaluate_effect_multi_state.component_list}
+\alias{evaluate_effect_single_state.bru_comp_list}
+\alias{evaluate_effect_multi_state.bru_comp_list}
 \title{Evaluate a component effect}
 \usage{
 evaluate_effect_single_state(...)
@@ -20,14 +20,14 @@ evaluate_effect_multi_state(...)
 
 \method{evaluate_effect_multi_state}{comp_simple_list}(components, input, state, ...)
 
-\method{evaluate_effect_single_state}{component_list}(components, input, state, ...)
+\method{evaluate_effect_single_state}{bru_comp_list}(components, input, state, ...)
 
-\method{evaluate_effect_multi_state}{component_list}(components, input, state, ...)
+\method{evaluate_effect_multi_state}{bru_comp_list}(components, input, state, ...)
 }
 \arguments{
 \item{...}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
 
-\item{component}{A \code{bru_mapper}, \code{bru_component}, \code{comp_simple}, or
+\item{component}{A \link{bru_mapper}, \link{bru_comp}, \code{comp_simple}, or
 \code{comp_simple_list}.}
 
 \item{input}{Pre-evaluated component input}
@@ -46,8 +46,8 @@ affected component.}
 }
 \value{
 \itemize{
-\item \code{evaluate_effect_single_state.component_list}: A list of evaluated
-component effect values
+\item \code{evaluate_effect_single_state.comp_simple_list}: A list of
+evaluated component effect values
 }
 
 \itemize{

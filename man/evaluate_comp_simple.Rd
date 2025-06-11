@@ -2,14 +2,14 @@
 % Please edit documentation in R/model.R
 \name{evaluate_comp_simple}
 \alias{evaluate_comp_simple}
-\alias{evaluate_comp_simple.component_list}
+\alias{evaluate_comp_simple.bru_comp_list}
 \alias{evaluate_comp_simple.bru_model}
 \alias{[.comp_simple_list}
 \title{Compute simplified component mappings}
 \usage{
 evaluate_comp_simple(...)
 
-\method{evaluate_comp_simple}{component_list}(components, input, inla_f = FALSE, ...)
+\method{evaluate_comp_simple}{bru_comp_list}(components, input, inla_f = FALSE, ...)
 
 \method{evaluate_comp_simple}{bru_model}(model, input, ...)
 

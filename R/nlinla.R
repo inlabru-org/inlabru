@@ -10,7 +10,7 @@ bru_compute_linearisation <- function(...) {
   UseMethod("bru_compute_linearisation")
 }
 
-#' @param cmp A [bru_component] object
+#' @param cmp A [bru_comp] object
 #' @param model A [bru_model] object
 #' @param lhood_expr A predictor expression
 #' @param data Input data
@@ -18,12 +18,12 @@ bru_compute_linearisation <- function(...) {
 #' @param input Precomputed component inputs from `evaluate_inputs()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
-#' * For `bru_component`: `bru_mapper_taylor` object
+#' * For `bru_comp`: [bru_mapper_taylor] object
 #' * For `bru_obs`: A `comp_simple_list` object
 #'   for the components in the likelihood
 #' * For `bru_obs_list`: A `comp_simple_list_list` object
 #' @param effects
-#' * For `bru_component`:
+#' * For `bru_comp`:
 #' Precomputed effect list for all components involved in the likelihood
 #' expression
 #' @param pred0 Precomputed predictor for the given state
@@ -36,21 +36,21 @@ bru_compute_linearisation <- function(...) {
 #'
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.component <- function(cmp,
-                                                model,
-                                                lhood_expr,
-                                                data,
-                                                data_extra,
-                                                input,
-                                                state,
-                                                comp_simple,
-                                                effects,
-                                                pred0,
-                                                used,
-                                                allow_combine,
-                                                eps,
-                                                n_pred = NULL,
-                                                ...) {
+bru_compute_linearisation.bru_comp <- function(cmp,
+                                               model,
+                                               lhood_expr,
+                                               data,
+                                               data_extra,
+                                               input,
+                                               state,
+                                               comp_simple,
+                                               effects,
+                                               pred0,
+                                               used,
+                                               allow_combine,
+                                               eps,
+                                               n_pred = NULL,
+                                               ...) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
@@ -313,7 +313,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
   # Compute derivatives for each non-const/offset component
   B <- list()
   offset <- pred0
-  # Either this loop or the internal bru_component specific loop
+  # Either this loop or the internal bru_comp specific loop
   # can in principle be parallelised.
   for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {

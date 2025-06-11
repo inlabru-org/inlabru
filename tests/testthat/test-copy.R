@@ -19,7 +19,7 @@ test_that("bru: inla copy feature", {
         )
       ) +
       myLin2(x, copy = "myLin1", fixed = FALSE)
-  cmps <- bru_component_list(cmp)
+  cmps <- bru_comp_list(cmp)
 
   fit <- bru(
     cmp,
@@ -86,7 +86,7 @@ test_that("bru: inla copy feature", {
 #     ) +
 #         myLin2(x, copy = "myLin1", fixed = FALSE, initial = 1)
 # #    myLin2(1)
-#   cmps <- bru_component_list(cmp)
+#   cmps <- bru_comp_list(cmp)
 #
 #   fit <- bru(
 #     cmp,

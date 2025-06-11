@@ -117,7 +117,7 @@ predictor expression, with a \verb{_latent} suffix. This also makes evaluator
 functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
 and \code{replicate}, taking values for where to evaluate the component effect
 that are different than those defined in the component definition itself
-(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
+(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
 in the predictor expression is detected automatically.
 }
 }

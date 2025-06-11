@@ -2,12 +2,12 @@
 % Please edit documentation in R/effect.R
 \name{inla_subset_eval}
 \alias{inla_subset_eval}
-\alias{inla_subset_eval.component_list}
+\alias{inla_subset_eval.bru_comp_list}
 \title{Obtain inla index subset information}
 \usage{
 inla_subset_eval(...)
 
-\method{inla_subset_eval}{component_list}(components, ...)
+\method{inla_subset_eval}{bru_comp_list}(components, ...)
 }
 \arguments{
 \item{...}{Unused.}

@@ -2,15 +2,15 @@
 % Please edit documentation in R/effect.R
 \name{comp_lin_eval}
 \alias{comp_lin_eval}
-\alias{comp_lin_eval.component}
-\alias{comp_lin_eval.component_list}
+\alias{comp_lin_eval.bru_comp}
+\alias{comp_lin_eval.bru_comp_list}
 \title{Construct component linearisations}
 \usage{
 comp_lin_eval(...)
 
-\method{comp_lin_eval}{component}(component, input = NULL, state = NULL, ...)
+\method{comp_lin_eval}{bru_comp}(component, input = NULL, state = NULL, ...)
 
-\method{comp_lin_eval}{component_list}(components, input, state, ...)
+\method{comp_lin_eval}{bru_comp_list}(components, input, state, ...)
 }
 \arguments{
 \item{...}{Optional parameters passed on to \code{ibm_eval}

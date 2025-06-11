@@ -2,15 +2,15 @@
 % Please edit documentation in R/effect.R
 \name{add_mappers}
 \alias{add_mappers}
-\alias{add_mappers.component}
-\alias{add_mappers.component_list}
+\alias{add_mappers.bru_comp}
+\alias{add_mappers.bru_comp_list}
 \title{Add component input/latent mappers}
 \usage{
 add_mappers(...)
 
-\method{add_mappers}{component}(component, lhoods, inputs = NULL, ...)
+\method{add_mappers}{bru_comp}(component, lhoods, inputs = NULL, ...)
 
-\method{add_mappers}{component_list}(components, lhoods, inputs = NULL, ...)
+\method{add_mappers}{bru_comp_list}(components, lhoods, inputs = NULL, ...)
 }
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
@@ -19,7 +19,7 @@ add_mappers(...)
 
 \item{lhoods}{A \link{bru_obs_list} object}
 
-\item{components}{A \code{component_list} object}
+\item{components}{A \code{bru_comp_list} object}
 }
 \value{
 A \code{component} object with completed mapper information

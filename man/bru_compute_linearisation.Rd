@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlinla.R
 \name{bru_compute_linearisation}
 \alias{bru_compute_linearisation}
-\alias{bru_compute_linearisation.component}
+\alias{bru_compute_linearisation.bru_comp}
 \alias{bru_compute_linearisation.bru_obs}
 \alias{bru_compute_linearisation.bru_obs_list}
 \alias{bru_compute_linearisation.bru_model}
@@ -10,7 +10,7 @@
 \usage{
 bru_compute_linearisation(...)
 
-\method{bru_compute_linearisation}{component}(
+\method{bru_compute_linearisation}{bru_comp}(
   cmp,
   model,
   lhood_expr,
@@ -54,7 +54,7 @@ bru_compute_linearisation(...)
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
 
-\item{cmp}{A \link{bru_component} object}
+\item{cmp}{A \link{bru_comp} object}
 
 \item{model}{A \code{bru_model} object}
 
@@ -70,14 +70,14 @@ bru_compute_linearisation(...)
 
 \item{comp_simple}{Component evaluation information
 \itemize{
-\item For \code{bru_component}: \code{bru_mapper_taylor} object
+\item For \code{bru_comp}: \link{bru_mapper_taylor} object
 \item For \code{bru_obs}: A \code{comp_simple_list} object
 for the components in the likelihood
 \item For \code{bru_obs_list}: A \code{comp_simple_list_list} object
 }}
 
 \item{effects}{\itemize{
-\item For \code{bru_component}:
+\item For \code{bru_comp}:
 Precomputed effect list for all components involved in the likelihood
 expression
 }}

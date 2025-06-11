@@ -642,7 +642,7 @@ It is also possible to evaluate the effect of a covariate directly, by bypassing
 the component definition input. This is done by adding the suffix `_eval()` to
 the end of the component name in the predictor expression, and supplying data
 that is sufficient for evaluating , and supplying data needed by the input
-arguments to this function, see `bru_component_eval()`.
+arguments to this function, see `bru_comp_eval()`.
 
 Note on backwards version support, starting with version `2.2.8`
 Prior to version `2.8.0`, this feature required setting the `include`

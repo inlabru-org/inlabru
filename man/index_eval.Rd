@@ -2,15 +2,15 @@
 % Please edit documentation in R/effect.R
 \name{index_eval}
 \alias{index_eval}
-\alias{index_eval.component}
-\alias{index_eval.component_list}
+\alias{index_eval.bru_comp}
+\alias{index_eval.bru_comp_list}
 \title{Obtain indices}
 \usage{
 index_eval(...)
 
-\method{index_eval}{component}(component, inla_f, ...)
+\method{index_eval}{bru_comp}(component, inla_f, ...)
 
-\method{index_eval}{component_list}(components, inla_f, ...)
+\method{index_eval}{bru_comp_list}(components, inla_f, ...)
 }
 \arguments{
 \item{...}{Unused.}

@@ -57,7 +57,7 @@
 #'
 #'
 #' @export
-#' @param components A [component_list] object
+#' @param components A [bru_comp_list] object
 #' @param lhoods Either a [bru_obs()] object, a [bru_obs_list()] object, or
 #'   a list of one or more [bru_obs()] or [bru_obs_list()] objects,
 #'   or a list of arguments for a call to [bru_obs()].
@@ -78,7 +78,7 @@ bru_model <- function(components,
 
   # Turn input into a list of components (from existing list, or a special
   # formula)
-  components <- bru_component_list(components, .envir = .envir)
+  components <- bru_comp_list(components, .envir = .envir)
 
   lhoods <- bru_obs_list_construct(
     lhoods,
@@ -103,7 +103,7 @@ bru_model <- function(components,
   included <- union(included[["effect"]], included[["latent"]])
 
   # Complete the used component definitions based on data
-  components <- bru_component_list(
+  components <- bru_comp_list(
     components[included],
     lhoods = lhoods,
     inputs = inputs
@@ -334,7 +334,7 @@ evaluate_effect_multi_state <- function(...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component A `bru_mapper`, `bru_component`, `comp_simple`, or
+#' @param component A [bru_mapper], [bru_comp], `comp_simple`, or
 #'   `comp_simple_list`.
 #' @param input Pre-evaluated component input
 #' @param state Specification of one (for `evaluate_effect_single_state`) or
@@ -376,8 +376,8 @@ evaluate_effect_single_state.bru_mapper <- function(component, input, state,
   as.vector(as.matrix(values))
 }
 
-#' @return * `evaluate_effect_single_state.component_list`: A list of evaluated
-#' component effect values
+#' @return * `evaluate_effect_single_state.comp_simple_list`: A list of
+#'   evaluated component effect values
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
@@ -423,20 +423,20 @@ evaluate_effect_multi_state.comp_simple_list <- function(components,
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_single_state.component_list <- function(components,
-                                                        input,
-                                                        state,
-                                                        ...) {
+evaluate_effect_single_state.bru_comp_list <- function(components,
+                                                       input,
+                                                       state,
+                                                       ...) {
   comp_simple <- evaluate_comp_simple(components, input = input, ...)
   evaluate_effect_single_state(comp_simple, input = input, state = state, ...)
 }
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_multi_state.component_list <- function(components,
-                                                       input,
-                                                       state,
-                                                       ...) {
+evaluate_effect_multi_state.bru_comp_list <- function(components,
+                                                      input,
+                                                      state,
+                                                      ...) {
   comp_simple <- evaluate_comp_simple(components, input = input, ...)
   evaluate_effect_multi_state(comp_simple, input = input, state = state, ...)
 }
@@ -457,7 +457,7 @@ evaluate_effect_multi_state.component_list <- function(components,
 #' @param state A list where each element is a list of named latent state
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
-#' as computed by [evaluate_effect_multi_state.component_list()]
+#' as computed by [evaluate_effect_multi_state.bru_comp_list()]
 #' @param predictor Either a formula or expression
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
@@ -474,7 +474,7 @@ evaluate_effect_multi_state.component_list <- function(components,
 #' vectors of length `n_pred`.
 #' @details For each component, e.g. "name", the state values are available as
 #'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
-#'   see [bru_component_eval()].
+#'   see [bru_comp_eval()].
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -723,6 +723,7 @@ evaluate_predictor <- function(model,
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
 #' the effect of a component called "name".
 #'
+#' @aliases bru_component_eval
 #' @param main,group,replicate,weights Specification of where to evaluate a
 #'   component. The four inputs are passed on to the joint `bru_mapper` for the
 #'   component, as
@@ -775,14 +776,14 @@ evaluate_predictor <- function(model,
 #'     n.samples = 1L
 #'   )
 #' }
-bru_component_eval <- function(main,
-                               group = NULL,
-                               replicate = NULL,
-                               weights = NULL,
-                               .state = NULL) {
+bru_comp_eval <- function(main,
+                          group = NULL,
+                          replicate = NULL,
+                          weights = NULL,
+                          .state = NULL) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",
-    "'bru_component_eval(...)'.  See ?bru_component_eval for more information."
+    "'bru_comp_eval(...)'.  See ?bru_comp_eval for more information."
   ))
 }
 
@@ -858,8 +859,8 @@ evaluate_comp_simple <- function(...) {
 
 #' @export
 #' @rdname evaluate_comp_simple
-evaluate_comp_simple.component_list <- function(components, input,
-                                                inla_f = FALSE, ...) {
+evaluate_comp_simple.bru_comp_list <- function(components, input,
+                                               inla_f = FALSE, ...) {
   mappers <- lapply(
     components,
     function(x) {

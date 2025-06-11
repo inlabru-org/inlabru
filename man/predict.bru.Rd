@@ -86,7 +86,7 @@ to directly access the latent state for a component, and the suffix function
 \verb{_eval} can be used to evaluate a component at other input values than the
 expressions defined in the component definition itself, e.g.
 \code{field_eval(cbind(x, y))} for a component that was defined with
-\code{field(coordinates, ...)} (see also \code{\link[=bru_component_eval]{bru_component_eval()}}).
+\code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
 For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.

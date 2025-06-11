@@ -61,11 +61,11 @@ add_mappers <- function(...) {
 #' definitions can optionally be split up into separate component definitions.
 #' See Details for more information.
 #'
-#' The `bru_component` methods all rely on the [bru_component.character()]
+#' The `bru_comp` methods all rely on the [bru_comp.character()]
 #' method, that defines a model component with a given label/name. The user
 #' usually doesn't need to call these methods directly, but can instead supply a
 #' formula expression that can be interpreted by the
-#' [bru_component_list.formula()] method, called inside [bru()].
+#' [bru_comp_list.formula()] method, called inside [bru()].
 #'
 #' @details
 #' As shorthand, [bru()] will understand basic additive formulae describing
@@ -133,7 +133,7 @@ add_mappers <- function(...) {
 #'
 #' @param \dots Parameters passed on to other methods
 #'
-#' @rdname bru_component
+#' @rdname bru_comp
 #' @aliases component
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -147,16 +147,22 @@ add_mappers <- function(...) {
 #' # called "x". Note that a list of components is returned because the
 #' # formula may define multiple components
 #'
-#' cmp <- bru_component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+#' cmp <- bru_comp_list(~ myLinearEffectOfX(main = x, model = "linear"))
 #' summary(cmp)
 #' # Equivalent shortcuts:
-#' cmp <- bru_component_list(~ myLinearEffectOfX(x, model = "linear"))
-#' cmp <- bru_component_list(~ myLinearEffectOfX(x))
+#' cmp <- bru_comp_list(~ myLinearEffectOfX(x, model = "linear"))
+#' cmp <- bru_comp_list(~ myLinearEffectOfX(x))
 #' # Individual component
-#' cmp <- bru_component("myLinearEffectOfX", main = x, model = "linear")
+#' cmp <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 #' summary(cmp)
+bru_comp <- function(...) {
+  UseMethod("bru_comp")
+}
+
+#' @describeIn bru_comp
+#' Backwards compatibility alias for `bru_comp()`
 bru_component <- function(...) {
-  UseMethod("bru_component")
+  bru_comp(...)
 }
 
 #' @export
@@ -224,14 +230,15 @@ bru_component <- function(...) {
 #' @param .envir Evaluation environment
 #' @param envir_extra TODO: check/fix this parameter.
 #'
-#' @details The `bru_component.character` method is inlabru's equivalent to
+#' @details The `bru_comp.character` method is inlabru's equivalent to
 #'   `INLA`'s `f()` function but adds functionality that is unique to inlabru.
 #'
 #' Deprecated parameters:
 #' * map: Use `main` instead.
 #' * mesh: Use `mapper` instead.
 #'
-#' @rdname bru_component
+#' @rdname bru_comp
+#' @aliases bru_comp
 #' @aliases bru_component
 #'
 #' @examples
@@ -241,59 +248,59 @@ bru_component <- function(...) {
 #'   # called "myEffectOfX" while the covariate the component acts on is called
 #'   # "x":
 #'
-#'   cmp <- bru_component("myEffectOfX", main = x, model = "linear")
+#'   cmp <- bru_comp("myEffectOfX", main = x, model = "linear")
 #'   summary(cmp)
 #'
 #'   # A more complicated component:
-#'   cmp <- bru_component("myEffectOfX",
+#'   cmp <- bru_comp("myEffectOfX",
 #'     main = x,
 #'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
 #'   # The formula will be passed on to MatrixModels::model.Matrix:
-#'   cmp <- bru_component("eff", ~ -1 + x:z, model = "fixed")
+#'   cmp <- bru_comp("eff", ~ -1 + x:z, model = "fixed")
 #'   summary(cmp)
 #' }
 #' }
 #'
-bru_component.character <- function(object,
-                                    # Main model parameters
-                                    main = NULL, # This must be kept as 1st arg.
-                                    weights = NULL, # This must be 2nd arg.
-                                    ..., # Prevent partial matching
-                                    model = NULL,
-                                    mapper = NULL,
-                                    main_layer = NULL,
-                                    main_selector = NULL,
-                                    n = NULL,
-                                    values = NULL,
-                                    season.length = NULL,
-                                    nrow = NULL,
-                                    ncol = NULL,
-                                    # Copy feature
-                                    copy = NULL,
-                                    # Weights
-                                    weights_layer = NULL,
-                                    weights_selector = NULL,
-                                    # Group model parameters
-                                    group = 1L,
-                                    group_mapper = NULL,
-                                    group_layer = NULL,
-                                    group_selector = NULL,
-                                    ngroup = NULL,
-                                    control.group = NULL,
-                                    # Replicate model parameters
-                                    replicate = 1L,
-                                    replicate_mapper = NULL,
-                                    replicate_layer = NULL,
-                                    replicate_selector = NULL,
-                                    nrep = NULL,
-                                    # Marginal transformation
-                                    marginal = NULL,
-                                    A.msk = deprecated(),
-                                    .envir = parent.frame(),
-                                    envir_extra = NULL) {
+bru_comp.character <- function(object,
+                               # Main model parameters
+                               main = NULL, # This must be kept as 1st arg.
+                               weights = NULL, # This must be 2nd arg.
+                               ..., # Prevent partial matching
+                               model = NULL,
+                               mapper = NULL,
+                               main_layer = NULL,
+                               main_selector = NULL,
+                               n = NULL,
+                               values = NULL,
+                               season.length = NULL,
+                               nrow = NULL,
+                               ncol = NULL,
+                               # Copy feature
+                               copy = NULL,
+                               # Weights
+                               weights_layer = NULL,
+                               weights_selector = NULL,
+                               # Group model parameters
+                               group = 1L,
+                               group_mapper = NULL,
+                               group_layer = NULL,
+                               group_selector = NULL,
+                               ngroup = NULL,
+                               control.group = NULL,
+                               # Replicate model parameters
+                               replicate = 1L,
+                               replicate_mapper = NULL,
+                               replicate_layer = NULL,
+                               replicate_selector = NULL,
+                               nrep = NULL,
+                               # Marginal transformation
+                               marginal = NULL,
+                               A.msk = deprecated(),
+                               .envir = parent.frame(),
+                               envir_extra = NULL) {
   # INLA models:
   # itypes = c(linear, iid, mec, meb, rgeneric, rw1, rw2, crw2, seasonal, besag,
   # besag2, bym, bym2, besagproper, besagproper2, fgn, fgn2, ar1, ar1c, ar, ou,
@@ -331,7 +338,7 @@ bru_component.character <- function(object,
     lifecycle::deprecate_stop(
       "2.3.0",
       "bru_component(map)",
-      "bru_component(main)"
+      "bru_comp(main)"
     )
   }
 
@@ -339,7 +346,7 @@ bru_component.character <- function(object,
     lifecycle::deprecate_stop(
       "2.3.0",
       "bru_component(mesh)",
-      "bru_component(mapper)"
+      "bru_comp(mapper)"
     )
   }
 
@@ -379,7 +386,7 @@ bru_component.character <- function(object,
   component <- list(
     label = label,
     inla.formula = NULL,
-    main = bru_subcomponent(
+    main = bru_subcomp(
       input = bru_input(
         substitute(main),
         label = label,
@@ -394,7 +401,7 @@ bru_component.character <- function(object,
       nrow = nrow,
       ncol = ncol
     ),
-    group = bru_subcomponent(
+    group = bru_subcomp(
       input = bru_input(
         substitute(group),
         label = paste0(label, ".group"),
@@ -405,7 +412,7 @@ bru_component.character <- function(object,
       n = NULL,
       model = group_model
     ),
-    replicate = bru_subcomponent(
+    replicate = bru_subcomp(
       input = bru_input(
         substitute(replicate),
         label = paste0(label, ".repl"),
@@ -593,7 +600,7 @@ bru_component.character <- function(object,
     component$fcall <- fcall
   }
 
-  class(component) <- "component"
+  class(component) <- "bru_comp"
   component
 }
 
@@ -602,7 +609,7 @@ bru_component.character <- function(object,
 #' Methods for inlabru component lists
 #'
 #' Constructor methods for inlabru component lists. Syntax details are given in
-#' [bru_component()].
+#' [bru_comp()].
 #'
 #' @param \dots Parameters passed on to other methods. Also see Details.
 #' @family component constructors
@@ -610,17 +617,18 @@ bru_component.character <- function(object,
 #' @param lhoods A [bru_obs_list] object
 #' @param .envir An evaluation environment for non-formula input
 #' @export
-#' @rdname bru_component_list
+#' @rdname bru_comp_list
+#' @aliases bru_component_list
 #' @aliases component_list
-bru_component_list <- function(object,
-                               lhoods = NULL,
-                               .envir = parent.frame(),
-                               ...) {
-  UseMethod("bru_component_list")
+bru_comp_list <- function(object,
+                          lhoods = NULL,
+                          .envir = parent.frame(),
+                          ...) {
+  UseMethod("bru_comp_list")
 }
 
-#' @describeIn bru_component_list Convert a component formula
-#' into a `component_list` object
+#' @describeIn bru_comp_list Convert a component formula
+#' into a `bru_comp_list` object
 #'
 #' @export
 #' @family component constructors
@@ -633,16 +641,16 @@ bru_component_list <- function(object,
 #' # called "x". Note that a list of components is returned because the
 #' # formula may define multiple components
 #'
-#' eff <- bru_component_list(~ myLinearEffectOfX(main = x, model = "linear"))
+#' eff <- bru_comp_list(~ myLinearEffectOfX(main = x, model = "linear"))
 #' summary(eff[[1]])
 #' # Equivalent shortcuts:
-#' eff <- bru_component_list(~ myLinearEffectOfX(x, model = "linear"))
-#' eff <- bru_component_list(~ myLinearEffectOfX(x))
+#' eff <- bru_comp_list(~ myLinearEffectOfX(x, model = "linear"))
+#' eff <- bru_comp_list(~ myLinearEffectOfX(x))
 #' # Individual component
-#' eff <- bru_component("myLinearEffectOfX", main = x, model = "linear")
-bru_component_list.formula <- function(object,
-                                       lhoods = NULL,
-                                       .envir = parent.frame(), ...) {
+#' eff <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
+bru_comp_list.formula <- function(object,
+                                  lhoods = NULL,
+                                  .envir = parent.frame(), ...) {
   if (!is.null(environment(object))) {
     .envir <- environment(object)
   }
@@ -650,7 +658,7 @@ bru_component_list.formula <- function(object,
   # or -Intercept is in components formula
   object <- auto_intercept(object)
 
-  code <- code.components(object)
+  code <- bru_formula_to_bru_obs_code(object)
   parsed <- lapply(code, function(x) parse(text = x))
   components <- lapply(
     parsed,
@@ -661,23 +669,23 @@ bru_component_list.formula <- function(object,
     }
   )
   environment(object) <- .envir
-  bru_component_list(components, lhoods = lhoods, .envir = .envir)
+  bru_comp_list(components, lhoods = lhoods, .envir = .envir)
 }
 
 
 
 
 
-#' @describeIn bru_component_list Combine a list of components and/or component
-#'   formulas into a `component_list` object
+#' @describeIn bru_comp_list Combine a list of components and/or component
+#'   formulas into a `bru_comp_list` object
 #' @param inputs A tree-like list of component input evaluations,
 #' from [input_eval.bru_obs_list()].
 #' @export
-bru_component_list.list <- function(object,
-                                    lhoods = NULL,
-                                    .envir = parent.frame(),
-                                    inputs = NULL,
-                                    ...) {
+bru_comp_list.list <- function(object,
+                               lhoods = NULL,
+                               .envir = parent.frame(),
+                               inputs = NULL,
+                               ...) {
   # Maybe the list has been given an environment?
   if (!is.null(environment(object))) {
     .envir <- environment(object)
@@ -693,7 +701,7 @@ bru_component_list.list <- function(object,
           object,
           function(x) {
             if (inherits(x, "formula")) {
-              bru_component_list(x, lhoods = lhoods, .envir = .envir)
+              bru_comp_list(x, lhoods = lhoods, .envir = .envir)
             } else {
               list(x)
             }
@@ -701,7 +709,7 @@ bru_component_list.list <- function(object,
         )
       )
   }
-  stopifnot(all(vapply(object, function(x) inherits(x, "component"), TRUE)))
+  stopifnot(all(vapply(object, function(x) inherits(x, "bru_comp"), TRUE)))
   names(object) <- lapply(object, function(x) x$label)
   if (anyDuplicated(names(object))) {
     stop(paste0(
@@ -714,7 +722,7 @@ bru_component_list.list <- function(object,
       )
     ))
   }
-  class(object) <- c("component_list", "list")
+  class(object) <- c("bru_comp_list", "list")
   environment(object) <- .envir
   if (!is.null(lhoods)) {
     lhoods <- bru_used_update(lhoods, names(object))
@@ -729,47 +737,47 @@ bru_component_list.list <- function(object,
 
 
 #' @export
-#' @describeIn bru_component_list The `...` arguments should be `component_list`
+#' @describeIn bru_comp_list The `...` arguments should be `bru_comp_list`
 #' objects. The environment from the first argument will be applied to the
-#' resulting `component_list`.
-`c.component_list` <- function(...) {
+#' resulting `bru_comp_list`.
+`c.bru_comp_list` <- function(...) {
   stopifnot(all(vapply(
     list(...),
-    function(x) inherits(x, "component_list"),
+    function(x) inherits(x, "bru_comp_list"),
     TRUE
   )))
   env <- environment(list(...)[[1]])
   object <- NextMethod()
-  class(object) <- c("component_list", "list")
+  class(object) <- c("bru_comp_list", "list")
   environment(object) <- env
   object
 }
 
 #' @export
-#' @describeIn bru_component_list The `...` arguments should be `component`
-#'   objects from [bru_component()]. The environment from the first argument
-#'   will be applied to the resulting ``component_list`.
-`c.component` <- function(...) {
+#' @describeIn bru_comp_list The `...` arguments should be `component`
+#'   objects from [bru_comp()]. The environment from the first argument
+#'   will be applied to the resulting `bru_comp_list`.
+`c.bru_comp` <- function(...) {
   stopifnot(all(vapply(
     list(...),
-    function(x) inherits(x, "component"),
+    function(x) inherits(x, "bru_comp"),
     TRUE
   )))
   env <- environment(list(...)[[1]])
   object <- list(...)
-  class(object) <- c("component_list", "list")
+  class(object) <- c("bru_comp_list", "list")
   environment(object) <- env
   object
 }
 
 #' @export
-#' @param x `component_list` object from which to extract a sub-list
+#' @param x `bru_comp_list` object from which to extract a sub-list
 #' @param i indices specifying elements to extract
-#' @rdname bru_component_list
-`[.component_list` <- function(x, i) {
+#' @rdname bru_comp_list
+`[.bru_comp_list` <- function(x, i) {
   env <- environment(x)
   object <- NextMethod()
-  class(object) <- c("component_list", "list")
+  class(object) <- c("bru_comp_list", "list")
   environment(object) <- env
   object
 }
@@ -794,7 +802,7 @@ bru_component_list.list <- function(object,
 #' @keywords internal
 #' @export
 
-add_mappers.component <- function(component, lhoods, inputs = NULL, ...) {
+add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
   # Filter out lhoods that don't use/support the component
   keep_lh <-
     vapply(lhoods,
@@ -910,10 +918,10 @@ add_mappers.component <- function(component, lhoods, inputs = NULL, ...) {
   component
 }
 
-#' @param components A `component_list` object
+#' @param components A `bru_comp_list` object
 #' @export
 #' @rdname add_mappers
-add_mappers.component_list <- function(components, lhoods, inputs = NULL, ...) {
+add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
   if (is.null(inputs)) {
     inputs <- input_eval(lhoods, components = components)
   }
@@ -956,14 +964,14 @@ bru_input <- function(input, label = NULL, layer = NULL, selector = NULL) {
   inp
 }
 
-bru_subcomponent <- function(input = NULL,
-                             mapper = NULL,
-                             model = NULL,
-                             n = NULL,
-                             values = NULL,
-                             season.length = NULL,
-                             nrow = NULL,
-                             ncol = NULL) {
+bru_subcomp <- function(input = NULL,
+                        mapper = NULL,
+                        model = NULL,
+                        n = NULL,
+                        values = NULL,
+                        season.length = NULL,
+                        nrow = NULL,
+                        ncol = NULL) {
   type <- model
   factor_mapping <- NULL
   if (inherits(model, "inla.spde")) {
@@ -1058,7 +1066,7 @@ bru_subcomponent <- function(input = NULL,
         season.length = season.length,
         factor_mapping = factor_mapping
       ),
-      class = "bru_subcomponent"
+      class = "bru_subcomp"
     )
 
   subcomponent
@@ -1569,14 +1577,14 @@ make_mapper <- function(subcomp,
 
 #' Convert components to R code
 #'
-#' @aliases code.components
+#' @aliases bru_formula_to_bru_obs_code
 #' @keywords internal
 #' @param components A [formula] describing latent model components.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
 
-code.components <- function(components, add = "") {
-  fname <- "inlabru:::bru_component.character"
+bru_formula_to_bru_obs_code <- function(components, add = "") {
+  fname <- "inlabru:::bru_comp.character"
   # If rhs is "~1", make sure there's at least one component to parse
   # and that offsets show up in "factors"
   tms <- terms(update.formula(components, . ~ . + BRU_DUMMY_COMPONENT + 1))
@@ -1662,8 +1670,6 @@ code.components <- function(components, add = "") {
 
 #' Summarise components
 #'
-#' @export
-#' @method summary component
 #' @keywords internal
 #' @param object Object to be summarised.
 #' @param ... Passed on to other summary methods.
@@ -1675,8 +1681,10 @@ code.components <- function(components, add = "") {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #'
+#' @export
+#' @method summary bru_comp
 
-summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
+summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
   result <- list(
     "Label" = object[["label"]],
     "Copy_of" = object[["copy"]],
@@ -1774,11 +1782,11 @@ summary.component <- function(object, ..., depth = Inf, verbose = TRUE) {
 }
 
 #' @export
-#' @method summary component_list
+#' @method summary bru_comp_list
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 
-summary.component_list <- function(object, verbose = TRUE, ...) {
+summary.bru_comp_list <- function(object, verbose = TRUE, ...) {
   result <- lapply(
     object,
     function(x) {
@@ -1788,39 +1796,39 @@ summary.component_list <- function(object, verbose = TRUE, ...) {
   for (cp in which(vapply(result, function(x) !is.null(x$Copy_of), FALSE))) {
     result[[cp]]$Type <- result[[result[[cp]][["Copy_of"]]]][["Type"]]
   }
-  class(result) <- c("summary_component_list", "list")
+  class(result) <- c("summary_bru_comp_list", "list")
   result
 }
 
 #' @export
-#' @method print component
+#' @method print bru_comp
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
-print.component <- function(x, ...) {
+#' @rdname summary.bru_comp
+print.bru_comp <- function(x, ...) {
   print(summary(x, ...))
   invisible(x)
 }
 
 #' @export
-#' @method print component_list
+#' @method print bru_comp_list
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
-print.component_list <- function(x, ...) {
+#' @rdname summary.bru_comp
+print.bru_comp_list <- function(x, ...) {
   print(summary(x, ...))
   invisible(x)
 }
 
 
 #' @export
-#' @method format bru_subcomponent
+#' @method format bru_subcomp
 #' @param label.override character; If not `NULL`, use this label instead of
 #' the object's label.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
-format.bru_subcomponent <- function(x,
-                                    verbose = TRUE,
-                                    ...,
-                                    label.override = NULL) {
+#' @rdname summary.bru_comp
+format.bru_subcomp <- function(x,
+                               verbose = TRUE,
+                               ...,
+                               label.override = NULL) {
   text <- format(x[["input"]],
     verbose = verbose,
     ...,
@@ -1831,13 +1839,13 @@ format.bru_subcomponent <- function(x,
 }
 
 #' @export
-#' @method summary bru_subcomponent
+#' @method summary bru_subcomp
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
-summary.bru_subcomponent <- function(object,
-                                     verbose = TRUE,
-                                     ...,
-                                     label.override = NULL) {
+#' @rdname summary.bru_comp
+summary.bru_subcomp <- function(object,
+                                verbose = TRUE,
+                                ...,
+                                label.override = NULL) {
   text <- format(
     object,
     verbose = verbose,
@@ -1848,19 +1856,19 @@ summary.bru_subcomponent <- function(object,
     list(
       text = text
     ),
-    class = "summary_bru_subcomponent"
+    class = "summary_bru_subcomp"
   )
   res
 }
 
 #' @export
-#' @method print bru_subcomponent
+#' @method print bru_subcomp
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
-print.bru_subcomponent <- function(x,
-                                   verbose = TRUE,
-                                   ...,
-                                   label.override = NULL) {
+#' @rdname summary.bru_comp
+print.bru_subcomp <- function(x,
+                              verbose = TRUE,
+                              ...,
+                              label.override = NULL) {
   text <- format(x, verbose = verbose, ..., label.override = label.override)
   cat(text, "\n", sep = "")
   invisible(x)
@@ -1871,7 +1879,7 @@ print.bru_subcomponent <- function(x,
 #' @param type character; if non-NULL, added to the output'; `label =
 #'   type(input)`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
                              type = NULL) {
   inp <- x[["input"]]
@@ -1903,7 +1911,7 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
 #' @export
 #' @method summary bru_input
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 summary.bru_input <- function(object,
                               verbose = TRUE,
                               ...,
@@ -1924,7 +1932,7 @@ summary.bru_input <- function(object,
 #' @export
 #' @method print bru_input
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
   cat(
     format(x,
@@ -1943,7 +1951,7 @@ print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
 #' @export
 #' @param x Object to be printed.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 
 print.summary_component <- function(x, ...) {
   if (is.null(x[["Summary"]])) {
@@ -1967,17 +1975,17 @@ print.summary_component <- function(x, ...) {
 #' @export
 #' @param x A summary object to be printed.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 
-print.summary_component_list <- function(x, ...) {
+print.summary_bru_comp_list <- function(x, ...) {
   lapply(x, print)
   invisible(x)
 }
 
 #' @export
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 
-print.summary_bru_subcomponent <- function(x, ...) {
+print.summary_bru_subcomp <- function(x, ...) {
   if (!is.null(x[["text"]])) {
     cat(x[["text"]], "\n", sep = "")
   }
@@ -1985,7 +1993,7 @@ print.summary_bru_subcomponent <- function(x, ...) {
 }
 
 #' @export
-#' @rdname summary.component
+#' @rdname summary.bru_comp
 
 print.summary_bru_input <- function(x, ...) {
   if (!is.null(x[["text"]])) {
@@ -2008,10 +2016,10 @@ print.summary_bru_input <- function(x, ...) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname comp_lin_eval
 
-comp_lin_eval.component <- function(component,
-                                    input = NULL,
-                                    state = NULL,
-                                    ...) {
+comp_lin_eval.bru_comp <- function(component,
+                                   input = NULL,
+                                   state = NULL,
+                                   ...) {
   bru_log_message(
     paste0("Linearise component '", component[["label"]], "'"),
     verbosity = 5
@@ -2025,7 +2033,7 @@ comp_lin_eval.component <- function(component,
 #' @export
 #' @rdname comp_lin_eval
 
-comp_lin_eval.component_list <- function(components, input, state, ...) {
+comp_lin_eval.bru_comp_list <- function(components, input, state, ...) {
   bru_log_message(
     paste0("Linearise components"),
     verbosity = 5
@@ -2104,7 +2112,7 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' components = y ~ psi(mySpatialPixels, model = "linear")
 #' ```
 #' For more precise control, use the the `layer` and `selector` arguments (see
-#' [bru_component()]), or call `eval_spatial()` directly, e.g.:
+#' [bru_comp()]), or call [eval_spatial()] directly, e.g.:
 #' ```
 #' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.),
 #'                      model = "linear")
@@ -2147,11 +2155,11 @@ comp_lin_eval.component_list <- function(components, input, state, ...) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
-input_eval.component <- function(component,
-                                 data,
-                                 ...) {
+input_eval.bru_comp <- function(component,
+                                data,
+                                ...) {
   bru_log_message(
-    paste0("input_eval.component(", component$label, ")"),
+    paste0("input_eval.bru_comp(", component$label, ")"),
     verbosity = 4
   )
 
@@ -2191,15 +2199,15 @@ input_eval.component <- function(component,
   list(mapper = mapper_val, scale = scale_val)
 }
 
-#' @param components A [component_list].
+#' @param components A [bru_comp_list].
 #' @export
 #' @rdname input_eval
 
-input_eval.component_list <-
+input_eval.bru_comp_list <-
   function(components,
            data,
            ...) {
-    bru_log_message("input_eval.component_list", verbosity = 4)
+    bru_log_message("input_eval.bru_comp_list", verbosity = 4)
     lapply(components, function(x) input_eval(x, data = data, ...))
   }
 
@@ -2269,7 +2277,7 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 #' 4. Else we obtain a vector and return as-is. This happens when input
 #'    references a column of the data points, or some other complete expression
 #'
-#' @seealso [bru_component()]
+#' @seealso [bru_comp()]
 #' @export
 input_eval.bru_input <- function(input, data, env = NULL,
                                  null.on.fail = FALSE, ...) {
@@ -2521,7 +2529,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
 #'   Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname index_eval
 
-index_eval.component <- function(component, inla_f, ...) {
+index_eval.bru_comp <- function(component, inla_f, ...) {
   idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = TRUE)
   names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
   idx
@@ -2531,7 +2539,7 @@ index_eval.component <- function(component, inla_f, ...) {
 #' @export
 #' @rdname index_eval
 
-index_eval.component_list <- function(components, inla_f, ...) {
+index_eval.bru_comp_list <- function(components, inla_f, ...) {
   lapply(components, function(x) index_eval(x, inla_f = inla_f, ...))
 }
 
@@ -2542,6 +2550,6 @@ index_eval.component_list <- function(components, inla_f, ...) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname inla_subset_eval
 
-inla_subset_eval.component_list <- function(components, ...) {
+inla_subset_eval.bru_comp_list <- function(components, ...) {
   lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = TRUE))
 }

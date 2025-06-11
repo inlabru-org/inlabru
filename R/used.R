@@ -156,7 +156,7 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #'   functions with suffix `_eval` available, taking parameters `main`, `group`,
 #'   and `replicate`, taking values for where to evaluate the component effect
 #'   that are different than those defined in the component definition itself
-#'   (see [bru_component_eval()]). If `NULL`, the use of `_latent` and `_eval`
+#'   (see [bru_comp_eval()]). If `NULL`, the use of `_latent` and `_eval`
 #'   in the predictor expression is detected automatically.
 #'   }
 #' }

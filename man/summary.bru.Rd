@@ -17,7 +17,7 @@ component definitions. If \code{FALSE}, only show basic component
 definition information. Default: \code{FALSE}}
 
 \item{\dots}{arguments passed on to component summary functions, see
-\code{\link[=summary.component]{summary.component()}}.}
+\code{\link[=summary.bru_comp]{summary.bru_comp()}}.}
 
 \item{x}{An object to be printed}
 }

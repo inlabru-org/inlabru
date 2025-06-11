@@ -177,7 +177,7 @@ test_that("Marginal parameter transformation", {
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- bru_component_list(~
+  cmp <- bru_comp_list(~
     sigma(
       1,
       prec.linear = 1,

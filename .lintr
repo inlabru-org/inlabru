@@ -126,7 +126,6 @@ exclusions: list(
     "man/stransform.Rd",
     "man/summary.bru_options.Rd",
     "man/summary.bru.Rd",
-    "man/summary.component.Rd",
     "man/toygroups.Rd",
     "man/tsplit.inla.mesh.Rd",
     "man/vertices.inla.mesh.Rd",

@@ -108,7 +108,7 @@ reference:
   - matches("^bru_obs$")
   - matches("^bru_rerun$")
   - matches("^bru_options$")
-  - starts_with("bru_component")
+  - starts_with("bru_comp")
   - starts_with("lgcp")
   - starts_with("bru_response_size")
   - starts_with("bru_index")

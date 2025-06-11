@@ -22,7 +22,7 @@ test_that("Linearisation", {
         family = "poisson"
       )
     )
-  lhoods <- bru_used_update(lhoods, names(bru_component_list(cmp)))
+  lhoods <- bru_used_update(lhoods, names(bru_comp_list(cmp)))
 
   used <- bru_used(lhoods[[1]])
   expect_equal(used[["effect"]], "x")
@@ -36,7 +36,7 @@ test_that("Linearisation", {
   expect_equal(used[["effect"]], "x")
   expect_equal(used[["latent"]], c("Int_y", "Int_z"))
 
-  model <- bru_model(bru_component_list(cmp), lhoods)
+  model <- bru_model(bru_comp_list(cmp), lhoods)
   lhoods <- model$lhoods
 
   idx <- evaluate_index(model, used = bru_used(lhoods))

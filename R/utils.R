@@ -577,7 +577,7 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' @param values A vector of values to be filled in where `is.na(values)` is
 #' `TRUE`
 #' @param layer,selector Specifies what data column or columns from which to
-#' extract data, see [bru_component()] for details.
+#' extract data, see [bru_comp()] for details.
 #' @param batch_size `r lifecycle::badge("deprecated")` due to improved
 #'   algorithm.
 #' Size of nearest-neighbour calculation blocks, to limit the

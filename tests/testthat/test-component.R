@@ -6,8 +6,8 @@ test_that("Component construction: linear model", {
   llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = df)))
 
   # Using label as input:
-  cmp0 <- bru_component_list(
-    list(bru_component("x", x)),
+  cmp0 <- bru_comp_list(
+    list(bru_comp("x", x)),
     lhoods = llik
   )[["x"]]
 
@@ -16,7 +16,7 @@ test_that("Component construction: linear model", {
   expect_equal(as.character(cmp0$main$input$input), "x")
 
   # Using label as input:
-  cmp0 <- bru_component_list(
+  cmp0 <- bru_comp_list(
     ~x,
     lhoods = llik
   )[["x"]]
@@ -25,7 +25,7 @@ test_that("Component construction: linear model", {
   expect_equal(cmp0$main$model, "linear")
   expect_equal(as.character(cmp0$main$input$input), "x")
 
-  cmp <- bru_component_list(
+  cmp <- bru_comp_list(
     ~ beta(main = x, model = "linear", values = 1),
     lhoods = llik
   )[["beta"]]
@@ -71,7 +71,7 @@ test_that("Component construction: linear model", {
   v <- evaluate_effect_single_state(comp_lin, state = 2, A = A)
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
-  cmps <- bru_component_list(list(cmp))
+  cmps <- bru_comp_list(list(cmp))
   inps <- input_eval(cmps, data = df)
   v <- evaluate_effect_multi_state(
     cmps,
@@ -92,7 +92,7 @@ test_that("Component construction: linear model", {
 
 test_that("Component construction: duplicate detection", {
   expect_error(
-    bru_component_list(
+    bru_comp_list(
       ~ -1 +
         beta(main = x, model = "linear", values = 1) +
         beta(main = x, model = "linear", values = 2)
@@ -104,7 +104,7 @@ test_that("Component construction: duplicate detection", {
 
 
 test_that("Component construction: offset", {
-  cmp <- bru_component_list(~ -1 + something(a, model = "offset"))
+  cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
   inp <- input_eval(cmp, data = data.frame(a = 11:15))
   val <- evaluate_effect_single_state(cmp,
     input = inp,
@@ -141,7 +141,7 @@ test_that("Component construction: terra", {
   llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = data)))
 
   local_bru_safe_inla()
-  cmp <- bru_component_list(
+  cmp <- bru_comp_list(
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
   )
@@ -160,7 +160,7 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- bru_component_list(~ -1 + something(r, model = "linear"),
+  cmp <- bru_comp_list(~ -1 + something(r, model = "linear"),
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
@@ -178,7 +178,7 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- bru_component_list(
+  cmp <- bru_comp_list(
     ~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = llik
   )
@@ -197,7 +197,7 @@ test_that("Component construction: terra", {
     2 * 406
   )
 
-  cmp <- bru_component_list(
+  cmp <- bru_comp_list(
     ~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = llik
   )
@@ -217,14 +217,14 @@ test_that("Component construction: terra", {
   )
 
   expect_error(
-    bru_component_list(~ something(r, model = "linear", main_layer = 2),
+    bru_comp_list(~ something(r, model = "linear", main_layer = 2),
       lhoods = llik
     ),
     NULL
   )
 
   expect_error(
-    bru_component_list(~ something(r, model = "linear", main_layer = "elev"),
+    bru_comp_list(~ something(r, model = "linear", main_layer = "elev"),
       lhoods = llik
     ),
     NULL
@@ -245,7 +245,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     used = bru_used(effect = "effect")
   )
 
-  cmp1 <- bru_component_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
+  cmp1 <- bru_comp_list(~ effect(c(1, 1.5, 2, NA, 4), model = "iid") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
@@ -259,7 +259,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     c(11, 0, 14)
   )
 
-  cmp1 <- bru_component_list(~ effect(x, model = "rw2") - 1)
+  cmp1 <- bru_comp_list(~ effect(x, model = "rw2") - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
     ibm_values(cmp2$effect$mapper, multi = 1)$main,
@@ -270,13 +270,13 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
-    bru_component_list(
+    bru_comp_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1
     ),
     regexp = "Unknown mapper"
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = FALSE)
@@ -288,7 +288,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ effect(x,
       model = "rw2",
       mapper = bru_mapper(mesh1, indexed = TRUE)
@@ -313,7 +313,7 @@ test_that("Component construction: main iid factor construction", {
     used = bru_used(effect = "effect")
   )
 
-  cmp1 <- bru_component_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
+  cmp1 <- bru_comp_list(~ effect(as.factor(c(1, 1.5, 2, 3, 4)),
     model = "iid"
   ) - 1)
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
@@ -341,7 +341,7 @@ test_that("Component construction: group iid factor construction", {
     used = bru_used(effect = "effect")
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ -1 +
       effect(rep(1, 5),
         group = x,
@@ -377,7 +377,7 @@ test_that("Component construction: replicate iid factor construction", {
     used = bru_used(effect = "effect")
   )
 
-  cmp1 <- bru_component_list(
+  cmp1 <- bru_comp_list(
     ~ -1 +
       effect(rep(1, 5),
         replicate = x,
@@ -407,7 +407,7 @@ test_that("Component construction: replicate iid factor construction", {
 test_that("Component construction: unsafe intercepts", {
   local_bru_safe_inla()
 
-  cmp <- bru_component_list(~ something_unknown - 1)
+  cmp <- bru_comp_list(~ something_unknown - 1)
   lik <- bru_obs(formula = response ~ ., data = data.frame(response = 1:5))
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_error(
@@ -442,7 +442,7 @@ test_that("Component inputs: non-numeric input detection", {
 
   # No model specified (argument unnamed), geometry invalid for
   # bru_mapper_linear:
-  cmp <- bru_component_list(~ Intercept(1) + field(geometry, matern))
+  cmp <- bru_comp_list(~ Intercept(1) + field(geometry, matern))
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
@@ -452,7 +452,7 @@ test_that("Component inputs: non-numeric input detection", {
     "The input to a bru_mapper_linear evaluation must be numeric or logical."
   )
 
-  cmp <- bru_component_list(
+  cmp <- bru_comp_list(
     ~ Intercept(1) + field(geometry, matern, model = matern)
   )
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")

@@ -13,7 +13,7 @@ bru_model(components, lhoods, options = list(), .envir = parent.frame())
 \method{print}{summary_bru_model}(x, ...)
 }
 \arguments{
-\item{components}{A \link{component_list} object}
+\item{components}{A \link{bru_comp_list} object}
 
 \item{lhoods}{Either a \code{\link[=bru_obs]{bru_obs()}} object, a \code{\link[=bru_obs_list]{bru_obs_list()}} object, or
 a list of one or more \code{\link[=bru_obs]{bru_obs()}} or \code{\link[=bru_obs_list]{bru_obs_list()}} objects,

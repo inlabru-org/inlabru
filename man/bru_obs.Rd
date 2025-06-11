@@ -201,7 +201,7 @@ predictor expression, with a \verb{_latent} suffix. This also makes evaluator
 functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
 and \code{replicate}, taking values for where to evaluate the component effect
 that are different than those defined in the component definition itself
-(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
+(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
 auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
 }
 }}
@@ -330,8 +330,8 @@ if (bru_safe_inla() &&
 }
 }
 \seealso{
-\code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_component]{bru_component()}},
-\code{\link[=bru_component_eval]{bru_component_eval()}}
+\code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_comp]{bru_comp()}},
+\code{\link[=bru_comp_eval]{bru_comp_eval()}}
 
 \code{\link[=summary.bru_obs]{summary.bru_obs()}}
 }

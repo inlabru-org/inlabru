@@ -290,6 +290,16 @@ bru_info_upgrade <- function(object,
         class(object[["lhoods"]]) <- c("bru_obs_list", "list")
       }
 
+      eff <- object[["model"]][["effects"]]
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        class(eff[[k]][["main"]]) <- "bru_subcomp"
+        class(eff[[k]][["group"]]) <- "bru_subcomp"
+        class(eff[[k]][["replicate"]]) <- "bru_subcomp"
+        class(eff[[k]]) <- "bru_comp"
+      }
+      class(eff) <- c("bru_comp_list", "list")
+      eff <- object[["model"]][["effects"]] <- eff
+
       object[["inlabru_version"]] <- "2.12.0.9017"
     }
 
@@ -533,7 +543,7 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #'
 #' @param components A `formula`-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
-#'   [bru_component()] for details.
+#'   [bru_comp()] for details.
 #' @param ... Obervation models, each constructed by a calling [bru_obs()], or
 #'   named parameters that can be passed to a single [bru_obs()] call. Note that
 #'   all the arguments will be evaluated before calling [bru_obs()] in order to
@@ -1186,14 +1196,14 @@ bru_is_additive.formula <- function(x, ...) {
 #'   functions with suffix `_eval` available, taking parameters `main`, `group`,
 #'   and `replicate`, taking values for where to evaluate the component effect
 #'   that are different than those defined in the component definition itself
-#'   (see [bru_component_eval()]). If `NULL`, the [bru_used()] method
+#'   (see [bru_comp_eval()]). If `NULL`, the [bru_used()] method
 #'   auto-detects use of `_latent` and `_eval` in the predictor expression.
 #'   }
 #' }
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
-#' @seealso [bru_response_size()], [bru_used()], [bru_component()],
-#' [bru_component_eval()]
+#' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
+#' [bru_comp_eval()]
 #'
 #' @example inst/examples/bru_obs.R
 bru_obs <- function(formula = . ~ .,
@@ -2591,7 +2601,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [bru_component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
@@ -2788,7 +2798,7 @@ predict.bru <- function(object,
 #' `_eval` can be used to evaluate a component at other input values than the
 #' expressions defined in the component definition itself, e.g.
 #' `field_eval(cbind(x, y))` for a component that was defined with
-#' `field(coordinates, ...)` (see also [bru_component_eval()]).
+#' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
 #' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
@@ -4597,10 +4607,10 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
 auto_intercept <- function(components) {
   if (!inherits(components, "formula")) {
-    if (inherits(components, "component_list")) {
+    if (inherits(components, "bru_comp_list")) {
       return(components)
     }
-    stop("components must be a formula to auto-add an intercept component")
+    stop("`components` must be a formula to auto-add an intercept component")
   }
   env <- environment(components)
 
@@ -4651,7 +4661,7 @@ auto_additive_formula <- function(formula, components) {
   if (as.character(formula)[length(as.character(formula))] != ".") {
     return(formula)
   }
-  stopifnot(inherits(components, "component_list"))
+  stopifnot(inherits(components, "bru_comp_list"))
 
   env <- environment(formula)
   formula <- update.formula(
@@ -4737,7 +4747,7 @@ list.data <- function(formula) {
 #' component definitions. If `FALSE`, only show basic component
 #' definition information. Default: `FALSE`
 #' @param \dots arguments passed on to component summary functions, see
-#' [summary.component()].
+#' [summary.bru_comp()].
 #' @example inst/examples/bru.R
 #'
 

@@ -14,7 +14,7 @@
 #' `method` vignette.
 #'
 #' The main function for inference using inlabru is [bru()].
-#' The general model specification details is documented in [bru_component()]
+#' The general model specification details is documented in [bru_comp()]
 #' and [bru_obs()].
 #' Posterior quantities beyond the basic summaries can be calculated with
 #' a `predict()` method, documented in [predict.bru()].
