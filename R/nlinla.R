@@ -18,10 +18,10 @@ bru_compute_linearisation <- function(...) {
 #' @param input Precomputed component inputs from `evaluate_inputs()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
-#' * For `bru_comp`: [bru_mapper_taylor] object
-#' * For `bru_obs`: A `comp_simple_list` object
+#' * For `bru_comp`: A [bru_mapper_taylor] object
+#' * For `bru_obs`: A [bm_list] object
 #'   for the components in the likelihood
-#' * For `bru_obs_list`: A `comp_simple_list_list` object
+#' * For `bru_obs_list`: A list of [bm_list] objects
 #' @param effects
 #' * For `bru_comp`:
 #' Precomputed effect list for all components involved in the likelihood

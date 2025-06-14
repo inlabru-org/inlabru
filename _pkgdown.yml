@@ -134,6 +134,8 @@ reference:
   - starts_with("bru_mapper")
   - starts_with("ibm_")
   - starts_with("bm_")
+  - starts_with("as_bru_mapper")
+  - starts_with("as_bm_list")
   - starts_with("bru_forward_transformation")
 - title: "Miscellaneous"
   desc: "Miscellaneous functions."

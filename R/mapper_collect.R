@@ -27,7 +27,7 @@
 #' ibm_eval2(m, list(a = c(1, 2), b = c(1, 3, 2)), 1:5)
 bru_mapper_collect <- function(mappers, hidden = FALSE) {
   mapper <- list(
-    mappers = mappers,
+    mappers = as_bm_list(mappers),
     n_multi = lapply(mappers, ibm_n),
     values_multi = lapply(mappers, ibm_values),
     hidden = hidden,

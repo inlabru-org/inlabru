@@ -2065,6 +2065,84 @@ bru_obs_list.list <- function(object, ..., .envir = NULL) {
   bru_obs_list(object, .envir = .envir)
 }
 
+set_list_names <- function(x, tag, priority = "immutable") {
+  priority <- match.arg(priority, c("immutable", "tag", "name"))
+  list_names <- names(x)
+  if (is.null(list_names)) {
+    list_names <- rep(NA_character_, length(x))
+  } else {
+    list_names <- vapply(
+      list_names,
+      function(xx) {
+        if (identical(xx, "")) {
+          NA_character_
+        } else {
+          xx
+        }
+      },
+      ""
+    )
+  }
+  tag_names <- vapply(
+    x,
+    function(xx) {
+      if (is.null(xx[[tag]]) ||
+          identical(xx[[tag]], "")) {
+        NA_character_
+      } else {
+        xx[[tag]]
+      }
+    },
+    ""
+  )
+  new_names <- vapply(
+    seq_along(x),
+    function(k) {
+      if (priority == "immutable") {
+        if (is.na(list_names[k])) {
+          return(tag_names[k])
+        }
+        if (is.na(tag_names[k])) {
+          return(list_names[k])
+        }
+        if (identical(list_names[k], tag_names[k])) {
+          return(list_names[k])
+        }
+        stop(paste0(
+          "Cannot combine objects with mismatching tags and names:\n",
+          "  Tag: ", tag_names[k], "\n",
+          "  Name: ", list_names[k], "\n",
+          "  Use `NA` for either the tag or name, or use matching tags and names."
+        ))
+      } else if (priority == "tag") {
+        if (!is.na(tag_names[k])) {
+          return(tag_names[k])
+        }
+        if (!is.na(list_names[k])) {
+          return(list_names[k])
+        }
+        return(NA_character_)
+      } else if (priority == "name") {
+        if (!is.na(list_names[k])) {
+          return(list_names[k])
+        }
+        if (!is.na(tag_names[k])) {
+          return(tag_names[k])
+        }
+        return(NA_character_)
+      }
+    },
+    ""
+  )
+  names(x) <- new_names
+  # Set tags on missing tags
+  for (k in which(is.na(tag_names))) {
+    x[[k]][[tag]] <- new_names[k]
+  }
+
+  x
+}
+
 #' @describeIn bru_obs
 #' Combine a list of `bru_obs` observation model objects
 #' into a `bru_obs_list` object
@@ -2088,60 +2166,7 @@ bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
   }
 
   environment(object) <- .envir
-  orig_names <- names(object)
-  if (is.null(orig_names)) {
-    orig_names <- rep(NA_character_, length(object))
-  } else {
-    orig_names <- vapply(
-      orig_names,
-      function(x) {
-        if (identical(x, "")) {
-          NA_character_
-        } else {
-          x
-        }
-      },
-      ""
-    )
-  }
-  tag_names <- vapply(
-    object,
-    function(x) {
-      if (is.null(x[["tag"]]) ||
-        identical(x[["tag"]], "")) {
-        NA_character_
-      } else {
-        x[["tag"]]
-      }
-    },
-    ""
-  )
-  new_names <- vapply(
-    seq_along(object),
-    function(k) {
-      if (is.na(tag_names[k])) {
-        return(orig_names[k])
-      }
-      if (is.na(orig_names[k])) {
-        return(tag_names[k])
-      }
-      if (identical(tag_names[k], orig_names[k])) {
-        return(orig_names[k])
-      }
-      stop(paste0(
-        "Cannot combine 'bru_obs' objects with mismatching tags and names:\n",
-        "  Tag: ", tag_names[k], "\n",
-        "  Name: ", orig_names[k], "\n",
-        "  Use `NA` for either the tag or name, or use matching tags and names."
-      ))
-    },
-    ""
-  )
-  names(object) <- new_names
-  # Set tags on missing tags
-  for (k in which(is.na(tag_names))) {
-    object[[k]][["tag"]] <- new_names[k]
-  }
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
   object
 }
 
@@ -4140,7 +4165,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate component linearisations",
     verbosity = 3
   )
-  comp_lin <- evaluate_comp_lin(model,
+  comp_lin <- ibm_linear(
+    model,
     input = inputs,
     state = states[[length(states)]],
     inla_f = TRUE
@@ -4149,7 +4175,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate component simplifications",
     verbosity = 3
   )
-  comp_simple <- evaluate_comp_simple(model,
+  comp_simple <- ibm_simplify(
+    model,
     input = inputs,
     inla_f = TRUE
   )
@@ -4505,7 +4532,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           "iinla: Evaluate component linearisations",
           verbosity = 3
         )
-        comp_lin <- evaluate_comp_lin(model,
+        comp_lin <- ibm_linear(
+          model,
           input = inputs,
           state = state,
           inla_f = TRUE

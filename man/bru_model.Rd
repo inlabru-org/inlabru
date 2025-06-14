@@ -4,6 +4,7 @@
 \alias{bru_model}
 \alias{summary.bru_model}
 \alias{print.summary_bru_model}
+\alias{print.bru_model}
 \title{Create an inlabru model object from model components}
 \usage{
 bru_model(components, lhoods, options = list(), .envir = parent.frame())
@@ -11,6 +12,8 @@ bru_model(components, lhoods, options = list(), .envir = parent.frame())
 \method{summary}{bru_model}(object, ...)
 
 \method{print}{summary_bru_model}(x, ...)
+
+\method{print}{bru_model}(x, ...)
 }
 \arguments{
 \item{components}{A \link{bru_comp_list} object}
@@ -28,7 +31,7 @@ on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{\dots}{Arguments passed on to other methods}
 
-\item{x}{A \code{summary_bru_model} object to be printed}
+\item{x}{An object to be printed}
 }
 \value{
 A \link{bru_model} object

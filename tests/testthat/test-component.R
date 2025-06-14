@@ -57,7 +57,7 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  comp_lin <- comp_lin_eval(cmp, input = inp, inla_f = FALSE)
+  comp_lin <- ibm_linear(cmp, input = inp, inla_f = FALSE)
   A <- ibm_jacobian(comp_lin)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
@@ -73,19 +73,12 @@ test_that("Component construction: linear model", {
 
   cmps <- bru_comp_list(list(cmp))
   inps <- input_eval(cmps, data = df)
-  v <- evaluate_effect_multi_state(
+  v <- evaluate_effect_single_state(
     cmps,
     input = inps,
-    state = list(list(beta = 2))
+    state = list(beta = 2)
   )
-  expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
-
-  v <- evaluate_effect_multi_state(
-    cmps,
-    input = inps,
-    state = list(list(beta = 2))
-  )
-  expect_equal(v[[1]][["beta"]], 2 * df$x, ignore_attr = TRUE)
+  expect_equal(v[["beta"]], 2 * df$x, ignore_attr = TRUE)
 })
 
 
@@ -146,7 +139,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp,
+  comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -164,7 +157,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp,
+  comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -183,7 +176,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp,
+  comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -202,7 +195,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- input_eval(cmp, data = data)
-  comp_lin <- comp_lin_eval(cmp,
+  comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE

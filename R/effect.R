@@ -1,13 +1,5 @@
 # GENERICS ----
 
-#' Construct component linearisations
-#'
-#' Constructs the linearisation mapper for each component
-#' @export
-#' @rdname comp_lin_eval
-comp_lin_eval <- function(...) {
-  UseMethod("comp_lin_eval")
-}
 #' Obtain component inputs
 #'
 #' @export
@@ -710,7 +702,10 @@ bru_comp_list.list <- function(object,
       )
   }
   stopifnot(all(vapply(object, function(x) inherits(x, "bru_comp"), TRUE)))
-  names(object) <- lapply(object, function(x) x$label)
+  class(object) <- c("bru_comp_list", "list")
+  environment(object) <- .envir
+
+  object <- set_list_names(object, tag = "label", priority = "name")
   if (anyDuplicated(names(object))) {
     stop(paste0(
       "Duplicated component labels detected: ",
@@ -722,8 +717,7 @@ bru_comp_list.list <- function(object,
       )
     ))
   }
-  class(object) <- c("bru_comp_list", "list")
-  environment(object) <- .envir
+
   if (!is.null(lhoods)) {
     lhoods <- bru_used_update(lhoods, names(object))
     object <- add_mappers(object, lhoods = lhoods, inputs = inputs)
@@ -750,6 +744,7 @@ bru_comp_list.list <- function(object,
   object <- NextMethod()
   class(object) <- c("bru_comp_list", "list")
   environment(object) <- env
+  object <- set_list_names(object, tag = "label", priority = "name")
   object
 }
 
@@ -767,6 +762,7 @@ bru_comp_list.list <- function(object,
   object <- list(...)
   class(object) <- c("bru_comp_list", "list")
   environment(object) <- env
+  object <- set_list_names(object, tag = "label", priority = "name")
   object
 }
 
@@ -2004,59 +2000,7 @@ print.summary_bru_input <- function(x, ...) {
 
 
 
-
-#' @export
-#' @keywords internal
-#' @param component A [component].
-#' @param input Component inputs, from `input_eval()`
-#' @param state linearisation evaluation state
-#' @param ... Optional parameters passed on to `ibm_eval`
-#' and `ibm_jacobian.
-#' @return A `bru_mapper_taylor` or `comp_simple_list` object.
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname comp_lin_eval
-
-comp_lin_eval.bru_comp <- function(component,
-                                   input = NULL,
-                                   state = NULL,
-                                   ...) {
-  bru_log_message(
-    paste0("Linearise component '", component[["label"]], "'"),
-    verbosity = 5
-  )
-  if (is.null(state)) {
-    state <- rep(0, ibm_n(component[["mapper"]]))
-  }
-  ibm_linear(component[["mapper"]], input = input, state = state, ...)
-}
-
-#' @export
-#' @rdname comp_lin_eval
-
-comp_lin_eval.bru_comp_list <- function(components, input, state, ...) {
-  bru_log_message(
-    paste0("Linearise components"),
-    verbosity = 5
-  )
-  # Note: Make sure the list element names carry over!
-  mappers <-
-    lapply(
-      components,
-      function(x) {
-        label <- x[["label"]]
-        comp_lin_eval(x,
-          input = input[[label]],
-          state = state[[label]],
-          ...
-        )
-      }
-    )
-
-  class(mappers) <- c("comp_simple_list", class(mappers))
-  mappers
-}
-
-#' @section Simple covariates and the map parameter:
+#' @section Simple covariates and the input parameters:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate.
 #' In other frameworks this would mean that the transformed covariate would have
@@ -2073,8 +2017,8 @@ comp_lin_eval.bru_comp_list <- function(components, input, state, ...) {
 #' (`map` in version 2.1.13 and earlier), which does not need to be named.
 #'
 #' \itemize{
-#' \item{`components = y ~ psi(main = x^2, model = "linear")`}
 #' \item{`components = y ~ psi(x^2, model = "linear")`}
+#' \item{`components = y ~ psi(main = x^2, model = "linear")`}
 #' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
 #' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
 #'
@@ -2199,10 +2143,15 @@ input_eval.bru_comp <- function(component,
   list(mapper = mapper_val, scale = scale_val)
 }
 
+#' @export
+#' @rdname input_eval
+input_eval.bru_model <- function(model, lhoods, ...) {
+  input_eval(lhoods, components = model[["effects"]])
+}
+
 #' @param components A [bru_comp_list].
 #' @export
 #' @rdname input_eval
-
 input_eval.bru_comp_list <-
   function(components,
            data,

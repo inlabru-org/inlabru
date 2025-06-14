@@ -163,10 +163,17 @@ summary.bru_model <- function(object, ...) {
 }
 
 #' @export
-#' @param x A `summary_bru_model` object to be printed
+#' @param x An object to be printed
 #' @rdname bru_model
 print.summary_bru_model <- function(x, ...) {
   print(x[["components"]])
+  invisible(x)
+}
+
+#' @export
+#' @rdname bru_model
+print.bru_model <- function(x, ...) {
+  print(summary(x))
   invisible(x)
 }
 
@@ -182,7 +189,8 @@ print.summary_bru_model <- function(x, ...) {
 #' and covariates needed to evaluate the predictor.
 #' @param data_extra Additional data for the predictor evaluation
 #' @param input Precomputed inputs list for the components
-#' @param comp_simple Precomputed `comp_simple_list` for the components
+#' @param comp_simple Precomputed [bm_list] of simplified mappers for the
+#' components
 #' @param predictor A formula or an expression to be evaluated given the
 #' posterior or for each sample thereof. The default (`NULL`) returns a
 #' `data.frame` containing the sampled effects. In case of a formula the right
@@ -232,7 +240,8 @@ evaluate_model <- function(model,
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
-    comp_simple <- evaluate_comp_simple(model$effects[used$effect],
+    comp_simple <- ibm_simplify(
+      model$effects[used$effect],
       input = input,
       inla_f = TRUE
     )
@@ -240,11 +249,17 @@ evaluate_model <- function(model,
   if (is.null(comp_simple)) {
     effects <- NULL
   } else {
-    effects <- evaluate_effect_multi_state(
-      comp_simple,
-      state = state,
-      input = input
-    )
+    effects <-
+      lapply(
+        state,
+        function(x) {
+          evaluate_effect_single_state(
+            comp_simple,
+            state = x,
+            input = input
+          )
+        }
+      )
   }
 
   if (is.null(predictor)) {
@@ -321,11 +336,6 @@ evaluate_state <- function(model,
 evaluate_effect_single_state <- function(...) {
   UseMethod("evaluate_effect_single_state")
 }
-#' @export
-#' @rdname evaluate_effect
-evaluate_effect_multi_state <- function(...) {
-  UseMethod("evaluate_effect_multi_state")
-}
 
 #' Evaluate a component effect
 #'
@@ -334,15 +344,13 @@ evaluate_effect_multi_state <- function(...) {
 #'
 #' @export
 #' @keywords internal
-#' @param component A [bru_mapper], [bru_comp], `comp_simple`, or
-#'   `comp_simple_list`.
+#' @param component A [bru_mapper], [bru_comp], or
+#'   [bm_list].
 #' @param input Pre-evaluated component input
-#' @param state Specification of one (for `evaluate_effect_single_state`) or
-#'   several (for `evaluate_effect_multi_State`) latent variable states:
+#' @param state Specification of one latent variable state:
 #' * `evaluate_effect_single_state.bru_mapper`:
 #'   A vector of the latent component state.
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
-#' * `evaluate_effect_multi_state.*_list`: list of lists of named state vectors.
 #' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
 #' @param label Option label used for any warning messages, specifying the
 #' affected component.
@@ -376,15 +384,15 @@ evaluate_effect_single_state.bru_mapper <- function(component, input, state,
   as.vector(as.matrix(values))
 }
 
-#' @return * `evaluate_effect_single_state.comp_simple_list`: A list of
+#' @return * `evaluate_effect_single_state.bm_list`: A list of
 #'   evaluated component effect values
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_single_state.comp_simple_list <- function(components,
-                                                          input,
-                                                          state,
-                                                          ...) {
+evaluate_effect_single_state.bm_list <- function(components,
+                                                 input,
+                                                 state,
+                                                 ...) {
   result <- list()
   for (label in names(components)) {
     result[[label]] <- evaluate_effect_single_state(
@@ -398,28 +406,6 @@ evaluate_effect_single_state.comp_simple_list <- function(components,
   result
 }
 
-#' @return * `evaluate_effect_multi.comp_simple_list`: A list of lists of
-#' evaluated component effects, one list for each state
-#' @export
-#' @rdname evaluate_effect
-#' @keywords internal
-evaluate_effect_multi_state.comp_simple_list <- function(components,
-                                                         input,
-                                                         state,
-                                                         ...) {
-  lapply(
-    state,
-    function(x) {
-      evaluate_effect_single_state(
-        components,
-        input = input,
-        state = x,
-        ...
-      )
-    }
-  )
-}
-
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
@@ -427,18 +413,8 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
                                                        input,
                                                        state,
                                                        ...) {
-  comp_simple <- evaluate_comp_simple(components, input = input, ...)
+  comp_simple <- ibm_simplify(components, input = input, state = state, ...)
   evaluate_effect_single_state(comp_simple, input = input, state = state, ...)
-}
-#' @export
-#' @rdname evaluate_effect
-#' @keywords internal
-evaluate_effect_multi_state.bru_comp_list <- function(components,
-                                                      input,
-                                                      state,
-                                                      ...) {
-  comp_simple <- evaluate_comp_simple(components, input = input, ...)
-  evaluate_effect_multi_state(comp_simple, input = input, state = state, ...)
 }
 
 
@@ -457,7 +433,7 @@ evaluate_effect_multi_state.bru_comp_list <- function(components,
 #' @param state A list where each element is a list of named latent state
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
-#' as computed by [evaluate_effect_multi_state.bru_comp_list()]
+#' each computed by [evaluate_effect_single_state.bru_comp_list()]
 #' @param predictor Either a formula or expression
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
@@ -790,139 +766,6 @@ bru_comp_eval <- function(main,
 
 
 
-
-#' @title Compute all component linearisations
-#'
-#' @description
-#' Computes individual `bru_mapper_taylor` objects for included components
-#' for each model likelihood
-#'
-#' @param model A `bru_model` object
-#' @param input A list of named lists of component inputs
-#' @param state A named list of component states
-#' @param inla_f Controls the input data interpretations
-#' @return A list (class 'comp_simple') of named lists (class
-#'   'comp_simple_list') of `bru_mapper_taylor` objects, one for each included
-#'   component
-#' @rdname evaluate_comp_lin
-#' @keywords internal
-evaluate_comp_lin <- function(model, input, state, inla_f = FALSE) {
-  stopifnot(inherits(model, "bru_model"))
-  bru_log_message(
-    paste0("Linearise components for each observation model"),
-    verbosity = 3
-  )
-  mappers <-
-    lapply(
-      input,
-      function(inp) {
-        included <- parse_inclusion(
-          names(model[["effects"]]),
-          names(inp),
-          NULL
-        )
-
-        mappers <- comp_lin_eval(
-          model[["effects"]][included],
-          input = inp[included],
-          state = state[included],
-          inla_f = inla_f
-        )
-
-        class(mappers) <- c("comp_simple_list", class(mappers))
-        mappers
-      }
-    )
-
-  class(mappers) <- c("comp_simple_list_list", class(mappers))
-  mappers
-}
-
-#' @title Compute simplified component mappings
-#'
-#' @description
-#' Computes individual `bru_mapper_taylor` objects for included linear
-#' components for each model likelihood, and keeps non-linear mappers intact.
-#'
-#' @param model A `bru_model` object
-#' @param input A list of named lists of component inputs
-#' @param inla_f Controls the input data interpretations
-#' @return A list (class 'comp_simple_list_list') of named lists (class
-#'   'comp_simple_list') of `bru_mapper` objects, one for each included
-#'   component
-#' @export
-#' @keywords internal
-#' @rdname evaluate_comp_simple
-evaluate_comp_simple <- function(...) {
-  UseMethod("evaluate_comp_simple")
-}
-
-#' @export
-#' @rdname evaluate_comp_simple
-evaluate_comp_simple.bru_comp_list <- function(components, input,
-                                               inla_f = FALSE, ...) {
-  mappers <- lapply(
-    components,
-    function(x) {
-      label <- x[["label"]]
-      bru_log_message(
-        paste0("Simplify component '", label, "'"),
-        verbosity = 4
-      )
-      ibm_simplify(
-        x[["mapper"]],
-        input[[label]],
-        state = NULL,
-        inla_f = inla_f
-      )
-    }
-  )
-
-  class(mappers) <- c("comp_simple_list", class(mappers))
-  mappers
-}
-
-#' @export
-#' @rdname evaluate_comp_simple
-evaluate_comp_simple.bru_model <- function(model, input, ...) {
-  bru_log_message(
-    paste0("Simplify model components"),
-    verbosity = 3
-  )
-  mappers <-
-    lapply(
-      input,
-      function(inp) {
-        included <- parse_inclusion(
-          names(model[["effects"]]),
-          names(inp),
-          NULL
-        )
-
-        evaluate_comp_simple(model[["effects"]][included], input = inp, ...)
-      }
-    )
-
-  class(mappers) <- c("comp_simple_list_list", class(mappers))
-  mappers
-}
-
-#' @describeIn evaluate_comp_simple
-#' Subsetting of comp_simple_list objects, retaining class
-#' @export
-#' @param x `comp_simple_list` object from which to extract element(s)
-#' @param i indices specifying elements to extract
-#' @keywords internal
-`[.comp_simple_list` <- function(x, i) {
-  env <- environment(x)
-  object <- NextMethod()
-  class(object) <- c("comp_simple_list", "list")
-  environment(object) <- env
-  object
-}
-
-
-
 #' Compute all component inputs
 #'
 #' Computes the component inputs for included components
@@ -934,14 +777,14 @@ evaluate_comp_simple.bru_model <- function(model, input, ...) {
 #' @keywords internal
 evaluate_inputs <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  input_eval(lhoods, components = model[["effects"]])
+  input_eval(model, lhoods = lhoods)
 }
 
 #' Compute all index values
 #'
 #' Computes the index values matrices for included components
 #'
-#' @param model A `bru_model` object
+#' @param model A [bru_model] object
 #' @param used A [bru_used()] object
 #' @return A named list of `idx_full` and `idx_inla`,
 #' named list of indices, and `inla_subset`, and `inla_subset`,
@@ -958,4 +801,203 @@ evaluate_index <- function(model, used) {
     idx_inla = index_eval(model[["effects"]][included], inla_f = TRUE),
     inla_subset = inla_subset_eval(model[["effects"]][included])
   )
+}
+
+
+#' @include mappers.R
+
+#' @title Mapper methods for model objects
+#' @description
+#' Methods for the `ibm_linear()` and `ibm_simplify()` methods for
+#' [bru] model objects and related classes.
+#'
+#' @inheritParams bru_mapper_generics
+#'
+#' @name bru_model_mapper_methods
+#' @rdname bru_model_mapper_methods
+NULL
+
+#' @describeIn bru_model_mapper_methods Returns a list (one element per
+#'   observation model) of [bm_list] objects, each with one [bru_mapper_taylor]
+#'   entry for each included component.
+#' @export
+ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
+  model <- mapper
+  stopifnot(inherits(model, "bru_model"))
+  bru_log_message(
+    paste0("Linearise components for each observation model"),
+    verbosity = 3
+  )
+  mappers <-
+    lapply(
+      input,
+      function(inp) {
+        ibm_linear(
+          model[["effects"]],
+          input = inp,
+          state = state,
+          ...
+        )
+      }
+    )
+
+  mappers
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
+  comp <- mapper
+  included <- parse_inclusion(
+    names(comp),
+    names(input),
+    NULL
+  )
+
+  mappers <- ibm_linear(
+    as_bm_list(comp[included]),
+    input = input[included],
+    state = state[included],
+    ...
+  )
+
+  mappers
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_linear.bru_comp <- function(mapper,
+                                input,
+                                state = NULL,
+                                ...) {
+  bru_log_message(
+    paste0("Linearise component '", mapper[["label"]], "'"),
+    verbosity = 5
+  )
+  if (is.null(state)) {
+    state <- rep(0, ibm_n(mapper[["mapper"]]))
+  }
+  ibm_linear(mapper[["mapper"]], input = input, state = state, ...)
+}
+
+#' @describeIn bru_model_mapper_methods Returns a list (one element per
+#'   observation model) of [bm_list] objects, each with one [bru_mapper]
+#'   entry for each included component.
+#' @export
+ibm_simplify.bru_model <- function(mapper, input = NULL, state = NULL, ...) {
+  model <- mapper
+  bru_log_message(
+    paste0("Simplify component mappers for each observation model"),
+    verbosity = 3
+  )
+  mappers <-
+    lapply(
+      input,
+      function(inp) {
+        ibm_simplify(
+          model[["effects"]],
+          input = inp,
+          state = state,
+          ...
+        )
+      }
+    )
+
+  mappers
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_simplify.bru_comp <- function(mapper,
+                                  input = NULL,
+                                  state = NULL,
+                                  ...) {
+  bru_log_message(
+    paste0("Linearise component '", mapper[["label"]], "'"),
+    verbosity = 5
+  )
+  if (is.null(state)) {
+    state <- rep(0, ibm_n(mapper[["mapper"]]))
+  }
+  ibm_simplify(mapper[["mapper"]], input = input, state = state, ...)
+}
+
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_simplify.bru_comp_list <- function(mapper,
+                                       input = NULL,
+                                       state = NULL,
+                                       ...) {
+  comp <- mapper
+  included <- parse_inclusion(names(comp), names(input), NULL)
+
+  mappers <- ibm_simplify(as_bm_list(comp[included]),
+                          input = input[included],
+                          state = state[included],
+                          ...
+  )
+
+  mappers
+}
+
+
+# @title Mapper methods for model objects
+# @description
+# Methods for the `ibm_linear()` and `ibm_simplify()` methods for
+# [bru] model objects and related classes.
+#
+#' @inheritParams bru_mapper_generics
+#'
+#' @export
+#' @rdname bm_list
+#' @export
+ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
+  label <- names(mapper)
+  if (is.null(label)) {
+    label <- as.character(seq_along(mapper))
+  }
+  mappers <- lapply(
+    seq_along(mapper),
+    function(k) {
+      bru_log_message(
+        paste0("Linearise component '", label[k], "'"),
+        verbosity = 4
+      )
+      ibm_linear(
+        mapper[[k]],
+        input[[k]],
+        state = NULL,
+        ...
+      )
+    }
+  )
+  names(mappers) <- names(mapper)
+  as_bm_list(mappers)
+}
+
+#' @rdname bm_list
+#' @export
+ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
+  label <- names(mapper)
+  if (is.null(label)) {
+    label <- as.character(seq_along(mapper))
+  }
+  mappers <- lapply(
+    seq_along(mapper),
+    function(k) {
+      bru_log_message(
+        paste0("Simplify component '", label[k], "'"),
+        verbosity = 4
+      )
+      ibm_simplify(
+        mapper[[k]],
+        input[[k]],
+        state = NULL,
+        ...
+      )
+    }
+  )
+  names(mappers) <- names(mapper)
+  as_bm_list(mappers)
 }

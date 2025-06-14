@@ -7,7 +7,7 @@
 evaluate_index(model, used)
 }
 \arguments{
-\item{model}{A \code{bru_model} object}
+\item{model}{A \link{bru_model} object}
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object}
 }

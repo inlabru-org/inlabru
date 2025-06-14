@@ -92,19 +92,19 @@ test_that("Component construction: separate response_data input", {
   lik1 <- bru_obs("gaussian",
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = list(x = c(1, 1.5, 2, 3, 4)),
-    response_data = data.frame(y = 11:12),
+    response_data = data.frame(y = c(11, 12)),
     allow_combine = TRUE
   )
 
   lik2 <- bru_obs("gaussian",
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = data.frame(x = c(1, 1.5, 2, 3, 4)),
-    response_data = data.frame(y = 11:12),
+    response_data = data.frame(y = c(11,12)),
     allow_combine = TRUE
   )
 
 
-  cmp1 <- bru_comp_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
+  cmp1 <- bru_comp_list(~ effect(x, model = "iid") - 1)
 
   fit1 <- bru(components = cmp1, lik1)
   fit2 <- bru(components = cmp1, lik2)

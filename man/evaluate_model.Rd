@@ -42,7 +42,8 @@ and covariates needed to evaluate the predictor.}
 
 \item{input}{Precomputed inputs list for the components}
 
-\item{comp_simple}{Precomputed \code{comp_simple_list} for the components}
+\item{comp_simple}{Precomputed \link{bm_list} of simplified mappers for the
+components}
 
 \item{predictor}{A formula or an expression to be evaluated given the
 posterior or for each sample thereof. The default (\code{NULL}) returns a

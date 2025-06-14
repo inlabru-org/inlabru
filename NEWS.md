@@ -37,6 +37,9 @@
   (version `2.12.0.9013`)
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
+* Code refactor to expand `bm_list` mapper list handling, removing unnecessary
+  method layers for component linearisation and simplification
+  (version `2.12.0.9018`)
 
 ## Bugfixes and deprecations
   

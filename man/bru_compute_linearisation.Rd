@@ -70,10 +70,10 @@ bru_compute_linearisation(...)
 
 \item{comp_simple}{Component evaluation information
 \itemize{
-\item For \code{bru_comp}: \link{bru_mapper_taylor} object
-\item For \code{bru_obs}: A \code{comp_simple_list} object
+\item For \code{bru_comp}: A \link{bru_mapper_taylor} object
+\item For \code{bru_obs}: A \link{bm_list} object
 for the components in the likelihood
-\item For \code{bru_obs_list}: A \code{comp_simple_list_list} object
+\item For \code{bru_obs_list}: A list of \link{bm_list} objects
 }}
 
 \item{effects}{\itemize{

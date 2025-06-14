@@ -214,7 +214,76 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 #' `bru_mapper` lists can be combined into `bm_list` lists.
 #' @name bm_list
 #' @param \dots Objects to be combined.
-NULL
+#' @param x Object to convert
+#' @export
+as_bm_list <- function(x) {
+  UseMethod("as_bm_list")
+}
+
+#' @rdname bm_list
+#' @export
+as_bm_list.list <- function(x) {
+  stopifnot(all(vapply(
+    x,
+    function(x) inherits(x, "bru_mapper"),
+    TRUE
+  )))
+  class(x) <- c("bm_list", "list")
+  x
+}
+
+#' @rdname bm_list
+#' @export
+as_bm_list.bm_list <- function(x) {
+  x
+}
+
+#' @rdname bm_list
+#' @export
+as_bm_list.bru_comp_list <- function(x) {
+  if (is.null(names(x))) {
+    names(x) <- vapply(x, function(y) {
+      y[["label"]]
+    }, "")
+  }
+  mappers <- as_bm_list(lapply(x, function(y) {
+    y[["mapper"]]
+  }))
+  mappers
+}
+
+#' Methods for mapper extraction
+#'
+#' Extract a mapper from another object
+#' @name as_bru_mapper
+#' @param x Object to convert/extract
+#' @returns A `bru_mapper` object
+#' @export
+as_bru_mapper <- function(x) {
+  UseMethod("as_bru_mapper")
+}
+
+#' @rdname as_bru_mapper
+#' @export
+as_bru_mapper.bru_mapper <- function(x) {
+  x
+}
+
+#' @rdname as_bru_mapper
+#' @export
+as_bru_mapper.bru_comp <- function(x) {
+  x[["mapper"]]
+}
+
+#' @rdname as_bru_mapper
+#' @export
+#' @examples
+#' # Extract a mapper from a `bru_subcomp` object
+#' as_bru_mapper(bru_comp("x", x, mapper = bru_mapper_index(4))$main)
+#'
+as_bru_mapper.bru_subcomp <- function(x) {
+  x[["mapper"]]
+}
 
 #' @export
 #' @describeIn bm_list The `...` arguments should be `bru_mapper`
@@ -225,14 +294,7 @@ NULL
 #' str(m)
 #' str(m[2])
 `c.bru_mapper` <- function(...) {
-  stopifnot(all(vapply(
-    list(...),
-    function(x) inherits(x, "bru_mapper"),
-    TRUE
-  )))
-  mappers <- list(...)
-  class(mappers) <- c("bm_list", "list")
-  mappers
+  as_bm_list(list(...))
 }
 
 #' @export
@@ -2446,6 +2508,7 @@ ibm_eval.bru_mapper_marginal <- function(mapper, input, state = NULL,
 #' ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
 #'
 bru_mapper_pipe <- function(mappers) {
+  mappers <- as_bm_list(mappers)
   is_linear_multi <- vapply(mappers, function(x) ibm_is_linear(x), TRUE)
   n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
   n <- ibm_n(mappers[[1]])
@@ -2684,6 +2747,7 @@ bru_mapper_multi <- function(mappers) {
   } else if (any(names(mappers) == "")) {
     stop("Either all or none of the multi sub-mappers should be named.")
   }
+  mappers <- as_bm_list(mappers)
   mapper <- list(
     mappers = mappers,
     n_multi = lapply(mappers, ibm_n),

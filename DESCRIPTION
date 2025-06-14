@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.12.0.9017
+Version: 2.12.0.9018
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -104,7 +104,7 @@ Collate:
     '0_inlabru_envir.R'
     'bru.gof.R'
     'bru.inference.R'
-    'bru_obs_conversion.R'
+    'bru_conversion.R'
     'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'

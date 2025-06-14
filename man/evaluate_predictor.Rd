@@ -28,7 +28,7 @@ with the same name as in \code{data} will be ignored, unless accessed via
 \code{.data_extra.[["name"]]} or \code{.data_extra.$name}.}
 
 \item{effects}{A list where each element is list of named evaluated effects,
-as computed by \code{\link[=evaluate_effect_multi_state.bru_comp_list]{evaluate_effect_multi_state.bru_comp_list()}}}
+each computed by \code{\link[=evaluate_effect_single_state.bru_comp_list]{evaluate_effect_single_state.bru_comp_list()}}}
 
 \item{predictor}{Either a formula or expression}
 

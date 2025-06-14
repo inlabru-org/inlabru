@@ -3,6 +3,7 @@
 \name{input_eval}
 \alias{input_eval}
 \alias{input_eval.bru_comp}
+\alias{input_eval.bru_model}
 \alias{input_eval.bru_comp_list}
 \alias{input_eval.bru_obs_list}
 \alias{input_eval.bru_input}
@@ -11,6 +12,8 @@
 input_eval(...)
 
 \method{input_eval}{bru_comp}(component, data, ...)
+
+\method{input_eval}{bru_model}(model, lhoods, ...)
 
 \method{input_eval}{bru_comp_list}(components, data, ...)
 
@@ -27,9 +30,9 @@ input_eval(...)
 covariates and/or point locations.
 If \code{NULL}, return the component's map.}
 
-\item{components}{A \link{bru_comp_list}.}
-
 \item{lhoods}{A \link{bru_obs_list} object}
+
+\item{components}{A \link{bru_comp_list}.}
 }
 \value{
 An list of mapper input values, formatted for the full component
@@ -60,7 +63,7 @@ references a column of the data points, or some other complete expression
 }
 
 }}
-\section{Simple covariates and the map parameter}{
+\section{Simple covariates and the input parameters}{
 
 
 It is not unusual for a random effect act on a transformation of a covariate.
@@ -78,8 +81,8 @@ In inlabru this can be achieved in several ways of using the \code{main} paramet
 (\code{map} in version 2.1.13 and earlier), which does not need to be named.
 
 \itemize{
-\item{\code{components = y ~ psi(main = x^2, model = "linear")}}
 \item{\code{components = y ~ psi(x^2, model = "linear")}}
+\item{\code{components = y ~ psi(main = x^2, model = "linear")}}
 \item{\code{components = y ~ psi(mySquareFun(x), model = "linear")},}
 \item{\code{components = y ~ psi(myOtherSquareFun, model = "linear")},}
 

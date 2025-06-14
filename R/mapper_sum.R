@@ -34,6 +34,7 @@
 #'   seq_len(ibm_n(m))
 #' )
 bru_mapper_sum <- function(mappers, single_input = FALSE) {
+  mappers <- as_bm_list(mappers)
   if (is.null(names(mappers))) {
     names(mappers) <- as.character(seq_along(mappers))
   }
