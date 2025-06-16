@@ -85,7 +85,7 @@ as_bru_comp_list <- function(x, ...) {
 #' @rdname as_bru_comp
 #' @export
 as_bru_comp.bru_comp <- function(x, ...) {
-  return(x)
+  x
 }
 
 #' @rdname as_bru_comp

@@ -99,7 +99,7 @@ test_that("Component construction: separate response_data input", {
   lik2 <- bru_obs("gaussian",
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = data.frame(x = c(1, 1.5, 2, 3, 4)),
-    response_data = data.frame(y = c(11,12)),
+    response_data = data.frame(y = c(11, 12)),
     allow_combine = TRUE
   )
 

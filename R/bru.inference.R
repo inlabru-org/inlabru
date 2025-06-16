@@ -2087,7 +2087,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
     x,
     function(xx) {
       if (is.null(xx[[tag]]) ||
-          identical(xx[[tag]], "")) {
+        identical(xx[[tag]], "")) {
         NA_character_
       } else {
         xx[[tag]]
@@ -2112,7 +2112,8 @@ set_list_names <- function(x, tag, priority = "immutable") {
           "Cannot combine objects with mismatching tags and names:\n",
           "  Tag: ", tag_names[k], "\n",
           "  Name: ", list_names[k], "\n",
-          "  Use `NA` for either the tag or name, or use matching tags and names."
+          "  Use `NA` for either the tag or name,",
+          " or use matching tags and names."
         ))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
@@ -2121,7 +2122,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
         if (!is.na(list_names[k])) {
           return(list_names[k])
         }
-        return(NA_character_)
+        NA_character_
       } else if (priority == "name") {
         if (!is.na(list_names[k])) {
           return(list_names[k])
@@ -2129,7 +2130,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
         if (!is.na(tag_names[k])) {
           return(tag_names[k])
         }
-        return(NA_character_)
+        NA_character_
       }
     },
     ""

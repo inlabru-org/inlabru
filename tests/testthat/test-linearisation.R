@@ -42,14 +42,14 @@ test_that("Linearisation", {
   idx <- evaluate_index(model, used = bru_used(lhoods))
   inp <- evaluate_inputs(model, lhoods)
   comp_lin <- ibm_linear(model, input = inp, state = NULL)
-  lin0 <- bru_compute_linearisation.bru_model(
+  lin0 <- bru_compute_linearisation(
     model,
     lhoods = lhoods,
     input = inp,
     state = list(Int_y = 0, Int_z = 0, x = 0),
     comp_simple = comp_lin
   )
-  lin <- bru_compute_linearisation.bru_model(
+  lin <- bru_compute_linearisation(
     model,
     lhoods = lhoods,
     input = inp,

@@ -932,10 +932,11 @@ ibm_simplify.bru_comp_list <- function(mapper,
   comp <- mapper
   included <- parse_inclusion(names(comp), names(input), NULL)
 
-  mappers <- ibm_simplify(as_bm_list(comp[included]),
-                          input = input[included],
-                          state = state[included],
-                          ...
+  mappers <- ibm_simplify(
+    as_bm_list(comp[included]),
+    input = input[included],
+    state = state[included],
+    ...
   )
 
   mappers
