@@ -9,6 +9,7 @@
 \alias{c.bru_obs}
 \alias{c.bru_obs_list}
 \alias{[.bru_obs_list}
+\alias{like_list}
 \title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
@@ -72,6 +73,8 @@ bru_obs_list(...)
 \method{c}{bru_obs_list}(..., .envir = NULL)
 
 \method{[}{bru_obs_list}(x, i)
+
+like_list(...)
 }
 \arguments{
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -132,18 +135,11 @@ to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}
 
-\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
-the \code{include}, \code{exclude}, \code{include_latent} arguments.
-When \code{used} is \code{NULL} (default), the information about what effects and
+\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,
+\code{NULL}, the information about what effects and
 latent vectors are made available to the predictor evaluation is defined by
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{used <- bru_used(
-  formula,
-  effect = include,
-  effect_exclude = exclude,
-  latent = include_latent
-)
-}\if{html}{\out{</div>}}}
+\code{bru_used(formula)}, which will include all effects and latent vectors
+used by the predictor expression.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
 several rows of the input data to influence the same row. When \code{NULL},
@@ -180,31 +176,7 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \code{data}. Defaults to the calling environment.}
 
 \item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
-\code{used} instead.
-
-Arguments controlling what components
-and effects are available for use in the predictor expression.
-\describe{
-\item{\code{include}}{
-Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
-method is used to extract the variable names from the formula.
-}
-\item{\code{exclude}}{
-Character vector of component labels to be excluded from the effect list
-determined by the \code{include} argument. Default is \code{NULL}; do not remove
-any components from the inclusion list.
-}
-\item{\code{include_latent}}{Character vector.
-Specifies which latent state variables are directly available to the
-predictor expression, with a \verb{_latent} suffix. This also makes evaluator
-functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
-and \code{replicate}, taking values for where to evaluate the component effect
-that are different than those defined in the component definition itself
-(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
-auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
-}
-}}
+\code{used} instead.}
 
 \item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
 
@@ -247,6 +219,10 @@ into a \code{bru_obs_list} object
 into a \code{bru_obs_list} object
 
 \item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
+
+\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0}. For later versions, use
+\code{bru_obs_list()} or \code{c()}.
 
 }}
 \examples{

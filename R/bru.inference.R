@@ -1136,18 +1136,11 @@ bru_is_additive.formula <- function(x, ...) {
 #'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
 #'   overrides `domain` and `samplers`.}
 #' }
-#' @param used Either `NULL` (default) or a [bru_used()] object, that overrides
-#' the `include`, `exclude`, `include_latent` arguments.
-#' When `used` is `NULL` (default), the information about what effects and
+#' @param used Either `NULL` (default) or a [bru_used()] object. When,
+#'   `NULL`, the information about what effects and
 #' latent vectors are made available to the predictor evaluation is defined by
-#' ```{r, eval=FALSE}
-#' used <- bru_used(
-#'   formula,
-#'   effect = include,
-#'   effect_exclude = exclude,
-#'   latent = include_latent
-#' )
-#' ```
+#' `bru_used(formula)`, which will include all effects and latent vectors
+#' used by the predictor expression.
 #' @param allow_combine logical; If `TRUE`, the predictor expression may involve
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
@@ -1176,30 +1169,6 @@ bru_is_additive.formula <- function(x, ...) {
 #'   `data`. Defaults to the calling environment.
 #' @param include,exclude,include_latent `r lifecycle::badge("deprecated")`, use
 #'   `used` instead.
-#'
-#'   Arguments controlling what components
-#'   and effects are available for use in the predictor expression.
-#' \describe{
-#'   \item{`include`}{
-#'   Character vector of component labels that are used as effects
-#'   by the predictor expression; If `NULL` (default), the [bru_used()]
-#'   method is used to extract the variable names from the formula.
-#'   }
-#'   \item{`exclude`}{
-#'   Character vector of component labels to be excluded from the effect list
-#'   determined by the `include` argument. Default is `NULL`; do not remove
-#'   any components from the inclusion list.
-#'   }
-#'   \item{`include_latent`}{Character vector.
-#'   Specifies which latent state variables are directly available to the
-#'   predictor expression, with a `_latent` suffix. This also makes evaluator
-#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
-#'   and `replicate`, taking values for where to evaluate the component effect
-#'   that are different than those defined in the component definition itself
-#'   (see [bru_comp_eval()]). If `NULL`, the [bru_used()] method
-#'   auto-detects use of `_latent` and `_eval` in the predictor expression.
-#'   }
-#' }
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
@@ -1663,82 +1632,69 @@ bru_obs <- function(formula = . ~ .,
     response <- "BRU_response"
   }
 
+  if (lifecycle::is_present(include)) {
+    bru_log_message(
+      paste0(
+        "The `include` argument of `bru_obs()` is deprecated ",
+        "since inlabru 2.11.0 and will be ignored.\n\t",
+        "If auto-detection doesn't work, use ",
+        "`used = bru_used(effect = include)` instead."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_warn(
+      "2.11.0",
+      "bru_obs(include)",
+      "bru_obs(used)",
+      c("The provided `include` value will be ignored.",
+        "If auto-detection doesn't work, use `bru_used(effect = include)`")
+    )
+  }
+  if (lifecycle::is_present(exclude)) {
+    bru_log_message(
+      paste0(
+        "The `exclude` argument of `bru_obs()` is deprecated ",
+        "since inlabru 2.11.0 and will be ignored.\n\t",
+        "If auto-detection doesn't work, use ",
+        "`used = bru_used(effect_exclude = exclude)` instead."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_warn(
+      "2.11.0",
+      "bru_obs(exclude)",
+      "bru_obs(used)",
+      c("The provided `exclude` value will be ignored.",
+        paste0(
+        "If auto-detection doesn't work, ",
+        "use `bru_used(effect_exclude = exclude)`"
+      ))
+    )
+  }
+  if (lifecycle::is_present(include_latent)) {
+    bru_log_message(
+      paste0(
+        "The `include_latent` argument of `bru_obs()` is deprecated ",
+        "since inlabru 2.11.0 and will be ignored.\n\t",
+        "If auto-detection doesn't work, use ",
+        "`used = bru_used(latent = include_latent)` instead."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_warn(
+      "2.11.0",
+      "bru_obs(include_latent)",
+      "bru_obs(used)",
+      c("The provided `include_latent` value will be ignored.",
+      paste0(
+        "If auto-detection doesn't work, ",
+        "use `bru_used(latent = include_latent)`"
+      ))
+    )
+  }
+
   if (is.null(used)) {
-    if (lifecycle::is_present(include) ||
-      lifecycle::is_present(exclude) ||
-      lifecycle::is_present(include_latent)) {
-      if (!lifecycle::is_present(include)) {
-        include <- NULL
-      } else {
-        bru_log_message(
-          paste0(
-            "The `include` argument of `bru_obs()` is deprecated ",
-            "since inlabru 2.11.0.\n\t",
-            "If auto-detection doesn't work, use ",
-            "`used = bru_used(effect = include)` instead."
-          ),
-          verbosity = 1L
-        )
-        lifecycle::deprecate_warn(
-          "2.11.0",
-          "bru_obs(include)",
-          "bru_obs(used)",
-          "If auto-detection doesn't work, use `bru_used(effect = include)`"
-        )
-      }
-      if (!lifecycle::is_present(exclude)) {
-        exclude <- NULL
-      } else {
-        bru_log_message(
-          paste0(
-            "The `exclude` argument of `bru_obs()` is deprecated ",
-            "since inlabru 2.11.0.\n\t",
-            "If auto-detection doesn't work, use ",
-            "`used = bru_used(effect_exclude = include)` instead."
-          ),
-          verbosity = 1L
-        )
-        lifecycle::deprecate_warn(
-          "2.11.0",
-          "bru_obs(exclude)",
-          "bru_obs(used)",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(effect_exclude = exclude)`"
-          )
-        )
-      }
-      if (!lifecycle::is_present(include_latent)) {
-        include_latent <- NULL
-      } else {
-        bru_log_message(
-          paste0(
-            "The `include_latent` argument of `bru_obs()` is deprecated ",
-            "since inlabru 2.11.0.\n\t",
-            "If auto-detection doesn't work, use ",
-            "`used = bru_used(latent = include_latent)` instead."
-          ),
-          verbosity = 1L
-        )
-        lifecycle::deprecate_warn(
-          "2.11.0",
-          "bru_obs(include_latent)",
-          "bru_obs(used)",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(latent = include_latent)`"
-          )
-        )
-      }
-      used <- bru_used(
-        formula,
-        effect = include,
-        effect_exclude = exclude,
-        latent = include_latent
-      )
-    } else {
-      used <- bru_used(formula)
-    }
+    used <- bru_used(formula)
   }
 
   # The likelihood object that will be returned
@@ -2235,6 +2191,21 @@ summary.bru_obs <- function(object, verbose = TRUE, ...) {
     ),
     class = "summary_bru_obs"
   )
+}
+
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")`
+#' Backwards compatibility for versions `<= 2.12.0`. For later versions, use
+#' `bru_obs_list()` or `c()`.
+#' @export
+like_list <- function(...) {
+  lifecycle::deprecate_soft(
+    "2.12.0",
+    "like_list()",
+    "bru_obs_list()",
+    details = paste0("Use `bru_obs_list(...)` or `c(...)` to construct ",
+                     "observation model lists.")
+  )
+  bru_obs_list(...)
 }
 
 #' @rdname bru_obs_print
