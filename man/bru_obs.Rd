@@ -10,6 +10,7 @@
 \alias{c.bru_obs_list}
 \alias{[.bru_obs_list}
 \alias{like_list}
+\alias{bru_like_list}
 \title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
@@ -75,6 +76,8 @@ bru_obs_list(...)
 \method{[}{bru_obs_list}(x, i)
 
 like_list(...)
+
+bru_like_list(...)
 }
 \arguments{
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -223,6 +226,10 @@ into a \code{bru_obs_list} object
 \item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Backwards compatibility for versions \verb{<= 2.12.0}. For later versions, use
 \code{bru_obs_list()} or \code{c()}.
+
+\item \code{bru_like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0.9017}. For later versions,
+use \code{bru_obs_list()} or \code{c()}.
 
 }}
 \examples{

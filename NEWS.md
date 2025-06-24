@@ -22,8 +22,8 @@
   evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`)
 * Automatically detect purely additive linear models (version `2.12.0.9014`)
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
-  and re-reintroduce `like_list()` as alias for `bru_obs_list()`
-  (version `2.12.0.9020`)
+  and re-reintroduce `like_list()` and `bru_like_list()` as aliases for
+  `bru_obs_list()` (version `2.12.0.9020`)
 
 ## New and updated mapper features
 

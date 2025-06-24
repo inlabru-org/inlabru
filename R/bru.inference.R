@@ -2208,6 +2208,21 @@ like_list <- function(...) {
   bru_obs_list(...)
 }
 
+#' @describeIn bru_obs `r lifecycle::badge("deprecated")`
+#' Backwards compatibility for versions `<= 2.12.0.9017`. For later versions,
+#' use `bru_obs_list()` or `c()`.
+#' @export
+bru_like_list <- function(...) {
+  lifecycle::deprecate_soft(
+    "2.12.0.9017",
+    "bru_like_list()",
+    "bru_obs_list()",
+    details = paste0("Use `bru_obs_list(...)` or `c(...)` to construct ",
+                     "observation model lists.")
+  )
+  bru_obs_list(...)
+}
+
 #' @rdname bru_obs_print
 #' @method summary bru_obs_list
 #' @export
