@@ -235,7 +235,8 @@ spde.posterior <- function(result, name, what = "range",
       median = out$median
     )
     colnames(df)[3] <- paste0("q", paste0(round((1 - quantile) / 2, 5), "%"))
-    colnames(df)[4] <- paste0("q", paste0(round(1 - (1 - quantile) / 2, 5), "%"))
+    colnames(df)[4] <-
+      paste0("q", paste0(round(1 - (1 - quantile) / 2, 5), "%"))
     attr(df, "type") <- "1d"
     attr(df, "misc") <- list(dims = "x", predictor = c("distance", ylab))
     class(df) <- list("prediction", "data.frame")
@@ -254,8 +255,8 @@ spde.posterior <- function(result, name, what = "range",
     }
 
     med <- INLA::inla.qmarginal(0.5, marg)
-    uq <- INLA::inla.qmarginal(1 - (1 - quantile)/2, marg)
-    lq <- INLA::inla.qmarginal((1 - quantile)/2, marg)
+    uq <- INLA::inla.qmarginal(1 - (1 - quantile) / 2, marg)
+    lq <- INLA::inla.qmarginal((1 - quantile) / 2, marg)
     inner.x <- seq(lq, uq, length.out = 100)
     inner.marg <- data.frame(
       x = inner.x,
