@@ -50,9 +50,9 @@ quantile}
 }
 \description{
 Evaluate the covariance function for an inla.spde
-objectPlots the posterior distribution of the range,
+object. Calculates the posterior distribution of the range,
 log(range), variance, or log(variance) parameter of a model's
-SPDE component. Can also plot Matern correlation or covariance
+SPDE component. Can also calculate Matern correlation or covariance
 function.
 }
 \details{

@@ -40,6 +40,9 @@
 * Code refactor to expand `bm_list` mapper list handling, removing unnecessary
   method layers for component linearisation and simplification
   (version `2.12.0.9018`)
+* Add `quantile` argument to `spde.posterior()` for controlling the credible
+  interval calculations, like `materncov.bands()`, which is now also exported
+  (version `2.12.0.9019`)
 
 ## Bugfixes and deprecations
   
