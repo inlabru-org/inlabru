@@ -1632,67 +1632,89 @@ bru_obs <- function(formula = . ~ .,
     response <- "BRU_response"
   }
 
-  if (lifecycle::is_present(include)) {
-    bru_log_message(
-      paste0(
-        "The `include` argument of `bru_obs()` is deprecated ",
-        "since inlabru 2.11.0 and will be ignored.\n\t",
-        "If auto-detection doesn't work, use ",
-        "`used = bru_used(effect = include)` instead."
-      ),
-      verbosity = 1L
-    )
-    lifecycle::deprecate_warn(
-      "2.11.0",
-      "bru_obs(include)",
-      "bru_obs(used)",
-      c("The provided `include` value will be ignored.",
-        "If auto-detection doesn't work, use `bru_used(effect = include)`")
-    )
-  }
-  if (lifecycle::is_present(exclude)) {
-    bru_log_message(
-      paste0(
-        "The `exclude` argument of `bru_obs()` is deprecated ",
-        "since inlabru 2.11.0 and will be ignored.\n\t",
-        "If auto-detection doesn't work, use ",
-        "`used = bru_used(effect_exclude = exclude)` instead."
-      ),
-      verbosity = 1L
-    )
-    lifecycle::deprecate_warn(
-      "2.11.0",
-      "bru_obs(exclude)",
-      "bru_obs(used)",
-      c("The provided `exclude` value will be ignored.",
+  if (lifecycle::is_present(include) ||
+    lifecycle::is_present(exclude) ||
+    lifecycle::is_present(include_latent)) {
+    if (!lifecycle::is_present(include)) {
+      include <- NULL
+    } else {
+      bru_log_message(
         paste0(
-        "If auto-detection doesn't work, ",
-        "use `bru_used(effect_exclude = exclude)`"
-      ))
-    )
+          "The `include` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect = include)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include)",
+        "bru_obs(used)",
+        c(
+          "The provided `include` value may be ignored.",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      )
+    }
+    if (!lifecycle::is_present(exclude)) {
+      exclude <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `exclude` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect_exclude = exclude)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(exclude)",
+        "bru_obs(used)",
+        c(
+          "The provided `exclude` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      )
+    }
+    if (!lifecycle::is_present(include_latent)) {
+      include_latent <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include_latent` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(latent = include_latent)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include_latent)",
+        "bru_obs(used)",
+        c(
+          "The provided `include_latent` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      )
+    }
+    if (is.null(used)) {
+      used <- bru_used(formula,
+        effect = include,
+        effect_exclude = exclude,
+        latent = include_latent
+      )
+    }
   }
-  if (lifecycle::is_present(include_latent)) {
-    bru_log_message(
-      paste0(
-        "The `include_latent` argument of `bru_obs()` is deprecated ",
-        "since inlabru 2.11.0 and will be ignored.\n\t",
-        "If auto-detection doesn't work, use ",
-        "`used = bru_used(latent = include_latent)` instead."
-      ),
-      verbosity = 1L
-    )
-    lifecycle::deprecate_warn(
-      "2.11.0",
-      "bru_obs(include_latent)",
-      "bru_obs(used)",
-      c("The provided `include_latent` value will be ignored.",
-      paste0(
-        "If auto-detection doesn't work, ",
-        "use `bru_used(latent = include_latent)`"
-      ))
-    )
-  }
-
   if (is.null(used)) {
     used <- bru_used(formula)
   }
@@ -2202,8 +2224,10 @@ like_list <- function(...) {
     "2.12.0",
     "like_list()",
     "bru_obs_list()",
-    details = paste0("Use `as_bru_obs_list()`, `bru_obs_list(...)` or ",
-                     "`c(...)` to construct observation model lists.")
+    details = paste0(
+      "Use `as_bru_obs_list()`, `bru_obs_list(...)` or ",
+      "`c(...)` to construct observation model lists."
+    )
   )
   as_bru_obs_list(list(...))
 }
@@ -2217,8 +2241,10 @@ bru_like_list <- function(...) {
     "2.12.0.9017",
     "bru_like_list()",
     "bru_obs_list()",
-    details = paste0("Use `as_bru_obs_list()`, `bru_obs_list(...)` or ",
-                     "`c(...)` to construct observation model lists.")
+    details = paste0(
+      "Use `as_bru_obs_list()`, `bru_obs_list(...)` or ",
+      "`c(...)` to construct observation model lists."
+    )
   )
   as_bru_obs_list(list(...))
 }
