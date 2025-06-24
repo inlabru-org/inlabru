@@ -225,11 +225,11 @@ into a \code{bru_obs_list} object
 
 \item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Backwards compatibility for versions \verb{<= 2.12.0}. For later versions, use
-\code{bru_obs_list()} or \code{c()}.
+\code{as_bru_obs_list()}, \code{bru_obs_list()}, or \code{c()}.
 
 \item \code{bru_like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Backwards compatibility for versions \verb{<= 2.12.0.9017}. For later versions,
-use \code{bru_obs_list()} or \code{c()}.
+use \code{as_bru_obs_list()}, \code{bru_obs_list()} or \code{c()}.
 
 }}
 \examples{
