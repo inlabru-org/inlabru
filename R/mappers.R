@@ -1033,7 +1033,7 @@ bm_fmesher <- function(mesh) {
     return(NULL)
   }
   mapper <- list(mesh = mesh)
-  bru_mapper_define(mapper, new_class = "bru_mapper_fmesher")
+  bru_mapper_define(mapper, new_class = "bm_fmesher")
 }
 
 #' @export
@@ -1171,7 +1171,7 @@ bru_mapper.fm_mesh_1d <- function(mesh, indexed = TRUE, ...) {
     mesh = mesh,
     indexed = indexed
   )
-  bru_mapper_define(mapper, new_class = "bru_mapper_fm_mesh_1d")
+  bru_mapper_define(mapper, new_class = "bm_fm_mesh_1d")
 }
 
 #' @export
@@ -1252,7 +1252,7 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
 #' m <- bm_index(4)
 #' ibm_eval(m, -2:6, 1:4)
 bm_index <- function(n = 1L, ...) {
-  bru_mapper_define(list(n = n), new_class = "bru_mapper_index")
+  bru_mapper_define(list(n = n), new_class = "bm_index")
 }
 
 #' @export
@@ -1418,7 +1418,7 @@ bm_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
       values_mapper = NULL
     ),
     # TODO: maybe allow values_mapper
-    new_class = "bru_mapper_taylor"
+    new_class = "bm_taylor"
   )
 }
 
@@ -1556,7 +1556,7 @@ ibm_eval.bm_taylor <- function(mapper,
 #' ibm_eval(m, input = 1:4, state = 2)
 #'
 bm_linear <- function() {
-  bru_mapper_define(list(), new_class = "bru_mapper_linear")
+  bru_mapper_define(list(), new_class = "bm_linear")
 }
 
 #' @export
@@ -1635,7 +1635,7 @@ bm_matrix <- function(labels) {
       labels = as.character(labels)
     )
   }
-  bru_mapper_define(mapper, new_class = "bru_mapper_matrix")
+  bru_mapper_define(mapper, new_class = "bm_matrix")
 }
 
 #' @export
@@ -1742,12 +1742,12 @@ bm_factor <- function(values, factor_mapping, indexed = FALSE) {
   if (indexed) {
     bru_mapper_define(mapper,
       new_class = c(
-        "bru_mapper_factor_index",
-        "bru_mapper_factor"
+        "bm_factor_index",
+        "bm_factor"
       )
     )
   } else {
-    bru_mapper_define(mapper, new_class = "bru_mapper_factor")
+    bru_mapper_define(mapper, new_class = "bm_factor")
   }
 }
 
@@ -1823,7 +1823,7 @@ ibm_jacobian.bm_factor <- function(mapper, input, ...) {
 #' ibm_eval2(m, input = 1:4)
 #'
 bm_const <- function() {
-  bru_mapper_define(list(), new_class = "bru_mapper_const")
+  bru_mapper_define(list(), new_class = "bm_const")
 }
 
 #' @export
@@ -1882,7 +1882,7 @@ ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
 bm_shift <- function(mapper = NULL) {
   m <- bru_mapper_define(
     list(),
-    new_class = "bru_mapper_shift"
+    new_class = "bm_shift"
   )
   if (!is.null(mapper)) {
     m <- bm_pipe(list(mapper = mapper, shift = m))
@@ -1983,7 +1983,7 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...,
 bm_scale <- function(mapper = NULL) {
   m <- bru_mapper_define(
     list(),
-    new_class = "bru_mapper_scale"
+    new_class = "bm_scale"
   )
   if (!is.null(mapper)) {
     m <- bm_pipe(list(mapper = mapper, scale = m))
@@ -2150,7 +2150,7 @@ bm_aggregate <- function(rescale = FALSE,
       rescale = rescale,
       n_block = n_block
     ),
-    new_class = "bru_mapper_aggregate"
+    new_class = "bm_aggregate"
   )
 }
 
@@ -2315,7 +2315,7 @@ bm_logsumexp <- function(rescale = FALSE,
       n_block = n_block,
       is_linear = FALSE
     ),
-    new_class = c("bru_mapper_logsumexp", "bru_mapper_aggregate")
+    new_class = c("bm_logsumexp", "bm_aggregate")
   )
 }
 
@@ -2487,7 +2487,7 @@ bm_marginal <- function(qfun,
       param = list(...),
       is_linear = FALSE
     ),
-    new_class = "bru_mapper_marginal"
+    new_class = "bm_marginal"
   )
 }
 
@@ -2708,7 +2708,7 @@ bm_pipe <- function(mappers) {
       n = n,
       names = the_names
     ),
-    new_class = "bru_mapper_pipe"
+    new_class = "bm_pipe"
   )
 }
 
@@ -2950,7 +2950,7 @@ bm_multi <- function(mappers) {
   if (!mapper[["is_linear"]]) {
     stop("bm_multi sub-mappers must be linear mappers")
   }
-  bru_mapper_define(mapper, new_class = "bru_mapper_multi")
+  bru_mapper_define(mapper, new_class = "bm_multi")
 }
 
 #' @export
@@ -3389,7 +3389,7 @@ bm_harmonics <- function(order = 1,
     intercept = intercept,
     interval = interval
   )
-  bru_mapper_define(mapper, new_class = "bru_mapper_harmonics")
+  bru_mapper_define(mapper, new_class = "bm_harmonics")
 }
 
 #' @export
@@ -3456,7 +3456,7 @@ ibm_jacobian.bm_harmonics <- function(mapper,
 bm_mesh_B <- function(mesh, B) {
   stopifnot(nrow(B) >= ncol(B))
   mapper <- list(mapper = bru_mapper(mesh), B = B)
-  bru_mapper_define(mapper, new_class = "bru_mapper_mesh_B")
+  bru_mapper_define(mapper, new_class = "bm_mesh_B")
 }
 
 #' @export

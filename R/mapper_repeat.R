@@ -57,7 +57,7 @@ bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
       is_linear = ibm_is_linear(mapper),
       interleaved = interleaved
     )
-    return(bru_mapper_define(mapper, new_class = "bru_mapper_repeat"))
+    return(bru_mapper_define(mapper, new_class = "bm_repeat"))
   }
 
   # Combine non-interleaved repeats

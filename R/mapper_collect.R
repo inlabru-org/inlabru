@@ -38,7 +38,7 @@ bm_collect <- function(mappers, hidden = FALSE) {
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
-  bru_mapper_define(mapper, new_class = "bru_mapper_collect")
+  bru_mapper_define(mapper, new_class = "bm_collect")
 }
 
 #' @export

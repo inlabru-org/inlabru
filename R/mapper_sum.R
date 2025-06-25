@@ -45,7 +45,7 @@ bm_sum <- function(mappers, single_input = FALSE) {
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
-  bru_mapper_define(mapper, new_class = "bru_mapper_sum")
+  bru_mapper_define(mapper, new_class = "bm_sum")
 }
 
 #' @export
