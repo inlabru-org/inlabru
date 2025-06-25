@@ -434,14 +434,14 @@ test_that("Component inputs: non-numeric input detection", {
   )
 
   # No model specified (argument unnamed), geometry invalid for
-  # bru_mapper_linear:
+  # bm_linear:
   cmp <- bru_comp_list(~ Intercept(1) + field(geometry, matern))
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
 
   expect_error(
-    ibm_eval(bru_mapper_linear(), input = df$geometry, state = 1),
+    ibm_eval(bm_linear(), input = df$geometry, state = 1),
     "The input to a bm_linear evaluation must be numeric or logical."
   )
 

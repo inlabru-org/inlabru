@@ -12,7 +12,7 @@ test_that("bru: factor component", {
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bru_mapper_index(10)),
+  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
     family = "gaussian", data = input.df
   )
 

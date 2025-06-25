@@ -34,7 +34,7 @@ test_that("Additivity: Additive predictor with nonlinear components", {
     1,
     mean.linear = 0,
     prec.linear = 1,
-    marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1)
+    marginal = bm_marginal(qexp, pexp, dexp, rate = 1)
   ) + 0
   form <- y ~ x
   fit <- bru(

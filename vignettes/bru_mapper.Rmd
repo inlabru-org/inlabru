@@ -42,16 +42,13 @@ construct the built-in mappers, and finally how to construct new mappers.
 
 The in-package documentation for the mapper methods is contained in four parts:
 ```{r, eval=FALSE}
-?bru_mapper # Mapper constructors
+?bru_mapper # Mapper constructors, with links to predefined mappers
 ?bru_mapper_generics # Generic and default methods
-?bru_mapper_methods # Specialised mapper methods
 ?bru_get_mapper # Mapper extraction methods
 ```
 
 Regular users normally at most need some of the methods from `?bru_mapper`
-and sometimes `?bru_mapper_generics`.
-The methods in `?bru_mapper_methods` provides more details and allows the user
-to query mappers and to use them outside the context of inlabru model definitions.
+and links to predefined mappers, and sometimes `?bru_mapper_generics`.
 The `bru_mapper_define()` and `bru_get_mapper()` methods are needed for those
 implementing their own mapper class.
 

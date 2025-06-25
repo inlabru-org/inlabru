@@ -195,7 +195,7 @@ test_that("Aggregated Poisson observations, using mapper", {
 
   # Aggregation by summation on the intensity/expectation scale
   # (log-sum-exp since the predictor is log-intensity)
-  agg <- bru_mapper_logsumexp(rescale = FALSE, n_block = nrow(obs))
+  agg <- bm_logsumexp(rescale = FALSE, n_block = nrow(obs))
 
   comp <- ~ Intercept(1) + x
 
@@ -266,7 +266,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
   )
 
   # Aggregation by average:
-  agg <- bru_mapper_aggregate(rescale = TRUE, n_block = nrow(obs))
+  agg <- bm_aggregate(rescale = TRUE, n_block = nrow(obs))
 
   comp <- ~ Intercept(1) + x
 

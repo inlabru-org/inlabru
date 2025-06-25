@@ -1,5 +1,5 @@
 test_that("Linear mapper", {
-  mapper <- bru_mapper_linear()
+  mapper <- bm_linear()
 
   input <- seq_len(4)
   state <- 10
@@ -24,7 +24,7 @@ test_that("Linear mapper", {
 test_that("Index mapper", {
   values <- seq_len(4)
   state <- c(10, 20, 30, 40)
-  mapper <- bru_mapper_index(max(values))
+  mapper <- bm_index(max(values))
   input <- c(2, 2, 1, 3)
   val <- state[input]
 
@@ -59,7 +59,7 @@ test_that("Factor mapper", {
     )
   for (factor_mapping in rev(c("full", "contrast"))) {
     values <- all_values[[factor_mapping]]
-    mapper <- bru_mapper_factor(all_values[["full"]],
+    mapper <- bm_factor(all_values[["full"]],
       factor_mapping = factor_mapping
     )
 
@@ -93,13 +93,13 @@ test_that("Factor mapper", {
 
 test_that("Pipe mapper", {
   mapper <-
-    bru_mapper_pipe(
+    bm_pipe(
       list(
-        bru_mapper_multi(list(
-          space = bru_mapper_index(4),
-          time = bru_mapper_index(3)
+        bm_multi(list(
+          space = bm_index(4),
+          time = bm_index(3)
         )),
-        bru_mapper_scale()
+        bm_scale()
       )
     )
 
@@ -131,7 +131,7 @@ test_that("Pipe mapper", {
 
 
 test_that("Aggregate mapper", {
-  mapper <- bru_mapper_aggregate(rescale = FALSE)
+  mapper <- bm_aggregate(rescale = FALSE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
   expect_equal(
@@ -159,7 +159,7 @@ test_that("Aggregate mapper", {
   expect_equal(ibm_jacobian(mapper, input = input, state = state), A)
 
 
-  mapper <- bru_mapper_aggregate(rescale = TRUE)
+  mapper <- bm_aggregate(rescale = TRUE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
   expect_equal(
@@ -200,7 +200,7 @@ test_that("Aggregate mapper", {
 
 
 test_that("logsumexp mapper", {
-  mapper <- bru_mapper_logsumexp(rescale = FALSE)
+  mapper <- bm_logsumexp(rescale = FALSE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
   expect_equal(
@@ -256,7 +256,7 @@ test_that("logsumexp mapper", {
   )
 
 
-  mapper <- bru_mapper_logsumexp(rescale = TRUE)
+  mapper <- bm_logsumexp(rescale = TRUE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
   expect_equal(
@@ -310,9 +310,9 @@ test_that("logsumexp mapper", {
 
 
 test_that("Multi-mapper bru input", {
-  mapper <- bru_mapper_multi(list(
-    space = bru_mapper_index(4),
-    time = bru_mapper_index(3)
+  mapper <- bm_multi(list(
+    space = bm_index(4),
+    time = bm_index(3)
   ))
   expect_equal(ibm_n(mapper), 12)
   expect_equal(ibm_n(mapper, multi = 1), list(space = 4, time = 3))
@@ -351,12 +351,12 @@ test_that("Multi-mapper bru input", {
 })
 
 test_that("Multi-mapper bru input with offset", {
-  mapper <- bru_mapper_multi(
+  mapper <- bm_multi(
     list(
-      space = bru_mapper_pipe(
-        list(mapper = bru_mapper_index(4), offset = bru_mapper_shift())
+      space = bm_pipe(
+        list(mapper = bm_index(4), offset = bm_shift())
       ),
-      time = bru_mapper_index(3)
+      time = bm_index(3)
     )
   )
   expect_equal(ibm_n(mapper), 12)
@@ -451,10 +451,10 @@ test_that("Collect mapper, direct construction", {
   skip_on_cran()
   withr::local_seed(1234L)
 
-  mapper <- bru_mapper_collect(
+  mapper <- bm_collect(
     list(
-      u = bru_mapper_index(4),
-      v = bru_mapper_index(4)
+      u = bm_index(4),
+      v = bm_index(4)
     ),
     hidden = TRUE
   )
@@ -509,10 +509,10 @@ test_that("Collect mapper, automatic construction", {
 
   data <- data.frame(val = 1:3, y = 1:3)
 
-  mapper <- bru_mapper_collect(
+  mapper <- bm_collect(
     list(
-      u = bru_mapper_index(4),
-      v = bru_mapper_index(4)
+      u = bm_index(4),
+      v = bm_index(4)
     ),
     hidden = TRUE
   )
@@ -645,14 +645,14 @@ test_that("Collect mapper works", {
 
 
 test_that("Marginal mapper", {
-  m1 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8)
+  m1 <- bm_marginal(qexp, pexp, rate = 1 / 8)
   state0 <- -5:5
   val1 <- ibm_eval(m1, state = state0)
 
   state1 <- ibm_eval(m1, state = val1, reverse = TRUE)
   expect_equal(state1, state0)
 
-  m2 <- bru_mapper_marginal(qexp, pexp, rate = 1 / 8, inverse = TRUE)
+  m2 <- bm_marginal(qexp, pexp, rate = 1 / 8, inverse = TRUE)
   state2 <- ibm_eval(m2, state = val1)
   expect_equal(state2, state0)
 
@@ -682,8 +682,8 @@ test_that("Marginal mapper", {
     }
     return(exp(val))
   }
-  m1_d <- bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
-  m1_dq <- bru_mapper_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
+  m1_d <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  m1_dq <- bm_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
   jac1 <- ibm_jacobian(m1, state = state0)
   jac1_d <- ibm_jacobian(m1_d, state = state0)
   jac1_dq <- ibm_jacobian(m1_dq, state = state0)
@@ -694,8 +694,8 @@ test_that("Marginal mapper", {
 
 
 test_that("Mapper lists", {
-  m1 <- bru_mapper_index(4L)
-  m2 <- bru_mapper_index(3L)
+  m1 <- bm_index(4L)
+  m2 <- bm_index(3L)
 
   expect_s3_class(c(m1), "bm_list")
   expect_s3_class(c(m1, m2), "bm_list")
@@ -709,6 +709,10 @@ test_that("Mesh 1d mapper", {
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, length(loc))
   expect_equal(val, loc)
+
+  m <- bru_mapper(fmesher::fm_mesh_1d(c(1, 2, 4, 6, 9), boundary = "f"),
+                  indexed = FALSE)
+  expect_equal(ibm_values(m), c(1, 2, 4, 6, 9))
 })
 
 test_that("Mesh 2d mapper", {
@@ -728,8 +732,8 @@ test_that("Mesh 2d mapper", {
 test_that("Repeat mapper, direct construction", {
   withr::local_seed(1234L)
 
-  mapper <- bru_mapper_repeat(
-    bru_mapper_index(4),
+  mapper <- bm_repeat(
+    bm_index(4),
     n_rep = 3
   )
   expect_equal(ibm_n(mapper), 12)
@@ -767,7 +771,7 @@ test_that("Repeat mapper works", {
         y ~ Intercept(1) + field(
           x,
           model = "iid",
-          mapper = bru_mapper_repeat(bru_mapper_index(4), n_rep = 2)
+          mapper = bm_repeat(bm_index(4), n_rep = 2)
         ),
         data = data,
         control.family = list(hyper = list(prec = list(
