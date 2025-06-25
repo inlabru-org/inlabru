@@ -24,27 +24,32 @@
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
   and re-reintroduce `like_list()` and `bru_like_list()` as aliases for
   `bru_obs_list()` (version `2.12.0.9020`)
+* Add `quantile` argument to `spde.posterior()` for controlling the credible
+  interval calculations, like `materncov.bands()`, which is now also exported
+  (version `2.12.0.9019`)
 
 ## New and updated mapper features
 
-* Add `bru_mapper_sum()` mapper, for automated adding the output of
+* The standard mapper class names have been shortened from `bru_mapper_<type>`
+  to `bm_<type>`, to make code using them more readable. Objects of the old
+  class names will be converted to the new classes internally, so that old
+  stored objects will still work. Constructors of the form `bru_mapper_<type>()`
+  call the corresponding new constructor `bm_<type>()` (version `2.12.0.9021`)
+* Add `bm_sum()` mapper, for automated adding the output of
   multiple mappers, optionally with a single common input (version `2.12.0.9001`)
-* Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
+* Add `interleaved` option to `bm_repeat()` to allow interleaved
   states for summation of a repeated mapper (version `2.12.0.9001`)
-* Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
-  `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
+* Allow `n_block` in `input` argument to `bm_aggregate` and
+  `bm_logsumexp` evaluation methods, overriding the optional mapper
   object setting (version `2.12.0.9005`)
-* Allow `character` block information in `bru_mapper_aggregate` and
-  `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
+* Allow `character` block information in `bm_aggregate` and
+  `bm_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
   (version `2.12.0.9013`)
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 * Code refactor to expand `bm_list` mapper list handling, removing unnecessary
   method layers for component linearisation and simplification
   (version `2.12.0.9018`)
-* Add `quantile` argument to `spde.posterior()` for controlling the credible
-  interval calculations, like `materncov.bands()`, which is now also exported
-  (version `2.12.0.9019`)
 
 ## Bugfixes and deprecations
   

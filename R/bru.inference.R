@@ -64,11 +64,11 @@ bru_info_upgrade <- function(object,
       if (is.null(object[["INLA_version"]])) {
         object[["INLA_version"]] <- "0.0.0"
       }
-      # Check for component$mapper as a bru_mapper_multi
+      # Check for component$mapper as a bm_multi
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
         cmp[["mapper"]] <-
-          bru_mapper_multi(list(
+          bm_multi(list(
             main = cmp$main$mapper,
             group = cmp$group$mapper,
             replicate = cmp$replicate$mapper
@@ -92,22 +92,22 @@ bru_info_upgrade <- function(object,
 
     if (utils::compareVersion("2.5.3.9005", old_ver) > 0) {
       message("Upgrading bru_info to 2.5.3.9005")
-      # Make sure component$mapper is a bru_mapper_scale
+      # Make sure component$mapper is a bm_pipe
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
         # Convert offset mappers to const mappers
-        if (inherits(cmp$main$mapper, "bru_mapper_offset")) {
-          cmp$main$mapper <- bru_mapper_const()
+        if (inherits(cmp$main$mapper, c("bm_offset", "bru_mapper_offset"))) {
+          cmp$main$mapper <- bm_const()
         }
         cmp[["mapper"]] <-
-          bru_mapper_pipe(
+          bm_pipe(
             list(
-              mapper = bru_mapper_multi(list(
+              mapper = bm_multi(list(
                 main = cmp$main$mapper,
                 group = cmp$group$mapper,
                 replicate = cmp$replicate$mapper
               )),
-              scale = bru_mapper_scale()
+              scale = bm_scale()
             )
           )
         object[["model"]][["effects"]][[k]] <- cmp
@@ -117,18 +117,18 @@ bru_info_upgrade <- function(object,
 
     if (utils::compareVersion("2.6.0.9000", old_ver) > 0) {
       message("Upgrading bru_info to 2.6.0.9000")
-      # Make sure component$mapper is a bru_mapper_pipe
+      # Make sure component$mapper is a bm_pipe
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
         cmp[["mapper"]] <-
-          bru_mapper_pipe(
+          bm_pipe(
             list(
-              mapper = bru_mapper_multi(list(
+              mapper = bm_multi(list(
                 main = cmp$main$mapper,
                 group = cmp$group$mapper,
                 replicate = cmp$replicate$mapper
               )),
-              scale = bru_mapper_scale()
+              scale = bm_scale()
             )
           )
         object[["model"]][["effects"]][[k]] <- cmp
@@ -1146,9 +1146,9 @@ bru_is_additive.formula <- function(x, ...) {
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
 #' @param aggregate character ("none", "sum", "average", "logsumexp", or
-#'   "logaverageexp", as defined by `bru_mapper_aggregate(type = aggregate)`)
+#'   "logaverageexp", as defined by `bm_aggregate(type = aggregate)`)
 #'   or an aggregation `bru_mapper` object
-#'   ([bru_mapper_aggregate()] or [bru_mapper_logsumexp()]). Default `NULL`,
+#'   ([bm_aggregate()] or [bm_logsumexp()]). Default `NULL`,
 #'   interpreted as "none". `r lifecycle::badge("experimental")`, available
 #'   from version `2.12.0.9013`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
@@ -1306,7 +1306,7 @@ bru_obs <- function(formula = . ~ .,
     )
     aggregate <- switch(aggregate,
       "none" = NULL,
-      bru_mapper_aggregate(type = aggregate)
+      bm_aggregate(type = aggregate)
     )
   }
   if (!is.null(aggregate)) {
@@ -2641,7 +2641,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
-#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' For "iid" models with `mapper = bm_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
 #' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values
@@ -2838,7 +2838,7 @@ predict.bru <- function(object,
 #' `field_eval(cbind(x, y))` for a component that was defined with
 #' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
-#' For "iid" models with `mapper = bru_mapper_index(n)`, `rnorm()` is used to
+#' For "iid" models with `mapper = bm_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`.
 #'
 #' @return List of generated samples

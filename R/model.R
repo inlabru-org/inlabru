@@ -818,7 +818,7 @@ evaluate_index <- function(model, used) {
 NULL
 
 #' @describeIn bru_model_mapper_methods Returns a list (one element per
-#'   observation model) of [bm_list] objects, each with one [bru_mapper_taylor]
+#'   observation model) of [bm_list] objects, each with one [bm_taylor]
 #'   entry for each included component.
 #' @export
 ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {

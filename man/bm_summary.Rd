@@ -2,26 +2,26 @@
 % Please edit documentation in R/mappers.R
 \name{summary.bru_mapper}
 \alias{summary.bru_mapper}
-\alias{summary.bru_mapper_multi}
-\alias{summary.bru_mapper_pipe}
-\alias{summary.bru_mapper_collect}
-\alias{summary.bru_mapper_sum}
-\alias{summary.bru_mapper_repeat}
+\alias{summary.bm_multi}
+\alias{summary.bm_pipe}
+\alias{summary.bm_collect}
+\alias{summary.bm_sum}
+\alias{summary.bm_repeat}
 \alias{print.summary_bru_mapper}
 \alias{print.bru_mapper}
 \title{mapper object summaries}
 \usage{
 \method{summary}{bru_mapper}(object, ..., prefix = "", initial = prefix, depth = 1)
 
-\method{summary}{bru_mapper_multi}(object, ..., prefix = "", initial = prefix, depth = 1)
+\method{summary}{bm_multi}(object, ..., prefix = "", initial = prefix, depth = 1)
 
-\method{summary}{bru_mapper_pipe}(object, ..., prefix = "", initial = prefix, depth = 1)
+\method{summary}{bm_pipe}(object, ..., prefix = "", initial = prefix, depth = 1)
 
-\method{summary}{bru_mapper_collect}(object, ..., prefix = "", initial = prefix, depth = 1)
+\method{summary}{bm_collect}(object, ..., prefix = "", initial = prefix, depth = 1)
 
-\method{summary}{bru_mapper_sum}(object, ..., prefix = "", initial = prefix, depth = 1)
+\method{summary}{bm_sum}(object, ..., prefix = "", initial = prefix, depth = 1)
 
-\method{summary}{bru_mapper_repeat}(object, ..., prefix = "", initial = prefix, depth = 1)
+\method{summary}{bm_repeat}(object, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{print}{summary_bru_mapper}(x, ...)
 
@@ -46,22 +46,22 @@ mapper object summaries
 }
 \examples{
 mapper <-
-  bru_mapper_pipe(
+  bm_pipe(
     list(
-      bru_mapper_multi(list(
-        A = bru_mapper_index(2),
-        B = bru_mapper_index(3)
+      bm_multi(list(
+        A = bm_index(2),
+        B = bm_index(3)
       )),
-      bru_mapper_index(2)
+      bm_index(2)
     )
   )
 summary(mapper, depth = 2)
 mapper <-
-  bru_mapper_repeat(
-    bru_mapper_multi(
+  bm_repeat(
+    bm_multi(
       list(
-        A = bru_mapper_index(2),
-        B = bru_mapper_index(3)
+        A = bm_index(2),
+        B = bm_index(3)
       )
     ),
     3

@@ -66,7 +66,7 @@ objects.
 
 }}
 \examples{
-m <- c(A = bru_mapper_const(), B = bru_mapper_scale())
+m <- c(A = bm_const(), B = bm_scale())
 str(m)
 str(m[2])
 }

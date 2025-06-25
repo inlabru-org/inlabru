@@ -18,7 +18,7 @@ bru_compute_linearisation <- function(...) {
 #' @param input Precomputed component inputs from `evaluate_inputs()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
-#' * For `bru_comp`: A [bru_mapper_taylor] object
+#' * For `bru_comp`: A [bm_taylor] object
 #' * For `bru_obs`: A [bm_list] object
 #'   for the components in the likelihood
 #' * For `bru_obs_list`: A list of [bm_list] objects
@@ -361,7 +361,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
     }
   }
 
-  bru_mapper_taylor(offset = offset, jacobian = B, state0 = NULL)
+  bm_taylor(offset = offset, jacobian = B, state0 = NULL)
 }
 
 #' @param lhoods A `bru_obs_list` object

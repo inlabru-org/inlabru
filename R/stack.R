@@ -12,15 +12,15 @@ bru_make_stack <- function(...) {
 
 #' @param lhood A `bru_obs` object
 #' @param lin Linearisation information
-#' * For `.bru_obs`, a `bru_mapper_taylor` object
-#' * For `.bru_obs_list`, a list of `bru_mapper_taylor` objects
+#' * For `.bru_obs`, a `bm_taylor` object
+#' * For `.bru_obs_list`, a list of `bm_taylor` objects
 #' @param idx Output from `evaluate_index(...)`
 #' @param family_index integer specifying the family sequence index of the
 #'   observation model
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
-  stopifnot(inherits(lin, "bru_mapper_taylor"))
+  stopifnot(inherits(lin, c("bm_taylor", "bru_mapper_taylor")))
   stopifnot(!is.null(lin[["offset"]]))
   stopifnot(is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]))
   stopifnot(is.null(lin[["state0"]]))

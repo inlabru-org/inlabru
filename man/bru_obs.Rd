@@ -150,9 +150,9 @@ defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \co
 \code{list}, or the likelihood construction requires it.}
 
 \item{aggregate}{character ("none", "sum", "average", "logsumexp", or
-"logaverageexp", as defined by \code{bru_mapper_aggregate(type = aggregate)})
+"logaverageexp", as defined by \code{bm_aggregate(type = aggregate)})
 or an aggregation \code{bru_mapper} object
-(\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
+(\code{\link[=bm_aggregate]{bm_aggregate()}} or \code{\link[=bm_logsumexp]{bm_logsumexp()}}). Default \code{NULL},
 interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
 from version \verb{2.12.0.9013}.}
 

@@ -36,7 +36,7 @@ If \code{NULL}, return the component's map.}
 }
 \value{
 An list of mapper input values, formatted for the full component
-mapper (of type \code{bru_mapper_pipe})
+mapper (of type \link{bm_pipe})
 }
 \description{
 Obtain component inputs

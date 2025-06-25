@@ -442,7 +442,7 @@ test_that("Component inputs: non-numeric input detection", {
 
   expect_error(
     ibm_eval(bru_mapper_linear(), input = df$geometry, state = 1),
-    "The input to a bru_mapper_linear evaluation must be numeric or logical."
+    "The input to a bm_linear evaluation must be numeric or logical."
   )
 
   cmp <- bru_comp_list(
@@ -459,6 +459,6 @@ test_that("Component inputs: non-numeric input detection", {
       input = input,
       state = rep(1, fm_dof(mesh))
     ),
-    "The input to a bru_mapper_scale evaluation must be numeric or logical."
+    "The input to a bm_scale evaluation must be numeric or logical."
   )
 })

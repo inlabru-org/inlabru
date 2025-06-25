@@ -216,7 +216,7 @@ bru_component <- function(...) {
 #' @param replicate,replicate_mapper,replicate_layer,replicate_selector,nrep
 #' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
-#' @param marginal May specify a `bru_mapper_marginal()` mapper,
+#' @param marginal May specify a `bm_marginal()` mapper,
 #' that is applied before scaling by `weights`.
 #' @param A.msk `r lifecycle::badge("deprecated")` and has no effect.
 #' @param .envir Evaluation environment
@@ -363,14 +363,14 @@ bru_comp.character <- function(object,
     if (!is.null(group_mapper)) {
       stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
     }
-    group_mapper <- bru_mapper_index(ngroup)
+    group_mapper <- bm_index(ngroup)
     ngroup <- NULL
   }
   if (!is.null(nrep)) {
     if (!is.null(replicate_mapper)) {
       stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
     }
-    replicate_mapper <- bru_mapper_index(nrep)
+    replicate_mapper <- bm_index(nrep)
     nrep <- NULL
   }
 
@@ -469,19 +469,19 @@ bru_comp.character <- function(object,
     component$inla.formula <- as.formula(paste0("~ ."),
       env = .envir
     )
-    component$main$mapper <- bru_mapper_const()
-    component$group$mapper <- bru_mapper_index(1L)
-    component$replicate$mapper <- bru_mapper_index(1L)
+    component$main$mapper <- bm_const()
+    component$group$mapper <- bm_index(1L)
+    component$replicate$mapper <- bm_index(1L)
     # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
+          mapper = bm_multi(list(
             main = component$main$mapper,
             group = component$group$mapper,
             replicate = component$replicate$mapper
           )),
-          scale = bru_mapper_scale()
+          scale = bm_scale()
         )
       )
   } else {
@@ -847,27 +847,27 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
   # Add scalable multi-mapper
   if (is.null(component[["marginal"]])) {
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
+          mapper = bm_multi(list(
             main = component$main$mapper,
             group = component$group$mapper,
             replicate = component$replicate$mapper
           )),
-          scale = bru_mapper_scale()
+          scale = bm_scale()
         )
       )
   } else {
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
+          mapper = bm_multi(list(
             main = component$main$mapper,
             group = component$group$mapper,
             replicate = component$replicate$mapper
           )),
           marginal = component[["marginal"]],
-          scale = bru_mapper_scale()
+          scale = bm_scale()
         )
       )
   }
@@ -1354,7 +1354,7 @@ make_submapper <- function(subcomp_n,
     }
     subcomp_n <- n
     return(
-      bru_mapper_index(n = subcomp_n)
+      bm_index(n = subcomp_n)
     )
   }
 
@@ -1364,7 +1364,7 @@ make_submapper <- function(subcomp_n,
     is.character(values) ||
     (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     return(
-      bru_mapper_factor(
+      bm_factor(
         values,
         factor_mapping = subcomp_factor_mapping,
         indexed = require_indexed
@@ -1382,25 +1382,25 @@ make_submapper <- function(subcomp_n,
         )
       )
     }
-    mapper <- bru_mapper_index(n = ceiling(max(values)))
+    mapper <- bm_index(n = ceiling(max(values)))
     return(mapper)
   }
   if (all(values == 1)) {
     if (require_indexed) {
-      return(bru_mapper_index(n = 1L))
+      return(bm_index(n = 1L))
     }
-    return(bru_mapper_linear())
+    return(bm_linear())
   }
   if (require_indexed) {
     return(
-      bru_mapper_factor(values,
+      bm_factor(values,
         factor_mapping = "full",
         indexed = TRUE
       )
     )
   }
 
-  return(bru_mapper_linear())
+  return(bm_linear())
 }
 
 
@@ -1439,7 +1439,7 @@ bru_get_mapper <- function(model, ...) {
 #' which is assumed to be of a class supporting relevant `fmesher` methods.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  bru_mapper_fmesher(model[["mesh"]])
+  bm_fmesher(model[["mesh"]])
 }
 
 #' @describeIn bru_get_mapper Returns the mapper given by a call to
@@ -1504,10 +1504,10 @@ make_mapper <- function(subcomp,
     ))
   }
   if (subcomp[["type"]] %in% c("linear", "specialnonlinear")) {
-    return(bru_mapper_linear())
+    return(bm_linear())
   }
   if (subcomp[["type"]] %in% c("offset", "const")) {
-    return(bru_mapper_const())
+    return(bm_const())
   }
   if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
@@ -1527,7 +1527,7 @@ make_mapper <- function(subcomp,
         "' of component '", label, "'."
       ))
     }
-    return(bru_mapper_matrix(labels))
+    return(bm_matrix(labels))
   }
   allow_interpolation <- TRUE
   stopifnot(bru_safe_inla(multicore = TRUE))
@@ -1566,7 +1566,7 @@ make_mapper <- function(subcomp,
 
   if (length(mapper_names) > 1L) {
     names(mappers) <- mapper_names
-    return(bru_mapper_collect(mappers, hidden = TRUE))
+    return(bm_collect(mappers, hidden = TRUE))
   }
   return(mappers[[1]])
 }
@@ -2095,7 +2095,7 @@ print.summary_bru_input <- function(x, ...) {
 #' If `NULL`, return the component's map.
 #' @param ... Unused.
 #' @return An list of mapper input values, formatted for the full component
-#'   mapper (of type `bru_mapper_pipe`)
+#'   mapper (of type [bm_pipe])
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
 #' @rdname input_eval
@@ -2110,7 +2110,7 @@ input_eval.bru_comp <- function(component,
   if (is.null(component[["mapper"]])) {
     part_names <- c("main", "group", "replicate")
   } else {
-    stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
+    stopifnot(inherits(component[["mapper"]], c("bm_pipe", "bru_mapper_pipe")))
 
     # The names should be a subset of main, group, replicate
     part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
@@ -2138,8 +2138,8 @@ input_eval.bru_comp <- function(component,
         ...
       )
   }
-  # Any potential length mismatches must be handled by bru_mapper_multi and
-  # bru_mapper_collect, since e.g. 'main' might take a list() input object.
+  # Any potential length mismatches must be handled by bm_multi and
+  # bm_collect, since e.g. 'main' might take a list() input object.
   list(mapper = mapper_val, scale = scale_val)
 }
 

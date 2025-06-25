@@ -110,7 +110,7 @@ passed directly on to \code{INLA::f}}
 \item{replicate, replicate_mapper, replicate_layer, replicate_selector, nrep}{Optional specification of indices for an independent
 replication model. Same syntax as for \code{main}}
 
-\item{marginal}{May specify a \code{bru_mapper_marginal()} mapper,
+\item{marginal}{May specify a \code{bm_marginal()} mapper,
 that is applied before scaling by \code{weights}.}
 
 \item{A.msk}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} and has no effect.}

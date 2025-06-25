@@ -26,7 +26,7 @@ indexing is given by \code{offsets[k] + index}.
 }
 \description{
 Helper methods for regular and interleaved state vector
-indexing, meant for use in \link{bru_mapper_repeat} mappers.
+indexing, meant for use in \link{bm_repeat} mappers.
 }
 \section{Functions}{
 \itemize{

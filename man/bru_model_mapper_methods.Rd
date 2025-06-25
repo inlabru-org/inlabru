@@ -39,7 +39,7 @@ Methods for the \code{ibm_linear()} and \code{ibm_simplify()} methods for
 \section{Functions}{
 \itemize{
 \item \code{ibm_linear(bru_model)}: Returns a list (one element per
-observation model) of \link{bm_list} objects, each with one \link{bru_mapper_taylor}
+observation model) of \link{bm_list} objects, each with one \link{bm_taylor}
 entry for each included component.
 
 \item \code{ibm_simplify(bru_model)}: Returns a list (one element per

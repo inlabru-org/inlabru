@@ -7,7 +7,7 @@
 #' @param mapper The mapper to be repeated.
 #' @param n_rep The number of times to repeat the mapper. If a vector, the
 #'   non-interleaved repeats are combined into a single repeat mapping,
-#'   and combined with interleaved repeats via a [bru_mapper_sum()] of mappers.
+#'   and combined with interleaved repeats via a [bm_sum()] of mappers.
 #' @param interleaved logical; if `TRUE`, the repeated mapping columns are
 #' interleaved; `(x1[1], x2[1], ..., x1[2], x2[2], ...)`.
 #' If `FALSE` (default), the repeated
@@ -21,30 +21,30 @@
 #' @description Defines a repeated-space mapper that sums the contributions for
 #'   each copy. The `ibm_n()` method returns `ibm_n(mapper) * n_rep`, and
 #'   `ibm_values()` returns `seq_len(ibm_n(mapper))`.
-#' @returns A `bru_mapper_repeat` or `bru_mapper_sum` object, or the original
+#' @returns A `bm_repeat` or `bm_sum` object, or the original
 #' input `mapper`.
-#' @rdname bru_mapper_repeat
+#' @rdname bm_repeat
 #' @inheritParams bru_mapper_generics
-#' @inheritParams bru_mapper_scale
-#' @inheritParams bru_mapper_multi
+#' @inheritParams bm_scale
+#' @inheritParams bm_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @examples
-#' (m0 <- bru_mapper_index(3))
-#' (m <- bru_mapper_repeat(m0, 5))
+#' (m0 <- bm_index(3))
+#' (m <- bm_repeat(m0, 5))
 #' ibm_n(m)
 #' ibm_values(m)
 #' ibm_jacobian(m, 1:3)
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
 #' # Interleaving and grouping
-#' (m <- bru_mapper_repeat(m0, c(2, 1, 2), c(TRUE, FALSE, FALSE)))
+#' (m <- bm_repeat(m0, c(2, 1, 2), c(TRUE, FALSE, FALSE)))
 #' ibm_n(m)
 #' ibm_values(m)
 #' ibm_jacobian(m, 1:3)
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
-bru_mapper_repeat <- function(mapper, n_rep, interleaved = FALSE) {
+bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
   stopifnot((length(n_rep) > 0L) && sum(n_rep) > 0L)
   if ((length(n_rep) == 1L) || !any(interleaved)) {
     n_rep <- sum(n_rep)
@@ -71,7 +71,7 @@ bru_mapper_repeat <- function(mapper, n_rep, interleaved = FALSE) {
     if (interleaved[k]) {
       if (n_rep_cumulative > 0L) {
         m_idx <- m_idx + 1L
-        mappers[[m_idx]] <- bru_mapper_repeat(
+        mappers[[m_idx]] <- bm_repeat(
           mapper,
           n_rep = n_rep_cumulative,
           interleaved = FALSE
@@ -79,7 +79,7 @@ bru_mapper_repeat <- function(mapper, n_rep, interleaved = FALSE) {
         n_rep_cumulative <- 0L
       }
       m_idx <- m_idx + 1L
-      mappers[[m_idx]] <- bru_mapper_repeat(
+      mappers[[m_idx]] <- bm_repeat(
         mapper,
         n_rep = n_rep[k],
         interleaved = TRUE
@@ -90,7 +90,7 @@ bru_mapper_repeat <- function(mapper, n_rep, interleaved = FALSE) {
   }
   if (n_rep_cumulative > 0L) {
     m_idx <- m_idx + 1L
-    mappers[[m_idx]] <- bru_mapper_repeat(
+    mappers[[m_idx]] <- bm_repeat(
       mapper,
       n_rep = n_rep_cumulative,
       interleaved = FALSE
@@ -101,24 +101,30 @@ bru_mapper_repeat <- function(mapper, n_rep, interleaved = FALSE) {
   if (m_idx == 1L) {
     return(mappers[[1]])
   }
-  mapper_ <- bru_mapper_sum(mappers, single_input = TRUE)
+  mapper_ <- bm_sum(mappers, single_input = TRUE)
   return(mapper_)
 }
 
 #' @export
-#' @rdname bru_mapper_repeat
-ibm_n.bru_mapper_repeat <- function(mapper, ...) {
+#' @rdname bm_repeat
+bru_mapper_repeat <- function(...) {
+  bm_repeat(...)
+}
+
+#' @export
+#' @rdname bm_repeat
+ibm_n.bm_repeat <- function(mapper, ...) {
   ibm_n(mapper[["mapper"]], ...) * mapper[["n_rep"]]
 }
 #' @export
-#' @rdname bru_mapper_repeat
-ibm_n_output.bru_mapper_repeat <- function(mapper, ...) {
+#' @rdname bm_repeat
+ibm_n_output.bm_repeat <- function(mapper, ...) {
   ibm_n_output(mapper[["mapper"]], ...)
 }
 
 #' @export
-#' @rdname bru_mapper_repeat
-ibm_values.bru_mapper_repeat <- function(mapper, ...) {
+#' @rdname bm_repeat
+ibm_values.bm_repeat <- function(mapper, ...) {
   seq_len(ibm_n(mapper, ...))
 }
 
@@ -149,14 +155,14 @@ bm_repeat_sub_lin <- function(mapper, input, state,
 
 
 
-#' @describeIn bru_mapper_repeat The input should take the format of the
+#' @describeIn bm_repeat The input should take the format of the
 #'   repeated submapper.
 #' @export
-ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
-                                           inla_f = FALSE,
-                                           multi = FALSE,
-                                           ...,
-                                           sub_lin = NULL) {
+ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
+                                   inla_f = FALSE,
+                                   multi = FALSE,
+                                   ...,
+                                   sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_repeat_sub_lin(mapper, input, state)
   }
@@ -179,11 +185,11 @@ ibm_jacobian.bru_mapper_repeat <- function(mapper, input, state = NULL,
 
 
 #' @export
-#' @rdname bru_mapper_repeat
-ibm_eval.bru_mapper_repeat <- function(mapper, input, state,
-                                       multi = FALSE,
-                                       ...,
-                                       sub_lin = NULL) {
+#' @rdname bm_repeat
+ibm_eval.bm_repeat <- function(mapper, input, state,
+                               multi = FALSE,
+                               ...,
+                               sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_repeat_sub_lin(mapper, input, state)
   }
@@ -199,9 +205,9 @@ ibm_eval.bru_mapper_repeat <- function(mapper, input, state,
 
 
 #' @export
-#' @rdname bru_mapper_repeat
-ibm_linear.bru_mapper_repeat <- function(mapper, input, state,
-                                         ...) {
+#' @rdname bm_repeat
+ibm_linear.bm_repeat <- function(mapper, input, state,
+                                 ...) {
   sub_lin <-
     bm_repeat_sub_lin(
       mapper, input, state,
@@ -215,7 +221,7 @@ ibm_linear.bru_mapper_repeat <- function(mapper, input, state,
     ...,
     sub_lin = sub_lin
   )
-  bru_mapper_taylor(
+  bm_taylor(
     offset = eval2$offset,
     jacobian = eval2$jacobian,
     state0 = state,
@@ -226,11 +232,11 @@ ibm_linear.bru_mapper_repeat <- function(mapper, input, state,
 
 
 
-#' @describeIn bru_mapper_repeat
+#' @describeIn bm_repeat
 #' Passes on the input to the corresponding method.
 #' @export
-ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
-                                                 ...) {
+ibm_invalid_output.bm_repeat <- function(mapper, input, state,
+                                         ...) {
   idx <- bm_repeat_indexing(
     n_map = ibm_n(mapper[["mapper"]]),
     n_rep = mapper[["n_rep"]],
@@ -249,7 +255,7 @@ ibm_invalid_output.bru_mapper_repeat <- function(mapper, input, state,
 #' @name bm_repeat_indexing
 #' @rdname bm_repeat_indexing
 #' @description Helper methods for regular and interleaved state vector
-#'   indexing, meant for use in [bru_mapper_repeat] mappers.
+#'   indexing, meant for use in [bm_repeat] mappers.
 #' @keywords internal
 NULL
 

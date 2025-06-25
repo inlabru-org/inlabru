@@ -26,6 +26,6 @@ Extract a mapper from another object
 }
 \examples{
 # Extract a mapper from a `bru_subcomp` object
-as_bru_mapper(bru_comp("x", x, mapper = bru_mapper_index(4))$main)
+as_bru_mapper(bru_comp("x", x, mapper = bm_index(4))$main)
 
 }
