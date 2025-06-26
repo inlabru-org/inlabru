@@ -710,8 +710,10 @@ test_that("Mesh 1d mapper", {
   expect_length(val, length(loc))
   expect_equal(val, loc)
 
-  m <- bru_mapper(fmesher::fm_mesh_1d(c(1, 2, 4, 6, 9), boundary = "f"),
-                  indexed = FALSE)
+  m <- bru_mapper(
+    fmesher::fm_mesh_1d(c(1, 2, 4, 6, 9), boundary = "f"),
+    indexed = FALSE
+  )
   expect_equal(ibm_values(m), c(1, 2, 4, 6, 9))
 })
 

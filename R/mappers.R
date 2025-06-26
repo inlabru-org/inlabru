@@ -341,15 +341,35 @@ ibm_shortname <- function(mapper, ...) {
 
 #' @title mapper object summaries
 #'
-#' @param object `bru_mapper` object to summarise
+#' @param x Object to format/print
+#' @param object Object to summarise
 #' @param \dots Unused arguments
 #' @param prefix character prefix for each line. Default `""`.
 #' @param initial character prefix for the first line. Default `initial=prefix`.
 #' @param depth The recursion depth for multi/collection/pipe mappers. Default
 #'   1, to only show the collection, and not the contents of the sub-mappers.
 #' @export
-#' @method summary bru_mapper
+#' @method format bru_mapper
 #' @rdname bm_summary
+format.bru_mapper <- function(x, ...,
+                              prefix = "",
+                              initial = prefix,
+                              depth = 1) {
+  if (!is.null(mapper_new <- make_bm_class_from_old(x))) {
+    return(format(
+      mapper_new,
+      ...,
+      prefix = prefix,
+      initial = initial,
+      depth = depth
+    ))
+  }
+  txt <- paste0(initial, ibm_shortname(x))
+}
+
+#' @rdname bm_summary
+#' @export
+#' @method summary bru_mapper
 summary.bru_mapper <- function(object, ...,
                                prefix = "",
                                initial = prefix,
@@ -363,7 +383,12 @@ summary.bru_mapper <- function(object, ...,
       depth = depth
     ))
   }
-  summary_object <- paste0(initial, ibm_shortname(object))
+  summary_object <- format(
+    object,
+    prefix = prefix,
+    initial = initial,
+    depth = 1
+  )
   class(summary_object) <- c(
     "summary_bru_mapper",
     class(summary_object)
@@ -372,7 +397,7 @@ summary.bru_mapper <- function(object, ...,
 }
 
 #' @export
-#' @method summary bm_multi
+#' @method format bm_multi
 #' @rdname bm_summary
 #' @examples
 #' mapper <-
@@ -386,31 +411,28 @@ summary.bru_mapper <- function(object, ...,
 #'     )
 #'   )
 #' summary(mapper, depth = 2)
-summary.bm_multi <- function(object, ...,
-                             prefix = "",
-                             initial = prefix,
-                             depth = 1) {
-  summary_object <- NextMethod()
+format.bm_multi <- function(x, ...,
+                            prefix = "",
+                            initial = prefix,
+                            depth = 1) {
+  txt <- NextMethod()
   if (depth <= 0) {
-    if (!inherits(summary_object, "summary_bru_mapper")) {
-      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-    }
-    return(summary_object)
+    return(txt)
   }
   sub_prefix <- paste0(prefix, "      ")
-  summary_object <-
+  txt <-
     paste0(
-      summary_object,
+      txt,
       "(",
       paste0(
         vapply(
-          names(object[["mappers"]]),
+          names(x[["mappers"]]),
           function(nm) {
             paste0(
               nm,
               " = ",
-              summary(
-                object[["mappers"]][[nm]],
+              format(
+                x[["mappers"]][[nm]],
                 prefix = sub_prefix,
                 initial = "",
                 depth = depth - 1
@@ -423,35 +445,31 @@ summary.bm_multi <- function(object, ...,
       ),
       ")"
     )
-  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-  summary_object
+  txt
 }
 
 
 #' @export
-#' @method summary bm_pipe
+#' @method format bm_pipe
 #' @rdname bm_summary
-summary.bm_pipe <- function(object, ...,
-                            prefix = "",
-                            initial = prefix,
-                            depth = 1) {
-  summary_object <- NextMethod()
+format.bm_pipe <- function(x, ...,
+                           prefix = "",
+                           initial = prefix,
+                           depth = 1) {
+  txt <- NextMethod()
   if (depth <= 0) {
-    if (!inherits(summary_object, "summary_bru_mapper")) {
-      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-    }
-    return(summary_object)
+    return(txt)
   }
   sub_prefix <- paste0(prefix, "      ")
-  summary_object <-
+  txt <-
     paste0(
-      summary_object,
+      txt,
       " = ",
       paste0(
         vapply(
-          object[["mappers"]],
-          function(x) {
-            summary(x,
+          x[["mappers"]],
+          function(xx) {
+            format(xx,
               prefix = sub_prefix,
               initial = "",
               depth = depth - 1
@@ -462,34 +480,30 @@ summary.bm_pipe <- function(object, ...,
         collapse = paste0(" -> ")
       )
     )
-  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-  summary_object
+  txt
 }
 
 #' @export
-#' @method summary bm_collect
+#' @method format bm_collect
 #' @rdname bm_summary
-summary.bm_collect <- function(object, ...,
-                               prefix = "",
-                               initial = prefix,
-                               depth = 1) {
-  summary_object <- NextMethod()
+format.bm_collect <- function(x, ...,
+                              prefix = "",
+                              initial = prefix,
+                              depth = 1) {
+  txt <- NextMethod()
   if (depth <= 0) {
-    if (!inherits(summary_object, "summary_bru_mapper")) {
-      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-    }
-    return(summary_object)
+    return(txt)
   }
   sub_prefix <- paste0(prefix, "      ")
-  summary_object <-
+  txt <-
     paste0(
-      summary_object,
+      txt,
       "(",
       paste0(
         vapply(
-          seq_along(object[["mappers"]]),
+          seq_along(x[["mappers"]]),
           function(k) {
-            nm <- names(object[["mappers"]])[k]
+            nm <- names(x[["mappers"]])[k]
             if (is.null(nm)) {
               nm <- as.character(k)
             }
@@ -497,12 +511,12 @@ summary.bm_collect <- function(object, ...,
               nm,
               " = ",
               summary(
-                object[["mappers"]][[k]],
+                x[["mappers"]][[k]],
                 prefix = sub_prefix,
                 initial = "",
                 depth = depth - 1
               ),
-              if (object[["hidden"]] && (k > 1)) {
+              if (x[["hidden"]] && (k > 1)) {
                 "(hidden)"
               } else {
                 NULL
@@ -515,34 +529,30 @@ summary.bm_collect <- function(object, ...,
       ),
       ")"
     )
-  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-  summary_object
+  txt
 }
 
 #' @export
-#' @method summary bm_sum
+#' @method format bm_sum
 #' @rdname bm_summary
-summary.bm_sum <- function(object, ...,
-                           prefix = "",
-                           initial = prefix,
-                           depth = 1) {
-  summary_object <- NextMethod()
+format.bm_sum <- function(x, ...,
+                          prefix = "",
+                          initial = prefix,
+                          depth = 1) {
+  txt <- NextMethod()
   if (depth <= 0) {
-    if (!inherits(summary_object, "summary_bru_mapper")) {
-      class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-    }
-    return(summary_object)
+    return(txt)
   }
   sub_prefix <- paste0(prefix, "      ")
-  summary_object <-
+  txt <-
     paste0(
-      summary_object,
+      txt,
       "(",
       paste0(
         vapply(
-          seq_along(object[["mappers"]]),
+          seq_along(x[["mappers"]]),
           function(k) {
-            nm <- names(object[["mappers"]])[k]
+            nm <- names(x[["mappers"]])[k]
             if (is.null(nm)) {
               nm <- as.character(k)
             }
@@ -550,7 +560,7 @@ summary.bm_sum <- function(object, ...,
               nm,
               " = ",
               summary(
-                object[["mappers"]][[k]],
+                x[["mappers"]][[k]],
                 prefix = sub_prefix,
                 initial = "",
                 depth = depth - 1
@@ -563,12 +573,11 @@ summary.bm_sum <- function(object, ...,
       ),
       ")"
     )
-  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-  summary_object
+  txt
 }
 
 #' @export
-#' @method summary bm_repeat
+#' @method format bm_repeat
 #' @rdname bm_summary
 #' @examples
 #' mapper <-
@@ -583,44 +592,43 @@ summary.bm_sum <- function(object, ...,
 #'   )
 #' summary(mapper)
 #' summary(mapper, depth = 0)
-summary.bm_repeat <- function(object, ...,
-                              prefix = "",
-                              initial = prefix,
-                              depth = 1) {
-  summary_object <- NextMethod()
+format.bm_repeat <- function(x, ...,
+                             prefix = "",
+                             initial = prefix,
+                             depth = 1) {
+  txt <- NextMethod()
   sub_prefix <- paste0(prefix, "      ")
-  summary_object <-
+  txt <-
     paste0(
-      summary_object,
+      txt,
       "(",
-      object[["n_rep"]],
+      x[["n_rep"]],
       " x ",
       paste0(
-        summary(
-          object[["mapper"]],
+        format(
+          x[["mapper"]],
           prefix = sub_prefix,
           initial = "",
           depth = depth
         )
       ),
-      if (isTRUE(object[["interleaved"]])) {
+      if (isTRUE(x[["interleaved"]])) {
         ", interleaved"
       } else {
         NULL
       },
       ")"
     )
-  class(summary_object) <- c("summary_bru_mapper", class(summary_object))
-  summary_object
+  txt
 }
 
 
-#' @param x Object to be printed
+#' @param sep character; separator for printing the summary.
 #' @export
 #' @method print summary_bru_mapper
 #' @rdname bm_summary
-print.summary_bru_mapper <- function(x, ...) {
-  cat(x)
+print.summary_bru_mapper <- function(x, ..., sep = "\n") {
+  cat(x, sep = sep)
   invisible(x)
 }
 
@@ -628,14 +636,18 @@ print.summary_bru_mapper <- function(x, ...) {
 #' @method print bru_mapper
 #' @rdname bm_summary
 print.bru_mapper <- function(x, ...,
+                             sep = "\n",
                              prefix = "",
                              initial = prefix,
                              depth = 1) {
-  print(summary(x,
-    prefix = "",
-    initial = prefix,
-    depth = depth
-  ), ...)
+  cat(
+    format(x,
+      prefix = "",
+      initial = prefix,
+      depth = depth
+    ),
+    sep = sep
+  )
   invisible(x)
 }
 
@@ -644,13 +656,13 @@ print.bru_mapper <- function(x, ...,
 ## Constructor ----
 
 #' @param mapper For `bru_mapper_define`, a prototype mapper object, see
-#'   Details. For `bm_scale`, a mapper to be scaled.
+#'   Details.
 #' @param new_class If non-`NULL`, this is added at the front of the class
 #'   definition
 #' @param remove_class If non-`NULL`, this class or classes is removed from the
 #'   class definition before adding the `new_class` names. Default is `"list"`.
 #'
-#' @describeIn bru_mapper Adds the `new_class` and "bru_mapper" class names to
+#' @describeIn bru_mapper Adds the `new_class` and `"bru_mapper"` class names to
 #'   the inheritance list for the input `mapper` object, unless the object
 #'   already inherits from these.
 #'
@@ -1973,6 +1985,8 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...,
 #' returns
 #' `bm_pipe(list(mapper = mapper, scale = bm_scale()))`
 #' @rdname bm_scale
+#' @param mapper For `bm_scale()`, an optional `bru_mapper` to be scaled.
+#'   For `ibm_*` methods, a `bm_scale` mapper object.
 #' @inheritParams bru_mapper_generics
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers

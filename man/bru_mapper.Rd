@@ -14,7 +14,7 @@ bru_mapper_define(mapper, new_class = NULL, remove_class = "list", ...)
 purposes, see details for each function below.}
 
 \item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see
-Details. For \code{bm_scale}, a mapper to be scaled.}
+Details.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class
 definition}
@@ -37,7 +37,7 @@ mappers for special objects. See below for details of the
 default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
 new mappers in user code.
 
-\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class names to
+\item \code{bru_mapper_define()}: Adds the \code{new_class} and \code{"bru_mapper"} class names to
 the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
 

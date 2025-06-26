@@ -25,7 +25,8 @@ bru_mapper_scale(...)
 \method{ibm_eval}{bm_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 }
 \arguments{
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
+\item{mapper}{For \code{bm_scale()}, an optional \code{bru_mapper} to be scaled.
+For \verb{ibm_*} methods, a \code{bm_scale} mapper object.}
 
 \item{...}{Arguments passed on to other methods}
 
