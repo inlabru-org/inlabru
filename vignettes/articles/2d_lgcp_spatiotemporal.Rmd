@@ -72,7 +72,7 @@ matern <- inla.spde2.pcmatern(mrsea$mesh,
   prior.range = c(10, 0.01)
 )
 
-cmp <- geometry + season ~ Intercept(1) +
+cmp <- ~ Intercept(1) +
   mySmooth(
     geometry,
     model = matern,
@@ -80,12 +80,17 @@ cmp <- geometry + season ~ Intercept(1) +
     ngroup = 4
   )
 
-fit <- lgcp(cmp,
-  data = mrsea$points,
-  samplers = mrsea$samplers,
-  domain = list(
-    geometry = mrsea$mesh,
-    season = seq_len(4)
+fit <- bru(
+  cmp,
+  bru_obs(
+    geometry + season ~ .,
+    family = "cp",
+    data = mrsea$points,
+    samplers = mrsea$samplers,
+    domain = list(
+      geometry = mrsea$mesh,
+      season = seq_len(4)
+    )
   )
 )
 ```
