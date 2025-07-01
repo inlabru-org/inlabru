@@ -1128,11 +1128,12 @@ bru_is_additive.formula <- function(x, ...) {
 #'   location uncertainty.
 #' @param scale Fixed (optional) scale parameters of the precision for several
 #'   models, such as Gaussian and student-t response models.
-#' @param domain,samplers,ips Arguments used for `family="cp"`.
+#' @param domain,samplers,ips Arguments used for `family="cp"` and `aggregate=`.
 #' \describe{
 #' \item{`domain`}{Named list of domain definitions.}
-#' \item{`samplers`}{Integration subdomain for 'cp' family.}
-#' \item{`ips`}{Integration points for 'cp' family. Defaults
+#' \item{`samplers`}{Integration domain for `family="cp"` or subdomains for
+#'   `aggregate=`.}
+#' \item{`ips`}{Integration points. Defaults
 #'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
 #'   overrides `domain` and `samplers`.}
 #' }
@@ -1310,6 +1311,42 @@ bru_obs <- function(formula = . ~ .,
     )
   }
   if (!is.null(aggregate)) {
+    if (is.null(ips)) {
+      if (!is.null(domain)) {
+        ips <- fm_int(
+          domain = domain,
+          samplers = samplers,
+          int.args = options[["bru_int_args"]]
+        )
+      }
+    } else {
+      if (is.null(data)) {
+        data <- ips
+        ips <- NULL
+      }
+    }
+    if (!is.null(ips)) {
+      if (!is.null(data)) {
+        ips$.block <- as.integer(ips$.block)
+        if (".block" %in% names(data)) {
+          ips <- dplyr::left_join(ips, data, by = ".block")
+        } else {
+          if (NROW(data) != max(ips$.block)) {
+            stop(paste0(
+              "`data` has ", NROW(data), " rows, but `ips` has ",
+              max(ips$.block), " blocks. Cannot join."
+            ))
+          }
+          ips <- dplyr::left_join(
+            ips,
+            dplyr::bind_cols(data, .block = seq_len(NROW(data)))
+          )
+        }
+      }
+      data <- ips
+      ips <- NULL
+    }
+
     aggregate_input <- bru_eval_in_data_context(
       substitute(aggregate_input),
       data = list(data = data, response_data = response_data),

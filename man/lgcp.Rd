@@ -25,11 +25,12 @@ Also used to define a default linear additive predictor.  See
 \code{SpatialPoints[DataFrame]}
 object.}
 
-\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"} and \verb{aggregate=}.
 \describe{
 \item{\code{domain}}{Named list of domain definitions.}
-\item{\code{samplers}}{Integration subdomain for 'cp' family.}
-\item{\code{ips}}{Integration points for 'cp' family. Defaults
+\item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
+\verb{aggregate=}.}
+\item{\code{ips}}{Integration points. Defaults
 to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}

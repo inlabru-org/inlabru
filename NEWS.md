@@ -19,7 +19,9 @@
 * Add experimental predictor aggregation helper feature
   `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
   specification of models with aggregation as the final step of the predictor
-  evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`)
+  evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`). Includes support
+  for constructing the aggregation information, via `domain`,`samplers`, or
+  precomputed `ips` (version `2.12.0.9022`)
 * Automatically detect purely additive linear models (version `2.12.0.9014`)
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
   and re-reintroduce `like_list()` and `bru_like_list()` as aliases for

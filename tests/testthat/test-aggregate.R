@@ -87,7 +87,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
 
   obs <- data.frame(
     x = c(10, 20, 30),
-    y = c(10, 20, 30),
+    y = c(1000, 2000, 3000),
     z = c(10, 20, 30)
   )
   pred <- data.frame(
@@ -96,13 +96,14 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     weights = c(1, 1, 1, 1, 1, 1),
     grp = c(1, 1, 2, 2, 2, 3)
   )
+  domain <- list()
 
-  comp <- ~ Intercept(1) + x
+  comp <- ~ Intercept(1) + x + y
 
   fit <- bru(
     comp,
     bru_obs(
-      z ~ Intercept + x,
+      z ~ Intercept + x + y,
       family = "normal",
       response_data = obs,
       data = pred,
@@ -125,13 +126,13 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
 
   expect_equal(
     fit$summary.fixed$mean,
-    c(3.033, 4.426),
+    c(3.636, 3.889, 0.0505),
     tolerance = midtol
   )
 
   expect_no_error({
     bru_obs(
-      z ~ Intercept + x,
+      z ~ Intercept + x + y,
       family = "normal",
       response_data = obs,
       data = pred,
@@ -154,7 +155,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   expect_error(
     {
       bru_obs(
-        z ~ Intercept + x,
+        z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
         data = pred,
@@ -176,6 +177,80 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     paste0(
       "Aggregation requested, but `aggregate_input[['block']]` ",
       "evaluates to NULL."
+    ),
+    fixed = TRUE
+  )
+})
+
+
+test_that("Aggregated Gaussian observations, using domain/samplers feature", {
+  local_bru_safe_inla()
+
+  obs <- data.frame(
+    x = c(10, 20, 30),
+    z = c(10, 20, 30)
+  )
+  pred <- data.frame(
+    y = c((1 + 20) / 2, (3 + 40 + 5) / 3, 60)
+  )
+  domain <- list(x = 1:6)
+  samplers <- list(x = list(1:2, 3:5, 6))
+
+  comp <- ~ Intercept(1) + x + y
+
+  fit <- bru(
+    comp,
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      domain = domain,
+      samplers = samplers,
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    )
+  )
+
+  expect_equal(
+    fit$summary.fixed$mean,
+    c(3.636, 3.889, 0.0505),
+    tolerance = midtol
+  )
+
+  expect_error(
+    {
+      bru(
+        comp,
+        bru_obs(
+          z ~ Intercept + x + y,
+          family = "normal",
+          response_data = obs,
+          data = NULL,
+          aggregate = "average",
+          domain = domain,
+          samplers = samplers,
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = 6,
+                fixed = TRUE
+              )
+            )
+          )
+        )
+      )
+    },
+    paste0(
+      "The input evaluation 'y' for 'y' failed. ",
+      "Perhaps the data object doesn't contain the needed variables?"
     ),
     fixed = TRUE
   )
