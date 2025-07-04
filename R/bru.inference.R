@@ -886,7 +886,9 @@ extended_bind_rows <- function(...) {
     for (i in sf_data_idx_) {
       if (!inherits(dt[[i]][[nm]], "sfc")) {
         stop(paste0(
-          "Column '", nm, "' is not a simple feature column in all data objects."
+          "Column '",
+          nm,
+          "' is not a simple feature column in all data objects."
         ))
       }
       dt_crs <- fm_crs(dt[[i]][[nm]])
