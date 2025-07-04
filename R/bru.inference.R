@@ -877,8 +877,18 @@ extended_bind_rows <- function(...) {
       which(vapply(dt, function(data) !is.null(data[[nm]]), TRUE))
 
     # Unify CRS
+    if (!inherits(dt[[sf_data_idx_[1]]][[nm]], "sfc")) {
+      stop(paste0(
+        "Column '", nm, "' is not a simple feature column in all data objects."
+      ))
+    }
     the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
     for (i in sf_data_idx_) {
+      if (!inherits(dt[[i]][[nm]], "sfc")) {
+        stop(paste0(
+          "Column '", nm, "' is not a simple feature column in all data objects."
+        ))
+      }
       dt_crs <- fm_crs(dt[[i]][[nm]])
       if (!fm_crs_is_identical(dt_crs, the_crs)) {
         dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
