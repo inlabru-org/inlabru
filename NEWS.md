@@ -24,8 +24,8 @@
   precomputed `ips` (version `2.12.0.9022`)
 * Automatically detect purely additive linear models (version `2.12.0.9014`)
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
-  and re-reintroduce `like_list()` and `bru_like_list()` as aliases for
-  `bru_obs_list()` (version `2.12.0.9020`)
+  and temporarily re-reintroduce `like_list()` and `bru_like_list()` as aliases
+  for `bru_obs_list()` (version `2.12.0.9020`)
 * Add `quantile` argument to `spde.posterior()` for controlling the credible
   interval calculations, like `materncov.bands()`, which is now also exported
   (version `2.12.0.9019`)

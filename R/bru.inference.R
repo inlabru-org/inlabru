@@ -1390,6 +1390,26 @@ bru_obs <- function(formula = . ~ .,
         .envir = .envir
       )
     }
+    if (is.character(aggregate_input[["block"]])) {
+      msg <- paste0(
+        "'character' aggregation block information detected.\n",
+        "Please use a numeric or integer vector for the block information ",
+        "instead.\n",
+        "If you want to use a character vector, ",
+        "please convert it to a factor first,\n",
+        "making sure the factor level order matches your intended order,\n",
+        "and use `as.integer()`."
+      )
+
+      if (utils::packageVersion("fmesher") < "0.4.0.9008") {
+        msg <- paste0(
+          msg,
+          "\nYou have fmesher < 0.4.0.9006.\nFrom version 0.4.0.9006, `fm_int()`/`fm_cprod()` creates ",
+          "integer block information automatically."
+        )
+      }
+      bru_log_abort(msg)
+    }
     if (is.null(aggregate_input[["weights"]])) {
       aggregate_input[["weights"]] <- bru_eval_in_data_context(
         quote(.data.[["weight"]]),
