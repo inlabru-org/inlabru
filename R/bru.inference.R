@@ -927,6 +927,20 @@ extended_bind_rows <- function(...) {
       }
     }
   }
+  # Technically, we only need this if at lest one of the objects is a tibble
+  dt <- lapply(dt, function(object) {
+    if (!tibble::is_tibble(object)) {
+      if (inherits(object, "sf")) {
+        # Convert to tibble, preserving geometry column
+        geometry_name <- attr(object, "sf_column", exact = TRUE)
+        object <- tibble::as_tibble(object)
+        object <- sf::st_as_sf(object, sf_column_name = geometry_name)
+      } else {
+        object <- tibble::as_tibble(object)
+      }
+    }
+    object
+  })
   result <- do.call(dplyr::bind_rows, dt)
   if (length(sfc_names_) > 0) {
     result <- sf::st_as_sf(result)
