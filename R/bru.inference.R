@@ -3026,7 +3026,7 @@ generate.bru <- function(object,
         )
         lifecycle::deprecate_soft(
           "2.12.0.9003",
-          "generate(include)",
+          "generate(exclude)",
           "generate(used)",
           paste0(
             "If auto-detection doesn't work, ",
