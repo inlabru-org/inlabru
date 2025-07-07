@@ -1365,7 +1365,8 @@ bru_obs <- function(formula = . ~ .,
           }
           ips <- dplyr::left_join(
             ips,
-            dplyr::bind_cols(data, .block = seq_len(NROW(data)))
+            dplyr::bind_cols(data, .block = seq_len(NROW(data))),
+            by = ".block"
           )
         }
       }
@@ -1401,11 +1402,11 @@ bru_obs <- function(formula = . ~ .,
         "and use `as.integer()`."
       )
 
-      if (utils::packageVersion("fmesher") < "0.4.0.9008") {
+      if (utils::packageVersion("fmesher") < "0.4.0.9006") {
         msg <- paste0(
           msg,
-          "\nYou have fmesher < 0.4.0.9006.\nFrom version 0.4.0.9006, `fm_int()`/`fm_cprod()` creates ",
-          "integer block information automatically."
+          "\nYou have fmesher < 0.4.0.9006. From version 0.4.0.9006,\n",
+          "`fm_int()`/`fm_cprod()` creates integer block information automatically."
         )
       }
       bru_log_abort(msg)
