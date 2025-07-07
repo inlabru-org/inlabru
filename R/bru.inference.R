@@ -1406,7 +1406,8 @@ bru_obs <- function(formula = . ~ .,
         msg <- paste0(
           msg,
           "\nYou have fmesher < 0.4.0.9006. From version 0.4.0.9006,\n",
-          "`fm_int()`/`fm_cprod()` creates integer block information automatically."
+          "`fm_int()`/`fm_cprod()` creates integer block information ",
+          "automatically."
         )
       }
       bru_log_abort(msg)
