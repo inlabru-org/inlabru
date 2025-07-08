@@ -1402,13 +1402,12 @@ bru_obs <- function(formula = . ~ .,
         "and use `as.integer()`."
       )
 
-      if (utils::packageVersion("fmesher") < "0.4.0.9006") {
-        msg <- paste0(
-          msg,
-          "\nYou have fmesher < 0.4.0.9006. From version 0.4.0.9006,\n",
-          "`fm_int()`/`fm_cprod()` creates integer block information ",
+      if (utils::packageVersion("fmesher") < "0.5.0") {
+        msg <- c(msg, paste0(
+          "You have fmesher < 0.5.0. From version 0.5.0,",
+          "`fm_int()`/`fm_cprod()`\ncreates integer block information ",
           "automatically."
-        )
+        ))
       }
       bru_log_abort(msg)
     }

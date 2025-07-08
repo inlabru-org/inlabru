@@ -590,5 +590,5 @@ crps_score <-
 summary(crps_score)
 ```
 Formulas and functions for Poisson CRPS, as well as for other distributions, can be found via
-https://cran.r-project.org/web/packages/scoringRules/vignettes/article.pdf and
-the references in `?scoringRules::crps.numeric`.
+the ["Evaluating Probabilistic Forecasts with scoringRules"](https://cran.r-project.org/package=scoringRules/vignettes/article.pdf)
+vignette of the `scoringRules` package, and the references in `?scoringRules::crps.numeric`.
