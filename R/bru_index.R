@@ -84,7 +84,7 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
       stop(paste0(
         "Invalid tag(s) '", paste(tag, collapse = ", "), "' for ",
         "bru object with tags '", paste(names(object[["bru_info"]][["lhoods"]]),
-                                        collapse = ", "
+          collapse = ", "
         ), "'"
       ))
     }

@@ -1,5 +1,3 @@
-
-
 #' Obtain component inputs
 #'
 #' @export
@@ -18,13 +16,15 @@ bru_input.default <- function(input,
                               layer = NULL,
                               selector = NULL,
                               ...) {
-  inp <- structure(list(
-    input = input,
-    label = label,
-    layer = layer,
-    selector = selector
-  ),
-  class = "bru_input")
+  inp <- structure(
+    list(
+      input = input,
+      label = label,
+      layer = layer,
+      selector = selector
+    ),
+    class = "bru_input"
+  )
   inp
 }
 
@@ -371,8 +371,8 @@ bru_input.bru_input <- function(input, data, env = NULL,
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_CRS(data),
-                               error = function(e) {
-                               }
+            error = function(e) {
+            }
           )
           if (!fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
@@ -452,7 +452,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
     "SpatialPixelsDataFrame",
     "SpatRaster"
   ))) &&
-  any(is.na(as.data.frame(val)))) {
+    any(is.na(as.data.frame(val)))) {
     msg <- paste0(
       "Model input '",
       paste0(deparse(input$input), collapse = "\n"),
@@ -564,9 +564,9 @@ summary.bru_input <- function(object,
   res <- structure(
     list(
       text = format(object,
-                    verbose = verbose,
-                    ...,
-                    label.override = label.override
+        verbose = verbose,
+        ...,
+        label.override = label.override
       )
     ),
     class = "summary_bru_input"
@@ -582,9 +582,9 @@ summary.bru_input <- function(object,
 print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
   cat(
     format(x,
-           verbose = verbose,
-           ...,
-           label.override = label.override
+      verbose = verbose,
+      ...,
+      label.override = label.override
     ),
     "\n",
     sep = ""

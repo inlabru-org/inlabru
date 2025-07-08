@@ -480,10 +480,11 @@ format.bm_multi <- function(x, ...,
       txt,
       "(",
       format(x[["mappers"]],
-             prefix = sub_prefix,
-             initial = "",
-             depth = depth - 1,
-             collapse = ", "),
+        prefix = sub_prefix,
+        initial = "",
+        depth = depth - 1,
+        collapse = ", "
+      ),
       ")"
     )
   txt
@@ -507,11 +508,12 @@ format.bm_pipe <- function(x, ...,
       txt,
       " = ",
       format(x[["mappers"]],
-             prefix = sub_prefix,
-             initial = "",
-             depth = depth - 1,
-             collapse = " -> ",
-             labels = FALSE)
+        prefix = sub_prefix,
+        initial = "",
+        depth = depth - 1,
+        collapse = " -> ",
+        labels = FALSE
+      )
     )
   txt
 }
@@ -586,7 +588,8 @@ format.bm_sum <- function(x, ...,
         prefix = sub_prefix,
         initial = "",
         depth = depth - 1,
-        collapse = ", "),
+        collapse = ", "
+      ),
       ")"
     )
   txt
@@ -658,9 +661,9 @@ print.bru_mapper <- function(x, ...,
                              depth = 1) {
   cat(
     format(x,
-           prefix = "",
-           initial = prefix,
-           depth = depth
+      prefix = "",
+      initial = prefix,
+      depth = depth
     ),
     sep = sep
   )
@@ -679,10 +682,10 @@ print.bm_list <- function(x, ...,
                           collapse = ", ") {
   cat(
     format(x,
-           prefix = "",
-           initial = prefix,
-           depth = depth,
-           collapse = collapse
+      prefix = "",
+      initial = prefix,
+      depth = depth,
+      collapse = collapse
     ),
     sep = sep
   )
