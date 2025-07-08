@@ -6,8 +6,8 @@
   "bym2" models (version `2.12.0.9002`)
 * Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
   "matern2d" (version `2.12.0.9004`)
-* Allow `bru_obs(family = "cp")`/`lgcp()` optional `weights` argument to contain
-  individual point observation weights, so that the `eta` contribution to
+* Allow the optional `weights` argument to `bru_obs(family = "cp")`/`lgcp()`
+  to contain individual point observation weights, so that the `eta` contribution to
   the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
   `2.12.0.9006`)
 * Add `inputs` data to the `bru_info` object, so that the component inputs
