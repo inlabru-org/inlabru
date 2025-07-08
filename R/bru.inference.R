@@ -1124,12 +1124,13 @@ bru_is_additive.formula <- function(x, ...) {
 #'   processes via `family = "cp"`.
 #'   As an alternative to [bru()], the [lgcp()] function provides
 #'   a convenient interface to fitting Cox processes.
-#' @param data Predictor expression-specific data, as a `data.frame`, `sf`, or
-#' `SpatialPoints[DataFrame]`
-#'   object.
+#' @param data Predictor expression-specific data, as a `data.frame`, `tibble`,
+#'  or `sf`.  Since `2.12.0.9023`, deprecated support for
+#' `SpatialPoints[DataFrame]` objects.
 #' @param response_data Observation/response-specific data for models that need
 #'   different size/format for inputs and response variables, as a `data.frame`,
-#'   `sf`, or `SpatialPoints[DataFrame]` object.
+#'   `tibble`, or `sf`. Since `2.12.0.9023`, deprecated support for
+#'   `SpatialPoints[DataFrame]` objects.
 #' @param data_extra object convertible with `as.list()` with additional
 #'   variables to be made available in predictor evaluations. Variables with
 #'   the same names as the data object will be ignored, unless accessed via
@@ -1156,9 +1157,9 @@ bru_is_additive.formula <- function(x, ...) {
 #'   models, such as Gaussian and student-t response models.
 #' @param domain,samplers,ips Arguments used for `family="cp"` and `aggregate=`.
 #' \describe{
-#' \item{`domain`}{Named list of domain definitions.}
+#' \item{`domain`}{Named list of domain definitions, see [fmesher::fm_int()].}
 #' \item{`samplers`}{Integration domain for `family="cp"` or subdomains for
-#'   `aggregate=`.}
+#'   `aggregate=`, see [fmesher::fm_int()].}
 #' \item{`ips`}{Integration points. Defaults
 #'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
 #'   overrides `domain` and `samplers`.}
@@ -1465,6 +1466,42 @@ bru_obs <- function(formula = . ~ .,
     is_additive <- FALSE
   }
 
+  if (inherits(data, "Spatial")) {
+    lifecycle::deprecate_warn(
+      "2.12.0.9023",
+      "bru_obs(data = 'has deprecated support for `Spatial` input')",
+      I("`sf` input")
+    )
+  }
+  if (inherits(response, "Spatial")) {
+    lifecycle::deprecate_warn(
+      "2.12.0.9023",
+      I("`bru_obs() response objects of `Spatial` type"),
+      I("`sf` input")
+    )
+  } else if (is.list(response) &&
+    inherits(response[["coordinates"]], "Spatial")) {
+    lifecycle::deprecate_warn(
+      "2.12.0.9023",
+      I("`bru_obs() response objects of `Spatial` type"),
+      I("`sf` input")
+    )
+  }
+  if (inherits(samplers, "Spatial")) {
+    lifecycle::deprecate_warn(
+      "2.12.0.9023",
+      "bru_obs(samplers = 'has deprecated support for `Spatial` input')",
+      I("`sf` input")
+    )
+  }
+  if (inherits(ips, "Spatial")) {
+    lifecycle::deprecate_warn(
+      "2.12.0.9023",
+      "bru_obs(ips = 'has deprecated support for `Spatial` input')",
+      I("`sf` input")
+    )
+  }
+
   # More on special bru likelihoods
   if (family == "cp") {
     if (!is.null(aggregate)) {
@@ -1496,6 +1533,7 @@ bru_obs <- function(formula = . ~ .,
           ")"
         ))
       }
+
       ips <- fm_int(
         domain = domain,
         samplers = samplers,
@@ -1560,14 +1598,14 @@ bru_obs <- function(formula = . ~ .,
       data_ <- data
     }
     if (inherits(data_, "Spatial")) {
-      data_ <- as.data.frame(data_)
+      data_ <- tibble::as_tibble(as.data.frame(data_))
     }
     if (ips_is_Spatial) {
       if ("coordinates" %in% names(response)) {
         idx <- names(response) %in% "coordinates"
         data <- as.data.frame(response$coordinates)
         if (any(!idx)) {
-          data <- cbind(data, as.data.frame(response[!idx]))
+          data <- dplyr::bind_cols(data, as.data.frame(response[!idx]))
         }
       } else {
         data <- as.data.frame(response)
@@ -1575,7 +1613,7 @@ bru_obs <- function(formula = . ~ .,
       response_data <- NULL
       N_data <- NROW(data)
     } else {
-      data <- as.data.frame(response)
+      data <- tibble::as_tibble(response)
       if (("geometry" %in% names(data)) &&
         inherits(data$geometry, "sfc")) {
         sf::st_geometry(data) <- "geometry"
@@ -1610,7 +1648,7 @@ bru_obs <- function(formula = . ~ .,
 
     if (identical(options[["bru_compress_cp"]], TRUE)) {
       allow_combine <- TRUE
-      response_data <- data.frame(
+      response_data <- tibble::tibble(
         BRU_E = c(
           0,
           E * ips[["weight"]]
@@ -2552,7 +2590,7 @@ bru_obs_expr <- function(lhood, components) {
 #' assumed that all of the LGCP's dimensions have been observed completely.
 #'
 #' @export
-#' @inheritParams like
+#' @inheritParams bru_obs
 #' @inheritParams bru
 #' @param \dots Further arguments passed on to [bru_obs()]. In particular,
 #'   optional `E`, a single numeric used rescale all integration weights by a
@@ -3988,7 +4026,7 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' @param model A [bru_model] object
 #' @param lhoods A list of likelihood objects from [bru_obs()]
 #' @param inputs Optional pre-computed  list of per-likelihood component
-#'   evaluations, from [input_eval.bru_obs_list()].
+#'   evaluations, from [bru_input.bru_obs_list()].
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`

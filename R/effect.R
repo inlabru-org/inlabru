@@ -3,9 +3,20 @@
 #' Obtain component inputs
 #'
 #' @export
-#' @rdname input_eval
+#' @rdname bru_input
+bru_input <- function(...) {
+  UseMethod("bru_input")
+}
+#' @export
+#' @describeIn bru_input `r lifecycle::badge("deprecated")` from `2.12.0.9023`.
+#' Use `bru_input()` instead.
 input_eval <- function(...) {
-  UseMethod("input_eval")
+  lifecycle::deprecate_warn(
+    "2.12.0.9023",
+    "input_eval()",
+    "bru_input()"
+  )
+  bru_input(...)
 }
 #' Obtain indices
 #'
@@ -671,7 +682,7 @@ bru_comp_list.formula <- function(object,
 #' @describeIn bru_comp_list Combine a list of components and/or component
 #'   formulas into a `bru_comp_list` object
 #' @param inputs A tree-like list of component input evaluations,
-#' from [input_eval.bru_obs_list()].
+#' from [bru_input.bru_obs_list()].
 #' @export
 bru_comp_list.list <- function(object,
                                lhoods = NULL,
@@ -919,7 +930,7 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
 #' @rdname add_mappers
 add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
   if (is.null(inputs)) {
-    inputs <- input_eval(lhoods, components = components)
+    inputs <- bru_input(lhoods, components = components)
   }
   is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
   for (k in which(!is_copy)) {
@@ -947,16 +958,23 @@ add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
   components
 }
 
-bru_input <- function(input, label = NULL, layer = NULL, selector = NULL) {
-  inp <- structure(
-    list(
-      input = input,
-      label = label,
-      layer = layer,
-      selector = selector
-    ),
-    class = "bru_input"
-  )
+#' @describeIn bru_input Create a `bru_input` object.
+#' @export
+#' @examples
+#' inp <- bru_input(expression(x), "LABEL")
+#' bru_input(inp, data.frame(x = 1:3))
+bru_input.default <- function(input,
+                              label = NULL,
+                              layer = NULL,
+                              selector = NULL,
+                              ...) {
+  inp <- structure(list(
+    input = input,
+    label = label,
+    layer = layer,
+    selector = selector
+  ),
+  class = "bru_input")
   inp
 }
 
@@ -1224,7 +1242,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
           inputs <- lapply(
             lhoods,
             function(lh) {
-              input_eval(
+              bru_input(
                 subcomp$input,
                 data = lh$data,
                 env = env,
@@ -1240,7 +1258,7 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
         # useful for intercept-like components only used via the
         # *_latent technique.
         inputs <- list(
-          input_eval(subcomp$input,
+          bru_input(subcomp$input,
             data = NULL,
             env = env,
             label = subcomp$input$label,
@@ -2098,12 +2116,12 @@ print.summary_bru_input <- function(x, ...) {
 #'   mapper (of type [bm_pipe])
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
-#' @rdname input_eval
-input_eval.bru_comp <- function(component,
-                                data,
-                                ...) {
+#' @rdname bru_input
+bru_input.bru_comp <- function(component,
+                               data,
+                               ...) {
   bru_log_message(
-    paste0("input_eval.bru_comp(", component$label, ")"),
+    paste0("bru_input.bru_comp(", component$label, ")"),
     verbosity = 4
   )
 
@@ -2118,7 +2136,7 @@ input_eval.bru_comp <- function(component,
   mapper_val <- list()
   for (part in part_names) {
     mapper_val[[part]] <-
-      input_eval(
+      bru_input(
         component[[part]]$input,
         data,
         env = component$env,
@@ -2130,7 +2148,7 @@ input_eval.bru_comp <- function(component,
     scale_val <- NULL
   } else {
     scale_val <-
-      input_eval(
+      bru_input(
         component[["weights"]],
         data,
         env = component$env,
@@ -2144,28 +2162,28 @@ input_eval.bru_comp <- function(component,
 }
 
 #' @export
-#' @rdname input_eval
-input_eval.bru_model <- function(model, lhoods, ...) {
-  input_eval(lhoods, components = model[["effects"]])
+#' @rdname bru_input
+bru_input.bru_model <- function(model, lhoods, ...) {
+  bru_input(lhoods, components = model[["effects"]])
 }
 
 #' @param components A [bru_comp_list].
 #' @export
-#' @rdname input_eval
-input_eval.bru_comp_list <-
+#' @rdname bru_input
+bru_input.bru_comp_list <-
   function(components,
            data,
            ...) {
-    bru_log_message("input_eval.bru_comp_list", verbosity = 4)
-    lapply(components, function(x) input_eval(x, data = data, ...))
+    bru_log_message("bru_input.bru_comp_list", verbosity = 4)
+    lapply(components, function(x) bru_input(x, data = data, ...))
   }
 
-#' @describeIn input_eval Computes the component inputs for included components
+#' @describeIn bru_input Computes the component inputs for included components
 #' for each model likelihood
 #'
 #' @param lhoods A [bru_obs_list] object
 #' @export
-input_eval.bru_obs_list <- function(lhoods, components, ...) {
+bru_input.bru_obs_list <- function(lhoods, components, ...) {
   bru_log_message(
     "Evaluate component inputs for each observation model",
     verbosity = 3L
@@ -2175,7 +2193,7 @@ input_eval.bru_obs_list <- function(lhoods, components, ...) {
     function(lh) {
       included <- bru_used(lh)[["effect"]]
 
-      input_eval(
+      bru_input(
         components[included],
         data = lh[["data"]],
         ...
@@ -2185,9 +2203,9 @@ input_eval.bru_obs_list <- function(lhoods, components, ...) {
 }
 
 
-input_eval_layer <- function(layer, selector = NULL, envir, enclos,
-                             label,
-                             e_input) {
+bru_input_layer <- function(layer, selector = NULL, envir, enclos,
+                            label,
+                            e_input) {
   input_layer <- tryCatch(
     eval(layer, envir = envir, enclos = enclos),
     error = function(e) {
@@ -2212,7 +2230,7 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 }
 
 
-#' @describeIn input_eval Attempts to evaluate a component input (e.g. `main`,
+#' @describeIn bru_input Attempts to evaluate a component input (e.g. `main`,
 #' `group`, `replicate`, or `weight`), and process the results:
 #' 1. If `eval()` failed, return NULL or map everything to 1
 #'    (see the `null.on.fail` argument). This should normally not
@@ -2228,10 +2246,10 @@ input_eval_layer <- function(layer, selector = NULL, envir, enclos,
 #'
 #' @seealso [bru_comp()]
 #' @export
-input_eval.bru_input <- function(input, data, env = NULL,
-                                 null.on.fail = FALSE, ...) {
+bru_input.bru_input <- function(input, data, env = NULL,
+                                null.on.fail = FALSE, ...) {
   bru_log_message(
-    paste0("input_eval.bru_input(", input$label, ")"),
+    paste0("bru_input.bru_input(", input$label, ")"),
     verbosity = 5
   )
   # Evaluate the map with the data in an environment
@@ -2247,7 +2265,11 @@ input_eval.bru_input <- function(input, data, env = NULL,
       assign(nm, data[[nm]], envir = envir)
     }
   } else {
-    data_df <- as.data.frame(data)
+    if (inherits(data, "Spatial")) {
+      data_df <- as.data.frame(data)
+    } else {
+      data_df <- tibble::as_tibble(data)
+    }
     for (nm in names(data_df)) {
       assign(nm, data_df[[nm]], envir = envir)
     }
@@ -2291,7 +2313,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
           immediate. = TRUE
         )
         input$input <- expression(sp::coordinates)
-        return(input_eval(
+        return(bru_input(
           input,
           data = data,
           env = env,
@@ -2375,7 +2397,7 @@ input_eval.bru_input <- function(input, data, env = NULL,
     )
   )) {
     input_layer <-
-      input_eval_layer(
+      bru_input_layer(
         layer = input[["layer"]],
         selector = input[["selector"]],
         envir = envir,

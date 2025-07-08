@@ -39,7 +39,7 @@ bru_comp_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 \item{\dots}{Parameters passed on to other methods. Also see Details.}
 
 \item{inputs}{A tree-like list of component input evaluations,
-from \code{\link[=input_eval.bru_obs_list]{input_eval.bru_obs_list()}}.}
+from \code{\link[=bru_input.bru_obs_list]{bru_input.bru_obs_list()}}.}
 
 \item{x}{\code{bru_comp_list} object from which to extract a sub-list}
 

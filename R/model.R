@@ -92,7 +92,7 @@ bru_model <- function(components,
     stop("No observation models provided.")
   }
 
-  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+  inputs <- bru_input(lhoods, components = components, null.on.fail = FALSE)
 
   # Back up environment
   env <- environment(components)
@@ -234,7 +234,7 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input)) {
-    input <- input_eval(
+    input <- bru_input(
       components = model$effects[used$effect],
       data = data
     )
@@ -777,7 +777,12 @@ bru_comp_eval <- function(main,
 #' @keywords internal
 evaluate_inputs <- function(model, lhoods) {
   stopifnot(inherits(model, "bru_model"))
-  input_eval(model, lhoods = lhoods)
+  lifecycle::deprecate_warn(
+    when = "2.12.9023",
+    "evaluate_inputs()",
+    "bru_input()"
+  )
+  bru_input(model, lhoods = lhoods)
 }
 
 #' Compute all index values

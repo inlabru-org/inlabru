@@ -55,6 +55,10 @@
 
 ## Bugfixes and deprecations
   
+* Give deprecation warnings for `Spatial` object inputs to `bru_obs()`, as
+  maintaining the fallback support code is becoming increasingly time-consuming,
+  and the `sf` package is now the recommended spatial data handling package.
+  (version `2.12.0.9023`)
 * Bugfix for `generate.bru()` for evaluation of expressions in the absence of
   `newdata` (version `2.12.0.9007`)
 * Use `mid` locations for `ibm_values()` for non-indexed `fm_mesh_1d` mapper

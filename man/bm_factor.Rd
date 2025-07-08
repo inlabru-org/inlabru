@@ -19,7 +19,7 @@ bru_mapper_factor(...)
 \method{ibm_jacobian}{bm_factor}(mapper, input, ...)
 }
 \arguments{
-\item{values}{Input values calculated by \code{\link[=input_eval.bru_input]{input_eval.bru_input()}}}
+\item{values}{Input values calculated by \code{\link[=bru_input.bru_input]{bru_input.bru_input()}}}
 
 \item{factor_mapping}{character; selects the type of factor mapping.
 \itemize{

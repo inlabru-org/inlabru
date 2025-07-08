@@ -1706,7 +1706,7 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
 ## _factor ####
 
 #' @title Mapper for factor variables
-#' @param values Input values calculated by [input_eval.bru_input()]
+#' @param values Input values calculated by [bru_input.bru_input()]
 #' @param factor_mapping character; selects the type of factor mapping.
 #' * `'contrast'` for leaving out the first factor level.
 #' * `'full'` for keeping all levels.

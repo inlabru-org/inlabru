@@ -36,7 +36,7 @@ test_that("Component construction: linear model", {
 
   # Covariate mapping
   df <- data.frame(x = 1:10)
-  inp <- input_eval(cmp, data = df)
+  inp <- bru_input(cmp, data = df)
   expect_equal(
     inp,
     list(
@@ -72,7 +72,7 @@ test_that("Component construction: linear model", {
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   cmps <- bru_comp_list(list(cmp))
-  inps <- input_eval(cmps, data = df)
+  inps <- bru_input(cmps, data = df)
   v <- evaluate_effect_single_state(
     cmps,
     input = inps,
@@ -98,7 +98,7 @@ test_that("Component construction: duplicate detection", {
 
 test_that("Component construction: offset", {
   cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
-  inp <- input_eval(cmp, data = data.frame(a = 11:15))
+  inp <- bru_input(cmp, data = data.frame(a = 11:15))
   val <- evaluate_effect_single_state(cmp,
     input = inp,
     state = NULL
@@ -138,7 +138,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -156,7 +156,7 @@ test_that("Component construction: terra", {
   cmp <- bru_comp_list(~ -1 + something(r, model = "linear"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -175,7 +175,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -194,7 +194,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -451,7 +451,7 @@ test_that("Component inputs: non-numeric input detection", {
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
-  input <- input_eval(model$effects$field, data = df)
+  input <- bru_input(model$effects$field, data = df)
 
   expect_error(
     ibm_eval(
