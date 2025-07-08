@@ -49,7 +49,7 @@ test_that("Component construction: linear model", {
     )
   )
 
-  idx <- index_eval(cmp, inla_f = FALSE)
+  idx <- bru_index(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
   expect_equal(names(idx)[2], "beta.group")

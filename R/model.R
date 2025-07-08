@@ -785,28 +785,6 @@ evaluate_inputs <- function(model, lhoods) {
   bru_input(model, lhoods = lhoods)
 }
 
-#' Compute all index values
-#'
-#' Computes the index values matrices for included components
-#'
-#' @param model A [bru_model] object
-#' @param used A [bru_used()] object
-#' @return A named list of `idx_full` and `idx_inla`,
-#' named list of indices, and `inla_subset`, and `inla_subset`,
-#' a named list of logical subset specifications for extracting the `INLA::f()`
-#' compatible index subsets.
-#' @rdname evaluate_index
-#' @keywords internal
-evaluate_index <- function(model, used) {
-  stopifnot(inherits(model, "bru_model"))
-  included <- union(used[["effect"]], used[["latent"]])
-
-  list(
-    idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),
-    idx_inla = index_eval(model[["effects"]][included], inla_f = TRUE),
-    inla_subset = inla_subset_eval(model[["effects"]][included])
-  )
-}
 
 
 #' @include mappers.R

@@ -14,7 +14,7 @@ bru_make_stack <- function(...) {
 #' @param lin Linearisation information
 #' * For `.bru_obs`, a `bm_taylor` object
 #' * For `.bru_obs_list`, a list of `bm_taylor` objects
-#' @param idx Output from `evaluate_index(...)`
+#' @param idx Output from [bru_index.bru_model()]
 #' @param family_index integer specifying the family sequence index of the
 #'   observation model
 #' @export

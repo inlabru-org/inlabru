@@ -64,7 +64,7 @@ bru_compute_linearisation(...)
 
 \item{data_extra}{Additional data for the predictor}
 
-\item{input}{Precomputed component inputs from \code{evaluate_inputs()}}
+\item{input}{Precomputed component inputs from \code{bru_input()}}
 
 \item{state}{The state information, as a list of named vectors}
 

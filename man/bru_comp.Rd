@@ -254,6 +254,8 @@ if (bru_safe_inla()) {
 
 }
 \seealso{
+\code{\link[=bru_input]{bru_input()}}, \code{\link[=summary.bru_comp]{summary.bru_comp()}}
+
 Other component constructors: 
 \code{\link{bru_comp_list}()}
 }

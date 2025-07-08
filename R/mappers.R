@@ -364,7 +364,62 @@ format.bru_mapper <- function(x, ...,
       depth = depth
     ))
   }
-  txt <- paste0(initial, ibm_shortname(x))
+  paste0(initial, ibm_shortname(x))
+}
+
+#' @export
+#' @method format bm_list
+#' @param collapse character or NULL, as in [base::paste()].
+#' @rdname bm_summary
+format.bm_list <- function(x, ...,
+                           prefix = "",
+                           initial = prefix,
+                           depth = 1,
+                           collapse = ", ",
+                           labels = TRUE) {
+  if (labels) {
+    paste0(
+      vapply(
+        seq_along(x),
+        function(k) {
+          nm <- names(x)[k]
+          if (is.null(nm) || (identical(nm, ""))) {
+            nm <- as.character(k)
+          }
+          paste0(
+            nm,
+            " = ",
+            format(
+              x[[k]],
+              prefix = prefix,
+              initial = initial,
+              depth = depth
+            )
+          )
+        },
+        ""
+      ),
+      collapse = collapse
+    )
+  } else {
+    paste0(
+      vapply(
+        seq_along(x),
+        function(k) {
+          paste0(
+            format(
+              x[[k]],
+              prefix = prefix,
+              initial = initial,
+              depth = depth
+            )
+          )
+        },
+        ""
+      ),
+      collapse = collapse
+    )
+  }
 }
 
 #' @rdname bm_summary
@@ -424,25 +479,11 @@ format.bm_multi <- function(x, ...,
     paste0(
       txt,
       "(",
-      paste0(
-        vapply(
-          names(x[["mappers"]]),
-          function(nm) {
-            paste0(
-              nm,
-              " = ",
-              format(
-                x[["mappers"]][[nm]],
-                prefix = sub_prefix,
-                initial = "",
-                depth = depth - 1
-              )
-            )
-          },
-          ""
-        ),
-        collapse = ", "
-      ),
+      format(x[["mappers"]],
+             prefix = sub_prefix,
+             initial = "",
+             depth = depth - 1,
+             collapse = ", "),
       ")"
     )
   txt
@@ -465,20 +506,12 @@ format.bm_pipe <- function(x, ...,
     paste0(
       txt,
       " = ",
-      paste0(
-        vapply(
-          x[["mappers"]],
-          function(xx) {
-            format(xx,
-              prefix = sub_prefix,
-              initial = "",
-              depth = depth - 1
-            )
-          },
-          ""
-        ),
-        collapse = paste0(" -> ")
-      )
+      format(x[["mappers"]],
+             prefix = sub_prefix,
+             initial = "",
+             depth = depth - 1,
+             collapse = " -> ",
+             labels = FALSE)
     )
   txt
 }
@@ -548,29 +581,12 @@ format.bm_sum <- function(x, ...,
     paste0(
       txt,
       "(",
-      paste0(
-        vapply(
-          seq_along(x[["mappers"]]),
-          function(k) {
-            nm <- names(x[["mappers"]])[k]
-            if (is.null(nm)) {
-              nm <- as.character(k)
-            }
-            paste0(
-              nm,
-              " = ",
-              summary(
-                x[["mappers"]][[k]],
-                prefix = sub_prefix,
-                initial = "",
-                depth = depth - 1
-              )
-            )
-          },
-          ""
-        ),
-        collapse = ", "
-      ),
+      format(
+        x[["mappers"]],
+        prefix = sub_prefix,
+        initial = "",
+        depth = depth - 1,
+        collapse = ", "),
       ")"
     )
   txt
@@ -642,9 +658,31 @@ print.bru_mapper <- function(x, ...,
                              depth = 1) {
   cat(
     format(x,
-      prefix = "",
-      initial = prefix,
-      depth = depth
+           prefix = "",
+           initial = prefix,
+           depth = depth
+    ),
+    sep = sep
+  )
+  invisible(x)
+}
+
+#' @export
+#' @method print bm_list
+#' @rdname bm_summary
+print.bm_list <- function(x, ...,
+                          sep = "\n",
+                          prefix = "",
+                          initial = prefix,
+                          depth = 1,
+                          labels = TRUE,
+                          collapse = ", ") {
+  cat(
+    format(x,
+           prefix = "",
+           initial = prefix,
+           depth = depth,
+           collapse = collapse
     ),
     sep = sep
   )

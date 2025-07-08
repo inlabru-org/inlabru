@@ -15,7 +15,7 @@ bru_compute_linearisation <- function(...) {
 #' @param lhood_expr A predictor expression
 #' @param data Input data
 #' @param data_extra Additional data for the predictor
-#' @param input Precomputed component inputs from `evaluate_inputs()`
+#' @param input Precomputed component inputs from `bru_input()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
 #' * For `bru_comp`: A [bm_taylor] object

@@ -1907,11 +1907,11 @@ like <- function(formula = . ~ .,
     ),
     verbosity = 1L
   )
-  # lifecycle::deprecate_soft(
-  #   "2.11.1.9026",
-  #   "like()",
-  #   "bru_obs()"
-  # )
+  lifecycle::deprecate_soft(
+    "2.12.0",
+    "like()",
+    "bru_obs()"
+  )
 
   E <- bru_eval_in_data_context(
     substitute(E),
@@ -1972,114 +1972,7 @@ like <- function(formula = . ~ .,
   )
 }
 
-#' @title Extract predictor index information
-#'
-#' @description
-#' `r lifecycle::badge("experimental")`
-#' Extract the index vector for a [bru_obs()] predictor,
-#' or the whole or a subset of a full [bru()] predictor.
-#'
-#' @param object A [bru()] or [bru_obs()] output object
-#' @param \dots Arguments passed on to sub-methods.
-#' @returns An `integer` vector.
-#' @examplesIf bru_safe_inla()
-#' fit <- bru(
-#'   ~ 0 + x,
-#'   bru_obs(
-#'     y ~ .,
-#'     data = data.frame(x = 1:3, y = 1:3 + rnorm(3)),
-#'     tag = "A"
-#'   ),
-#'   bru_obs(
-#'     y ~ .,
-#'     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
-#'     tag = "B"
-#'   )
-#' )
-#' bru_index(fit)
-#' bru_index(fit, "A")
-#' bru_index(fit, "B")
-#' bru_index(fit, c("B", "A"))
-#' bru_index(fit, what = "missing")
-#' @export
-bru_index <- function(object, ...) {
-  UseMethod("bru_index")
-}
 
-#' @describeIn bru_index Extract the index vector for the predictor vector for a
-#'   [bru_obs()] sub-model. The indices are relative to the sub-model, and need
-#'   to be appropriately offset to be used in the full model predictor.
-#' @param what `character` or `NULL`; One of `NULL`, "all", "observed", and
-#'   "missing". If `NULL` (default) or "all", gives the index vector for the
-#'   full sub-model predictor. If "observed", gives the index vector for the
-#'   observed part (response is not `NA`). If "missing", gives the index vector
-#'   for the missing part (response is `NA`) of the model.
-#' @export
-bru_index.bru_obs <- function(object, what = NULL, ...) {
-  what <- match.arg(what, c("all", "observed", "missing"))
-  size <- bru_response_size(object)
-  idx <- seq_len(size)
-  if (identical(what, "all")) {
-    return(idx)
-  }
-  resp <- object[["response_data"]][[object[["response"]]]]
-  if (is.vector(resp)) {
-    miss <- is.na(resp)
-  } else {
-    # Should work for both inla.surv and inla.mdata objects:
-    miss <- is.na(resp[[1]])
-  }
-  if (identical(what, "observed")) {
-    return(idx[!miss])
-  }
-  return(idx[miss])
-}
-
-#' @describeIn bru_index Extract the index vector for "APredictor" for one or
-#'   more specified observation [bru_obs()] sub-models. Accepts any combination
-#'   of `tag` and `what`.
-#' @param tag `character` or `integer`; Either a character vector identifying
-#'   the tags of one or more of the [bru_obs()] observation models, or an
-#'   integer vector identifying models by their [bru()] specification order. If
-#'   `NULL` (default) computes indices for all sub-models.
-#' @export
-bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
-  if (is.null(tag)) {
-    tag <- seq_len(length(object[["bru_info"]][["lhoods"]]))
-  }
-  if (length(tag) == 0L) {
-    return(integer(0))
-  }
-  size <- bru_response_size(object)
-  off <- c(0L, cumsum(size))
-  if (is.character(tag)) {
-    if (!all(tag %in% names(object[["bru_info"]][["lhoods"]]))) {
-      stop(paste0(
-        "Invalid tag(s) '", paste(tag, collapse = ", "), "' for ",
-        "bru object with tags '", paste(names(object[["bru_info"]][["lhoods"]]),
-          collapse = ", "
-        ), "'"
-      ))
-    }
-    unlist(lapply(tag, function(x) {
-      x_idx <- which(names(object$bru_info$lhoods) %in% x)
-      off[x_idx] + bru_index(object$bru_info$lhoods[[x_idx]], what = what)
-    }))
-  } else {
-    ok_tags <- (tag >= 1L) &
-      (tag <= length(object[["bru_info"]][["lhoods"]]))
-    if (any(!ok_tags)) {
-      stop(paste0(
-        "Invalid tag indices '", paste(tag[!ok_tags], collapse = ", "),
-        "' for bru object with tag indices '1, ..., ",
-        length(object[["bru_info"]][["lhoods"]]), "'"
-      ))
-    }
-    unlist(lapply(tag, function(x) {
-      off[x] + bru_index(object$bru_info$lhoods[[x]], what = what)
-    }))
-  }
-}
 
 
 
@@ -4294,7 +4187,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       "iinla: Evaluate component inputs",
       verbosity = 3
     )
-    inputs <- evaluate_inputs(model, lhoods = lhoods)
+    inputs <- bru_input(model, lhoods = lhoods)
   }
   bru_log_message(
     "iinla: Evaluate component linearisations",
@@ -4338,7 +4231,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     verbosity = 3
   )
   # Initial stack
-  idx <- evaluate_index(model, used = bru_used(lhoods))
+  idx <- bru_index(model, used = bru_used(lhoods))
   stk <- bru_make_stack(lhoods, lin, idx)
 
   if (utils::packageVersion("INLA") <= "24.06.02") {

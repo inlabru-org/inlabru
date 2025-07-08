@@ -2,6 +2,7 @@
 % Please edit documentation in R/mappers.R
 \name{format.bru_mapper}
 \alias{format.bru_mapper}
+\alias{format.bm_list}
 \alias{summary.bru_mapper}
 \alias{format.bm_multi}
 \alias{format.bm_pipe}
@@ -10,9 +11,20 @@
 \alias{format.bm_repeat}
 \alias{print.summary_bru_mapper}
 \alias{print.bru_mapper}
+\alias{print.bm_list}
 \title{mapper object summaries}
 \usage{
 \method{format}{bru_mapper}(x, ..., prefix = "", initial = prefix, depth = 1)
+
+\method{format}{bm_list}(
+  x,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1,
+  collapse = ", ",
+  labels = TRUE
+)
 
 \method{summary}{bru_mapper}(object, ..., prefix = "", initial = prefix, depth = 1)
 
@@ -29,6 +41,17 @@
 \method{print}{summary_bru_mapper}(x, ..., sep = "\\n")
 
 \method{print}{bru_mapper}(x, ..., sep = "\\n", prefix = "", initial = prefix, depth = 1)
+
+\method{print}{bm_list}(
+  x,
+  ...,
+  sep = "\\n",
+  prefix = "",
+  initial = prefix,
+  depth = 1,
+  labels = TRUE,
+  collapse = ", "
+)
 }
 \arguments{
 \item{x}{Object to format/print}
@@ -41,6 +64,8 @@
 
 \item{depth}{The recursion depth for multi/collection/pipe mappers. Default
 1, to only show the collection, and not the contents of the sub-mappers.}
+
+\item{collapse}{character or NULL, as in \code{\link[base:paste]{base::paste()}}.}
 
 \item{object}{Object to summarise}
 

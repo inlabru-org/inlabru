@@ -23,7 +23,7 @@ bru_make_stack(...)
 \item For \code{.bru_obs_list}, a list of \code{bm_taylor} objects
 }}
 
-\item{idx}{Output from \code{evaluate_index(...)}}
+\item{idx}{Output from \code{\link[=bru_index.bru_model]{bru_index.bru_model()}}}
 
 \item{family_index}{integer specifying the family sequence index of the
 observation model}
