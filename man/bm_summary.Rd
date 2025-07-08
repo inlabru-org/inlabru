@@ -67,6 +67,9 @@
 
 \item{collapse}{character or NULL, as in \code{\link[base:paste]{base::paste()}}.}
 
+\item{labels}{logical; if TRUE, include mapper names or numerical indices.
+Default \code{TRUE}}
+
 \item{object}{Object to summarise}
 
 \item{sep}{character; separator for printing the summary.}

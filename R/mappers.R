@@ -370,6 +370,9 @@ format.bru_mapper <- function(x, ...,
 #' @export
 #' @method format bm_list
 #' @param collapse character or NULL, as in [base::paste()].
+#' @param labels logical; if TRUE, include mapper names or numerical indices.
+#'   Default `TRUE`
+#'
 #' @rdname bm_summary
 format.bm_list <- function(x, ...,
                            prefix = "",
