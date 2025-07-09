@@ -49,7 +49,7 @@ bru_used_update <- function(x, labels, ...) {
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_like_list <- function(x, labels, ...) {
+bru_used_update.bru_obs_list <- function(x, labels, ...) {
   for (k in seq_along(x)) {
     x[[k]] <- bru_used_update(x[[k]], labels = labels, ...)
   }
@@ -58,9 +58,34 @@ bru_used_update.bru_like_list <- function(x, labels, ...) {
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_like <- function(x, labels, ...) {
-  x[["used"]] <-
-    bru_used_update(bru_used(x), labels = labels, ...)
+bru_used_update.bru_obs <- function(x, labels, ...) {
+  pre_used <- bru_used(x)
+  used <- bru_used_update(pre_used, labels = labels, ...)
+  if (isTRUE(x[["is_additive"]])) {
+    if ((length(used$latent) > 0) ||
+      (length(setdiff(pre_used$effect, used$effect)) > 0)) {
+      x[["is_additive"]] <- FALSE
+      x[["linear"]] <- FALSE
+
+      if (is.null(x[["expr"]])) {
+        expr_text <- paste0(pre_used$effect, collapse = " + ")
+        if (length(pre_used$latent) > 0) {
+          expr_text <- paste(
+            expr_text,
+            paste0(pre_used$latent, "_latent", collapse = " + "),
+            sep = " + "
+          )
+        }
+        x[["expr"]] <- parse(text = expr_text)
+      }
+    } else {
+      if (is.null(x[["expr"]])) {
+        expr_text <- paste0(used$effect, collapse = " + ")
+        x[["expr"]] <- parse(text = expr_text)
+      }
+    }
+  }
+  x[["used"]] <- used
   x
 }
 
@@ -75,6 +100,9 @@ bru_used_update.bru_used <- function(x, labels, ...) {
       exclude = used[["effect_exclude"]]
     )
   used[["effect_exclude"]] <- NULL
+  if (is.null(used[["latent"]])) {
+    used$latent <- character(0)
+  }
   used$latent <-
     parse_inclusion(
       labels,
@@ -93,7 +121,7 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #'
 #' @param x An object that contains information about used components
 #' @param effect character; components used as effects. When `NULL`, auto-detect
-#' components to include or include all components.
+#' components to include all components in a predictor expression.
 #' @param effect_exclude character; components to specifically exclude from
 #' effect evaluation. When `NULL`, do not specifically exclude any components.
 #' @param latent character; components used as `_latent` or `_eval()`. When
@@ -107,6 +135,31 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' @returns A `bru_used` object (a list with elements `effect`
 #' and `latent`), or a list of such objects
 #' (for methods with `join = FALSE`)
+#'
+#' @details
+#' The arguments `effect`, `effect_exclude`, and `latent` control what
+#' components and effects are available for use in predictor expressions.
+#' \describe{
+#'   \item{`effect`}{
+#'   Character vector of component labels that are used as effects
+#'   by the predictor expression; If `NULL` (default), the names
+#'   are extracted from the formula.
+#'   }
+#'   \item{`exclude`}{
+#'   Character vector of component labels to be excluded from the effect list
+#'   even if they have been auto-detected as being necessary.
+#'   Default is `NULL`; do not remove any components from the inclusion list.
+#'   }
+#'   \item{`include_latent`}{Character vector.
+#'   Specifies which latent state variables need to be directly available to the
+#'   predictor expression, with a `_latent` suffix. This also makes evaluator
+#'   functions with suffix `_eval` available, taking parameters `main`, `group`,
+#'   and `replicate`, taking values for where to evaluate the component effect
+#'   that are different than those defined in the component definition itself
+#'   (see [bru_comp_eval()]). If `NULL`, the use of `_latent` and `_eval`
+#'   in the predictor expression is detected automatically.
+#'   }
+#' }
 #'
 #' @examples
 #' (used <- bru_used(~.))
@@ -124,20 +177,14 @@ bru_used <- function(x = NULL, ...) {
   UseMethod("bru_used", x)
 }
 
-#' @describeIn bru_used Create a `bru_used` object.
+#' @describeIn bru_used Create a `bru_used` object from effect name character
+#'   vectors.
 #' @export
-bru_used.default <- function(x = NULL, ...,
-                             effect = NULL,
-                             effect_exclude = NULL,
-                             latent = NULL,
-                             labels = NULL) {
-  if (!is.null(x)) {
-    stop(paste0(
-      "bru_used input class not supported: ",
-      "'", paste0(class(x), collapse = "', '"), "'"
-    ))
-  }
-
+bru_used.NULL <- function(x = NULL, ...,
+                          effect = NULL,
+                          effect_exclude = NULL,
+                          latent = NULL,
+                          labels = NULL) {
   used <- structure(
     list(
       effect = effect,
@@ -217,7 +264,9 @@ bru_used_vars.character <- function(x, functions = FALSE) {
   ex <- str2lang(ex)
   ex <- replace_dollar(ex)
   vars <- all.vars(ex, functions = functions, unique = TRUE)
-  if (identical(vars, ".") || identical(vars, character(0))) {
+  # Map '.' to NULL, to defer decision until later
+  # Do not map character(0) to NULL, as it is a valid result
+  if (identical(vars, ".")) {
     vars <- NULL
   }
   vars
@@ -321,13 +370,15 @@ bru_used.formula <- function(x, ...,
   )
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru` object.
 #' @export
 bru_used.bru <- function(x, ..., join = TRUE) {
   bru_used(x[["bru_info"]][["lhoods"]], ..., join = join)
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for each element
+#'   of a list, and optionally join into a single `bru_used` object.
 #' @export
 bru_used.list <- function(x, ..., join = TRUE) {
   used <- lapply(x, function(y) bru_used(y, ...))
@@ -350,9 +401,10 @@ bru_used.list <- function(x, ..., join = TRUE) {
   used
 }
 
-#' @rdname bru_used
+#' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru` observation model `bru_obs` object.
 #' @export
-bru_used.bru_like <- function(x, ...) {
+bru_used.bru_obs <- function(x, ...) {
   bru_used(x[["used"]], ...)
 }
 
@@ -381,7 +433,7 @@ format.bru_used <- function(x, ...) {
   } else {
     s <- paste0(s, ", latent[", paste0(x$latent, collapse = ", "), "]")
   }
-  if (!is.null(x$effect_exclude)) {
+  if (!is.null(x[["effect_exclude"]])) {
     s <- paste0(s, ", exclude[", paste0(x$effect_exclude, collapse = ", "), "]")
   }
   s

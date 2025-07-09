@@ -2,33 +2,33 @@
 % Please edit documentation in R/stack.R
 \name{bru_make_stack}
 \alias{bru_make_stack}
-\alias{bru_make_stack.bru_like}
-\alias{bru_make_stack.bru_like_list}
+\alias{bru_make_stack.bru_obs}
+\alias{bru_make_stack.bru_obs_list}
 \title{Build an inla data stack from linearisation information}
 \usage{
 bru_make_stack(...)
 
-\method{bru_make_stack}{bru_like}(lhood, lin, idx, ..., family_index = 1L)
+\method{bru_make_stack}{bru_obs}(lhood, lin, idx, ..., family_index = 1L)
 
-\method{bru_make_stack}{bru_like_list}(lhoods, lin, idx, ...)
+\method{bru_make_stack}{bru_obs_list}(lhoods, lin, idx, ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to other methods}
 
-\item{lhood}{A \code{bru_like} object}
+\item{lhood}{A \code{bru_obs} object}
 
 \item{lin}{Linearisation information
 \itemize{
-\item For \code{.bru_like}, a \code{bru_mapper_taylor} object
-\item For \code{.bru_like_list}, a list of \code{bru_mapper_taylor} objects
+\item For \code{.bru_obs}, a \code{bm_taylor} object
+\item For \code{.bru_obs_list}, a list of \code{bm_taylor} objects
 }}
 
-\item{idx}{Output from \code{evaluate_index(...)}}
+\item{idx}{Output from \code{\link[=bru_index.bru_model]{bru_index.bru_model()}}}
 
 \item{family_index}{integer specifying the family sequence index of the
 observation model}
 
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \code{bru_obs_list} object}
 }
 \description{
 Combine linearisation for multiple likelihoods

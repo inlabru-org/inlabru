@@ -17,7 +17,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   }
 
   as.detection.dsdata <- function(dsdata, ...) {
-    return(as.detection.effort(dsdata$effort, ...))
+    as.detection.effort(dsdata$effort, ...)
   }
 
 
@@ -30,7 +30,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   }
 
   segdata.dsdata <- function(data, ...) {
-    return(data$effort[is.na(data$effort$det), ])
+    data$effort[is.na(data$effort$det), ]
   }
 
 
@@ -45,7 +45,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
     idx <- which(!(is.na(effort$det)))
     det <- data.frame(start = idx, end = idx)
     class(det) <- c("detection", "data.frame")
-    return(det)
+    det
   }
 
 

@@ -26,7 +26,7 @@ evaluated values}
 \code{TRUE}}
 
 \item{layer, selector}{Specifies what data column or columns from which to
-extract data, see \code{\link[=bru_component]{bru_component()}} for details.}
+extract data, see \code{\link[=bru_comp]{bru_comp()}} for details.}
 
 \item{batch_size}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} due to improved
 algorithm.

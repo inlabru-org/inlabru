@@ -1,16 +1,15 @@
-test_that("Georeferenced data with sp", {
+test_that("Georeferenced data with sf", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(bru_safe_sp())
 
-  set.seed(123)
+  withr::local_seed(123)
   mydata <- expand.grid(
     Easting = seq(5, 45, by = 20),
     Northing = seq(10, 30, by = 10),
     KEEP.OUT.ATTRS = FALSE
   )
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
-  sp::coordinates(mydata) <- c("Easting", "Northing")
+  mydata <- sf::st_as_sf(mydata, coords = c("Easting", "Northing"))
 
   mesh <- fm_mesh_2d_inla(
     loc = mydata,
@@ -26,13 +25,13 @@ test_that("Georeferenced data with sp", {
   )
 
   # Check that mistaken empty or unnamed arguments are detected
-  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern, )
+  cmp <- obs ~ Intercept(1) + field(geometry, model = matern, )
   expect_error(
-    bru_component_list(cmp),
+    bru_comp_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
   )
 
-  cmp <- obs ~ Intercept(1) + field(sp::coordinates, model = matern)
+  cmp <- obs ~ Intercept(1) + field(geometry, model = matern)
 
   fit <- bru(
     cmp,
@@ -60,7 +59,7 @@ test_that("Georeferenced data with sp", {
 
 
   # Check that explicit access to the data object works
-  cmp <- obs ~ Intercept(1) + field(sp::coordinates(.data.), model = matern)
+  cmp <- obs ~ Intercept(1) + field(sf::st_coordinates(.data.), model = matern)
 
   fit <- bru(
     cmp,
@@ -86,47 +85,11 @@ test_that("Georeferenced data with sp", {
     tolerance = midtol
   )
 
-
-  # Check that explicit access to the data object works
-  cmp <- obs ~ Intercept(1) + field(
-    cbind(
-      as.data.frame(.data.)$Easting,
-      as.data.frame(.data.)$Northing
-    ),
-    model = matern
-  )
-
-  fit <- bru(
-    cmp,
-    data = mydata,
-    options = list(
-      control.inla = list(
-        int.strategy = "eb"
-      )
-    )
-  )
-
-  # Check Intercept
-  expect_equal(
-    fit$summary.fixed["Intercept", "mean"],
-    0.5398535,
-    tolerance = midtol
-  )
-
-  # Check SPDE
-  expect_equal(
-    fit$summary.random$field$mean[mesh$idx$loc[1:3]],
-    c(-2.6003077, -0.2699909, 3.5188725),
-    tolerance = midtol
-  )
-
-  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sp")
-  sp::coordnames(pred_df) <- sp::coordnames(mydata)
-  expect_s4_class(pred_df, "SpatialPixelsDataFrame")
+  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sf")
 
   skip_if_not_installed("sn")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
-  expect_s4_class(pred, "SpatialPixelsDataFrame")
+  expect_s3_class(pred, "sf")
 })
 
 
@@ -134,7 +97,7 @@ test_that("Georeferenced data with sf, with groups", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123)
+  withr::local_seed(123)
   mydata <- expand.grid(
     Easting = seq(5, 45, by = 20),
     Northing = seq(10, 30, by = 10),

@@ -33,7 +33,7 @@ test_that("1D LGCP fitting", {
   fit <- result$fit
 
   # Needed for reproducible predict
-  set.seed(123L)
+  withr::local_seed(123L)
 
   expect_s3_class(fit, "bru")
 
@@ -113,7 +113,7 @@ test_that("1D LGCP fitting, discrete point domain", {
   fit <- result$fit
 
   # Needed for reproducible predict
-  set.seed(123L)
+  withr::local_seed(123L)
 
   expect_s3_class(fit, "bru")
 
@@ -161,9 +161,8 @@ test_that("1D LGCP fitting, discrete point domain", {
 test_that("1D LGCP fitting, compressed format", {
   skip_on_cran()
   local_bru_safe_inla()
-  local_bru_options_set(
-    control.inla = list(int.strategy = "eb"),
-    control.compute = list(dic = FALSE, waic = FALSE)
+  bru_options_set_local(
+    control.inla = list(int.strategy = "eb")
   )
 
   data(Poisson2_1D, package = "inlabru", envir = environment())

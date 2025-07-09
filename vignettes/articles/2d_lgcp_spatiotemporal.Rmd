@@ -56,35 +56,15 @@ ggplot() +
   ggtitle("MRSea observation seasons")
 ```
 
-Integration points
------------------------------------
-
-The `inlabru` point process model knows how to construct the numerical integration
-scheme for the LGCP likelihood.  We can also call the internal functions directly to see
-what the integration scheme will look like.  Because our model will take time (season)
-into account we have to construct the integration points for the LGCP accordingly.
-Using the `fm_int()` we can specify the product domain space. Note that omitting
-this step would simply aggregate all sampling regions over time.
-
-```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ips <- fm_int(
-  domain = list(geometry = mrsea$mesh, season = 1:4),
-  samplers = mrsea$samplers
-)
-```
-Plot the integration points:
-```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
-ggplot() +
-  geom_fm(data = mrsea$mesh) +
-  gg(ips, aes(size = weight)) +
-  scale_size_area(max_size = 1) +
-  facet_wrap(~season)
-```
 
 Fitting the model
 -----------------------------------
 
-Fit an LGCP model to the locations of the animals. In this example we will employ a spatio-temporal SPDE. Note how the `group` and `ngroup` parameters are employed to let the SPDE model know about the name of the time dimension (season) and the total number of distinct points in time. 
+Fit an LGCP model to the locations of the animals. In this example we will employ a spatio-temporal SPDE. Note how the `group` and `ngroup` parameters are employed to let the SPDE model know about the name of the time dimension (season) and the total number of distinct points in time. The point process likelihood is constructed by the `lgcp()` function, which is a wrapper around the `bru_obs(..., model = "cp")` and `bru()` functions. Like for ordinary spatial point process
+models, the `samplers` argument specifies the observation region/set, in this case
+combinations spatial lines and seasons. The `domain` argument specifies the
+spatio-temporal function space to use when constructing the numerical integration
+scheme needed for the point process likelihood evaluation.
 
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 matern <- inla.spde2.pcmatern(mrsea$mesh,
@@ -92,7 +72,7 @@ matern <- inla.spde2.pcmatern(mrsea$mesh,
   prior.range = c(10, 0.01)
 )
 
-cmp <- geometry + season ~ Intercept(1) +
+cmp <- ~ Intercept(1) +
   mySmooth(
     geometry,
     model = matern,
@@ -100,12 +80,17 @@ cmp <- geometry + season ~ Intercept(1) +
     ngroup = 4
   )
 
-fit <- lgcp(cmp,
-  data = mrsea$points,
-  samplers = mrsea$samplers,
-  domain = list(
-    geometry = mrsea$mesh,
-    season = seq_len(4)
+fit <- bru(
+  cmp,
+  bru_obs(
+    geometry + season ~ .,
+    family = "cp",
+    data = mrsea$points,
+    samplers = mrsea$samplers,
+    domain = list(
+      geometry = mrsea$mesh,
+      season = seq_len(4)
+    )
   )
 )
 ```
@@ -129,4 +114,33 @@ pl1 <- ggplot() +
   facet_wrap(~season) +
   coord_sf()
 pl1
+```
+
+Integration points
+-----------------------------------
+
+The `inlabru` point process model, `lgcp()` or `bru_obs(..., model = "cp")`,
+knows how to construct the numerical integration
+scheme for the LGCP likelihood.  To see what happens internally, we can also
+call the internal functions directly to see
+what the integration scheme will look like,
+using the `fm_int()` function with the same `domain` and `samplers` arguments as
+in the previous `lgcp()` call.
+Note that omitting
+the `season` dimension from `domain` would lead to aggregation of all sampling
+regions over time.
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ips <- fm_int(
+  domain = list(geometry = mrsea$mesh, season = 1:4),
+  samplers = mrsea$samplers
+)
+```
+Plot the integration points:
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+ggplot() +
+  geom_fm(data = mrsea$mesh) +
+  gg(ips, aes(size = weight)) +
+  scale_size_area(max_size = 1) +
+  facet_wrap(~season)
 ```

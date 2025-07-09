@@ -23,7 +23,8 @@
 #' @references
 #' Pennino, M. G., Paradinas, I., Munoz, F., Illian, J.,Quilez-Lopez, A.,
 #' Bellido, J.M., Conesa, D. Accounting for preferential sampling in species
-#' distribution models. Ecology and Evolution,  In Press.
+#' distribution models. Ecology and Evolution, 9(1), p653-663, 2019
+#' \doi{10.1002/ece3.4789}
 #'
 #' @examples
 #' \donttest{

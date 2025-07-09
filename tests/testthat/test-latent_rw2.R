@@ -2,7 +2,7 @@ test_that("Latent models: RW2 mapping", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   data1 <- data.frame(
     time = rep(c(1, 2, 4, 8, 16), times = 4),
@@ -32,7 +32,7 @@ test_that("Latent models: RW2 mapping, data is list with different I/O sizes", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(123L)
+  withr::local_seed(123L)
 
   data1 <- list(
     time = c(1, 2, 4, 8, 16),

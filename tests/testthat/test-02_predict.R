@@ -3,7 +3,7 @@ test_that("bru: factor component", {
   local_bru_safe_inla()
 
   # Required for reproducible predict() and generate() output.
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
   input.df <- within(input.df, y <- 5 + 2 * cos(1:10) +
@@ -12,7 +12,7 @@ test_that("bru: factor component", {
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bru_mapper_index(10)),
+  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
     family = "gaussian", data = input.df
   )
 
@@ -130,7 +130,7 @@ test_that("bru: predict with _eval", {
   local_bru_safe_inla()
 
   # Required for reproducible predict() and generate() output.
-  set.seed(1234L)
+  withr::local_seed(1234L)
 
   data <- data.frame(
     z = rnorm(5),
@@ -155,7 +155,8 @@ test_that("bru: predict with _eval", {
     formula = ~ data.frame(
       A = fun,
       B = fun_eval(u)
-    )
+    ),
+    n.samples = 10L
   )
 
   expect_equal(pred$B, pred$A)

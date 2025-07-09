@@ -4,7 +4,7 @@
 \alias{bru_convergence_plot}
 \title{Plot inlabru convergence diagnostics}
 \usage{
-bru_convergence_plot(x, from = 1, to = NULL)
+bru_convergence_plot(x, from = 1, to = NULL, type = NULL)
 }
 \arguments{
 \item{x}{a \link{bru} object, typically a result from \code{\link[=bru]{bru()}} for a nonlinear
@@ -14,6 +14,10 @@ predictor model}
 Default \code{from = 1} (start from the first iteration) and \code{to = NULL} (end at
 the last iteration).
 Set \code{from = 0} to include the initial linearisation point in the track plot.}
+
+\item{type}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} character; "bru" (default)
+for iterative nonlinear inlabru convergence diagnostics plots, or "inla"
+for INLA optimiser trace plots.}
 }
 \value{
 A ggplot object with four panels of convergence diagnostics:

@@ -3,6 +3,7 @@ test_that("fm_pixels sp vs sf", {
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
   skip_if_not_installed("sn")
+  withr::local_options(lifecycle_verbosity = "quiet")
 
   mesh <- fm_mesh_2d_inla(cbind(0, 0),
     offset = 10, max.edge = 1,
@@ -34,7 +35,7 @@ test_that("fm_pixels sp vs sf", {
   )
 
   system.time({
-    set.seed(1234L)
+    withr::local_seed(1234L)
     surface1 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sp")
     density1 <- predict(fit,
       surface1,
@@ -45,7 +46,7 @@ test_that("fm_pixels sp vs sf", {
   })
 
   system.time({
-    set.seed(1234L)
+    withr::local_seed(1234L)
     surface2 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sf")
     density2 <- predict(fit,
       surface2,

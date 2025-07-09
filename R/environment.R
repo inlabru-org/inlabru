@@ -344,13 +344,20 @@ bru_log.iinla <- function(x, verbosity = NULL) {
 #' @export
 bru_log.bru <- function(x, verbosity = NULL) {
   x <- bru_check_object_bru(x)
-  if (is.null(x[["bru_iinla"]][["log"]])) {
-    return(bru_log_new(character(0)))
+
+  if (is.null(x[["bru_info"]][["log"]])) {
+    result <- bru_log_new(character(0))
+  } else {
+    result <- bru_log(x[["bru_info"]][["log"]], verbosity = verbosity)
   }
-  bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity)
+
+  if (is.null(x[["bru_iinla"]][["log"]])) {
+    return(result)
+  }
+  c(result, bru_log(x[["bru_iinla"]][["log"]], verbosity = verbosity))
 }
 
-#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
+#' @describeIn bru_log Format a `bru_log` object for printing.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
 #' @param ... further arguments passed to or from other methods.
 #' @param timestamp If `TRUE`, include the timestamp of each message. Default
@@ -358,9 +365,9 @@ bru_log.bru <- function(x, verbosity = NULL) {
 #' @export
 #' @examples
 #' bru_log(verbosity = 2L)
-#' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+#' format(bru_log())
 #'
-print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
+format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   msg <- x[["log"]][["message"]]
   if (timestamp) {
     msg <- paste0(
@@ -372,7 +379,25 @@ print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
       msg, " (level ", x[["log"]][["verbosity"]], ")"
     )
   }
-  cat(msg, sep = "\n")
+  msg
+}
+
+#' @describeIn bru_log Print a `bru_log` object with `cat(x, sep = "\n")`.
+#' If `verbosity` is `TRUE`, include the verbosity level of each message.
+#' @export
+#' @examples
+#' bru_log(verbosity = 2L)
+#' print(bru_log(), timestamp = TRUE, verbosity = TRUE)
+#'
+print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
+  cat(
+    format(x,
+      ...,
+      timestamp = timestamp,
+      verbosity = verbosity
+    ),
+    sep = "\n"
+  )
   invisible(x)
 }
 
@@ -447,8 +472,9 @@ as.character.bru_log <- function(x, ...) {
 
 #' @title Add a log message
 #' @description Adds a log message.
-#' @param ... For `bru_log_message()`, zero or more objects passed on to
-#' [`base::.makeMessage()`]
+#' @param \dots For `bru_log_message()`, zero or more objects passed on to
+#'   [`base::.makeMessage()`]. For `bru_log_abort()` and `bru_log_warn()`,
+#'   passed on to `rlang::abort()` and `rlang::warn()`.
 #' @param domain Domain for translations, passed on to [`base::.makeMessage()`]
 #' @param appendLF logical; whether to add a newline to the message. Only
 #'   used for verbose output.
@@ -472,7 +498,7 @@ as.character.bru_log <- function(x, ...) {
 #' @examples
 #' if (interactive()) {
 #'   code_runner <- function() {
-#'     local_bru_options_set(
+#'     bru_options_set_local(
 #'       # Show messages up to and including level 2 (default 0)
 #'       bru_verbose = 2,
 #'       # Store messages to an including level 3 (default Inf, storing all)
@@ -537,6 +563,61 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
   }
 }
 
+
+#' @describeIn bru_log_message Store a log message and throw an error.
+#' @param msg character; passed to [`base::.makeMessage()`]
+#' @param call The calling environment.
+#' @param .frame The throwing context, for when `.internal` is `TRUE`
+#' @export
+bru_log_abort <- function(
+    msg,
+    ...,
+    domain = NULL,
+    appendLF = TRUE,
+    verbosity = 1L,
+    allow_verbose = TRUE,
+    verbose = FALSE,
+    verbose_store = NULL,
+    call = rlang::caller_env(),
+    .frame = rlang::caller_env()) {
+  bru_log_message(
+    msg,
+    domain = domain,
+    appendLF = appendLF,
+    verbosity = verbosity,
+    allow_verbose = allow_verbose,
+    verbose = verbose,
+    verbose_store = verbose_store
+  )
+  rlang::abort(msg, call = call, .frame = .frame, ...)
+}
+
+#' @describeIn bru_log_message Store a log message and throw a warning.
+#' @export
+bru_log_warn <- function(
+    msg,
+    ...,
+    domain = NULL,
+    appendLF = TRUE,
+    verbosity = 1L,
+    allow_verbose = TRUE,
+    verbose = FALSE,
+    verbose_store = NULL,
+    call = rlang::caller_env(),
+    .frame = rlang::caller_env()) {
+  bru_log_message(
+    msg,
+    domain = domain,
+    appendLF = appendLF,
+    verbosity = verbosity,
+    allow_verbose = allow_verbose,
+    verbose = verbose,
+    verbose_store = verbose_store
+  )
+  ## Need to solve inla swallowing warnings before this works:
+  ## rlang::warn(msg, call = call, .frame = .frame, ...)
+  warning(msg, immediate. = TRUE)
+}
 
 
 # Options methods ----
@@ -720,7 +801,7 @@ bru_options_default <- function() {
     # inla options
     E = 1,
     Ntrials = 1,
-    control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
+    control.compute = list(config = TRUE),
     control.inla = list(int.strategy = "auto"),
     control.fixed = list(expand.factor.strategy = "inla")
   )
@@ -956,6 +1037,31 @@ bru_options_reset <- function() {
   envir <- bru_env_get()
   envir$options <- bru_options()
   invisible(bru_options_get(include_default = FALSE))
+}
+
+
+#' @describeIn bru_options Sets local option overrides, that are
+#'   automatically reset using `withr::defer()`.
+#' @param .envir The environment in which to set the options.
+#'   Default: `parent.frame()`
+#' @examples
+#' my_fun <- function(val) {
+#'   bru_options_set_local(bru_verbose = val)
+#'   bru_options_get("bru_verbose")
+#' }
+#' # Inside the function, the bru_verbose option is changed.
+#' # Outside the function, the bru_verbose option is unchanged.
+#' print(my_fun(TRUE))
+#' print(bru_options_get("bru_verbose"))
+#' print(my_fun(FALSE))
+#' print(bru_options_get("bru_verbose"))
+#' @export
+bru_options_set_local <- function(...,
+                                  .reset = FALSE,
+                                  .envir = parent.frame()) {
+  original_options <- bru_options_get(include_default = FALSE)
+  withr::defer(bru_options_set(original_options, .reset = TRUE), envir = .envir)
+  invisible(bru_options_set(..., .reset = .reset))
 }
 
 

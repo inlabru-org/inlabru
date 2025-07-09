@@ -14,11 +14,11 @@ generate(object, ...)
   n.samples = 100,
   seed = 0L,
   num.threads = NULL,
-  include = NULL,
-  exclude = NULL,
   used = NULL,
   ...,
-  data = deprecated()
+  data = deprecated(),
+  include = deprecated(),
+  exclude = deprecated()
 )
 }
 \arguments{
@@ -26,8 +26,8 @@ generate(object, ...)
 
 \item{...}{additional, unused arguments.}
 
-\item{newdata}{A data.frame or SpatialPointsDataFrame of covariates needed
-for sampling.}
+\item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
+needed for sampling.}
 
 \item{formula}{A formula where the right hand side defines an R expression
 to evaluate for each generated sample. If \code{NULL}, the latent and
@@ -45,20 +45,13 @@ The default, 100, is rather low but provides a quick approximate result.}
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
-\item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: NULL (include all components that are not
-explicitly excluded) if \code{newdata} is provided, otherwise \code{character(0)}.}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
+Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 
-\item{exclude}{Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)}
+\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and
-\code{exclude}.}
-
-\item{data}{Deprecated. Use \code{newdata} instead.
-sampling.}
+\item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
+of used variables fails, use \code{used} instead.}
 }
 \value{
 The form of the value returned by \code{generate()} depends on the data
@@ -84,9 +77,9 @@ to directly access the latent state for a component, and the suffix function
 \verb{_eval} can be used to evaluate a component at other input values than the
 expressions defined in the component definition itself, e.g.
 \code{field_eval(cbind(x, y))} for a component that was defined with
-\code{field(coordinates, ...)} (see also \code{\link[=bru_component_eval]{bru_component_eval()}}).
+\code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
-For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
+For "iid" models with \code{mapper = bm_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
 \examples{

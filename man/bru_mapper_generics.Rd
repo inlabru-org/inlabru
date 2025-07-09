@@ -63,7 +63,7 @@ ibm_invalid_output(mapper, input, state, ...)
 
 \method{ibm_is_linear}{default}(mapper, ...)
 
-\method{ibm_jacobian}{default}(mapper, input, state, ...)
+\method{ibm_jacobian}{default}(mapper, input, state = NULL, ...)
 
 \method{ibm_linear}{default}(mapper, input, state, ...)
 
@@ -88,7 +88,7 @@ result must be compatible with the \code{INLA::f(...)} and corresponding
 the \code{input} interpretation may be different.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bru_mapper_collect}.}
+as "bym2", which can be handled by \code{bm_collect}.}
 
 \item{\dots}{Arguments passed on to other methods}
 
@@ -118,13 +118,13 @@ being mapped to.
 \item \code{ibm_n_output()}: Implementations must return an integer denoting the
 mapper output length.
 The default implementation returns \code{NROW(input)}.
-Mappers such as \code{bru_mapper_multi} and \code{bru_mapper_collect},
+Mappers such as \code{bm_multi} and \code{bm_collect},
 that can accept \code{list()} inputs require their own methods implementations.
 
 \item \code{ibm_values()}: When \code{inla_f=TRUE}, implementations must return a vector that
 would be interpretable by an \code{INLA::f(..., values = ...)} specification.
-The exception is the method for \code{bru_mapper_multi}, that returns a
-multi-column data frame.
+The exception is the method for \code{bm_multi}, that returns a
+multi-column data frame if \code{multi=TRUE}.
 
 \item \code{ibm_is_linear()}: Implementations must return \code{TRUE} or \code{FALSE}.
 If \code{TRUE} (returned by the default method unless the mapper
@@ -136,7 +136,7 @@ may assume the mapper is linear.
 by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should
 only affect the allowed type of input format.
 
-\item \code{ibm_linear()}: Implementations must return a \link{bru_mapper_taylor} object
+\item \code{ibm_linear()}: Implementations must return a \link{bm_taylor} object
 The linearisation information includes \code{offset}, \code{jacobian}, and \code{state0}.
 The state information indicates for which state the \code{offset} was evaluated,
 with \code{NULL} meaning all-zero.
@@ -198,7 +198,7 @@ it doesn't exist.
 \item \code{ibm_jacobian(default)}: Mapper classes must implement their own \code{ibm_jacobian} method.
 
 \item \code{ibm_linear(default)}: Calls \code{ibm_eval()} and \code{ibm_jacobian()}
-and returns a \code{bru_mapper_taylor} object.
+and returns a \code{bm_taylor} object.
 The \code{state0} information in the affine mapper indicates for which state
 the \code{offset} was evaluated; The affine mapper output is defined as
 
@@ -233,10 +233,7 @@ both regular vector values and \code{multi=1} data.frame values).
 }}
 \examples{
 # ibm_names
-mapper <- bru_mapper_multi(list(
-  A = bru_mapper_index(2),
-  B = bru_mapper_index(2)
-))
+mapper <- bm_multi(list(A = bm_index(2), B = bm_index(2)))
 ibm_names(mapper)
 ibm_names(mapper) <- c("new", "names")
 ibm_names(mapper)
@@ -249,27 +246,28 @@ class objects.
 \link{bru_mapper}, \code{\link[=bru_get_mapper]{bru_get_mapper()}}
 
 Other mappers: 
+\code{\link{bm_aggregate}()},
+\code{\link{bm_collect}()},
+\code{\link{bm_const}()},
+\code{\link{bm_factor}()},
+\code{\link{bm_fmesher}()},
+\code{\link{bm_harmonics}()},
+\code{\link{bm_index}()},
+\code{\link{bm_linear}()},
+\code{\link{bm_logsumexp}()},
+\code{\link{bm_marginal}()},
+\code{\link{bm_matrix}()},
+\code{\link{bm_mesh_B}()},
+\code{\link{bm_multi}()},
+\code{\link{bm_pipe}()},
+\code{\link{bm_repeat}()},
+\code{\link{bm_scale}()},
+\code{\link{bm_shift}()},
+\code{\link{bm_sum}()},
+\code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_aggregate}()},
-\code{\link{bru_mapper_collect}()},
-\code{\link{bru_mapper_const}()},
-\code{\link{bru_mapper_factor}()},
-\code{\link{bru_mapper_fmesher}()},
-\code{\link{bru_mapper_harmonics}()},
-\code{\link{bru_mapper_index}()},
-\code{\link{bru_mapper_linear}()},
-\code{\link{bru_mapper_logsumexp}()},
-\code{\link{bru_mapper_marginal}()},
-\code{\link{bru_mapper_matrix}()},
-\code{\link{bru_mapper_mesh_B}()},
-\code{\link{bru_mapper_multi}()},
-\code{\link{bru_mapper_pipe}()},
-\code{\link{bru_mapper_repeat}()},
-\code{\link{bru_mapper_scale}()},
-\code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()}
+\code{\link{bru_mapper.fm_mesh_2d}()}
 }
 \concept{mappers}

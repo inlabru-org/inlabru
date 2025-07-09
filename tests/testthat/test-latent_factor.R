@@ -3,7 +3,7 @@ test_that("bru: factor component", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123)
+  withr::local_seed(123)
 
   # Factor models
   input.df <- data.frame(
@@ -104,7 +104,7 @@ test_that("bru: indexed factor component", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  set.seed(123)
+  withr::local_seed(123)
 
   # Factor models
   input.df <- data.frame(

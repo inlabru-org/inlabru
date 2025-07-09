@@ -86,15 +86,15 @@ A.loc
 index <- c(1, 3, 5, 2, 1, 2)
 inla.spde.make.A(A.loc = A.loc, index = index)
 
-mapper <- bru_mapper_taylor(jacobian = A.loc[index, , drop = FALSE])
+mapper <- bm_taylor(jacobian = A.loc[index, , drop = FALSE])
 ibm_jacobian(mapper)
 
 # For run-time indexing:
 mapper <-
-  bru_mapper_pipe(
+  bm_pipe(
     list(
-      matrix = bru_mapper_taylor(jacobian = A.loc),
-      index = bru_mapper_index(nrow(A.loc))
+      matrix = bm_taylor(jacobian = A.loc),
+      index = bm_index(nrow(A.loc))
     )
   )
 ibm_jacobian(mapper, input = list(index = index))
@@ -105,7 +105,7 @@ ibm_jacobian(mapper, input = list(index = index))
 ```{r, eval=FALSE}
 inla.spde.make.A(..., group = group.values, group.mesh = group.mesh)
 
-mapper <- bru_mapper_multi(list(
+mapper <- bm_multi(list(
   main = bru_mapper(mesh),
   group = bru_mapper(group.mesh)
 ))
@@ -113,7 +113,7 @@ ibm_jacobian(mapper, input = list(main = loc, group = group.values))
 ```
 ### Blockwise aggregation
 
-Blockwise aggregation can be implemented with a `bru_mapper_aggregate` mapper.
+Blockwise aggregation can be implemented with a `bm_aggregate` mapper.
 
 ```{r, eval=FALSE}
 block_rescale <- "none" # one of "none", "count", "weights", "sum"
@@ -133,10 +133,10 @@ the sum of the weights is equivalent to dividing by the number of elements in ea
 * `block_rescale = "weights"` corresponds to `rescale = TRUE`
 * `block_rescale = "sum"` is not supported by the aggregation mapper.
 ```{r, eval = FALSE}
-mapper <- bru_mapper_pipe(
+mapper <- bm_pipe(
   list(
-    main = bru_mapper_multi(list(main = bru_mapper(mesh), ...)),
-    block = bru_mapper_aggregate(
+    main = bm_multi(list(main = bru_mapper(mesh), ...)),
+    block = bm_aggregate(
       rescale = (block_rescale != "none"),
       n_block = n_block
     )
@@ -168,10 +168,10 @@ summary(
   )
 )
 
-mapper <- bru_mapper_multi(list(
+mapper <- bm_multi(list(
   field.main = bru_mapper(mesh),
-  field.group = bru_mapper_index(ngroup),
-  field.replicate = bru_mapper_index(nrepl)
+  field.group = bm_index(ngroup),
+  field.replicate = bm_index(nrepl)
 ))
 summary(ibm_values(mapper, multi = TRUE, inla_f = TRUE))
 ```

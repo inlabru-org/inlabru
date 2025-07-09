@@ -14,7 +14,8 @@
 call.}
 
 \item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed
-on to \code{geom_line}.}
+on to \code{geom_line()}.
+If "fill" is present, it is passed to \code{geom_ribbon()}.}
 
 \item{ribbon}{If TRUE, plot a ribbon around the line based on the smallest
 and largest quantiles present in the data, found by matching names starting

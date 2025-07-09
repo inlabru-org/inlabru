@@ -11,7 +11,7 @@ test_that("mdata", {
     idx.non.zero <- which(!event)
     y[idx.zero] <- 0
     y[idx.non.zero] <- rpois(length(idx.non.zero), lambda = m[idx.non.zero])
-    return(y)
+    y
   }
   ## chose link-function to use for the zero-inflation probability
   link.simple <- "logit"

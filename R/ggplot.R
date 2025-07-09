@@ -186,7 +186,8 @@ gg.data.frame <- function(...) {
 #' @param data A prediction object, usually the result of a [predict.bru()]
 #'   call.
 #' @param mapping a set of aesthetic mappings created by `aes`. These are passed
-#'   on to `geom_line`.
+#'   on to `geom_line()`.
+#'   If "fill" is present, it is passed to `geom_ribbon()`.
 #' @param ribbon If TRUE, plot a ribbon around the line based on the smallest
 #'   and largest quantiles present in the data, found by matching names starting
 #'   with `q` and followed by a numerical value.  `inla()`-style
@@ -355,16 +356,17 @@ gg.bru_prediction <- function(data,
         ymin = .data[[lqname]],
         ymax = .data[[uqname]]
       )
-      # Use line color for ribbon filling
-      if ("colour" %in% names(line.map)) {
-        ribbon.map <- modifyList(
-          ribbon.map,
-          ggplot2::aes(fill = .data[[line.map[["colour"]]]])
-        )
+      if (!is.null(mapping)) {
+        ribbon.map <- utils::modifyList(ribbon.map, mapping)
       }
       geom <- c(
         geom,
-        ggplot2::geom_ribbon(data = data, ribbon.map, alpha = alpha)
+        ggplot2::geom_ribbon(
+          data = data,
+          ribbon.map,
+          alpha = alpha,
+          colour = NA
+        )
       )
     }
   }
@@ -997,17 +999,6 @@ gg.fm_mesh_1d <- function(data,
   df <- data.frame(x = data$loc, y = y)
   ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
-
-#' @describeIn gg.fm_mesh_2d Alias for `gg.fm_mesh_2d`, supporting `inla.mesh`
-#' objects.
-#' @export
-gg.inla.mesh <- gg.fm_mesh_2d
-
-#' @describeIn gg.fm_mesh_1d Alias for `gg.fm_mesh_1d`, supporting
-#' `inla.mesh.1d` objects.
-#' @export
-gg.inla.mesh.1d <- gg.fm_mesh_1d
-
 
 
 #' Geom for RasterLayer objects

@@ -2,19 +2,20 @@
 % Please edit documentation in R/nlinla.R
 \name{bru_compute_linearisation}
 \alias{bru_compute_linearisation}
-\alias{bru_compute_linearisation.component}
-\alias{bru_compute_linearisation.bru_like}
-\alias{bru_compute_linearisation.bru_like_list}
+\alias{bru_compute_linearisation.bru_comp}
+\alias{bru_compute_linearisation.bru_obs}
+\alias{bru_compute_linearisation.bru_obs_list}
 \alias{bru_compute_linearisation.bru_model}
 \title{Compute inlabru model linearisation information}
 \usage{
 bru_compute_linearisation(...)
 
-\method{bru_compute_linearisation}{component}(
+\method{bru_compute_linearisation}{bru_comp}(
   cmp,
   model,
   lhood_expr,
   data,
+  data_extra,
   input,
   state,
   comp_simple,
@@ -24,11 +25,10 @@ bru_compute_linearisation(...)
   allow_combine,
   eps,
   n_pred = NULL,
-  ...,
-  options = NULL
+  ...
 )
 
-\method{bru_compute_linearisation}{bru_like}(
+\method{bru_compute_linearisation}{bru_obs}(
   lhood,
   model,
   data,
@@ -39,7 +39,7 @@ bru_compute_linearisation(...)
   ...
 )
 
-\method{bru_compute_linearisation}{bru_like_list}(
+\method{bru_compute_linearisation}{bru_obs_list}(
   lhoods,
   model,
   input,
@@ -54,7 +54,7 @@ bru_compute_linearisation(...)
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
 
-\item{cmp}{A \link{bru_component} object}
+\item{cmp}{A \link{bru_comp} object}
 
 \item{model}{A \code{bru_model} object}
 
@@ -62,20 +62,22 @@ bru_compute_linearisation(...)
 
 \item{data}{Input data}
 
-\item{input}{Precomputed component inputs from \code{evaluate_inputs()}}
+\item{data_extra}{Additional data for the predictor}
+
+\item{input}{Precomputed component inputs from \code{bru_input()}}
 
 \item{state}{The state information, as a list of named vectors}
 
 \item{comp_simple}{Component evaluation information
 \itemize{
-\item For \code{bru_component}: \code{bru_mapper_taylor} object
-\item For \code{bru_like}: A \code{comp_simple_list} object
+\item For \code{bru_comp}: A \link{bm_taylor} object
+\item For \code{bru_obs}: A \link{bm_list} object
 for the components in the likelihood
-\item For \code{bru_like_list}: A \code{comp_simple_list_list} object
+\item For \code{bru_obs_list}: A list of \link{bm_list} objects
 }}
 
 \item{effects}{\itemize{
-\item For \code{bru_component}:
+\item For \code{bru_comp}:
 Precomputed effect list for all components involved in the likelihood
 expression
 }}
@@ -92,12 +94,9 @@ involve several rows of the input data to influence the same row.}
 \item{n_pred}{The length of the predictor expression. If not \code{NULL}, scalar
 predictor evaluations are expanded to vectors of length \code{n_pred}.}
 
-\item{options}{A \code{bru_options} object. The log verbosity options
-are used.}
+\item{lhood}{A \code{bru_obs} object}
 
-\item{lhood}{A \code{bru_like} object}
-
-\item{lhoods}{A \code{bru_like_list} object}
+\item{lhoods}{A \code{bru_obs_list} object}
 }
 \description{
 Compute inlabru model linearisation information

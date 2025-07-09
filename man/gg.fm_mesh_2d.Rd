@@ -2,29 +2,9 @@
 % Please edit documentation in R/ggplot.R
 \name{gg.fm_mesh_2d}
 \alias{gg.fm_mesh_2d}
-\alias{gg.inla.mesh}
 \title{Geom for fm_mesh_2d objects}
 \usage{
 \method{gg}{fm_mesh_2d}(
-  data,
-  color = NULL,
-  alpha = NULL,
-  edge.color = "grey",
-  edge.linewidth = 0.25,
-  interior = TRUE,
-  int.color = "blue",
-  int.linewidth = 0.5,
-  exterior = TRUE,
-  ext.color = "black",
-  ext.linewidth = 1,
-  crs = NULL,
-  mask = NULL,
-  nx = 500,
-  ny = 500,
-  ...
-)
-
-\method{gg}{inla.mesh}(
   data,
   color = NULL,
   alpha = NULL,
@@ -98,12 +78,6 @@ Requires the \code{ggplot2} package.
 
 Also see the \code{\link[fmesher:geom_fm]{fmesher::geom_fm()}} method.
 }
-\section{Functions}{
-\itemize{
-\item \code{gg(inla.mesh)}: Alias for \code{gg.fm_mesh_2d}, supporting \code{inla.mesh}
-objects.
-
-}}
 \examples{
 \donttest{
 if (require(fmesher, quietly = TRUE) &&

@@ -8,6 +8,7 @@ evaluate_predictor(
   model,
   state,
   data,
+  data_extra,
   effects,
   predictor,
   used = NULL,
@@ -22,8 +23,12 @@ information, as produced by \code{\link[=evaluate_state]{evaluate_state()}}}
 \item{data}{A \code{list}, \code{data.frame}, or \code{Spatial*DataFrame}, with coordinates
 and covariates needed to evaluate the model.}
 
+\item{data_extra}{Additional data for the predictor evaluation. Variables
+with the same name as in \code{data} will be ignored, unless accessed via
+\code{.data_extra.[["name"]]} or \code{.data_extra.$name}.}
+
 \item{effects}{A list where each element is list of named evaluated effects,
-as computed by \code{\link[=evaluate_effect_multi_state.component_list]{evaluate_effect_multi_state.component_list()}}}
+each computed by \code{\link[=evaluate_effect_single_state.bru_comp_list]{evaluate_effect_single_state.bru_comp_list()}}}
 
 \item{predictor}{Either a formula or expression}
 
@@ -55,6 +60,6 @@ several states of the latent variables and hyperparameters.
 \details{
 For each component, e.g. "name", the state values are available as
 \code{name_latent}, and arbitrary evaluation can be done with \code{name_eval(...)},
-see \code{\link[=bru_component_eval]{bru_component_eval()}}.
+see \code{\link[=bru_comp_eval]{bru_comp_eval()}}.
 }
 \keyword{internal}

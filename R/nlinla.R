@@ -10,19 +10,20 @@ bru_compute_linearisation <- function(...) {
   UseMethod("bru_compute_linearisation")
 }
 
-#' @param cmp A [bru_component] object
+#' @param cmp A [bru_comp] object
 #' @param model A [bru_model] object
 #' @param lhood_expr A predictor expression
 #' @param data Input data
-#' @param input Precomputed component inputs from `evaluate_inputs()`
+#' @param data_extra Additional data for the predictor
+#' @param input Precomputed component inputs from `bru_input()`
 #' @param state The state information, as a list of named vectors
 #' @param comp_simple Component evaluation information
-#' * For `bru_component`: `bru_mapper_taylor` object
-#' * For `bru_like`: A `comp_simple_list` object
+#' * For `bru_comp`: A [bm_taylor] object
+#' * For `bru_obs`: A [bm_list] object
 #'   for the components in the likelihood
-#' * For `bru_like_list`: A `comp_simple_list_list` object
+#' * For `bru_obs_list`: A list of [bm_list] objects
 #' @param effects
-#' * For `bru_component`:
+#' * For `bru_comp`:
 #' Precomputed effect list for all components involved in the likelihood
 #' expression
 #' @param pred0 Precomputed predictor for the given state
@@ -32,32 +33,28 @@ bru_compute_linearisation <- function(...) {
 #' @param eps The finite difference step size
 #' @param n_pred The length of the predictor expression. If not `NULL`, scalar
 #' predictor evaluations are expanded to vectors of length `n_pred`.
-#' @param options A `bru_options` object. The log verbosity options
-#' are used.
 #'
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.component <- function(cmp,
-                                                model,
-                                                lhood_expr,
-                                                data,
-                                                input,
-                                                state,
-                                                comp_simple,
-                                                effects,
-                                                pred0,
-                                                used,
-                                                allow_combine,
-                                                eps,
-                                                n_pred = NULL,
-                                                ...,
-                                                options = NULL) {
+bru_compute_linearisation.bru_comp <- function(cmp,
+                                               model,
+                                               lhood_expr,
+                                               data,
+                                               data_extra,
+                                               input,
+                                               state,
+                                               comp_simple,
+                                               effects,
+                                               pred0,
+                                               used,
+                                               allow_combine,
+                                               eps,
+                                               n_pred = NULL,
+                                               ...) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
-    verbose = options$bru_verbose,
-    verbose_store = options$bru_verbose_store,
-    verbosity = 4
+    verbosity = 5
   )
 
   if (cmp[["main"]][["type"]] %in% c("offset", "const")) {
@@ -199,6 +196,7 @@ bru_compute_linearisation.component <- function(cmp,
           } else {
             data
           },
+        data_extra = data_extra,
         effects =
           if (symmetric_diffs) {
             effects_eps
@@ -277,33 +275,34 @@ bru_compute_linearisation.component <- function(cmp,
   B
 }
 
-#' @param lhood A `bru_like` object
+#' @param lhood A `bru_obs` object
 #' @param model A `bru_model` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like <- function(lhood,
-                                               model,
-                                               data,
-                                               input,
-                                               state,
-                                               comp_simple,
-                                               eps,
-                                               ...) {
+bru_compute_linearisation.bru_obs <- function(lhood,
+                                              model,
+                                              data,
+                                              input,
+                                              state,
+                                              comp_simple,
+                                              eps,
+                                              ...) {
   used <- bru_used(lhood)
   allow_combine <- lhood[["allow_combine"]]
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
     input = input[used[["effect"]]],
-    state = state[used[["effect"]]],
+    state = state[used[["effect"]]]
   )
 
-  lhood_expr <- bru_like_expr(lhood, model[["effects"]])
+  lhood_expr <- bru_obs_expr(lhood, model[["effects"]])
   n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(
     model,
     state = list(state),
     data = data,
+    data_extra = lhood[["data_extra"]],
     effects = list(effects),
     predictor = lhood_expr,
     used = used,
@@ -314,12 +313,12 @@ bru_compute_linearisation.bru_like <- function(lhood,
   # Compute derivatives for each non-const/offset component
   B <- list()
   offset <- pred0
-  # Either this loop or the internal bru_component specific loop
+  # Either this loop or the internal bru_comp specific loop
   # can in principle be parallelised.
   for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
-      if (lhood[["linear"]] && !lhood[["allow_combine"]]) {
-        # If linear and no combinations allowed, just need to copy the
+      if (lhood[["is_additive"]] && !lhood[["allow_combine"]]) {
+        # If additive and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
           comp_simple[[label]],
@@ -342,6 +341,7 @@ bru_compute_linearisation.bru_like <- function(lhood,
             model = model,
             lhood_expr = lhood_expr,
             data = data,
+            data_extra = lhood[["data_extra"]],
             input = input,
             state = state,
             comp_simple = comp_simple[[label]],
@@ -361,19 +361,19 @@ bru_compute_linearisation.bru_like <- function(lhood,
     }
   }
 
-  bru_mapper_taylor(offset = offset, jacobian = B, state0 = NULL)
+  bm_taylor(offset = offset, jacobian = B, state0 = NULL)
 }
 
-#' @param lhoods A `bru_like_list` object
+#' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_like_list <- function(lhoods,
-                                                    model,
-                                                    input,
-                                                    state,
-                                                    comp_simple,
-                                                    eps = 1e-5,
-                                                    ...) {
+bru_compute_linearisation.bru_obs_list <- function(lhoods,
+                                                   model,
+                                                   input,
+                                                   state,
+                                                   comp_simple,
+                                                   eps = 1e-5,
+                                                   ...) {
   # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]

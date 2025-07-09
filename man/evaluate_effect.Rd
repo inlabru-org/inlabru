@@ -2,43 +2,32 @@
 % Please edit documentation in R/model.R
 \name{evaluate_effect_single_state}
 \alias{evaluate_effect_single_state}
-\alias{evaluate_effect_multi_state}
 \alias{evaluate_effect_single_state.bru_mapper}
-\alias{evaluate_effect_single_state.comp_simple_list}
-\alias{evaluate_effect_multi_state.comp_simple_list}
-\alias{evaluate_effect_single_state.component_list}
-\alias{evaluate_effect_multi_state.component_list}
+\alias{evaluate_effect_single_state.bm_list}
+\alias{evaluate_effect_single_state.bru_comp_list}
 \title{Evaluate a component effect}
 \usage{
 evaluate_effect_single_state(...)
 
-evaluate_effect_multi_state(...)
-
 \method{evaluate_effect_single_state}{bru_mapper}(component, input, state, ..., label = NULL)
 
-\method{evaluate_effect_single_state}{comp_simple_list}(components, input, state, ...)
+\method{evaluate_effect_single_state}{bm_list}(components, input, state, ...)
 
-\method{evaluate_effect_multi_state}{comp_simple_list}(components, input, state, ...)
-
-\method{evaluate_effect_single_state}{component_list}(components, input, state, ...)
-
-\method{evaluate_effect_multi_state}{component_list}(components, input, state, ...)
+\method{evaluate_effect_single_state}{bru_comp_list}(components, input, state, ...)
 }
 \arguments{
 \item{...}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
 
-\item{component}{A \code{bru_mapper}, \code{bru_component}, \code{comp_simple}, or
-\code{comp_simple_list}.}
+\item{component}{A \link{bru_mapper}, \link{bru_comp}, or
+\link{bm_list}.}
 
 \item{input}{Pre-evaluated component input}
 
-\item{state}{Specification of one (for \code{evaluate_effect_single_state}) or
-several (for \code{evaluate_effect_multi_State}) latent variable states:
+\item{state}{Specification of one latent variable state:
 \itemize{
 \item \code{evaluate_effect_single_state.bru_mapper}:
 A vector of the latent component state.
 \item \verb{evaluate_effect_single_state.*_list}: list of named state vectors.
-\item \verb{evaluate_effect_multi_state.*_list}: list of lists of named state vectors.
 }}
 
 \item{label}{Option label used for any warning messages, specifying the
@@ -46,13 +35,8 @@ affected component.}
 }
 \value{
 \itemize{
-\item \code{evaluate_effect_single_state.component_list}: A list of evaluated
-component effect values
-}
-
-\itemize{
-\item \code{evaluate_effect_multi.comp_simple_list}: A list of lists of
-evaluated component effects, one list for each state
+\item \code{evaluate_effect_single_state.bm_list}: A list of
+evaluated component effect values
 }
 }
 \description{

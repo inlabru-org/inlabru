@@ -12,12 +12,12 @@
   seed = 0L,
   probs = c(0.025, 0.5, 0.975),
   num.threads = NULL,
-  include = NULL,
-  exclude = NULL,
   used = NULL,
   drop = FALSE,
   ...,
-  data = deprecated()
+  data = deprecated(),
+  include = deprecated(),
+  exclude = deprecated()
 )
 }
 \arguments{
@@ -44,21 +44,8 @@ passed to \code{stats::quantile}}
 computations. Default NULL, leaves it up to INLA.
 When seed != 0, overridden to "1:1"}
 
-\item{include}{Character vector of component labels that are needed by the
-predictor expression; Default: the result of \verb{[all.vars()]} on the
-predictor expression, unless the expression is not ".", in which case
-\code{include=NULL}, to include all components that are not
-explicitly excluded. The \code{\link[=bru_used]{bru_used()}} methods are used
-to extract the variable names, followed by removal of non-component names
-when the components are available.}
-
-\item{exclude}{Character vector of component labels that are not used by the
-predictor expression. The exclusion list is applied to the list
-as determined by the \code{include} parameter; Default: NULL (do not remove
-any components from the inclusion list)}
-
-\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object, overriding \code{include} and
-\code{exclude}. Default \code{NULL}}
+\item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
+Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 
 \item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and
 the prediciton summary has the same number of rows as \code{newdata}, then the
@@ -67,6 +54,9 @@ output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 
 \item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
+
+\item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
+of used variables fails, use \code{used} instead.}
 }
 \value{
 a \code{data.frame}, \code{sf}, or \verb{Spatial*} object with predicted mean values
@@ -96,16 +86,14 @@ to directly access the latent state for a component, and the suffix function
 \verb{_eval} can be used to evaluate a component at other input values than the
 expressions defined in the component definition itself, e.g.
 \code{field_eval(cbind(x, y))} for a component that was defined with
-\code{field(coordinates, ...)} (see also \code{\link[=bru_component_eval]{bru_component_eval()}}).
+\code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
-For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
+For "iid" models with \code{mapper = bm_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    bru_safe_sp() &&
-    require("sp") &&
     require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE) &&
     require("terra", quietly = TRUE) &&
@@ -113,30 +101,33 @@ if (bru_safe_inla() &&
 
   # Load the Gorilla data
 
-  gorillas <- gorillas_sp()
+  gorillas <- gorillas_sf
 
   # Plot the Gorilla nests, the mesh and the survey boundary
 
   ggplot() +
     gg(gorillas$mesh) +
     gg(gorillas$nests) +
-    gg(gorillas$boundary)
+    gg(gorillas$boundary, alpha = 0.1)
 
   # Define SPDE prior
 
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(
+    gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(0.01, 0.01)
   )
 
   # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
 
-  cmp <- coordinates ~ mySmooth(main = coordinates, model = matern) + Intercept(1)
+  cmp <- geometry ~ field(geometry, model = matern) + Intercept(1)
 
   # Fit the model, with "eb" instead of full Bayes
-  fit <- lgcp(cmp, gorillas$nests,
+  fit <- lgcp(
+    cmp,
+    data = gorillas$nests,
     samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
+    domain = list(geometry = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
@@ -157,13 +148,13 @@ if (bru_safe_inla() &&
   plot(exp.icpt, bar = TRUE)
 
   # The intercept is special in the sense that it does not depend on other variables
-  # or covariates. However, this is not true for the smooth spatial effects 'mySmooth'.
-  # In order to predict 'mySmooth' we have to define where (in space) to predict. For
+  # or covariates. However, this is not true for the smooth spatial effects 'field'.
+  # In order to predict 'field' we have to define where (in space) to predict. For
   # this purpose, the second argument of the predict function can take \code{data.frame}
   # objects as well as Spatial objects. For instance, we might want to predict
-  # 'mySmooth' at the locations of the mesh vertices. Using
+  # 'field' at the locations of the mesh vertices. Using
 
-  vrt <- fm_vertices(gorillas$mesh, format = "sp")
+  vrt <- fm_vertices(gorillas$mesh, format = "sf")
 
   # we obtain these vertices as a SpatialPointsDataFrame
 
@@ -173,38 +164,39 @@ if (bru_safe_inla() &&
 
   # Predicting 'mySmooth' at these locations works as follows
 
-  mySmooth <- predict(fit, vrt, ~mySmooth)
+  field <- predict(fit, vrt, ~field)
 
-  # Note that just like the input also the output will be a SpatialPointsDataFrame
-  # and that the predicted statistics are simply added as columns
+  # Note that just like the input also the output will be a sf object with
+  # points and that the predicted statistics are simply added as columns
 
-  class(mySmooth)
+  class(field)
   head(vrt)
-  head(mySmooth)
+  head(field)
 
   # Plotting the mean, for instance, at the mesh node is straight forward
 
   ggplot() +
     gg(gorillas$mesh) +
-    gg(mySmooth, aes(color = mean), size = 3)
+    gg(field, aes(color = mean), size = 2)
 
   # However, we are often interested in a spatial field and thus a linear interpolation,
   # which can be achieved by using the gg mechanism for meshes
 
   ggplot() +
-    gg(gorillas$mesh, color = mySmooth$mean)
+    gg(gorillas$mesh, color = field$mean)
 
   # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
-  # SpatialPixels object covering the mesh
+  # sf object with a grid of points covering the relevant part of mesh
 
-  pxl <- fm_pixels(gorillas$mesh, format = "sp")
-  mySmooth2 <- predict(fit, pxl, ~mySmooth)
+  pxl <- fm_pixels(gorillas$mesh, format = "sf", mask = gorillas$boundary)
+  field2 <- predict(fit, pxl, ~field)
 
-  # This will give us a SpatialPixelDataFrame with the columns we are looking for
+  # This will give us a sf with the columns we are looking for
 
-  head(mySmooth2)
+  head(field2)
   ggplot() +
-    gg(mySmooth2)
+    gg(gorillas$boundary) +
+    gg(data = field2, geom = "tile")
 }
 }
 }

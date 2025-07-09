@@ -38,34 +38,21 @@ local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
 
 
 
-#' @details `local_bru_options_set()` is used to set global package options.
+#' @describeIn local_testthat Wrapper for [bru_options_set_local()],
+#' to locally override the global package options.
 #' @return `local_bru_options_set()` returns a copy of the global override
 #' options (not including the defaults), invisibly.
-#' @seealso [bru_options_set()], [bru_options_default()], [bru_options_get()]
+#' @seealso [bru_options_set_local()], [bru_options_default()],
+#'   [bru_options_get()]
 #' @param .reset For `local_bru_options_set`, logical indicating if the global
 #' override options list should be emptied before setting the new option(s).
 #'
-#' @examples
-#' my_fun <- function(val) {
-#'   local_bru_options_set(bru_verbose = val)
-#'   bru_options_get("bru_verbose")
-#' }
-#' # Inside the function, the bru_verbose option is changed.
-#' # Outside the function, the bru_verbose option is unchanged.
-#' print(my_fun(TRUE))
-#' print(bru_options_get("bru_verbose"))
-#' print(my_fun(FALSE))
-#' print(bru_options_get("bru_verbose"))
 #' @export
-#' @describeIn local_testthat Calls [bru_options_set()] in a reversible way
 
 local_bru_options_set <- function(...,
                                   .reset = FALSE,
                                   envir = parent.frame()) {
-  old_opt <- bru_options_get(include_default = FALSE)
-  withr::defer(bru_options_set(old_opt, .reset = TRUE), envir = envir)
-  bru_options_set(..., .reset = .reset)
-  invisible(old_opt)
+  bru_options_set_local(..., .reset = .reset, .envir = envir)
 }
 
 
@@ -73,7 +60,7 @@ local_bru_options_set <- function(...,
 #' @export
 #' @rdname local_testthat
 local_basic_intercept_testdata <- function() {
-  set.seed(123)
+  withr::local_seed(123)
   data.frame(
     Intercept = 1,
     y = rnorm(100)
@@ -83,11 +70,54 @@ local_basic_intercept_testdata <- function() {
 #' @export
 #' @rdname local_testthat
 local_basic_fixed_effect_testdata <- function() {
-  set.seed(123)
+  withr::local_seed(123)
   cbind(
     local_basic_intercept_testdata(),
     data.frame(x1 = rnorm(100))
   )
+}
+
+
+# @returns logical; If the option setting was successful, `TRUE` is returned,
+# otherwise `FALSE`.
+local_inla_options_set <- function(...,
+                                   envir = parent.frame(),
+                                   .save_only = FALSE) {
+  # Set INLA options
+  inla_options <- list(...)
+  old_inla_options <- list()
+  if (length(inla_options) > 0) {
+    for (name in names(inla_options)) {
+      old_inla_options[[name]] <- tryCatch(
+        INLA::inla.getOption(name),
+        error = function(e) {
+          e
+        }
+      )
+
+      if (inherits(old_inla_options[[name]], "simpleError")) {
+        return(FALSE)
+      }
+
+      if (!.save_only) {
+        e <- tryCatch(
+          INLA::inla.setOption(name, inla_options[[name]]),
+          error = function(e) {
+            e
+          }
+        )
+        if (inherits(e, "simpleError")) {
+          return(FALSE)
+        }
+      }
+
+      withr::defer(
+        INLA::inla.setOption(name, old_inla_options[[name]]),
+        envir
+      )
+    }
+  }
+  TRUE
 }
 
 
@@ -118,63 +148,22 @@ local_bru_safe_inla <- function(multicore = FALSE,
     }
 
     # Save the num.threads option so it can be restored
-    old_threads <- tryCatch(
-      INLA::inla.getOption("num.threads"),
-      error = function(e) {
-        e
-      }
-    )
-    if (inherits(old_threads, "simpleError")) {
-      return(testthat::skip("inla.getOption() failed, skip INLA tests."))
-    }
-    withr::defer(
-      INLA::inla.setOption(num.threads = old_threads),
-      envir
+    local_inla_options_set(
+      num.threads = NULL,
+      envir = envir,
+      .save_only = TRUE
     )
 
-    # Save the fmesher.timeout option so it can be restored
-    old_fmesher_timeout <- INLA::inla.getOption("fmesher.timeout")
-    withr::defer(
-      INLA::inla.setOption(fmesher.timeout = old_fmesher_timeout),
-      envir
+    local_inla_options_set(
+      inla.timeout = 60,
+      fmesher.timeout = 30,
+      fmesher.evolution = 2L,
+      fmesher.evolution.warn = TRUE,
+      fmesher.evolution.verbosity = "stop",
+      envir = envir,
+      .save_only = FALSE
     )
-    INLA::inla.setOption(fmesher.timeout = 30)
 
-    if ("fmesher.evolution" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution option so it can be restored
-      old_fmesher_evolution <- INLA::inla.getOption("fmesher.evolution")
-      withr::defer(
-        INLA::inla.setOption(fmesher.evolution = old_fmesher_evolution),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution = max(old_fmesher_evolution, 2L))
-    }
-
-    if ("fmesher.evolution.warn" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution.warn option so it can be restored
-      old_fmesher_evolution_warn <-
-        INLA::inla.getOption("fmesher.evolution.warn")
-      withr::defer(
-        INLA::inla.setOption(
-          fmesher.evolution.warn = old_fmesher_evolution_warn
-        ),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution.warn = TRUE)
-    }
-
-    if ("fmesher.evolution.verbosity" %in% names(INLA::inla.getOption())) {
-      # Save the fmesher.evolution.verbosity option so it can be restored
-      old_fmesher_evolution_verbosity <-
-        INLA::inla.getOption("fmesher.evolution.verbosity")
-      withr::defer(
-        INLA::inla.setOption(
-          fmesher.evolution.verbosity = old_fmesher_evolution_verbosity
-        ),
-        envir
-      )
-      INLA::inla.setOption(fmesher.evolution.verbosity = "stop")
-    }
     # withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
   }
 

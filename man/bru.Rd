@@ -15,7 +15,7 @@ bru_rerun(result, options = list())
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\code{\link[=bru_component]{bru_component()}} for details.}
+\code{\link[=bru_comp]{bru_comp()}} for details.}
 
 \item{...}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
 named parameters that can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. Note that
@@ -71,6 +71,10 @@ available by using the \code{cp} family or (even easier) by using the
 \itemize{
 \item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate. The estimation
 \code{options} list can be given new values to override the original settings.
+
+To rerun with a subset of the data (e.g. for cross validation or prior
+sampling), use \code{\link[=bru_set_missing]{bru_set_missing()}} to set all or part of the response data
+to \code{NA} before calling \code{bru_rerun()}.
 
 }}
 \examples{

@@ -3,16 +3,14 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   local_bru_safe_inla()
   skip_if_not_installed("terra")
   skip_if_not_installed("sf")
-  skip_if_not(bru_safe_sp())
 
   options <- list(
     control.inla = list(
       int.strategy = "eb"
     )
   )
-  skip_if_not_installed("terra")
-  skip_if_not_installed("sf")
-  gorillas <- gorillas_sp()
+
+  gorillas <- gorillas_sf
 
   matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
@@ -55,11 +53,11 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   #      gg(ips_new, aes(size=weight, col = factor(ID)))
   #  }
 
-  cmp <- coordinates ~ my.spde(main = sp::coordinates, model = matern)
+  cmp <- geometry ~ my.spde(main = geometry, model = matern)
   fit <- lgcp(cmp,
     data = gorillas$plotsample$nests,
     samplers = gorillas$plotsample$plots,
-    domain = list(coordinates = gorillas$mesh),
+    domain = list(geometry = gorillas$mesh),
     options = options
   )
 

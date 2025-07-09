@@ -18,22 +18,28 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.height = 5
 )
+library(inlabru)
+inla_available <- inlabru::bru_safe_inla(
+  multicore = interactive(),
+  quietly = TRUE
+)
 ```
 
 
 Setting things up
 ----------------
 
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 library(INLA)
 library(inlabru)
 library(mgcv)
 library(ggplot2)
 library(fmesher)
+library(patchwork)
 ```
 
 Make a shortcut to a nicer colour scale:
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 colsc <- function(...) {
   scale_fill_gradientn(
     colours = rev(RColorBrewer::brewer.pal(11, "RdYlBu")),
@@ -46,20 +52,17 @@ colsc <- function(...) {
 Get the data
 -----------------------------------
 
-```{r results="hide",warning=FALSE,message=FALSE}
+Load the data and rename the countdata object to `cd` (just because '`cd`'
+is less to type than '`countdata2`'.):
+
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 data(Poisson2_1D)
-```
-
-Put the count data in `cd` (just because '`cd`' is less to type than '`countdata2`'.)
-
-```{r }
 cd <- countdata2
 ```
 
 Take a look at the count data.
 
-
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE,eval=inla_available}
 cd
 ggplot(cd) +
   geom_point(aes(x, y = count)) +
@@ -74,8 +77,7 @@ Fitting a Generalised Additive Model (GAM)
 If you're not familiar with GAMs and the syntax of `gam` don't worry, the point of 
 this is just to provide something to which we can compare the `inlabru` model fit.
 
-
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)),
   family = poisson(),
   data = cd
@@ -86,36 +88,35 @@ The term `s(x,k=10)` just specifies that as nonparametric smooth function is to
 be fitted to the data, with _no more than_ 10 degrees of freedom (df). (The
 larger the df, the more wiggly the fitted curve (recall from the lecture that
 this is an effect of how some spline methods are defined, without discretisation
-dependent penalty); `gam` selects the 'best' df.)  Notice the use of `offset=`.
-(Refer to slides for an explanation of `offset`.) The variable `exposure` in
-data frame `cd` is the size of the bin in which each count was made.
+dependent penalty); `gam` selects the 'best' df.)  Notice the use of `offset=`
+to incorporate the variable `exposure` in `cd` is the size of the bin in which
+each count was made.
 
 You can look at the fitted model using `summary( )` as below if you want to, but
 you do not need to understand this output, or the code that makes the
 predictions immediately below it if you are not familiar with GAMs.
 
-
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 summary(fit2.gam)
 ```
 
 Make a prediction data frame, get predictions and add them to the data frame
 First make vectors of x-values and associated (equal) exposures:
 
-```{r }
+```{r,eval=inla_available}
 xs <- seq(0, 55, length = 100)
 exposures <- rep(cd$exposure[1], 100)
 ```
 
 and put them in a data frame:
 
-```{r }
+```{r,eval=inla_available}
 dat4pred <- data.frame(x = xs, exposure = exposures)
 ```
 
 Then predict 
 
-```{r }
+```{r,eval=inla_available}
 pred2.gam <- predict(fit2.gam, newdata = dat4pred, type = "response")
 # add column for prediction in data frame:
 dat4pred2 <- cbind(dat4pred, gam = pred2.gam)
@@ -124,7 +125,7 @@ dat4pred2 <- cbind(dat4pred, gam = pred2.gam)
 Plotting the fit and the data using the `ggplot2` commands below should give you
 the plot shown below
 
-```{r }
+```{r,eval=inla_available}
 ggplot(dat4pred2) +
   geom_line(aes(x = x, y = gam), lty = 2) +
   ylim(0, max(dat4pred2$gam, cd$count)) +
@@ -136,20 +137,41 @@ Fitting an SPDE model with inlabru
 Make mesh. To avoid boundary effects in the region of interest, let the
 mesh extend outside the data range.
 
-```{r }
-x <- seq(-10, 65, by = 1) # this sets mesh points - try others if you like
-mesh1D <- fm_mesh_1d(x, boundary = "free")
+```{r,eval=inla_available}
+x <- seq(-10, 65, by = 5) # this sets mesh points - try others if you like
+(mesh1D <- fm_mesh_1d(x, degree = 2, boundary = "free"))
 ```
 
-... and see where the mesh points are:
+... and see where the mesh knots are:
 
 
-```{r fig.show="hide"}
+```{r fig.show="hide",eval=inla_available}
 ggplot() +
   gg(mesh1D)
 ```
 
+We can also draw the basis functions:
+
+```{r,eval=inla_available}
+ggplot() +
+  geom_fm(data = mesh1D)
+```
+
+For special cases, one can control the knots and boundary conditions. Normally,
+we just need to ensure that there is enough flexibility to represent the intended Gaussian
+process dependence structure, while not adding needless computations.
+
+```{r,eval=inla_available}
+(mesh <- fm_mesh_1d(c(1, 2, 3, 4, 6),
+  boundary = c("neumann", "free"),
+  degree = 2
+))
+ggplot() +
+  geom_fm(data = mesh, xlim = c(0, 7))
+```
+
 ### Using function `bru( )` to fit to count data
+
 We need to specify model components and a model formula in order to fit it.
 This can be done inside the call to `bru( )` but that is a bit messy, so we'll
 store it in `comp` first and then pass that to `bru( )`.
@@ -173,13 +195,13 @@ The user gets to name the GRF function. The syntax is
   `INLA` function `inla.spde2.pcmatern( )`, which requires a mesh to be passed
   to it, so we pass it the 1D mesh that we created above, `mesh1D`.
 
-For models that only adds the model components, we don't need to specify the
+For models that only sums all the model components, we don't need to specify the
 full predictor formula. Instead, we can provide the name of the output to the
 left of the `~` in the component specification, and "." on the right hand side,
 which will cause it to add all components (unless a subset is selected via the
-`include`/`exclude` arguments to `bru_obs()`).
+`used` argument to `bru_obs()`).
 
-```{r }
+```{r,eval=inla_available}
 the_spde <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(1, 0.01),
   prior.sigma = c(1, 0.01)
@@ -189,7 +211,8 @@ comp <- ~ field(x, model = the_spde) + Intercept(1, prec.linear = 1 / 2^2)
 
 fit2.bru <- bru(
   comp,
-  bru_obs(count ~ .,
+  bru_obs(
+    count ~ .,
     data = cd,
     family = "poisson",
     E = exposure
@@ -202,7 +225,7 @@ summary(fit2.bru)
 Predict the values at the x points used for mesh
 (the data argument must be a data frame, see `?predict.bru`):
 
-```{r }
+```{r,eval=inla_available}
 x4pred <- data.frame(x = xs)
 pred2.bru <- predict(fit2.bru,
   x4pred,
@@ -222,7 +245,7 @@ you understand why we divide the count by `cd$exposure`? (We will in due course
 allow predictions on the count scale as well.)
 
 
-```{r }
+```{r,eval=inla_available}
 true.lambda <- data.frame(x = cd$x, y = E_nc2 / cd$exposure)
 ```
 
@@ -231,7 +254,7 @@ intensities as short horizontal blue lines, the observed intensities as black
 dots, and the fitted intensity function as a red curve, with 95% credible
 intervals shown as a light red band about the curve.
 
-```{r }
+```{r,eval=inla_available}
 ggplot() +
   gg(pred2.bru) +
   geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
@@ -243,7 +266,7 @@ ggplot() +
 
 Compare the `inlabru` fit to the `gam` fit:
 
-```{r fig.show="hide"}
+```{r fig.show="hide",eval=inla_available}
 ggplot() +
   gg(pred2.bru) +
   geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
@@ -257,7 +280,7 @@ ggplot() +
 We can look at the Intercept posterior using the function 
 `plot( )`, as below. 
 
-```{r }
+```{r,eval=inla_available}
 plot(fit2.bru, "Intercept")
 ```
 
@@ -265,14 +288,13 @@ You have to know that there is a variable called `Intercept` in order to use
 this function. To see what fixed effect parameters' posterior distributions are
 available to be plotted, you can type
 
-```{r results="hide",warning=FALSE,message=FALSE}
+```{r results="hide",warning=FALSE,message=FALSE,eval=inla_available}
 names(fit2.bru$marginals.fixed)
 ```
 
 This does not tell you about the SPDE parameters, and if you type
 
-
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE,eval=inla_available}
 names(fit2.bru$marginals.random)
 ```
 
@@ -286,19 +308,20 @@ the *log* of the variance because the variance posterior is very skewed and so
 it is easier to view the log of the variance)
 
 
-```{r warning=FALSE,message=FALSE}
+```{r warning=FALSE,message=FALSE,eval=inla_available}
 spde.range <- spde.posterior(fit2.bru, "field", what = "range")
 spde.logvar <- spde.posterior(fit2.bru, "field", what = "log.variance")
 
 range.plot <- plot(spde.range)
 var.plot <- plot(spde.logvar)
-multiplot(range.plot, var.plot)
+
+(range.plot | var.plot)
 ```
 
 We can look at the posterior distributions of the Matern correlation and
 covariance functions as follows:
 
-```{r warning=FALSE,message=FALSE}
-plot(spde.posterior(fit2.bru, "field", what = "matern.correlation"))
-plot(spde.posterior(fit2.bru, "field", what = "matern.covariance"))
+```{r warning=FALSE,message=FALSE,eval=inla_available}
+(plot(spde.posterior(fit2.bru, "field", what = "matern.correlation")) /
+  plot(spde.posterior(fit2.bru, "field", what = "matern.covariance")))
 ```

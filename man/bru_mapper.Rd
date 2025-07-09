@@ -7,17 +7,20 @@
 \usage{
 bru_mapper(...)
 
-bru_mapper_define(mapper, new_class = NULL, ...)
+bru_mapper_define(mapper, new_class = NULL, remove_class = "list", ...)
 }
 \arguments{
 \item{\dots}{Arguments passed on to sub-methods, or used for special
 purposes, see details for each function below.}
 
 \item{mapper}{For \code{bru_mapper_define}, a prototype mapper object, see
-Details. For \code{bru_mapper_scale}, a mapper to be scaled.}
+Details.}
 
 \item{new_class}{If non-\code{NULL}, this is added at the front of the class
 definition}
+
+\item{remove_class}{If non-\code{NULL}, this class or classes is removed from the
+class definition before adding the \code{new_class} names. Default is \code{"list"}.}
 }
 \value{
 \itemize{
@@ -34,7 +37,7 @@ mappers for special objects. See below for details of the
 default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
 new mappers in user code.
 
-\item \code{bru_mapper_define()}: Adds the \code{new_class} and "bru_mapper" class names to
+\item \code{bru_mapper_define()}: Adds the \code{new_class} and \code{"bru_mapper"} class names to
 the inheritance list for the input \code{mapper} object, unless the object
 already inherits from these.
 
@@ -60,7 +63,7 @@ etc., which semi-automates it.
 
 }}
 \examples{
-mapper <- bru_mapper_index(5)
+mapper <- bm_index(5)
 ibm_jacobian(mapper, input = c(1, 3, 4, 5, 2))
 }
 \seealso{
@@ -70,27 +73,28 @@ the individual mapper pages for special method implementations, and
 class objects.
 
 Other mappers: 
+\code{\link{bm_aggregate}()},
+\code{\link{bm_collect}()},
+\code{\link{bm_const}()},
+\code{\link{bm_factor}()},
+\code{\link{bm_fmesher}()},
+\code{\link{bm_harmonics}()},
+\code{\link{bm_index}()},
+\code{\link{bm_linear}()},
+\code{\link{bm_logsumexp}()},
+\code{\link{bm_marginal}()},
+\code{\link{bm_matrix}()},
+\code{\link{bm_mesh_B}()},
+\code{\link{bm_multi}()},
+\code{\link{bm_pipe}()},
+\code{\link{bm_repeat}()},
+\code{\link{bm_scale}()},
+\code{\link{bm_shift}()},
+\code{\link{bm_sum}()},
+\code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_aggregate}()},
-\code{\link{bru_mapper_collect}()},
-\code{\link{bru_mapper_const}()},
-\code{\link{bru_mapper_factor}()},
-\code{\link{bru_mapper_fmesher}()},
-\code{\link{bru_mapper_generics}},
-\code{\link{bru_mapper_harmonics}()},
-\code{\link{bru_mapper_index}()},
-\code{\link{bru_mapper_linear}()},
-\code{\link{bru_mapper_logsumexp}()},
-\code{\link{bru_mapper_marginal}()},
-\code{\link{bru_mapper_matrix}()},
-\code{\link{bru_mapper_mesh_B}()},
-\code{\link{bru_mapper_multi}()},
-\code{\link{bru_mapper_pipe}()},
-\code{\link{bru_mapper_repeat}()},
-\code{\link{bru_mapper_scale}()},
-\code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()}
+\code{\link{bru_mapper_generics}}
 }
 \concept{mappers}

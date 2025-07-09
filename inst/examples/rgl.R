@@ -11,7 +11,7 @@ if (interactive() &&
   mexdolphin <- inlabru::mexdolphin_sp()
 
   # Add mesh, ship transects and dolphin sightings stored
-  # as inla.mesh, SpatialLines and SpatialPoints objects, respectively
+  # as fm_mesh_2d, SpatialLines and SpatialPoints objects, respectively
 
   glplot(mexdolphin$mesh, alpha = 0.2)
   glplot(mexdolphin$samplers, lwd = 5)

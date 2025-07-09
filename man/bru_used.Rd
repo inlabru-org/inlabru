@@ -2,13 +2,13 @@
 % Please edit documentation in R/used.R
 \name{bru_used}
 \alias{bru_used}
-\alias{bru_used.default}
+\alias{bru_used.NULL}
 \alias{bru_used.character}
 \alias{bru_used.expression}
 \alias{bru_used.formula}
 \alias{bru_used.bru}
 \alias{bru_used.list}
-\alias{bru_used.bru_like}
+\alias{bru_used.bru_obs}
 \alias{bru_used.bru_used}
 \alias{format.bru_used}
 \alias{summary.bru_used}
@@ -17,7 +17,7 @@
 \usage{
 bru_used(x = NULL, ...)
 
-\method{bru_used}{default}(
+\method{bru_used}{`NULL`}(
   x = NULL,
   ...,
   effect = NULL,
@@ -57,7 +57,7 @@ bru_used(x = NULL, ...)
 
 \method{bru_used}{list}(x, ..., join = TRUE)
 
-\method{bru_used}{bru_like}(x, ...)
+\method{bru_used}{bru_obs}(x, ...)
 
 \method{bru_used}{bru_used}(x, labels = NULL, ...)
 
@@ -73,7 +73,7 @@ bru_used(x = NULL, ...)
 \item{...}{Parameters passed on to the other methods}
 
 \item{effect}{character; components used as effects. When \code{NULL}, auto-detect
-components to include or include all components.}
+components to include all components in a predictor expression.}
 
 \item{effect_exclude}{character; components to specifically exclude from
 effect evaluation. When \code{NULL}, do not specifically exclude any components.}
@@ -97,9 +97,35 @@ Create or extract information about which components are used by a model, or
 its individual observation models. If a non-NULL \code{labels} argument is
 supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \code{bru_used} objects.
 }
+\details{
+The arguments \code{effect}, \code{effect_exclude}, and \code{latent} control what
+components and effects are available for use in predictor expressions.
+\describe{
+\item{\code{effect}}{
+Character vector of component labels that are used as effects
+by the predictor expression; If \code{NULL} (default), the names
+are extracted from the formula.
+}
+\item{\code{exclude}}{
+Character vector of component labels to be excluded from the effect list
+even if they have been auto-detected as being necessary.
+Default is \code{NULL}; do not remove any components from the inclusion list.
+}
+\item{\code{include_latent}}{Character vector.
+Specifies which latent state variables need to be directly available to the
+predictor expression, with a \verb{_latent} suffix. This also makes evaluator
+functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
+and \code{replicate}, taking values for where to evaluate the component effect
+that are different than those defined in the component definition itself
+(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
+in the predictor expression is detected automatically.
+}
+}
+}
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_used(default)}: Create a \code{bru_used} object.
+\item \code{bru_used(`NULL`)}: Create a \code{bru_used} object from effect name character
+vectors.
 
 \item \code{bru_used(character)}: Create a \code{bru_used} object from a \code{character}
 representation of an expression.
@@ -108,6 +134,15 @@ representation of an expression.
 
 \item \code{bru_used(formula)}: Create a \code{bru_used} object from a formula (only the
 right-hand side is used).
+
+\item \code{bru_used(bru)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru} object.
+
+\item \code{bru_used(list)}: Extract the \code{bru_used} information for each element
+of a list, and optionally join into a single \code{bru_used} object.
+
+\item \code{bru_used(bru_obs)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru} observation model \code{bru_obs} object.
 
 \item \code{bru_used(bru_used)}: Convenience method that takes
 an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_used_update()}}

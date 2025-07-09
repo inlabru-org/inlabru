@@ -157,13 +157,13 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
 
 #' @describeIn glplot This function transforms the mesh to 3D cartesian
-#'   coordinates and uses `inla.plot.mesh()` with `rgl=TRUE` to plot the result.
+#'   coordinates and uses [fmesher::plot_rgl()] to plot the result.
 #'
 #' @export
 #'
 #' @param col Color specification. A single named color, a vector of scalar
 #'   values, or a matrix of RGB values.
-#' @param ... Parameters passed on to plot_rgl.fm_mesh_2d()
+#' @param ... Parameters passed on to `plot_rgl.fm_mesh_2d()`
 #'
 #' @family inlabru RGL tools
 
@@ -179,9 +179,4 @@ glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
   } else {
     fmesher::plot_rgl(object, add = add, col = col, ...)
   }
-}
-#' @rdname glplot
-#' @export
-glplot.inla.mesh <- function(object, add = TRUE, col = NULL, ...) {
-  glplot(fm_as_fm(object), add = add, col = col, ...)
 }

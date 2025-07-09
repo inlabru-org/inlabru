@@ -76,11 +76,9 @@
 #'
 #' @examples
 #' if (interactive() &&
-#'   bru_safe_inla() &&
-#'   bru_safe_sp() &&
-#'   require("sp") &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE)) {
+#'   requireNamespace("terra", quietly = TRUE) &&
+#'   requireNamespace("tidyterra", quietly = TRUE)) {
 #'   # plot all the nests, mesh and boundary
 #'   ggplot() +
 #'     gg(gorillas_sf$mesh) +
@@ -91,10 +89,9 @@
 #'     geom_sf(data = gorillas_sf$nests)
 #'
 #'   # Plot the elevation covariate
-#'   gorillas_sf$gcov <- terra::rast(
-#'     system.file(gorillas_sf$gcov_file, package = "inlabru")
-#'   )
-#'   plot(gorillas_sf$gcov$elevation)
+#'   gorillas_sf$gcov <- gorillas_sf_gcov()
+#'   ggplot() +
+#'     tidyterra::geom_spatraster(data = gorillas_sf$gcov$elevation)
 #'
 #'   # Plot the plot sample
 #'   ggplot() +
@@ -108,10 +105,9 @@
 #' `terra::rast()` object.
 #' @export
 #' @examples
-#' \dontrun{
-#' if (requireNamespace("terra", quietly = TRUE)) {
+#' if (interactive() &&
+#'   requireNamespace("terra", quietly = TRUE)) {
 #'   gorillas_sf$gcov <- gorillas_sf_gcov()
-#' }
 #' }
 gorillas_sf_gcov <- function() {
   requireNamespace("terra")

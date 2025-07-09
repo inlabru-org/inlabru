@@ -19,17 +19,18 @@ lgcp(
 \arguments{
 \item{components}{A \code{formula}-like specification of latent components.
 Also used to define a default linear additive predictor.  See
-\code{\link[=bru_component]{bru_component()}} for details.}
+\code{\link[=bru_comp]{bru_comp()}} for details.}
 
-\item{data}{Likelihood-specific data, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]}
-object.}
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{tibble},
+or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
+\code{SpatialPoints[DataFrame]} objects.}
 
-\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"} and \verb{aggregate=}.
 \describe{
-\item{\code{domain}}{Named list of domain definitions.}
-\item{\code{samplers}}{Integration subdomain for 'cp' family.}
-\item{\code{ips}}{Integration points for 'cp' family. Defaults
+\item{\code{domain}}{Named list of domain definitions, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
+\verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{ips}}{Integration points. Defaults
 to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}

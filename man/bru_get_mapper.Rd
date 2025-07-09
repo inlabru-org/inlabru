@@ -32,9 +32,8 @@ for the given latent model.
 \section{Methods (by class)}{
 \itemize{
 \item \code{bru_get_mapper(inla.spde)}: Extract an indexed mapper for
-the \code{model$mesh} object contained in the model object.
-It returns \code{NULL} gives a warning
-if no known mesh type is found in the model object.
+the \code{model$mesh} object contained in the model object,
+which is assumed to be of a class supporting relevant \code{fmesher} methods.
 
 \item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a call to
 \code{model$f$rgeneric$definition("mapper")}. To support this for your own
@@ -70,27 +69,28 @@ if (bru_safe_inla()) {
 the individual mappers for specific implementation details.
 
 Other mappers: 
+\code{\link{bm_aggregate}()},
+\code{\link{bm_collect}()},
+\code{\link{bm_const}()},
+\code{\link{bm_factor}()},
+\code{\link{bm_fmesher}()},
+\code{\link{bm_harmonics}()},
+\code{\link{bm_index}()},
+\code{\link{bm_linear}()},
+\code{\link{bm_logsumexp}()},
+\code{\link{bm_marginal}()},
+\code{\link{bm_matrix}()},
+\code{\link{bm_mesh_B}()},
+\code{\link{bm_multi}()},
+\code{\link{bm_pipe}()},
+\code{\link{bm_repeat}()},
+\code{\link{bm_scale}()},
+\code{\link{bm_shift}()},
+\code{\link{bm_sum}()},
+\code{\link{bm_taylor}()},
 \code{\link{bru_mapper}()},
 \code{\link{bru_mapper.fm_mesh_1d}()},
 \code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_aggregate}()},
-\code{\link{bru_mapper_collect}()},
-\code{\link{bru_mapper_const}()},
-\code{\link{bru_mapper_factor}()},
-\code{\link{bru_mapper_fmesher}()},
-\code{\link{bru_mapper_generics}},
-\code{\link{bru_mapper_harmonics}()},
-\code{\link{bru_mapper_index}()},
-\code{\link{bru_mapper_linear}()},
-\code{\link{bru_mapper_logsumexp}()},
-\code{\link{bru_mapper_marginal}()},
-\code{\link{bru_mapper_matrix}()},
-\code{\link{bru_mapper_mesh_B}()},
-\code{\link{bru_mapper_multi}()},
-\code{\link{bru_mapper_pipe}()},
-\code{\link{bru_mapper_repeat}()},
-\code{\link{bru_mapper_scale}()},
-\code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_taylor}()}
+\code{\link{bru_mapper_generics}}
 }
 \concept{mappers}

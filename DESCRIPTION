@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.12.0
+Version: 2.13.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -52,7 +52,7 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.2.0),
+    fmesher (>= 0.4.0),
     methods,
     R (>= 3.6),
     stats
@@ -82,6 +82,7 @@ Suggests:
     rgl,
     rmarkdown,
     scales,
+    scoringRules,
     shiny,
     sn,
     sp (>= 2.1),
@@ -91,7 +92,7 @@ Suggests:
     splancs,
     terra,
     tidyterra,
-    testthat,
+    testthat (>= 3.2.0),
     tidyr,
     DiagrammeR
 Enhances:
@@ -103,6 +104,9 @@ Collate:
     '0_inlabru_envir.R'
     'bru.gof.R'
     'bru.inference.R'
+    'bru_conversion.R'
+    'bru_index.R'
+    'bru_input.R'
     'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
@@ -124,7 +128,9 @@ Collate:
     'inlabru-package.R'
     'local_testthat.R'
     'mappers.R'
+    'mapper_collect.R'
     'mapper_repeat.R'
+    'mapper_sum.R'
     'model.R'
     'nlinla.R'
     'plotsample.R'

@@ -55,9 +55,6 @@ options (not including the defaults), invisibly.
 \description{
 Local helper functions for package unit tests
 }
-\details{
-\code{local_bru_options_set()} is used to set global package options.
-}
 \section{Functions}{
 \itemize{
 \item \code{local_bru_testthat_assign()}: Assign local variable. Useful for easy cleanup
@@ -69,7 +66,8 @@ Assign local tolerance variables. Useful for easy cleanup
 of global workspace with \code{withr::deferred_run()} when running tests
 interactively.
 
-\item \code{local_bru_options_set()}: Calls \code{\link[=bru_options_set]{bru_options_set()}} in a reversible way
+\item \code{local_bru_options_set()}: Wrapper for \code{\link[=bru_options_set_local]{bru_options_set_local()}},
+to locally override the global package options.
 
 \item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
 within-system repeatability by calling \code{local_bru_safe_inla()}; see also
@@ -82,19 +80,8 @@ Does \emph{not} call \code{\link[=local_bru_safe_inla]{local_bru_safe_inla()}}, 
 should be called inside each test that relies on INLA.
 
 }}
-\examples{
-my_fun <- function(val) {
-  local_bru_options_set(bru_verbose = val)
-  bru_options_get("bru_verbose")
-}
-# Inside the function, the bru_verbose option is changed.
-# Outside the function, the bru_verbose option is unchanged.
-print(my_fun(TRUE))
-print(bru_options_get("bru_verbose"))
-print(my_fun(FALSE))
-print(bru_options_get("bru_verbose"))
-}
 \seealso{
-\code{\link[=bru_options_set]{bru_options_set()}}, \code{\link[=bru_options_default]{bru_options_default()}}, \code{\link[=bru_options_get]{bru_options_get()}}
+\code{\link[=bru_options_set_local]{bru_options_set_local()}}, \code{\link[=bru_options_default]{bru_options_default()}},
+\code{\link[=bru_options_get]{bru_options_get()}}
 }
 \keyword{internal}

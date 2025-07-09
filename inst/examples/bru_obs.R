@@ -2,8 +2,8 @@
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE)) {
 
-  # The like function's main purpose is to set up models with multiple
-  # likelihoods.
+  # The 'bru_obs()' (previously 'like()') function's main purpose is to set up
+  # observation models, both for single- and multi-likelihood models.
   # The following example generates some random covariates which are observed
   # through two different random effect models with different likelihoods
 
@@ -37,13 +37,26 @@ if (bru_safe_inla() &&
   # A joint model has two likelihoods, which are set up using the bru_obs
   # function
 
-  lik1 <- bru_obs("gaussian", formula = y ~ x + Intercept, data = df1)
-  lik2 <- bru_obs("poisson", formula = y ~ x + z + Intercept, data = df2)
+  lik1 <- bru_obs(
+    "gaussian",
+    formula = y ~ x + Intercept,
+    data = df1,
+    tag = "norm"
+  )
+  lik2 <- bru_obs(
+    "poisson",
+    formula = y ~ x + z + Intercept,
+    data = df2,
+    tag = "pois"
+  )
 
   # The union of effects of both models gives the components needed to run bru
 
   jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
+
+  bru_index(jfit, "norm")
+  bru_index(jfit, "pois")
 
   # Compare the estimates
 

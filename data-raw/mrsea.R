@@ -188,7 +188,7 @@ mrseanames2dsmnames <- function(data) {
   data$Effort <- data$length
   # At 2021-01-16, the distances were stored in metres, so need to convert
   data$distance <- data$distance / 1000
-  return(data)
+  data
 }
 # ---------------------------------------------------------------------
 makepreddata <- function(data) {
@@ -197,7 +197,7 @@ makepreddata <- function(data) {
   # 2021-02-16 the original data was stored in metres units in MRSea; convert:
   data$x <- data$x / 1000
   data$y <- data$y / 1000
-  return(data)
+  data
 }
 makecovardata <- function(data) {
   depth <- data[
@@ -221,7 +221,7 @@ makedistdata <- function(data) {
     distdata$size <- data$size
   }
   distdata <- na.omit(distdata)
-  return(distdata)
+  distdata
 }
 # ---------------------------------------------------------------------
 makeobsdata <- function(data) {
@@ -238,7 +238,7 @@ makeobsdata <- function(data) {
     "Effort",
     "size"
   )]
-  return(obsdata)
+  obsdata
 }
 # ---------------------------------------------------------------------
 

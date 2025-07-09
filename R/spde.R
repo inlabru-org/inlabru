@@ -1,9 +1,9 @@
 #' @title Matern correlation or covariance function approximate credible bands.
 #'
 #' @description Evaluate the covariance function for an inla.spde
-#'     objectPlots the posterior distribution of the range,
+#'     object. Calculates the posterior distribution of the range,
 #'     log(range), variance, or log(variance) parameter of a model's
-#'     SPDE component. Can also plot Matern correlation or covariance
+#'     SPDE component. Can also calculate Matern correlation or covariance
 #'     function.
 #'
 #' @keywords internal
@@ -36,7 +36,7 @@
 #' region in parameter space with approximately `quantile` probability.
 #'
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
-
+#' @export
 materncov.bands <- function(manifold, dist, log.range,
                             log.variance = NULL, alpha = 2,
                             quantile = 0.95, n = 64, S1.L = NULL) {
@@ -121,8 +121,9 @@ materncov.bands <- function(manifold, dist, log.range,
   if (!is.list(log.range)) {
     log.range <- list(mean = log.range, sd = 0)
   }
+  probs <- c((1 - quantile) / 2, 0.5, (1 + quantile) / 2)
   if (is.null(log.variance)) {
-    qq <- qnorm(c((1 - quantile) / 2, 0.5, (1 + quantile) / 2))
+    qq <- qnorm(probs)
     kappas <- sqrt(8 * nu) / exp(log.range$mean + log.range$sd * rev(qq))
     out <- data.frame(
       lower = calc.corr(dist, kappas[1]),
@@ -180,6 +181,7 @@ materncov.bands <- function(manifold, dist, log.range,
 #'   `names(result$summary.random)`.
 #' @param what One of "range", "log.range", "variance", "log.variance",
 #'   "matern.correlation" or "matern.covariance".
+#' @inheritParams materncov.bands
 #' @return A `prediction` object.
 #'
 #' @export
@@ -187,7 +189,8 @@ materncov.bands <- function(manifold, dist, log.range,
 #'
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 
-spde.posterior <- function(result, name, what = "range") {
+spde.posterior <- function(result, name, what = "range",
+                           quantile = 0.95) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
   spdespec <- result$bru_info$model$effects[[name]]$main$model
@@ -212,7 +215,7 @@ spde.posterior <- function(result, name, what = "range") {
         dist = x,
         log.range = log.range,
         log.variance = NULL,
-        alpha = 2, quantile = 0.95
+        alpha = 2, quantile = quantile
       )
     } else {
       corr <- FALSE
@@ -222,15 +225,18 @@ spde.posterior <- function(result, name, what = "range") {
         dist = x,
         log.range = log.range,
         log.variance = log.variance,
-        alpha = 2, quantile = 0.95
+        alpha = 2, quantile = quantile
       )
     }
 
 
     df <- data.frame(
-      x = x, q0.5 = out$median, q0.025 = out$lower, q0.975 = out$upper,
+      x = x, q0.5 = out$median, lower = out$lower, upper = out$upper,
       median = out$median
     )
+    colnames(df)[3] <- paste0("q", paste0(round((1 - quantile) / 2, 5), "%"))
+    colnames(df)[4] <-
+      paste0("q", paste0(round(1 - (1 - quantile) / 2, 5), "%"))
     attr(df, "type") <- "1d"
     attr(df, "misc") <- list(dims = "x", predictor = c("distance", ylab))
     class(df) <- list("prediction", "data.frame")
@@ -249,8 +255,8 @@ spde.posterior <- function(result, name, what = "range") {
     }
 
     med <- INLA::inla.qmarginal(0.5, marg)
-    uq <- INLA::inla.qmarginal(0.975, marg)
-    lq <- INLA::inla.qmarginal(0.025, marg)
+    uq <- INLA::inla.qmarginal(1 - (1 - quantile) / 2, marg)
+    lq <- INLA::inla.qmarginal((1 - quantile) / 2, marg)
     inner.x <- seq(lq, uq, length.out = 100)
     inner.marg <- data.frame(
       x = inner.x,

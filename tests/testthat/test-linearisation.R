@@ -2,7 +2,7 @@ test_that("Linearisation", {
   skip_on_cran()
   local_bru_safe_inla()
 
-  set.seed(12345L)
+  withr::local_seed(12345L)
   data <- data.frame(x = seq_len(10) / 1)
   data <- within(data, {
     y <- exp(x / 5) - 2 + rnorm(length(x), sd = 0.1)
@@ -11,7 +11,7 @@ test_that("Linearisation", {
 
   cmp <- ~ -1 + x + Int_y(1) + Int_z(1)
   lhoods <-
-    bru_like_list(
+    c(
       bru_obs(
         formula = y ~ exp(x) + Int_y_latent,
         data = data
@@ -22,7 +22,7 @@ test_that("Linearisation", {
         family = "poisson"
       )
     )
-  lhoods <- bru_used_update(lhoods, names(bru_component_list(cmp)))
+  lhoods <- bru_used_update(lhoods, names(bru_comp_list(cmp)))
 
   used <- bru_used(lhoods[[1]])
   expect_equal(used[["effect"]], "x")
@@ -36,19 +36,20 @@ test_that("Linearisation", {
   expect_equal(used[["effect"]], "x")
   expect_equal(used[["latent"]], c("Int_y", "Int_z"))
 
-  model <- bru_model(bru_component_list(cmp, lhoods), lhoods)
+  model <- bru_model(bru_comp_list(cmp), lhoods)
+  lhoods <- model$lhoods
 
-  idx <- evaluate_index(model, lhoods)
-  inp <- evaluate_inputs(model, lhoods, inla_f = FALSE)
-  comp_lin <- evaluate_comp_lin(model, input = inp, state = NULL)
-  lin0 <- bru_compute_linearisation.bru_model(
+  idx <- bru_index(model, used = bru_used(lhoods))
+  inp <- bru_input(model, lhoods)
+  comp_lin <- ibm_linear(model, input = inp, state = NULL)
+  lin0 <- bru_compute_linearisation(
     model,
     lhoods = lhoods,
     input = inp,
     state = list(Int_y = 0, Int_z = 0, x = 0),
     comp_simple = comp_lin
   )
-  lin <- bru_compute_linearisation.bru_model(
+  lin <- bru_compute_linearisation(
     model,
     lhoods = lhoods,
     input = inp,
@@ -114,11 +115,11 @@ test_that("Linearisation", {
       c(stks0, list(compress = TRUE, remove.unused = FALSE))
     )
 
-  stk0_ <- bru_make_stack.bru_like_list(lhoods, lin0, idx)
+  stk0_ <- bru_make_stack(lhoods, lin0, idx)
 
   expect_s3_class(stk0, "inla.data.stack")
 
-  expect_error(
+  expect_no_error(
     object = {
       fit <- bru(
         components = cmp,
@@ -135,7 +136,6 @@ test_that("Linearisation", {
           )
         )
       )
-    },
-    NA
+    }
   )
 })

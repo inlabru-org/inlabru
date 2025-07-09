@@ -3,13 +3,14 @@
 \name{bru_obs}
 \alias{bru_obs}
 \alias{like}
-\alias{bru_like_list}
+\alias{bru_obs_list}
+\alias{bru_obs_list.list}
+\alias{bru_obs_list.bru_obs_list}
+\alias{c.bru_obs}
+\alias{c.bru_obs_list}
+\alias{[.bru_obs_list}
 \alias{like_list}
-\alias{bru_like_list.list}
-\alias{bru_like_list.bru_like}
-\alias{c.bru_like}
-\alias{c.bru_like_list}
-\alias{[.bru_like_list}
+\alias{bru_like_list}
 \title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
@@ -17,6 +18,7 @@ bru_obs(
   family = "gaussian",
   data = NULL,
   response_data = NULL,
+  data_extra = NULL,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
@@ -24,15 +26,17 @@ bru_obs(
   domain = NULL,
   samplers = NULL,
   ips = NULL,
-  include = NULL,
-  exclude = NULL,
-  include_latent = NULL,
   used = NULL,
   allow_combine = NULL,
+  aggregate = NULL,
+  aggregate_input = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
-  .envir = parent.frame()
+  .envir = parent.frame(),
+  include = deprecated(),
+  exclude = deprecated(),
+  include_latent = deprecated()
 )
 
 like(
@@ -47,31 +51,33 @@ like(
   domain = NULL,
   samplers = NULL,
   ips = NULL,
-  include = NULL,
-  exclude = NULL,
-  include_latent = NULL,
   used = NULL,
   allow_combine = NULL,
   control.family = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
-  mesh = deprecated()
+  mesh = deprecated(),
+  include = deprecated(),
+  exclude = deprecated(),
+  include_latent = deprecated()
 )
 
-bru_like_list(...)
+bru_obs_list(...)
+
+\method{bru_obs_list}{list}(object, ..., .envir = NULL)
+
+\method{bru_obs_list}{bru_obs_list}(..., .envir = NULL)
+
+\method{c}{bru_obs}(..., .envir = NULL)
+
+\method{c}{bru_obs_list}(..., .envir = NULL)
+
+\method{[}{bru_obs_list}(x, i)
 
 like_list(...)
 
-\method{bru_like_list}{list}(object, envir = NULL, ...)
-
-\method{bru_like_list}{bru_like}(..., envir = NULL)
-
-\method{c}{bru_like}(..., envir = NULL)
-
-\method{c}{bru_like_list}(..., envir = NULL)
-
-\method{[}{bru_like_list}(x, i)
+bru_like_list(...)
 }
 \arguments{
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -86,19 +92,25 @@ processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{data}{Likelihood-specific data, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]}
-object.}
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{tibble},
+or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
+\code{SpatialPoints[DataFrame]} objects.}
 
-\item{response_data}{Likelihood-specific data for models that need different
-size/format for inputs and response variables, as a \code{data.frame} or
-\code{SpatialPoints[DataFrame]} object.}
+\item{response_data}{Observation/response-specific data for models that need
+different size/format for inputs and response variables, as a \code{data.frame},
+\code{tibble}, or \code{sf}. Since \verb{2.12.0.9023}, deprecated support for
+\code{SpatialPoints[DataFrame]} objects.}
 
-\item{E}{Exposure parameter for family = 'poisson' passed on to \code{INLA::inla}.
-Special case if family is 'cp': rescale all integration weights by a scalar
-E. For sampler specific reweighting/effort, use a \code{weight} column in the
-\code{samplers} object, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}. Default taken from \code{options$E},
-normally \code{1}.}
+\item{data_extra}{object convertible with \code{as.list()} with additional
+variables to be made available in predictor evaluations. Variables with
+the same names as the data object will be ignored, unless accessed via
+\code{.data_extra.[["name"]]} or \code{.data_extra.$name} in the formula.}
+
+\item{E}{Exposure/effort parameter for family = 'poisson' passed on to
+\code{INLA::inla}. Special case if family is 'cp': rescale all integration
+weights by a scalar \code{E}. For sampler specific reweighting/effort, use a
+\code{weight} column in the \code{samplers} object instead, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
 
 \item{Ntrials}{A vector containing the number of trials for the 'binomial'
 likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
@@ -107,61 +119,54 @@ likelihood. Default taken from \code{options$Ntrials}, normally \code{1}.}
 log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
 Default value is \code{1}. WARNING: The normalizing constant for the likelihood
 is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
-interpreted with great care.}
+interpreted with great care.
+
+For \code{family = "cp"}, the weights are applied as \code{sum(weights * eta)} in
+the point location contribution part of the log-likelihood, where \code{eta} is
+the linear predictor, and do not affect the integration part of the
+likelihood. This can be used to implement approximative methods for point
+location uncertainty.}
 
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}
 
-\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"} and \verb{aggregate=}.
 \describe{
-\item{\code{domain}}{Named list of domain definitions.}
-\item{\code{samplers}}{Integration subdomain for 'cp' family.}
-\item{\code{ips}}{Integration points for 'cp' family. Defaults
+\item{\code{domain}}{Named list of domain definitions, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
+\verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{ips}}{Integration points. Defaults
 to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}
 
-\item{include, exclude, include_latent}{Arguments controlling what components
-and effects are available for use in the predictor expression.
-\describe{
-\item{\code{include}}{
-Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
-method is used to extract the variable names from the formula.
-}
-\item{\code{exclude}}{
-Character vector of component labels to be excluded from the effect list
-determined by the \code{include} argument. Default is \code{NULL}; do not remove
-any components from the inclusion list.
-}
-\item{\code{include_latent}}{Character vector.
-Specifies which latent state variables are directly available to the
-predictor expression, with a \verb{_latent} suffix. This also makes evaluator
-functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
-and \code{replicate}, taking values for where to evaluate the component effect
-that are different than those defined in the component definition itself
-(see \code{\link[=bru_component_eval]{bru_component_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
-auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
-}
-}}
-
-\item{used}{Wither \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
-the \code{include}, \code{exclude}, \code{include_latent} arguments.
-When \code{used} is \code{NULL} (default), the information about what effects and
+\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,
+\code{NULL}, the information about what effects and
 latent vectors are made available to the predictor evaluation is defined by
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{used <- bru_used(
-  formula,
-  effect = include,
-  effect_exclude = exclude,
-  latent = include_latent
-)
-}\if{html}{\out{</div>}}}
+\code{bru_used(formula)}, which will include all effects and latent vectors
+used by the predictor expression.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
 several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
+
+\item{aggregate}{character ("none", "sum", "average", "logsumexp", or
+"logaverageexp", as defined by \code{bm_aggregate(type = aggregate)})
+or an aggregation \code{bru_mapper} object
+(\code{\link[=bm_aggregate]{bm_aggregate()}} or \code{\link[=bm_logsumexp]{bm_logsumexp()}}). Default \code{NULL},
+interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
+from version \verb{2.12.0.9013}.}
+
+\item{aggregate_input}{\code{NULL} or an optional input list to the mapper
+defined by non-NULL \code{aggregate}, overriding the default,
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
+     weights = .data.[["weight"]],
+     n_block = bru_response_size(.response_data.))
+}\if{html}{\out{</div>}}
+
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
@@ -175,15 +180,16 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \code{Ntrials}, \code{weights}, and \code{scale}) if not found in \code{response_data} or
 \code{data}. Defaults to the calling environment.}
 
+\item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
+\code{used} instead.}
+
 \item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
 
-\item{\dots}{For \code{bru_like_list.bru_like}, one or more \code{bru_like} objects}
+\item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
-\item{object}{A list of \code{bru_like} objects}
+\item{object}{A list of \code{bru_obs} objects}
 
-\item{envir}{An optional environment for the new \code{bru_like_list} object}
-
-\item{x}{\code{bru_like_list} object from which to extract element(s)}
+\item{x}{\code{bru_obs_list} object from which to extract element(s)}
 
 \item{i}{indices specifying elements to extract}
 }
@@ -199,27 +205,33 @@ made aware of the change. The name change is to avoid issues with namespace
 clashes, e.g. with \code{data.table::like()}, and also to signal that the function
 defines observation models, not just likelihood functions.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{c(bru_obs)}: Combine several \code{bru_obs} objects into a \code{bru_obs_list} object
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{like()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy \code{like()}
 method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_obs]{bru_obs()}} instead.
 
-\item \code{bru_like_list()}: Combine \code{bru_like} likelihoods into a \code{bru_like_list} object
+\item \code{bru_obs_list()}: Combine \code{bru_obs} observation model object into a \code{bru_obs_list} object
 
-\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Legacy \code{like_list()}
-alias. Use \code{\link[=bru_like_list]{bru_like_list()}} instead.
+\item \code{bru_obs_list(list)}: Combine one or more lists of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
 
-\item \code{bru_like_list(list)}: Combine a list of \code{bru_like} likelihoods
-into a \code{bru_like_list} object
+\item \code{bru_obs_list(bru_obs_list)}: Combine a list of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
 
-\item \code{bru_like_list(bru_like)}: Combine several \code{bru_like} likelihoods
-into a \code{bru_like_list} object
+\item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
-\item \code{c(bru_like)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
-objects into a \code{bru_like_list} object
+\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0}. For later versions, use
+\code{as_bru_obs_list()}, \code{bru_obs_list()}, or \code{c()}.
 
-\item \code{c(bru_like_list)}: Combine several \code{bru_like} likelihoods and/or \code{bru_like_list}
-objects into a \code{bru_like_list} object
+\item \code{bru_like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0.9017}. For later versions,
+use \code{as_bru_obs_list()}, \code{bru_obs_list()} or \code{c()}.
 
 }}
 \examples{
@@ -227,8 +239,8 @@ objects into a \code{bru_like_list} object
 if (bru_safe_inla() &&
     require(ggplot2, quietly = TRUE)) {
 
-  # The like function's main purpose is to set up models with multiple
-  # likelihoods.
+  # The 'bru_obs()' (previously 'like()') function's main purpose is to set up
+  # observation models, both for single- and multi-likelihood models.
   # The following example generates some random covariates which are observed
   # through two different random effect models with different likelihoods
 
@@ -262,13 +274,26 @@ if (bru_safe_inla() &&
   # A joint model has two likelihoods, which are set up using the bru_obs
   # function
 
-  lik1 <- bru_obs("gaussian", formula = y ~ x + Intercept, data = df1)
-  lik2 <- bru_obs("poisson", formula = y ~ x + z + Intercept, data = df2)
+  lik1 <- bru_obs(
+    "gaussian",
+    formula = y ~ x + Intercept,
+    data = df1,
+    tag = "norm"
+  )
+  lik2 <- bru_obs(
+    "poisson",
+    formula = y ~ x + z + Intercept,
+    data = df2,
+    tag = "pois"
+  )
 
   # The union of effects of both models gives the components needed to run bru
 
   jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
+
+  bru_index(jfit, "norm")
+  bru_index(jfit, "pois")
 
   # Compare the estimates
 
@@ -290,10 +315,10 @@ if (bru_safe_inla() &&
 }
 }
 \seealso{
-\code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_component]{bru_component()}},
-\code{\link[=bru_component_eval]{bru_component_eval()}}
+\code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_comp]{bru_comp()}},
+\code{\link[=bru_comp_eval]{bru_comp_eval()}}
 
-\code{\link[=summary.bru_like]{summary.bru_like()}}
+\code{\link[=summary.bru_obs]{summary.bru_obs()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}
