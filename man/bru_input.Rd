@@ -9,6 +9,7 @@
 \alias{bru_input.bru_obs_list}
 \alias{bru_input.bru_input}
 \alias{input_eval}
+\alias{evaluate_inputs}
 \title{Obtain component inputs}
 \usage{
 bru_input(...)
@@ -26,11 +27,13 @@ bru_input(...)
 \method{bru_input}{bru_input}(input, data, env = NULL, null.on.fail = FALSE, ...)
 
 input_eval(...)
+
+evaluate_inputs(...)
 }
 \arguments{
-\item{...}{Unused.}
+\item{\dots}{Passed on to sub-methods.}
 
-\item{component}{A \link{component}.}
+\item{component}{A \link{bru_comp} object.}
 
 \item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
 covariates and/or point locations.
@@ -41,8 +44,10 @@ If \code{NULL}, return the component's map.}
 \item{components}{A \link{bru_comp_list}.}
 }
 \value{
-An list of mapper input values, formatted for the full component
-mapper (of type \link{bm_pipe})
+\itemize{
+\item \code{bru_input(bru_comp)}: A list of mapper input values, formatted
+for the full component mapper (of type \link{bm_pipe})
+}
 }
 \description{
 Obtain component inputs
@@ -75,6 +80,10 @@ references a column of the data points, or some other complete expression
 \itemize{
 \item \code{input_eval()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from \verb{2.12.0.9023}.
 Use \code{bru_input()} instead.
+
+\item \code{evaluate_inputs()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} since version
+\verb{2.12.0.9023}. Use \code{\link[=bru_input]{bru_input()}} instead. Computes the component inputs for
+included components for each observation model.
 
 }}
 \section{Simple covariates and the input parameters}{

@@ -2,6 +2,7 @@
 #'
 #' @export
 #' @rdname bru_input
+#' @param \dots Passed on to sub-methods.
 #' @seealso [summary.bru_input()], [bru_comp()]
 bru_input <- function(...) {
   UseMethod("bru_input")
@@ -117,13 +118,12 @@ bru_input.default <- function(input,
 #'
 #' @export
 #' @keywords internal
-#' @param component A [component].
+#' @param component A [bru_comp] object.
 #' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
 #' covariates and/or point locations.
 #' If `NULL`, return the component's map.
-#' @param ... Unused.
-#' @return An list of mapper input values, formatted for the full component
-#'   mapper (of type [bm_pipe])
+#' @return * `bru_input(bru_comp)`: A list of mapper input values, formatted
+#'   for the full component mapper (of type [bm_pipe])
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
 #' @rdname bru_input
@@ -500,6 +500,20 @@ input_eval <- function(...) {
   lifecycle::deprecate_warn(
     "2.12.0.9023",
     "input_eval()",
+    "bru_input()"
+  )
+  bru_input(...)
+}
+
+#' @describeIn bru_input `r lifecycle::badge("deprecated")` since version
+#'   `2.12.0.9023`. Use [bru_input()] instead. Computes the component inputs for
+#'   included components for each observation model.
+#' @keywords internal
+evaluate_inputs <- function(...) {
+  stopifnot(inherits(model, "bru_model"))
+  lifecycle::deprecate_warn(
+    when = "2.12.9023",
+    "evaluate_inputs()",
     "bru_input()"
   )
   bru_input(...)

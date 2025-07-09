@@ -766,24 +766,6 @@ bru_comp_eval <- function(main,
 
 
 
-#' Compute all component inputs
-#'
-#' Computes the component inputs for included components
-#' for each model likelihood
-#'
-#' @param model A `bru_model` object
-#' @param lhoods A `bru_obs_list` object
-#' @rdname evaluate_inputs
-#' @keywords internal
-evaluate_inputs <- function(model, lhoods) {
-  stopifnot(inherits(model, "bru_model"))
-  lifecycle::deprecate_warn(
-    when = "2.12.9023",
-    "evaluate_inputs()",
-    "bru_input()"
-  )
-  bru_input(model, lhoods = lhoods)
-}
 
 
 
