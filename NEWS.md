@@ -1,37 +1,40 @@
 # inlabru 2.13.0
 
-## General features
+## New features
 
-* Add automated support for INLA models with hidden states, beyond the "bym" and
-  "bym2" models (version `2.12.0.9002`)
-* Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
-  "matern2d" (version `2.12.0.9004`)
 * Allow the optional `weights` argument to `bru_obs(family = "cp")`/`lgcp()`
   to contain individual point observation weights, so that the `eta` contribution to
   the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
   `2.12.0.9006`)
-* Add `inputs` data to the `bru_info` object, so that the component inputs
-  can be pre-evaluated before automated mapper construction, and avoiding
-  duplicate evaluation in `iinla()`. This can halve the pre-processing
-  time for large spatial and spatio-temporal models (version `2.12.0.9010`)
-* Add `bru_log()` data for warnings and errors reported by inlabru (version
-  `2.12.0.9011`)
+* Automatically detect purely additive linear models (version `2.12.0.9014`)
 * Add experimental predictor aggregation helper feature
   `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
   specification of models with aggregation as the final step of the predictor
   evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`). Includes support
   for constructing the aggregation information, via `domain`,`samplers`, or
   precomputed `ips` (version `2.12.0.9022`)
-* Automatically detect purely additive linear models (version `2.12.0.9014`)
+* Add `bru_set_missing()` method for setting missing values in the
+  `bru_obs` data, e.g. for use in cross-validation or prior sampling
+  (version `2.12.0.9024`)
+
+## Updates features
+
+* Add automated support for INLA models with hidden states, beyond the "bym" and
+  "bym2" models (version `2.12.0.9002`)
+* Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
+  "matern2d" (version `2.12.0.9004`)
+* Add `inputs` data to the `bru_info` object, so that the component inputs
+  can be pre-evaluated before automated mapper construction, and avoiding
+  duplicate evaluation in `iinla()`. This can halve the pre-processing
+  time for large spatial and spatio-temporal models (version `2.12.0.9010`)
+* Add `bru_log()` data for warnings and errors reported by inlabru (version
+  `2.12.0.9011`)
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
   and temporarily re-reintroduce `like_list()` and `bru_like_list()` as aliases
   for `bru_obs_list()` (version `2.12.0.9020`)
 * Add `quantile` argument to `spde.posterior()` for controlling the credible
   interval calculations, like `materncov.bands()`, which is now also exported
   (version `2.12.0.9019`)
-* Add `bru_set_missing()` method for setting missing values in the
-  `bru_obs` data, e.g. for use in cross-validation or prior sampling
-  (version `2.12.0.9024`)
 * Remove `dic` and `waic` from default `control.compute`
   `bru_options`, to match INLA defaults (version `2.12.0.9024`)
 
