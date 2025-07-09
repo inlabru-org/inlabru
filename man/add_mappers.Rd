@@ -8,9 +8,9 @@
 \usage{
 add_mappers(...)
 
-\method{add_mappers}{bru_comp}(component, lhoods, inputs = NULL, ...)
+\method{add_mappers}{bru_comp}(component, lhoods, inputs = NULL, lh_data = NULL, ...)
 
-\method{add_mappers}{bru_comp_list}(components, lhoods, inputs = NULL, ...)
+\method{add_mappers}{bru_comp_list}(components, lhoods, inputs = NULL, lh_data = NULL, ...)
 }
 \arguments{
 \item{\dots}{Parameters passed on to other methods}
@@ -18,6 +18,13 @@ add_mappers(...)
 \item{component}{A \link{component} object}
 
 \item{lhoods}{A \link{bru_obs_list} object}
+
+\item{inputs}{A precomputed list of inputs, as returned by
+\code{\link[=bru_input.bru_comp_list]{bru_input.bru_comp_list()}}}
+
+\item{lh_data}{A list of data object, one for each likelihood in \code{lhoods}
+that is used to determine the mapper(s). If \code{NULL}, the data is
+or inputs are used instead.}
 
 \item{components}{A \code{bru_comp_list} object}
 }

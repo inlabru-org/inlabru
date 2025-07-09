@@ -72,6 +72,10 @@ available by using the \code{cp} family or (even easier) by using the
 \item \code{bru_rerun()}: Continue the optimisation from a previously computed estimate. The estimation
 \code{options} list can be given new values to override the original settings.
 
+To rerun with a subset of the data (e.g. for cross validation or prior
+sampling), use \code{\link[=bru_set_missing]{bru_set_missing()}} to set all or part of the response data
+to \code{NA} before calling \code{bru_rerun()}.
+
 }}
 \examples{
 \donttest{

@@ -764,6 +764,11 @@ bru_comp_list.list <- function(object,
 #'   determine the appropriate mapper(s).
 #' @param component A [component] object
 #' @param lhoods A [bru_obs_list] object
+#' @param inputs A precomputed list of inputs, as returned by
+#'   [bru_input.bru_comp_list()]
+#' @param lh_data A list of data object, one for each likelihood in `lhoods`
+#'   that is used to determine the mapper(s). If `NULL`, the data is
+#'   or inputs are used instead.
 #' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
@@ -774,23 +779,31 @@ bru_comp_list.list <- function(object,
 #' @keywords internal
 #' @export
 
-add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
-  # Filter out lhoods that don't use/support the component
-  keep_lh <-
-    vapply(lhoods,
-      function(lh, label) {
-        label %in% bru_used(lh)[["effect"]]
-      },
-      TRUE,
-      label = component$label
-    )
-  lh <- lhoods[keep_lh]
-  inputs <- inputs[keep_lh]
+add_mappers.bru_comp <- function(component,
+                                 lhoods,
+                                 inputs = NULL,
+                                 lh_data = NULL,
+                                 ...) {
+  if (is.null(lh_data)) {
+    # Filter out lhoods that don't use/support the component
+    keep_lh <-
+      vapply(lhoods,
+        function(lh, label) {
+          label %in% bru_used(lh)[["effect"]]
+        },
+        TRUE,
+        label = component$label
+      )
+    lh <- lhoods[keep_lh]
+    inputs <- inputs[keep_lh]
+
+    lh_data <- lapply(lh, function(x) x[["data"]])
+  }
 
   component$main <- add_mapper(
     component$main,
     label = component$label,
-    lhoods = lh,
+    data = lh_data,
     inputs = lapply(
       inputs,
       function(x) x[[component$label]][["mapper"]][["main"]]
@@ -801,7 +814,7 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
   component$group <- add_mapper(
     component$group,
     label = component$label,
-    lhoods = lh,
+    data = lh_data,
     inputs = lapply(
       inputs,
       function(x) x[[component$label]][["mapper"]][["group"]]
@@ -812,7 +825,7 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
   component$replicate <- add_mapper(
     component$replicate,
     label = component$label,
-    lhoods = lh,
+    data = lh_data,
     inputs = lapply(
       inputs,
       function(x) x[[component$label]][["mapper"]][["replicate"]]
@@ -893,13 +906,20 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
 #' @param components A `bru_comp_list` object
 #' @export
 #' @rdname add_mappers
-add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
+add_mappers.bru_comp_list <- function(components,
+                                      lhoods,
+                                      inputs = NULL,
+                                      lh_data = NULL,
+                                      ...) {
   if (is.null(inputs)) {
     inputs <- bru_input(lhoods, components = components)
   }
   is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
   for (k in which(!is_copy)) {
-    components[[k]] <- add_mappers(components[[k]], lhoods, inputs = inputs)
+    components[[k]] <- add_mappers(
+      components[[k]], lhoods,
+      inputs = inputs, lh_data = lh_data
+    )
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
@@ -1152,10 +1172,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 }
 
 
-# @param inputs list with the subcomponent inputs, for each lhoods element;
+# @param inputs list with precomputed inputs, for each lhoods element;
+# @param data list of data objects, one for each lhoods element
 # lapply(full_inputs,
 #        function(x) x[[component$label]][["mapper"]][[subcomponent_label]])
-add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
+add_mapper <- function(subcomp, label, data = NULL, env = NULL,
                        inputs = NULL,
                        require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
@@ -1181,35 +1202,35 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       require_indexed = require_indexed
     )
   } else {
-    if (!is.null(lhoods)) {
-      if (length(lhoods) > 0) {
-        if (is.null(inputs)) {
+    if (!is.null(data) || !is.null(inputs)) {
+      if (is.null(inputs) || (length(inputs) == 0)) {
+        if (!is.null(data) && (length(data) > 0)) {
           inputs <- lapply(
-            lhoods,
-            function(lh) {
+            data,
+            function(dat) {
               bru_input(
                 subcomp$input,
-                data = lh$data,
+                data = dat,
                 env = env,
                 label = subcomp$input$label,
                 null.on.fail = TRUE
               )
             }
           )
-        }
-      } else {
-        # Component not directly used in any likelihood.
-        # Attempt to evaluate with no data;
-        # useful for intercept-like components only used via the
-        # *_latent technique.
-        inputs <- list(
-          bru_input(subcomp$input,
-            data = NULL,
-            env = env,
-            label = subcomp$input$label,
-            null.on.fail = TRUE
+        } else {
+          # Component not directly used in any likelihood.
+          # Attempt to evaluate with no data;
+          # useful for intercept-like components only used via the
+          # *_latent technique.
+          inputs <- list(
+            bru_input(subcomp$input,
+              data = NULL,
+              env = env,
+              label = subcomp$input$label,
+              null.on.fail = TRUE
+            )
           )
-        )
+        }
       }
       # Check for
       # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,

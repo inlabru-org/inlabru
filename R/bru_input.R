@@ -121,7 +121,6 @@ bru_input.default <- function(input,
 #' @param component A [bru_comp] object.
 #' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
 #' covariates and/or point locations.
-#' If `NULL`, return the component's map.
 #' @return * `bru_input(bru_comp)`: A list of mapper input values, formatted
 #'   for the full component mapper (of type [bm_pipe])
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
@@ -510,7 +509,6 @@ input_eval <- function(...) {
 #'   included components for each observation model.
 #' @keywords internal
 evaluate_inputs <- function(...) {
-  stopifnot(inherits(model, "bru_model"))
   lifecycle::deprecate_warn(
     when = "2.12.9023",
     "evaluate_inputs()",

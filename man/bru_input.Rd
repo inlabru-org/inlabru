@@ -36,8 +36,7 @@ evaluate_inputs(...)
 \item{component}{A \link{bru_comp} object.}
 
 \item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
-covariates and/or point locations.
-If \code{NULL}, return the component's map.}
+covariates and/or point locations.}
 
 \item{lhoods}{A \link{bru_obs_list} object}
 

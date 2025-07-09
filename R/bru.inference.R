@@ -660,6 +660,10 @@ bru <- function(components = ~ Intercept(1),
 #' @describeIn bru
 #' Continue the optimisation from a previously computed estimate. The estimation
 #' `options` list can be given new values to override the original settings.
+#'
+#' To rerun with a subset of the data (e.g. for cross validation or prior
+#' sampling), use [bru_set_missing()] to set all or part of the response data
+#' to `NA` before calling `bru_rerun()`.
 #' @param result A previous estimation object of class `bru`
 #'
 #' @export
@@ -699,6 +703,151 @@ bru_rerun <- function(result, options = list()) {
   return(result)
 }
 
+#' @title Set missing values in observation models
+#'
+#' @description Set all or parts of the observation model response data
+#' to `NA`, for example for use in cross validation (with [bru_rerun()])
+#' or prior sampling (with [bru_rerun()] and [inlabru::generate()]).
+#'
+#' @param object A `bru`, `bru_obs` or `bru_obs_list` object
+#' @param keep For `bru_obs`, a single logical or an integer vector;
+#'   If `TRUE`, keep all the response data, if `FALSE` (default),
+#'   set all of it to `NA`. An integer vector determines which elements
+#'   to keep (for positive values) or to set as missing (negative values).
+#'
+#'   For `bru` and `bru_obs_list`, a logical scalar or vector, or a list, see
+#'   Details.
+#' @param \dots Additional arguments passed on to the `bru_obs` method.
+#'   Currently unused.
+#'
+#' @details For `bru` and `bru_obs_list`,
+#' \itemize{
+#'   \item{`keep` must be either a single logical, which is expanded to a list,}
+#'   \item{a logical vector, which is converted to a list,}
+#'   \item{an unnamed list of the same length as the number of observation
+#'     models, with elements compatible with the `bru_obs` method, or}
+#'   \item{a named list with elements compatible with the `bru_obs` method,
+#'     and only the named `bro_obs` models are acted upon, i.e. the elements
+#'     not present in the list are treated as `keep = TRUE`.}
+#' }
+#'
+#' E.g.: `keep = list(b = FALSE)` sets all observations in model `b` to missing,
+#' and does not change model `a`.
+#'
+#' E.g.: `keep = list(a = 1:4, b = -(3:5))` keeps only observations `1:4` of
+#' model `a`, marking the rest as missing, and sets observations `3:5` of model
+#' `b` to missing.
+#'
+#' @export
+#' @rdname bru_set_missing
+#' @examples
+#' obs <- c(
+#'   A = bru_obs(y_A ~ ., data = data.frame(y_A = 1:6)),
+#'   B = bru_obs(y_B ~ ., data = data.frame(y_B = 11:15))
+#' )
+#' bru_response_size(obs)
+#' lapply(
+#'   bru_set_missing(obs, keep = FALSE),
+#'   function(x) {
+#'     x[["response_data"]][["BRU_response"]]
+#'   }
+#' )
+#' lapply(
+#'   bru_set_missing(obs, keep = list(B = FALSE)),
+#'   function(x) {
+#'     x[["response_data"]][["BRU_response"]]
+#'   }
+#' )
+#' lapply(
+#'   bru_set_missing(obs, keep = list(1:4, -(3:5))),
+#'   function(x) {
+#'     x[["response_data"]][["BRU_response"]]
+#'   }
+#' )
+bru_set_missing <- function(object, keep = FALSE, ...) {
+  UseMethod("bru_set_missing")
+}
+#' @export
+#' @rdname bru_set_missing
+bru_set_missing.bru <- function(object, keep = FALSE, ...) {
+  object <- bru_check_object_bru(object)
+  object[["bru_info"]][["lhoods"]] <-
+    bru_set_missing(object[["bru_info"]][["lhoods"]], keep = keep, ...)
+  object
+}
+#' @export
+#' @rdname bru_set_missing
+bru_set_missing.bru_obs_list <- function(object, keep = FALSE, ...) {
+  if (is.logical(keep)) {
+    if (length(keep) == 1L) {
+      keep <- rep(list(keep), length(object))
+    } else {
+      keep <- as.list(keep)
+    }
+  }
+  if (is.null(names(keep))) {
+    idxs <- seq_along(object)
+    if (length(keep) != length(object)) {
+      stop(paste0(
+        "When `keep` is not named list or vector, it must have ",
+        "length matching the number of observation models."
+      ))
+    }
+  } else {
+    idxs <- intersect(names(keep), names(object))
+    if (length(setdiff(names(keep), names(object))) > 0) {
+      stop(paste0(
+        "Some observation models in `keep` were not found: ",
+        paste0("'", setdiff(names(keep), names(object)), "'", collapse = ", ")
+      ))
+    }
+  }
+  for (idx in idxs) {
+    object[[idx]] <- bru_set_missing(object[[idx]],
+      keep = keep[[idx]],
+      ...
+    )
+  }
+  object
+}
+#' @export
+#' @rdname bru_set_missing
+bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
+  if (is.null(keep) || isTRUE(keep)) {
+    return(object)
+  }
+  if (isFALSE(keep)) {
+    keep <- -seq_len(bru_response_size(object))
+  }
+  if (inherits(object[["response_data"]][["BRU_response"]], "inla.surv")) {
+    if (!is.data.frame(object[["response_data"]][["BRU_response"]])) {
+      # TODO: This block should be function, but inla.surv might standardise
+      # to tibble or data.frame, so we should remove this when possible.
+      dat <- object[["response_data"]][["BRU_response"]]
+      cls <- class(dat)
+      att <- attributes(dat)
+      cure_null <- ("cure" %in% names(dat)) && is.null(dat[["cure"]])
+      if (cure_null) {
+        dat["cure"] <- NULL
+      }
+      dat <- as.data.frame(unclass(dat))
+      attr(dat, "names.ori") <- att[["names.ori"]]
+      class(dat) <- c("inla.surv", "data.frame")
+      object[["response_data"]][["BRU_response"]] <- dat
+    }
+    # Note: by only setting time,lower,upper to NA, printing of the object
+    # still works without giving an NA indexing error.
+    object[["response_data"]][["BRU_response"]]$time[-keep] <- NA
+    object[["response_data"]][["BRU_response"]]$lower[-keep] <- NA
+    object[["response_data"]][["BRU_response"]]$upper[-keep] <- NA
+  } else if (is.data.frame(object[["response_data"]][["BRU_response"]])) {
+    # Handles data.frame and tibble, including inla.mdata
+    object[["response_data"]][["BRU_response"]][-keep, ] <- NA
+  } else {
+    object[["response_data"]][["BRU_response"]][-keep] <- NA
+  }
+  object
+}
 
 #' Parse inclusion of component labels in a predictor expression
 #' @param thenames Set of labels to restrict
@@ -1553,7 +1702,6 @@ bru_obs <- function(formula = . ~ .,
       )
     }
 
-    # TODO!!! ####
     ips_is_Spatial <- inherits(ips, "Spatial")
     if (ips_is_Spatial) {
       bru_safe_sp(force = TRUE)

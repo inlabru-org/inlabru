@@ -801,7 +801,7 @@ bru_options_default <- function() {
     # inla options
     E = 1,
     Ntrials = 1,
-    control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
+    control.compute = list(config = TRUE),
     control.inla = list(int.strategy = "auto"),
     control.fixed = list(expand.factor.strategy = "inla")
   )

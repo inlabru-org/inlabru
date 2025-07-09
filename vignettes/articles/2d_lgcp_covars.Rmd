@@ -280,7 +280,8 @@ comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
 fit3 <- lgcp(comp3,
   data = nests,
   samplers = boundary,
-  domain = list(geometry = mesh)
+  domain = list(geometry = mesh),
+  options = list(control.compute(dic = TRUE))
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -293,7 +294,8 @@ if ((!.cache_recompute) &&
   fit3 <- lgcp(comp3,
     nests,
     samplers = boundary,
-    domain = list(geometry = mesh)
+    domain = list(geometry = mesh),
+    options = list(control.compute(dic = TRUE))
   )
   saveRDS(fit3, .cache_file)
 }

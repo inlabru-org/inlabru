@@ -52,14 +52,18 @@ deltaIC <- function(..., criterion = "DIC") {
   dic <- waic <- rep(NA, nmod)
   for (i in 1:nmod) {
     mod <- model[[i]]
-    if (("DIC" %in% criterion) && is.null(mod$dic$dic)) {
-      stop("Object ", i, " does not have DIC information.")
+    if ("DIC" %in% criterion) {
+      if (is.null(mod$dic$dic)) {
+        stop("Object ", i, " does not have DIC information.")
+      }
+      dic[i] <- mod$dic$dic
     }
-    if (("WAIC" %in% criterion) && is.null(mod$waic$waic)) {
-      stop("Object ", i, " does not have WAIC information.")
+    if ("WAIC" %in% criterion) {
+      if (is.null(mod$waic$waic)) {
+        stop("Object ", i, " does not have WAIC information.")
+      }
+      waic[i] <- mod$waic$waic
     }
-    dic[i] <- mod$dic$dic
-    waic[i] <- mod$waic$waic
   }
   if ("DIC" %in% criterion) {
     ord <- order(dic)

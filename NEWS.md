@@ -29,6 +29,11 @@
 * Add `quantile` argument to `spde.posterior()` for controlling the credible
   interval calculations, like `materncov.bands()`, which is now also exported
   (version `2.12.0.9019`)
+* Add `bru_set_missing()` method for setting missing values in the
+  `bru_obs` data, e.g. for use in cross-validation or prior sampling
+  (version `2.12.0.9024`)
+* Remove `dic` and `waic` from default `control.compute`
+  `bru_options`, to match INLA defaults (version `2.12.0.9024`)
 
 ## New and updated mapper features
 
