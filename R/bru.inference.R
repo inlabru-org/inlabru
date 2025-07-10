@@ -841,7 +841,8 @@ bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
     bru_set_missing(
       object[["response_data"]][["BRU_response"]],
       keep = keep,
-      ...)
+      ...
+    )
   object
 }
 
@@ -883,10 +884,18 @@ bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
 #' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
 #' bru_set_missing(obs, keep = c(1, 4))
 #'
-#' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0), cure = matrix(1:8, 4, 2)))
-#' bru_set_missing(obs, keep = c(1, 4))
+#' (obs <- INLA::inla.surv(
+#'   time = 1:4,
+#'   event = c(1, 0, 1, 0),
+#'   cure = matrix(1:8, 4, 2)
+#' ))
+#' bru_set_missing(obs, keep = c(1, 4))|>str()
 #'
-#' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0), subject = c(1, 1, 2, 1)))
+#' (obs <- INLA::inla.surv(
+#'   time = 1:4,
+#'   event = c(1, 0, 1, 0),
+#'   subject = c(1, 1, 2, 1)
+#' ))
 #' bru_set_missing(obs, keep = c(1, 4))
 #'
 bru_set_missing.inla.surv <- function(object, keep = FALSE, ...) {

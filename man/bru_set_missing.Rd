@@ -125,5 +125,19 @@ bru_set_missing(obs, keep = c(1, 4))
 \dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
 bru_set_missing(obs, keep = c(1, 4))
+
+(obs <- INLA::inla.surv(
+  time = 1:4,
+  event = c(1, 0, 1, 0),
+  cure = matrix(1:8, 4, 2)
+))
+bru_set_missing(obs, keep = c(1, 4))|>str()
+
+(obs <- INLA::inla.surv(
+  time = 1:4,
+  event = c(1, 0, 1, 0),
+  subject = c(1, 1, 2, 1)
+))
+bru_set_missing(obs, keep = c(1, 4))
 \dontshow{\}) # examplesIf}
 }
