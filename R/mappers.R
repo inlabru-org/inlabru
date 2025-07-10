@@ -2255,7 +2255,11 @@ bm_aggregate_n_block <- function(mapper, input = NULL) {
   }
   if (is.null(n_block) && !is.null(input[["block"]])) {
     if (is.character(input[["block"]])) {
-      n_block <- max(as.integer(factor(input[["block"]])))
+      lifecycle::deprecate_stop(
+        "2.12.0.9001",
+        "bm_aggregate(input = 'can not be a `character`')",
+        I("`integer` values for the `input` argument.")
+      )
     } else {
       n_block <- max(input[["block"]])
     }

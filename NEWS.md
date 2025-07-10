@@ -52,9 +52,11 @@
 * Allow `n_block` in `input` argument to `bm_aggregate` and
   `bm_logsumexp` evaluation methods, overriding the optional mapper
   object setting (version `2.12.0.9005`)
-* Allow `character` block information in `bm_aggregate` and
+* (Note: due to the difficulty of ensuring correct output ordering,
+   and `fmesher` will refuse `character` block input from version `0.5.0`.
+   Was: Allow `character` block information in `bm_aggregate` and
   `bm_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
-  (version `2.12.0.9013`)
+  (version `2.12.0.9013`))
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 * Code refactor to expand `bm_list` mapper list handling, removing unnecessary
