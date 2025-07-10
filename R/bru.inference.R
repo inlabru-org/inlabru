@@ -883,6 +883,12 @@ bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
 #' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
 #' bru_set_missing(obs, keep = c(1, 4))
 #'
+#' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0), cure = matrix(1:8, 4, 2)))
+#' bru_set_missing(obs, keep = c(1, 4))
+#'
+#' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0), subject = c(1, 1, 2, 1)))
+#' bru_set_missing(obs, keep = c(1, 4))
+#'
 bru_set_missing.inla.surv <- function(object, keep = FALSE, ...) {
   if (is.null(keep) || isTRUE(keep)) {
     return(object)
@@ -890,27 +896,33 @@ bru_set_missing.inla.surv <- function(object, keep = FALSE, ...) {
   if (isFALSE(keep)) {
     keep <- -seq_len(bru_response_size(object))
   }
-  if (!is.data.frame(object[["response_data"]][["BRU_response"]])) {
+  cls <- class(object)
+  if (!is.data.frame(object)) {
     # TODO: This block should be function for converting list-`inla.surv` to
     # `data.frame`-`inla.surv`, but inla.surv might standardise
     # to tibble or data.frame, so we should remove this when possible.
     dat <- object
-    cls <- class(dat)
     att <- attributes(dat)
     cure_null <- ("cure" %in% names(dat)) && is.null(dat[["cure"]])
     if (cure_null) {
       dat["cure"] <- NULL
     }
-    dat <- as.data.frame(unclass(dat))
+    dat <- tibble::as_tibble(unclass(dat))
     attr(dat, "names.ori") <- att[["names.ori"]]
-    class(dat) <- c("inla.surv", "data.frame")
-    object[["response_data"]][["BRU_response"]] <- dat
+    class(dat) <- c("inla.surv", class(dat))
+    object <- dat
   }
   # Note: by only setting time,lower,upper to NA, printing of the object
   # still works without giving an NA indexing error.
-  object$time[-keep] <- NA
-  object$lower[-keep] <- NA
-  object$upper[-keep] <- NA
+  if ("subject" %in% names(object)) {
+    object$time[-keep] <- NA
+  } else {
+    object$time[-keep] <- NA
+    object$lower[-keep] <- NA
+    object$upper[-keep] <- NA
+  }
+  object <- as.list(object)
+  class(object) <- c("inla.surv", class(object))
   object
 }
 
