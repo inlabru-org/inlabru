@@ -863,7 +863,7 @@ bru_set_missing.default <- function(object, keep = FALSE, ...) {
 #' @describeIn bru_set_missing From `> 2.13.0`, handles `data.frame`, tibbles,
 #'   including `inla.mdata`.
 #' @examplesIf bru_safe_inla()
-#' (obs <- INLA::inla.mdata(time = 1:4, event = c(1, 0, 1, 0)))
+#' (obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
 #' bru_set_missing(obs, keep = c(1, 4))
 #'
 bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {

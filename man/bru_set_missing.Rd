@@ -119,7 +119,7 @@ lapply(
 )
 
 \dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-(obs <- INLA::inla.mdata(time = 1:4, event = c(1, 0, 1, 0)))
+(obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
 bru_set_missing(obs, keep = c(1, 4))
 \dontshow{\}) # examplesIf}
 \dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
