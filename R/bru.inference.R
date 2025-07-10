@@ -717,8 +717,8 @@ bru_rerun <- function(result, options = list()) {
 #'
 #'   For `bru` and `bru_obs_list`, a logical scalar or vector, or a list, see
 #'   Details.
-#' @param \dots Additional arguments passed on to the `bru_obs` method.
-#'   Currently unused.
+#' @param \dots Additional arguments passed on to the `bru_obs` and individual
+#'   data class methods.  Currently unused.
 #'
 #' @details For `bru` and `bru_obs_list`,
 #' \itemize{
@@ -819,33 +819,72 @@ bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
   if (isFALSE(keep)) {
     keep <- -seq_len(bru_response_size(object))
   }
-  if (inherits(object[["response_data"]][["BRU_response"]], "inla.surv")) {
-    if (!is.data.frame(object[["response_data"]][["BRU_response"]])) {
-      # TODO: This block should be function, but inla.surv might standardise
-      # to tibble or data.frame, so we should remove this when possible.
-      dat <- object[["response_data"]][["BRU_response"]]
-      cls <- class(dat)
-      att <- attributes(dat)
-      cure_null <- ("cure" %in% names(dat)) && is.null(dat[["cure"]])
-      if (cure_null) {
-        dat["cure"] <- NULL
-      }
-      dat <- as.data.frame(unclass(dat))
-      attr(dat, "names.ori") <- att[["names.ori"]]
-      class(dat) <- c("inla.surv", "data.frame")
-      object[["response_data"]][["BRU_response"]] <- dat
-    }
-    # Note: by only setting time,lower,upper to NA, printing of the object
-    # still works without giving an NA indexing error.
-    object[["response_data"]][["BRU_response"]]$time[-keep] <- NA
-    object[["response_data"]][["BRU_response"]]$lower[-keep] <- NA
-    object[["response_data"]][["BRU_response"]]$upper[-keep] <- NA
-  } else if (is.data.frame(object[["response_data"]][["BRU_response"]])) {
-    # Handles data.frame and tibble, including inla.mdata
-    object[["response_data"]][["BRU_response"]][-keep, ] <- NA
-  } else {
-    object[["response_data"]][["BRU_response"]][-keep] <- NA
+  object[["response_data"]][["BRU_response"]] <-
+    bru_set_missing(
+      object[["response_data"]][["BRU_response"]],
+      keep = keep,
+      ...)
+  object
+}
+
+#' @export
+#' @describeIn bru_set_missing From `> 2.13.0`, set missing values in any
+#' object supporting [base::is.na<-()] for positive and negative indices.
+bru_set_missing.default <- function(object, keep = FALSE, ...) {
+  if (is.null(keep) || isTRUE(keep)) {
+    return(object)
   }
+  if (isFALSE(keep)) {
+    keep <- -seq_len(bru_response_size(object))
+  }
+  is.na(object) <- -keep
+  object
+}
+
+#' @export
+#' @describeIn bru_set_missing From `> 2.13.0`, handles `data.frame`, tibbles,
+#'   including `inla.mdata`.
+bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
+  if (is.null(keep) || isTRUE(keep)) {
+    return(object)
+  }
+  if (isFALSE(keep)) {
+    keep <- -seq_len(bru_response_size(object))
+  }
+  object[-keep, ] <- NA
+  object
+}
+
+#' @export
+#' @describeIn bru_set_missing From `> 2.13.0`, handles `inla.surv`.
+bru_set_missing.inla.surv <- function(object, keep = FALSE, ...) {
+  if (is.null(keep) || isTRUE(keep)) {
+    return(object)
+  }
+  if (isFALSE(keep)) {
+    keep <- -seq_len(bru_response_size(object))
+  }
+  if (!is.data.frame(object[["response_data"]][["BRU_response"]])) {
+    # TODO: This block should be function for converting list-`inla.surv` to
+    # `data.frame`-`inla.surv`, but inla.surv might standardise
+    # to tibble or data.frame, so we should remove this when possible.
+    dat <- object
+    cls <- class(dat)
+    att <- attributes(dat)
+    cure_null <- ("cure" %in% names(dat)) && is.null(dat[["cure"]])
+    if (cure_null) {
+      dat["cure"] <- NULL
+    }
+    dat <- as.data.frame(unclass(dat))
+    attr(dat, "names.ori") <- att[["names.ori"]]
+    class(dat) <- c("inla.surv", "data.frame")
+    object[["response_data"]][["BRU_response"]] <- dat
+  }
+  # Note: by only setting time,lower,upper to NA, printing of the object
+  # still works without giving an NA indexing error.
+  object$time[-keep] <- NA
+  object$lower[-keep] <- NA
+  object$upper[-keep] <- NA
   object
 }
 

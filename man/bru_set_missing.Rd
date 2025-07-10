@@ -5,6 +5,9 @@
 \alias{bru_set_missing.bru}
 \alias{bru_set_missing.bru_obs_list}
 \alias{bru_set_missing.bru_obs}
+\alias{bru_set_missing.default}
+\alias{bru_set_missing.data.frame}
+\alias{bru_set_missing.inla.surv}
 \title{Set missing values in observation models}
 \usage{
 bru_set_missing(object, keep = FALSE, ...)
@@ -14,6 +17,12 @@ bru_set_missing(object, keep = FALSE, ...)
 \method{bru_set_missing}{bru_obs_list}(object, keep = FALSE, ...)
 
 \method{bru_set_missing}{bru_obs}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{default}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{data.frame}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{inla.surv}(object, keep = FALSE, ...)
 }
 \arguments{
 \item{object}{A \code{bru}, \code{bru_obs} or \code{bru_obs_list} object}
@@ -26,8 +35,8 @@ to keep (for positive values) or to set as missing (negative values).
 For \code{bru} and \code{bru_obs_list}, a logical scalar or vector, or a list, see
 Details.}
 
-\item{\dots}{Additional arguments passed on to the \code{bru_obs} method.
-Currently unused.}
+\item{\dots}{Additional arguments passed on to the \code{bru_obs} and individual
+data class methods.  Currently unused.}
 }
 \description{
 Set all or parts of the observation model response data
@@ -53,6 +62,17 @@ E.g.: \code{keep = list(a = 1:4, b = -(3:5))} keeps only observations \code{1:4}
 model \code{a}, marking the rest as missing, and sets observations \code{3:5} of model
 \code{b} to missing.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bru_set_missing(default)}: From \verb{> 2.13.0}, set missing values in any
+object supporting \code{\link[base:NA]{base::is.na<-()}} for positive and negative indices.
+
+\item \code{bru_set_missing(data.frame)}: From \verb{> 2.13.0}, handles \code{data.frame}, tibbles,
+including \code{inla.mdata}.
+
+\item \code{bru_set_missing(inla.surv)}: From \verb{> 2.13.0}, handles \code{inla.surv}.
+
+}}
 \examples{
 obs <- c(
   A = bru_obs(y_A ~ ., data = data.frame(y_A = 1:6)),
