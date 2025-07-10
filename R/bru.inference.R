@@ -707,7 +707,8 @@ bru_rerun <- function(result, options = list()) {
 #'
 #' @description Set all or parts of the observation model response data
 #' to `NA`, for example for use in cross validation (with [bru_rerun()])
-#' or prior sampling (with [bru_rerun()] and [inlabru::generate()]).
+#' or prior sampling (with [bru_rerun()] and [inlabru::generate()], but see
+#' "Prior sampling caveats" below).
 #'
 #' @param object A `bru`, `bru_obs` or `bru_obs_list` object
 #' @param keep For `bru_obs`, a single logical or an integer vector;
@@ -738,6 +739,22 @@ bru_rerun <- function(result, options = list()) {
 #' model `a`, marking the rest as missing, and sets observations `3:5` of model
 #' `b` to missing.
 #'
+#' @section Prior sampling caveats:
+#' Note that prior sampling requires special care for hyperparameters, as the
+#' prior modes are not typically useful; in the future, we plan to have a
+#' dedicated method that samples from the hyperparameters, and then uses
+#' ```
+#' bru_rerun(
+#'   bru_set_missing(...),
+#'   options = list(
+#'     control.mode = list(
+#'       theta = theta_sample,
+#'       fixed = TRUE)
+#'     )
+#'   )
+#' ```
+#' for each sample.
+#'
 #' @export
 #' @rdname bru_set_missing
 #' @examples
@@ -764,6 +781,7 @@ bru_rerun <- function(result, options = list()) {
 #'     x[["response_data"]][["BRU_response"]]
 #'   }
 #' )
+#'
 bru_set_missing <- function(object, keep = FALSE, ...) {
   UseMethod("bru_set_missing")
 }
@@ -844,6 +862,10 @@ bru_set_missing.default <- function(object, keep = FALSE, ...) {
 #' @export
 #' @describeIn bru_set_missing From `> 2.13.0`, handles `data.frame`, tibbles,
 #'   including `inla.mdata`.
+#' @examplesIf bru_safe_inla()
+#' (obs <- INLA::inla.mdata(time = 1:4, event = c(1, 0, 1, 0)))
+#' bru_set_missing(obs, keep = c(1, 4))
+#'
 bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
   if (is.null(keep) || isTRUE(keep)) {
     return(object)
@@ -857,6 +879,10 @@ bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
 
 #' @export
 #' @describeIn bru_set_missing From `> 2.13.0`, handles `inla.surv`.
+#' @examplesIf bru_safe_inla()
+#' (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
+#' bru_set_missing(obs, keep = c(1, 4))
+#'
 bru_set_missing.inla.surv <- function(object, keep = FALSE, ...) {
   if (is.null(keep) || isTRUE(keep)) {
     return(object)
