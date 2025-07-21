@@ -889,7 +889,7 @@ bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
 #'   event = c(1, 0, 1, 0),
 #'   cure = matrix(1:8, 4, 2)
 #' ))
-#' bru_set_missing(obs, keep = c(1, 4))|>str()
+#' bru_set_missing(obs, keep = c(1, 4)) |> str()
 #'
 #' (obs <- INLA::inla.surv(
 #'   time = 1:4,
@@ -2517,40 +2517,43 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
 
 #' @rdname bru_obs_print
 #' @export
+#' @importFrom glue glue
 print.summary_bru_obs <- function(x, ...) {
   lh <- x
-  cat(sprintf(
-    paste0(
-      "  Family: '%s'\n",
-      "    Tag: %s\n",
-      "    Data class: %s\n",
-      "    Response class: %s\n",
-      "    Predictor: %s\n",
-      "    Additive/Linear: %s/%s\n",
-      "    Used components: %s\n"
-    ),
-    lh$family,
-    if (is.null(lh$tag) || is.na(lh$tag)) {
+  cat(glue::glue_data(
+    lh,
+    "  Family: '{family}'\n",
+    "    Tag: {tag}\n",
+    "    Data class: {data_class}\n",
+    "    Response class: {response_class}\n",
+    "    Predictor: {predictor}\n",
+    "    Additive/Linear: {is_additive}/{is_linear}\n",
+    "    Used components: {format(lh$used)}\n",
+    tag = if (is.null(lh$tag) || is.na(lh$tag)) {
       "<No tag>"
     } else {
-      paste0("'", lh$tag, "'", collapse = ", ")
+      glue::glue_collapse(glue::glue_data(lh, "'{tag}'"), sep = ", ")
     },
-    paste0("'", lh$data_class, "'", collapse = ", "),
-    paste0("'", lh$response_class, "'", collapse = ", "),
-    if (length(lh$predictor) > 1) {
-      paste0(
-        "\n        ",
+    data_class = glue::glue_collapse(
+      glue::glue_data(lh, "'{data_class}'"),
+      sep = ", "
+    ),
+    response_class = glue::glue_collapse(
+      glue::glue_data(lh, "'{response_class}'"),
+      sep = ", "
+    ),
+    predictor =
+      if (length(lh$predictor) > 1) {
         paste0(
-          lh$predictor,
-          collapse = "\n        "
+          "\n        ",
+          paste0(
+            lh$predictor,
+            collapse = "\n        "
+          )
         )
-      )
-    } else {
-      lh$predictor
-    },
-    as.character(lh$is_additive),
-    as.character(lh$is_linear),
-    format(lh$used)
+      } else {
+        lh$predictor
+      }
   ))
   invisible(x)
 }

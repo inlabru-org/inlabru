@@ -131,7 +131,7 @@ bru_set_missing(obs, keep = c(1, 4))
   event = c(1, 0, 1, 0),
   cure = matrix(1:8, 4, 2)
 ))
-bru_set_missing(obs, keep = c(1, 4))|>str()
+bru_set_missing(obs, keep = c(1, 4)) |> str()
 
 (obs <- INLA::inla.surv(
   time = 1:4,
