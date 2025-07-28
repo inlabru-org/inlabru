@@ -4228,6 +4228,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     if (is.null(orig_inla_track)) {
       orig_inla_track <- tibble::tibble(
         iteration = integer(0),
+        iteration_part = numeric(0),
         f = numeric(0),
         nfunc = integer(0),
         nfunc_total = integer(0)
@@ -4250,12 +4251,9 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )
     }
 
-    list(
-      log = c(original_log, bru_log()["iinla"]),
-      states = states,
-      inla_stack = stk,
-      track = if (is.null(orig_track) ||
-        setequal(names(orig_track), track_names)) {
+    track <-
+      if (is.null(orig_track) ||
+          setequal(names(orig_track), track_names)) {
         do.call(dplyr::bind_rows, c(list(orig_track), track))
       } else {
         track <- do.call(dplyr::bind_rows, track)
@@ -4268,27 +4266,69 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           track[[nn]] <- NA
         }
         dplyr::bind_rows(orig_track, track)
-      },
-      inla_track = {
-        offsets <- cumsum(vapply(
-          seq_along(inla_track),
-          function(k) {
-            if (nrow(inla_track[[k]]) > 0) {
-              max(inla_track[[k]]$nfunc)
-            } else {
-              0L
-            }
-          },
-          0L
-        ))
-        offsets <- nfunc_offset + c(0, offsets)
-        for (k in seq_along(inla_track)) {
+      }
+
+    inla_track <- {
+      offsets <- cumsum(vapply(
+        seq_along(inla_track),
+        function(k) {
           if (nrow(inla_track[[k]]) > 0) {
-            inla_track[[k]]$nfunc_total <- inla_track[[k]]$nfunc + offsets[k]
+            max(inla_track[[k]]$nfunc)
+          } else {
+            0L
           }
+        },
+        0L
+      ))
+      offsets <- nfunc_offset + c(0, offsets)
+      for (k in seq_along(inla_track)) {
+        if (nrow(inla_track[[k]]) > 0) {
+          inla_track[[k]]$nfunc_total <- inla_track[[k]]$nfunc + offsets[k]
         }
-        dplyr::bind_rows(orig_inla_track, inla_track)
-      },
+      }
+      ## In case the number of theta values changes during the iterations,
+      ## e.g.
+      ## bru_rerun(..., options = list(control.mode = list(fixed = TRUE)))
+      orig_n <- NCOL(orig_inla_track[["theta"]])
+      new_n <- vapply(inla_track, function(x) NCOL(x[["theta"]]), 0L)
+      if (max(new_n) > orig_n) {
+        orig_inla_track[["theta"]] <-
+          cbind(
+            orig_inla_track[["theta"]],
+            matrix(NA_real_,
+                   nrow = NROW(orig_inla_track),
+                   ncol = max(new_n) - orig_n)
+          )
+      }
+      orig_n <- max(new_n)
+      if (any(new_n != orig_n)) {
+        inla_track <- lapply(
+          inla_track,
+          function(x) {
+            if (ncol(x[["theta"]]) < orig_n) {
+              x[["theta"]] <- cbind(
+                x[["theta"]],
+                matrix(NA_real_,
+                       nrow = NROW(x),
+                       ncol = orig_n - ncol(x[["theta"]]))
+              )
+            }
+            x
+          }
+        )
+      }
+      inla_track <- dplyr::bind_rows(inla_track)
+      inla_track$iteration_part <-
+        (seq_len(NROW(inla_track)) - 1L) / NROW(inla_track)
+      dplyr::bind_rows(orig_inla_track, inla_track)
+    }
+
+    list(
+      log = c(original_log, bru_log()["iinla"]),
+      states = states,
+      inla_stack = stk,
+      track = track,
+      inla_track = inla_track,
       timings = {
         iteration_offset <- if (is.null(orig_timings)) {
           0L
