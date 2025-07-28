@@ -5,7 +5,7 @@
 * Fix logic for `bru_set_missing<inla.surv>()` to correctly handle the
   `inla.surv()` class variations (version `2.13.0.9002`)
 * Handle changing number of hyperparameters in inla tracing
-  (version `2.13.0.9003`)
+  (version `2.13.0.9004`)
 
 # inlabru 2.13.0
 

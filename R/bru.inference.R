@@ -4306,7 +4306,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             )
         }
       }
-      orig_n <- max(new_n)
+      orig_n <- NCOL(orig_inla_track[["theta"]])
       if (any(new_n != orig_n)) {
         inla_track <- lapply(
           inla_track,
