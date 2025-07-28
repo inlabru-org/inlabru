@@ -4292,26 +4292,39 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       orig_n <- NCOL(orig_inla_track[["theta"]])
       new_n <- vapply(inla_track, function(x) NCOL(x[["theta"]]), 0L)
       if (max(new_n) > orig_n) {
-        orig_inla_track[["theta"]] <-
-          cbind(
-            orig_inla_track[["theta"]],
-            matrix(NA_real_,
-                   nrow = NROW(orig_inla_track),
-                   ncol = max(new_n) - orig_n)
-          )
+        if (is.null(orig_inla_track[["theta"]])) {
+          orig_inla_track[["theta"]] <- matrix(NA_real_,
+                                               nrow = NROW(orig_inla_track),
+                                               ncol = max(new_n))
+        } else {
+          orig_inla_track[["theta"]] <-
+            cbind(
+              orig_inla_track[["theta"]],
+              matrix(NA_real_,
+                     nrow = NROW(orig_inla_track),
+                     ncol = max(new_n) - orig_n)
+            )
+        }
       }
       orig_n <- max(new_n)
       if (any(new_n != orig_n)) {
         inla_track <- lapply(
           inla_track,
           function(x) {
-            if (ncol(x[["theta"]]) < orig_n) {
-              x[["theta"]] <- cbind(
-                x[["theta"]],
-                matrix(NA_real_,
-                       nrow = NROW(x),
-                       ncol = orig_n - ncol(x[["theta"]]))
-              )
+            if (NCOL(x[["theta"]]) < orig_n) {
+              if (is.null(x[["theta"]])) {
+                x[["theta"]] <-
+                  matrix(NA_real_,
+                         nrow = NROW(x),
+                         ncol = orig_n)
+              } else {
+                x[["theta"]] <- cbind(
+                  x[["theta"]],
+                  matrix(NA_real_,
+                         nrow = NROW(x),
+                         ncol = orig_n - NCOL(x[["theta"]]))
+                )
+              }
             }
             x
           }
