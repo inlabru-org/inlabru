@@ -4253,7 +4253,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
     track <-
       if (is.null(orig_track) ||
-          setequal(names(orig_track), track_names)) {
+        setequal(names(orig_track), track_names)) {
         do.call(dplyr::bind_rows, c(list(orig_track), track))
       } else {
         track <- do.call(dplyr::bind_rows, track)
@@ -4294,15 +4294,17 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       if (max(new_n) > orig_n) {
         if (is.null(orig_inla_track[["theta"]])) {
           orig_inla_track[["theta"]] <- matrix(NA_real_,
-                                               nrow = NROW(orig_inla_track),
-                                               ncol = max(new_n))
+            nrow = NROW(orig_inla_track),
+            ncol = max(new_n)
+          )
         } else {
           orig_inla_track[["theta"]] <-
             cbind(
               orig_inla_track[["theta"]],
               matrix(NA_real_,
-                     nrow = NROW(orig_inla_track),
-                     ncol = max(new_n) - orig_n)
+                nrow = NROW(orig_inla_track),
+                ncol = max(new_n) - orig_n
+              )
             )
         }
       }
@@ -4315,14 +4317,16 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
               if (is.null(x[["theta"]])) {
                 x[["theta"]] <-
                   matrix(NA_real_,
-                         nrow = NROW(x),
-                         ncol = orig_n)
+                    nrow = NROW(x),
+                    ncol = orig_n
+                  )
               } else {
                 x[["theta"]] <- cbind(
                   x[["theta"]],
                   matrix(NA_real_,
-                         nrow = NROW(x),
-                         ncol = orig_n - NCOL(x[["theta"]]))
+                    nrow = NROW(x),
+                    ncol = orig_n - NCOL(x[["theta"]])
+                  )
                 )
               }
             }
