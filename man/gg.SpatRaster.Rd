@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{A SpatRaster object.}
 
-\item{...}{Arguments passed on to \code{geom_spatraster}.}
+\item{\dots}{Arguments passed on to \code{geom_spatraster}.}
 }
 \value{
 The output from `geom_spatraster.

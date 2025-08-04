@@ -10,7 +10,7 @@ method_classes <- function(f) {
 #' Observation model objects
 #'
 #' Construct an observation model object; new modular alternative to [like()]
-#' @param ... Arguments passed on to submethods
+#' @param \dots Arguments passed on to submethods
 #' @export
 bru_obs <- function(...) {
   UseMethod("bru_obs")

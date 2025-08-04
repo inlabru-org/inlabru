@@ -3,42 +3,16 @@
 \name{bm_scale}
 \alias{bm_scale}
 \alias{bru_mapper_scale}
-\alias{ibm_n.bm_scale}
-\alias{ibm_n_output.bm_scale}
-\alias{ibm_values.bm_scale}
-\alias{ibm_jacobian.bm_scale}
-\alias{ibm_eval.bm_scale}
 \title{Mapper for element-wise scaling}
 \usage{
 bm_scale(mapper = NULL)
 
 bru_mapper_scale(...)
-
-\method{ibm_n}{bm_scale}(mapper, ..., state = NULL, n_state = NULL)
-
-\method{ibm_n_output}{bm_scale}(mapper, input, state = NULL, ..., n_state = NULL)
-
-\method{ibm_values}{bm_scale}(mapper, ..., state = NULL, n_state = NULL)
-
-\method{ibm_jacobian}{bm_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
-
-\method{ibm_eval}{bm_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
 }
 \arguments{
-\item{mapper}{For \code{bm_scale()}, an optional \code{bru_mapper} to be scaled.
-For \verb{ibm_*} methods, a \code{bm_scale} mapper object.}
+\item{mapper}{An optional \code{bru_mapper} to be scaled.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{n_state}{integer giving the length of the state vector for mappers
-that have state dependent output size.}
-
-\item{input}{Data input for the mapper.}
-
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+\item{\dots}{Arguments passed on to \code{\link[=bm_scale]{bm_scale()}}}
 }
 \description{
 Create a standalone
@@ -47,12 +21,6 @@ If \code{mapper} is non-null, the \code{bm_scale()} constructor
 returns
 \code{bm_pipe(list(mapper = mapper, scale = bm_scale()))}
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_scale)}: \code{input} NULL values
-are interpreted as no scaling.
-
-}}
 \examples{
 m <- bm_scale()
 ibm_eval2(m, c(1, 2, 1, 2), 1:4)
@@ -66,6 +34,7 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
@@ -81,9 +50,14 @@ Other mappers:
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
+
+Other specific \link{bm_scale} method implementations: 
+\code{\link{ibm_eval}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_values}()}
 }
 \concept{mappers}
+\concept{specific \link{bm_scale} method implementations}

@@ -39,7 +39,7 @@
 \arguments{
 \item{x}{A summary object to be printed.}
 
-\item{...}{Passed on to other summary methods.}
+\item{\dots}{Passed on to other summary methods.}
 
 \item{object}{Object to be summarised.}
 

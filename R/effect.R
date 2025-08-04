@@ -1652,7 +1652,7 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 #'
 #' @keywords internal
 #' @param object Object to be summarised.
-#' @param ... Passed on to other summary methods.
+#' @param \dots Passed on to other summary methods.
 #' @param depth The depth of which to expand the component mapper.
 #' Default `Inf`, to traverse the entire mapper tree.
 #' @param verbose logical; If `TRUE`, includes more details of the

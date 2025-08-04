@@ -62,7 +62,7 @@ parameter).}
 \item{ny}{Number of pixels in y direction (when plotting using the color
 parameter).}
 
-\item{...}{ignored arguments (S3 generic compatibility).}
+\item{\dots}{ignored arguments (S3 generic compatibility).}
 }
 \value{
 \code{geom_line} return values or, if the color argument is used, the

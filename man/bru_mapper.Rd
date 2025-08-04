@@ -77,6 +77,7 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
@@ -92,9 +93,6 @@ Other mappers:
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
-\code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_get_mapper}()}
 }
 \concept{mappers}

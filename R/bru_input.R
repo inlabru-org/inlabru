@@ -522,7 +522,7 @@ evaluate_inputs <- function(...) {
 #'
 #' @keywords internal
 #' @param object Object to be summarised.
-#' @param ... Passed on to other summary methods.
+#' @param \dots Passed on to other summary methods.
 #' @param verbose logical; If `TRUE`, includes more details of the
 #' component definitions. When `FALSE`, only show basic component
 #' definition information.  Default `TRUE`.

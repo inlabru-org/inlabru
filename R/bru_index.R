@@ -177,7 +177,7 @@ index_eval <- function(...) {
 #' Subsets for `INLA::f()` compatible indexing
 #'
 #' @export
-#' @param ... Passed on to submethods.
+#' @param \dots Passed on to submethods.
 #' @rdname inla_subset_eval
 inla_subset_eval <- function(...) {
   UseMethod("inla_subset_eval")

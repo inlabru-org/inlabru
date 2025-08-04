@@ -9,7 +9,7 @@
 #' @export
 #' @family sample generators
 #' @param object a fitted model.
-#' @param ... additional arguments affecting the samples produced.
+#' @param \dots additional arguments affecting the samples produced.
 #' @return The form of the value returned by `generate()` depends on the data
 #' class and prediction formula. Normally, a data.frame is returned, or a list
 #' of data.frames (if the prediction formula generates a list)
@@ -427,7 +427,7 @@ print.bru_info <- function(x, ...) {
 #' Extracts a data.frame or tibble with information about the `Time` (CPU),
 #' `System`, and `Elapsed` time for each step of a `bru()` run.
 #' @param object A fitted `bru` object
-#' @param ... unused
+#' @param \dots unused
 #' @export
 bru_timings <- function(object, ...) {
   UseMethod("bru_timings")
@@ -544,7 +544,7 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #' @param components A `formula`-like specification of latent components.
 #'   Also used to define a default linear additive predictor.  See
 #'   [bru_comp()] for details.
-#' @param ... Obervation models, each constructed by a calling [bru_obs()], or
+#' @param \dots Obervation models, each constructed by a calling [bru_obs()], or
 #'   named parameters that can be passed to a single [bru_obs()] call. Note that
 #'   all the arguments will be evaluated before calling [bru_obs()] in order to
 #'   detect if they are `like` objects. This means that special arguments that
@@ -889,7 +889,7 @@ bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
 #'   event = c(1, 0, 1, 0),
 #'   cure = matrix(1:8, 4, 2)
 #' ))
-#' bru_set_missing(obs, keep = c(1, 4)) |> str()
+#' bru_set_missing(obs, keep = c(1, 4))
 #'
 #' (obs <- INLA::inla.surv(
 #'   time = 1:4,
@@ -3077,7 +3077,7 @@ predict.bru <- function(object,
 #' When seed != 0, overridden to "1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
-#' @param ... additional, unused arguments.
+#' @param \dots additional, unused arguments.
 #' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
 #' of used variables fails, use `used` instead.

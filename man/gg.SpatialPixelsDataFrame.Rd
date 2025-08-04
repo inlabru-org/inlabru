@@ -25,7 +25,7 @@ data to before plotting.}
 \item{mask}{A \code{sp::SpatialPolygons} object defining the region that is
 plotted.}
 
-\item{...}{Arguments passed on to \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
 A \code{geom_tile} return value.

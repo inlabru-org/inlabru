@@ -3,8 +3,8 @@
 #' @description
 #' Calculates DIC and/or WAIC differences and produces an ordered summary.
 #'
-#' @param ... Comma-separated objects inheriting from class `inla` and obtained
-#' from a run of `INLA::inla()`, [bru()] or [lgcp()]
+#' @param \dots Comma-separated objects inheriting from class `inla` and
+#'   obtained from a run of `INLA::inla()`, [bru()] or [lgcp()]
 #' @param criterion character vector.
 #' If it includes 'DIC', computes DIC differences;
 #' If it contains 'WAIC', computes WAIC differences. Default: 'DIC'

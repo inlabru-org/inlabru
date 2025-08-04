@@ -10,7 +10,7 @@ inla_subset_eval(...)
 \method{inla_subset_eval}{bru_comp_list}(components, ...)
 }
 \arguments{
-\item{...}{Passed on to submethods.}
+\item{\dots}{Passed on to submethods.}
 
 \item{components}{A component list.}
 }

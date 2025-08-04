@@ -28,7 +28,7 @@ bru_options_reset()
 bru_options_set_local(..., .reset = FALSE, .envir = parent.frame())
 }
 \arguments{
-\item{...}{A collection of named options, optionally including one or more
+\item{\dots}{A collection of named options, optionally including one or more
 \code{\link{bru_options}} objects. Options specified later override the previous
 options.}
 

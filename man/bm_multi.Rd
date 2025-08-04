@@ -3,96 +3,22 @@
 \name{bm_multi}
 \alias{bm_multi}
 \alias{bru_mapper_multi}
-\alias{ibm_n.bm_multi}
-\alias{ibm_n_output.bm_multi}
-\alias{ibm_values.bm_multi}
-\alias{ibm_is_linear.bm_multi}
-\alias{ibm_jacobian.bm_multi}
-\alias{ibm_linear.bm_multi}
-\alias{ibm_eval.bm_multi}
-\alias{ibm_invalid_output.bm_multi}
 \alias{[.bm_multi}
 \alias{[.bru_mapper_multi}
-\alias{ibm_names.bm_multi}
-\alias{ibm_names<-.bm_multi}
-\alias{ibm_names<-.bru_mapper_multi}
 \title{Mapper for tensor product domains}
 \usage{
 bm_multi(mappers)
 
-bru_mapper_multi(mappers)
-
-\method{ibm_n}{bm_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_n_output}{bm_multi}(mapper, input, ...)
-
-\method{ibm_values}{bm_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_is_linear}{bm_multi}(mapper, multi = FALSE, ...)
-
-\method{ibm_jacobian}{bm_multi}(
-  mapper,
-  input,
-  state = NULL,
-  inla_f = FALSE,
-  multi = FALSE,
-  ...,
-  sub_A = NULL
-)
-
-\method{ibm_linear}{bm_multi}(mapper, input, state, inla_f = FALSE, ...)
-
-\method{ibm_eval}{bm_multi}(
-  mapper,
-  input,
-  state = NULL,
-  inla_f = FALSE,
-  ...,
-  jacobian = NULL,
-  pre_A = deprecated()
-)
-
-\method{ibm_invalid_output}{bm_multi}(mapper, input, state, inla_f = FALSE, multi = FALSE, ...)
+bru_mapper_multi(...)
 
 \method{[}{bm_multi}(x, i, drop = TRUE)
 
 \method{[}{bru_mapper_multi}(x, i, drop = TRUE)
-
-\method{ibm_names}{bm_multi}(mapper)
-
-\method{ibm_names}{bm_multi}(mapper) <- value
-
-\method{ibm_names}{bru_mapper_multi}(mapper) <- value
 }
 \arguments{
 \item{mappers}{A list of \code{bru_mapper} objects}
 
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{multi}{logical;
-If \code{TRUE} (or positive), recurse one level into sub-mappers}
-
-\item{...}{Arguments passed on to other methods}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{sub_A}{Internal; precomputed Jacobian matrices.}
-
-\item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
-supplied by internal methods that already have the Jacobian.}
-
-\item{pre_A}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{jacobian}.}
+\item{\dots}{Arguments passed on to \code{\link[=bm_multi]{bm_multi()}}}
 
 \item{x}{object from which to extract element(s)}
 
@@ -103,9 +29,6 @@ For \verb{[.bm_multi}, whether to extract an individual mapper when
 \code{i} identifies a single element. If \code{FALSE}, a list of sub-mappers is
 returned (suitable e.g. for creating a new \code{bm_multi} object).
 Default: \code{TRUE}}
-
-\item{value}{a character vector of up to the same length as the number
-of mappers in the multi-mapper x}
 }
 \value{
 \itemize{
@@ -119,27 +42,6 @@ Constructs a row-wise Kronecker product mapping of linear/affine
 mappers. Any offset in sub-mappers is added into a combined offset. Only
 linear/affine sub-mappers are allowed.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_multi)}: Accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bm_multi]{ibm_names.bm_multi()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-
-\item \code{ibm_invalid_output(bm_multi)}: Accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bm_multi]{ibm_names.bm_multi()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-
-\item \code{ibm_names(bm_multi)}: Returns the names from the sub-mappers list
-
-}}
 \examples{
 (m <- bm_multi(list(a = bm_index(2), b = bm_index(3))))
 ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
@@ -153,6 +55,7 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
@@ -168,9 +71,18 @@ Other mappers:
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
+
+Other specific \link{bm_multi} method implementations: 
+\code{\link{ibm_eval}()},
+\code{\link{ibm_invalid_output}()},
+\code{\link{ibm_is_linear}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_linear}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_names}()},
+\code{\link{ibm_values}()}
 }
 \concept{mappers}
+\concept{specific \link{bm_multi} method implementations}

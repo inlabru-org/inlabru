@@ -359,7 +359,7 @@ bru_log.bru <- function(x, verbosity = NULL) {
 
 #' @describeIn bru_log Format a `bru_log` object for printing.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
-#' @param ... further arguments passed to or from other methods.
+#' @param \dots further arguments passed to or from other methods.
 #' @param timestamp If `TRUE`, include the timestamp of each message. Default
 #'   `TRUE`.
 #' @export
@@ -629,7 +629,7 @@ bru_log_warn <- function(
 #'   The `_get`, `_set`, and `_reset` functions operate on a global
 #'   package options override object. In many cases, setting options in
 #'   specific calls to [bru()] is recommended instead.
-#' @param ... A collection of named options, optionally including one or more
+#' @param \dots A collection of named options, optionally including one or more
 #'   [`bru_options`] objects. Options specified later override the previous
 #'   options.
 #' @return `bru_options()` returns a `bru_options` object.
@@ -1072,7 +1072,7 @@ bru_options_set_local <- function(...,
 #' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
 #' @param include_global logical; If `TRUE`, include global override options
 #' @param include_default logical; If `TRUE`, include default options
-#' @param ... Further parameters, currently ignored
+#' @param \dots Further parameters, currently ignored
 #'
 #' @examples
 #' if (interactive()) {

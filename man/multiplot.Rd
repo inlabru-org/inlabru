@@ -10,7 +10,7 @@
 multiplot(..., plotlist = NULL, cols = 1, layout = NULL)
 }
 \arguments{
-\item{...}{Comma-separated \code{ggplot} objects.}
+\item{\dots}{Comma-separated \code{ggplot} objects.}
 
 \item{plotlist}{A list of \code{ggplot} objects - an alternative to the
 comma-separated argument above.}

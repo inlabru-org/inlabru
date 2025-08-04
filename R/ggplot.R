@@ -50,7 +50,7 @@ gmap <- function(...) {
 #' @name gg
 #' @export
 #' @param data an object for which to generate a geom.
-#' @param ... Arguments passed on to the geom method.
+#' @param \dots Arguments passed on to the geom method.
 #' @return The form of the value returned by gg depends on the class of its
 #'   argument. See the documentation of the particular methods for details of
 #'   what is produced by that method.
@@ -112,7 +112,7 @@ gm <- function(...) {
 #' @param data A `matrix` object.
 #' @param mapping a set of aesthetic mappings created by `aes`. These are passed
 #'   on to `geom_tile`.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` with reversed y scale.
 #' @family geomes for inla and inlabru predictions
 #'
@@ -151,7 +151,7 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 #'
 #' @name gg.data.frame
 #' @export
-#' @param ... Arguments passed on to [gg.bru_prediction()].
+#' @param \dots Arguments passed on to [gg.bru_prediction()].
 #' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon`
 #'   value.
 #' @family geomes for inla and inlabru predictions
@@ -396,7 +396,7 @@ gg.prediction <- function(data, ...) {
 #'   ```
 #' @param crs A `sp::CRS` object defining the coordinate system to project the
 #'   data to before plotting.
-#' @param ... Arguments passed on to `geom_point`.
+#' @param \dots Arguments passed on to `geom_point`.
 #' @return A `geom_point` return value
 #' @family geomes for spatial data
 #'
@@ -442,7 +442,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' `geom_tile(..., stat = "sf_coordinates")`, intended for converting point data
 #' to grid tiles with the `fill` aesthetic, which is by default set to the first
 #' data column.
-#' @param ... Arguments passed on to `geom_sf` or `geom_tile`.
+#' @param \dots Arguments passed on to `geom_sf` or `geom_tile`.
 #' @return A ggplot return value
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sf.R
@@ -516,7 +516,7 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
 #'   ```
 #' @param crs A `CRS` object defining the coordinate system to project the data
 #'   to before plotting.
-#' @param ... Arguments passed on to `ggplot2::geom_segment`.
+#' @param \dots Arguments passed on to `ggplot2::geom_segment`.
 #' @return A `geom_segment`` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -589,7 +589,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #'   mapping.
 #' @param crs A `CRS` object defining the coordinate system to project the data
 #'   to before plotting.
-#' @param ... Arguments passed on to `geom_sf`.
+#' @param \dots Arguments passed on to `geom_sf`.
 #' Unless specified by the user,
 #' the argument `alpha = 0.2` (alpha level for polygon filling) is added.
 #' @return A `geom_sf` object.
@@ -624,7 +624,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
 #'
 #' @export
 #' @param data A SpatialGridDataFrame object.
-#' @param ... Arguments passed on to [gg.SpatialPixelsDataFrame()].
+#' @param \dots Arguments passed on to [gg.SpatialPixelsDataFrame()].
 #' @return A `geom_tile` value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -656,7 +656,7 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #'   data to before plotting.
 #' @param mask A `sp::SpatialPolygons` object defining the region that is
 #'   plotted.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -703,7 +703,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'
 #' @export
 #' @param data A `sp::SpatialPixels` object.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @examples
@@ -736,7 +736,7 @@ gg.SpatialPixels <- function(data, ...) {
 #'
 #' @export
 #' @param data A SpatRaster object.
-#' @param ... Arguments passed on to `geom_spatraster`.
+#' @param \dots Arguments passed on to `geom_spatraster`.
 #' @return The output from `geom_spatraster.
 #' @family geomes for spatial data
 #' @examples
@@ -813,7 +813,7 @@ gg.SpatRaster <- function(data, ...) {
 #'   parameter).
 #' @param mask A `SpatialPolygon` or `sf` polygon defining the region that is
 #'   plotted.
-#' @param ... ignored arguments (S3 generic compatibility).
+#' @param \dots ignored arguments (S3 generic compatibility).
 #' @return `geom_line` return values or, if the color argument is used, the
 #'   values of [gg.SpatialPixelsDataFrame()].
 #' @family geomes for meshes
@@ -969,7 +969,7 @@ gg.fm_mesh_2d <- function(data,
 #' @param y Single or vector numeric defining the y-coordinates of the mesh
 #'   knots to plot.
 #' @param shape Shape of the knot markers.
-#' @param ... parameters passed on to `geom_point`.
+#' @param \dots parameters passed on to `geom_point`.
 #' @return An object generated by `geom_point`.
 #' @family geomes for meshes
 #'
@@ -1012,7 +1012,7 @@ gg.fm_mesh_1d <- function(data,
 #' @param data A RasterLayer object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to
 #'   `geom_tile`.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return An object returned by `geom_tile`
 #' @family geomes for Raster data
 #'
@@ -1067,7 +1067,7 @@ gg.RasterLayer <- function(data,
 #' @method plot bru
 #' @export
 #' @param x a fitted [bru()] model.
-#' @param ... Options passed on to other methods.
+#' @param \dots Options passed on to other methods.
 #'
 #' @examples
 #' \dontrun{
@@ -1108,7 +1108,7 @@ plot.bru <- function(x, ...) {
 #' @name plot.bru_prediction
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
-#' @param ... Arguments passed on to [gg.prediction()].
+#' @param \dots Arguments passed on to [gg.prediction()].
 #' @return an object of class `gg`
 #' @example inst/examples/gg.prediction.R
 #' @export
@@ -1139,7 +1139,7 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'
 #' Renders multiple ggplots on a single page.
 #'
-#' @param ... Comma-separated `ggplot` objects.
+#' @param \dots Comma-separated `ggplot` objects.
 #' @param plotlist A list of `ggplot` objects - an alternative to the
 #'   comma-separated argument above.
 #' @param cols Number of columns of plots on the page.

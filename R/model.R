@@ -351,7 +351,7 @@ evaluate_effect_single_state <- function(...) {
 #' * `evaluate_effect_single_state.bru_mapper`:
 #'   A vector of the latent component state.
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
-#' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
+#' @param \dots Optional additional parameters, e.g. `inla_f`. Normally unused.
 #' @param label Option label used for any warning messages, specifying the
 #' affected component.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -777,6 +777,8 @@ bru_comp_eval <- function(main,
 #' [bru] model objects and related classes.
 #'
 #' @inheritParams bru_mapper_generics
+#' @inheritParams ibm_linear
+#' @inheritParams ibm_simplify
 #'
 #' @name bru_model_mapper_methods
 #' @rdname bru_model_mapper_methods
@@ -829,8 +831,9 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
   mappers
 }
 
-#' @rdname bru_model_mapper_methods
+#' @rdname ibm_linear
 #' @export
+#' @family specific [bru_comp] mapper method implementations
 ibm_linear.bru_comp <- function(mapper,
                                 input,
                                 state = NULL,
@@ -890,6 +893,7 @@ ibm_simplify.bru_comp <- function(mapper,
 
 #' @rdname bru_model_mapper_methods
 #' @export
+#' @family specific [bru_comp_list] mapper method implementations
 ibm_simplify.bru_comp_list <- function(mapper,
                                        input = NULL,
                                        state = NULL,
@@ -913,11 +917,10 @@ ibm_simplify.bru_comp_list <- function(mapper,
 # Methods for the `ibm_linear()` and `ibm_simplify()` methods for
 # [bru] model objects and related classes.
 #
-#' @inheritParams bru_mapper_generics
-#'
 #' @export
-#' @rdname bm_list
+#' @rdname bru_model_mapper_methods
 #' @export
+#' @family specific [bm_list] mapper method implementations
 ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
@@ -942,7 +945,7 @@ ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   as_bm_list(mappers)
 }
 
-#' @rdname bm_list
+#' @rdname bru_model_mapper_methods
 #' @export
 ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
   label <- names(mapper)

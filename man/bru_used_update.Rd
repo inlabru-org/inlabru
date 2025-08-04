@@ -20,7 +20,7 @@ bru_used_update(x, labels, ...)
 
 \item{labels}{character vector of component labels}
 
-\item{...}{Unused}
+\item{\dots}{Unused}
 }
 \value{
 An updated version of \code{x}

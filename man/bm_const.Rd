@@ -3,33 +3,11 @@
 \name{bm_const}
 \alias{bm_const}
 \alias{bru_mapper_const}
-\alias{ibm_n.bm_const}
-\alias{ibm_values.bm_const}
-\alias{ibm_jacobian.bm_const}
-\alias{ibm_eval.bm_const}
 \title{Constant mapper}
 \usage{
 bm_const()
 
 bru_mapper_const()
-
-\method{ibm_n}{bm_const}(mapper, ...)
-
-\method{ibm_values}{bm_const}(mapper, ...)
-
-\method{ibm_jacobian}{bm_const}(mapper, input, ...)
-
-\method{ibm_eval}{bm_const}(mapper, input, state = NULL, ...)
-}
-\arguments{
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{...}{Arguments passed on to other methods}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
 }
 \description{
 Create a constant mapper
@@ -46,6 +24,7 @@ Other mappers:
 \code{\link{bm_aggregate}()},
 \code{\link{bm_collect}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
@@ -62,9 +41,13 @@ Other mappers:
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
+
+Other specific \link{bm_const} method implementations: 
+\code{\link{ibm_eval}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_values}()}
 }
 \concept{mappers}
+\concept{specific \link{bm_const} method implementations}

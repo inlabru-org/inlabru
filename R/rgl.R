@@ -66,7 +66,7 @@ globe <- function(R = 1,
 #' @name glplot
 #' @export
 #' @param object an object used to select a method.
-#' @param ... further arguments passed to or from other methods.
+#' @param \dots further arguments passed to or from other methods.
 #'
 #' @family inlabru RGL tools
 #'
@@ -163,7 +163,7 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 #'
 #' @param col Color specification. A single named color, a vector of scalar
 #'   values, or a matrix of RGB values.
-#' @param ... Parameters passed on to `plot_rgl.fm_mesh_2d()`
+#' @param \dots Parameters passed on to `plot_rgl.fm_mesh_2d()`
 #'
 #' @family inlabru RGL tools
 

@@ -3,26 +3,11 @@
 \name{bm_taylor}
 \alias{bm_taylor}
 \alias{bru_mapper_taylor}
-\alias{ibm_n.bm_taylor}
-\alias{ibm_n_output.bm_taylor}
-\alias{ibm_values.bm_taylor}
-\alias{ibm_jacobian.bm_taylor}
-\alias{ibm_eval.bm_taylor}
 \title{Mapper for linear Taylor approximations}
 \usage{
 bm_taylor(offset = NULL, jacobian = NULL, state0 = NULL, values_mapper = NULL)
 
 bru_mapper_taylor(...)
-
-\method{ibm_n}{bm_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_n_output}{bm_taylor}(mapper, input, ...)
-
-\method{ibm_values}{bm_taylor}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_jacobian}{bm_taylor}(mapper, ..., multi = FALSE)
-
-\method{ibm_eval}{bm_taylor}(mapper, input = NULL, state = NULL, ...)
 }
 \arguments{
 \item{offset}{For \code{bm_taylor}, an offset vector giving the value of
@@ -41,25 +26,7 @@ linearisation, or a list of such states matching the \code{jacobian} list.
 \item{values_mapper}{mapper object to be used for \code{ibm_n} and
 \code{ibm_values} for \code{inla_f=TRUE} (experimental, currently unused)}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{multi}{logical;
-If \code{TRUE} (or positive), recurse one level into sub-mappers}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
+\item{\dots}{Arguments passed on to \code{\link[=bm_taylor]{bm_taylor()}}}
 }
 \description{
 Provides a pre-computed affine mapping,
@@ -69,17 +36,6 @@ evaluated;
 The affine mapper output is defined as
 \code{effect(state) = offset + jacobian \%*\% (state - state0)}
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_eval(bm_taylor)}: Evaluates linearised
-mapper information at the given \code{state}. The \code{input} argument is ignored,
-so that the usual argument order
-\code{ibm_eval(mapper, input, state)} syntax can be used, but also
-\code{ibm_eval(mapper, state = state)}.  For a mapper with a named jacobian list,
-the \code{state} argument must also be a named list.  If \code{state} is \code{NULL},
-all-zero is assumed.
-
-}}
 \examples{
 m <- bm_taylor(
   offset = rep(2, 3),
@@ -96,6 +52,7 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
@@ -111,9 +68,14 @@ Other mappers:
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
+
+Other specific \link{bm_taylor} method implementations: 
+\code{\link{ibm_eval}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_values}()}
 }
 \concept{mappers}
+\concept{specific \link{bm_taylor} method implementations}

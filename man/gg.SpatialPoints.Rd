@@ -21,7 +21,7 @@ mapping. The default mapping is
 \item{crs}{A \code{sp::CRS} object defining the coordinate system to project the
 data to before plotting.}
 
-\item{...}{Arguments passed on to \code{geom_point}.}
+\item{\dots}{Arguments passed on to \code{geom_point}.}
 }
 \value{
 A \code{geom_point} return value

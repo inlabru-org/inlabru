@@ -22,7 +22,7 @@
 \item{crs}{A \code{CRS} object defining the coordinate system to project the data
 to before plotting.}
 
-\item{...}{Arguments passed on to \code{ggplot2::geom_segment}.}
+\item{\dots}{Arguments passed on to \code{ggplot2::geom_segment}.}
 }
 \value{
 A `geom_segment`` return value.
