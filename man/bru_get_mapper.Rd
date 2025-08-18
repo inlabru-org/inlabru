@@ -4,6 +4,7 @@
 \alias{bru_get_mapper}
 \alias{bru_get_mapper.inla.spde}
 \alias{bru_get_mapper.inla.rgeneric}
+\alias{bru_get_mapper.inla.cgeneric}
 \alias{bru_get_mapper_safely}
 \title{Extract mapper information from INLA model component objects}
 \usage{
@@ -12,6 +13,8 @@ bru_get_mapper(model, ...)
 \method{bru_get_mapper}{inla.spde}(model, ...)
 
 \method{bru_get_mapper}{inla.rgeneric}(model, ...)
+
+\method{bru_get_mapper}{inla.cgeneric}(model, ...)
 
 bru_get_mapper_safely(model, ...)
 }
@@ -29,19 +32,46 @@ information from any model object by calling the generic \code{bru_get_mapper}.
 Any class method implementation should return a \link{bru_mapper} object suitable
 for the given latent model.
 }
+\details{
+Before implementing your own \code{bru_get_mapper} method, check if there
+is already a general method available that handles your model class, such as
+\code{\link[=bru_get_mapper.inla.spde]{bru_get_mapper.inla.spde()}}, \code{\link[=bru_get_mapper.inla.rgeneric]{bru_get_mapper.inla.rgeneric()}}, and
+\code{\link[=bru_get_mapper.inla.cgeneric]{bru_get_mapper.inla.cgeneric()}}.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{bru_get_mapper(inla.spde)}: Extract an indexed mapper for
 the \code{model$mesh} object contained in the model object,
 which is assumed to be of a class supporting relevant \code{fmesher} methods.
 
-\item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a call to
-\code{model$f$rgeneric$definition("mapper")}. To support this for your own
-\code{inla.rgeneric} models, add a \code{"mapper"} option to the \code{cmd} argument of
-your rgeneric definition function. You will need to store the mapper in
-your object as well.  Alternative, define your model using a subclass and
-define a corresponding \code{bru_get_mapper.subclass} method that should return
-the corresponding \code{bru_mapper} object.
+\item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a pre-computed mapper,
+a call to \code{INLA::inla.rgeneric.q(model, cmd = "mapper")}
+(Note: \code{cmd="mapper"} is
+not supported by INLA, at least not before 2025.08.17, so will be ignored),
+or an index mapper mapping the size of the model graph.
+
+The easiest method to define a mapper for an \code{inla.rgeneric} model is to
+store the mapper in the object.
+To support the function call version, add a \code{"mapper"} option to the
+\code{cmd} argument of
+your \code{rgeneric} definition function.
+Alternatively, define your model using a subclass and define a
+corresponding \verb{bru_get_mapper.<subclass>} method that should return the
+corresponding \code{bru_mapper} object.
+
+If no \verb{bru_get_mapper.<subclass>} method is defined, the order of precedence
+for the mapper construction in \verb{bru_get_mapper.<inla.rgeneric>} has the
+following precedence:
+\enumerate{
+\item \code{model$mapper}
+\item \code{inla.rgeneric.q(model, cmd = "mapper")}
+\item \code{\link[=bm_index]{bm_index()}} using the size of the graph returned by
+\code{inla.rgeneric.q(model, cmd = "graph")}
+}
+
+\item \code{bru_get_mapper(inla.cgeneric)}: Returns the mapper given by a pre-computed mapper,
+or an index mapper mapping the size of the model graph from
+\code{INLA::inla.cgeneric.q(model)$graph}.
 
 }}
 \section{Functions}{

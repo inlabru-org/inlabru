@@ -11,13 +11,14 @@
 #' [bru_get_mapper] for hooks to extract mappers from latent model object
 #' class objects.
 #' @describeIn bru_mapper
-#' Generic mapper S3 constructor, used for constructing
-#' mappers for special objects. See below for details of the
-#' default constructor [bru_mapper_define()] that can be used to define
-#' new mappers in user code.
+#' Generic mapper S3 constructor, used for constructing mappers for special
+#' objects. See below for details of the default constructor
+#' [bru_mapper_define()] that can be used to define new mapper clesses in user
+#' code. To extracting mappers for latent component models, see
+#' [bru_get_mapper()].
 #'
 #' @returns
-#' * `bru_mapper()` returns a `bru_mapper` object
+#' A `bru_mapper` object.
 #' @family mappers
 #' @examples
 #' mapper <- bm_index(5)

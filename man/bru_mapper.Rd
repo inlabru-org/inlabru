@@ -23,19 +23,18 @@ definition}
 class definition before adding the \code{new_class} names. Default is \code{"list"}.}
 }
 \value{
-\itemize{
-\item \code{bru_mapper()} returns a \code{bru_mapper} object
-}
+A \code{bru_mapper} object.
 }
 \description{
 Constructors for \code{bru_mapper} objects
 }
 \section{Functions}{
 \itemize{
-\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing
-mappers for special objects. See below for details of the
-default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
-new mappers in user code.
+\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing mappers for special
+objects. See below for details of the default constructor
+\code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define new mapper clesses in user
+code. To extracting mappers for latent component models, see
+\code{\link[=bru_get_mapper]{bru_get_mapper()}}.
 
 \item \code{bru_mapper_define()}: Adds the \code{new_class} and \code{"bru_mapper"} class names to
 the inheritance list for the input \code{mapper} object, unless the object

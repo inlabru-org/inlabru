@@ -1388,12 +1388,20 @@ make_submapper <- function(subcomp_n,
 }
 
 
+#' @title
 #' Extract mapper information from INLA model component objects
 #'
+#' @description
 #' The component definitions will automatically attempt to extract mapper
 #' information from any model object by calling the generic `bru_get_mapper`.
 #' Any class method implementation should return a [bru_mapper] object suitable
 #' for the given latent model.
+#'
+#' @details
+#' Before implementing your own `bru_get_mapper` method, check if there
+#' is already a general method available that handles your model class, such as
+#' [bru_get_mapper.inla.spde()], [bru_get_mapper.inla.rgeneric()], and
+#' [bru_get_mapper.inla.cgeneric()].
 #'
 #' @param model A model component object
 #' @param \dots Arguments passed on to other methods
@@ -1426,20 +1434,73 @@ bru_get_mapper.inla.spde <- function(model, ...) {
   bm_fmesher(model[["mesh"]])
 }
 
-#' @describeIn bru_get_mapper Returns the mapper given by a call to
-#'   `model$f$rgeneric$definition("mapper")`. To support this for your own
-#'   `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument of
-#'   your rgeneric definition function. You will need to store the mapper in
-#'   your object as well.  Alternative, define your model using a subclass and
-#'   define a corresponding `bru_get_mapper.subclass` method that should return
-#'   the corresponding `bru_mapper` object.
+#' @describeIn bru_get_mapper Returns the mapper given by a pre-computed mapper,
+#'   a call to `INLA::inla.rgeneric.q(model, cmd = "mapper")`
+#'   (Note: `cmd="mapper"` is
+#'   not supported by INLA, at least not before 2025.08.17, so will be ignored),
+#'   or an index mapper mapping the size of the model graph.
+#'
+#'   The easiest method to define a mapper for an `inla.rgeneric` model is to
+#'   store the mapper in the object.
+#'   To support the function call version, add a `"mapper"` option to the
+#'   `cmd` argument of
+#'   your `rgeneric` definition function.
+#'   Alternatively, define your model using a subclass and define a
+#'   corresponding `bru_get_mapper.<subclass>` method that should return the
+#'   corresponding `bru_mapper` object.
+#'
+#' If no `bru_get_mapper.<subclass>` method is defined, the order of precedence
+#' for the mapper construction in `bru_get_mapper.<inla.rgeneric>` has the
+#' following precedence:
+#'
+#' 1. `model$mapper`
+#' 2. `inla.rgeneric.q(model, cmd = "mapper")`
+#' 3. [bm_index()] using the size of the graph returned by
+#'        `inla.rgeneric.q(model, cmd = "graph")`
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
-  if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
-    NULL
-  } else {
-    model[["f"]][["rgeneric"]][["definition"]]("mapper")
+  if (!is.null(model[["mapper"]])) {
+    return(model[["mapper"]])
   }
+  mapper <- tryCatch(
+    INLA::inla.rgeneric.q(model, cmd = "mapper"),
+    error = function(e) {
+      NULL
+    }
+  )
+  if (!is.null(mapper)) {
+    return(mapper)
+  }
+  graph <- tryCatch(
+    INLA::inla.rgeneric.q(model, cmd = "graph"),
+    error = function(e) {
+      NULL
+    }
+  )
+  if (!is.null(graph)) {
+    return(bm_index(n = NROW(graph)))
+  }
+  NULL
+}
+
+#' @describeIn bru_get_mapper Returns the mapper given by a pre-computed mapper,
+#'   or an index mapper mapping the size of the model graph from
+#'   `INLA::inla.cgeneric.q(model)$graph`.
+#' @export
+bru_get_mapper.inla.cgeneric <- function(model, ...) {
+  if (!is.null(model[["mapper"]])) {
+    return(model[["mapper"]])
+  }
+  graph <- tryCatch(
+    INLA::inla.cgeneric.q(model)[["graph"]],
+    error = function(e) {
+      NULL
+    }
+  )
+  if (!is.null(graph)) {
+    return(bm_index(n = NROW(graph)))
+  }
+  NULL
 }
 
 #' @describeIn bru_get_mapper Tries to call the `bru_get_mapper`,
@@ -1451,6 +1512,7 @@ bru_get_mapper_safely <- function(model, ...) {
   m <- tryCatch(
     bru_get_mapper(model, ...),
     error = function(e) {
+      NULL
     }
   )
   if (!is.null(m) && !inherits(m, "bru_mapper")) {

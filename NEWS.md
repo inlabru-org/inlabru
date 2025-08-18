@@ -1,5 +1,13 @@
 # inlabru (development version)
 
+## Updates features
+
+* Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
+  the support for `inla.rgeneric`, to standardise where to store a
+  pre-constructed mapper, so that external packages will no longer need to
+  add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes.
+  (version `2.13.0.9005`)
+
 ## Bug fixes
 
 * Fix logic for `bru_set_missing<inla.surv>()` to correctly handle the
