@@ -5,7 +5,8 @@
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
   the support for `inla.rgeneric`, to standardise where to store a
   pre-constructed mapper, so that external packages will no longer need to
-  add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes.
+  add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes,
+  if the mapper is pre-computed.
   (version `2.13.0.9005`)
 
 ## Bug fixes

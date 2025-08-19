@@ -1435,70 +1435,39 @@ bru_get_mapper.inla.spde <- function(model, ...) {
 }
 
 #' @describeIn bru_get_mapper Returns the mapper given by a pre-computed mapper,
-#'   a call to `INLA::inla.rgeneric.q(model, cmd = "mapper")`
-#'   (Note: `cmd="mapper"` is
-#'   not supported by INLA, at least not before 2025.08.17, so will be ignored),
 #'   or an index mapper mapping the size of the model graph.
 #'
 #'   The easiest method to define a mapper for an `inla.rgeneric` model is to
 #'   store the mapper in the object.
-#'   To support the function call version, add a `"mapper"` option to the
-#'   `cmd` argument of
-#'   your `rgeneric` definition function.
 #'   Alternatively, define your model using a subclass and define a
-#'   corresponding `bru_get_mapper.<subclass>` method that should return the
+#'   `bru_get_mapper.<subclass>` method that should return the
 #'   corresponding `bru_mapper` object.
 #'
-#' If no `bru_get_mapper.<subclass>` method is defined, the order of precedence
-#' for the mapper construction in `bru_get_mapper.<inla.rgeneric>` has the
-#' following precedence:
+#' The order of precedence for the mapper construction when calling
+#' `bru_get_mapper(model)` has the following precedence:
 #'
-#' 1. `model$mapper`
-#' 2. `inla.rgeneric.q(model, cmd = "mapper")`
-#' 3. [bm_index()] using the size of the graph returned by
-#'        `inla.rgeneric.q(model, cmd = "graph")`
+#' 1. `bru_get_mapper.<subclass>`, if `model` has a subclass, otherwise
+#' 2. `model[["mapper"]]` if that is `NULL`, and otherwise
+#' 3. [bm_index()] using the size of the graph returned by `model[["f"]][["n"]]`
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
   if (!is.null(model[["mapper"]])) {
     return(model[["mapper"]])
   }
-  mapper <- tryCatch(
-    INLA::inla.rgeneric.q(model, cmd = "mapper"),
-    error = function(e) {
-      NULL
-    }
-  )
-  if (!is.null(mapper)) {
-    return(mapper)
-  }
-  graph <- tryCatch(
-    INLA::inla.rgeneric.q(model, cmd = "graph"),
-    error = function(e) {
-      NULL
-    }
-  )
-  if (!is.null(graph)) {
-    return(bm_index(n = NROW(graph)))
+  if (!is.null(model[["f"]][["n"]])) {
+    return(bm_index(n = model[["f"]][["n"]]))
   }
   NULL
 }
 
-#' @describeIn bru_get_mapper Returns the mapper given by a pre-computed mapper,
-#'   or an index mapper mapping the size of the model graph from
-#'   `INLA::inla.cgeneric.q(model)$graph`.
+#' @describeIn bru_get_mapper Works the same as the method of `inla.rgeneric`
 #' @export
 bru_get_mapper.inla.cgeneric <- function(model, ...) {
   if (!is.null(model[["mapper"]])) {
     return(model[["mapper"]])
   }
-  graph <- tryCatch(
-    INLA::inla.cgeneric.q(model)[["graph"]],
-    error = function(e) {
-      NULL
-    }
-  )
-  if (!is.null(graph)) {
-    return(bm_index(n = NROW(graph)))
+  if (!is.null(model[["f"]][["n"]])) {
+    return(bm_index(n = model[["f"]][["n"]]))
   }
   NULL
 }

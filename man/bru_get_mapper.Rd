@@ -45,33 +45,23 @@ the \code{model$mesh} object contained in the model object,
 which is assumed to be of a class supporting relevant \code{fmesher} methods.
 
 \item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a pre-computed mapper,
-a call to \code{INLA::inla.rgeneric.q(model, cmd = "mapper")}
-(Note: \code{cmd="mapper"} is
-not supported by INLA, at least not before 2025.08.17, so will be ignored),
 or an index mapper mapping the size of the model graph.
 
 The easiest method to define a mapper for an \code{inla.rgeneric} model is to
 store the mapper in the object.
-To support the function call version, add a \code{"mapper"} option to the
-\code{cmd} argument of
-your \code{rgeneric} definition function.
 Alternatively, define your model using a subclass and define a
-corresponding \verb{bru_get_mapper.<subclass>} method that should return the
+\verb{bru_get_mapper.<subclass>} method that should return the
 corresponding \code{bru_mapper} object.
 
-If no \verb{bru_get_mapper.<subclass>} method is defined, the order of precedence
-for the mapper construction in \verb{bru_get_mapper.<inla.rgeneric>} has the
-following precedence:
+The order of precedence for the mapper construction when calling
+\code{bru_get_mapper(model)} has the following precedence:
 \enumerate{
-\item \code{model$mapper}
-\item \code{inla.rgeneric.q(model, cmd = "mapper")}
-\item \code{\link[=bm_index]{bm_index()}} using the size of the graph returned by
-\code{inla.rgeneric.q(model, cmd = "graph")}
+\item \verb{bru_get_mapper.<subclass>}, if \code{model} has a subclass, otherwise
+\item \code{model[["mapper"]]} if that is \code{NULL}, and otherwise
+\item \code{\link[=bm_index]{bm_index()}} using the size of the graph returned by \code{model[["f"]][["n"]]}
 }
 
-\item \code{bru_get_mapper(inla.cgeneric)}: Returns the mapper given by a pre-computed mapper,
-or an index mapper mapping the size of the model graph from
-\code{INLA::inla.cgeneric.q(model)$graph}.
+\item \code{bru_get_mapper(inla.cgeneric)}: Works the same as the method of \code{inla.rgeneric}
 
 }}
 \section{Functions}{
