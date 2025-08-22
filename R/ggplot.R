@@ -219,7 +219,7 @@ gg.bru_prediction <- function(data,
       if (NROW(data[[x]]) == 1) {
         rownames(data[[x]]) <- x
       } else {
-        rownames(data[[x]]) <- paste0(x, ".", seq_len(NROW(data[[x]])))
+        rownames(data[[x]]) <- glue("{x}.{seq_len(NROW(data[[x]]))}")
       }
       data[[x]]
     })
@@ -542,7 +542,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
     function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
   ))
   colnames(sp) <- cnames
-  colnames(ep) <- paste0("end.", cnames)
+  colnames(ep) <- glue("end.{cnames}")
   if (!inherits(data, "SpatialLinesDataFrame")) {
     df <- data.frame(cbind(sp, ep))
   } else {
@@ -566,8 +566,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   dmap <- ggplot2::aes(
     x = .data[[cnames[1]]],
     y = .data[[cnames[2]]],
-    xend = .data[[paste0("end.", cnames[1])]],
-    yend = .data[[paste0("end.", cnames[2])]]
+    xend = .data[[glue("end.{cnames[1]}")]],
+    yend = .data[[glue("end.{cnames[2]}")]]
   )
 
   if (!is.null(mapping)) {

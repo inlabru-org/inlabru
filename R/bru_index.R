@@ -80,12 +80,13 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
   size <- bru_response_size(object)
   off <- c(0L, cumsum(size))
   if (is.character(tag)) {
-    if (!all(tag %in% names(object[["bru_info"]][["lhoods"]]))) {
-      stop(paste0(
-        "Invalid tag(s) '", paste(tag, collapse = ", "), "' for ",
-        "bru object with tags '", paste(names(object[["bru_info"]][["lhoods"]]),
-          collapse = ", "
-        ), "'"
+    ok_tags <- tag %in% names(object[["bru_info"]][["lhoods"]])
+    if (any(!ok_tags)) {
+      stop(glue(
+        "Invalid tag(s) {{{glue_collapse(tag[!ok_tags], sep = ', ')}}} for ",
+        "bru object with tags {{",
+        "{glue_collapse(names(object[['bru_info']][['lhoods']]), sep = ', ')}",
+        "}}"
       ))
     }
     unlist(lapply(tag, function(x) {
@@ -96,10 +97,10 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
     ok_tags <- (tag >= 1L) &
       (tag <= length(object[["bru_info"]][["lhoods"]]))
     if (any(!ok_tags)) {
-      stop(paste0(
-        "Invalid tag indices '", paste(tag[!ok_tags], collapse = ", "),
-        "' for bru object with tag indices '1, ..., ",
-        length(object[["bru_info"]][["lhoods"]]), "'"
+      stop(glue(
+        "Invalid tag indices {{{glue_collapse(tag[!ok_tags], sep = ', ')}}}",
+        " for bru object with tag indices {{1, ..., ",
+        "{length(object[['bru_info']][['lhoods']])}}}"
       ))
     }
     unlist(lapply(tag, function(x) {
@@ -123,7 +124,8 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 
 bru_index.bru_comp <- function(object, inla_f, ...) {
   idx <- ibm_values(object[["mapper"]], inla_f = inla_f, multi = TRUE)
-  names(idx) <- paste0(object[["label"]], c("", ".group", ".repl"))
+  names(idx) <- glue("{object[['label']]}{suffix}",
+                     suffix = c("", ".group", ".repl"))
   idx
 }
 

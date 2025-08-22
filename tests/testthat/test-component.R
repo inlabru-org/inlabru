@@ -409,7 +409,7 @@ test_that("Component construction: unsafe intercepts", {
     },
     paste0(
       "The input evaluation 'something_unknown' for 'something_unknown' ",
-      "failed. Perhaps the data object doesn't contain the needed variables?"
+      "failed.\nPerhaps the data object doesn't contain the needed variables?"
     )
   )
 })

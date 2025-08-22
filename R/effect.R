@@ -372,7 +372,7 @@ bru_comp.character <- function(object,
     group = bru_subcomp(
       input = bru_input(
         substitute(group),
-        label = paste0(label, ".group"),
+        label = glue("{label}.group"),
         layer = substitute(group_layer),
         selector = group_selector
       ),
@@ -383,7 +383,7 @@ bru_comp.character <- function(object,
     replicate = bru_subcomp(
       input = bru_input(
         substitute(replicate),
-        label = paste0(label, ".repl"),
+        label = glue("{label}.repl"),
         layer = substitute(replicate_layer),
         selector = replicate_selector
       ),
@@ -397,7 +397,7 @@ bru_comp.character <- function(object,
       } else {
         bru_input(
           substitute(weights),
-          label = paste0(label, ".weights"),
+          label = glue("{label}.weights"),
           layer = substitute(weights_layer),
           selector = weights_selector
         )
@@ -429,11 +429,11 @@ bru_comp.character <- function(object,
     # Without this check, R gives the error
     #   'In str2lang(s) : parsing result not of length one, but 0'
     # in the INLA call instead, which isn't very informative.
-    stop(paste0(
-      "Unnamed arguments detected in component '", label, "'.\n",
+    stop(glue(
+      "Unnamed arguments detected in component '{label}'.\n",
       "  Only 'main' and 'weights' parameters may be unnamed.\n",
       "  Unnamed arguments at position(s) ",
-      paste0(unnamed_arguments, collapse = ", ")
+      glue_collapse(unnamed_arguments, sep = ", ")
     ))
   }
 
@@ -442,9 +442,7 @@ bru_comp.character <- function(object,
     # The offset is included either automatically for ~ . linear models,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
-    component$inla.formula <- as.formula(paste0("~ ."),
-      env = .envir
-    )
+    component$inla.formula <- as.formula("~ .", env = .envir)
     component$main$mapper <- bm_const()
     component$group$mapper <- bm_index(1L)
     component$replicate$mapper <- bm_index(1L)
@@ -468,7 +466,7 @@ bru_comp.character <- function(object,
       #    assign(model_name, component$copy, envir = component$env_extra)
     } else {
       # Store model name or object in the environment
-      model_name <- paste0("BRU_", label, "_main_model")
+      model_name <- glue("BRU_{label}_main_model")
       fcall[["model"]] <- as.symbol(model_name)
       assign(model_name, component$main$model, envir = component$env_extra)
     }
@@ -503,7 +501,7 @@ bru_comp.character <- function(object,
     )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
-        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
+        fcall[[arg]] <- as.symbol(glue("{label}.{suffixes[[arg]]}"))
       }
     }
 
@@ -529,7 +527,7 @@ bru_comp.character <- function(object,
       if (is.null(component$main$values)) {
         fcall <- fcall[!("values" %in% names(fcall))]
       } else {
-        values_name <- paste0("BRU_", label, "_values")
+        values_name <- glue("BRU_{label}_values")
         fcall[["values"]] <- as.symbol(values_name)
         assign(
           values_name,
@@ -542,7 +540,7 @@ bru_comp.character <- function(object,
       if (component$main$type %in% c("factor", "fixed")) {
         if (is.null(fcall[["hyper"]])) {
           # TODO: allow configuration of the precision via prec.linear
-          fixed_hyper_name <- paste0("BRU_", label, "_main_fixed_hyper")
+          fixed_hyper_name <- glue("BRU_{label}_main_fixed_hyper")
           fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
           assign(
             fixed_hyper_name,
@@ -685,11 +683,11 @@ bru_comp_list.list <- function(object,
   if (anyDuplicated(names(object))) {
     stop(paste0(
       "Duplicated component labels detected: ",
-      paste0(
-        "'",
-        sort(unique(names(object)[duplicated(names(object))])),
-        "'",
-        collapse = ", "
+      glue_collapse(
+        glue(
+          "'{sort(unique(names(object)[duplicated(names(object))]))}'"
+        ),
+        sep = ", "
       )
     ))
   }
@@ -878,7 +876,7 @@ add_mappers.bru_comp <- function(component,
   if (is.null(component$main$values)) {
     fcall <- fcall[!("values" %in% names(fcall))]
   } else {
-    values_name <- paste0("BRU_", component$label, "_values")
+    values_name <- glue("BRU_{component$label}_values")
     fcall[["values"]] <- as.symbol(values_name)
     assign(values_name, component$main$values, envir = component$env_extra)
   }
@@ -887,12 +885,9 @@ add_mappers.bru_comp <- function(component,
     # Update the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(
-        paste0(
+        glue(
           "~ . + ",
-          paste0(
-            deparse(fcall),
-            collapse = "\n"
-          )
+          glue_collapse(deparse(fcall), sep = "\n")
         ),
         env = component$env
       )
@@ -929,12 +924,9 @@ add_mappers.bru_comp_list <- function(components,
       ))
     }
     if (is.null(components[[components[[k]][["copy"]]]])) {
-      stop(paste0(
-        "Could not find component '",
-        components[[k]][["copy"]],
-        "' to use as copy for component '",
-        components[[k]][["label"]],
-        "'."
+      stop(glue(
+        "Could not find component '{components[[k]][['copy']]}'",
+        " to use as copy for component '{components[[k]][['label']]}'."
       ))
     }
     components[[k]]$mapper <-
@@ -1026,7 +1018,7 @@ bru_subcomp <- function(input = NULL,
     if (!inherits(mapper, "bru_mapper")) {
       stop(
         "Unknown mapper class '",
-        paste0(class(mapper), collapse = ", "),
+        glue_collapse(class(mapper), sep = ", "),
         "'"
       )
     }
@@ -1186,10 +1178,10 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
   }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
-      stop(paste0(
+      stop(glue(
         "Unknown mapper of type '",
-        paste0(class(subcomp[["mapper"]]), collapse = ", "),
-        "' for ", label
+        glue_collapse(class(subcomp[["mapper"]]), sep = ", "),
+        "' for {label}"
       ))
     }
   } else if (is.null(subcomp[["input"]][["input"]])) {
@@ -1239,12 +1231,12 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inputs, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        msg <- paste0(
-          "All covariate evaluations for '", label,
-          "' are NULL; an intercept component was likely intended.\n",
+        msg <- glue(
+          "All covariate evaluations for '{label}'",
+          " are NULL; an intercept component was likely intended.\n",
           "  Implicit latent intercept component specification is ",
           "deprecated since version 2.1.14.\n",
-          "  Use explicit notation '+ ", label, "(1)' instead",
+          "  Use explicit notation '+ {label}(1)' instead",
           if (identical(label, "Intercept")) {
             " (or '+1' for '+ Intercept(1)')"
           },
@@ -1283,9 +1275,10 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
     mapper_n <- ibm_n(subcomp[["mapper"]], inla_f = TRUE)
     if (!is.null(subcomp[["n"]]) &&
       subcomp[["n"]] != mapper_n) {
-      stop(paste0(
-        "Size mismatch, n=", subcomp[["n"]], " != ibm_n(inla_f = TRUE)=",
-        mapper_n, " mapper for label ", label
+      stop(glue(
+        "Size mismatch, n={subcomp[['n']]}  != ",
+        "ibm_n(inla_f = TRUE)={mapper_n}, ",
+        " in mapper for label '{label}'."
       ))
     }
     subcomp[["n"]] <- mapper_n
@@ -1312,7 +1305,7 @@ make_values <- function(subcomp_n, subcomp_values, input_values, label) {
     return(input_values)
   }
 
-  stop(paste0("No mapper, no n, and no values given for ", label))
+  stop(glue("No mapper, no n, and no values given for '{label}'"))
 }
 
 make_submapper <- function(subcomp_n,
@@ -1327,9 +1320,7 @@ make_submapper <- function(subcomp_n,
   if (identical(subcomp_type, "inlalattice")) {
     if (is.null(subcomp_nrow_ncol)) {
       stop(
-        "nrow and ncol must be provided for inla lattice model '",
-        label,
-        "'."
+        glue("nrow and ncol must be provided for inla lattice model '{label}'.")
       )
     }
     n <- prod(subcomp_nrow_ncol)
@@ -1487,8 +1478,8 @@ bru_get_mapper_safely <- function(model, ...) {
   if (!is.null(m) && !inherits(m, "bru_mapper")) {
     stop(paste0(
       "The bru_get_mapper method for model class '",
-      paste0(class(model), collapse = ", "),
-      "' did not return a bru_mapper object"
+      glue_collapse(class(model), sep = ", "),
+      "' did not return a bru_mapper object."
     ))
   }
   m
@@ -1514,7 +1505,7 @@ make_mapper <- function(subcomp,
     }
     stop(paste0(
       "Unknown mapper of type '",
-      paste0(class(mapper), collapse = ", "),
+      glue_collapse(class(mapper), sep = ", "),
       "' for ", label
     ))
   }
@@ -1536,10 +1527,10 @@ make_mapper <- function(subcomp,
     } else if (!is.null(subcomp[["n"]])) {
       labels <- as.character(seq_len(subcomp[["n"]]))
     } else {
-      stop(paste0(
-        "Need to specify at least one of values (labels), input, or n for '",
-        subcomp[["label"]],
-        "' of component '", label, "'."
+      stop(glue(
+        "Need to specify at least one of values (labels), input, or n for ",
+        "'{subcomp[['label']]}'",
+        " of component '{label}'."
       ))
     }
     return(bm_matrix(labels))
@@ -1557,9 +1548,9 @@ make_mapper <- function(subcomp,
       mapper_names <- c("u", "v")
       allow_interpolation <- FALSE
     } else {
-      mapper_names <- paste0("u", seq_len(inla_model[["aug.factor"]]))
+      mapper_names <- glue("u{seq_len(inla_model[['aug.factor']])}")
     }
-    labels <- paste0(subcomp[["input"]][["label"]], "_", mapper_names)
+    labels <- glue("{subcomp[['input']][['label']]}_{mapper_names}")
   }
 
   mappers <- lapply(
@@ -1634,10 +1625,8 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 
     # Make code
     if (is.fixed) {
-      codes[[k]] <- paste0(
-        fname, '("', label, '", main = ', label,
-        ', model = "linear"',
-        add, ")"
+      codes[[k]] <- glue(
+        '{fname}("{label}", main = {label}, model = "linear"{add})'
       )
     } else {
       # Add extra code before final bracket
@@ -1652,17 +1641,15 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
       if (is.offset) {
         codes[[k]] <-
           sub(
-            paste0(label, "("),
-            paste0(
-              fname, '("', label, '"',
-              ', model = "const", main = '
-            ),
+            glue("{label}("),
+            glue('{fname}("{label}", model = "const", main = '),
             code,
             fixed = TRUE
           )
       } else {
-        codes[[k]] <- sub(paste0(label, "("),
-          paste0(fname, "(\"", label, "\", "),
+        codes[[k]] <- sub(
+          glue("{label}("),
+          glue('{fname}("{label}", '),
           code,
           fixed = TRUE
         )
@@ -1706,7 +1693,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
           if (is.null(object[[x]][["input"]][["input"]])) {
             NULL
           } else {
-            paste0(x, " = ", object[[x]][["type"]])
+            glue("{x} = {object[[x]][['type']]}")
           }
         }
       )),
@@ -1761,7 +1748,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
       if (is.null(object[["copy"]])) {
         NULL
       } else {
-        paste0("(=", object[["copy"]], ")")
+        glue("(={object[['copy']]})")
       },
       ": ",
       paste0(
@@ -1897,11 +1884,11 @@ print.summary_component <- function(x, ...) {
     for (name in names(x)) {
       if (!is.null(x[[name]])) {
         if (name %in% "Label") {
-          cat("Label:", "\t", x[[name]], "\n", sep = "")
+          cat(glue("Label:\t{x[[name]]}"), "\n")
         } else if (name %in% "Mapper") {
-          cat("  ", "Map: ", x[[name]], "\n", sep = "")
+          cat(glue("  Map:\t{x[[name]]}"), "\n")
         } else {
-          cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+          cat(glue("  {name}:\t{x[[name]]}"), "\n")
         }
       }
     }

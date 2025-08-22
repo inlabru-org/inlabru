@@ -130,7 +130,7 @@ bru_input.bru_comp <- function(component,
                                data,
                                ...) {
   bru_log_message(
-    paste0("bru_input.bru_comp(", component$label, ")"),
+    glue("bru_input.bru_comp({component$label})"),
     verbosity = 4
   )
 
@@ -224,10 +224,8 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
   if (inherits(input_layer, "error")) {
     stop(paste0(
       "Failed to evaluate 'layer' input '",
-      paste0(deparse(layer), collapse = "\n"),
-      "' for '",
-      paste0(label, ":layer"),
-      "'."
+      glue_collapse(deparse(layer), sep = "\n"),
+      glue("' for '{label}:layer'.")
     ))
   }
   if (is.null(input_layer) && is.null(selector)) {
@@ -257,7 +255,7 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
 bru_input.bru_input <- function(input, data, env = NULL,
                                 null.on.fail = FALSE, ...) {
   bru_log_message(
-    paste0("bru_input(bru_input) for (", input$label, ")"),
+    glue("bru_input(bru_input) for ({input$label})"),
     verbosity = 5
   )
   # Evaluate the map with the data in an environment
@@ -310,11 +308,9 @@ bru_input.bru_input <- function(input, data, env = NULL,
       input_string <- paste0(deparse(input$input), collapse = "\n")
       if (identical(input_string, "coordinates")) {
         warning(
-          paste0(
-            "The input evaluation '",
-            input_string,
-            "' for '", input$label,
-            "' failed. Perhaps you need to load the 'sp' package ",
+          glue(
+            "The input evaluation '{input_string}' for '{input$label}'",
+            " failed. Perhaps you need to load the 'sp' package ",
             "with 'library(sp)'?",
             " Attempting 'sp::coordinates'."
           ),
@@ -330,12 +326,9 @@ bru_input.bru_input <- function(input, data, env = NULL,
         ))
       } else {
         stop(
-          paste0(
-            "The input evaluation '",
-            input_string,
-            "' for '", input$label,
-            "' failed. Perhaps the data object doesn't contain ",
-            "the needed variables?"
+          glue(
+            "The input evaluation '{input_string}' for '{input$label}' failed.",
+            "\n  Perhaps the data object doesn't contain the needed variables?"
           )
         )
       }
@@ -452,11 +445,10 @@ bru_input.bru_input <- function(input, data, env = NULL,
     "SpatRaster"
   ))) &&
     any(is.na(as.data.frame(val)))) {
-    msg <- paste0(
+    msg <- glue(
       "Model input '",
-      paste0(deparse(input$input), collapse = "\n"),
-      "' for '", input$label,
-      "' returned some NA values.\n",
+      glue_collapse(deparse(input$input), sep = "\n"),
+      "' for '{input$label}' returned some NA values.\n",
       "Attempting to fill in spatially by nearest available value.\n",
       "To avoid this basic covariate imputation, supply complete data."
     )
@@ -549,16 +541,12 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
     text <- ""
   } else if (is.null(type)) {
     text <-
-      paste0(
-        lab, " = ",
-        paste0(deparse(inp), collapse = "\n")
-      )
+      glue("{lab} = ", glue_collapse(deparse(inp), sep = "\n"))
   } else {
     text <-
-      paste0(
-        lab, " = ",
-        type, "(",
-        paste0(deparse(inp), collapse = "\n"),
+      glue(
+        "{lab} = {type}(",
+        glue_collapse(deparse(inp), sep = "\n"),
         ")"
       )
   }

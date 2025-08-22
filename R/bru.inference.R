@@ -42,19 +42,16 @@ bru_info_upgrade <- function(object,
     msg <- "`inlabru_version` is missing"
   }
   if (!is.null(msg)) {
-    stop(paste0(
-      "bru_info part of the object can't be converted to `bru_info`; ",
-      msg
+    stop(glue(
+      "bru_info part of the object can't be converted to `bru_info`; {msg}"
     ))
   }
 
   old_ver <- object[["inlabru_version"]]
   if (utils::compareVersion(new_version, old_ver) > 0) {
     warning(
-      "Old bru_info object version ",
-      old_ver,
-      " detected. Attempting upgrade to version ",
-      new_version
+      glue("Old bru_info object version {old_ver} detected.
+            Attempting upgrade to version {new_version}.")
     )
 
     message("Detected bru_info version ", old_ver)
@@ -227,11 +224,12 @@ bru_info_upgrade <- function(object,
       # Update timings info to difftime format
 
       warning(
-        paste0(
-          "From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.",
-          "\n  Copying old elapsed time to both Elapsed and Time, ",
-          "setting System to zero;",
-          "  Do not over-interpret."
+        glue(
+          "
+           From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.
+             Copying old elapsed time to both Elapsed and Time,
+             setting System to zero;
+             Do not over-interpret."
         ),
         immediate. = TRUE
       )
@@ -304,7 +302,7 @@ bru_info_upgrade <- function(object,
     }
 
     object[["inlabru_version"]] <- new_version
-    message(paste0("Upgraded bru_info to ", new_version))
+    message(glue("Upgraded bru_info to {new_version}"))
 
     object_full[["bru_info"]] <- object
   }
@@ -403,11 +401,11 @@ summary.bru_info <- function(object, verbose = TRUE, ...) {
 #' @param x An  object to be printed
 #' @rdname bru_info
 print.summary_bru_info <- function(x, ...) {
-  cat(paste0("inlabru version: ", x$inlabru_version, "\n"))
-  cat(paste0("INLA version: ", x$INLA_version, "\n"))
-  cat(paste0("Components:\n"))
+  cat(glue("inlabru version: {x$inlabru_version}"), "\n")
+  cat(glue("INLA version: {x$INLA_version}"), "\n")
+  cat(paste0("Components:"), "\n")
   print(x$components)
-  cat(paste0("Observation models:\n"))
+  cat(paste0("Observation models:"), "\n")
   print(x$lhoods)
   invisible(x)
 }
@@ -468,8 +466,9 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
         "Cannot mix `bru_obs()` parameters with `bru_obs` ",
         "and `bru_obs_list` objects.",
         "\n  Check if the argument(s) ",
-        paste0("'", names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)], "'",
-          collapse = ", "
+        glue_collapse(
+          glue("'{names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)]}'"),
+          sep = ", ", last = ", and "
         ),
         " were meant to be given to a call to 'bru_obs()',\n  or in the ",
         "'options' list argument instead."
@@ -816,7 +815,7 @@ bru_set_missing.bru_obs_list <- function(object, keep = FALSE, ...) {
     if (length(setdiff(names(keep), names(object))) > 0) {
       stop(paste0(
         "Some observation models in `keep` were not found: ",
-        paste0("'", setdiff(names(keep), names(object)), "'", collapse = ", ")
+        glue_collapse(glue("'{setdiff(names(keep), names(object))}'"), ", ")
       ))
     }
   }
@@ -1010,7 +1009,7 @@ bru_eval_in_data_context <- function(input,
   enclos_envir <- new.env(parent = .envir)
   nms <- names(data)
   for (nm in setdiff(nms, "")) {
-    assign(paste0(".", nm, "."), data_orig[[nm]], envir = enclos_envir)
+    assign(glue(".{nm}."), data_orig[[nm]], envir = enclos_envir)
   }
   success <- FALSE
   result <- NULL
@@ -1037,10 +1036,9 @@ bru_eval_in_data_context <- function(input,
     }
   }
   if (!success) {
-    stop(paste0(
-      "Input '",
-      paste0(deparse(input), collapse = "\n"),
-      "' could not be evaluated."
+    stop(glue(
+      "Input '{glue_collapse(deparse(input), sep = '\n')}' could ",
+      "not be evaluated."
     ))
   }
   if (is.null(result)) {
@@ -1074,10 +1072,7 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
   dummies <- setdiff(dummies, c(from_data, from_ips))
 
   new_coordnames[dummies] <-
-    paste0(
-      "BRU_dummy_coordinate_",
-      seq_along(new_coordnames)
-    )[dummies]
+    glue("BRU_dummy_coordinate_{seq_along(new_coordnames)}")[dummies]
 
   list(
     data = new_coordnames[seq_along(data_coordnames)],
@@ -1113,17 +1108,15 @@ extended_bind_rows <- function(...) {
 
     # Unify CRS
     if (!inherits(dt[[sf_data_idx_[1]]][[nm]], "sfc")) {
-      stop(paste0(
-        "Column '", nm, "' is not a simple feature column in all data objects."
+      stop(glue(
+        "Column '{nm}' is not a simple feature column in all data objects."
       ))
     }
     the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
     for (i in sf_data_idx_) {
       if (!inherits(dt[[i]][[nm]], "sfc")) {
-        stop(paste0(
-          "Column '",
-          nm,
-          "' is not a simple feature column in all data objects."
+        stop(glue(
+          "Column '{nm}' is not a simple feature column in all data objects."
         ))
       }
       dt_crs <- fm_crs(dt[[i]][[nm]])
@@ -1508,9 +1501,9 @@ bru_obs <- function(formula = . ~ .,
           vapply(
             domain_names, function(x) {
               if (identical(x, "coordinates")) {
-                paste0(x, " = sp::", x, "(.data.)")
+                glue("{x} = sp::{x}(.data.)")
               } else {
-                paste0(x, " = ", x)
+                glue("{x} = {x}")
               }
             },
             ""
@@ -1594,9 +1587,9 @@ bru_obs <- function(formula = . ~ .,
           ips <- dplyr::left_join(ips, data, by = ".block")
         } else {
           if (NROW(data) != max(ips$.block)) {
-            stop(paste0(
-              "`data` has ", NROW(data), " rows, but `ips` has ",
-              max(ips$.block), " blocks. Cannot join."
+            stop(glue(
+              "`data` has {NROW(data)} rows, but `ips` has ",
+              "{max(ips$.block)} blocks. Cannot join."
             ))
           }
           ips <- dplyr::left_join(
@@ -1690,9 +1683,9 @@ bru_obs <- function(formula = . ~ .,
     } else {
       expr_text <- "BRU_EXPRESSION"
     }
-    expr_text <- paste0(
-      "{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-      " state = {", expr_text, "})}"
+    expr_text <- glue(
+      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+      " state = {{{expr_text}}})}}"
     )
     expr <- parse(text = expr_text)
     data_extra[["BRU_aggregate_mapper"]] <- aggregate
@@ -1757,15 +1750,10 @@ bru_obs <- function(formula = . ~ .,
         ))
       }
       if (!setequal(names(response), names(domain))) {
-        stop(paste0(
-          "Mismatch between names of observed dimensions and the given ",
-          "domain names:\n",
-          "    names(response) = (",
-          paste0(names(response), collapse = ", "),
-          ")\n",
-          "    names(domain)   = (",
-          paste0(names(domain), collapse = ", "),
-          ")"
+        stop(glue("
+          Mismatch between response and domain names:
+            names(response) = ({glue_collapse(names(response), sep = ', ')})
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"
         ))
       }
 
@@ -1897,16 +1885,18 @@ bru_obs <- function(formula = . ~ .,
       } else {
         expr_text <- "BRU_EXPRESSION"
       }
-      expr_text <- paste0(
-        "{\n",
-        "  BRU_eta <- {", expr_text, "}\n",
-        "  if (length(BRU_eta) == 1L) {\n",
-        "    BRU_eta <- rep(BRU_eta, length(BRU_aggregate))\n",
-        "  }\n",
-        "  c(mean(BRU_point_weights[BRU_aggregate] *\n",
-        "         BRU_eta[BRU_aggregate]),\n",
-        "    BRU_eta[!BRU_aggregate])\n",
-        "}"
+      expr_text <- glue("
+        {{
+          BRU_eta <- {{
+            {expr_text}
+          }}
+          if (length(BRU_eta) == 1L) {{
+            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
+          }}
+          c(mean(BRU_point_weights[BRU_aggregate] *
+                 BRU_eta[BRU_aggregate]),
+            BRU_eta[!BRU_aggregate])
+        }}"
       )
       expr <- parse(text = expr_text)
 
@@ -1968,8 +1958,8 @@ bru_obs <- function(formula = . ~ .,
         bru_log_warn(
           paste0(
             "Non data-frame list-like data supplied; ",
-            "guessing allow_combine=TRUE.",
-            "\n  Specify allow_combine explicitly to avoid this warning."
+            "guessing allow_combine=TRUE.\n",
+            "  Specify allow_combine explicitly to avoid this warning."
           )
         )
         allow_combine <- TRUE
@@ -2335,12 +2325,12 @@ set_list_names <- function(x, tag, priority = "immutable") {
         if (identical(list_names[k], tag_names[k])) {
           return(list_names[k])
         }
-        stop(paste0(
-          "Cannot combine objects with mismatching tags and names:\n",
-          "  Tag: ", tag_names[k], "\n",
-          "  Name: ", list_names[k], "\n",
-          "  Use `NA` for either the tag or name,",
-          " or use matching tags and names."
+        stop(glue("
+          When `priority = 'immutable'`, the tag and name must match.
+          Cannot combine objects with mismatching tags and names:
+            Tag: {tag_names[k]}
+            Name: {list_names[k]}
+          Use `NA` for either the tag or name, or use matching tags and names."
         ))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
@@ -2520,7 +2510,7 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
 #' @importFrom glue glue
 print.summary_bru_obs <- function(x, ...) {
   lh <- x
-  cat(glue::glue_data(
+  cat(glue_data(
     lh,
     "  Family: '{family}'\n",
     "    Tag: {tag}\n",
@@ -2528,7 +2518,8 @@ print.summary_bru_obs <- function(x, ...) {
     "    Response class: {response_class}\n",
     "    Predictor: {predictor}\n",
     "    Additive/Linear: {is_additive}/{is_linear}\n",
-    "    Used components: {format(lh$used)}\n",
+    "    Used components: {format(lh$used)}",
+    .trim = FALSE,
     tag = if (is.null(lh$tag) || is.na(lh$tag)) {
       "<No tag>"
     } else {
@@ -2554,7 +2545,8 @@ print.summary_bru_obs <- function(x, ...) {
       } else {
         lh$predictor
       }
-  ))
+  ),
+  "\n")
   invisible(x)
 }
 
@@ -2646,9 +2638,9 @@ bru_obs_control_family.bru_obs_list <- function(x,
     )
     if (any(like_has_cf)) {
       bru_log_warn(
-        paste0(
+        glue(
           "Global control.family option overrides settings in likelihood(s) ",
-          paste0(which(like_has_cf), collapse = ", "),
+          "{glue_collapse(which(like_has_cf), sep = ', ', last = ' and ')}",
         )
       )
     }
@@ -3302,17 +3294,7 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 
     # Plot new density estimate versus old one (debugging)
     if (verbose) {
-      cat(paste0(
-        "hpd:",
-        min(x),
-        " ",
-        max(x),
-        ", err = ",
-        err,
-        ", n = ",
-        n,
-        "\n"
-      ))
+      cat(glue("hpd: ({min(x)}, {max(x)}), err = {err}, n = {n}"), "\n")
       # plot(x, lest, type = "l") ; lines(x, est, type = "l", col = "red")
     }
 
@@ -3661,14 +3643,12 @@ bru_line_search <- function(model,
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 4),
-          "%, Contract",
+        glue(
+          "iinla: Step rescaling: {signif(100 * step_scaling, 4)}%, Contract",
           " (",
-          "norm0 = ", signif(norm0, 4),
-          ", norm1 = ", signif(norm1, 4),
-          ", norm01 = ", signif(norm01, 4),
+          "norm0 = {signif(norm0, 4)}, ",
+          "norm1 = {signif(norm1, 4)}, ",
+          "norm01 = {signif(norm01, 4)}",
           ")"
         ),
         verbosity = 3
@@ -3703,14 +3683,12 @@ bru_line_search <- function(model,
         (norm1 > norm1_prev) || !is.finite(norm1)
 
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 3),
-          "%, Expand",
+        glue(
+          "iinla: Step rescaling: {signif(100 * step_scaling, 3)}%, Expand",
           " (",
-          "norm0 = ", signif(norm0, 4),
-          ", norm1 = ", signif(norm1, 4),
-          ", norm01 = ", signif(norm01, 4),
+          "norm0 = {signif(norm0, 4)}, ",
+          "norm1 = {signif(norm1, 4)}, ",
+          "norm01 = {signif(norm01, 4)}",
           ")"
         ),
         verbosity = 3
@@ -3733,14 +3711,12 @@ bru_line_search <- function(model,
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling, 3),
-          "%, Overstep",
+        glue(
+          "iinla: Step rescaling: {signif(100 * step_scaling, 3)}%, Overstep",
           " (",
-          "norm0 = ", signif(norm0, 4),
-          ", norm1 = ", signif(norm1, 4),
-          ", norm01 = ", signif(norm01, 4),
+          "norm0 = {signif(norm0, 4)}, ",
+          "norm1 = {signif(norm1, 4)}, ",
+          "norm01 = {signif(norm01, 4)}",
           ")"
         ),
         verbosity = 3
@@ -3774,14 +3750,13 @@ bru_line_search <- function(model,
     norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
     bru_log_message(
-      paste0(
-        "iinla: Step rescaling: ",
-        signif(100 * step_scaling_opt_approx, 4),
-        "%, Approx Optimisation",
+      glue(
+        "iinla: Step rescaling: {signif(100 * step_scaling_opt_approx, 4)}%,",
+        " Approx Optimisation",
         " (",
-        "norm0 = ", signif(norm0_opt, 4),
-        ", norm1 = ", signif(norm1_opt, 4),
-        ", norm01 = ", signif(norm01, 4),
+        "norm0 = {signif(norm0_opt, 4)}, ",
+        "norm1 = {signif(norm1_opt, 4)}, ",
+        "norm01 = {signif(norm01, 4)}",
         ")"
       ),
       verbosity = 3
@@ -3789,11 +3764,11 @@ bru_line_search <- function(model,
 
     if (norm1_opt > norm01) {
       bru_log_message(
-        paste0(
+        glue(
           "iinla: norm1_opt > |delta|: ",
-          signif(norm1_opt, 4),
+          "{signif(norm1_opt, 4)}",
           " > ",
-          signif(norm01, 4)
+          "{signif(norm01, 4)}"
         ),
         verbosity = 3
       )
@@ -3824,14 +3799,13 @@ bru_line_search <- function(model,
       norm1_opt <- pred_norm(nonlin_pred_opt - lin_pred1)
 
       bru_log_message(
-        paste0(
-          "iinla: Step rescaling: ",
-          signif(100 * step_scaling_opt, 4),
-          "%, Optimisation",
+        glue(
+          "iinla: Step rescaling: {signif(100 * step_scaling_opt, 4)}%,",
+          " Optimisation",
           " (",
-          "norm0 = ", signif(norm0_opt, 4),
-          ", norm1 = ", signif(norm1_opt, 4),
-          ", norm01 = ", signif(norm01, 4),
+          "norm0 = {signif(norm0_opt, 4)}, ",
+          "norm1 = {signif(norm1_opt, 4)}, ",
+          "norm01 = {signif(norm01, 4)}",
           ")"
         ),
         verbosity = 3
@@ -3839,11 +3813,11 @@ bru_line_search <- function(model,
 
       if (norm1_opt > norm01) {
         bru_log_message(
-          paste0(
+          glue(
             "iinla: norm1_opt > |delta|: ",
-            signif(norm1_opt, 4),
+            "{signif(norm1_opt, 4)}",
             " > ",
-            signif(norm01, 4)
+            "{signif(norm01, 4)}"
           ),
           verbosity = 3
         )
@@ -3867,16 +3841,15 @@ bru_line_search <- function(model,
   }
 
   bru_log_message(
-    paste0(
-      "iinla: |lin1-lin0| = ",
-      signif(pred_norm(lin_pred1 - lin_pred0), 4),
-      "\n       <eta-lin1,delta>/|delta| = ",
-      signif(pred_scalprod(nonlin_pred - lin_pred1, lin_pred1 - lin_pred0) /
-        pred_norm(lin_pred1 - lin_pred0), 4),
-      "\n       |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = ",
-      signif(pred_norm(nonlin_pred - lin_pred0 - (lin_pred1 - lin_pred0) *
+    glue("
+      iinla: |lin1-lin0| = {signif(pred_norm(lin_pred1 - lin_pred0), 4)}
+        <eta-lin1,delta>/|delta| = {signif(rel1, 4)}
+        |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = {signif(rel2, 4)}",
+      rel1 = pred_scalprod(nonlin_pred - lin_pred1, lin_pred1 - lin_pred0) /
+        pred_norm(lin_pred1 - lin_pred0),
+      rel2 = pred_norm(nonlin_pred - lin_pred0 - (lin_pred1 - lin_pred0) *
         pred_scalprod(lin_pred1 - lin_pred0, nonlin_pred - lin_pred0) /
-        pred_norm2(lin_pred1 - lin_pred0)), 4)
+        pred_norm2(lin_pred1 - lin_pred0))
     ),
     verbosity = 4
   )
@@ -3893,14 +3866,14 @@ bru_line_search <- function(model,
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
     bru_log_message(
-      paste0(
+      glue(
         "iinla: Step rescaling: ",
-        signif(100 * step_scaling, 3),
-        "%, Maximum step length",
+        "{signif(100 * step_scaling, 3)}%, ",
+        "Maximum step length",
         " (",
-        "norm0 = ", signif(norm0, 4),
-        ", norm1 = ", signif(norm1, 4),
-        ", norm01 = ", signif(norm01, 4),
+        "norm0 = {signif(norm0, 4)}, ",
+        "norm1 = {signif(norm1, 4)}, ",
+        "norm01 = {signif(norm01, 4)}",
         ")"
       ),
       verbosity = 3
@@ -3913,14 +3886,13 @@ bru_line_search <- function(model,
 
   if (active && (options$bru_verbose <= 2)) {
     bru_log_message(
-      paste0(
+      glue(
         "iinla: Step rescaling: ",
-        signif(100 * step_scaling, 3),
-        "%",
+        "{signif(100 * step_scaling, 3)}%",
         " (",
-        "norm0 = ", signif(norm0, 4),
-        ", norm1 = ", signif(norm1, 4),
-        ", norm01 = ", signif(norm01, 4),
+        "norm0 = {signif(norm0, 4)}, ",
+        "norm1 = {signif(norm1, 4)}, ",
+        "norm01 = {signif(norm01, 4)}",
         ")"
       ),
       verbosity = 2
@@ -4117,7 +4089,7 @@ latent_names <- function(state) {
       if (length(state[[x]]) == 1) {
         x
       } else {
-        paste0(x, ".", seq_len(length(state[[x]])))
+        glue("{x}.{seq_along(state[[x]])}")
       }
     }
   )
@@ -4538,14 +4510,13 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   N_response <- sum(bru_response_size(lhoods))
   N_predictor <- NROW(inla.options$control.predictor$A)
   if (N_response != N_predictor) {
-    msg <- paste0(
-      "The total number of response values (N=",
-      N_response,
-      ") and predictor values (N=",
-      N_predictor,
-      ") do not match.\n",
-      "  This is likely due to a mistake in the component or predictor ",
-      "constructions."
+    msg <- glue(
+      "The total number of response values (N={N_response})",
+      " and predictor values (N={N_predictor})",
+      " do not match.\n",
+      "  This is likely due to a mistake in the component or predictor",
+      " constructions.",
+      .trim = FALSE
     )
     if ((N_response > 1L) && (N_predictor == 1L)) {
       msg <- paste0(
@@ -4643,7 +4614,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     }
 
     bru_log_message(
-      paste0("iinla: Iteration ", k, " [max:", options$bru_max_iter, "]"),
+      glue("iinla: Iteration {k} [max: {options$bru_max_iter}]"),
       verbosity = 1L
     )
 
@@ -4887,14 +4858,13 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         N_response <- sum(bru_response_size(lhoods))
         N_predictor <- NROW(inla.options$control.predictor$A)
         if (N_response != N_predictor) {
-          msg <- paste0(
-            "The total number of response values (N=",
-            N_response,
-            ") and predictor values (N=",
-            N_predictor,
-            ") do not match.\n",
-            "  This is likely due to a mistake in the component or predictor ",
-            "constructions."
+          msg <- glue(
+            "The total number of response values (N={N_response})",
+            " and predictor values (N={N_predictor})",
+            " do not match.\n",
+            "  This is likely due to a mistake in the component or predictor",
+            " constructions.",
+            .trim = FALSE
           )
           if ((N_response > 1L) && (N_predictor == 1L)) {
             msg <- paste0(
@@ -4921,12 +4891,12 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       ##   identity),
       ##   function(X) { abs(X$mean[k-1] - X$mean[k])/X$sd[k] }))
       bru_log_message(
-        paste0(
+        glue(
           "iinla: Max deviation from previous: ",
-          signif(100 * max(dev), 3),
+          "{signif(100 * max(dev), 3)}",
           "% of SD, and line search is ",
           if (line_search[["active"]]) "active" else "inactive",
-          "\n       [stop if: <", 100 * max.dev, "% and line search inactive]"
+          "\n       [stop if: < {100 * max.dev}% and line search inactive]"
         ),
         verbosity = 1L
       )
@@ -4989,10 +4959,8 @@ auto_intercept <- function(components) {
     } else {
       components <- update.formula(
         components,
-        as.formula(paste0(
-          ". ~ . - ",
-          var_names[inter_var],
-          " -1"
+        as.formula(glue(
+          ". ~ . - {var_names[inter_var]} -1"
         ))
       )
     }
@@ -5016,10 +4984,7 @@ auto_additive_formula <- function(formula, components) {
   env <- environment(formula)
   formula <- update.formula(
     formula,
-    paste0(
-      ". ~ ",
-      paste0(names(components), collapse = " + ")
-    )
+    glue(". ~ {glue_collapse(names(components), sep = ' + ')}")
   )
   environment(formula) <- env
   formula
@@ -5029,7 +4994,7 @@ auto_additive_formula <- function(formula, components) {
 extract_response <- function(formula) {
   if (inherits(formula, "formula") &&
     (length(as.character(formula)) == 3)) {
-    as.formula(paste0(as.character(formula)[2], " ~ ."))
+    as.formula(glue("{as.character(formula)[2]} ~ ."))
   } else {
     . ~ .
   }

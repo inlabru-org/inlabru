@@ -252,7 +252,7 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
       )
     },
     paste0(
-      "The input evaluation 'y' for 'y' failed. ",
+      "The input evaluation 'y' for 'y' failed.\n",
       "Perhaps the data object doesn't contain the needed variables?"
     ),
     fixed = TRUE

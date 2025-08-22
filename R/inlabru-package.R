@@ -33,6 +33,9 @@
 #' @import methods
 #' @importFrom Matrix diag
 #' @import fmesher
+#' @importFrom glue glue
+#' @importFrom glue glue_data
+#' @importFrom glue glue_collapse
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'   and Finn Lindgren \email{finn.lindgren@@gmail.com}
 "_PACKAGE"
