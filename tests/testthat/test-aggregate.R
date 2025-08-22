@@ -257,34 +257,6 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
     ),
     fixed = TRUE
   )
-
-  skip_if(utils::packageVersion("fmesher") >= "0.4.0.9006")
-  # For fmesher < 0.4.0.9006, detect character .block info
-  domain <- list(x = 1:6, y = 2:4)
-  samplers <- list(x = list(1:2, 3:5, 6))
-  expect_error(
-    {
-      bru_obs(
-        z ~ Intercept + x + y,
-        family = "normal",
-        response_data = obs,
-        data = NULL,
-        aggregate = "average",
-        domain = domain,
-        samplers = samplers,
-        control.family = list(
-          hyper = list(
-            prec = list(
-              initial = 6,
-              fixed = TRUE
-            )
-          )
-        )
-      )
-    },
-    "'character' aggregation block information detected.",
-    fixed = TRUE
-  )
 })
 
 
