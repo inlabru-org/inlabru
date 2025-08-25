@@ -8,6 +8,8 @@
   add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes,
   if the mapper is pre-computed.
   (version `2.13.0.9005`)
+* Remove unused `group` and `replicate` parts of each latent component, speeding
+  up component evaluation and linearisation. (version `2.13.0.9006`)
 
 ## Bug fixes
 

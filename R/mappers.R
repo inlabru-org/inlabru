@@ -3089,6 +3089,10 @@ ibm_simplify.bm_pipe <- function(mapper,
 
 #' @title Mapper for tensor product domains
 #' @param mappers A list of `bru_mapper` objects
+#' @param simplify logical; If `TRUE`, removes trivial submappers.
+#' Currently only sub-mappers of class [bm_index()] with `ibm_n() == 1L` are
+#' removed, and only if the mappers are named (to avoid ordering mismatches).
+#' Default: `FALSE`
 #' @description Constructs a row-wise Kronecker product mapping of linear/affine
 #'   mappers. Any offset in sub-mappers is added into a combined offset. Only
 #'   linear/affine sub-mappers are allowed.
@@ -3101,7 +3105,7 @@ ibm_simplify.bm_pipe <- function(mapper,
 #' ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
 #'
 #' @family specific [bm_multi] method implementations
-bm_multi <- function(mappers) {
+bm_multi <- function(mappers, simplify = FALSE) {
   if (!is.list(mappers)) {
     stop("bm_multi requires a list of sub-mappers.")
   }
@@ -3111,6 +3115,20 @@ bm_multi <- function(mappers) {
     stop("Either all or none of the multi sub-mappers should be named.")
   }
   mappers <- as_bm_list(mappers)
+
+  if (simplify) {
+    trivial <- vapply(mappers, function(x) {
+      inherits(x, "bm_index") && (ibm_n(x) == 1L)
+    }, logical(1))
+    if (any(trivial)) {
+      if (is.null(names(mappers))) {
+        warning("Not removing trivial sub-mappers in unnamed bm_multi.")
+      } else {
+        mappers <- mappers[!trivial]
+      }
+    }
+  }
+
   mapper <- list(
     mappers = mappers,
     n_multi = lapply(mappers, ibm_n),
@@ -3183,16 +3201,20 @@ ibm_values.bm_multi <- function(mapper,
                                 multi = FALSE,
                                 ...) {
   if (multi) {
+    vals <- if (inla_f) {
+      mapper[["values_inla_multi"]]
+    } else {
+      mapper[["values_multi"]]
+    }
+    if (any(vapply(vals, is.null, logical(1)))) {
+      return(NULL)
+    }
     # Expand indices/values. First sub-mapper varies fastest
     as.data.frame(
       do.call(
         expand.grid,
         c(
-          if (inla_f) {
-            mapper[["values_inla_multi"]]
-          } else {
-            mapper[["values_multi"]]
-          },
+          vals,
           list(
             KEEP.OUT.ATTRS = FALSE,
             stringsAsFactors = FALSE

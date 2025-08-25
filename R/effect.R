@@ -292,14 +292,20 @@ bru_comp.character <- function(object,
   # Force evaluation of explicit inputs
   force(values)
 
-  if (!is.null(substitute(group)) &&
-    !identical(deparse(substitute(group)), "1L")) {
-    if (is.null(control.group)) {
-      control.group <- INLA::inla.set.control.group.default()
+  include_group <- !missing(group) ||
+    !missing(ngroup) || !missing(group_mapper)
+  include_repl <- !missing(replicate) ||
+    !missing(nrep) || !missing(replicate_mapper)
+  if (include_group) {
+    if (!is.null(substitute(group)) &&
+        !identical(deparse(substitute(group)), "1L")) {
+      if (is.null(control.group)) {
+        control.group <- INLA::inla.set.control.group.default()
+      }
+      group_model <- control.group$model
+    } else {
+      group_model <- "exchangeable"
     }
-    group_model <- control.group$model
-  } else {
-    group_model <- "exchangeable"
   }
 
   if ("map" %in% names(sys.call())) {
@@ -325,9 +331,9 @@ bru_comp.character <- function(object,
   if (is.null(n)) {
     arg_names <- names(list(...))
     if ("Cmatrix" %in% arg_names) {
-      if (is.matrix(list(...)[["Cmatrix"]]) ||
-        inherits(list(...)[["Cmatrix"]], "Matrix")) {
-        n <- nrow(list(...)[["Cmatrix"]])
+      Cmat <- list(...)[["Cmatrix"]]
+      if (is.matrix(Cmat) || inherits(Cmat, "Matrix")) {
+        n <- nrow(Cmat)
       }
     } else if ("graph" %in% arg_names) {
       n <- INLA::inla.read.graph(list(...)[["graph"]], size.only = TRUE)
@@ -335,25 +341,26 @@ bru_comp.character <- function(object,
   }
 
   # Convert ngroup and nrep to bru_mapper info
-  if (!is.null(ngroup)) {
-    if (!is.null(group_mapper)) {
-      stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
+  if (include_group) {
+    if (!is.null(ngroup)) {
+      if (!is.null(group_mapper)) {
+        stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
+      }
+      group_mapper <- bm_index(ngroup)
+      ngroup <- NULL
     }
-    group_mapper <- bm_index(ngroup)
-    ngroup <- NULL
   }
-  if (!is.null(nrep)) {
-    if (!is.null(replicate_mapper)) {
-      stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
+  if (include_repl) {
+    if (!is.null(nrep)) {
+      if (!is.null(replicate_mapper)) {
+        stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
+      }
+      replicate_mapper <- bm_index(nrep)
+      nrep <- NULL
     }
-    replicate_mapper <- bm_index(nrep)
-    nrep <- NULL
   }
 
-  # Default component (to be filled)
-  component <- list(
-    label = label,
-    inla.formula = NULL,
+  subcomp <- list(
     main = bru_subcomp(
       input = bru_input(
         substitute(main),
@@ -362,50 +369,63 @@ bru_comp.character <- function(object,
         selector = main_selector
       ),
       mapper = mapper,
-      model = model,
       n = n,
+      model = model,
       values = values,
       season.length = season.length,
       nrow = nrow,
       ncol = ncol
-    ),
-    group = bru_subcomp(
-      input = bru_input(
-        substitute(group),
-        label = glue("{label}.group"),
-        layer = substitute(group_layer),
-        selector = group_selector
-      ),
-      mapper = group_mapper,
-      n = NULL,
-      model = group_model
-    ),
-    replicate = bru_subcomp(
-      input = bru_input(
-        substitute(replicate),
-        label = glue("{label}.repl"),
-        layer = substitute(replicate_layer),
-        selector = replicate_selector
-      ),
-      mapper = replicate_mapper,
-      n = NULL,
-      model = "iid"
-    ),
-    weights =
-      if (is.null(substitute(weights))) {
-        NULL
-      } else {
-        bru_input(
-          substitute(weights),
-          label = glue("{label}.weights"),
-          layer = substitute(weights_layer),
-          selector = weights_selector
-        )
-      },
-    copy = copy,
-    marginal = marginal,
-    env = .envir,
-    env_extra = envir_extra
+    )
+  )
+  if (include_group) {
+    subcomp$group <-
+      bru_subcomp(
+        input = bru_input(
+          substitute(group),
+          label = glue("{label}.group"),
+          layer = substitute(group_layer),
+          selector = group_selector
+        ),
+        mapper = group_mapper,
+        n = NULL,
+        model = group_model
+      )
+  }
+  if (include_repl) {
+    subcomp$replicate <-
+      bru_subcomp(
+        input = bru_input(
+          substitute(replicate),
+          label = glue("{label}.repl"),
+          layer = substitute(replicate_layer),
+          selector = replicate_selector
+        ),
+        mapper = replicate_mapper,
+        n = NULL,
+        model = "iid"
+      )
+  }
+  if (!is.null(substitute(weights))) {
+    subcomp$weights <-
+      bru_input(
+        substitute(weights),
+        label = glue("{label}.weights"),
+        layer = substitute(weights_layer),
+        selector = weights_selector
+      )
+  }
+  # Default component (to be filled)
+  component <- c(
+    list(
+      label = label,
+      inla.formula = NULL),
+    subcomp,
+    list(
+      copy = copy,
+      marginal = marginal,
+      env = .envir,
+      env_extra = envir_extra
+    )
   )
 
   # Main bit
@@ -444,16 +464,14 @@ bru_comp.character <- function(object,
     # component is needed.
     component$inla.formula <- as.formula("~ .", env = .envir)
     component$main$mapper <- bm_const()
-    component$group$mapper <- bm_index(1L)
-    component$replicate$mapper <- bm_index(1L)
+    component$group <- NULL
+    component$replicate <- NULL
     # Add scalable multi-mapper
     component[["mapper"]] <-
       bm_pipe(
         list(
           mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
+            main = component$main$mapper
           )),
           scale = bm_scale()
         )
@@ -809,38 +827,49 @@ add_mappers.bru_comp <- function(component,
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(
-    component$group,
-    label = component$label,
-    data = lh_data,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["group"]]
-    ),
-    env = component$env,
-    require_indexed = TRUE
-  )
-  component$replicate <- add_mapper(
-    component$replicate,
-    label = component$label,
-    data = lh_data,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["replicate"]]
-    ),
-    env = component$env,
-    require_indexed = TRUE
+  if (!is.null(component[["group"]])) {
+    component$group <- add_mapper(
+      component$group,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["group"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  if (!is.null(component[["replicate"]])) {
+    component$replicate <- add_mapper(
+      component$replicate,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["replicate"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  comp_mapper <- bm_multi(
+    lapply(
+      component[intersect(
+        c("main", "group", "replicate"),
+        names(component)
+      )],
+      function(subcomp) {
+        subcomp[["mapper"]]
+      }
+    )
   )
   # Add scalable multi-mapper
   if (is.null(component[["marginal"]])) {
     component[["mapper"]] <-
       bm_pipe(
         list(
-          mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
+          mapper = comp_mapper,
           scale = bm_scale()
         )
       )
@@ -848,11 +877,7 @@ add_mappers.bru_comp <- function(component,
     component[["mapper"]] <-
       bm_pipe(
         list(
-          mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
+          mapper = comp_mapper,
           marginal = component[["marginal"]],
           scale = bm_scale()
         )
@@ -862,15 +887,19 @@ add_mappers.bru_comp <- function(component,
   fcall <- component$fcall
 
   # Set ngroup and nrep defaults
-  if (is.null(component$group$n)) {
-    fcall[["ngroup"]] <- 1
-  } else {
-    fcall[["ngroup"]] <- component$group$n
+  if (!is.null(component[["group"]])) {
+    if (is.null(component$group[["n"]])) {
+      fcall[["ngroup"]] <- 1L
+    } else {
+      fcall[["ngroup"]] <- component$group$n
+    }
   }
-  if (is.null(component$replicate$n)) {
-    fcall[["nrep"]] <- 1
-  } else {
-    fcall[["nrep"]] <- component$replicate$n
+  if (!is.null(component[["replicate"]])) {
+    if (is.null(component$replicate[["n"]])) {
+      fcall[["nrep"]] <- 1L
+    } else {
+      fcall[["nrep"]] <- component$replicate$n
+    }
   }
 
   if (is.null(component$main$values)) {

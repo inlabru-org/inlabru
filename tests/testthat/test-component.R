@@ -41,9 +41,9 @@ test_that("Component construction: linear model", {
     inp,
     list(
       mapper = list(
-        main = 1:10,
-        group = 1,
-        replicate = 1
+        main = 1:10#,
+#        group = 1,
+#        replicate = 1
       ),
       scale = NULL
     )
@@ -52,8 +52,8 @@ test_that("Component construction: linear model", {
   idx <- bru_index(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
-  expect_equal(names(idx)[2], "beta.group")
-  expect_equal(names(idx)[3], "beta.repl")
+#  expect_equal(names(idx)[2], "beta.group")
+#  expect_equal(names(idx)[3], "beta.repl")
   expect_equal(idx$beta, 1)
 
   # A-matrix

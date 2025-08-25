@@ -7,7 +7,7 @@
 \alias{[.bru_mapper_multi}
 \title{Mapper for tensor product domains}
 \usage{
-bm_multi(mappers)
+bm_multi(mappers, simplify = FALSE)
 
 bru_mapper_multi(...)
 
@@ -17,6 +17,11 @@ bru_mapper_multi(...)
 }
 \arguments{
 \item{mappers}{A list of \code{bru_mapper} objects}
+
+\item{simplify}{logical; If \code{TRUE}, removes trivial submappers.
+Currently only sub-mappers of class \code{\link[=bm_index]{bm_index()}} with \code{ibm_n() == 1L} are
+removed, and only if the mappers are named (to avoid ordering mismatches).
+Default: \code{FALSE}}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_multi]{bm_multi()}}}
 
