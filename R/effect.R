@@ -1708,11 +1708,15 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
           } else {
             obj <- object[[x]][["input"]]
           }
-          format(obj,
-            verbose = verbose,
-            ...,
-            label.override = x
-          )
+          if (!is.null(obj)) {
+            format(obj,
+                   verbose = verbose,
+                   ...,
+                   label.override = x
+            )
+          } else {
+            NULL
+          }
         }
       )),
       collapse = ", "
@@ -1755,13 +1759,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
         unlist(lapply(
           c("main", "group", "replicate", "weights"),
           function(x) {
-            if (identical(x, "weights")) {
-              format(object[[x]],
-                verbose = verbose,
-                ...,
-                label.override = x
-              )
-            } else {
+            if (!is.null(object[[x]])) {
               format(object[[x]],
                 verbose = verbose,
                 ...,

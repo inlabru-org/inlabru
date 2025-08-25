@@ -155,7 +155,12 @@ summary.bru_model <- function(object, ...) {
   result <- structure(
     list(
       components =
-        summary(object[["effects"]], ...)
+        summary(object[["effects"]], ...),
+      lhoods = if (is.null(object[["lhoods"]])) {
+        NULL
+      } else {
+        summary(object[["lhoods"]], ...)
+      }
     ),
     class = "summary_bru_model"
   )
@@ -166,7 +171,12 @@ summary.bru_model <- function(object, ...) {
 #' @param x An object to be printed
 #' @rdname bru_model
 print.summary_bru_model <- function(x, ...) {
+  cat("Latent components:\n")
   print(x[["components"]])
+  if (!is.null(x[["lhoods"]])) {
+    cat("Observation models:\n")
+    print(x[["lhoods"]])
+  }
   invisible(x)
 }
 

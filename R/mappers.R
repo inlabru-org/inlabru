@@ -491,7 +491,7 @@ summary.bru_mapper <- function(object, ...,
     object,
     prefix = prefix,
     initial = initial,
-    depth = 1
+    depth = depth
   )
   class(summary_object) <- c(
     "summary_bru_mapper",
