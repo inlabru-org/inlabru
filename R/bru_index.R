@@ -124,8 +124,14 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 
 bru_index.bru_comp <- function(object, inla_f, ...) {
   idx <- ibm_values(object[["mapper"]], inla_f = inla_f, multi = TRUE)
-  names(idx) <- glue("{object[['label']]}{suffix}",
-                     suffix = c("", ".group", ".repl"))
+  if (is.null(idx)) {
+    return(list())
+  }
+  nms <- names(idx)
+  present <- match(nms, c("main", "group", "replicate"))
+  names(idx) <-
+    glue("{object[['label']]}{suffix}",
+         suffix = c("", ".group", ".repl")[present])
   idx
 }
 

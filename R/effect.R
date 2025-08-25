@@ -444,16 +444,14 @@ bru_comp.character <- function(object,
     # component is needed.
     component$inla.formula <- as.formula("~ .", env = .envir)
     component$main$mapper <- bm_const()
-    component$group$mapper <- bm_index(1L)
-    component$replicate$mapper <- bm_index(1L)
+    component$group <- NULL
+    component$replicate <- NULL
     # Add scalable multi-mapper
     component[["mapper"]] <-
       bm_pipe(
         list(
           mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
+            main = component$main$mapper
           )),
           scale = bm_scale()
         )
@@ -809,38 +807,50 @@ add_mappers.bru_comp <- function(component,
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(
-    component$group,
-    label = component$label,
-    data = lh_data,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["group"]]
+  if (!is.null(component[["group"]])) {
+    component$group <- add_mapper(
+      component$group,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["group"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  if (!is.null(component[["replicate"]])) {
+    component$replicate <- add_mapper(
+      component$replicate,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["replicate"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  comp_mapper <- bm_multi(
+    lapply(
+      component[intersect(
+        c("main", "group", "replicate"),
+        names(component)
+      )],
+      function(subcomp) {
+        subcomp[["mapper"]]
+      }
     ),
-    env = component$env,
-    require_indexed = TRUE
-  )
-  component$replicate <- add_mapper(
-    component$replicate,
-    label = component$label,
-    data = lh_data,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["replicate"]]
-    ),
-    env = component$env,
-    require_indexed = TRUE
+    simplify = TRUE
   )
   # Add scalable multi-mapper
   if (is.null(component[["marginal"]])) {
     component[["mapper"]] <-
       bm_pipe(
         list(
-          mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
+          mapper = comp_mapper,
           scale = bm_scale()
         )
       )
@@ -848,11 +858,7 @@ add_mappers.bru_comp <- function(component,
     component[["mapper"]] <-
       bm_pipe(
         list(
-          mapper = bm_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
+          mapper = comp_mapper,
           marginal = component[["marginal"]],
           scale = bm_scale()
         )

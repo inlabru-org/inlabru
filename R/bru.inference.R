@@ -65,11 +65,14 @@ bru_info_upgrade <- function(object,
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
         cmp[["mapper"]] <-
-          bm_multi(list(
-            main = cmp$main$mapper,
-            group = cmp$group$mapper,
-            replicate = cmp$replicate$mapper
-          ))
+          bm_multi(
+            list(
+              main = cmp$main$mapper,
+              group = cmp$group$mapper,
+              replicate = cmp$replicate$mapper
+            ),
+            simplify = TRUE
+          )
         object[["model"]][["effects"]][[k]] <- cmp
       }
       object[["inlabru_version"]] <- "2.1.14.901"
@@ -99,11 +102,14 @@ bru_info_upgrade <- function(object,
         cmp[["mapper"]] <-
           bm_pipe(
             list(
-              mapper = bm_multi(list(
-                main = cmp$main$mapper,
-                group = cmp$group$mapper,
-                replicate = cmp$replicate$mapper
-              )),
+              mapper = bm_multi(
+                list(
+                  main = cmp$main$mapper,
+                  group = cmp$group$mapper,
+                  replicate = cmp$replicate$mapper
+                ),
+                simplify = TRUE
+              ),
               scale = bm_scale()
             )
           )
@@ -120,11 +126,14 @@ bru_info_upgrade <- function(object,
         cmp[["mapper"]] <-
           bm_pipe(
             list(
-              mapper = bm_multi(list(
-                main = cmp$main$mapper,
-                group = cmp$group$mapper,
-                replicate = cmp$replicate$mapper
-              )),
+              mapper = bm_multi(
+                list(
+                  main = cmp$main$mapper,
+                  group = cmp$group$mapper,
+                  replicate = cmp$replicate$mapper
+                ),
+                simplify = TRUE
+              ),
               scale = bm_scale()
             )
           )
