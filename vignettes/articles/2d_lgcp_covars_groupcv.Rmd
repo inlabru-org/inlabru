@@ -146,7 +146,7 @@ fit1 <- lgcp(
   samplers = cvpart,
   domain = list(geometry = mesh),
   control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets=2),
-  options = list(bru_verbose = 3))
+  options = list(bru_verbose = 0))
 #  options = list(control.compute = list(control.gcpo = list(enable = TRUE))))
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -155,12 +155,13 @@ if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
   fit1 <- readRDS(file = .cache_file)
 } else {
-  fit1 <- lgcp(comp1,
+  fit1 <- lgcp(
+    comp1,
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh),
-    control.gcpo = list(enable = TRUE)
-  )
+    control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets=2),
+    options = list(bru_verbose = 0))
   saveRDS(fit1, .cache_file)
 }
 ```

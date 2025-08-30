@@ -1853,21 +1853,18 @@ bru_obs <- function(formula = . ~ .,
       } else {
         data <- as.data.frame(response)
       }
-      response_data <- NULL
-      N_data <- NROW(data)
     } else {
       data <- tibble::as_tibble(response)
       if (("geometry" %in% names(data)) &&
         inherits(data$geometry, "sfc")) {
         sf::st_geometry(data) <- "geometry"
       }
-      response_data <- NULL
-      if (".block" %in% names(data_)) {
-        N_data <- base::tabulate(data_$.block, max(ips$.block))
-      } else {
-
-        N_data <- NROW(data)
-      }
+    }
+    response_data <- NULL
+    if (".block" %in% names(data_)) {
+      N_data <- base::tabulate(data_$.block, max(ips$.block))
+    } else {
+      N_data <- NROW(data)
     }
 
     # Add back additional data
@@ -1876,7 +1873,7 @@ bru_obs <- function(formula = . ~ .,
       (NROW(data_) == sum(N_data))) {
       data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
     }
-    if (is.null(data$.block)) {
+    if (is.null(data[[".block"]])) {
       data$.block <- 1L
     }
 
@@ -2765,7 +2762,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
                                               control.gcpo = NULL,
                                               ...) {
   # Update the control.gcpo information for each likelihood
-  response_sizes <- bru_response_size(bru_obs_list)
+  response_sizes <- bru_response_size(x)
   any_element <- vapply(
     c("groups", "selection", "group.selection", "friends", "weights"),
     function(nm) {
