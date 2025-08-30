@@ -2634,10 +2634,12 @@ print.bru_obs_list <- function(x, ...) {
 
 #' Utility functions for bru observation model objects
 #' @param x Object of `bru_obs` or `bru_obs_list` type
+#' @param \dots Further arguments passed on to the submethods
 #' @export
 #' @keywords internal
 #' @returns * `bru_obs_inla_family()` returns a string or vector of strings
 #' @rdname bru_obs_methods
+#' @name bru_obs_methods
 #' @seealso [summary.bru_obs()]
 bru_obs_inla_family <- function(x, ...) {
   UseMethod("bru_obs_inla_family")
@@ -2710,7 +2712,6 @@ bru_obs_control_family.bru_obs_list <- function(x,
   control.family
 }
 
-#' @param control.gcpo list of INLA `control.gcpo` default options
 #' @export
 #' @keywords internal
 #' @returns * `bru_obs_control_gcpo()` returns a list with
@@ -2756,6 +2757,7 @@ bru_obs_control_gcpo.bru_obs <- function(x,
   c.gcpo
 }
 
+#' @param control.gcpo list of INLA `control.gcpo` default options
 #' @export
 #' @rdname bru_obs_methods
 bru_obs_control_gcpo.bru_obs_list <- function(x,
