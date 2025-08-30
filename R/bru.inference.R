@@ -2724,7 +2724,7 @@ bru_obs_control_gcpo <- function(x, ...) {
 
 #' @param index_offset integer; offset to add to indices in `control.gcpo`
 #' @param index_length integer; length of the response vector for the
-#'   observation model
+#'   observation model. Defaults to `bru_response_size(x)`.
 #' @param force_weights logical; if `TRUE`, ensure that `control.gcpo$weights`
 #'   is populated. This is needed if any of the observation models in a
 #'   `bru_obs_list` has non-null `control.gcpo$weights`.
@@ -2732,7 +2732,7 @@ bru_obs_control_gcpo <- function(x, ...) {
 #' @rdname bru_obs_methods
 bru_obs_control_gcpo.bru_obs <- function(x,
                                          index_offset,
-                                         index_length,
+                                         index_length = bru_response_size(x),
                                          force_weights,
                                          ...) {
   c.gcpo <- x[["control.gcpo"]]
@@ -2741,8 +2741,7 @@ bru_obs_control_gcpo.bru_obs <- function(x,
     c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
   }
   if (!("friends" %in% names(c.gcpo))) {
-    c.gcpo[["friends"]] <- as.list(seq.int(index_offset + 1L,
-                                           index_offset + index_length))
+    c.gcpo[["friends"]] <- as.list(index_offset + seq_len(index_length))
   }
   if (force_weights && !("weights" %in% names(c.gcpo))) {
     c.gcpo[["weights"]] <- rep(1.0, index_length)

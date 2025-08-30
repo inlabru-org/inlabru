@@ -27,7 +27,13 @@ bru_obs_control_family(x, control.family = NULL, ...)
 
 bru_obs_control_gcpo(x, ...)
 
-\method{bru_obs_control_gcpo}{bru_obs}(x, index_offset, index_length, force_weights, ...)
+\method{bru_obs_control_gcpo}{bru_obs}(
+  x,
+  index_offset,
+  index_length = bru_response_size(x),
+  force_weights,
+  ...
+)
 
 \method{bru_obs_control_gcpo}{bru_obs_list}(x, control.gcpo = NULL, ...)
 }
@@ -41,7 +47,7 @@ bru_obs_control_gcpo(x, ...)
 \item{index_offset}{integer; offset to add to indices in \code{control.gcpo}}
 
 \item{index_length}{integer; length of the response vector for the
-observation model}
+observation model. Defaults to \code{bru_response_size(x)}.}
 
 \item{force_weights}{logical; if \code{TRUE}, ensure that \code{control.gcpo$weights}
 is populated. This is needed if any of the observation models in a
