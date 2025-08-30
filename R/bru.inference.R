@@ -2745,7 +2745,14 @@ bru_obs_control_gcpo.bru_obs <- function(x,
     c("groups", "selection", "group.selection", "friends"),
     names(c.gcpo)
   )) {
-    c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
+    if (nm == "groups") {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) {
+        v$idx <- v$idx + index_offset
+        v
+      })
+    } else {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
+    }
   }
   if (!("friends" %in% names(c.gcpo))) {
     c.gcpo[["friends"]] <- as.list(index_offset + seq_len(index_length))
