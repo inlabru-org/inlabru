@@ -1,8 +1,8 @@
 # hexagon tiling CV -------------------------------------------------------
-#library(dplyr)
-#library(inlabru)
-#library(ggplot2)
-#library(sf)
+# library(dplyr)
+# library(inlabru)
+# library(ggplot2)
+# library(sf)
 
 #' ------------------
 #' cv_partition
@@ -20,47 +20,58 @@
 #' @param ncols number of columns of grids that are required
 #' @param chess chessboard partitioning
 #' Output:
-#' @return a partitioned sf object as required or a list of partitioned sf objects if chess is TRUE
+#' @return a partitioned sf object as required or a list of partitioned sf
+#'   objects if chess is TRUE
 #'
 #'
-cv_partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL,
-                         chess = TRUE, ...) {
+cv_partition <- function(samplers,
+                         resolution = NULL,
+                         nrows = NULL,
+                         ncols = NULL,
+                         chess = TRUE,
+                         ...) {
   require(sf)
   require(terra)
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- terra::rast(terra::ext(st_as_sf(fm_nonconvex_hull(samplers,...))),
-                        crs = fm_crs(samplers)$input,
-                        nrows = nrows, ncols = ncols
+    grid <- terra::rast(terra::ext(st_as_sf(fm_nonconvex_hull(samplers, ...))),
+      crs = fm_crs(samplers)$input,
+      nrows = nrows, ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- terra::rast(terra::ext(st_as_sf(fm_nonconvex_hull(samplers,...))),
-                        crs = fm_crs(samplers)$input,
-                        resolution = resolution
+    grid <- terra::rast(terra::ext(st_as_sf(fm_nonconvex_hull(samplers, ...))),
+      crs = fm_crs(samplers)$input,
+      resolution = resolution
     )
   }
 
   gridPolygon <- terra::as.polygons(grid)
-  if(chess == TRUE){
+  if (chess == TRUE) {
     # no idea how it works
-    # spatSample(x = gridPolygon, size = 0.5*nrow(gridPolygon), method="random", strata=NULL, chess="black")
+    # spatSample(x = gridPolygon, size = 0.5*nrow(gridPolygon),
+    #            method="random", strata=NULL, chess="black")
     grid_chess <- terra::init(grid, "chess")
-    grid_chess_sf <- st_intersection(st_cast(st_as_sf(terra::as.polygons(grid_chess)), "POLYGON"), samplers)
+    grid_chess_sf <- st_intersection(
+      st_cast(st_as_sf(terra::as.polygons(grid_chess)), "POLYGON"),
+      samplers
+    )
 
     # I am not sure which terra version changes how they name for init()
     terra_version <- packageVersion("terra")
     if (terra_version <= "1.8-42") {
-      grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$lyr.1==1,]
-      grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$lyr.1==0,]
-    }else{
-      grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$chess==1,]
-      grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$chess==0,]
+      grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 1, ]
+      grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 0, ]
+    } else {
+      grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$chess == 1, ]
+      grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$chess == 0, ]
     }
-    return(list(white=grid_chess_white_sf, black=grid_chess_black_sf))
-    # ggplot() + gg(data = grid_chess_white_sf, aes(fill = lyr.1)) + geom_sf(data = nepal_bnd, col = "red", fill = "NA")
-    # ggplot() + gg(data = grid_chess_black_sf, aes(fill = lyr.1)) + geom_sf(data = nepal_bnd, col = "red", fill = "NA")
+    return(list(white = grid_chess_white_sf, black = grid_chess_black_sf))
+    # ggplot() + gg(data = grid_chess_white_sf, aes(fill = lyr.1)) +
+    #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
+    # ggplot() + gg(data = grid_chess_black_sf, aes(fill = lyr.1)) +
+    #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
   } else {
     # Extract the boundary with subpolygons only
     sf::st_as_sf(
@@ -70,11 +81,11 @@ cv_partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL
 }
 
 
-#bnd <- gorillas_sf$boundary
+# bnd <- gorillas_sf$boundary
 #
-#chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
+# chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
 #
-#plot(chess$white)
+# plot(chess$white)
 
 #' ------------------
 #' cv_hex
@@ -90,19 +101,20 @@ cv_partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL
 #' Output:
 #' @return a partitioned sf object as required
 #'
-# @importsFrom sf st_as_sf st_make_grid st_centroid st_coordinates st_intersection
+# @importsFrom sf st_as_sf st_make_grid
+# @importsFrom sf st_centroid st_coordinates st_intersection
 cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
   bnd <- fm_nonconvex_hull(samplers, convex = -0.01)
   hex_cell <- sf::st_make_grid(
-      bnd,
-      cellsize = cellsize,
-      square = FALSE
+    bnd,
+    cellsize = cellsize,
+    square = FALSE
   )
   hex_cell <- sf::st_sf(geometry = hex_cell)
 
   # get centroids for x positions
   hex_centroids <- sf::st_centroid(hex_cell)
-  coords <- sf::st_coordinates(hex_centroids)[,1]
+  coords <- sf::st_coordinates(hex_centroids)[, 1]
 
   # get sorted unique x positions (columns)
   x_unique <- sort(unique(round(coords, 8)))
@@ -118,14 +130,13 @@ cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
     dplyr::mutate(
       hex_cell,
       column = col_index,
-      group = as.factor(paste0("group", col_group)))
+      group = as.factor(paste0("group", col_group))
+    )
 
   hex_cell_ <- sf::st_intersection(hex_groups, samplers)
 
   return(hex_cell_["group"])
-
 }
 
-#hex_cv <- cv_hex(bnd, cellsize = 0.5, n_group = 3)
-#plot(hex_cv)
-
+# hex_cv <- cv_hex(bnd, cellsize = 0.5, n_group = 3)
+# plot(hex_cv)

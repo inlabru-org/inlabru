@@ -35,7 +35,8 @@ library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
 bru_safe_sp(force = TRUE)
-bru_options_set(control.compute = list(dic = TRUE, waic = TRUE)) # Activate DIC output
+# Activate DIC output
+bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
 ```
 
 Introduction
@@ -274,7 +275,13 @@ IC_results <-
       fit1$dic$dic / (-2) + fit1$dic$p.eff + sum(int_points$weight),
       NA
     ),
-    p_eff = c(p_DIC, p_WAIC_limit, p_WAIC_blockwise, fit1$dic$p.eff, fit1$waic$p.eff),
+    p_eff = c(
+      p_DIC,
+      p_WAIC_limit,
+      p_WAIC_blockwise,
+      fit1$dic$p.eff,
+      fit1$waic$p.eff
+    ),
     IC = c(
       DIC,
       WAIC_limit,
@@ -289,7 +296,10 @@ knitr::kable(IC_results)
 #### Cross validation with NA setting
 
 ```{r}
-fit2prep <- bru_set_missing(fit1, keep = list(-which(fit1$bru_info$lhoods[[1]]$response_data$BRU_block == 8L)))
+fit2prep <- bru_set_missing(
+  fit1,
+  keep = list(-which(fit1$bru_info$lhoods[[1]]$response_data$BRU_block == 8L))
+)
 fit2 <- bru_rerun(fit2prep)
 ```
 
