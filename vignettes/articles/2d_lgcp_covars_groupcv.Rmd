@@ -145,8 +145,9 @@ fit1 <- lgcp(
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh),
-  control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets=2),
-  options = list(bru_verbose = 0))
+  control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets = 2),
+  options = list(bru_verbose = 0)
+)
 #  options = list(control.compute = list(control.gcpo = list(enable = TRUE))))
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -160,8 +161,9 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh),
-    control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets=2),
-    options = list(bru_verbose = 0))
+    control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets = 2),
+    options = list(bru_verbose = 0)
+  )
   saveRDS(fit1, .cache_file)
 }
 ```
@@ -204,41 +206,52 @@ Lambda1
 #### Continuous limit of WAIC
 
 ```{r}
-int_points <- fm_int(domain=list(geometry = mesh), boundary)
-block_int_points <- fm_int(domain=list(geometry = mesh), cvpart)
+int_points <- fm_int(domain = list(geometry = mesh), boundary)
+block_int_points <- fm_int(domain = list(geometry = mesh), cvpart)
 agg <- bm_aggregate(type = "sum", n_block = 1L)
 agg_block <- bm_aggregate(type = "sum", n_block = max(block_int_points$.block))
 pred <- predict(fit1,
-        newdata = cbind(
-          dplyr::bind_rows(nests, int_points, block_int_points),
-          part = c(rep("Y", nrow(nests)),
-                   rep("int", nrow(int_points)),
-                   rep("block_int", nrow(block_int_points)))),
-        formula = ~ {
-          eta <- {vegetation}
-          log_lambda_y <- eta[part == "Y"]
-          lambda_y <- exp(log_lambda_y)
-          # Full domain
-          lambda_int <- sum(weight[part == "int"] * (1 - exp(eta[part == "int"])))
-          log_like <- sum(log_lambda_y) + lambda_int
-          # Blockwise
-          lambda_block_int <- ibm_eval(agg_block,
-                                       input = list(block = .block[part == "block_int"],
-                                                    weights = weight[part == "block_int"]),
-                                       state = (1 - exp(eta[part == "block_int"])))
-          block_log_like <- lambda_block_int +
-            ibm_eval(agg_block,
-                     input = list(block = .block[part == "Y"]),
-                     state = log_lambda_y)
-          block_like <- exp(block_log_like)
-          list(log_lambda_y = log_lambda_y,
-               lambda_y = lambda_y,
-               lambda_int = lambda_int,
-               log_like = log_like,
-               block_log_like = block_log_like,
-               block_like = block_like)
-        },
-        n.samples = 2000
+  newdata = cbind(
+    dplyr::bind_rows(nests, int_points, block_int_points),
+    part = c(
+      rep("Y", nrow(nests)),
+      rep("int", nrow(int_points)),
+      rep("block_int", nrow(block_int_points))
+    )
+  ),
+  formula = ~ {
+    eta <- {
+      vegetation
+    }
+    log_lambda_y <- eta[part == "Y"]
+    lambda_y <- exp(log_lambda_y)
+    # Full domain
+    lambda_int <- sum(weight[part == "int"] * (1 - exp(eta[part == "int"])))
+    log_like <- sum(log_lambda_y) + lambda_int
+    # Blockwise
+    lambda_block_int <- ibm_eval(agg_block,
+      input = list(
+        block = .block[part == "block_int"],
+        weights = weight[part == "block_int"]
+      ),
+      state = (1 - exp(eta[part == "block_int"]))
+    )
+    block_log_like <- lambda_block_int +
+      ibm_eval(agg_block,
+        input = list(block = .block[part == "Y"]),
+        state = log_lambda_y
+      )
+    block_like <- exp(block_log_like)
+    list(
+      log_lambda_y = log_lambda_y,
+      lambda_y = lambda_y,
+      lambda_int = lambda_int,
+      log_like = log_like,
+      block_log_like = block_log_like,
+      block_like = block_like
+    )
+  },
+  n.samples = 2000
 )
 # Limit:
 lppd_limit <- sum(log(pred$lambda_y$mean)) + pred$lambda_int$mean
@@ -251,20 +264,24 @@ lppd_blockwise <- sum(log(pred$block_like$mean))
 p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
 WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
 # Collect
-IC_results <- 
+IC_results <-
   data.frame(
     type = c("DIC", "WAIC_limit", "WAIC_blockwise", "DIC_INLA", "WAIC_INLA"),
-    lppd = c(lppd_limit,
-             lppd_limit,
-             lppd_blockwise,
-             fit1$dic$dic/(-2) + fit1$dic$p.eff + sum(int_points$weight),
-             NA),
+    lppd = c(
+      lppd_limit,
+      lppd_limit,
+      lppd_blockwise,
+      fit1$dic$dic / (-2) + fit1$dic$p.eff + sum(int_points$weight),
+      NA
+    ),
     p_eff = c(p_DIC, p_WAIC_limit, p_WAIC_blockwise, fit1$dic$p.eff, fit1$waic$p.eff),
-    IC = c(DIC,
-           WAIC_limit,
-           WAIC_blockwise,
-           fit1$dic$dic,
-           fit1$waic$waic)
+    IC = c(
+      DIC,
+      WAIC_limit,
+      WAIC_blockwise,
+      fit1$dic$dic,
+      fit1$waic$waic
+    )
   )
 knitr::kable(IC_results)
 ```

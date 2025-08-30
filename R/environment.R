@@ -793,8 +793,10 @@ bru_options_default <- function() {
     # inla options
     E = 1,
     Ntrials = 1,
-    control.compute = list(config = TRUE,
-                           control.gcpo = list()),
+    control.compute = list(
+      config = TRUE,
+      control.gcpo = list()
+    ),
     control.inla = list(int.strategy = "auto"),
     control.fixed = list(expand.factor.strategy = "inla")
   )
@@ -818,9 +820,10 @@ bru_options_deprecated <- function(args) {
         "Ignoring deprecated global options ",
         glue_collapse(
           glue("'{depr}'",
-               depr =
-                 names(deprecated_args)[nzchar(names(deprecated_args)) == 0])
-          , sep = ", "
+            depr =
+              names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+          ),
+          sep = ", "
         ),
         ".",
       ))

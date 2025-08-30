@@ -1774,8 +1774,7 @@ bru_obs <- function(formula = . ~ .,
         stop(glue("
           Mismatch between response and domain names:
             names(response) = ({glue_collapse(names(response), sep = ', ')})
-            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"
-        ))
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
       }
 
       ips <- fm_int(
@@ -1917,7 +1916,7 @@ bru_obs <- function(formula = . ~ .,
         bm_aggregate(
           type = "average",
           n_block = data_extra[["BRU_cp_n_block"]]
-          )
+        )
 
       if (!is_additive) {
         expr_text <- formula_char[length(formula_char)]
@@ -1938,18 +1937,17 @@ bru_obs <- function(formula = . ~ .,
               state = BRU_eta[BRU_aggregate] *
                 BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
-        }}"
-      )
+        }}")
       expr <- parse(text = expr_text)
 
       data <- extended_bind_rows(
         dplyr::bind_cols(data,
-                         BRU_aggregate = TRUE,
-                         BRU_point_weights = point_weights
+          BRU_aggregate = TRUE,
+          BRU_point_weights = point_weights
         ),
         dplyr::bind_cols(ips,
-                         BRU_aggregate = FALSE,
-                         BRU_point_weights = 0.0
+          BRU_aggregate = FALSE,
+          BRU_point_weights = 0.0
         )
       )
 
@@ -1975,12 +1973,16 @@ bru_obs <- function(formula = . ~ .,
       }
       response_data <- data.frame(
         BRU_E = c(
-          rep(0, N_data),
+          rep(0, sum(N_data)),
           E * ips[["weight"]]
         ),
         BRU_response_cp = c(
-          rep(1, N_data),
+          rep(1, sum(N_data)),
           rep(0, NROW(ips))
+        ),
+        BRU_block = c(
+          data[[".block"]],
+          ips[[".block"]]
         )
       )
       data <- extended_bind_rows(data, ips)
@@ -2388,8 +2390,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
           Cannot combine objects with mismatching tags and names:
             Tag: {tag_names[k]}
             Name: {list_names[k]}
-          Use `NA` for either the tag or name, or use matching tags and names."
-        ))
+          Use `NA` for either the tag or name, or use matching tags/names."))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
           return(tag_names[k])
@@ -2568,43 +2569,45 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
 #' @importFrom glue glue
 print.summary_bru_obs <- function(x, ...) {
   lh <- x
-  cat(glue_data(
-    lh,
-    "  Family: '{family}'\n",
-    "    Tag: {tag}\n",
-    "    Data class: {data_class}\n",
-    "    Response class: {response_class}\n",
-    "    Predictor: {predictor}\n",
-    "    Additive/Linear: {is_additive}/{is_linear}\n",
-    "    Used components: {format(lh$used)}",
-    .trim = FALSE,
-    tag = if (is.null(lh$tag) || is.na(lh$tag)) {
-      "<No tag>"
-    } else {
-      glue::glue_collapse(glue::glue_data(lh, "'{tag}'"), sep = ", ")
-    },
-    data_class = glue::glue_collapse(
-      glue::glue_data(lh, "'{data_class}'"),
-      sep = ", "
-    ),
-    response_class = glue::glue_collapse(
-      glue::glue_data(lh, "'{response_class}'"),
-      sep = ", "
-    ),
-    predictor =
-      if (length(lh$predictor) > 1) {
-        paste0(
-          "\n        ",
-          paste0(
-            lh$predictor,
-            collapse = "\n        "
-          )
-        )
+  cat(
+    glue_data(
+      lh,
+      "  Family: '{family}'\n",
+      "    Tag: {tag}\n",
+      "    Data class: {data_class}\n",
+      "    Response class: {response_class}\n",
+      "    Predictor: {predictor}\n",
+      "    Additive/Linear: {is_additive}/{is_linear}\n",
+      "    Used components: {format(lh$used)}",
+      .trim = FALSE,
+      tag = if (is.null(lh$tag) || is.na(lh$tag)) {
+        "<No tag>"
       } else {
-        lh$predictor
-      }
-  ),
-  "\n")
+        glue::glue_collapse(glue::glue_data(lh, "'{tag}'"), sep = ", ")
+      },
+      data_class = glue::glue_collapse(
+        glue::glue_data(lh, "'{data_class}'"),
+        sep = ", "
+      ),
+      response_class = glue::glue_collapse(
+        glue::glue_data(lh, "'{response_class}'"),
+        sep = ", "
+      ),
+      predictor =
+        if (length(lh$predictor) > 1) {
+          paste0(
+            "\n        ",
+            paste0(
+              lh$predictor,
+              collapse = "\n        "
+            )
+          )
+        } else {
+          lh$predictor
+        }
+    ),
+    "\n"
+  )
   invisible(x)
 }
 
@@ -2736,8 +2739,10 @@ bru_obs_control_gcpo.bru_obs <- function(x,
                                          force_weights,
                                          ...) {
   c.gcpo <- x[["control.gcpo"]]
-  for (nm in intersect(c("groups", "selection", "group.selection", "friends"),
-                       names(c.gcpo))) {
+  for (nm in intersect(
+    c("groups", "selection", "group.selection", "friends"),
+    names(c.gcpo)
+  )) {
     c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
   }
   if (!("friends" %in% names(c.gcpo))) {
@@ -2786,9 +2791,10 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     seq_along(x),
     function(k) {
       bru_obs_control_gcpo(x[[k]],
-                           index_offset = sum(response_sizes[seq_len(k - 1)]),
-                           index_length = response_sizes[k],
-                           force_weights = any_element["weights"])
+        index_offset = sum(response_sizes[seq_len(k - 1)]),
+        index_length = response_sizes[k],
+        force_weights = any_element["weights"]
+      )
     }
   )
 
@@ -2801,14 +2807,16 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
           "control.gcpo${nm} given in some, but not all, observation modes"
         ))
       }
-      c.gcpo.combined[[nm]] <- do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
+      c.gcpo.combined[[nm]] <-
+        do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
     }
   }
   # Combine list/vector
   c.gcpo.combined[["friends"]] <-
     do.call("c", lapply(c.gcpo, function(lh) lh[["friends"]]))
   if (any_element[["weights"]]) {
-    c.gcpo.combined[["weights"]] <- unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
+    c.gcpo.combined[["weights"]] <-
+      unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
   }
   c.gcpo.new <- list()
   if (!is.null(control.gcpo)) {
