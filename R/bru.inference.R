@@ -1860,8 +1860,10 @@ bru_obs <- function(formula = . ~ .,
       }
     }
     response_data <- NULL
+    n_block <- max(ips$.block)
     if (".block" %in% names(data_)) {
-      N_data <- base::tabulate(data_$.block, max(ips$.block))
+      n_block <- max(max(data_$.block), n_block)
+      N_data <- base::tabulate(data_$.block, n_block)
     } else {
       N_data <- NROW(data)
     }
@@ -1911,11 +1913,11 @@ bru_obs <- function(formula = . ~ .,
       )
 
       data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
-      data_extra[["BRU_cp_n_block"]] <- max(max(data$.block), max(ips$.block))
+      data_extra[["BRU_cp_n_block"]] <- n_block
       data_extra[["BRU_cp_agg"]] <-
         bm_aggregate(
           type = "average",
-          n_block = data_extra[["BRU_cp_n_block"]]
+          n_block = n_block
         )
 
       if (!is_additive) {
