@@ -102,19 +102,19 @@ bru_response_size(obs)
 lapply(
   bru_set_missing(obs, keep = FALSE),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(B = FALSE)),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(1:4, -(3:5))),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 

@@ -774,19 +774,19 @@ bru_rerun <- function(result, options = list()) {
 #' lapply(
 #'   bru_set_missing(obs, keep = FALSE),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #' lapply(
 #'   bru_set_missing(obs, keep = list(B = FALSE)),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #' lapply(
 #'   bru_set_missing(obs, keep = list(1:4, -(3:5))),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #'
@@ -845,9 +845,9 @@ bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
   if (isFALSE(keep)) {
     keep <- -seq_len(bru_response_size(object))
   }
-  object[["response_data"]][["BRU_response"]] <-
+  object[["response_data"]][[x[["response"]]]] <-
     bru_set_missing(
-      object[["response_data"]][["BRU_response"]],
+      object[["response_data"]][[x[["response"]]]],
       keep = keep,
       ...
     )
