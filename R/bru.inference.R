@@ -845,9 +845,9 @@ bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
   if (isFALSE(keep)) {
     keep <- -seq_len(bru_response_size(object))
   }
-  object[["response_data"]][[x[["response"]]]] <-
+  object[["response_data"]][[object[["response"]]]] <-
     bru_set_missing(
-      object[["response_data"]][[x[["response"]]]],
+      object[["response_data"]][[object[["response"]]]],
       keep = keep,
       ...
     )
