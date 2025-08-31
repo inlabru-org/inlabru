@@ -330,7 +330,12 @@ bru_comp.character <- function(object,
 
   if (is.null(n)) {
     arg_names <- names(list(...))
-    if ("Cmatrix" %in% arg_names) {
+    if ("Z" %in% arg_names) {
+      Zmat <- list(...)[["Z"]]
+      if (is.matrix(Zmat) || inherits(Zmat, "Matrix")) {
+        n <- nrow(Zmat) + ncol(Zmat)
+      }
+    } else if ("Cmatrix" %in% arg_names) {
       Cmat <- list(...)[["Cmatrix"]]
       if (is.matrix(Cmat) || inherits(Cmat, "Matrix")) {
         n <- nrow(Cmat)
