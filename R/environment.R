@@ -817,9 +817,10 @@ bru_options_deprecated <- function(args) {
         "Ignoring deprecated global options ",
         glue_collapse(
           glue("'{depr}'",
-               depr =
-                 names(deprecated_args)[nzchar(names(deprecated_args)) == 0])
-          , sep = ", "
+            depr =
+              names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+          ),
+          sep = ", "
         ),
         ".",
       ))

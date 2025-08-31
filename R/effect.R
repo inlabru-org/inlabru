@@ -298,7 +298,7 @@ bru_comp.character <- function(object,
     !missing(nrep) || !missing(replicate_mapper)
   if (include_group) {
     if (!is.null(substitute(group)) &&
-        !identical(deparse(substitute(group)), "1L")) {
+      !identical(deparse(substitute(group)), "1L")) {
       if (is.null(control.group)) {
         control.group <- INLA::inla.set.control.group.default()
       }
@@ -336,11 +336,11 @@ bru_comp.character <- function(object,
         n <- nrow(Zmat) + ncol(Zmat)
       }
     } else if ("Cmatrix" %in% arg_names) {
-        Cmat <- list(...)[["Cmatrix"]]
-        if (is.matrix(Cmat) || inherits(Cmat, "Matrix")) {
-          n <- nrow(Cmat)
-        }
-      } else if ("graph" %in% arg_names) {
+      Cmat <- list(...)[["Cmatrix"]]
+      if (is.matrix(Cmat) || inherits(Cmat, "Matrix")) {
+        n <- nrow(Cmat)
+      }
+    } else if ("graph" %in% arg_names) {
       n <- INLA::inla.read.graph(list(...)[["graph"]], size.only = TRUE)
     }
   }
@@ -423,7 +423,8 @@ bru_comp.character <- function(object,
   component <- c(
     list(
       label = label,
-      inla.formula = NULL),
+      inla.formula = NULL
+    ),
     subcomp,
     list(
       copy = copy,
@@ -1744,9 +1745,9 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
           }
           if (!is.null(obj)) {
             format(obj,
-                   verbose = verbose,
-                   ...,
-                   label.override = x
+              verbose = verbose,
+              ...,
+              label.override = x
             )
           } else {
             NULL

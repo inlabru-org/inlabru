@@ -1762,8 +1762,7 @@ bru_obs <- function(formula = . ~ .,
         stop(glue("
           Mismatch between response and domain names:
             names(response) = ({glue_collapse(names(response), sep = ', ')})
-            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"
-        ))
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
       }
 
       ips <- fm_int(
@@ -1905,8 +1904,7 @@ bru_obs <- function(formula = . ~ .,
           c(mean(BRU_point_weights[BRU_aggregate] *
                  BRU_eta[BRU_aggregate]),
             BRU_eta[!BRU_aggregate])
-        }}"
-      )
+        }}")
       expr <- parse(text = expr_text)
 
       data <- extended_bind_rows(
@@ -2339,8 +2337,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
           Cannot combine objects with mismatching tags and names:
             Tag: {tag_names[k]}
             Name: {list_names[k]}
-          Use `NA` for either the tag or name, or use matching tags and names."
-        ))
+          Use `NA` for either the tag or name, or use matching tags and names."))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
           return(tag_names[k])
@@ -2519,43 +2516,45 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
 #' @importFrom glue glue
 print.summary_bru_obs <- function(x, ...) {
   lh <- x
-  cat(glue_data(
-    lh,
-    "  Family: '{family}'\n",
-    "    Tag: {tag}\n",
-    "    Data class: {data_class}\n",
-    "    Response class: {response_class}\n",
-    "    Predictor: {predictor}\n",
-    "    Additive/Linear: {is_additive}/{is_linear}\n",
-    "    Used components: {format(lh$used)}",
-    .trim = FALSE,
-    tag = if (is.null(lh$tag) || is.na(lh$tag)) {
-      "<No tag>"
-    } else {
-      glue::glue_collapse(glue::glue_data(lh, "'{tag}'"), sep = ", ")
-    },
-    data_class = glue::glue_collapse(
-      glue::glue_data(lh, "'{data_class}'"),
-      sep = ", "
-    ),
-    response_class = glue::glue_collapse(
-      glue::glue_data(lh, "'{response_class}'"),
-      sep = ", "
-    ),
-    predictor =
-      if (length(lh$predictor) > 1) {
-        paste0(
-          "\n        ",
-          paste0(
-            lh$predictor,
-            collapse = "\n        "
-          )
-        )
+  cat(
+    glue_data(
+      lh,
+      "  Family: '{family}'\n",
+      "    Tag: {tag}\n",
+      "    Data class: {data_class}\n",
+      "    Response class: {response_class}\n",
+      "    Predictor: {predictor}\n",
+      "    Additive/Linear: {is_additive}/{is_linear}\n",
+      "    Used components: {format(lh$used)}",
+      .trim = FALSE,
+      tag = if (is.null(lh$tag) || is.na(lh$tag)) {
+        "<No tag>"
       } else {
-        lh$predictor
-      }
-  ),
-  "\n")
+        glue::glue_collapse(glue::glue_data(lh, "'{tag}'"), sep = ", ")
+      },
+      data_class = glue::glue_collapse(
+        glue::glue_data(lh, "'{data_class}'"),
+        sep = ", "
+      ),
+      response_class = glue::glue_collapse(
+        glue::glue_data(lh, "'{response_class}'"),
+        sep = ", "
+      ),
+      predictor =
+        if (length(lh$predictor) > 1) {
+          paste0(
+            "\n        ",
+            paste0(
+              lh$predictor,
+              collapse = "\n        "
+            )
+          )
+        } else {
+          lh$predictor
+        }
+    ),
+    "\n"
+  )
   invisible(x)
 }
 
