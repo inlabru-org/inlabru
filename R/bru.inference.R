@@ -2337,7 +2337,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
           Cannot combine objects with mismatching tags and names:
             Tag: {tag_names[k]}
             Name: {list_names[k]}
-          Use `NA` for either the tag or name, or use matching tags and names."))
+          Use `NA` for either the tag or name, or use matching tags/names."))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
           return(tag_names[k])
