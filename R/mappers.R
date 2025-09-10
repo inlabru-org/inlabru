@@ -1305,14 +1305,8 @@ ibm_jacobian.bm_fm_mesh_1d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  ok <- !is.na(input)
-  if (all(ok)) {
-    A <- fm_basis(mapper[["mesh"]], input)
-  } else {
-    A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
-    A[ok, ] <- fm_basis(mapper[["mesh"]], input[ok])
-  }
-  A
+  # Note: Handles NA input from fmesher 0.2.0.9002, with fixes in 0.4.0.9003
+  fm_basis(mapper[["mesh"]], input)
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -1337,14 +1331,7 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  ok <- !is.na(input)
-  if (all(ok)) {
-    A <- fm_basis(mapper[["mesh"]], input)
-  } else {
-    A <- Matrix::Matrix(0, length(input), ibm_n(mapper))
-    A[ok, ] <- fm_basis(mapper[["mesh"]], input[ok])
-  }
-  A
+  fm_basis(mapper[["mesh"]], input)
 }
 
 ## _index ####
