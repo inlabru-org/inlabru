@@ -1134,18 +1134,30 @@ extended_bind_rows <- function(...) {
       }
     }
 
-    ncol_ <- vapply(
+    # Individual elements in sf columns may have different XY/XYZ properties,
+    # so need to find out if any of them have Z, and then extend all others
+    # to have Z too.
+    ncol_minmax <- lapply(
       sf_data_idx_,
       function(i) {
-        crds <- sf::st_coordinates(dt[[i]][[nm]])
-        length(intersect(colnames(crds), c("X", "Y", "Z")))
-      },
-      0L
+        range(vapply(dt[[i]][[nm]], function(x) {
+          if (inherits(x, "XY")) {
+            2L
+          } else if (inherits(x, "XYZ")) {
+            3L
+          } else {
+            0L
+          }
+        },
+        0L))
+      }
     )
-    if (length(unique(ncol_)) > 0) {
+    ncol_min_ <- vapply(ncol_minmax, function(x) x[1], 0L)
+    ncol_max_ <- vapply(ncol_minmax, function(x) x[2], 0L)
+    if (min(ncol_min_) != max(ncol_max_)) {
       # Some dimension mismatch
-      ncol_max <- max(ncol_)
-      for (ii in which(ncol_ < ncol_max)) {
+      ncol_max <- max(ncol_max_)
+      for (ii in which(ncol_min_ < ncol_max)) {
         i <- sf_data_idx_[ii]
         # Extend columns
         if (nrow(dt[[i]]) > 0) {

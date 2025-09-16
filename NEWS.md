@@ -17,6 +17,8 @@
   `inla.surv()` class variations (version `2.13.0.9002`)
 * Handle changing number of hyperparameters in inla tracing
   (version `2.13.0.9004`)
+* Robustify internal `extended_bind_rows()` method for unifying XY/XYZ `sf`
+  coordinate columns (version `2.13.0.9009`)
 
 # inlabru 2.13.0
 
