@@ -1,6 +1,6 @@
 # inlabru (development version)
 
-## Updates features
+## Updated features
 
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
   the support for `inla.rgeneric`, to standardise where to store a
@@ -10,6 +10,8 @@
   (version `2.13.0.9005`)
 * Remove unused `group` and `replicate` parts of each latent component, speeding
   up component evaluation and linearisation. (version `2.13.0.9006`)
+* Add `bm_logitaverage()` feature, for weighted logit-averages
+  (version `2.13.0.9010`)
 
 ## Bug fixes
 

@@ -16,6 +16,7 @@
 \alias{ibm_jacobian.bm_scale}
 \alias{ibm_jacobian.bm_aggregate}
 \alias{ibm_jacobian.bm_logsumexp}
+\alias{ibm_jacobian.bm_logitaverage}
 \alias{ibm_jacobian.bm_marginal}
 \alias{ibm_jacobian.bm_pipe}
 \alias{ibm_jacobian.bm_multi}
@@ -45,13 +46,15 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_jacobian}{bm_const}(mapper, input, ...)
 
-\method{ibm_jacobian}{bm_shift}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_jacobian}{bm_shift}(mapper, input, state = NULL, ...)
 
-\method{ibm_jacobian}{bm_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_jacobian}{bm_scale}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_aggregate}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_logsumexp}(mapper, input, state = NULL, ...)
+
+\method{ibm_jacobian}{bm_logitaverage}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
@@ -120,13 +123,13 @@ as "bym2", which can be handled by \code{bm_collect}.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
-
 \item{reverse}{logical; control \code{bm_marginal} evaluation. Default
 \code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
 for \code{marginal} mappers.}
 
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
+
+\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 }
 \description{
 Implementations must return a (sparse) matrix of size
@@ -159,6 +162,11 @@ equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 
 \item \code{ibm_jacobian(bm_logsumexp)}: \code{input} should be a list with elements
+\code{block} and \code{weights}. \code{block} should be a vector of the same length as the
+\code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
+If \code{weights} is \code{NULL}, it's interpreted as all-1.
+
+\item \code{ibm_jacobian(bm_logitaverage)}: \code{input} should be a list with elements
 \code{block} and \code{weights}. \code{block} should be a vector of the same length as the
 \code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
@@ -278,6 +286,10 @@ Other specific \link{bm_logsumexp} method implementations:
 \code{\link{bm_logsumexp}()},
 \code{\link{ibm_eval}()}
 
+Other specific \link{bm_logitaverage} method implementations: 
+\code{\link{bm_logitaverage}()},
+\code{\link{ibm_eval}()}
+
 Other specific \link{bm_marginal} method implementations: 
 \code{\link{bm_marginal}()},
 \code{\link{ibm_eval}()},
@@ -350,6 +362,7 @@ Other specific \link{bm_sum} method implementations:
 \concept{specific \link{bm_harmonics} method implementations}
 \concept{specific \link{bm_index} method implementations}
 \concept{specific \link{bm_linear} method implementations}
+\concept{specific \link{bm_logitaverage} method implementations}
 \concept{specific \link{bm_logsumexp} method implementations}
 \concept{specific \link{bm_marginal} method implementations}
 \concept{specific \link{bm_matrix} method implementations}

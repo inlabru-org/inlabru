@@ -151,10 +151,9 @@ several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
 
-\item{aggregate}{character ("none", "sum", "average", "logsumexp", or
-"logaverageexp", as defined by \code{bm_aggregate(type = aggregate)})
-or an aggregation \code{bru_mapper} object
-(\code{\link[=bm_aggregate]{bm_aggregate()}} or \code{\link[=bm_logsumexp]{bm_logsumexp()}}). Default \code{NULL},
+\item{aggregate}{character ("none" or a valid name for the \code{type} argument
+of \code{\link[=bm_aggregate]{bm_aggregate()}}) or an aggregation \code{bru_mapper} object
+(\code{\link[=bm_aggregate]{bm_aggregate()}}, \code{\link[=bm_logsumexp]{bm_logsumexp()}}, or \code{\link[=bm_logitaverage]{bm_logitaverage()}}). Default \code{NULL},
 interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
 from version \verb{2.12.0.9013}.}
 

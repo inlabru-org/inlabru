@@ -1422,10 +1422,9 @@ bru_is_additive.formula <- function(x, ...) {
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
-#' @param aggregate character ("none", "sum", "average", "logsumexp", or
-#'   "logaverageexp", as defined by `bm_aggregate(type = aggregate)`)
-#'   or an aggregation `bru_mapper` object
-#'   ([bm_aggregate()] or [bm_logsumexp()]). Default `NULL`,
+#' @param aggregate character ("none" or a valid name for the `type` argument
+#'   of [bm_aggregate()]) or an aggregation `bru_mapper` object
+#'   ([bm_aggregate()], [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`,
 #'   interpreted as "none". `r lifecycle::badge("experimental")`, available
 #'   from version `2.12.0.9013`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
@@ -1579,7 +1578,7 @@ bru_obs <- function(formula = . ~ .,
   if (!is.null(aggregate) && is.character(aggregate)) {
     aggregate <- match.arg(
       aggregate,
-      c("none", "sum", "average", "logsumexp", "logaverageexp")
+      c("none", "sum", "average", "logsumexp", "logaverageexp", "logitaverage")
     )
     aggregate <- switch(aggregate,
       "none" = NULL,
