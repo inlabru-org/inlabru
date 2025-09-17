@@ -132,10 +132,25 @@ Transformation mappers are mappers that would normally be combined with other
 mappers, as steps in a sequence of transformations, or as individual
 transformation mappers.
 
+* `bm_shift()`
 * `bm_scale()`
 * `bm_marginal(qfun, pfun, ...)`
 * `bm_aggregate(rescale)`
 * `bm_logsumexp(rescale)`
+* `bm_logitaverage()`
+
+#### shift
+
+The `shift` mapper adds the `input` vector to the `state` vector.
+This can be used as a stage of a `pipe` mapper.
+
+```{r, eval=FALSE}
+mapper <- bm_shift()
+ibm_eval(mapper,
+  input = ...,
+  state = ...
+)
+```
 
 #### scale
 
@@ -197,6 +212,25 @@ This can be used for summation, integration, and averaging (for `rescale=TRUE`).
 
 ```{r, eval=FALSE}
 mapper <- bm_logsumexp(rescale = ...)
+ibm_eval(mapper,
+  input = list(block = ..., weights = ...),
+  state = ...
+)
+```
+
+#### logitaverage
+
+The `logitaverage` mapper aggregates `plogis(state)` vector elements by blockwise
+summation after scaling the elements by weights, and takes `qlogis()` of the results.
+The implementation takes care to avoid numerical overflow.
+This can be used for averaging probabilities on the logit scale.
+However, note that while aggregation of Poisson variables gives a new Poisson
+variable, aggregation of Binomial variables with different probability
+parameters does not give a new Binomial variable, so this type of calculation
+should be used with care.
+
+```{r, eval=FALSE}
+mapper <- bm_logitaverage()
 ibm_eval(mapper,
   input = list(block = ..., weights = ...),
   state = ...
