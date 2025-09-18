@@ -2610,9 +2610,9 @@ bm_logitaverage <- function(n_block = NULL) {
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #' @family specific [bm_logitaverage] method implementations
 ibm_jacobian.bm_logitaverage <- function(mapper,
-                                           input,
-                                           state = NULL,
-                                           ...) {
+                                         input,
+                                         state = NULL,
+                                         ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   input <- fm_block_prep(
     block = input[["block"]],
@@ -2690,7 +2690,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
 #'   If `FALSE`, the `sum-weights=invere-logit` value is returned.
 #' @family specific [bm_logitaverage] method implementations
 ibm_eval.bm_logitaverage <- function(mapper, input, state = NULL,
-                                       logit = TRUE, ...) {
+                                     logit = TRUE, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   state1 <- plogis(state, log.p = TRUE)
   state2 <- plogis(-state, log.p = TRUE)

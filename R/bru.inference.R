@@ -1142,16 +1142,18 @@ extended_bind_rows <- function(...) {
     ncol_minmax <- lapply(
       sf_data_idx_,
       function(i) {
-        range(vapply(dt[[i]][[nm]], function(x) {
-          if (inherits(x, c("XY", "XYM"))) {
-            2L
-          } else if (inherits(x, c("XYZ", "XYZM"))) {
-            3L
-          } else {
-            0L
-          }
-        },
-        0L))
+        range(vapply(
+          dt[[i]][[nm]], function(x) {
+            if (inherits(x, c("XY", "XYM"))) {
+              2L
+            } else if (inherits(x, c("XYZ", "XYZM"))) {
+              3L
+            } else {
+              0L
+            }
+          },
+          0L
+        ))
       }
     )
     ncol_min_ <- vapply(ncol_minmax, function(x) x[1], 0L)
@@ -1424,11 +1426,11 @@ bru_is_additive.formula <- function(x, ...) {
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
-#' @param aggregate character ("none" or a valid name for the `type` argument
-#'   of [bm_aggregate()]) or an aggregation `bru_mapper` object
-#'   ([bm_aggregate()], [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`,
-#'   interpreted as "none". `r lifecycle::badge("experimental")`, available
-#'   from version `2.12.0.9013`.
+#' @param aggregate character ("none" or a valid name for the `type` argument of
+#'   [bm_aggregate()]) or an aggregation `bru_mapper` object ([bm_aggregate()],
+#'   [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`, interpreted as
+#'   "none". `r lifecycle::badge("experimental")`, available from version
+#'   `2.12.0.9013`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
 #'   defined by non-NULL `aggregate`, overriding the default,
 #'   ```
