@@ -1136,14 +1136,16 @@ extended_bind_rows <- function(...) {
 
     # Individual elements in sf columns may have different XY/XYZ properties,
     # so need to find out if any of them have Z, and then extend all others
-    # to have Z too.
+    # to have Z too. M is essentially ignored here, so the results may have a
+    # mix of with/without M, as sf::st_zm currently doesn't support drop=FALSE
+    # for M features.
     ncol_minmax <- lapply(
       sf_data_idx_,
       function(i) {
         range(vapply(dt[[i]][[nm]], function(x) {
-          if (inherits(x, "XY")) {
+          if (inherits(x, c("XY", "XYM"))) {
             2L
-          } else if (inherits(x, "XYZ")) {
+          } else if (inherits(x, c("XYZ", "XYZM"))) {
             3L
           } else {
             0L
