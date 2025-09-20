@@ -1,5 +1,13 @@
 # inlabru (development version)
 
+## New features
+
+* Add `bru_names()` method for extracting the inlabru standardised names of
+  fixed effects, latent components, and hyperparameters from a fitted `bru`
+  object. (version `2.13.0.9011`)
+* Add `bm_logitaverage()` mapper, for weighted logit-averages
+  (version `2.13.0.9010`)
+
 ## Updated features
 
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
@@ -10,8 +18,6 @@
   (version `2.13.0.9005`)
 * Remove unused `group` and `replicate` parts of each latent component, speeding
   up component evaluation and linearisation. (version `2.13.0.9006`)
-* Add `bm_logitaverage()` feature, for weighted logit-averages
-  (version `2.13.0.9010`)
 
 ## Bug fixes
 

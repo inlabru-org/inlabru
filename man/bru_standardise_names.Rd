@@ -20,4 +20,7 @@ with underscores.
 \examples{
 bru_standardise_names("Precision for the Gaussian observations")
 }
+\seealso{
+\code{\link[=bru_names]{bru_names()}}
+}
 \keyword{internal}
