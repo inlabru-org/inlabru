@@ -17,7 +17,7 @@ bru_rerun(result, options = list())
 Also used to define a default linear additive predictor.  See
 \code{\link[=bru_comp]{bru_comp()}} for details.}
 
-\item{...}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
+\item{\dots}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
 named parameters that can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. Note that
 all the arguments will be evaluated before calling \code{\link[=bru_obs]{bru_obs()}} in order to
 detect if they are \code{like} objects. This means that special arguments that

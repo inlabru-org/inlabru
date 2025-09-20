@@ -3,7 +3,7 @@
 #' distributions in predictor expressions
 #' @param qfun A quantile function object, such as `qexp`
 #' @param x Values to be transformed
-#' @param ... Distribution parameters passed on to the `qfun` and `pfun`
+#' @param \dots Distribution parameters passed on to the `qfun` and `pfun`
 #'   functions
 #' @param tail.split. For x-values larger than `tail.split.`, upper quantile
 #'   calculations are used internally, and for smaller values lower quantile

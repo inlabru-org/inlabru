@@ -24,7 +24,7 @@
 
 \item{include_default}{logical; If \code{TRUE}, include default options}
 
-\item{...}{Further parameters, currently ignored}
+\item{\dots}{Further parameters, currently ignored}
 
 \item{x}{A \code{summary_bru_options} object to be printed}
 }

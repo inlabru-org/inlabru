@@ -7,8 +7,8 @@
 deltaIC(..., criterion = "DIC")
 }
 \arguments{
-\item{...}{Comma-separated objects inheriting from class \code{inla} and obtained
-from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
+\item{\dots}{Comma-separated objects inheriting from class \code{inla} and
+obtained from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}}
 
 \item{criterion}{character vector.
 If it includes 'DIC', computes DIC differences;

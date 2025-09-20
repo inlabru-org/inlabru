@@ -15,7 +15,7 @@ bru_inverse_transformation(pfun, x, ..., tail.split. = NULL)
 
 \item{x}{Values to be transformed}
 
-\item{...}{Distribution parameters passed on to the \code{qfun} and \code{pfun}
+\item{\dots}{Distribution parameters passed on to the \code{qfun} and \code{pfun}
 functions}
 
 \item{tail.split.}{For x-values larger than \code{tail.split.}, upper quantile

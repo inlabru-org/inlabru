@@ -9,7 +9,7 @@ gg(data, ...)
 \arguments{
 \item{data}{an object for which to generate a geom.}
 
-\item{...}{Arguments passed on to the geom method.}
+\item{\dots}{Arguments passed on to the geom method.}
 }
 \value{
 The form of the value returned by gg depends on the class of its

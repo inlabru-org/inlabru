@@ -5,6 +5,9 @@
 \alias{bru_set_missing.bru}
 \alias{bru_set_missing.bru_obs_list}
 \alias{bru_set_missing.bru_obs}
+\alias{bru_set_missing.default}
+\alias{bru_set_missing.data.frame}
+\alias{bru_set_missing.inla.surv}
 \title{Set missing values in observation models}
 \usage{
 bru_set_missing(object, keep = FALSE, ...)
@@ -14,6 +17,12 @@ bru_set_missing(object, keep = FALSE, ...)
 \method{bru_set_missing}{bru_obs_list}(object, keep = FALSE, ...)
 
 \method{bru_set_missing}{bru_obs}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{default}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{data.frame}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{inla.surv}(object, keep = FALSE, ...)
 }
 \arguments{
 \item{object}{A \code{bru}, \code{bru_obs} or \code{bru_obs_list} object}
@@ -26,13 +35,14 @@ to keep (for positive values) or to set as missing (negative values).
 For \code{bru} and \code{bru_obs_list}, a logical scalar or vector, or a list, see
 Details.}
 
-\item{\dots}{Additional arguments passed on to the \code{bru_obs} method.
-Currently unused.}
+\item{\dots}{Additional arguments passed on to the \code{bru_obs} and individual
+data class methods.  Currently unused.}
 }
 \description{
 Set all or parts of the observation model response data
 to \code{NA}, for example for use in cross validation (with \code{\link[=bru_rerun]{bru_rerun()}})
-or prior sampling (with \code{\link[=bru_rerun]{bru_rerun()}} and \code{\link[=generate]{generate()}}).
+or prior sampling (with \code{\link[=bru_rerun]{bru_rerun()}} and \code{\link[=generate]{generate()}}, but see
+"Prior sampling caveats" below).
 }
 \details{
 For \code{bru} and \code{bru_obs_list},
@@ -53,6 +63,36 @@ E.g.: \code{keep = list(a = 1:4, b = -(3:5))} keeps only observations \code{1:4}
 model \code{a}, marking the rest as missing, and sets observations \code{3:5} of model
 \code{b} to missing.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bru_set_missing(default)}: From \verb{> 2.13.0}, set missing values in any
+object supporting \code{\link[base:NA]{base::is.na<-()}} for positive and negative indices.
+
+\item \code{bru_set_missing(data.frame)}: From \verb{> 2.13.0}, handles \code{data.frame}, tibbles,
+including \code{inla.mdata}.
+
+\item \code{bru_set_missing(inla.surv)}: From \verb{> 2.13.0}, handles \code{inla.surv}.
+
+}}
+\section{Prior sampling caveats}{
+
+Note that prior sampling requires special care for hyperparameters, as the
+prior modes are not typically useful; in the future, we plan to have a
+dedicated method that samples from the hyperparameters, and then uses
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bru_rerun(
+  bru_set_missing(...),
+  options = list(
+    control.mode = list(
+      theta = theta_sample,
+      fixed = TRUE)
+    )
+  )
+}\if{html}{\out{</div>}}
+
+for each sample.
+}
+
 \examples{
 obs <- c(
   A = bru_obs(y_A ~ ., data = data.frame(y_A = 1:6)),
@@ -62,19 +102,42 @@ bru_response_size(obs)
 lapply(
   bru_set_missing(obs, keep = FALSE),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(B = FALSE)),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(1:4, -(3:5))),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
+
+\dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
+(obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
+bru_set_missing(obs, keep = c(1, 4))
+\dontshow{\}) # examplesIf}
+\dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
+(obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
+bru_set_missing(obs, keep = c(1, 4))
+
+(obs <- INLA::inla.surv(
+  time = 1:4,
+  event = c(1, 0, 1, 0),
+  cure = matrix(1:8, 4, 2)
+))
+bru_set_missing(obs, keep = c(1, 4))
+
+(obs <- INLA::inla.surv(
+  time = 1:4,
+  event = c(1, 0, 1, 0),
+  subject = c(1, 1, 2, 1)
+))
+bru_set_missing(obs, keep = c(1, 4))
+\dontshow{\}) # examplesIf}
 }

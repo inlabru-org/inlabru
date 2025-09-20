@@ -24,7 +24,7 @@ generate(object, ...)
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \code{\link[=bru]{bru()}}.}
 
-\item{...}{additional, unused arguments.}
+\item{\dots}{additional, unused arguments.}
 
 \item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
 needed for sampling.}

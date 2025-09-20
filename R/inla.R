@@ -228,7 +228,7 @@ post.sample.structured <- function(result, n, seed = NULL,
         )
         #        }
         #        else {
-        #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
+        #         vals[[name]] <- smpl.hyperpar[glue("Beta for {name}")]
         #        }
       }
     }
@@ -275,7 +275,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
   }
   idx <- match(name, .contents[["tag"]])
   if (is.na(idx)) {
-    warning(paste0("Element '", name, "' not found in posterior sample."))
+    warning(glue("Element '{name}' not found in posterior sample."))
     return(numeric(0L))
   }
   vals <- smpl[.contents[["start"]][idx] +
@@ -466,7 +466,7 @@ plotmarginal.inla <- function(result,
         link,
         result$marginals.random[[varname]][[index]]
       )
-      ovarname <- paste0(ovarname, " ", index)
+      ovarname <- glue("{ovarname} {index}")
       if (ovarname %in% rownames(vars)) {
         if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
           # Use factor level name
@@ -530,7 +530,7 @@ plotmarginal.inla <- function(result,
       ggplot2::geom_line(ggplot2::aes(y = .data[["mean"]]), col = 2) +
       ggplot2::geom_line(ggplot2::aes(y = .data[["mid"]]), col = 2, lty = 2) +
       ggplot2::ylab("mode and quantiles") +
-      ggplot2::xlab(paste0(varname, " ID"))
+      ggplot2::xlab(glue("{varname} ID"))
   }
 }
 

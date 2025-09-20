@@ -16,7 +16,7 @@
 \item{mapping}{aesthetic mappings created by \code{aes}. These are passed on to
 \code{geom_tile}.}
 
-\item{...}{Arguments passed on to \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
 An object returned by \code{geom_tile}

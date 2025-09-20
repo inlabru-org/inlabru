@@ -3,27 +3,11 @@
 \name{bm_linear}
 \alias{bm_linear}
 \alias{bru_mapper_linear}
-\alias{ibm_n.bm_linear}
-\alias{ibm_values.bm_linear}
-\alias{ibm_jacobian.bm_linear}
 \title{Mapper for a linear effect}
 \usage{
 bm_linear()
 
 bru_mapper_linear()
-
-\method{ibm_n}{bm_linear}(mapper, ...)
-
-\method{ibm_values}{bm_linear}(mapper, ...)
-
-\method{ibm_jacobian}{bm_linear}(mapper, input, ...)
-}
-\arguments{
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{...}{Arguments passed on to other methods}
-
-\item{input}{Data input for the mapper.}
 }
 \description{
 Create a mapper for linear effects
@@ -41,9 +25,11 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
@@ -56,9 +42,12 @@ Other mappers:
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
+
+Other specific \link{bm_linear} method implementations: 
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_values}()}
 }
 \concept{mappers}
+\concept{specific \link{bm_linear} method implementations}

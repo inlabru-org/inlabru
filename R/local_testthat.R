@@ -81,7 +81,7 @@ local_basic_fixed_effect_testdata <- function() {
 # @returns logical; If the option setting was successful, `TRUE` is returned,
 # otherwise `FALSE`.
 local_inla_options_set <- function(...,
-                                   envir = parent.frame(),
+                                   .envir = parent.frame(),
                                    .save_only = FALSE) {
   # Set INLA options
   inla_options <- list(...)
@@ -113,7 +113,7 @@ local_inla_options_set <- function(...,
 
       withr::defer(
         INLA::inla.setOption(name, old_inla_options[[name]]),
-        envir
+        .envir
       )
     }
   }
@@ -150,7 +150,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
     # Save the num.threads option so it can be restored
     local_inla_options_set(
       num.threads = NULL,
-      envir = envir,
+      .envir = envir,
       .save_only = TRUE
     )
 
@@ -160,7 +160,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
       fmesher.evolution = 2L,
       fmesher.evolution.warn = TRUE,
       fmesher.evolution.verbosity = "stop",
-      envir = envir,
+      .envir = envir,
       .save_only = FALSE
     )
 

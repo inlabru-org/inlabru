@@ -24,7 +24,7 @@ bru_mapper_mesh_B(...)
 
 \item{B}{a square or tall basis conversion matrix}
 
-\item{...}{Arguments passed on to other methods}
+\item{\dots}{Arguments passed on to \code{\link[=bm_mesh_B]{bm_mesh_B()}}}
 
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
 
@@ -41,10 +41,12 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
@@ -56,9 +58,6 @@ Other mappers:
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}
