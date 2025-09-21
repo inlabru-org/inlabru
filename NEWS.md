@@ -1,6 +1,14 @@
 # inlabru (development version)
 
-## Updates features
+## New features
+
+* Add `bru_names()` method for extracting the inlabru standardised names of
+  fixed effects, latent components, and hyperparameters from a fitted `bru`
+  object. (version `2.13.0.9011`)
+* Add `bm_logitaverage()` mapper, for weighted logit-averages
+  (version `2.13.0.9010`)
+
+## Updated features
 
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
   the support for `inla.rgeneric`, to standardise where to store a
@@ -17,6 +25,8 @@
   `inla.surv()` class variations (version `2.13.0.9002`)
 * Handle changing number of hyperparameters in inla tracing
   (version `2.13.0.9004`)
+* Robustify internal `extended_bind_rows()` method for unifying XY/XYZ `sf`
+  coordinate columns (version `2.13.0.9009`)
 
 # inlabru 2.13.0
 

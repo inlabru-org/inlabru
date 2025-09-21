@@ -27,7 +27,9 @@ the mapper definition \code{n_block}, then \code{max(input$block)}.}
 
 \item{type}{character; if non-NULL, overrides the \code{rescale} argument, and
 constructs an aggregation mapper of the given type instead. Supported
-values are "sum", "average", "logsumexp", and "logaverageexp".}
+values are "sum", "average" (for regular \code{\link[=bm_aggregate]{bm_aggregate()}}),
+"logsumexp", "logaverageexp" (for \code{\link[=bm_logsumexp]{bm_logsumexp()}}), and
+"logitaverage" (for \code{\link[=bm_logitaverage]{bm_logitaverage()}}).}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_aggregate]{bm_aggregate()}}}
 }
@@ -54,6 +56,7 @@ Other mappers:
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},

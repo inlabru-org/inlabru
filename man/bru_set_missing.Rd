@@ -102,27 +102,27 @@ bru_response_size(obs)
 lapply(
   bru_set_missing(obs, keep = FALSE),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(B = FALSE)),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 lapply(
   bru_set_missing(obs, keep = list(1:4, -(3:5))),
   function(x) {
-    x[["response_data"]][["BRU_response"]]
+    x[["response_data"]][[x[["response"]]]]
   }
 )
 
-\dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
 (obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
 bru_set_missing(obs, keep = c(1, 4))
 \dontshow{\}) # examplesIf}
-\dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
 (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))
 bru_set_missing(obs, keep = c(1, 4))
 

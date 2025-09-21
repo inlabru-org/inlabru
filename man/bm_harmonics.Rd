@@ -72,6 +72,7 @@ Other mappers:
 \code{\link{bm_fmesher}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},

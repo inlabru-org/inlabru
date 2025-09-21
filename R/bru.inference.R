@@ -774,19 +774,19 @@ bru_rerun <- function(result, options = list()) {
 #' lapply(
 #'   bru_set_missing(obs, keep = FALSE),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #' lapply(
 #'   bru_set_missing(obs, keep = list(B = FALSE)),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #' lapply(
 #'   bru_set_missing(obs, keep = list(1:4, -(3:5))),
 #'   function(x) {
-#'     x[["response_data"]][["BRU_response"]]
+#'     x[["response_data"]][[x[["response"]]]]
 #'   }
 #' )
 #'
@@ -1134,18 +1134,34 @@ extended_bind_rows <- function(...) {
       }
     }
 
-    ncol_ <- vapply(
+    # Individual elements in sf columns may have different XY/XYZ properties,
+    # so need to find out if any of them have Z, and then extend all others
+    # to have Z too. M is essentially ignored here, so the results may have a
+    # mix of with/without M, as sf::st_zm currently doesn't support drop=FALSE
+    # for M features.
+    ncol_minmax <- lapply(
       sf_data_idx_,
       function(i) {
-        crds <- sf::st_coordinates(dt[[i]][[nm]])
-        length(intersect(colnames(crds), c("X", "Y", "Z")))
-      },
-      0L
+        range(vapply(
+          dt[[i]][[nm]], function(x) {
+            if (inherits(x, c("XY", "XYM"))) {
+              2L
+            } else if (inherits(x, c("XYZ", "XYZM"))) {
+              3L
+            } else {
+              0L
+            }
+          },
+          0L
+        ))
+      }
     )
-    if (length(unique(ncol_)) > 0) {
+    ncol_min_ <- vapply(ncol_minmax, function(x) x[1], 0L)
+    ncol_max_ <- vapply(ncol_minmax, function(x) x[2], 0L)
+    if (min(ncol_min_) != max(ncol_max_)) {
       # Some dimension mismatch
-      ncol_max <- max(ncol_)
-      for (ii in which(ncol_ < ncol_max)) {
+      ncol_max <- max(ncol_max_)
+      for (ii in which(ncol_min_ < ncol_max)) {
         i <- sf_data_idx_[ii]
         # Extend columns
         if (nrow(dt[[i]]) > 0) {
@@ -1410,12 +1426,11 @@ bru_is_additive.formula <- function(x, ...) {
 #'   several rows of the input data to influence the same row. When `NULL`,
 #'   defaults to `FALSE`, unless `response_data` is non-`NULL`, or `data` is a
 #'   `list`, or the likelihood construction requires it.
-#' @param aggregate character ("none", "sum", "average", "logsumexp", or
-#'   "logaverageexp", as defined by `bm_aggregate(type = aggregate)`)
-#'   or an aggregation `bru_mapper` object
-#'   ([bm_aggregate()] or [bm_logsumexp()]). Default `NULL`,
-#'   interpreted as "none". `r lifecycle::badge("experimental")`, available
-#'   from version `2.12.0.9013`.
+#' @param aggregate character ("none" or a valid name for the `type` argument of
+#'   [bm_aggregate()]) or an aggregation `bru_mapper` object ([bm_aggregate()],
+#'   [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`, interpreted as
+#'   "none". `r lifecycle::badge("experimental")`, available from version
+#'   `2.12.0.9013`.
 #' @param aggregate_input `NULL` or an optional input list to the mapper
 #'   defined by non-NULL `aggregate`, overriding the default,
 #'   ```
@@ -1579,7 +1594,7 @@ bru_obs <- function(formula = . ~ .,
   if (!is.null(aggregate) && is.character(aggregate)) {
     aggregate <- match.arg(
       aggregate,
-      c("none", "sum", "average", "logsumexp", "logaverageexp")
+      c("none", "sum", "average", "logsumexp", "logaverageexp", "logitaverage")
     )
     aggregate <- switch(aggregate,
       "none" = NULL,

@@ -10,6 +10,7 @@
 \alias{ibm_eval.bm_scale}
 \alias{ibm_eval.bm_aggregate}
 \alias{ibm_eval.bm_logsumexp}
+\alias{ibm_eval.bm_logitaverage}
 \alias{ibm_eval.bm_marginal}
 \alias{ibm_eval.bm_pipe}
 \alias{ibm_eval.bm_multi}
@@ -26,13 +27,15 @@ ibm_eval(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bm_const}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bm_shift}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_eval}{bm_shift}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bm_scale}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_eval}{bm_scale}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bm_aggregate}(mapper, input, state = NULL, ..., sub_lin = NULL)
+\method{ibm_eval}{bm_aggregate}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval}{bm_logsumexp}(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
+\method{ibm_eval}{bm_logsumexp}(mapper, input, state = NULL, log = TRUE, ...)
+
+\method{ibm_eval}{bm_logitaverage}(mapper, input, state = NULL, logit = TRUE, ...)
 
 \method{ibm_eval}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
@@ -75,10 +78,11 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
 supplied by internal methods that already have the Jacobian.}
 
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
-
 \item{log}{logical; control \code{log} output. Default \code{TRUE}, see the
 \code{ibm_eval()} details for \code{logsumexp} mappers.}
+
+\item{logit}{logical; control \code{logit} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logitaverage} mappers.}
 
 \item{reverse}{logical; control \code{bm_marginal} evaluation. Default
 \code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
@@ -96,6 +100,8 @@ as "bym2", which can be handled by \code{bm_collect}.}
 
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 }
 \description{
 Implementations must return a vector of length \code{\link[=ibm_n_output]{ibm_n_output()}}.
@@ -123,6 +129,10 @@ all-zero is assumed.
 \item \code{ibm_eval(bm_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()}
 for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
 \code{sum-weight-exp} value is returned.
+
+\item \code{ibm_eval(bm_logitaverage)}: When \code{logit} is \code{TRUE} (default), \code{ibm_eval()}
+for \code{logitaverage} returns the logit-sum-weight-inverse-logit value.
+If \code{FALSE}, the \code{sum-weights=invere-logit} value is returned.
 
 \item \code{ibm_eval(bm_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
 \code{FALSE}, \code{ibm_eval()}
@@ -181,6 +191,10 @@ Other specific \link{bm_aggregate} method implementations:
 
 Other specific \link{bm_logsumexp} method implementations: 
 \code{\link{bm_logsumexp}()},
+\code{\link{ibm_jacobian}()}
+
+Other specific \link{bm_logitaverage} method implementations: 
+\code{\link{bm_logitaverage}()},
 \code{\link{ibm_jacobian}()}
 
 Other specific \link{bm_marginal} method implementations: 
@@ -245,6 +259,7 @@ Other specific \link{bm_sum} method implementations:
 \concept{specific \link{bm_aggregate} method implementations}
 \concept{specific \link{bm_collect} method implementations}
 \concept{specific \link{bm_const} method implementations}
+\concept{specific \link{bm_logitaverage} method implementations}
 \concept{specific \link{bm_logsumexp} method implementations}
 \concept{specific \link{bm_marginal} method implementations}
 \concept{specific \link{bm_multi} method implementations}
