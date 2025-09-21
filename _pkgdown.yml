@@ -117,6 +117,7 @@ reference:
 - title: "Posterior evaluation"
   desc: "Functions for evaluating posterior properties."
   contents:
+  - starts_with("bru_names")
   - starts_with("generate")
   - starts_with("predict")
   - starts_with("spde.posterior")
