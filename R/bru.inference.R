@@ -549,15 +549,19 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param components A `formula`-like specification of latent components.
+#' @param components Latent component definitions, either as a [bru_comp_list()]
+#'   object, or a `formula`-like specification.
 #'   Also used to define a default linear additive predictor.  See
 #'   [bru_comp()] for details.
-#' @param \dots Obervation models, each constructed by a calling [bru_obs()], or
-#'   named parameters that can be passed to a single [bru_obs()] call. Note that
-#'   all the arguments will be evaluated before calling [bru_obs()] in order to
-#'   detect if they are `like` objects. This means that special arguments that
-#'   need to be evaluated in the context of `response_data` or `data` (such as
-#'   `Ntrials`) may will only work that way in direct calls to [bru_obs()].
+#' @param \dots Observation models, each constructed by a calling [bru_obs()],
+#'   or [bru_obs_list()].
+#'
+#'   Alternatively, for backwards compatibility, may be named parameters that
+#'   can be passed to a single [bru_obs()] call. These arguments will be
+#'   evaluated before calling [bru_obs()], in order to detect if they already
+#'   are `bru_obs` objects. This means that special arguments that are only
+#'   available in the context of `data` or `response_data` (such as `Ntrials`)
+#'   will only work properly in direct calls to [bru_obs()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
@@ -964,16 +968,14 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @title Evaluate expressions in data contexts
 #' @description Evaluate an expression in a series of data contexts, also making
 #'   the objects directly available as names surrounded by ".", stopping when
-#'   the expression evaluation completes with no error.
+#'   the expression evaluation completes with no error, as well as `tidy`
+#'   evaluation pronouns, e.g. `.data`.
 #'
 #'   This is an internal inlabru method, not intended for general use.
 #' @param input An expression to be evaluated
-#' @param data list of data objects in priority order. Named elements will
-#' be available as `.name.` in the evaluation. The `input` expression is
-#' evaluated with each non-NULL `data` object as `envir`, in order,
-#' until success. If there are no non-NULL data objects, the expression is
-#' evaluated in an empty environment, potentially falling back to enclosing
-#' environment variables.
+#' @param data list of data objects in priority order. Named elements will be
+#'   available as whole objects `.name.` as well as pronouns `.name` in the
+#'   evaluation.
 #' @param default Value used if the expression is evaluated as NULL. Default
 #' NULL
 #' @param .envir The evaluation environment
@@ -983,20 +985,16 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' # The A values come from the 'data' element, and the B values come from
 #' # the 'response_data' element, as that is listed first.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     response_data = tibble::tibble(x = 1:5),
 #'     data = tibble::tibble(x = 1:10)
 #'   )
 #' )
 #' # Both A and B come from the 'data' element, as 'x' is found there,
-#' # terminating the evaluation attempt.
+#' # and the data objects are listed in order of precedence.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     data = tibble::tibble(x = 1:10),
 #'     response_data = tibble::tibble(x = 1:5)
@@ -1008,6 +1006,8 @@ bru_eval_in_data_context <- function(input,
                                      data = NULL,
                                      default = NULL,
                                      .envir = parent.frame()) {
+  deparse_input <- deparse(substitute(input))
+  input <- rlang::enquo(input)
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
@@ -1015,38 +1015,35 @@ bru_eval_in_data_context <- function(input,
     }
     x
   })
-  enclos_envir <- new.env(parent = .envir)
+  top_envir <- rlang::new_environment()
   nms <- names(data)
   for (nm in setdiff(nms, "")) {
-    assign(glue(".{nm}."), data_orig[[nm]], envir = enclos_envir)
+    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
   }
   success <- FALSE
   result <- NULL
-  for (k in seq_along(data)) {
+  bottom_envir <- top_envir
+  for (k in rev(seq_along(data))) {
     if (is.null(data[[k]])) {
       next
     }
-    result <- try(
-      eval(input, envir = data[[k]], enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
-      break
-    }
+    bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
   }
-  if (all(vapply(data, is.null, TRUE))) {
-    result <- try(
-      eval(input, envir = NULL, enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
+  mask <- rlang::new_data_mask(bottom_envir, top_envir)
+  for (nm in setdiff(nms, "")) {
+    if (is.null(data[[nm]])) {
+      next
     }
+    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
   }
+  result <- try(
+    rlang::eval_tidy(input, data = mask, env = .envir),
+    silent = TRUE
+  )
+  success <- !inherits(result, "try-error")
   if (!success) {
-    stop(glue(
-      "Input '{glue_collapse(deparse(input), sep = '\n')}' could ",
+    stop(glue::glue(
+      "Input '{glue::glue_collapse(deparse_input, sep = '\n')}' could ",
       "not be evaluated."
     ))
   }
@@ -1351,6 +1348,36 @@ bru_is_additive.formula <- function(x, ...) {
 }
 
 
+check_sp_data_deprecation <- function(...) {
+  .caller <- sys.call(-1)[[1]]
+  obj <- list(...)
+  nms <- names(obj)
+  lapply(nms, function(nm) {
+    if (inherits(obj[[nm]], "Spatial")) {
+      if (!is.null(.caller)) {
+        lifecycle::deprecate_warn(
+          "2.12.0.9023",
+          as.character(glue::glue(
+            "{deparse(.caller)}({nm} = 'has deprecated support for `Spatial` input')"
+          )),
+          I("`sf` input")
+        )
+      } else {
+        lifecycle::deprecate_warn(
+          "2.12.0.9023",
+          I(as.character(glue::glue(
+            "{nm} has deprecated support for `Spatial` input"
+          ))),
+          I("`sf` input")
+        )
+      }
+    }
+  })
+  invisible()
+}
+
+
+
 #' @title Observation model construction for usage with [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
@@ -1450,6 +1477,10 @@ bru_is_additive.formula <- function(x, ...) {
 #' @param include,exclude,include_latent `r lifecycle::badge("deprecated")`, use
 #'   `used` instead.
 #'
+#' @details
+#' The `E`, `Ntrials`, `weights`, and `scale` arguments are evaluated in the
+#' data context, with values from `response_data` taking precedence over `data`.
+#'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
 #' [bru_comp_eval()]
@@ -1497,14 +1528,19 @@ bru_obs <- function(formula = . ~ .,
     expr <- NULL
   }
 
+  check_sp_data_deprecation(data = data,
+                            response_data = response_data,
+                            samplers = samplers,
+                            ips = ips)
+
   # Set the response name
   if (length(formula_char) < 3) {
     stop("Missing response variable names")
   }
-  response_expr <- parse(text = formula_char[2])
+  response_expr <- rlang::parse_expr(formula_char[2])
   response <- tryCatch(
     expr = bru_eval_in_data_context(
-      substitute(response_expr),
+      !!response_expr,
       data = list(response_data = response_data, data = data),
       default = NULL,
       .envir = .envir
@@ -1536,11 +1572,11 @@ bru_obs <- function(formula = . ~ .,
         ),
         ")"
       )
-      response_expr <- parse(text = domain_expr)
+      response_expr <- rlang::parse_expr(domain_expr)
     }
     response <- tryCatch(
       expr = bru_eval_in_data_context(
-        substitute(response_expr),
+        !!response_expr,
         data = list(response_data = response_data, data = data),
         default = NULL,
         .envir = .envir
@@ -1556,25 +1592,25 @@ bru_obs <- function(formula = . ~ .,
   }
 
   E <- bru_eval_in_data_context(
-    substitute(E),
+    {{E}},
     data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
   Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
+    {{Ntrials}},
     data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
   weights <- bru_eval_in_data_context(
-    substitute(weights),
+    {{weights}},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
   scale <- bru_eval_in_data_context(
-    substitute(scale),
+    {{scale}},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
@@ -1628,7 +1664,7 @@ bru_obs <- function(formula = . ~ .,
     }
 
     aggregate_input <- bru_eval_in_data_context(
-      substitute(aggregate_input),
+      {{aggregate_input}},
       data = list(data = data, response_data = response_data),
       default = NULL,
       .envir = .envir
@@ -1638,7 +1674,7 @@ bru_obs <- function(formula = . ~ .,
     }
     if (is.null(aggregate_input[["block"]])) {
       aggregate_input[["block"]] <- bru_eval_in_data_context(
-        quote(.data.[[".block"]]),
+        .data[[".block"]],
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
@@ -1666,38 +1702,33 @@ bru_obs <- function(formula = . ~ .,
     }
     if (is.null(aggregate_input[["weights"]])) {
       aggregate_input[["weights"]] <- bru_eval_in_data_context(
-        quote(.data.[["weight"]]),
+        .data[["weight"]],
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
       )
     }
     if (is.null(aggregate_input[["n_block"]])) {
+      agg_n_block_expr <- rlang::parse_expr(
+        "bru_response_size(.response_data.)"
+      )
       aggregate_input[["n_block"]] <- bru_eval_in_data_context(
-        quote(bru_response_size(.response_data.)),
+        !!agg_n_block_expr,
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
       )
     }
-    if (is.null(aggregate_input[["block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['block']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['weights']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['n_block']]` ",
-        "evaluates to NULL."
-      ))
-    }
+    lapply(c("block", "weights", "n_block"), function(nm) {
+      if (!is.numeric(aggregate_input[[nm]])) {
+        bru_log_abort(
+          glue::glue(
+            "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+            "evaluates to NULL."
+          )
+        )
+      }
+    })
   }
 
   data_extra <- as.list(data_extra)
@@ -1716,42 +1747,6 @@ bru_obs <- function(formula = . ~ .,
     data_extra[["BRU_aggregate_input"]] <- aggregate_input
     allow_combine <- TRUE
     is_additive <- FALSE
-  }
-
-  if (inherits(data, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(data = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(response, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  } else if (is.list(response) &&
-    inherits(response[["coordinates"]], "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  }
-  if (inherits(samplers, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(samplers = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(ips, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(ips = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
   }
 
   # More on special bru likelihoods
@@ -2121,29 +2116,15 @@ bru_obs <- function(formula = . ~ .,
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
-#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
+#' @param \dots Arguments passed from `like()` to `bru_obs()`
 #' @export
-like <- function(formula = . ~ .,
-                 family = "gaussian",
-                 data = NULL,
-                 response_data = NULL,
+like <- function(...,
                  E = NULL,
                  Ntrials = NULL,
                  weights = NULL,
                  scale = NULL,
-                 domain = NULL,
-                 samplers = NULL,
-                 ips = NULL,
-                 used = NULL,
-                 allow_combine = NULL,
-                 control.family = NULL,
-                 tag = NULL,
                  options = list(),
-                 .envir = parent.frame(),
-                 mesh = deprecated(),
-                 include = deprecated(),
-                 exclude = deprecated(),
-                 include_latent = deprecated()) {
+                 .envir = parent.frame()) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
   bru_log_message(
@@ -2159,62 +2140,14 @@ like <- function(formula = . ~ .,
     "bru_obs()"
   )
 
-  E <- bru_eval_in_data_context(
-    substitute(E),
-    data = list(response_data = response_data, data = data),
-    default = options[["E"]],
-    .envir = .envir
-  )
-  Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
-    data = list(response_data = response_data, data = data),
-    default = options[["Ntrials"]],
-    .envir = .envir
-  )
-  weights <- bru_eval_in_data_context(
-    substitute(weights),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-  scale <- bru_eval_in_data_context(
-    substitute(scale),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-
-  special_env <- new.env(parent = .envir)
-  assign("E", E, envir = special_env)
-  assign("Ntrials", Ntrials, envir = special_env)
-  assign("weights", weights, envir = special_env)
-  assign("scale", scale, envir = special_env)
-
   bru_obs(
-    formula = formula,
-    family = family,
-    data = data,
-    response_data = response_data,
-    E = E,
-    Ntrials = Ntrials,
-    weights = weights,
-    scale = scale,
-    domain = domain,
-    samplers = samplers,
-    ips = ips,
-    include = include,
-    exclude = exclude,
-    include_latent = include_latent,
-    used = used,
-    allow_combine = allow_combine,
-    control.family = control.family,
-    tag = if (is.null(tag) || identical(tag, "")) {
-      NA_character_
-    } else {
-      tag
-    },
+    ...,
+    E = {{E}},
+    Ntrials = {{Ntrials}},
+    weights = {{weights}},
+    scale = {{scale}},
     options = options,
-    .envir = special_env
+    .envir = .envir
   )
 }
 
@@ -2737,9 +2670,10 @@ bru_obs_expr <- function(lhood, components) {
 #' @export
 #' @inheritParams bru_obs
 #' @inheritParams bru
-#' @param \dots Further arguments passed on to [bru_obs()]. In particular,
-#'   optional `E`, a single numeric used rescale all integration weights by a
-#'   fixed factor.
+#' @param \dots Further arguments passed on to [bru_obs()].
+#' @details
+#' The `E` and `weights` arguments are evaluated in the data context, like for
+#' [bru_obs()].
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
@@ -2795,6 +2729,8 @@ lgcp <- function(components,
                  samplers = NULL,
                  ips = NULL,
                  formula = . ~ .,
+                 E = NULL,
+                 weights = NULL,
                  ...,
                  options = list(),
                  .envir = parent.frame()) {
@@ -2808,6 +2744,8 @@ lgcp <- function(components,
     formula = formula, data = data,
     domain = domain, samplers = samplers, ips = ips,
     ...,
+    E = {{E}},
+    weights = {{weights}},
     options = options,
     .envir = .envir
   )

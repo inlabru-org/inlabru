@@ -158,7 +158,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
-        data = pred,
+        data = c(as.list(pred), list(.block = NULL)),
         aggregate = "average",
         aggregate_input = list(
           weights = weights,
