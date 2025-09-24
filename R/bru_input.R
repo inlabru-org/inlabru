@@ -10,18 +10,18 @@ bru_input <- function(...) {
 #' @describeIn bru_input Create a `bru_input` object.
 #' @export
 #' @examples
-#' inp <- bru_input(expression(x), "LABEL")
+#' (inp <- bru_input_create(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
-bru_input.default <- function(input,
+bru_input_create <- function(input,
                               label = NULL,
                               layer = NULL,
                               selector = NULL,
                               ...) {
   inp <- structure(
     list(
-      input = input,
+      input = rlang::enquo(input),
       label = label,
-      layer = layer,
+      layer = rlang::enquo(layer),
       selector = selector
     ),
     class = "bru_input"
@@ -135,7 +135,7 @@ bru_input.bru_comp <- function(component,
   )
 
   if (is.null(component[["mapper"]])) {
-    part_names <- c("main", "group", "replicate")
+    part_names <- intersect(c("main", "group", "replicate"), names(component))
   } else {
     stopifnot(inherits(component[["mapper"]], c("bm_pipe", "bru_mapper_pipe")))
 
@@ -216,7 +216,7 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
                             label,
                             e_input) {
   input_layer <- tryCatch(
-    eval(layer, envir = envir, enclos = enclos),
+    rlang::eval_tidy(layer, data = envir, env = enclos),
     error = function(e) {
       e
     }
@@ -224,7 +224,7 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
   if (inherits(input_layer, "error")) {
     stop(paste0(
       "Failed to evaluate 'layer' input '",
-      glue_collapse(deparse(layer), sep = "\n"),
+      glue_collapse(rlang::as_label(layer), sep = "\n"),
       glue("' for '{label}:layer'.")
     ))
   }
@@ -265,25 +265,18 @@ bru_input.bru_input <- function(input, data, env = NULL,
     } else {
       env
     }
-  envir <- new.env(parent = enclos)
   if (is.list(data)) {
-    for (nm in names(data)) {
-      assign(nm, data[[nm]], envir = envir)
-    }
+    envir <- rlang::as_data_mask(data)
+  } else if (inherits(data, "Spatial")) {
+    envir <- rlang::as_data_mask(as.data.frame(data))
   } else {
-    if (inherits(data, "Spatial")) {
-      data_df <- as.data.frame(data)
-    } else {
-      data_df <- tibble::as_tibble(data)
-    }
-    for (nm in names(data_df)) {
-      assign(nm, data_df[[nm]], envir = envir)
-    }
+    envir <- rlang::as_data_mask(tibble::as_tibble(data))
   }
   assign(".data.", data, envir = envir)
 
+  inp <- rlang::as_quosure(input$input, env = enclos)
   e_input <- tryCatch(
-    eval(input$input, envir = envir, enclos = enclos),
+    rlang::eval_tidy(inp, data = envir, env = enclos),
     error = function(e) {
       e
     }
@@ -305,7 +298,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
       }
 
       val <- 1
-      input_string <- paste0(deparse(input$input), collapse = "\n")
+      input_string <- paste0(rlang::as_label(input$input), collapse = "\n")
       if (identical(input_string, "coordinates")) {
         warning(
           glue(
@@ -316,11 +309,11 @@ bru_input.bru_input <- function(input, data, env = NULL,
           ),
           immediate. = TRUE
         )
-        input$input <- expression(sp::coordinates)
+        input$input <- rlang::as_quosure(sp::coordinates, env = enclos)
         return(bru_input(
           input,
           data = data,
-          env = env,
+          env = enclos,
           null.on.fail = null.on.fail,
           ...
         ))
@@ -447,7 +440,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
     any(is.na(as.data.frame(val)))) {
     msg <- glue(
       "Model input '",
-      glue_collapse(deparse(input$input), sep = "\n"),
+      glue_collapse(rlang::as_label(input$input), sep = "\n"),
       "' for '{input$label}' returned some NA values.\n",
       "Attempting to fill in spatially by nearest available value.\n",
       "To avoid this basic covariate imputation, supply complete data."
@@ -541,12 +534,12 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
     text <- ""
   } else if (is.null(type)) {
     text <-
-      glue("{lab} = ", glue_collapse(deparse(inp), sep = "\n"))
+      glue("{lab} = ", glue_collapse(rlang::as_label(inp), sep = "\n"))
   } else {
     text <-
       glue(
         "{lab} = {type}(",
-        glue_collapse(deparse(inp), sep = "\n"),
+        glue_collapse(rlang::as_label(inp), sep = "\n"),
         ")"
       )
   }

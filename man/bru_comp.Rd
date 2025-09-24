@@ -53,7 +53,8 @@ bru_component(...)
 \item{main}{\code{main} takes an R expression that evaluates to where the latent variables
 should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main,
-but for the corresponding features of \code{INLA::f()}.}
+but for the corresponding features of \code{INLA::f()}. \code{main} supports \code{tidy}
+evaluation expressions, with \code{.data} and \code{.env} pronouns.}
 
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}

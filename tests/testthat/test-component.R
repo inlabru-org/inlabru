@@ -13,7 +13,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
 
   # Using label as input:
   cmp0 <- bru_comp_list(
@@ -23,7 +23,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
 
   cmp <- bru_comp_list(
     ~ beta(main = x, model = "linear", values = 1),
@@ -32,7 +32,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
-  expect_equal(as.character(cmp$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp$main$input$input), "x")
 
   # Covariate mapping
   df <- data.frame(x = 1:10)

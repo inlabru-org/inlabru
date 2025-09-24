@@ -310,6 +310,41 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.12.0.9017"
     }
 
+    if (utils::compareVersion("2.13.0.9012", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9012")
+
+      # Update bru_input input&layer to quosures
+      quosure_update <- function(x, env) {
+        if (is.null(x)) {
+          return(NULL)
+        }
+        rlang::as_quosure(x, env = env)
+      }
+      eff <- object[["model"]][["effects"]]
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        for (part in c("main", "group", "replicate")) {
+          if (!is.null(eff[[k]][[part]][["input"]])) {
+            for (input_part in c("input", "layer")) {
+              eff[[k]][[part]][["input"]][[input_part]] <-
+                quosure_update(eff[[k]][[part]][["input"]][[input_part]],
+                               eff[[k]][["env_extra"]])
+            }
+          }
+        }
+        part <- "weights"
+        if (!is.null(eff[[k]][[part]])) {
+          for (input_part in c("input", "layer")) {
+            eff[[k]][[part]][[input_part]] <-
+              quosure_update(eff[[k]][[part]][[input_part]],
+                             eff[[k]][["env_extra"]])
+          }
+        }
+      }
+      eff <- object[["model"]][["effects"]] <- eff
+
+      object[["inlabru_version"]] <- "2.13.0.9012"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 
@@ -1006,8 +1041,8 @@ bru_eval_in_data_context <- function(input,
                                      data = NULL,
                                      default = NULL,
                                      .envir = parent.frame()) {
-  deparse_input <- deparse(substitute(input))
   input <- rlang::enquo(input)
+  deparse_input <- rlang::expr_text(input)
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
