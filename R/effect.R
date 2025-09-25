@@ -139,7 +139,8 @@ bru_component <- function(...) {
 #' `main` takes an R expression that evaluates to where the latent variables
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
-#' but for the corresponding features of `INLA::f()`.
+#' but for the corresponding features of `INLA::f()`. `main` supports `tidy`
+#' evaluation expressions, with `.data` and `.env` pronouns.
 #' @param model Either one of "const" (same as "offset"), "factor_full",
 #' "factor_contrast", "linear",
 #' "fixed", or a model name or
@@ -201,9 +202,8 @@ bru_component <- function(...) {
 #' @details The `bru_comp.character` method is inlabru's equivalent to
 #'   `INLA`'s `f()` function but adds functionality that is unique to inlabru.
 #'
-#' Deprecated parameters:
-#' * map: Use `main` instead.
-#' * mesh: Use `mapper` instead.
+#'   The `main`, `weights`, `group`, `replicate`, and `*_layer` arguments
+#'   support `tidy` evaluation expressions, with `.data` and `.env` pronouns.
 #'
 #' @rdname bru_comp
 #' @aliases bru_comp
@@ -365,14 +365,15 @@ bru_comp.character <- function(object,
     }
   }
 
+  inp <- bru_input_create(
+    {{ main }},
+    label = label,
+    layer = {{ main_layer }},
+    selector = main_selector
+  )
   subcomp <- list(
     main = bru_subcomp(
-      input = bru_input(
-        substitute(main),
-        label = label,
-        layer = substitute(main_layer),
-        selector = main_selector
-      ),
+      input = inp,
       mapper = mapper,
       n = n,
       model = model,
@@ -385,10 +386,10 @@ bru_comp.character <- function(object,
   if (include_group) {
     subcomp$group <-
       bru_subcomp(
-        input = bru_input(
-          substitute(group),
+        input = bru_input_create(
+          {{ group }},
           label = glue("{label}.group"),
-          layer = substitute(group_layer),
+          layer = {{ group_layer }},
           selector = group_selector
         ),
         mapper = group_mapper,
@@ -399,10 +400,10 @@ bru_comp.character <- function(object,
   if (include_repl) {
     subcomp$replicate <-
       bru_subcomp(
-        input = bru_input(
-          substitute(replicate),
+        input = bru_input_create(
+          {{ replicate }},
           label = glue("{label}.repl"),
-          layer = substitute(replicate_layer),
+          layer = {{ replicate_layer }},
           selector = replicate_selector
         ),
         mapper = replicate_mapper,
@@ -412,10 +413,10 @@ bru_comp.character <- function(object,
   }
   if (!is.null(substitute(weights))) {
     subcomp$weights <-
-      bru_input(
-        substitute(weights),
+      bru_input_create(
+        {{ weights }},
         label = glue("{label}.weights"),
-        layer = substitute(weights_layer),
+        layer = {{ weights_layer }},
         selector = weights_selector
       )
   }
@@ -649,12 +650,12 @@ bru_comp_list.formula <- function(object,
   object <- auto_intercept(object)
 
   code <- bru_formula_to_bru_obs_code(object)
-  parsed <- lapply(code, function(x) parse(text = x))
+  parsed <- lapply(code, function(x) rlang::parse_expr(x))
   components <- lapply(
     parsed,
     function(component.expression) {
-      eval(component.expression,
-        envir = .envir
+      rlang::eval_bare(component.expression,
+        env = .envir
       )
     }
   )

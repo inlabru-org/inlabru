@@ -40,27 +40,13 @@ bru_obs(
 )
 
 like(
-  formula = . ~ .,
-  family = "gaussian",
-  data = NULL,
-  response_data = NULL,
+  ...,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
   scale = NULL,
-  domain = NULL,
-  samplers = NULL,
-  ips = NULL,
-  used = NULL,
-  allow_combine = NULL,
-  control.family = NULL,
-  tag = NULL,
   options = list(),
-  .envir = parent.frame(),
-  mesh = deprecated(),
-  include = deprecated(),
-  exclude = deprecated(),
-  include_latent = deprecated()
+  .envir = parent.frame()
 )
 
 bru_obs_list(...)
@@ -182,8 +168,6 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
 \code{used} instead.}
 
-\item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
-
 \item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
 \item{object}{A list of \code{bru_obs} objects}
@@ -203,6 +187,10 @@ alias will remain for a while until examples etc have been updated and users
 made aware of the change. The name change is to avoid issues with namespace
 clashes, e.g. with \code{data.table::like()}, and also to signal that the function
 defines observation models, not just likelihood functions.
+}
+\details{
+The \code{E}, \code{Ntrials}, \code{weights}, and \code{scale} arguments are evaluated in the
+data context, with values from \code{response_data} taking precedence over \code{data}.
 }
 \section{Methods (by generic)}{
 \itemize{

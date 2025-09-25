@@ -310,6 +310,45 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.12.0.9017"
     }
 
+    if (utils::compareVersion("2.13.0.9012", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9012")
+
+      # Update bru_input input&layer to quosures
+      quosure_update <- function(x, env) {
+        if (is.null(x)) {
+          return(NULL)
+        }
+        rlang::as_quosure(x, env = env)
+      }
+      eff <- object[["model"]][["effects"]]
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        for (part in c("main", "group", "replicate")) {
+          if (!is.null(eff[[k]][[part]][["input"]])) {
+            for (input_part in c("input", "layer")) {
+              eff[[k]][[part]][["input"]][[input_part]] <-
+                quosure_update(
+                  eff[[k]][[part]][["input"]][[input_part]],
+                  eff[[k]][["env_extra"]]
+                )
+            }
+          }
+        }
+        part <- "weights"
+        if (!is.null(eff[[k]][[part]])) {
+          for (input_part in c("input", "layer")) {
+            eff[[k]][[part]][[input_part]] <-
+              quosure_update(
+                eff[[k]][[part]][[input_part]],
+                eff[[k]][["env_extra"]]
+              )
+          }
+        }
+      }
+      eff <- object[["model"]][["effects"]] <- eff
+
+      object[["inlabru_version"]] <- "2.13.0.9012"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 
@@ -533,31 +572,35 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #'       projection matrices for (spatial) SPDE models. This feature is
 #'       accessible via the `components` parameter. Practical examples on how to
 #'       use spatial data by means of the components parameter can also be found
-#'       by looking at the [lgcp] function's documentation.
+#'       by looking at the [lgcp()] function's documentation.
 #'     \item
-#'       Constructing multiple likelihoods is straight forward. See [like] for
-#'       more information on how to provide additional likelihoods to `bru`
-#'       using the `...` parameter list.
+#'       Constructing multiple observation models is straightforward. See
+#'       [bru_obs()] for more information on how to provide additional
+#'       models to `bru` using the `...` parameter list.
 #'     \item
 #'       Support for non-linear predictors. See example below.
 #'     \item
 #'       Log Gaussian Cox process (LGCP) inference is
-#'       available by using the `cp` family or (even easier) by using the
-#'       [lgcp] function.
+#'       available by using the `"cp"` family or (even easier) by using the
+#'       [lgcp()] function.
 #'   }
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param components A `formula`-like specification of latent components.
+#' @param components Latent component definitions, either as a [bru_comp_list()]
+#'   object, or a `formula`-like specification.
 #'   Also used to define a default linear additive predictor.  See
 #'   [bru_comp()] for details.
-#' @param \dots Obervation models, each constructed by a calling [bru_obs()], or
-#'   named parameters that can be passed to a single [bru_obs()] call. Note that
-#'   all the arguments will be evaluated before calling [bru_obs()] in order to
-#'   detect if they are `like` objects. This means that special arguments that
-#'   need to be evaluated in the context of `response_data` or `data` (such as
-#'   `Ntrials`) may will only work that way in direct calls to [bru_obs()].
+#' @param \dots Observation models, each constructed by a calling [bru_obs()],
+#'   or [bru_obs_list()].
+#'
+#'   Alternatively, for backwards compatibility, may be named parameters that
+#'   can be passed to a single [bru_obs()] call. These arguments will be
+#'   evaluated before calling [bru_obs()], in order to detect if they already
+#'   are `bru_obs` objects. This means that special arguments that are only
+#'   available in the context of `data` or `response_data` (such as `Ntrials`)
+#'   will only work properly in direct calls to [bru_obs()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
@@ -583,27 +626,7 @@ bru <- function(components = ~ Intercept(1),
   bru_log_bookmark("bru")
   bru_log_message("bru: Preprocessing", verbosity = 1L)
 
-  timings_convert <- function(x) {
-    if (!is.na(x[4])) {
-      x[1] <- x[1] + x[4]
-    }
-    if (!is.na(x[5])) {
-      x[2] <- x[2] + x[5]
-    }
-    x[1:3]
-  }
-
-  timings_collect <- function(Task, Iteration, time_diff) {
-    data.frame(
-      Task = Task,
-      Iteration = Iteration,
-      Time = as.difftime(unname(time_diff[1]), units = "secs"),
-      System = as.difftime(unname(time_diff[2]), units = "secs"),
-      Elapsed = as.difftime(unname(time_diff[3]), units = "secs")
-    )
-  }
-
-  timing <- list(start = timings_convert(proc.time()))
+  timing <- bru_timer_do(NULL, "Preprocess", 0L)
 
   # Turn model components and bru_obs objects into internal bru model
   bru.model <- bru_model(
@@ -637,7 +660,7 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
-  timing$setup <- timings_convert(proc.time())
+  timing <- bru_timer_done(timing)
 
   # Run iterated INLA
   if (options$bru_run) {
@@ -651,10 +674,9 @@ bru <- function(components = ~ Intercept(1),
     result <- list()
   }
 
-  timing$end <- timings_convert(proc.time())
   result$bru_timings <-
     rbind(
-      timings_collect("Preprocess", 0L, timing$setup - timing$start),
+      timing,
       result[["bru_iinla"]][["timings"]]
     )
 
@@ -964,16 +986,14 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @title Evaluate expressions in data contexts
 #' @description Evaluate an expression in a series of data contexts, also making
 #'   the objects directly available as names surrounded by ".", stopping when
-#'   the expression evaluation completes with no error.
+#'   the expression evaluation completes with no error, as well as `tidy`
+#'   evaluation pronouns, e.g. `.data`.
 #'
 #'   This is an internal inlabru method, not intended for general use.
 #' @param input An expression to be evaluated
-#' @param data list of data objects in priority order. Named elements will
-#' be available as `.name.` in the evaluation. The `input` expression is
-#' evaluated with each non-NULL `data` object as `envir`, in order,
-#' until success. If there are no non-NULL data objects, the expression is
-#' evaluated in an empty environment, potentially falling back to enclosing
-#' environment variables.
+#' @param data list of data objects in priority order. Named elements will be
+#'   available as whole objects `.name.` as well as pronouns `.name` in the
+#'   evaluation.
 #' @param default Value used if the expression is evaluated as NULL. Default
 #' NULL
 #' @param .envir The evaluation environment
@@ -983,20 +1003,16 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' # The A values come from the 'data' element, and the B values come from
 #' # the 'response_data' element, as that is listed first.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     response_data = tibble::tibble(x = 1:5),
 #'     data = tibble::tibble(x = 1:10)
 #'   )
 #' )
 #' # Both A and B come from the 'data' element, as 'x' is found there,
-#' # terminating the evaluation attempt.
+#' # and the data objects are listed in order of precedence.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     data = tibble::tibble(x = 1:10),
 #'     response_data = tibble::tibble(x = 1:5)
@@ -1008,6 +1024,8 @@ bru_eval_in_data_context <- function(input,
                                      data = NULL,
                                      default = NULL,
                                      .envir = parent.frame()) {
+  input <- rlang::enquo(input)
+  deparse_input <- rlang::expr_text(input)
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
@@ -1015,38 +1033,35 @@ bru_eval_in_data_context <- function(input,
     }
     x
   })
-  enclos_envir <- new.env(parent = .envir)
+  top_envir <- rlang::new_environment()
   nms <- names(data)
   for (nm in setdiff(nms, "")) {
-    assign(glue(".{nm}."), data_orig[[nm]], envir = enclos_envir)
+    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
   }
   success <- FALSE
   result <- NULL
-  for (k in seq_along(data)) {
+  bottom_envir <- top_envir
+  for (k in rev(seq_along(data))) {
     if (is.null(data[[k]])) {
       next
     }
-    result <- try(
-      eval(input, envir = data[[k]], enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
-      break
-    }
+    bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
   }
-  if (all(vapply(data, is.null, TRUE))) {
-    result <- try(
-      eval(input, envir = NULL, enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
+  mask <- rlang::new_data_mask(bottom_envir, top_envir)
+  for (nm in setdiff(nms, "")) {
+    if (is.null(data[[nm]])) {
+      next
     }
+    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
   }
+  result <- try(
+    rlang::eval_tidy(input, data = mask, env = .envir),
+    silent = TRUE
+  )
+  success <- !inherits(result, "try-error")
   if (!success) {
-    stop(glue(
-      "Input '{glue_collapse(deparse(input), sep = '\n')}' could ",
+    stop(glue::glue(
+      "Input '{glue::glue_collapse(deparse_input, sep = '\n')}' could ",
       "not be evaluated."
     ))
   }
@@ -1351,6 +1366,37 @@ bru_is_additive.formula <- function(x, ...) {
 }
 
 
+check_sp_data_deprecation <- function(...) {
+  .caller <- sys.call(-1)[[1]]
+  obj <- list(...)
+  nms <- names(obj)
+  lapply(nms, function(nm) {
+    if (inherits(obj[[nm]], "Spatial")) {
+      if (!is.null(.caller)) {
+        lifecycle::deprecate_warn(
+          "2.12.0.9023",
+          as.character(glue::glue(
+            "{deparse(.caller)}({nm} = ",
+            "'has deprecated support for `Spatial` input')"
+          )),
+          I("`sf` input")
+        )
+      } else {
+        lifecycle::deprecate_warn(
+          "2.12.0.9023",
+          I(as.character(glue::glue(
+            "{nm} has deprecated support for `Spatial` input"
+          ))),
+          I("`sf` input")
+        )
+      }
+    }
+  })
+  invisible()
+}
+
+
+
 #' @title Observation model construction for usage with [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
@@ -1450,6 +1496,10 @@ bru_is_additive.formula <- function(x, ...) {
 #' @param include,exclude,include_latent `r lifecycle::badge("deprecated")`, use
 #'   `used` instead.
 #'
+#' @details
+#' The `E`, `Ntrials`, `weights`, and `scale` arguments are evaluated in the
+#' data context, with values from `response_data` taking precedence over `data`.
+#'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
 #' [bru_comp_eval()]
@@ -1497,14 +1547,21 @@ bru_obs <- function(formula = . ~ .,
     expr <- NULL
   }
 
+  check_sp_data_deprecation(
+    data = data,
+    response_data = response_data,
+    samplers = samplers,
+    ips = ips
+  )
+
   # Set the response name
   if (length(formula_char) < 3) {
     stop("Missing response variable names")
   }
-  response_expr <- parse(text = formula_char[2])
+  response_expr <- rlang::parse_expr(formula_char[2])
   response <- tryCatch(
     expr = bru_eval_in_data_context(
-      substitute(response_expr),
+      !!response_expr,
       data = list(response_data = response_data, data = data),
       default = NULL,
       .envir = .envir
@@ -1536,11 +1593,11 @@ bru_obs <- function(formula = . ~ .,
         ),
         ")"
       )
-      response_expr <- parse(text = domain_expr)
+      response_expr <- rlang::parse_expr(domain_expr)
     }
     response <- tryCatch(
       expr = bru_eval_in_data_context(
-        substitute(response_expr),
+        !!response_expr,
         data = list(response_data = response_data, data = data),
         default = NULL,
         .envir = .envir
@@ -1556,25 +1613,25 @@ bru_obs <- function(formula = . ~ .,
   }
 
   E <- bru_eval_in_data_context(
-    substitute(E),
+    {{ E }},
     data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
   Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
+    {{ Ntrials }},
     data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
   weights <- bru_eval_in_data_context(
-    substitute(weights),
+    {{ weights }},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
   scale <- bru_eval_in_data_context(
-    substitute(scale),
+    {{ scale }},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
@@ -1628,7 +1685,7 @@ bru_obs <- function(formula = . ~ .,
     }
 
     aggregate_input <- bru_eval_in_data_context(
-      substitute(aggregate_input),
+      {{ aggregate_input }},
       data = list(data = data, response_data = response_data),
       default = NULL,
       .envir = .envir
@@ -1638,7 +1695,7 @@ bru_obs <- function(formula = . ~ .,
     }
     if (is.null(aggregate_input[["block"]])) {
       aggregate_input[["block"]] <- bru_eval_in_data_context(
-        quote(.data.[[".block"]]),
+        .data[[".block"]],
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
@@ -1666,38 +1723,33 @@ bru_obs <- function(formula = . ~ .,
     }
     if (is.null(aggregate_input[["weights"]])) {
       aggregate_input[["weights"]] <- bru_eval_in_data_context(
-        quote(.data.[["weight"]]),
+        .data[["weight"]],
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
       )
     }
     if (is.null(aggregate_input[["n_block"]])) {
+      agg_n_block_expr <- rlang::parse_expr(
+        "bru_response_size(.response_data.)"
+      )
       aggregate_input[["n_block"]] <- bru_eval_in_data_context(
-        quote(bru_response_size(.response_data.)),
+        !!agg_n_block_expr,
         data = list(data = data, response_data = response_data),
         default = NULL,
         .envir = .envir
       )
     }
-    if (is.null(aggregate_input[["block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['block']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['weights']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['n_block']]` ",
-        "evaluates to NULL."
-      ))
-    }
+    lapply(c("block", "weights", "n_block"), function(nm) {
+      if (!is.numeric(aggregate_input[[nm]])) {
+        bru_log_abort(
+          glue::glue(
+            "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+            "evaluates to NULL."
+          )
+        )
+      }
+    })
   }
 
   data_extra <- as.list(data_extra)
@@ -1716,42 +1768,6 @@ bru_obs <- function(formula = . ~ .,
     data_extra[["BRU_aggregate_input"]] <- aggregate_input
     allow_combine <- TRUE
     is_additive <- FALSE
-  }
-
-  if (inherits(data, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(data = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(response, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  } else if (is.list(response) &&
-    inherits(response[["coordinates"]], "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  }
-  if (inherits(samplers, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(samplers = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(ips, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(ips = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
   }
 
   # More on special bru likelihoods
@@ -2121,29 +2137,15 @@ bru_obs <- function(formula = . ~ .,
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
-#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
+#' @param \dots Arguments passed from `like()` to `bru_obs()`
 #' @export
-like <- function(formula = . ~ .,
-                 family = "gaussian",
-                 data = NULL,
-                 response_data = NULL,
+like <- function(...,
                  E = NULL,
                  Ntrials = NULL,
                  weights = NULL,
                  scale = NULL,
-                 domain = NULL,
-                 samplers = NULL,
-                 ips = NULL,
-                 used = NULL,
-                 allow_combine = NULL,
-                 control.family = NULL,
-                 tag = NULL,
                  options = list(),
-                 .envir = parent.frame(),
-                 mesh = deprecated(),
-                 include = deprecated(),
-                 exclude = deprecated(),
-                 include_latent = deprecated()) {
+                 .envir = parent.frame()) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
   bru_log_message(
@@ -2159,62 +2161,14 @@ like <- function(formula = . ~ .,
     "bru_obs()"
   )
 
-  E <- bru_eval_in_data_context(
-    substitute(E),
-    data = list(response_data = response_data, data = data),
-    default = options[["E"]],
-    .envir = .envir
-  )
-  Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
-    data = list(response_data = response_data, data = data),
-    default = options[["Ntrials"]],
-    .envir = .envir
-  )
-  weights <- bru_eval_in_data_context(
-    substitute(weights),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-  scale <- bru_eval_in_data_context(
-    substitute(scale),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-
-  special_env <- new.env(parent = .envir)
-  assign("E", E, envir = special_env)
-  assign("Ntrials", Ntrials, envir = special_env)
-  assign("weights", weights, envir = special_env)
-  assign("scale", scale, envir = special_env)
-
   bru_obs(
-    formula = formula,
-    family = family,
-    data = data,
-    response_data = response_data,
-    E = E,
-    Ntrials = Ntrials,
-    weights = weights,
-    scale = scale,
-    domain = domain,
-    samplers = samplers,
-    ips = ips,
-    include = include,
-    exclude = exclude,
-    include_latent = include_latent,
-    used = used,
-    allow_combine = allow_combine,
-    control.family = control.family,
-    tag = if (is.null(tag) || identical(tag, "")) {
-      NA_character_
-    } else {
-      tag
-    },
+    ...,
+    E = {{ E }},
+    Ntrials = {{ Ntrials }},
+    weights = {{ weights }},
+    scale = {{ scale }},
     options = options,
-    .envir = special_env
+    .envir = .envir
   )
 }
 
@@ -2737,9 +2691,10 @@ bru_obs_expr <- function(lhood, components) {
 #' @export
 #' @inheritParams bru_obs
 #' @inheritParams bru
-#' @param \dots Further arguments passed on to [bru_obs()]. In particular,
-#'   optional `E`, a single numeric used rescale all integration weights by a
-#'   fixed factor.
+#' @param \dots Further arguments passed on to [bru_obs()].
+#' @details
+#' The `E` and `weights` arguments are evaluated in the data context, like for
+#' [bru_obs()].
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
@@ -2795,6 +2750,8 @@ lgcp <- function(components,
                  samplers = NULL,
                  ips = NULL,
                  formula = . ~ .,
+                 E = NULL,
+                 weights = NULL,
                  ...,
                  options = list(),
                  .envir = parent.frame()) {
@@ -2808,6 +2765,8 @@ lgcp <- function(components,
     formula = formula, data = data,
     domain = domain, samplers = samplers, ips = ips,
     ...,
+    E = {{ E }},
+    weights = {{ weights }},
     options = options,
     .envir = .envir
   )
@@ -4140,6 +4099,60 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 }
 
 
+bru_timer_do <- function(timer, task = NULL, iteration = NA_integer_) {
+  if (is.null(timer)) {
+    timer <- data.frame(
+      Task = character(0),
+      Iteration = integer(0),
+      Time = as.difftime(numeric(0), units = "secs"),
+      System = as.difftime(numeric(0), units = "secs"),
+      Elapsed = as.difftime(numeric(0), units = "secs")
+    )
+  }
+  tag <- list(
+    time = proc.time(),
+    task = task,
+    iter = iteration
+  )
+  old_tag <- attr(timer, "bru_timer_tag", exact = TRUE)
+  if (!is.null(old_tag)) {
+    ptm <- tag$time - old_tag$time
+    if (!is.na(ptm[4])) {
+      ptm[1] <- ptm[1] + ptm[4]
+    }
+    if (!is.na(ptm[5])) {
+      ptm[2] <- ptm[2] + ptm[5]
+    }
+
+    if (is.null(old_tag$task)) {
+      old_tag$task <- "Unknown"
+    }
+    if (is.null(old_tag$iter)) {
+      old_tag$iter <- NA_integer_
+    }
+    timer <- rbind(
+      timer,
+      data.frame(
+        Task = old_tag$task,
+        Iteration = old_tag$iter,
+        Time = as.difftime(unname(ptm[1]), units = "secs"),
+        System = as.difftime(unname(ptm[2]), units = "secs"),
+        Elapsed = as.difftime(unname(ptm[3]), units = "secs")
+      )
+    )
+  }
+  attr(timer, "bru_timer_tag") <- if (is.null(task)) {
+    NULL
+  } else {
+    tag
+  }
+  timer
+}
+bru_timer_done <- function(timer) {
+  bru_timer_do(timer, task = NULL)
+}
+
+
 #' Iterated INLA
 #'
 #' This is an internal wrapper for iterated runs of `INLA::inla`.
@@ -4168,32 +4181,11 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' an element `error` with the error object.
 #' @keywords internal
 
-
 iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
-  add_timing <- function(timings, task, iteration = NA_integer_) {
-    AbsTime <- proc.time()
-    if (!is.na(AbsTime[4])) {
-      AbsTime[1] <- AbsTime[1] + AbsTime[4]
-    }
-    if (!is.na(AbsTime[5])) {
-      AbsTime[2] <- AbsTime[2] + AbsTime[2]
-    }
-    return(rbind(
-      timings,
-      data.frame(
-        Task = task,
-        Iteration = iteration,
-        Time = AbsTime[1],
-        System = AbsTime[2],
-        Elapsed = AbsTime[3]
-      )
-    ))
-  }
-
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
 
-  timings <- add_timing(NULL, "Start")
+  timings <- bru_timer_do(NULL, "Preprocess", 1L)
 
   inla.options <- bru_options_inla(options)
 
@@ -4202,6 +4194,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
+    timings <- bru_timer_done(timings)
     if (is.null(orig_track)) {
       track_df <- list()
       for (label in names(states[[1]])) {
@@ -4350,11 +4343,11 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         rbind(
           orig_timings,
           data.frame(
-            Task = timings$Task[-1],
-            Iteration = timings$Iteration[-1] + iteration_offset,
-            Time = as.difftime(diff(timings$Time), units = "secs"),
-            System = as.difftime(diff(timings$System), units = "secs"),
-            Elapsed = as.difftime(diff(timings$Elapsed), units = "secs")
+            Task = timings$Task,
+            Iteration = timings$Iteration + iteration_offset,
+            Time = timings$Time,
+            System = timings$System,
+            Elapsed = timings$Elapsed
           )
         )
       },
@@ -4575,6 +4568,10 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   do_final_integration <- (options$bru_max_iter == 1)
   do_final_theta_no_restart <- FALSE
   while (!interrupt) {
+    if (k > 1L) {
+      timings <- bru_timer_do(timings, "Preprocess", k)
+    }
+
     if ((k >= options$bru_max_iter) && !do_final_integration) {
       do_final_integration <- TRUE
       bru_log_message(
@@ -4710,7 +4707,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         )
     }
 
-    timings <- add_timing(timings, "Preprocess", k)
+    timings <- bru_timer_do(timings, "Run inla()", k)
 
     result <- fm_try_callstack(
       do.call(
@@ -4720,7 +4717,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )
     )
 
-    timings <- add_timing(timings, "Run inla()", k)
+    timings <- bru_timer_do(timings, "Postprocess", k)
 
     if (inherits(result, "try-error")) {
       bru_log_warn(
@@ -4820,6 +4817,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
+          timings <- bru_timer_do(timings, "Line search", k)
           line_weights <-
             extract_property(
               result = result,
@@ -4841,8 +4839,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             options = options
           )
           state <- line_search[["state"]]
-          timings <- add_timing(timings, "Line search", k)
         }
+        timings <- bru_timer_do(timings, "Linearise", k)
 
         bru_log_message(
           "iinla: Evaluate component linearisations",
@@ -4941,6 +4939,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
     k <- k + 1L
   }
+
+  timings <- bru_timer_done(timings)
 
   result[["bru_iinla"]] <- collect_misc_info()
   class(result) <- c("iinla", class(result))
