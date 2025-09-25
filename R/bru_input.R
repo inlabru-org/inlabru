@@ -13,10 +13,10 @@ bru_input <- function(...) {
 #' (inp <- bru_input_create(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
 bru_input_create <- function(input,
-                              label = NULL,
-                              layer = NULL,
-                              selector = NULL,
-                              ...) {
+                             label = NULL,
+                             layer = NULL,
+                             selector = NULL,
+                             ...) {
   inp <- structure(
     list(
       input = rlang::enquo(input),

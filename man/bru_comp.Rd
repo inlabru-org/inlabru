@@ -168,11 +168,8 @@ or the effect of the covariate.
 The \code{bru_comp.character} method is inlabru's equivalent to
 \code{INLA}'s \code{f()} function but adds functionality that is unique to inlabru.
 
-Deprecated parameters:
-\itemize{
-\item map: Use \code{main} instead.
-\item mesh: Use \code{mapper} instead.
-}
+The \code{main}, \code{weights}, \code{group}, \code{replicate}, and \verb{*_layer} arguments
+support \code{tidy} evaluation expressions, with \code{.data} and \code{.env} pronouns.
 }
 \section{Functions}{
 \itemize{

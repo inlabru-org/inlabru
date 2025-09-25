@@ -365,10 +365,10 @@ bru_comp.character <- function(object,
     }
   }
 
-  inp = bru_input_create(
-    {{main}},
+  inp <- bru_input_create(
+    {{ main }},
     label = label,
-    layer = {{main_layer}},
+    layer = {{ main_layer }},
     selector = main_selector
   )
   subcomp <- list(
@@ -387,9 +387,9 @@ bru_comp.character <- function(object,
     subcomp$group <-
       bru_subcomp(
         input = bru_input_create(
-          {{group}},
+          {{ group }},
           label = glue("{label}.group"),
-          layer = {{group_layer}},
+          layer = {{ group_layer }},
           selector = group_selector
         ),
         mapper = group_mapper,
@@ -401,9 +401,9 @@ bru_comp.character <- function(object,
     subcomp$replicate <-
       bru_subcomp(
         input = bru_input_create(
-          {{replicate}},
+          {{ replicate }},
           label = glue("{label}.repl"),
-          layer = {{replicate_layer}},
+          layer = {{ replicate_layer }},
           selector = replicate_selector
         ),
         mapper = replicate_mapper,
@@ -414,9 +414,9 @@ bru_comp.character <- function(object,
   if (!is.null(substitute(weights))) {
     subcomp$weights <-
       bru_input_create(
-        {{weights}},
+        {{ weights }},
         label = glue("{label}.weights"),
-        layer = {{weights_layer}},
+        layer = {{ weights_layer }},
         selector = weights_selector
       )
   }
