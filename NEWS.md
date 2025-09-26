@@ -18,6 +18,8 @@
   (version `2.13.0.9005`)
 * Remove unused `group` and `replicate` parts of each latent component, speeding
   up component evaluation and linearisation. (version `2.13.0.9006`)
+* Allow index extraction from duplicated tags in `bru_index()`, returning
+  all matching indices. (version `2.13.0.9014`)
 
 ## Bug fixes
 

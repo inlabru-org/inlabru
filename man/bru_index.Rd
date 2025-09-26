@@ -3,6 +3,7 @@
 \name{bru_index}
 \alias{bru_index}
 \alias{bru_index.bru_obs}
+\alias{bru_index.bru_obs_list}
 \alias{bru_index.bru}
 \alias{bru_index.bru_comp}
 \alias{bru_index.bru_comp_list}
@@ -13,6 +14,8 @@
 bru_index(object, ...)
 
 \method{bru_index}{bru_obs}(object, what = NULL, ...)
+
+\method{bru_index}{bru_obs_list}(object, tag = NULL, what = NULL, ...)
 
 \method{bru_index}{bru}(object, tag = NULL, what = NULL, ...)
 
@@ -52,6 +55,10 @@ an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
 }
 
 \itemize{
+\item \code{bru_index(bru_obs_list)}: An \code{integer} vector.
+}
+
+\itemize{
 \item \code{bru_index(bru)}: An \code{integer} vector.
 }
 
@@ -84,6 +91,10 @@ or the whole or a subset of a full \code{\link[=bru]{bru()}} predictor.
 \item \code{bru_index(bru_obs)}: Extract the index vector for the predictor vector for a
 \code{\link[=bru_obs]{bru_obs()}} sub-model. The indices are relative to the sub-model, and need
 to be appropriately offset to be used in the full model predictor.
+
+\item \code{bru_index(bru_obs_list)}: Extract the index vector for "APredictor" for one or
+more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination
+of \code{tag} and \code{what}.
 
 \item \code{bru_index(bru)}: Extract the index vector for "APredictor" for one or
 more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination
