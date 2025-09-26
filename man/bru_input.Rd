@@ -2,7 +2,7 @@
 % Please edit documentation in R/bru_input.R
 \name{bru_input}
 \alias{bru_input}
-\alias{bru_input.default}
+\alias{bru_input_create}
 \alias{bru_input.bru_comp}
 \alias{bru_input.bru_model}
 \alias{bru_input.bru_comp_list}
@@ -14,7 +14,7 @@
 \usage{
 bru_input(...)
 
-\method{bru_input}{default}(input, label = NULL, layer = NULL, selector = NULL, ...)
+bru_input_create(input, label = NULL, layer = NULL, selector = NULL, ...)
 
 \method{bru_input}{bru_comp}(component, data, ...)
 
@@ -53,8 +53,6 @@ Obtain component inputs
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_input(default)}: Create a \code{bru_input} object.
-
 \item \code{bru_input(bru_obs_list)}: Computes the component inputs for included components
 for each model likelihood
 
@@ -77,6 +75,8 @@ references a column of the data points, or some other complete expression
 }}
 \section{Functions}{
 \itemize{
+\item \code{bru_input_create()}: Create a \code{bru_input} object.
+
 \item \code{input_eval()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from \verb{2.12.0.9023}.
 Use \code{bru_input()} instead.
 
@@ -181,7 +181,7 @@ to be built on a different CRS than the observation data.
 }
 
 \examples{
-inp <- bru_input(expression(x), "LABEL")
+(inp <- bru_input_create(x, "LABEL"))
 bru_input(inp, data.frame(x = 1:3))
 }
 \seealso{

@@ -25,9 +25,12 @@ converted with \code{\link[=bru_standardise_names]{bru_standardise_names()}}
 \examples{
 if (bru_safe_inla()) {
   fit <- bru(y ~ 1 + x + z(z, model = "iid"),
-             data = data.frame(y = rnorm(10),
-                               x = rnorm(10),
-                               z = rep(seq_len(2), 5)))
+    data = data.frame(
+      y = rnorm(10),
+      x = rnorm(10),
+      z = rep(seq_len(2), 5)
+    )
+  )
   bru_names(fit)
 }
 }
