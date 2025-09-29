@@ -1390,6 +1390,119 @@ check_sp_data_deprecation <- function(...) {
 }
 
 
+bru_agg_data <- function(
+    data,
+    ips = NULL,
+    domain = NULL,
+    samplers = NULL,
+    options,
+    .envir) {
+  if (is.null(ips)) {
+    if (!is.null(domain)) {
+      ips <- fm_int(
+        domain = domain,
+        samplers = samplers,
+        int.args = options[["bru_int_args"]]
+      )
+    }
+  } else {
+    if (is.null(data)) {
+      data <- ips
+      ips <- NULL
+    }
+  }
+  if (!is.null(ips)) {
+    if (!is.null(data)) {
+      ips$.block <- as.integer(ips$.block)
+      if (".block" %in% names(data)) {
+        ips <- dplyr::left_join(ips, data, by = ".block")
+      } else {
+        if (NROW(data) != max(ips$.block)) {
+          stop(glue(
+            "`data` has {NROW(data)} rows, but `ips` has ",
+            "{max(ips$.block)} blocks. Cannot join."
+          ))
+        }
+        ips <- dplyr::left_join(
+          ips,
+          dplyr::bind_cols(data, .block = seq_len(NROW(data))),
+          by = ".block"
+        )
+      }
+    }
+    data <- ips
+    ips <- NULL
+  }
+
+  data
+}
+
+
+bru_agg_input <- function(input, data_list, .envir) {
+  aggregate_input <- bru_eval_in_data_context(
+    {{ input }},
+    data = data_list,
+    default = NULL,
+    .envir = .envir
+  )
+  if (is.null(aggregate_input)) {
+    aggregate_input <- list()
+  }
+  if (is.null(aggregate_input[["block"]])) {
+    aggregate_input[["block"]] <- bru_eval_in_data_context(
+      .data[[".block"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.character(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'character' aggregation block information detected.\n",
+      "Please use a numeric or integer vector for the block information ",
+      "instead.\n",
+      "If you want to use a character vector, ",
+      "please convert it to a factor first,\n",
+      "making sure the factor level order matches your intended order,\n",
+      "and use `as.integer()`."
+    )
+
+    bru_log_abort(msg)
+  }
+  if (is.null(aggregate_input[["weights"]])) {
+    aggregate_input[["weights"]] <- bru_eval_in_data_context(
+      .data[["weight"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["n_block"]])) {
+    agg_n_block_expr <- rlang::parse_expr(
+      "bru_response_size(.response_data.)"
+    )
+    aggregate_input[["n_block"]] <- bru_eval_in_data_context(
+      !!agg_n_block_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  lapply(c("block", "weights", "n_block"), function(nm) {
+    if (!is.numeric(aggregate_input[[nm]])) {
+      bru_log_abort(
+        glue::glue(
+          "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+          "evaluates to NULL."
+        )
+      )
+    }
+  })
+
+  aggregate_input
+}
+
+
 
 #' @title Observation model construction for usage with [bru()]
 #'
@@ -1630,124 +1743,36 @@ bru_obs <- function(formula = . ~ .,
     default = 1,
     .envir = .envir
   )
+
+  data_extra <- as.list(data_extra)
+
   if (!is.null(aggregate) && is.character(aggregate)) {
-    aggregate <- match.arg(
-      aggregate,
-      c("none", "sum", "average", "logsumexp", "logaverageexp", "logitaverage")
-    )
     aggregate <- switch(aggregate,
       "none" = NULL,
       bm_aggregate(type = aggregate)
     )
   }
   if (!is.null(aggregate)) {
-    if (is.null(ips)) {
-      if (!is.null(domain)) {
-        ips <- fm_int(
-          domain = domain,
-          samplers = samplers,
-          int.args = options[["bru_int_args"]]
-        )
-      }
-    } else {
-      if (is.null(data)) {
-        data <- ips
-        ips <- NULL
-      }
-    }
-    if (!is.null(ips)) {
-      if (!is.null(data)) {
-        ips$.block <- as.integer(ips$.block)
-        if (".block" %in% names(data)) {
-          ips <- dplyr::left_join(ips, data, by = ".block")
-        } else {
-          if (NROW(data) != max(ips$.block)) {
-            stop(glue(
-              "`data` has {NROW(data)} rows, but `ips` has ",
-              "{max(ips$.block)} blocks. Cannot join."
-            ))
-          }
-          ips <- dplyr::left_join(
-            ips,
-            dplyr::bind_cols(data, .block = seq_len(NROW(data))),
-            by = ".block"
-          )
-        }
-      }
-      data <- ips
-      ips <- NULL
-    }
-
-    aggregate_input <- bru_eval_in_data_context(
-      {{ aggregate_input }},
-      data = list(data = data, response_data = response_data),
-      default = NULL,
+    data <- bru_agg_data(
+      data = data,
+      ips = ips,
+      domain = domain,
+      samplers = samplers,
+      options = options,
       .envir = .envir
     )
-    if (is.null(aggregate_input)) {
-      aggregate_input <- list()
-    }
-    if (is.null(aggregate_input[["block"]])) {
-      aggregate_input[["block"]] <- bru_eval_in_data_context(
-        .data[[".block"]],
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.character(aggregate_input[["block"]])) {
-      msg <- paste0(
-        "'character' aggregation block information detected.\n",
-        "Please use a numeric or integer vector for the block information ",
-        "instead.\n",
-        "If you want to use a character vector, ",
-        "please convert it to a factor first,\n",
-        "making sure the factor level order matches your intended order,\n",
-        "and use `as.integer()`."
-      )
+    ips <- NULL
 
-      if (utils::packageVersion("fmesher") < "0.5.0") {
-        msg <- c(msg, paste0(
-          "You have fmesher < 0.5.0. From version 0.5.0,",
-          "`fm_int()`/`fm_cprod()`\ncreates integer block information ",
-          "automatically."
-        ))
-      }
-      bru_log_abort(msg)
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      aggregate_input[["weights"]] <- bru_eval_in_data_context(
-        .data[["weight"]],
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      agg_n_block_expr <- rlang::parse_expr(
-        "bru_response_size(.response_data.)"
-      )
-      aggregate_input[["n_block"]] <- bru_eval_in_data_context(
-        !!agg_n_block_expr,
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    lapply(c("block", "weights", "n_block"), function(nm) {
-      if (!is.numeric(aggregate_input[[nm]])) {
-        bru_log_abort(
-          glue::glue(
-            "Aggregation requested, but `aggregate_input[['{nm}']]` ",
-            "evaluates to NULL."
-          )
-        )
-      }
-    })
-  }
+    aggregate_input <- bru_agg_input(
+      {{ aggregate_input }},
+      data_list = list(
+        data = data,
+        response_data = response_data,
+        extra_data = data_extra
+      ),
+      .envir = .envir
+    )
 
-  data_extra <- as.list(data_extra)
-  if (!is.null(aggregate)) {
     if (!is_additive) {
       expr_text <- formula_char[length(formula_char)]
     } else {

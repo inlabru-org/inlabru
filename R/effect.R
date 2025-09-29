@@ -446,11 +446,11 @@ bru_comp.character <- function(object,
   # 'main' and 'weights' are the only regular parameter allowed to be nameless,
   # and only if they are the first parameters (position 3 and 4 in fcall)
   if ((length(fcall) >= 3L) &&
-      (is.null(names(fcall)) || (names(fcall)[3] %in% c("", NA_character_)))) {
+    (is.null(names(fcall)) || (names(fcall)[3] %in% c("", NA_character_)))) {
     names(fcall)[3] <- "main"
   }
   if ((length(fcall) >= 4L) &&
-      (is.null(names(fcall)) || (names(fcall)[4] %in% c("", NA_character_)))) {
+    (is.null(names(fcall)) || (names(fcall)[4] %in% c("", NA_character_)))) {
     names(fcall)[4] <- "weights"
   }
   unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% c("", NA_character_))
