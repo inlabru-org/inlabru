@@ -522,12 +522,6 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
         "'options' list argument instead."
       ))
     }
-    if (!all(dot_is_lhood) && !all(dot_is_lhood_list)) {
-      stop(paste0(
-        "Cannot mix `bru_obs` and `bru_obs_list` objects in the `...` ",
-        "argument of `bru()`."
-      ))
-    }
   } else {
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
@@ -2239,25 +2233,6 @@ bru_response_size.bru <- function(object) {
 }
 
 
-#' @describeIn bru_obs
-#' Combine `bru_obs` observation model object into a `bru_obs_list` object
-#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
-#' @export
-bru_obs_list <- function(...) {
-  UseMethod("bru_obs_list")
-}
-
-#' @describeIn bru_obs
-#' Combine one or more lists of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
-#' @export
-bru_obs_list.list <- function(object, ..., .envir = NULL) {
-  object <- lapply(object, as_bru_obs)
-  class(object) <- c("bru_obs_list", "list")
-  bru_obs_list(object, .envir = .envir)
-}
-
 set_list_names <- function(x, tag, priority = "immutable") {
   priority <- match.arg(priority, c("immutable", "tag", "name"))
   list_names <- names(x)
@@ -2280,7 +2255,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
     x,
     function(xx) {
       if (is.null(xx[[tag]]) ||
-        identical(xx[[tag]], "")) {
+          identical(xx[[tag]], "")) {
         NA_character_
       } else {
         xx[[tag]]
@@ -2337,28 +2312,80 @@ set_list_names <- function(x, tag, priority = "immutable") {
 }
 
 #' @describeIn bru_obs
-#' Combine a list of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
+#' Combine `bru_obs` observation model object into a `bru_obs_list` object
+#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
 #' @export
-bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
-  if (length(list(...)) > 1) {
-    # If multiple objects are given, combine them into a single list
-    # and then recall the method
-    object <- lapply(list(...), as_bru_obs_list)
-    object <- structure(
-      unlist(object, recursive = FALSE),
-      class = c("bru_obs_list", "list")
+bru_obs_list <- function(..., .tag = NULL) {
+  UseMethod("bru_obs_list")
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param object A list of `bru_obs` and/or `bru_obs_list` objects
+#' @export
+bru_obs_list.list <- function(object, ..., .tag = NULL) {
+  if (length(list(...)) > 0) {
+    return(bru_obs_list(list(object, ...)))
+  }
+  if (length(object) == 0) {
+    return(
+      structure(
+        list(),
+        class = c("bru_obs_list", "list")
+      )
     )
-  } else {
-    object <- list(...)[[1]]
+  }
+  is_obs <- vapply(object, function(x) inherits(x, "bru_obs"), TRUE)
+  if (!all(is_obs)) {
+    is_obs_list <- vapply(object, function(x) inherits(x, "bru_obs_list"), TRUE)
+    if (!all(is_obs_list)) {
+      object <- lapply(seq_along(object), function(k) {
+        bru_obs_list(object[[k]], .tag = names(object)[k])
+      })
+    }
+    object <- unlist(object, recursive = FALSE)
+  }
+  object <- structure(
+    object,
+    class = c("bru_obs_list", "list")
+  )
+
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+
+  object
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param .tag Optional name to assign to a single `bru_obs` object. Reserved
+#'   for internal use.
+#' @export
+bru_obs_list.bru_obs <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
   }
 
-  if (is.null(.envir)) {
-    .envir <- environment(object)
+  object <- structure(
+    list(...),
+    class = c("bru_obs_list", "list")
+  )
+  if (!is.null(.tag)) {
+    names(object) <- .tag
   }
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+  object
+}
 
-  environment(object) <- .envir
+#' @describeIn bru_obs
+#' Combine one or more `bru_obs_list` objects into a `bru_obs_list` object
+#' @export
+bru_obs_list.bru_obs_list <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
+  }
+  object <- list(...)[[1]]
   object <- set_list_names(object, tag = "tag", priority = "immutable")
   object
 }
@@ -2368,16 +2395,16 @@ bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
 #' @describeIn bru_obs
 #' Combine several `bru_obs` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs <- function(..., .envir = NULL) {
-  bru_obs_list(list(...), .envir = .envir)
+c.bru_obs <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
 #' @describeIn bru_obs
 #' Combine several `bru_obs_list` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs_list <- function(..., .envir = NULL) {
-  bru_obs_list(..., .envir = .envir)
+c.bru_obs_list <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
@@ -2443,7 +2470,7 @@ like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")`
@@ -2460,7 +2487,7 @@ bru_like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @rdname bru_obs_print

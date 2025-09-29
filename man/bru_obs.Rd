@@ -5,6 +5,7 @@
 \alias{like}
 \alias{bru_obs_list}
 \alias{bru_obs_list.list}
+\alias{bru_obs_list.bru_obs}
 \alias{bru_obs_list.bru_obs_list}
 \alias{c.bru_obs}
 \alias{c.bru_obs_list}
@@ -49,15 +50,17 @@ like(
   .envir = parent.frame()
 )
 
-bru_obs_list(...)
+bru_obs_list(..., .tag = NULL)
 
-\method{bru_obs_list}{list}(object, ..., .envir = NULL)
+\method{bru_obs_list}{list}(object, ..., .tag = NULL)
 
-\method{bru_obs_list}{bru_obs_list}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs}(..., .tag = NULL)
 
-\method{c}{bru_obs}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs_list}(..., .tag = NULL)
 
-\method{c}{bru_obs_list}(..., .envir = NULL)
+\method{c}{bru_obs}(...)
+
+\method{c}{bru_obs_list}(...)
 
 \method{[}{bru_obs_list}(x, i)
 
@@ -170,7 +173,10 @@ on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
-\item{object}{A list of \code{bru_obs} objects}
+\item{.tag}{Optional name to assign to a single \code{bru_obs} object. Reserved
+for internal use.}
+
+\item{object}{A list of \code{bru_obs} and/or \code{bru_obs_list} objects}
 
 \item{x}{\code{bru_obs_list} object from which to extract element(s)}
 
@@ -194,6 +200,9 @@ data context, with values from \code{response_data} taking precedence over \code
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{bru_obs_list(bru_obs)}: Combine one or more lists of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
+
 \item \code{c(bru_obs)}: Combine several \code{bru_obs} objects into a \code{bru_obs_list} object
 
 }}
@@ -207,8 +216,7 @@ method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_o
 \item \code{bru_obs_list(list)}: Combine one or more lists of \code{bru_obs} observation model objects
 into a \code{bru_obs_list} object
 
-\item \code{bru_obs_list(bru_obs_list)}: Combine a list of \code{bru_obs} observation model objects
-into a \code{bru_obs_list} object
+\item \code{bru_obs_list(bru_obs_list)}: Combine one or more \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
 \item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
