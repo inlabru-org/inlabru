@@ -445,13 +445,15 @@ bru_comp.character <- function(object,
   names(fcall)[2] <- ""
   # 'main' and 'weights' are the only regular parameter allowed to be nameless,
   # and only if they are the first parameters (position 3 and 4 in fcall)
-  if (is.null(names(fcall)) || identical(names(fcall)[3], "")) {
+  if ((length(fcall) >= 3L) &&
+      (is.null(names(fcall)) || (names(fcall)[3] %in% c("", NA_character_)))) {
     names(fcall)[3] <- "main"
   }
-  if (is.null(names(fcall)) || identical(names(fcall)[4], "")) {
+  if ((length(fcall) >= 4L) &&
+      (is.null(names(fcall)) || (names(fcall)[4] %in% c("", NA_character_)))) {
     names(fcall)[4] <- "weights"
   }
-  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
+  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% c("", NA_character_))
   if (length(unnamed_arguments) > 0) {
     # Without this check, R gives the error
     #   'In str2lang(s) : parsing result not of length one, but 0'
