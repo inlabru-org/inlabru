@@ -2255,7 +2255,7 @@ set_list_names <- function(x, tag, priority = "immutable") {
     x,
     function(xx) {
       if (is.null(xx[[tag]]) ||
-          identical(xx[[tag]], "")) {
+        identical(xx[[tag]], "")) {
         NA_character_
       } else {
         xx[[tag]]

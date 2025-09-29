@@ -686,7 +686,9 @@ bru_comp_list.list <- function(object,
   }
   is_comp <- vapply(object, function(x) inherits(x, "bru_comp"), TRUE)
   if (!all(is_comp)) {
-    is_comp_list <- vapply(object, function(x) inherits(x, "bru_comp_list"), TRUE)
+    is_comp_list <- vapply(object, function(x) {
+      inherits(x, "bru_comp_list")
+    }, TRUE)
     if (!all(is_comp_list)) {
       object <- lapply(seq_along(object), function(k) {
         bru_comp_list(object[[k]], .envir = .envir)
