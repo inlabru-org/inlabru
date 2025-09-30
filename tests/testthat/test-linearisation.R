@@ -68,10 +68,10 @@ test_that("Linearisation", {
           nms <- names(lin_A)
           INLA::inla.stack(
             list(
-              BRU.E = lh[["E"]],
-              BRU.Ntrials = lh[["Ntrials"]],
-              BRU.weights = lh[["weights"]],
-              BRU.scale = lh[["scale"]],
+              BRU.E = lh[["response_data"]][["BRU_E"]],
+              BRU.Ntrials = lh[["response_data"]][["BRU_Ntrials"]],
+              BRU.weights = lh[["response_data"]][["BRU_weights"]],
+              BRU.scale = lh[["response_data"]][["BRU_scale"]],
               BRU.offset = as.vector(lin_off)
             ),
             A = lapply(nms, function(nm) {
@@ -94,10 +94,10 @@ test_that("Linearisation", {
           INLA::inla.stack(
             list(
               BRU.response = lh$response_data[[lh$response]],
-              BRU.E = lh[["E"]],
-              BRU.Ntrials = lh[["Ntrials"]],
-              BRU.weights = lh[["weights"]],
-              BRU.scale = lh[["scale"]],
+              BRU.E = lh[["response_data"]][["BRU_E"]],
+              BRU.Ntrials = lh[["response_data"]][["BRU_Ntrials"]],
+              BRU.weights = lh[["response_data"]][["BRU_weights"]],
+              BRU.scale = lh[["response_data"]][["BRU_scale"]],
               BRU.offset = as.vector(lin_off)
             ),
             A = lapply(nms, function(nm) {

@@ -1525,6 +1525,58 @@ bru_agg_input <- function(input, data_list, .envir) {
 }
 
 
+
+bru_obs_agg <- function(lh,
+                        aggregate = NULL,
+                        aggregate_input = NULL,
+                        options = list(),
+                        .envir = parent.frame()) {
+  if (!is.null(aggregate) && is.character(aggregate)) {
+    aggregate <- switch(aggregate,
+      "none" = NULL,
+      bm_aggregate(type = aggregate)
+    )
+  }
+  if (!is.null(aggregate)) {
+    lh$data <- bru_agg_data(
+      data = lh$data,
+      ips = lh$integration_info$ips,
+      domain = lh$integration_info$domain,
+      samplers = lh$integration_info$samplers,
+      options = options,
+      .envir = .envir
+    )
+    lh$integration_info$ips <- NULL
+
+    aggregate_input <- bru_agg_input(
+      {{ aggregate_input }},
+      data_list = list(
+        data = lh$data,
+        response_data = lh$BRU_original_response_data,
+        extra_data = lh$data_extra
+      ),
+      .envir = .envir
+    )
+
+    if (lh$is_additive) {
+      lh$expr_text <- "BRU_EXPRESSION"
+    }
+    lh$expr_text <- glue(
+      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+      " state = {{{lh$expr_text}}})}}"
+    )
+    lh$expr <- parse(text = lh$expr_text)
+    lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
+    lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
+    lh$allow_combine <- TRUE
+    lh$is_additive <- FALSE
+  }
+
+  lh
+}
+
+
+
 bru_obs_family_cp <- function(lh, options, .envir) {
   if (!is.null(lh[["aggregate"]])) {
     stop("The 'aggregate' feature cannot be used with family='cp'.")
@@ -1719,12 +1771,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
   if (identical(options[["bru_compress_cp"]], TRUE)) {
     allow_combine <- TRUE
-    response_data <- tibble::tibble(
+    new_response_data <- tibble::tibble(
       BRU_E = c(
         rep(0, length(N_data[N_data > 0])),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
-      BRU_response_cp = c(
+      BRU_response = c(
         N_data[N_data > 0],
         rep(0, NROW(ips))
       ),
@@ -1737,9 +1789,9 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       BRU_scale = response_data[["BRU_scale"]][1]
     )
 
-    data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
-    data_extra[["BRU_cp_n_block"]] <- n_block
-    data_extra[["BRU_cp_agg"]] <-
+    lh$data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
+    lh$data_extra[["BRU_cp_n_block"]] <- n_block
+    lh$data_extra[["BRU_cp_agg"]] <-
       bm_aggregate(
         type = "average",
         n_block = n_block
@@ -1767,12 +1819,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
-                       BRU_aggregate = TRUE,
-                       BRU_point_weights = point_weights
+        BRU_aggregate = TRUE,
+        BRU_point_weights = point_weights
       ),
       dplyr::bind_cols(ips,
-                       BRU_aggregate = FALSE,
-                       BRU_point_weights = 0.0
+        BRU_aggregate = FALSE,
+        BRU_point_weights = 0.0
       )
     )
 
@@ -1786,8 +1838,8 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       which(group_cv_block == group_cv_block[i])
     })
 
-    control.gcpo <- modifyList(
-      control.gcpo,
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
       list(friends = group_cv_friends)
     )
   } else {
@@ -1796,8 +1848,8 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         rep(0, sum(N_data)),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
-      BRU_response_cp = c(
-        points_weight,
+      BRU_response = c(
+        point_weights,
         rep(0, NROW(ips))
       ),
       BRU_block = c(
@@ -2046,84 +2098,89 @@ bru_obs <- function(formula = . ~ .,
 
   data_extra <- as.list(data_extra)
 
-  if (!is.null(aggregate) && is.character(aggregate)) {
-    aggregate <- switch(aggregate,
-      "none" = NULL,
-      bm_aggregate(type = aggregate)
-    )
+  if (!is.logical(allow_combine)) {
+    if (!is.null(aggregate)) {
+      allow_combine <- TRUE
+    } else if (!is.null(response_data)) {
+      bru_log_warn(
+        paste0(
+          "Non-null response data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else if (is.list(data) && !is.data.frame(data)) {
+      bru_log_warn(
+        paste0(
+          "Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.\n",
+          "  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else {
+      allow_combine <- FALSE
+    }
   }
-  if (!is.null(aggregate)) {
-    data <- bru_agg_data(
+
+  original_response_data <- response_data
+  # Must be a list or tibble to allow inla.mdata responses
+  # Until inla.surv is converted to tibble (or data.frame), must be a list
+  response_data <- tibble::tibble(
+    BRU_E = E,
+    BRU_Ntrials = Ntrials,
+    BRU_scale = scale,
+    BRU_weights = weights,
+  )
+  response_data <- as.list(response_data)
+  response_data$BRU_response <- response
+
+  # Prototype object
+  lh <- structure(
+    list(
+      family = family,
+      formula = formula,
+      response_data = response_data,
       data = data,
-      ips = ips,
-      domain = domain,
-      samplers = samplers,
+      data_extra = data_extra,
+      integration_info = list(
+        ips = ips,
+        domain = domain,
+        samplers = samplers
+      ),
+      is_additive = is_additive,
+      linear = is_additive, # Not quite correct, as depends on component defs
+      expr_text = expr_text,
+      expr = expr,
+      response = "BRU_response",
+      inla.family = inla.family,
+      used = used,
+      allow_combine = allow_combine,
+      control.family = control.family,
+      control.gcpo = control.gcpo,
+      tag = tag,
+      BRU_original_response_data = original_response_data
+    ),
+    class = "bru_obs"
+  )
+
+  if (!is.null(aggregate)) {
+    lh <- bru_obs_agg(lh,
+      aggregate = aggregate,
+      aggregate_input = {{ aggregate_input }},
       options = options,
       .envir = .envir
     )
-    ips <- NULL
-
-    aggregate_input <- bru_agg_input(
-      {{ aggregate_input }},
-      data_list = list(
-        data = data,
-        response_data = response_data,
-        extra_data = data_extra
-      ),
-      .envir = .envir
-    )
-
-    if (!is_additive) {
-      expr_text <- formula_char[length(formula_char)]
-    } else {
-      expr_text <- "BRU_EXPRESSION"
-    }
-    expr_text <- glue(
-      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-      " state = {{{expr_text}}})}}"
-    )
-    expr <- parse(text = expr_text)
-    data_extra[["BRU_aggregate_mapper"]] <- aggregate
-    data_extra[["BRU_aggregate_input"]] <- aggregate_input
-    allow_combine <- TRUE
-    is_additive <- FALSE
   }
 
   # More on special bru likelihoods
   if (family == "cp") {
-  } else {
-    if (!is.logical(allow_combine)) {
-      if (!is.null(response_data)) {
-        bru_log_warn(
-          paste0(
-            "Non-null response data supplied; ",
-            "guessing allow_combine=TRUE.",
-            "\n  Specify allow_combine explicitly to avoid this warning."
-          )
-        )
-        allow_combine <- TRUE
-      } else if (is.list(data) && !is.data.frame(data)) {
-        bru_log_warn(
-          paste0(
-            "Non data-frame list-like data supplied; ",
-            "guessing allow_combine=TRUE.\n",
-            "  Specify allow_combine explicitly to avoid this warning."
-          )
-        )
-        allow_combine <- TRUE
-      } else {
-        allow_combine <- FALSE
-      }
-    }
+    lh <- bru_obs_family_cp(lh, options = options, .envir = .envir)
+  }
 
-    # Need to make a list instead of data.frame, to allow inla.mdata responses
-    response_data <- list(
-      BRU_response = response,
-      BRU_E = E,
-      BRU_Ntrials = Ntrials,
-      BRU_scale = scale
-    )
-    response <- "BRU_response"
+  if (is.null(lh[["response_data"]][[lh[["response"]]]])) {
+    stop("Response variable missing or could not be evaluated")
   }
 
   if (lifecycle::is_present(include) ||
@@ -2201,46 +2258,20 @@ bru_obs <- function(formula = . ~ .,
         )
       )
     }
-    if (is.null(used)) {
-      used <- bru_used(formula,
+    if (is.null(lh[["used"]])) {
+      lh[["used"]] <- bru_used(formula,
         effect = include,
         effect_exclude = exclude,
         latent = include_latent
       )
     }
   }
-  if (is.null(used)) {
-    used <- bru_used(formula)
+  if (is.null(lh[["used"]])) {
+    lh[["used"]] <- bru_used(formula)
   }
 
-  # The likelihood object that will be returned
-
-  lh <- structure(
-    list(
-      family = family,
-      formula = formula,
-      response_data = response_data, # agg
-      data = data,
-      data_extra = data_extra,
-      E = E,
-      Ntrials = Ntrials,
-      weights = weights,
-      scale = scale,
-      samplers = samplers,
-      is_additive = is_additive,
-      linear = is_additive, # Not quite correct, as depends on component defs
-      expr = expr,
-      response = response,
-      inla.family = inla.family,
-      domain = domain,
-      used = used,
-      allow_combine = allow_combine,
-      control.family = control.family,
-      control.gcpo = control.gcpo,
-      tag = tag
-    ),
-    class = "bru_obs"
-  )
+  # Remove temporary copy of input data
+  lh$BRU_original_response_data <- NULL
 
   # Return likelihood
   lh
