@@ -1726,17 +1726,15 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     } else {
       data <- as.data.frame(response)
     }
-    orig_response_data <- NULL
-    N_data <- NROW(data)
   } else {
     data <- tibble::as_tibble(response)
     if (("geometry" %in% names(data)) &&
       inherits(data$geometry, "sfc")) {
       sf::st_geometry(data) <- "geometry"
     }
-    orig_response_data <- NULL
-    N_data <- NROW(data)
   }
+  orig_response_data <- NULL
+  N_data <- NROW(data)
 
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
