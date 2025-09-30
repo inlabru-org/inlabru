@@ -445,13 +445,15 @@ bru_comp.character <- function(object,
   names(fcall)[2] <- ""
   # 'main' and 'weights' are the only regular parameter allowed to be nameless,
   # and only if they are the first parameters (position 3 and 4 in fcall)
-  if (is.null(names(fcall)) || identical(names(fcall)[3], "")) {
+  if ((length(fcall) >= 3L) &&
+    (is.null(names(fcall)) || (names(fcall)[3] %in% c("", NA_character_)))) {
     names(fcall)[3] <- "main"
   }
-  if (is.null(names(fcall)) || identical(names(fcall)[4], "")) {
+  if ((length(fcall) >= 4L) &&
+    (is.null(names(fcall)) || (names(fcall)[4] %in% c("", NA_character_)))) {
     names(fcall)[4] <- "weights"
   }
-  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
+  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% c("", NA_character_))
   if (length(unnamed_arguments) > 0) {
     # Without this check, R gives the error
     #   'In str2lang(s) : parsing result not of length one, but 0'
@@ -612,9 +614,8 @@ bru_comp.character <- function(object,
 #' @aliases bru_component_list
 #' @aliases component_list
 bru_comp_list <- function(object,
-                          lhoods = NULL,
-                          .envir = parent.frame(),
-                          ...) {
+                          ...,
+                          .envir = parent.frame()) {
   UseMethod("bru_comp_list")
 }
 
@@ -640,8 +641,9 @@ bru_comp_list <- function(object,
 #' # Individual component
 #' eff <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 bru_comp_list.formula <- function(object,
+                                  ...,
                                   lhoods = NULL,
-                                  .envir = parent.frame(), ...) {
+                                  .envir = parent.frame()) {
   if (!is.null(environment(object))) {
     .envir <- environment(object)
   }
@@ -667,16 +669,16 @@ bru_comp_list.formula <- function(object,
 
 
 
-#' @describeIn bru_comp_list Combine a list of components and/or component
-#'   formulas into a `bru_comp_list` object
+#' @describeIn bru_comp_list Combine a list of components, component lists,
+#'   and/or component formulas into a single `bru_comp_list` object
 #' @param inputs A tree-like list of component input evaluations,
 #' from [bru_input.bru_obs_list()].
 #' @export
 bru_comp_list.list <- function(object,
+                               ...,
                                lhoods = NULL,
                                .envir = parent.frame(),
-                               inputs = NULL,
-                               ...) {
+                               inputs = NULL) {
   # Maybe the list has been given an environment?
   if (!is.null(environment(object))) {
     .envir <- environment(object)
@@ -684,24 +686,22 @@ bru_comp_list.list <- function(object,
     # Later code needs an actual environment
     .envir <- new.env()
   }
-  if (any(vapply(object, function(x) inherits(x, "formula"), TRUE))) {
-    object <-
-      do.call(
-        c,
-        lapply(
-          object,
-          function(x) {
-            if (inherits(x, "formula")) {
-              bru_comp_list(x, lhoods = lhoods, .envir = .envir)
-            } else {
-              list(x)
-            }
-          }
-        )
-      )
+  is_comp <- vapply(object, function(x) inherits(x, "bru_comp"), TRUE)
+  if (!all(is_comp)) {
+    is_comp_list <- vapply(object, function(x) {
+      inherits(x, "bru_comp_list")
+    }, TRUE)
+    if (!all(is_comp_list)) {
+      object <- lapply(seq_along(object), function(k) {
+        bru_comp_list(object[[k]], .envir = .envir)
+      })
+    }
+    object <- unlist(object, recursive = FALSE)
   }
-  stopifnot(all(vapply(object, function(x) inherits(x, "bru_comp"), TRUE)))
-  class(object) <- c("bru_comp_list", "list")
+  object <- structure(
+    object,
+    class = c("bru_comp_list", "list")
+  )
   environment(object) <- .envir
 
   object <- set_list_names(object, tag = "label", priority = "name")
@@ -724,7 +724,23 @@ bru_comp_list.list <- function(object,
   object
 }
 
+#' @export
+#' @describeIn bru_comp_list Place a single `bru_comp` object into a
+#'   `bru_comp_list` object.
+bru_comp_list.bru_comp <- function(object,
+                                   ...,
+                                   .envir = parent.frame()) {
+  bru_comp_list(list(object), .envir = .envir, ...)
+}
 
+#' @export
+#' @describeIn bru_comp_list Make sure a `bru_comp_list` object is fully
+#'   configured.
+bru_comp_list.bru_comp_list <- function(object,
+                                        ...,
+                                        .envir = parent.frame()) {
+  bru_comp_list(list(object), .envir = .envir, ...)
+}
 
 
 
@@ -734,17 +750,7 @@ bru_comp_list.list <- function(object,
 #' objects. The environment from the first argument will be applied to the
 #' resulting `bru_comp_list`.
 `c.bru_comp_list` <- function(...) {
-  stopifnot(all(vapply(
-    list(...),
-    function(x) inherits(x, "bru_comp_list"),
-    TRUE
-  )))
-  env <- environment(list(...)[[1]])
-  object <- NextMethod()
-  class(object) <- c("bru_comp_list", "list")
-  environment(object) <- env
-  object <- set_list_names(object, tag = "label", priority = "name")
-  object
+  bru_comp_list(list(...), .envir = environment(list(...)[[1]]))
 }
 
 #' @export
@@ -752,17 +758,7 @@ bru_comp_list.list <- function(object,
 #'   objects from [bru_comp()]. The environment from the first argument
 #'   will be applied to the resulting `bru_comp_list`.
 `c.bru_comp` <- function(...) {
-  stopifnot(all(vapply(
-    list(...),
-    function(x) inherits(x, "bru_comp"),
-    TRUE
-  )))
-  env <- environment(list(...)[[1]])
-  object <- list(...)
-  class(object) <- c("bru_comp_list", "list")
-  environment(object) <- env
-  object <- set_list_names(object, tag = "label", priority = "name")
-  object
+  bru_comp_list(list(...), .envir = environment(list(...)[[1]]))
 }
 
 #' @export

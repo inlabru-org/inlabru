@@ -522,12 +522,6 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
         "'options' list argument instead."
       ))
     }
-    if (!all(dot_is_lhood) && !all(dot_is_lhood_list)) {
-      stop(paste0(
-        "Cannot mix `bru_obs` and `bru_obs_list` objects in the `...` ",
-        "argument of `bru()`."
-      ))
-    }
   } else {
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
@@ -1396,6 +1390,119 @@ check_sp_data_deprecation <- function(...) {
 }
 
 
+bru_agg_data <- function(
+    data,
+    ips = NULL,
+    domain = NULL,
+    samplers = NULL,
+    options,
+    .envir) {
+  if (is.null(ips)) {
+    if (!is.null(domain)) {
+      ips <- fm_int(
+        domain = domain,
+        samplers = samplers,
+        int.args = options[["bru_int_args"]]
+      )
+    }
+  } else {
+    if (is.null(data)) {
+      data <- ips
+      ips <- NULL
+    }
+  }
+  if (!is.null(ips)) {
+    if (!is.null(data)) {
+      ips$.block <- as.integer(ips$.block)
+      if (".block" %in% names(data)) {
+        ips <- dplyr::left_join(ips, data, by = ".block")
+      } else {
+        if (NROW(data) != max(ips$.block)) {
+          stop(glue(
+            "`data` has {NROW(data)} rows, but `ips` has ",
+            "{max(ips$.block)} blocks. Cannot join."
+          ))
+        }
+        ips <- dplyr::left_join(
+          ips,
+          dplyr::bind_cols(data, .block = seq_len(NROW(data))),
+          by = ".block"
+        )
+      }
+    }
+    data <- ips
+    ips <- NULL
+  }
+
+  data
+}
+
+
+bru_agg_input <- function(input, data_list, .envir) {
+  aggregate_input <- bru_eval_in_data_context(
+    {{ input }},
+    data = data_list,
+    default = NULL,
+    .envir = .envir
+  )
+  if (is.null(aggregate_input)) {
+    aggregate_input <- list()
+  }
+  if (is.null(aggregate_input[["block"]])) {
+    aggregate_input[["block"]] <- bru_eval_in_data_context(
+      .data[[".block"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.character(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'character' aggregation block information detected.\n",
+      "Please use a numeric or integer vector for the block information ",
+      "instead.\n",
+      "If you want to use a character vector, ",
+      "please convert it to a factor first,\n",
+      "making sure the factor level order matches your intended order,\n",
+      "and use `as.integer()`."
+    )
+
+    bru_log_abort(msg)
+  }
+  if (is.null(aggregate_input[["weights"]])) {
+    aggregate_input[["weights"]] <- bru_eval_in_data_context(
+      .data[["weight"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["n_block"]])) {
+    agg_n_block_expr <- rlang::parse_expr(
+      "bru_response_size(.response_data.)"
+    )
+    aggregate_input[["n_block"]] <- bru_eval_in_data_context(
+      !!agg_n_block_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  lapply(c("block", "weights", "n_block"), function(nm) {
+    if (!is.numeric(aggregate_input[[nm]])) {
+      bru_log_abort(
+        glue::glue(
+          "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+          "evaluates to NULL."
+        )
+      )
+    }
+  })
+
+  aggregate_input
+}
+
+
 
 #' @title Observation model construction for usage with [bru()]
 #'
@@ -1648,124 +1755,36 @@ bru_obs <- function(formula = . ~ .,
     default = 1,
     .envir = .envir
   )
+
+  data_extra <- as.list(data_extra)
+
   if (!is.null(aggregate) && is.character(aggregate)) {
-    aggregate <- match.arg(
-      aggregate,
-      c("none", "sum", "average", "logsumexp", "logaverageexp", "logitaverage")
-    )
     aggregate <- switch(aggregate,
       "none" = NULL,
       bm_aggregate(type = aggregate)
     )
   }
   if (!is.null(aggregate)) {
-    if (is.null(ips)) {
-      if (!is.null(domain)) {
-        ips <- fm_int(
-          domain = domain,
-          samplers = samplers,
-          int.args = options[["bru_int_args"]]
-        )
-      }
-    } else {
-      if (is.null(data)) {
-        data <- ips
-        ips <- NULL
-      }
-    }
-    if (!is.null(ips)) {
-      if (!is.null(data)) {
-        ips$.block <- as.integer(ips$.block)
-        if (".block" %in% names(data)) {
-          ips <- dplyr::left_join(ips, data, by = ".block")
-        } else {
-          if (NROW(data) != max(ips$.block)) {
-            stop(glue(
-              "`data` has {NROW(data)} rows, but `ips` has ",
-              "{max(ips$.block)} blocks. Cannot join."
-            ))
-          }
-          ips <- dplyr::left_join(
-            ips,
-            dplyr::bind_cols(data, .block = seq_len(NROW(data))),
-            by = ".block"
-          )
-        }
-      }
-      data <- ips
-      ips <- NULL
-    }
-
-    aggregate_input <- bru_eval_in_data_context(
-      {{ aggregate_input }},
-      data = list(data = data, response_data = response_data),
-      default = NULL,
+    data <- bru_agg_data(
+      data = data,
+      ips = ips,
+      domain = domain,
+      samplers = samplers,
+      options = options,
       .envir = .envir
     )
-    if (is.null(aggregate_input)) {
-      aggregate_input <- list()
-    }
-    if (is.null(aggregate_input[["block"]])) {
-      aggregate_input[["block"]] <- bru_eval_in_data_context(
-        .data[[".block"]],
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.character(aggregate_input[["block"]])) {
-      msg <- paste0(
-        "'character' aggregation block information detected.\n",
-        "Please use a numeric or integer vector for the block information ",
-        "instead.\n",
-        "If you want to use a character vector, ",
-        "please convert it to a factor first,\n",
-        "making sure the factor level order matches your intended order,\n",
-        "and use `as.integer()`."
-      )
+    ips <- NULL
 
-      if (utils::packageVersion("fmesher") < "0.5.0") {
-        msg <- c(msg, paste0(
-          "You have fmesher < 0.5.0. From version 0.5.0,",
-          "`fm_int()`/`fm_cprod()`\ncreates integer block information ",
-          "automatically."
-        ))
-      }
-      bru_log_abort(msg)
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      aggregate_input[["weights"]] <- bru_eval_in_data_context(
-        .data[["weight"]],
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      agg_n_block_expr <- rlang::parse_expr(
-        "bru_response_size(.response_data.)"
-      )
-      aggregate_input[["n_block"]] <- bru_eval_in_data_context(
-        !!agg_n_block_expr,
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    lapply(c("block", "weights", "n_block"), function(nm) {
-      if (!is.numeric(aggregate_input[[nm]])) {
-        bru_log_abort(
-          glue::glue(
-            "Aggregation requested, but `aggregate_input[['{nm}']]` ",
-            "evaluates to NULL."
-          )
-        )
-      }
-    })
-  }
+    aggregate_input <- bru_agg_input(
+      {{ aggregate_input }},
+      data_list = list(
+        data = data,
+        response_data = response_data,
+        extra_data = data_extra
+      ),
+      .envir = .envir
+    )
 
-  data_extra <- as.list(data_extra)
-  if (!is.null(aggregate)) {
     if (!is_additive) {
       expr_text <- formula_char[length(formula_char)]
     } else {
@@ -2294,25 +2313,6 @@ bru_response_size.bru <- function(object) {
 }
 
 
-#' @describeIn bru_obs
-#' Combine `bru_obs` observation model object into a `bru_obs_list` object
-#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
-#' @export
-bru_obs_list <- function(...) {
-  UseMethod("bru_obs_list")
-}
-
-#' @describeIn bru_obs
-#' Combine one or more lists of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
-#' @export
-bru_obs_list.list <- function(object, ..., .envir = NULL) {
-  object <- lapply(object, as_bru_obs)
-  class(object) <- c("bru_obs_list", "list")
-  bru_obs_list(object, .envir = .envir)
-}
-
 set_list_names <- function(x, tag, priority = "immutable") {
   priority <- match.arg(priority, c("immutable", "tag", "name"))
   list_names <- names(x)
@@ -2392,28 +2392,80 @@ set_list_names <- function(x, tag, priority = "immutable") {
 }
 
 #' @describeIn bru_obs
-#' Combine a list of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
+#' Combine `bru_obs` observation model object into a `bru_obs_list` object
+#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
 #' @export
-bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
-  if (length(list(...)) > 1) {
-    # If multiple objects are given, combine them into a single list
-    # and then recall the method
-    object <- lapply(list(...), as_bru_obs_list)
-    object <- structure(
-      unlist(object, recursive = FALSE),
-      class = c("bru_obs_list", "list")
+bru_obs_list <- function(..., .tag = NULL) {
+  UseMethod("bru_obs_list")
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param object A list of `bru_obs` and/or `bru_obs_list` objects
+#' @export
+bru_obs_list.list <- function(object, ..., .tag = NULL) {
+  if (length(list(...)) > 0) {
+    return(bru_obs_list(list(object, ...)))
+  }
+  if (length(object) == 0) {
+    return(
+      structure(
+        list(),
+        class = c("bru_obs_list", "list")
+      )
     )
-  } else {
-    object <- list(...)[[1]]
+  }
+  is_obs <- vapply(object, function(x) inherits(x, "bru_obs"), TRUE)
+  if (!all(is_obs)) {
+    is_obs_list <- vapply(object, function(x) inherits(x, "bru_obs_list"), TRUE)
+    if (!all(is_obs_list)) {
+      object <- lapply(seq_along(object), function(k) {
+        bru_obs_list(object[[k]], .tag = names(object)[k])
+      })
+    }
+    object <- unlist(object, recursive = FALSE)
+  }
+  object <- structure(
+    object,
+    class = c("bru_obs_list", "list")
+  )
+
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+
+  object
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param .tag Optional name to assign to a single `bru_obs` object. Reserved
+#'   for internal use.
+#' @export
+bru_obs_list.bru_obs <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
   }
 
-  if (is.null(.envir)) {
-    .envir <- environment(object)
+  object <- structure(
+    list(...),
+    class = c("bru_obs_list", "list")
+  )
+  if (!is.null(.tag)) {
+    names(object) <- .tag
   }
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+  object
+}
 
-  environment(object) <- .envir
+#' @describeIn bru_obs
+#' Combine one or more `bru_obs_list` objects into a `bru_obs_list` object
+#' @export
+bru_obs_list.bru_obs_list <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
+  }
+  object <- list(...)[[1]]
   object <- set_list_names(object, tag = "tag", priority = "immutable")
   object
 }
@@ -2423,16 +2475,16 @@ bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
 #' @describeIn bru_obs
 #' Combine several `bru_obs` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs <- function(..., .envir = NULL) {
-  bru_obs_list(list(...), .envir = .envir)
+c.bru_obs <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
 #' @describeIn bru_obs
 #' Combine several `bru_obs_list` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs_list <- function(..., .envir = NULL) {
-  bru_obs_list(..., .envir = .envir)
+c.bru_obs_list <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
@@ -2498,7 +2550,7 @@ like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")`
@@ -2515,7 +2567,7 @@ bru_like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @rdname bru_obs_print
