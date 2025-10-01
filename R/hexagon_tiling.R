@@ -62,7 +62,7 @@ cv_partition <- function(samplers,
     )
 
     # I am not sure which terra version changes how they name for init()
-    terra_version <- packageVersion("terra")
+    terra_version <- utils::packageVersion("terra")
     if (terra_version <= "1.8-42") {
       grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 1, ]
       grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 0, ]
