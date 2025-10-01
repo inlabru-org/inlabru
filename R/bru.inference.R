@@ -2099,6 +2099,130 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 }
 
 
+check_used_deprecation <- function(used,
+                                   include,
+                                   exclude,
+                                   include_latent,
+                                   formula) {
+  if (lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)) {
+    if (!lifecycle::is_present(include)) {
+      include <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect = include)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include)",
+        "bru_obs(used)",
+        c(
+          "The provided `include` value may be ignored.",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      )
+    }
+    if (!lifecycle::is_present(exclude)) {
+      exclude <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `exclude` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect_exclude = exclude)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(exclude)",
+        "bru_obs(used)",
+        c(
+          "The provided `exclude` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      )
+    }
+    if (!lifecycle::is_present(include_latent)) {
+      include_latent <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include_latent` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(latent = include_latent)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include_latent)",
+        "bru_obs(used)",
+        c(
+          "The provided `include_latent` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      )
+    }
+    if (is.null(used)) {
+      used <- bru_used(formula,
+                       effect = include,
+                       effect_exclude = exclude,
+                       latent = include_latent
+      )
+    }
+  }
+  used
+}
+
+bru_obs_handle_allow_combine <- function(allow_combine,
+                                         data,
+                                         response_data,
+                                         aggregate) {
+  if (!is.logical(allow_combine)) {
+    if (!is.null(aggregate)) {
+      allow_combine <- TRUE
+    } else if (!is.null(response_data)) {
+      bru_log_warn(
+        paste0(
+          "Non-null response data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else if (is.list(data) && !is.data.frame(data)) {
+      bru_log_warn(
+        paste0(
+          "Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.\n",
+          "  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else {
+      allow_combine <- FALSE
+    }
+  }
+  allow_combine
+}
+
+
 #' @title Observation model construction for usage with [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
@@ -2269,6 +2393,13 @@ bru_obs <- function(formula = . ~ .,
     samplers = samplers,
     ips = ips
   )
+  used <- check_used_deprecation(
+    used = used,
+    include = rlang::maybe_missing(include),
+    exclude = rlang::maybe_missing(exclude),
+    include_latent = rlang::maybe_missing(include_latent),
+    formula = formula
+  )
 
   # Set the response name
   if (length(formula_char) < 3) {
@@ -2314,43 +2445,24 @@ bru_obs <- function(formula = . ~ .,
 
   data_extra <- as.list(data_extra)
 
-  if (!is.logical(allow_combine)) {
-    if (!is.null(aggregate)) {
-      allow_combine <- TRUE
-    } else if (!is.null(response_data)) {
-      bru_log_warn(
-        paste0(
-          "Non-null response data supplied; ",
-          "guessing allow_combine=TRUE.",
-          "\n  Specify allow_combine explicitly to avoid this warning."
-        )
-      )
-      allow_combine <- TRUE
-    } else if (is.list(data) && !is.data.frame(data)) {
-      bru_log_warn(
-        paste0(
-          "Non data-frame list-like data supplied; ",
-          "guessing allow_combine=TRUE.\n",
-          "  Specify allow_combine explicitly to avoid this warning."
-        )
-      )
-      allow_combine <- TRUE
-    } else {
-      allow_combine <- FALSE
-    }
-  }
+  # Decide on allow_combine default
+  allow_combine <- bru_obs_handle_allow_combine(
+    allow_combine = allow_combine,
+    data = data,
+    response_data = response_data,
+    aggregate = aggregate
+  )
 
   original_response_data <- response_data
   # Must be a list or tibble to allow inla.mdata responses
   # Until inla.surv is converted to tibble (or data.frame), must be a list
-  response_data <- tibble::tibble(
+  response_data <- list(
+    BRU_response = response,
     BRU_E = E,
     BRU_Ntrials = Ntrials,
     BRU_scale = scale,
-    BRU_weights = weights,
+    BRU_weights = weights
   )
-  response_data <- as.list(response_data)
-  response_data$BRU_response <- response
 
   # Prototype object
   lh <- structure(
@@ -2398,89 +2510,6 @@ bru_obs <- function(formula = . ~ .,
     stop("Response variable missing or could not be evaluated")
   }
 
-  if (lifecycle::is_present(include) ||
-    lifecycle::is_present(exclude) ||
-    lifecycle::is_present(include_latent)) {
-    if (!lifecycle::is_present(include)) {
-      include <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `include` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(effect = include)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(include)",
-        "bru_obs(used)",
-        c(
-          "The provided `include` value may be ignored.",
-          "If auto-detection doesn't work, use `bru_used(effect = include)`"
-        )
-      )
-    }
-    if (!lifecycle::is_present(exclude)) {
-      exclude <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `exclude` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(effect_exclude = exclude)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(exclude)",
-        "bru_obs(used)",
-        c(
-          "The provided `exclude` value may be ignored.",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(effect_exclude = exclude)`"
-          )
-        )
-      )
-    }
-    if (!lifecycle::is_present(include_latent)) {
-      include_latent <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `include_latent` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(latent = include_latent)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(include_latent)",
-        "bru_obs(used)",
-        c(
-          "The provided `include_latent` value may be ignored.",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(latent = include_latent)`"
-          )
-        )
-      )
-    }
-    if (is.null(lh[["used"]])) {
-      lh[["used"]] <- bru_used(formula,
-        effect = include,
-        effect_exclude = exclude,
-        latent = include_latent
-      )
-    }
-  }
   if (is.null(lh[["used"]])) {
     lh[["used"]] <- bru_used(formula)
   }
