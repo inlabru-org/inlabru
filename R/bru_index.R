@@ -62,17 +62,17 @@ bru_index.bru_obs <- function(object, what = NULL, ...) {
 }
 
 #' @describeIn bru_index Extract the index vector for "APredictor" for one or
-#'   more specified observation [bru_obs()] sub-models. Accepts any combination
-#'   of `tag` and `what`.
+#'  more specified observation [bru_obs()] sub-models. Accepts any combination
+#'  of `tag` and `what`.
 #' @param tag `character` or `integer`; Either a character vector identifying
-#'   the tags of one or more of the [bru_obs()] observation models, or an
-#'   integer vector identifying models by their [bru()] specification order. If
-#'   `NULL` (default) computes indices for all sub-models.
+#'  the tags of one or more of the [bru_obs()] observation models, or an
+#'  integer vector identifying models by their [bru()] specification order. If
+#'  `NULL` (default) computes indices for all sub-models.
 #' @export
-#' @returns * `bru_index(bru)`: An `integer` vector.
-bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
+#' @returns * `bru_index(bru_obs_list)`: An `integer` vector.
+bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
   if (is.null(tag)) {
-    tag <- seq_len(length(object[["bru_info"]][["lhoods"]]))
+    tag <- seq_len(length(object))
   }
   if (length(tag) == 0L) {
     return(integer(0))
@@ -80,33 +80,44 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
   size <- bru_response_size(object)
   off <- c(0L, cumsum(size))
   if (is.character(tag)) {
-    ok_tags <- tag %in% names(object[["bru_info"]][["lhoods"]])
+    ok_tags <- tag %in% names(object)
     if (any(!ok_tags)) {
       stop(glue(
         "Invalid tag(s) {{{glue_collapse(tag[!ok_tags], sep = ', ')}}} for ",
         "bru object with tags {{",
-        "{glue_collapse(names(object[['bru_info']][['lhoods']]), sep = ', ')}",
+        "{glue_collapse(names(object), sep = ', ')}",
         "}}"
       ))
     }
     unlist(lapply(tag, function(x) {
-      x_idx <- which(names(object$bru_info$lhoods) %in% x)
-      off[x_idx] + bru_index(object$bru_info$lhoods[[x_idx]], what = what)
+      x_idx <- which(names(object) %in% x)
+      unlist(lapply(x_idx, function(x_idx_) {
+        off[x_idx_] + bru_index(object[[x_idx_]], what = what)
+      }))
     }))
   } else {
     ok_tags <- (tag >= 1L) &
-      (tag <= length(object[["bru_info"]][["lhoods"]]))
+      (tag <= length(object))
     if (any(!ok_tags)) {
       stop(glue(
         "Invalid tag indices {{{glue_collapse(tag[!ok_tags], sep = ', ')}}}",
         " for bru object with tag indices {{1, ..., ",
-        "{length(object[['bru_info']][['lhoods']])}}}"
+        "{length(object)}}}"
       ))
     }
     unlist(lapply(tag, function(x) {
-      off[x] + bru_index(object$bru_info$lhoods[[x]], what = what)
+      off[x] + bru_index(object[[x]], what = what)
     }))
   }
+}
+
+#' @describeIn bru_index Extract the index vector for "APredictor" for one or
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination
+#'   of `tag` and `what`.
+#' @export
+#' @returns * `bru_index(bru)`: An `integer` vector.
+bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
+  bru_index(object[["bru_info"]][["lhoods"]], tag = tag, what = what, ...)
 }
 
 #' @export

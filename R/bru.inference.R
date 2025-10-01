@@ -310,6 +310,67 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.12.0.9017"
     }
 
+    if (utils::compareVersion("2.13.0.9012", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9012")
+
+      # Update bru_input input&layer to quosures
+      quosure_update <- function(x, env) {
+        if (is.null(x)) {
+          return(NULL)
+        }
+        rlang::as_quosure(x, env = env)
+      }
+      eff <- object[["model"]][["effects"]]
+      for (k in seq_along(object[["model"]][["effects"]])) {
+        for (part in c("main", "group", "replicate")) {
+          if (!is.null(eff[[k]][[part]][["input"]])) {
+            for (input_part in c("input", "layer")) {
+              eff[[k]][[part]][["input"]][[input_part]] <-
+                quosure_update(
+                  eff[[k]][[part]][["input"]][[input_part]],
+                  eff[[k]][["env_extra"]]
+                )
+            }
+          }
+        }
+        part <- "weights"
+        if (!is.null(eff[[k]][[part]])) {
+          for (input_part in c("input", "layer")) {
+            eff[[k]][[part]][[input_part]] <-
+              quosure_update(
+                eff[[k]][[part]][[input_part]],
+                eff[[k]][["env_extra"]]
+              )
+          }
+        }
+      }
+      eff <- object[["model"]][["effects"]] <- eff
+
+      object[["inlabru_version"]] <- "2.13.0.9012"
+    }
+
+    if (utils::compareVersion("2.13.0.9015", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9015")
+
+      # Update lhoods to streamlined storage format
+      if (!is.null(object[["lhoods"]])) {
+        object[["lhoods"]] <-
+          lapply(object[["lhoods"]], function(x) {
+            for (what in c("E", "Ntrials", "weights", "scale")) {
+              BRU_what <- paste0("BRU_", what)
+              if (is.null(x[["response_data"]][[BRU_what]])) {
+                x[["response_data"]][[BRU_what]] <- x[[what]]
+              }
+              x[[what]] <- NULL
+            }
+            x
+          })
+        class(object[["lhoods"]]) <- c("bru_obs_list", "list")
+      }
+
+      object[["inlabru_version"]] <- "2.13.0.9015"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 
@@ -483,12 +544,6 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
         "'options' list argument instead."
       ))
     }
-    if (!all(dot_is_lhood) && !all(dot_is_lhood_list)) {
-      stop(paste0(
-        "Cannot mix `bru_obs` and `bru_obs_list` objects in the `...` ",
-        "argument of `bru()`."
-      ))
-    }
   } else {
     if (is.null(lhoods[["formula"]])) {
       lhoods[["formula"]] <- . ~ .
@@ -533,31 +588,35 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #'       projection matrices for (spatial) SPDE models. This feature is
 #'       accessible via the `components` parameter. Practical examples on how to
 #'       use spatial data by means of the components parameter can also be found
-#'       by looking at the [lgcp] function's documentation.
+#'       by looking at the [lgcp()] function's documentation.
 #'     \item
-#'       Constructing multiple likelihoods is straight forward. See [like] for
-#'       more information on how to provide additional likelihoods to `bru`
-#'       using the `...` parameter list.
+#'       Constructing multiple observation models is straightforward. See
+#'       [bru_obs()] for more information on how to provide additional
+#'       models to `bru` using the `...` parameter list.
 #'     \item
 #'       Support for non-linear predictors. See example below.
 #'     \item
 #'       Log Gaussian Cox process (LGCP) inference is
-#'       available by using the `cp` family or (even easier) by using the
-#'       [lgcp] function.
+#'       available by using the `"cp"` family or (even easier) by using the
+#'       [lgcp()] function.
 #'   }
 #' @export
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #'
-#' @param components A `formula`-like specification of latent components.
+#' @param components Latent component definitions, either as a [bru_comp_list()]
+#'   object, or a `formula`-like specification.
 #'   Also used to define a default linear additive predictor.  See
 #'   [bru_comp()] for details.
-#' @param \dots Obervation models, each constructed by a calling [bru_obs()], or
-#'   named parameters that can be passed to a single [bru_obs()] call. Note that
-#'   all the arguments will be evaluated before calling [bru_obs()] in order to
-#'   detect if they are `like` objects. This means that special arguments that
-#'   need to be evaluated in the context of `response_data` or `data` (such as
-#'   `Ntrials`) may will only work that way in direct calls to [bru_obs()].
+#' @param \dots Observation models, each constructed by a calling [bru_obs()],
+#'   or [bru_obs_list()].
+#'
+#'   Alternatively, for backwards compatibility, may be named parameters that
+#'   can be passed to a single [bru_obs()] call. These arguments will be
+#'   evaluated before calling [bru_obs()], in order to detect if they already
+#'   are `bru_obs` objects. This means that special arguments that are only
+#'   available in the context of `data` or `response_data` (such as `Ntrials`)
+#'   will only work properly in direct calls to [bru_obs()].
 #' @param .envir Environment for component evaluation (for when a non-formula
 #' specification is used)
 #' @param options A [bru_options] options object or a list of options passed
@@ -583,27 +642,7 @@ bru <- function(components = ~ Intercept(1),
   bru_log_bookmark("bru")
   bru_log_message("bru: Preprocessing", verbosity = 1L)
 
-  timings_convert <- function(x) {
-    if (!is.na(x[4])) {
-      x[1] <- x[1] + x[4]
-    }
-    if (!is.na(x[5])) {
-      x[2] <- x[2] + x[5]
-    }
-    x[1:3]
-  }
-
-  timings_collect <- function(Task, Iteration, time_diff) {
-    data.frame(
-      Task = Task,
-      Iteration = Iteration,
-      Time = as.difftime(unname(time_diff[1]), units = "secs"),
-      System = as.difftime(unname(time_diff[2]), units = "secs"),
-      Elapsed = as.difftime(unname(time_diff[3]), units = "secs")
-    )
-  }
-
-  timing <- list(start = timings_convert(proc.time()))
+  timing <- bru_timer_do(NULL, "Preprocess", 0L)
 
   # Turn model components and bru_obs objects into internal bru model
   bru.model <- bru_model(
@@ -637,7 +676,7 @@ bru <- function(components = ~ Intercept(1),
     options = options
   )
 
-  timing$setup <- timings_convert(proc.time())
+  timing <- bru_timer_done(timing)
 
   # Run iterated INLA
   if (options$bru_run) {
@@ -651,10 +690,9 @@ bru <- function(components = ~ Intercept(1),
     result <- list()
   }
 
-  timing$end <- timings_convert(proc.time())
   result$bru_timings <-
     rbind(
-      timings_collect("Preprocess", 0L, timing$setup - timing$start),
+      timing,
       result[["bru_iinla"]][["timings"]]
     )
 
@@ -964,16 +1002,14 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @title Evaluate expressions in data contexts
 #' @description Evaluate an expression in a series of data contexts, also making
 #'   the objects directly available as names surrounded by ".", stopping when
-#'   the expression evaluation completes with no error.
+#'   the expression evaluation completes with no error, as well as `tidy`
+#'   evaluation pronouns, e.g. `.data`.
 #'
 #'   This is an internal inlabru method, not intended for general use.
 #' @param input An expression to be evaluated
-#' @param data list of data objects in priority order. Named elements will
-#' be available as `.name.` in the evaluation. The `input` expression is
-#' evaluated with each non-NULL `data` object as `envir`, in order,
-#' until success. If there are no non-NULL data objects, the expression is
-#' evaluated in an empty environment, potentially falling back to enclosing
-#' environment variables.
+#' @param data list of data objects in priority order. Named elements will be
+#'   available as whole objects `.name.` as well as pronouns `.name` in the
+#'   evaluation.
 #' @param default Value used if the expression is evaluated as NULL. Default
 #' NULL
 #' @param .envir The evaluation environment
@@ -983,20 +1019,16 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' # The A values come from the 'data' element, and the B values come from
 #' # the 'response_data' element, as that is listed first.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     response_data = tibble::tibble(x = 1:5),
 #'     data = tibble::tibble(x = 1:10)
 #'   )
 #' )
 #' # Both A and B come from the 'data' element, as 'x' is found there,
-#' # terminating the evaluation attempt.
+#' # and the data objects are listed in order of precedence.
 #' bru_eval_in_data_context(
-#'   quote(
-#'     list(A = .data.$x, B = x)
-#'   ),
+#'   list(A = .data$x, B = x),
 #'   list(
 #'     data = tibble::tibble(x = 1:10),
 #'     response_data = tibble::tibble(x = 1:5)
@@ -1008,6 +1040,8 @@ bru_eval_in_data_context <- function(input,
                                      data = NULL,
                                      default = NULL,
                                      .envir = parent.frame()) {
+  input <- rlang::enquo(input)
+  deparse_input <- rlang::expr_text(input)
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
@@ -1015,38 +1049,35 @@ bru_eval_in_data_context <- function(input,
     }
     x
   })
-  enclos_envir <- new.env(parent = .envir)
+  top_envir <- rlang::new_environment()
   nms <- names(data)
   for (nm in setdiff(nms, "")) {
-    assign(glue(".{nm}."), data_orig[[nm]], envir = enclos_envir)
+    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
   }
   success <- FALSE
   result <- NULL
-  for (k in seq_along(data)) {
+  bottom_envir <- top_envir
+  for (k in rev(seq_along(data))) {
     if (is.null(data[[k]])) {
       next
     }
-    result <- try(
-      eval(input, envir = data[[k]], enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
-      break
-    }
+    bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
   }
-  if (all(vapply(data, is.null, TRUE))) {
-    result <- try(
-      eval(input, envir = NULL, enclos = enclos_envir),
-      silent = TRUE
-    )
-    if (!inherits(result, "try-error")) {
-      success <- TRUE
+  mask <- rlang::new_data_mask(bottom_envir, top_envir)
+  for (nm in setdiff(nms, "")) {
+    if (is.null(data[[nm]])) {
+      next
     }
+    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
   }
+  result <- try(
+    rlang::eval_tidy(input, data = mask, env = .envir),
+    silent = TRUE
+  )
+  success <- !inherits(result, "try-error")
   if (!success) {
-    stop(glue(
-      "Input '{glue_collapse(deparse(input), sep = '\n')}' could ",
+    stop(glue::glue(
+      "Input '{glue::glue_collapse(deparse_input, sep = '\n')}' could ",
       "not be evaluated."
     ))
   }
@@ -1351,6 +1382,1060 @@ bru_is_additive.formula <- function(x, ...) {
 }
 
 
+# Returns TRUE if any argument is a Spatial* object, and gives deprecation
+# messages.
+check_sp_data_deprecation <- function(...) {
+  .caller <- sys.call(-1)[[1]]
+  obj <- list(...)
+  nms <- names(obj)
+  result <- vapply(
+    nms,
+    function(nm) {
+      if (inherits(obj[[nm]], "Spatial")) {
+        if (!is.null(.caller)) {
+          lifecycle::deprecate_warn(
+            "2.12.0.9023",
+            as.character(glue::glue(
+              "{deparse(.caller)}({nm} = ",
+              "'has deprecated support for `Spatial` input')"
+            )),
+            I("`sf` input")
+          )
+        } else {
+          lifecycle::deprecate_warn(
+            "2.12.0.9023",
+            I(as.character(glue::glue(
+              "{nm} has deprecated support for `Spatial` input"
+            ))),
+            I("`sf` input")
+          )
+        }
+        TRUE
+      } else {
+        FALSE
+      }
+    },
+    logical(1)
+  )
+  invisible(any(result))
+}
+
+
+bru_agg_data <- function(
+    data,
+    ips = NULL,
+    domain = NULL,
+    samplers = NULL,
+    options,
+    .envir) {
+  if (is.null(ips)) {
+    if (!is.null(domain)) {
+      ips <- fm_int(
+        domain = domain,
+        samplers = samplers,
+        int.args = options[["bru_int_args"]]
+      )
+    }
+  } else {
+    if (is.null(data)) {
+      data <- ips
+      ips <- NULL
+    }
+  }
+  if (!is.null(ips)) {
+    if (!is.null(data)) {
+      ips$.block <- as.integer(ips$.block)
+      if (".block" %in% names(data)) {
+        ips <- dplyr::left_join(ips, data, by = ".block")
+      } else {
+        if (NROW(data) != max(ips$.block)) {
+          stop(glue(
+            "`data` has {NROW(data)} rows, but `ips` has ",
+            "{max(ips$.block)} blocks. Cannot join."
+          ))
+        }
+        ips <- dplyr::left_join(
+          ips,
+          dplyr::bind_cols(data, .block = seq_len(NROW(data))),
+          by = ".block"
+        )
+      }
+    }
+    data <- ips
+    ips <- NULL
+  }
+
+  data
+}
+
+
+bru_agg_input <- function(input, data_list, .envir) {
+  aggregate_input <- bru_eval_in_data_context(
+    {{ input }},
+    data = data_list,
+    default = NULL,
+    .envir = .envir
+  )
+  if (is.null(aggregate_input)) {
+    aggregate_input <- list()
+  }
+  if (is.null(aggregate_input[["block"]])) {
+    aggregate_input[["block"]] <- bru_eval_in_data_context(
+      .data[[".block"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["weights"]])) {
+    aggregate_input[["weights"]] <- bru_eval_in_data_context(
+      .data[["weight"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["n_block"]])) {
+    agg_n_block_expr <- rlang::parse_expr(
+      "bru_response_size(.response_data.)"
+    )
+    aggregate_input[["n_block"]] <- bru_eval_in_data_context(
+      !!agg_n_block_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  lapply(c("block", "weights", "n_block"), function(nm) {
+    if (is.null(aggregate_input[[nm]])) {
+      bru_log_abort(
+        glue::glue(
+          "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+          "evaluates to NULL."
+        )
+      )
+    }
+  })
+
+  if (!is.null(aggregate_input[["block_response"]])) {
+    blk_resp <- aggregate_input[["block_response"]]
+    if (is.null(data_list$response_data[[blk_resp]])) {
+      msg <- glue::glue(
+        '`block_response` variable "{blk_resp}" ',
+        "not found in `response_data`."
+      )
+
+      bru_log_abort(msg)
+    }
+  } else {
+    aggregate_input[["block_response"]] <- ".block"
+  }
+  blk_resp <- aggregate_input[["block_response"]]
+  if (!is.null(data_list$response_data[[blk_resp]])) {
+    agg_block_resp_expr <- rlang::parse_expr(
+      glue::glue('.response_data[["{blk_resp}"]]')
+    )
+    block_response <- bru_eval_in_data_context(
+      !!agg_block_resp_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+
+    aggregate_input[["block"]] <-
+      match(aggregate_input[["block"]], block_response)
+  }
+
+  if (is.character(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'character' aggregation block information detected.\n",
+      "Please use a numeric or integer vector for the block information ",
+      "instead.\n",
+      "If you want to use a character vector, supply a `block_response`\n",
+      "argument with the name of a response variableto match the character ",
+      "vector to."
+    )
+
+    bru_log_abort(msg)
+  }
+
+  if (any(is.na(aggregate_input[["block"]]))) {
+    msg <- paste0(
+      "'NA' aggregation block information detected.",
+      "Either the `block` information was out of range, or a match was not ",
+      "found when using `.response_data$block_response`."
+    )
+
+    bru_log_abort(msg)
+  }
+
+  aggregate_input
+}
+
+
+
+bru_obs_agg <- function(lh,
+                        aggregate = NULL,
+                        aggregate_input = NULL,
+                        options = list(),
+                        .envir = parent.frame()) {
+  if (!is.null(aggregate) && is.character(aggregate)) {
+    aggregate <- switch(aggregate,
+      "none" = NULL,
+      bm_aggregate(type = aggregate)
+    )
+  }
+  if (!is.null(aggregate)) {
+    lh$data <- bru_agg_data(
+      data = lh$data,
+      ips = lh$integration_info$ips,
+      domain = lh$integration_info$domain,
+      samplers = lh$integration_info$samplers,
+      options = options,
+      .envir = .envir
+    )
+    lh$integration_info$ips <- NULL
+
+    aggregate_input <- bru_agg_input(
+      {{ aggregate_input }},
+      data_list = list(
+        data = lh$data,
+        response_data = lh$BRU_original_response_data,
+        extra_data = lh$data_extra
+      ),
+      .envir = .envir
+    )
+
+    if (lh$is_additive) {
+      lh$expr_text <- "BRU_EXPRESSION"
+    }
+    lh$expr_text <- glue(
+      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+      " state = {{{lh$expr_text}}})}}"
+    )
+    lh$expr <- parse(text = lh$expr_text)
+    lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
+    lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
+    lh$allow_combine <- TRUE
+    lh$is_additive <- FALSE
+  }
+
+  lh
+}
+
+
+
+bru_obs_family_cp_sp <- function(lh, options, .envir) {
+  if (!is.null(lh[["aggregate"]])) {
+    stop("The 'aggregate' feature cannot be used with family='cp'.")
+  }
+
+  response <- lh[["response_data"]][[lh[["response"]]]]
+  orig_response_data <- lh[["BRU_original_response_data"]]
+  response_data <- lh[["response_data"]]
+  data <- lh[["data"]]
+  formula <- lh[["formula"]]
+  domain <- lh[["integration_info"]][["domain"]]
+  samplers <- lh[["integration_info"]][["samplers"]]
+  ips <- lh[["integration_info"]][["ips"]]
+
+  response_expr_text <- as.character(formula)[2]
+
+  # Catch and handle special cases:
+  if (is.null(response) || !inherits(response, "list")) {
+    domain_names <- trimws(strsplit(response_expr_text, split = "\\+")[[1]])
+    if (!is.null(domain_names)) {
+      # "a + b" conversion to list(a = a, b = b)
+      domain_expr <- paste0(
+        "list(",
+        paste0(
+          vapply(
+            domain_names, function(x) {
+              if (identical(x, "coordinates")) {
+                glue("{x} = sp::{x}(.data.)")
+              } else {
+                glue("{x} = {x}")
+              }
+            },
+            ""
+          ),
+          collapse = ", "
+        ),
+        ")"
+      )
+      response_expr <- rlang::parse_expr(domain_expr)
+    }
+    response <- tryCatch(
+      expr = bru_eval_in_data_context(
+        !!response_expr,
+        data = list(response_data = orig_response_data, data = data),
+        default = NULL,
+        .envir = .envir
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+
+  if (is.null(response)) {
+    stop(paste0(
+      "You called bru_obs() with family='cp' but the evaluated ",
+      "response information is NULL"
+    ))
+  }
+
+  if (is.null(ips)) {
+    if (is.null(domain)) {
+      stop(paste0(
+        "The family='cp' model requires a 'domain' specification compatible ",
+        "with 'fmesher::fm_int()'"
+      ))
+    }
+    if (!setequal(names(response), names(domain))) {
+      stop(glue("
+          Mismatch between response and domain names:
+            names(response) = ({glue_collapse(names(response), sep = ', ')})
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
+    }
+
+    ips <- fm_int(
+      domain = domain,
+      samplers = samplers,
+      int.args = options[["bru_int_args"]]
+    )
+    if ((inherits(samplers, "Spatial") ||
+      inherits(data, "Spatial") ||
+      inherits(response[["coordinates"]], "Spatial")) &&
+      inherits(ips, "sf")) {
+      ips <- sf::as_Spatial(ips)
+    }
+  }
+
+  if (length(unique(response_data[["BRU_E"]])) > 1) {
+    bru_log_warn(
+      "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
+    )
+  }
+
+  ips_is_Spatial <- inherits(ips, "Spatial")
+  if (ips_is_Spatial) {
+    bru_safe_sp(force = TRUE)
+    ips_coordnames <- sp::coordnames(ips)
+    ips_crs <- fm_CRS(ips)
+    # For backwards compatibility:
+    data_crs <- fm_CRS(data)
+
+    if ("coordinates" %in% names(response)) {
+      data_coordnames <- colnames(response$coordinates)
+      new_coordnames <- complete_coordnames(data_coordnames, ips_coordnames)
+      colnames(response$coordinates) <- new_coordnames$data
+      sp::coordnames(ips) <- new_coordnames$ips
+    } else {
+      if (inherits(response, c("sf", "sfc")) ||
+        (is.list(response) &&
+          any(vapply(
+            response,
+            function(x) inherits(x, c("sf", "sfc")), TRUE
+          )))) {
+        ips <- sf::st_as_sf(ips)
+        ips_is_Spatial <- FALSE
+      }
+    }
+  }
+  # TODO: check that the crs info is the same
+
+  # For non-Spatial models:
+  # Use the response data list as the actual data object, since that's now the
+  # canonical place where the point information is given.  This also allows
+  # response_data to be used when constructing the response list. This makes
+  # it a strict requirement that the predictor can be evaluated as a pure
+  # function of the domain data.  When implementing sf support, might be able
+  # to give explicit access to spatial coordinates, but otherwise the user can
+  # extract it from the geometry with st_coordinates(geometry)[,1] or similar.
+  # For Spatial models, keep the old behaviour for backwards compatibility for
+  # now, but can likely realign that in the future after more testing.
+  # Save general response data to add to response (precomputed covariates etc)
+  if (!is.null(orig_response_data)) {
+    data_ <- orig_response_data
+  } else {
+    data_ <- data
+  }
+  if (inherits(data_, "Spatial")) {
+    data_ <- tibble::as_tibble(as.data.frame(data_))
+  }
+  if (ips_is_Spatial) {
+    if ("coordinates" %in% names(response)) {
+      idx <- names(response) %in% "coordinates"
+      data <- as.data.frame(response$coordinates)
+      if (any(!idx)) {
+        data <- dplyr::bind_cols(data, as.data.frame(response[!idx]))
+      }
+    } else {
+      data <- as.data.frame(response)
+    }
+  } else {
+    data <- tibble::as_tibble(response)
+    if (("geometry" %in% names(data)) &&
+      inherits(data$geometry, "sfc")) {
+      sf::st_geometry(data) <- "geometry"
+    }
+  }
+  orig_response_data <- NULL
+  n_block <- max(ips$.block)
+  if (".block" %in% names(data_)) {
+    n_block <- max(max(data_$.block), n_block)
+    N_data <- base::tabulate(data_$.block, n_block)
+  } else {
+    N_data <- NROW(data)
+  }
+
+  # Add back additional data
+  additional_data_names <- setdiff(names(data_), names(data))
+  if ((length(additional_data_names) > 0) &&
+    (NROW(data_) == sum(N_data))) {
+    data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
+  }
+  if (is.null(data[[".block"]])) {
+    data$.block <- 1L
+  }
+
+  if (ips_is_Spatial) {
+    ips <- as.data.frame(ips)
+  } else {
+    if ("geometry" %in% names(ips)) {
+      sf::st_geometry(ips) <- "geometry"
+    }
+  }
+
+  # Use 'weights' for per-point weighting of eta
+  if (length(response_data[["BRU_weights"]]) == 1L) {
+    point_weights <- rep(response_data[["BRU_weights"]], sum(N_data))
+  } else {
+    stopifnot(length(response_data[["BRU_weights"]]) == sum(N_data))
+    point_weights <- response_data[["BRU_weights"]]
+  }
+  response_data[["BRU_weights"]] <- 1L
+
+  if (identical(options[["bru_compress_cp"]], TRUE)) {
+    allow_combine <- TRUE
+    new_response_data <- tibble::tibble(
+      BRU_E = c(
+        rep(0, length(N_data[N_data > 0])),
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        N_data[N_data > 0],
+        rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        which(N_data > 0),
+        ips[[".block"]]
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+
+    lh$data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
+    lh$data_extra[["BRU_cp_n_block"]] <- n_block
+    lh$data_extra[["BRU_cp_agg"]] <-
+      bm_aggregate(
+        type = "average",
+        n_block = n_block
+      )
+
+    if (lh$is_additive) {
+      lh$expr_text <- "BRU_EXPRESSION"
+    }
+    lh$expr_text <- glue("
+        {{
+          BRU_eta <- {{
+            {lh$expr_text}
+          }}
+          if (length(BRU_eta) == 1L) {{
+            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
+          }}
+          c(ibm_eval(
+              BRU_cp_agg,
+              list(block = .block[BRU_aggregate]),
+              state = BRU_eta[BRU_aggregate] *
+                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
+            BRU_eta[!BRU_aggregate])
+        }}")
+    lh$expr <- parse(text = lh$expr_text)
+
+    data <- extended_bind_rows(
+      dplyr::bind_cols(data,
+        BRU_aggregate = TRUE,
+        BRU_point_weights = point_weights
+      ),
+      dplyr::bind_cols(ips,
+        BRU_aggregate = FALSE,
+        BRU_point_weights = 0.0
+      )
+    )
+
+    group_cv_block <- c(which(N_data > 0), ips$.block)
+    # Would like:
+    # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
+    #   which(group_cv_block == i)
+    # })
+    # Current inla.group.cv interface (2025-08-28)
+    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+      which(group_cv_block == group_cv_block[i])
+    })
+
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
+      list(friends = group_cv_friends)
+    )
+  } else {
+    new_response_data <- data.frame(
+      BRU_E = c(
+        rep(0, sum(N_data)),
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        point_weights,
+        rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        data[[".block"]],
+        ips[[".block"]]
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+    data <- extended_bind_rows(data, ips)
+  }
+  if (ips_is_Spatial) {
+    non_coordnames <- setdiff(names(data), data_coordnames)
+    data <- sp::SpatialPointsDataFrame(
+      coords = as.matrix(data[data_coordnames]),
+      data = data[non_coordnames],
+      proj4string = fm_CRS(data_crs),
+      match.ID = FALSE
+    )
+  }
+
+  lh$data <- data
+  lh$allow_combine <- TRUE
+  lh$response_data <- new_response_data
+  lh$response <- "BRU_response"
+  lh$inla.family <- "poisson"
+  lh$integration_info$ips <- NULL
+
+  lh
+}
+
+bru_obs_family_cp <- function(lh, options, .envir) {
+  if (inherits(lh[["data"]], "Spatial") ||
+    inherits(lh[["BRU_original_response_data"]], "Spatial") ||
+    inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
+    inherits(lh[["integration_info"]][["ips"]], "Spatial")) {
+    return(bru_obs_family_cp_sp(lh, options, .envir))
+  }
+
+  if (!is.null(lh[["aggregate"]])) {
+    stop("The 'aggregate' feature cannot be used with family='cp'.")
+  }
+
+  response <- lh[["response_data"]][[lh[["response"]]]]
+  orig_response_data <- lh[["BRU_original_response_data"]]
+  response_data <- lh[["response_data"]]
+  data <- lh[["data"]]
+  formula <- lh[["formula"]]
+  domain <- lh[["integration_info"]][["domain"]]
+  samplers <- lh[["integration_info"]][["samplers"]]
+  ips <- lh[["integration_info"]][["ips"]]
+
+  response_expr_text <- as.character(formula)[2]
+
+  # Catch and handle special cases:
+  if (is.null(response) || !inherits(response, "list")) {
+    domain_names <- trimws(strsplit(response_expr_text, split = "\\+")[[1]])
+    if (!is.null(domain_names)) {
+      # "a + b" conversion to list(a = a, b = b)
+      domain_expr <- paste0(
+        "list(",
+        paste0(
+          vapply(
+            domain_names, function(x) {
+              if (identical(x, "coordinates")) {
+                glue("{x} = sp::{x}(.data.)")
+              } else {
+                glue("{x} = {x}")
+              }
+            },
+            ""
+          ),
+          collapse = ", "
+        ),
+        ")"
+      )
+      response_expr <- rlang::parse_expr(domain_expr)
+    }
+    response <- tryCatch(
+      expr = bru_eval_in_data_context(
+        !!response_expr,
+        data = list(response_data = orig_response_data, data = data),
+        default = NULL,
+        .envir = .envir
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+
+  if (is.null(response)) {
+    stop(paste0(
+      "You called bru_obs() with family='cp' but the evaluated ",
+      "response information is NULL"
+    ))
+  }
+
+  if (is.null(ips)) {
+    if (is.null(domain)) {
+      stop(paste0(
+        "The family='cp' model requires a 'domain' specification compatible ",
+        "with 'fmesher::fm_int()'"
+      ))
+    }
+    if (!setequal(names(response), names(domain))) {
+      stop(glue("
+          Mismatch between response and domain names:
+            names(response) = ({glue_collapse(names(response), sep = ', ')})
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
+    }
+
+    ips <- fm_int(
+      domain = domain,
+      samplers = samplers,
+      int.args = options[["bru_int_args"]]
+    )
+  }
+
+  if (length(unique(response_data[["BRU_E"]])) > 1) {
+    bru_log_warn(
+      "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
+    )
+  }
+
+  # TODO: check that the crs info is the same
+
+  # For non-Spatial models:
+  # Use the response data list as the actual data object, since that's now the
+  # canonical place where the point information is given.  This also allows
+  # response_data to be used when constructing the response list. This makes
+  # it a strict requirement that the predictor can be evaluated as a pure
+  # function of the domain data.  When implementing sf support, might be able
+  # to give explicit access to spatial coordinates, but otherwise the user can
+  # extract it from the geometry with st_coordinates(geometry)[,1] or similar.
+  # For Spatial models, keep the old behaviour for backwards compatibility for
+  # now, but can likely realign that in the future after more testing.
+  # Save general response data to add to response (precomputed covariates etc)
+  if (!is.null(orig_response_data)) {
+    data_ <- orig_response_data
+  } else {
+    data_ <- data
+  }
+
+  data <- tibble::as_tibble(response)
+  if (("geometry" %in% names(data)) &&
+    inherits(data$geometry, "sfc")) {
+    sf::st_geometry(data) <- "geometry"
+  }
+
+  orig_response_data <- NULL
+  n_block <- max(ips$.block)
+  if (".block" %in% names(data_)) {
+    n_block <- max(max(data_$.block), n_block)
+    N_data <- base::tabulate(data_$.block, n_block)
+  } else {
+    N_data <- NROW(data)
+  }
+
+  # Add back additional data
+  additional_data_names <- setdiff(names(data_), names(data))
+  if ((length(additional_data_names) > 0) &&
+    (NROW(data_) == sum(N_data))) {
+    data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
+  }
+  if (is.null(data[[".block"]])) {
+    data$.block <- 1L
+  }
+
+  if ("geometry" %in% names(ips)) {
+    sf::st_geometry(ips) <- "geometry"
+  }
+
+  # Use 'weights' for per-point weighting of eta
+  if (length(response_data[["BRU_weights"]]) == 1L) {
+    point_weights <- rep(response_data[["BRU_weights"]], sum(N_data))
+  } else {
+    stopifnot(length(response_data[["BRU_weights"]]) == sum(N_data))
+    point_weights <- response_data[["BRU_weights"]]
+  }
+  response_data[["BRU_weights"]] <- 1L
+
+  if (identical(options[["bru_compress_cp"]], TRUE)) {
+    allow_combine <- TRUE
+    new_response_data <- tibble::tibble(
+      BRU_E = c(
+        rep(0, length(N_data[N_data > 0])),
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        N_data[N_data > 0],
+        rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        which(N_data > 0),
+        ips[[".block"]]
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+
+    lh$data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
+    lh$data_extra[["BRU_cp_n_block"]] <- n_block
+    lh$data_extra[["BRU_cp_agg"]] <-
+      bm_aggregate(
+        type = "average",
+        n_block = n_block
+      )
+
+    if (lh$is_additive) {
+      lh$expr_text <- "BRU_EXPRESSION"
+    }
+    lh$expr_text <- glue("
+        {{
+          BRU_eta <- {{
+            {lh$expr_text}
+          }}
+          if (length(BRU_eta) == 1L) {{
+            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
+          }}
+          c(ibm_eval(
+              BRU_cp_agg,
+              list(block = .block[BRU_aggregate]),
+              state = BRU_eta[BRU_aggregate] *
+                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
+            BRU_eta[!BRU_aggregate])
+        }}")
+    lh$expr <- parse(text = lh$expr_text)
+
+    data <- extended_bind_rows(
+      dplyr::bind_cols(data,
+        BRU_aggregate = TRUE,
+        BRU_point_weights = point_weights
+      ),
+      dplyr::bind_cols(ips,
+        BRU_aggregate = FALSE,
+        BRU_point_weights = 0.0
+      )
+    )
+
+    group_cv_block <- c(which(N_data > 0), ips$.block)
+    # Would like:
+    # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
+    #   which(group_cv_block == i)
+    # })
+    # Current inla.group.cv interface (2025-08-28)
+    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+      which(group_cv_block == group_cv_block[i])
+    })
+
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
+      list(friends = group_cv_friends)
+    )
+  } else {
+    new_response_data <- data.frame(
+      BRU_E = c(
+        rep(0, N_data),
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        point_weights,
+        rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        data[[".block"]],
+        ips[[".block"]]
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+    data <- extended_bind_rows(data, ips)
+  }
+
+  lh$data <- data
+  lh$allow_combine <- TRUE
+  lh$response_data <- new_response_data
+  lh$response <- "BRU_response"
+  lh$inla.family <- "poisson"
+  lh$integration_info$ips <- NULL
+
+  lh
+}
+
+
+check_used_deprecation <- function(used,
+                                   include,
+                                   exclude,
+                                   include_latent,
+                                   formula) {
+  if (lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)) {
+    if (!lifecycle::is_present(include)) {
+      include <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect = include)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include)",
+        "bru_obs(used)",
+        c(
+          "The provided `include` value may be ignored.",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      )
+    }
+    if (!lifecycle::is_present(exclude)) {
+      exclude <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `exclude` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect_exclude = exclude)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(exclude)",
+        "bru_obs(used)",
+        c(
+          "The provided `exclude` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      )
+    }
+    if (!lifecycle::is_present(include_latent)) {
+      include_latent <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include_latent` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(latent = include_latent)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include_latent)",
+        "bru_obs(used)",
+        c(
+          "The provided `include_latent` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      )
+    }
+    if (is.null(used)) {
+      used <- bru_used(formula,
+                       effect = include,
+                       effect_exclude = exclude,
+                       latent = include_latent
+      )
+    }
+  }
+  used
+}
+
+bru_obs_handle_allow_combine <- function(allow_combine,
+                                         data,
+                                         response_data,
+                                         aggregate) {
+  if (!is.logical(allow_combine)) {
+    if (!is.null(aggregate)) {
+      allow_combine <- TRUE
+    } else if (!is.null(response_data)) {
+      bru_log_warn(
+        paste0(
+          "Non-null response data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else if (is.list(data) && !is.data.frame(data)) {
+      bru_log_warn(
+        paste0(
+          "Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.\n",
+          "  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else {
+      allow_combine <- FALSE
+    }
+  }
+  allow_combine
+}
+
+
+
+
+check_used_deprecation <- function(used,
+                                   include,
+                                   exclude,
+                                   include_latent,
+                                   formula) {
+  if (lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)) {
+    if (!lifecycle::is_present(include)) {
+      include <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect = include)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include)",
+        "bru_obs(used)",
+        c(
+          "The provided `include` value may be ignored.",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      )
+    }
+    if (!lifecycle::is_present(exclude)) {
+      exclude <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `exclude` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect_exclude = exclude)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(exclude)",
+        "bru_obs(used)",
+        c(
+          "The provided `exclude` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      )
+    }
+    if (!lifecycle::is_present(include_latent)) {
+      include_latent <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include_latent` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(latent = include_latent)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include_latent)",
+        "bru_obs(used)",
+        c(
+          "The provided `include_latent` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      )
+    }
+    if (is.null(used)) {
+      used <- bru_used(formula,
+                       effect = include,
+                       effect_exclude = exclude,
+                       latent = include_latent
+      )
+    }
+  }
+  used
+}
+
+bru_obs_handle_allow_combine <- function(allow_combine,
+                                         data,
+                                         response_data,
+                                         aggregate) {
+  if (!is.logical(allow_combine)) {
+    if (!is.null(aggregate)) {
+      allow_combine <- TRUE
+    } else if (!is.null(response_data)) {
+      bru_log_warn(
+        paste0(
+          "Non-null response data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else if (is.list(data) && !is.data.frame(data)) {
+      bru_log_warn(
+        paste0(
+          "Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.\n",
+          "  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else {
+      allow_combine <- FALSE
+    }
+  }
+  allow_combine
+}
+
+
 #' @title Observation model construction for usage with [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
@@ -1436,10 +2521,23 @@ bru_is_additive.formula <- function(x, ...) {
 #'   ```
 #'   list(block = .data.[[".block"]],
 #'        weights = .data.[["weight"]],
-#'        n_block = bru_response_size(.response_data.))
+#'        n_block = bru_response_size(.response_data.),
+#'        block_response = ".block")
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
+#'
+#'   From `2.13.0.9016`, it will look for a `block_response` element in the
+#'   list, which should be the name of a response variable in `response_data` to
+#'   match the `block` information against, allowing character or factor
+#'   aggregation block information to be used by replacing `block` with
+#'   `match(block, block_response)`. If not supplied, the name
+#'   `".block"` is tried. If that isn't available, the `block` information must
+#'   be supplied directly as a numeric or integer vector, indexing into the rows
+#'   of the response variable. Having no `block_response` variable is equivalent
+#'   to having
+#'   `response_data$.block = seq_len(bru_response_size(response_data))`.
 #' @param control.family A optional `list` of `INLA::control.family` options
+#' @param control.gcpo A optional `list` of `INLA::control.gcpo` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
 #' @param options A [bru_options] options object or a list of options passed
@@ -1449,6 +2547,10 @@ bru_is_additive.formula <- function(x, ...) {
 #'   `data`. Defaults to the calling environment.
 #' @param include,exclude,include_latent `r lifecycle::badge("deprecated")`, use
 #'   `used` instead.
+#'
+#' @details
+#' The `E`, `Ntrials`, `weights`, and `scale` arguments are evaluated in the
+#' data context, with values from `response_data` taking precedence over `data`.
 #'
 #' @return A likelihood configuration which can be used to parameterise [bru()].
 #' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
@@ -1472,6 +2574,7 @@ bru_obs <- function(formula = . ~ .,
                     aggregate = NULL,
                     aggregate_input = NULL,
                     control.family = NULL,
+                    control.gcpo = NULL,
                     tag = NULL,
                     options = list(),
                     .envir = parent.frame(),
@@ -1484,6 +2587,16 @@ bru_obs <- function(formula = . ~ .,
   # Some defaults
   inla.family <- family
 
+  default.control.gcpo <- list()
+  if (is.null(control.gcpo)) {
+    control.gcpo <- default.control.gcpo
+  } else {
+    control.gcpo <- modifyList(
+      default.control.gcpo,
+      control.gcpo
+    )
+  }
+
   formula_char <- as.character(formula)
 
   # Does the likelihood formula imply an additive predictor?
@@ -1492,19 +2605,35 @@ bru_obs <- function(formula = . ~ .,
 
   # If not additive, set predictor expression according to the formula's RHS
   if (!is_additive) {
-    expr <- parse(text = formula_char[length(formula_char)])
+    expr_text <- formula_char[length(formula_char)]
+    expr <- parse(text = expr_text)
   } else {
+    expr_text <- NULL
     expr <- NULL
   }
+
+  check_sp_data_deprecation(
+    data = data,
+    response_data = response_data,
+    samplers = samplers,
+    ips = ips
+  )
+  used <- check_used_deprecation(
+    used = used,
+    include = rlang::maybe_missing(include),
+    exclude = rlang::maybe_missing(exclude),
+    include_latent = rlang::maybe_missing(include_latent),
+    formula = formula
+  )
 
   # Set the response name
   if (length(formula_char) < 3) {
     stop("Missing response variable names")
   }
-  response_expr <- parse(text = formula_char[2])
+  response_expr <- rlang::parse_expr(formula_char[2])
   response <- tryCatch(
     expr = bru_eval_in_data_context(
-      substitute(response_expr),
+      !!response_expr,
       data = list(response_data = response_data, data = data),
       default = NULL,
       .envir = .envir
@@ -1514,606 +2643,105 @@ bru_obs <- function(formula = . ~ .,
     }
   )
 
-  # Catch and handle special cases:
-  if ((family == "cp") && (is.null(response) || !inherits(response, "list"))) {
-    domain_names <- trimws(strsplit(formula_char[2], split = "\\+")[[1]])
-    if (!is.null(domain_names)) {
-      # "a + b" conversion to list(a = a, b = b)
-      domain_expr <- paste0(
-        "list(",
-        paste0(
-          vapply(
-            domain_names, function(x) {
-              if (identical(x, "coordinates")) {
-                glue("{x} = sp::{x}(.data.)")
-              } else {
-                glue("{x} = {x}")
-              }
-            },
-            ""
-          ),
-          collapse = ", "
-        ),
-        ")"
-      )
-      response_expr <- parse(text = domain_expr)
-    }
-    response <- tryCatch(
-      expr = bru_eval_in_data_context(
-        substitute(response_expr),
-        data = list(response_data = response_data, data = data),
-        default = NULL,
-        .envir = .envir
-      ),
-      error = function(e) {
-        NULL
-      }
-    )
-  }
-
-  if (is.null(response)) {
-    stop("Response variable missing or could not be evaluated")
-  }
-
   E <- bru_eval_in_data_context(
-    substitute(E),
+    {{ E }},
     data = list(response_data = response_data, data = data),
     default = options[["E"]],
     .envir = .envir
   )
   Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
+    {{ Ntrials }},
     data = list(response_data = response_data, data = data),
     default = options[["Ntrials"]],
     .envir = .envir
   )
   weights <- bru_eval_in_data_context(
-    substitute(weights),
+    {{ weights }},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
   scale <- bru_eval_in_data_context(
-    substitute(scale),
+    {{ scale }},
     data = list(response_data = response_data, data = data),
     default = 1,
     .envir = .envir
   )
-  if (!is.null(aggregate) && is.character(aggregate)) {
-    aggregate <- match.arg(
-      aggregate,
-      c("none", "sum", "average", "logsumexp", "logaverageexp", "logitaverage")
-    )
-    aggregate <- switch(aggregate,
-      "none" = NULL,
-      bm_aggregate(type = aggregate)
-    )
-  }
-  if (!is.null(aggregate)) {
-    if (is.null(ips)) {
-      if (!is.null(domain)) {
-        ips <- fm_int(
-          domain = domain,
-          samplers = samplers,
-          int.args = options[["bru_int_args"]]
-        )
-      }
-    } else {
-      if (is.null(data)) {
-        data <- ips
-        ips <- NULL
-      }
-    }
-    if (!is.null(ips)) {
-      if (!is.null(data)) {
-        ips$.block <- as.integer(ips$.block)
-        if (".block" %in% names(data)) {
-          ips <- dplyr::left_join(ips, data, by = ".block")
-        } else {
-          if (NROW(data) != max(ips$.block)) {
-            stop(glue(
-              "`data` has {NROW(data)} rows, but `ips` has ",
-              "{max(ips$.block)} blocks. Cannot join."
-            ))
-          }
-          ips <- dplyr::left_join(
-            ips,
-            dplyr::bind_cols(data, .block = seq_len(NROW(data))),
-            by = ".block"
-          )
-        }
-      }
-      data <- ips
-      ips <- NULL
-    }
-
-    aggregate_input <- bru_eval_in_data_context(
-      substitute(aggregate_input),
-      data = list(data = data, response_data = response_data),
-      default = NULL,
-      .envir = .envir
-    )
-    if (is.null(aggregate_input)) {
-      aggregate_input <- list()
-    }
-    if (is.null(aggregate_input[["block"]])) {
-      aggregate_input[["block"]] <- bru_eval_in_data_context(
-        quote(.data.[[".block"]]),
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.character(aggregate_input[["block"]])) {
-      msg <- paste0(
-        "'character' aggregation block information detected.\n",
-        "Please use a numeric or integer vector for the block information ",
-        "instead.\n",
-        "If you want to use a character vector, ",
-        "please convert it to a factor first,\n",
-        "making sure the factor level order matches your intended order,\n",
-        "and use `as.integer()`."
-      )
-
-      if (utils::packageVersion("fmesher") < "0.5.0") {
-        msg <- c(msg, paste0(
-          "You have fmesher < 0.5.0. From version 0.5.0,",
-          "`fm_int()`/`fm_cprod()`\ncreates integer block information ",
-          "automatically."
-        ))
-      }
-      bru_log_abort(msg)
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      aggregate_input[["weights"]] <- bru_eval_in_data_context(
-        quote(.data.[["weight"]]),
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      aggregate_input[["n_block"]] <- bru_eval_in_data_context(
-        quote(bru_response_size(.response_data.)),
-        data = list(data = data, response_data = response_data),
-        default = NULL,
-        .envir = .envir
-      )
-    }
-    if (is.null(aggregate_input[["block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['block']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["weights"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['weights']]` ",
-        "evaluates to NULL."
-      ))
-    }
-    if (is.null(aggregate_input[["n_block"]])) {
-      stop(paste0(
-        "Aggregation requested, but `aggregate_input[['n_block']]` ",
-        "evaluates to NULL."
-      ))
-    }
-  }
 
   data_extra <- as.list(data_extra)
-  if (!is.null(aggregate)) {
-    if (!is_additive) {
-      expr_text <- formula_char[length(formula_char)]
-    } else {
-      expr_text <- "BRU_EXPRESSION"
-    }
-    expr_text <- glue(
-      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-      " state = {{{expr_text}}})}}"
-    )
-    expr <- parse(text = expr_text)
-    data_extra[["BRU_aggregate_mapper"]] <- aggregate
-    data_extra[["BRU_aggregate_input"]] <- aggregate_input
-    allow_combine <- TRUE
-    is_additive <- FALSE
-  }
 
-  if (inherits(data, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(data = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(response, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  } else if (is.list(response) &&
-    inherits(response[["coordinates"]], "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      I("`bru_obs() response objects of `Spatial` type"),
-      I("`sf` input")
-    )
-  }
-  if (inherits(samplers, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(samplers = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
-    )
-  }
-  if (inherits(ips, "Spatial")) {
-    lifecycle::deprecate_warn(
-      "2.12.0.9023",
-      "bru_obs(ips = 'has deprecated support for `Spatial` input')",
-      I("`sf` input")
+  # Decide on allow_combine default
+  allow_combine <- bru_obs_handle_allow_combine(
+    allow_combine = allow_combine,
+    data = data,
+    response_data = response_data,
+    aggregate = aggregate
+  )
+
+  original_response_data <- response_data
+  # Must be a list or tibble to allow inla.mdata responses
+  # Until inla.surv is converted to tibble (or data.frame), must be a list
+  response_data <- list(
+    BRU_response = response,
+    BRU_E = E,
+    BRU_Ntrials = Ntrials,
+    BRU_scale = scale,
+    BRU_weights = weights
+  )
+
+  # Prototype object
+  lh <- structure(
+    list(
+      family = family,
+      formula = formula,
+      response_data = response_data,
+      data = data,
+      data_extra = data_extra,
+      integration_info = list(
+        ips = ips,
+        domain = domain,
+        samplers = samplers
+      ),
+      is_additive = is_additive,
+      linear = is_additive, # Not quite correct, as depends on component defs
+      expr_text = expr_text,
+      expr = expr,
+      response = "BRU_response",
+      inla.family = inla.family,
+      used = used,
+      allow_combine = allow_combine,
+      control.family = control.family,
+      control.gcpo = control.gcpo,
+      tag = tag,
+      BRU_original_response_data = original_response_data
+    ),
+    class = "bru_obs"
+  )
+
+  if (!is.null(aggregate)) {
+    lh <- bru_obs_agg(lh,
+      aggregate = aggregate,
+      aggregate_input = {{ aggregate_input }},
+      options = options,
+      .envir = .envir
     )
   }
 
   # More on special bru likelihoods
   if (family == "cp") {
-    if (!is.null(aggregate)) {
-      stop("The 'aggregate' feature cannot be used with family='cp'.")
-    }
-    if (is.null(response)) {
-      stop(paste0(
-        "You called bru_obs() with family='cp' but the evaluated ",
-        "response information is NULL"
-      ))
-    }
-
-    if (is.null(ips)) {
-      if (is.null(domain)) {
-        stop(paste0(
-          "The family='cp' model requires a 'domain' specification compatible ",
-          "with 'fmesher::fm_int()'"
-        ))
-      }
-      if (!setequal(names(response), names(domain))) {
-        stop(glue("
-          Mismatch between response and domain names:
-            names(response) = ({glue_collapse(names(response), sep = ', ')})
-            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
-      }
-
-      ips <- fm_int(
-        domain = domain,
-        samplers = samplers,
-        int.args = options[["bru_int_args"]]
-      )
-      if ((inherits(samplers, "Spatial") ||
-        inherits(data, "Spatial") ||
-        inherits(response[["coordinates"]], "Spatial")) &&
-        inherits(ips, "sf")) {
-        ips <- sf::as_Spatial(ips)
-      }
-    }
-
-    if (length(E) > 1) {
-      bru_log_warn(
-        "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
-      )
-    }
-
-    ips_is_Spatial <- inherits(ips, "Spatial")
-    if (ips_is_Spatial) {
-      bru_safe_sp(force = TRUE)
-      ips_coordnames <- sp::coordnames(ips)
-      ips_crs <- fm_CRS(ips)
-      # For backwards compatibility:
-      data_crs <- fm_CRS(data)
-
-      if ("coordinates" %in% names(response)) {
-        data_coordnames <- colnames(response$coordinates)
-        new_coordnames <- complete_coordnames(data_coordnames, ips_coordnames)
-        colnames(response$coordinates) <- new_coordnames$data
-        sp::coordnames(ips) <- new_coordnames$ips
-      } else {
-        if (inherits(response, c("sf", "sfc")) ||
-          (is.list(response) &&
-            any(vapply(
-              response,
-              function(x) inherits(x, c("sf", "sfc")), TRUE
-            )))) {
-          ips <- sf::st_as_sf(ips)
-          ips_is_Spatial <- FALSE
-        }
-      }
-    }
-    # TODO: check that the crs info is the same
-
-    # For non-Spatial models:
-    # Use the response data list as the actual data object, since that's now the
-    # canonical place where the point information is given.  This also allows
-    # response_data to be used when constructing the response list. This makes
-    # it a strict requirement that the predictor can be evaluated as a pure
-    # function of the domain data.  When implementing sf support, might be able
-    # to give explicit access to spatial coordinates, but otherwise the user can
-    # extract it from the geometry with st_coordinates(geometry)[,1] or similar.
-    # For Spatial models, keep the old behaviour for backwards compatibility for
-    # now, but can likely realign that in the future after more testing.
-    # Save general response data to add to response (precomputed covariates etc)
-    if (!is.null(response_data)) {
-      data_ <- response_data
-    } else {
-      data_ <- data
-    }
-    if (inherits(data_, "Spatial")) {
-      data_ <- tibble::as_tibble(as.data.frame(data_))
-    }
-    if (ips_is_Spatial) {
-      if ("coordinates" %in% names(response)) {
-        idx <- names(response) %in% "coordinates"
-        data <- as.data.frame(response$coordinates)
-        if (any(!idx)) {
-          data <- dplyr::bind_cols(data, as.data.frame(response[!idx]))
-        }
-      } else {
-        data <- as.data.frame(response)
-      }
-      response_data <- NULL
-      N_data <- NROW(data)
-    } else {
-      data <- tibble::as_tibble(response)
-      if (("geometry" %in% names(data)) &&
-        inherits(data$geometry, "sfc")) {
-        sf::st_geometry(data) <- "geometry"
-      }
-      response_data <- NULL
-      N_data <- NROW(data)
-    }
-
-    # Add back additional data
-    additional_data_names <- setdiff(names(data_), names(data))
-    if ((length(additional_data_names) > 0) &&
-      (NROW(data_) == N_data)) {
-      data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
-    }
-
-    if (ips_is_Spatial) {
-      ips <- as.data.frame(ips)
-    } else {
-      if ("geometry" %in% names(ips)) {
-        sf::st_geometry(ips) <- "geometry"
-      }
-    }
-
-    # Use 'weights' for per-point weighting of eta
-    if (length(weights) == 1L) {
-      point_weights <- rep(weights, N_data)
-    } else {
-      stopifnot(length(weights) == N_data)
-      point_weights <- weights
-    }
-    weights <- 1L
-
-    if (identical(options[["bru_compress_cp"]], TRUE)) {
-      allow_combine <- TRUE
-      response_data <- tibble::tibble(
-        BRU_E = c(
-          0,
-          E * ips[["weight"]]
-        ),
-        BRU_response_cp = c(
-          N_data,
-          rep(0, NROW(ips))
-        )
-      )
-      if (!is_additive) {
-        expr_text <- formula_char[length(formula_char)]
-      } else {
-        expr_text <- "BRU_EXPRESSION"
-      }
-      expr_text <- glue("
-        {{
-          BRU_eta <- {{
-            {expr_text}
-          }}
-          if (length(BRU_eta) == 1L) {{
-            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
-          }}
-          c(mean(BRU_point_weights[BRU_aggregate] *
-                 BRU_eta[BRU_aggregate]),
-            BRU_eta[!BRU_aggregate])
-        }}")
-      expr <- parse(text = expr_text)
-
-      data <- extended_bind_rows(
-        dplyr::bind_cols(data,
-          BRU_aggregate = TRUE,
-          BRU_point_weights = point_weights
-        ),
-        dplyr::bind_cols(ips,
-          BRU_aggregate = FALSE,
-          BRU_point_weights = 0.0
-        )
-      )
-    } else {
-      if (!all(point_weights == 1)) {
-        stop(
-          "Point 'weights' are not supported for non-compressed Cox processes."
-        )
-      }
-      response_data <- data.frame(
-        BRU_E = c(
-          rep(0, N_data),
-          E * ips[["weight"]]
-        ),
-        BRU_response_cp = c(
-          rep(1, N_data),
-          rep(0, NROW(ips))
-        )
-      )
-      data <- extended_bind_rows(data, ips)
-    }
-    if (ips_is_Spatial) {
-      non_coordnames <- setdiff(names(data), data_coordnames)
-      data <- sp::SpatialPointsDataFrame(
-        coords = as.matrix(data[data_coordnames]),
-        data = data[non_coordnames],
-        proj4string = fm_CRS(data_crs),
-        match.ID = FALSE
-      )
-    }
-
-    response <- "BRU_response_cp"
-    inla.family <- "poisson"
-    E <- response_data[["BRU_E"]]
-
-    allow_combine <- TRUE
-  } else {
-    if (!is.logical(allow_combine)) {
-      if (!is.null(response_data)) {
-        bru_log_warn(
-          paste0(
-            "Non-null response data supplied; ",
-            "guessing allow_combine=TRUE.",
-            "\n  Specify allow_combine explicitly to avoid this warning."
-          )
-        )
-        allow_combine <- TRUE
-      } else if (is.list(data) && !is.data.frame(data)) {
-        bru_log_warn(
-          paste0(
-            "Non data-frame list-like data supplied; ",
-            "guessing allow_combine=TRUE.\n",
-            "  Specify allow_combine explicitly to avoid this warning."
-          )
-        )
-        allow_combine <- TRUE
-      } else {
-        allow_combine <- FALSE
-      }
-    }
-
-    # Need to make a list instead of data.frame, to allow inla.mdata responses
-    response_data <- list(
-      BRU_response = response,
-      BRU_E = E,
-      BRU_Ntrials = Ntrials,
-      BRU_scale = scale
-    )
-    response <- "BRU_response"
+    lh <- bru_obs_family_cp(lh, options = options, .envir = .envir)
   }
 
-  if (lifecycle::is_present(include) ||
-    lifecycle::is_present(exclude) ||
-    lifecycle::is_present(include_latent)) {
-    if (!lifecycle::is_present(include)) {
-      include <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `include` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(effect = include)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(include)",
-        "bru_obs(used)",
-        c(
-          "The provided `include` value may be ignored.",
-          "If auto-detection doesn't work, use `bru_used(effect = include)`"
-        )
-      )
-    }
-    if (!lifecycle::is_present(exclude)) {
-      exclude <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `exclude` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(effect_exclude = exclude)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(exclude)",
-        "bru_obs(used)",
-        c(
-          "The provided `exclude` value may be ignored.",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(effect_exclude = exclude)`"
-          )
-        )
-      )
-    }
-    if (!lifecycle::is_present(include_latent)) {
-      include_latent <- NULL
-    } else {
-      bru_log_message(
-        paste0(
-          "The `include_latent` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
-          "If auto-detection doesn't work, use ",
-          "`used = bru_used(latent = include_latent)` instead."
-        ),
-        verbosity = 1L
-      )
-      lifecycle::deprecate_warn(
-        "2.11.0",
-        "bru_obs(include_latent)",
-        "bru_obs(used)",
-        c(
-          "The provided `include_latent` value may be ignored.",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(latent = include_latent)`"
-          )
-        )
-      )
-    }
-    if (is.null(used)) {
-      used <- bru_used(formula,
-        effect = include,
-        effect_exclude = exclude,
-        latent = include_latent
-      )
-    }
-  }
-  if (is.null(used)) {
-    used <- bru_used(formula)
+  if (is.null(lh[["response_data"]][[lh[["response"]]]])) {
+    stop("Response variable missing or could not be evaluated")
   }
 
-  # The likelihood object that will be returned
+  if (is.null(lh[["used"]])) {
+    lh[["used"]] <- bru_used(formula)
+  }
 
-  lh <- structure(
-    list(
-      family = family,
-      formula = formula,
-      response_data = response_data, # agg
-      data = data,
-      data_extra = data_extra,
-      E = E,
-      Ntrials = Ntrials,
-      weights = weights,
-      scale = scale,
-      samplers = samplers,
-      is_additive = is_additive,
-      linear = is_additive, # Not quite correct, as depends on component defs
-      expr = expr,
-      response = response,
-      inla.family = inla.family,
-      domain = domain,
-      used = used,
-      allow_combine = allow_combine,
-      control.family = control.family,
-      tag = tag
-    ),
-    class = "bru_obs"
-  )
+  # Remove temporary copy of input data
+  lh$BRU_original_response_data <- NULL
 
   # Return likelihood
   lh
@@ -2121,29 +2749,15 @@ bru_obs <- function(formula = . ~ .,
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")` Legacy `like()`
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
-#' @param mesh `r lifecycle::badge("deprecated")` Ignored.
+#' @param \dots Arguments passed from `like()` to `bru_obs()`
 #' @export
-like <- function(formula = . ~ .,
-                 family = "gaussian",
-                 data = NULL,
-                 response_data = NULL,
+like <- function(...,
                  E = NULL,
                  Ntrials = NULL,
                  weights = NULL,
                  scale = NULL,
-                 domain = NULL,
-                 samplers = NULL,
-                 ips = NULL,
-                 used = NULL,
-                 allow_combine = NULL,
-                 control.family = NULL,
-                 tag = NULL,
                  options = list(),
-                 .envir = parent.frame(),
-                 mesh = deprecated(),
-                 include = deprecated(),
-                 exclude = deprecated(),
-                 include_latent = deprecated()) {
+                 .envir = parent.frame()) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
   bru_log_message(
@@ -2159,62 +2773,14 @@ like <- function(formula = . ~ .,
     "bru_obs()"
   )
 
-  E <- bru_eval_in_data_context(
-    substitute(E),
-    data = list(response_data = response_data, data = data),
-    default = options[["E"]],
-    .envir = .envir
-  )
-  Ntrials <- bru_eval_in_data_context(
-    substitute(Ntrials),
-    data = list(response_data = response_data, data = data),
-    default = options[["Ntrials"]],
-    .envir = .envir
-  )
-  weights <- bru_eval_in_data_context(
-    substitute(weights),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-  scale <- bru_eval_in_data_context(
-    substitute(scale),
-    data = list(response_data = response_data, data = data),
-    default = 1,
-    .envir = .envir
-  )
-
-  special_env <- new.env(parent = .envir)
-  assign("E", E, envir = special_env)
-  assign("Ntrials", Ntrials, envir = special_env)
-  assign("weights", weights, envir = special_env)
-  assign("scale", scale, envir = special_env)
-
   bru_obs(
-    formula = formula,
-    family = family,
-    data = data,
-    response_data = response_data,
-    E = E,
-    Ntrials = Ntrials,
-    weights = weights,
-    scale = scale,
-    domain = domain,
-    samplers = samplers,
-    ips = ips,
-    include = include,
-    exclude = exclude,
-    include_latent = include_latent,
-    used = used,
-    allow_combine = allow_combine,
-    control.family = control.family,
-    tag = if (is.null(tag) || identical(tag, "")) {
-      NA_character_
-    } else {
-      tag
-    },
+    ...,
+    E = {{ E }},
+    Ntrials = {{ Ntrials }},
+    weights = {{ weights }},
+    scale = {{ scale }},
     options = options,
-    .envir = special_env
+    .envir = .envir
   )
 }
 
@@ -2244,6 +2810,13 @@ bru_response_size <- function(object) {
 #' @export
 bru_response_size.default <- function(object) {
   NROW(object)
+}
+
+#' @describeIn bru_response_size Extract the number of observations from an
+#'   object supporting `NROW(object[[1]])`.
+#' @export
+bru_response_size.list <- function(object) {
+  NROW(object[[1]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from an
@@ -2284,25 +2857,6 @@ bru_response_size.bru <- function(object) {
   bru_response_size(object[["bru_info"]])
 }
 
-
-#' @describeIn bru_obs
-#' Combine `bru_obs` observation model object into a `bru_obs_list` object
-#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
-#' @export
-bru_obs_list <- function(...) {
-  UseMethod("bru_obs_list")
-}
-
-#' @describeIn bru_obs
-#' Combine one or more lists of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
-#' @export
-bru_obs_list.list <- function(object, ..., .envir = NULL) {
-  object <- lapply(object, as_bru_obs)
-  class(object) <- c("bru_obs_list", "list")
-  bru_obs_list(object, .envir = .envir)
-}
 
 set_list_names <- function(x, tag, priority = "immutable") {
   priority <- match.arg(priority, c("immutable", "tag", "name"))
@@ -2383,28 +2937,80 @@ set_list_names <- function(x, tag, priority = "immutable") {
 }
 
 #' @describeIn bru_obs
-#' Combine a list of `bru_obs` observation model objects
-#' into a `bru_obs_list` object
-#' @param object A list of `bru_obs` objects
+#' Combine `bru_obs` observation model object into a `bru_obs_list` object
+#' @param \dots For `bru_obs_list.bru_obs`, one or more `bru_obs` objects
 #' @export
-bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
-  if (length(list(...)) > 1) {
-    # If multiple objects are given, combine them into a single list
-    # and then recall the method
-    object <- lapply(list(...), as_bru_obs_list)
-    object <- structure(
-      unlist(object, recursive = FALSE),
-      class = c("bru_obs_list", "list")
+bru_obs_list <- function(..., .tag = NULL) {
+  UseMethod("bru_obs_list")
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param object A list of `bru_obs` and/or `bru_obs_list` objects
+#' @export
+bru_obs_list.list <- function(object, ..., .tag = NULL) {
+  if (length(list(...)) > 0) {
+    return(bru_obs_list(list(object, ...)))
+  }
+  if (length(object) == 0) {
+    return(
+      structure(
+        list(),
+        class = c("bru_obs_list", "list")
+      )
     )
-  } else {
-    object <- list(...)[[1]]
+  }
+  is_obs <- vapply(object, function(x) inherits(x, "bru_obs"), TRUE)
+  if (!all(is_obs)) {
+    is_obs_list <- vapply(object, function(x) inherits(x, "bru_obs_list"), TRUE)
+    if (!all(is_obs_list)) {
+      object <- lapply(seq_along(object), function(k) {
+        bru_obs_list(object[[k]], .tag = names(object)[k])
+      })
+    }
+    object <- unlist(object, recursive = FALSE)
+  }
+  object <- structure(
+    object,
+    class = c("bru_obs_list", "list")
+  )
+
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+
+  object
+}
+
+#' @describeIn bru_obs
+#' Combine one or more lists of `bru_obs` observation model objects
+#' into a `bru_obs_list` object
+#' @param .tag Optional name to assign to a single `bru_obs` object. Reserved
+#'   for internal use.
+#' @export
+bru_obs_list.bru_obs <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
   }
 
-  if (is.null(.envir)) {
-    .envir <- environment(object)
+  object <- structure(
+    list(...),
+    class = c("bru_obs_list", "list")
+  )
+  if (!is.null(.tag)) {
+    names(object) <- .tag
   }
+  object <- set_list_names(object, tag = "tag", priority = "immutable")
+  object
+}
 
-  environment(object) <- .envir
+#' @describeIn bru_obs
+#' Combine one or more `bru_obs_list` objects into a `bru_obs_list` object
+#' @export
+bru_obs_list.bru_obs_list <- function(..., .tag = NULL) {
+  if (length(list(...)) != 1L) {
+    return(bru_obs_list(list(...)))
+  }
+  object <- list(...)[[1]]
   object <- set_list_names(object, tag = "tag", priority = "immutable")
   object
 }
@@ -2414,16 +3020,16 @@ bru_obs_list.bru_obs_list <- function(..., .envir = NULL) {
 #' @describeIn bru_obs
 #' Combine several `bru_obs` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs <- function(..., .envir = NULL) {
-  bru_obs_list(list(...), .envir = .envir)
+c.bru_obs <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
 #' @describeIn bru_obs
 #' Combine several `bru_obs_list` objects into a `bru_obs_list` object
 #' @export
-c.bru_obs_list <- function(..., .envir = NULL) {
-  bru_obs_list(..., .envir = .envir)
+c.bru_obs_list <- function(...) {
+  bru_obs_list(list(...))
 }
 
 
@@ -2489,7 +3095,7 @@ like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @describeIn bru_obs `r lifecycle::badge("deprecated")`
@@ -2506,7 +3112,7 @@ bru_like_list <- function(...) {
       "`c(...)` to construct observation model lists."
     )
   )
-  as_bru_obs_list(list(...))
+  bru_obs_list(list(...))
 }
 
 #' @rdname bru_obs_print
@@ -2599,10 +3205,12 @@ print.bru_obs_list <- function(x, ...) {
 
 #' Utility functions for bru observation model objects
 #' @param x Object of `bru_obs` or `bru_obs_list` type
+#' @param \dots Further arguments passed on to the submethods
 #' @export
 #' @keywords internal
 #' @returns * `bru_obs_inla_family()` returns a string or vector of strings
 #' @rdname bru_obs_methods
+#' @name bru_obs_methods
 #' @seealso [summary.bru_obs()]
 bru_obs_inla_family <- function(x, ...) {
   UseMethod("bru_obs_inla_family")
@@ -2675,6 +3283,131 @@ bru_obs_control_family.bru_obs_list <- function(x,
   control.family
 }
 
+#' @export
+#' @keywords internal
+#' @returns * `bru_obs_control_gcpo()` returns a list with
+#'   `INLA::control.gcpo` options, with predictor/response variable indices
+#'   unified for multi-observation models.
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo <- function(x, ...) {
+  UseMethod("bru_obs_control_gcpo")
+}
+
+#' @param index_offset integer; offset to add to indices in `control.gcpo`
+#' @param index_length integer; length of the response vector for the
+#'   observation model. Defaults to `bru_response_size(x)`.
+#' @param force_weights logical; if `TRUE`, ensure that `control.gcpo$weights`
+#'   is populated. This is needed if any of the observation models in a
+#'   `bru_obs_list` has non-null `control.gcpo$weights`.
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo.bru_obs <- function(x,
+                                         index_offset,
+                                         index_length = bru_response_size(x),
+                                         force_weights,
+                                         ...) {
+  c.gcpo <- x[["control.gcpo"]]
+  for (nm in intersect(
+    c("groups", "selection", "group.selection", "friends"),
+    names(c.gcpo)
+  )) {
+    if (nm == "groups") {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) {
+        v$idx <- v$idx + index_offset
+        v
+      })
+    } else {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
+    }
+  }
+  if (!("friends" %in% names(c.gcpo))) {
+    c.gcpo[["friends"]] <- as.list(index_offset + seq_len(index_length))
+  }
+  if (force_weights && !("weights" %in% names(c.gcpo))) {
+    c.gcpo[["weights"]] <- rep(1.0, index_length)
+  } else if ("weights" %in% names(c.gcpo)) {
+    if (length(c.gcpo[["weights"]]) != index_length) {
+      stop(glue::glue(
+        "Length of control.gcpo$weights ({length(c.gcpo[['weights']])}) ",
+        "does not match response length ({index_length})"
+      ))
+    }
+  }
+  c.gcpo
+}
+
+#' @param control.gcpo list of INLA `control.gcpo` default options
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo.bru_obs_list <- function(x,
+                                              control.gcpo = NULL,
+                                              ...) {
+  # Update the control.gcpo information for each likelihood
+  response_sizes <- bru_response_size(x)
+  any_element <- vapply(
+    c("groups", "selection", "group.selection", "friends", "weights"),
+    function(nm) {
+      any(vapply(x, function(lh) {
+        !is.null(lh[["control.gcpo"]][[nm]])
+      }, TRUE))
+    },
+    TRUE
+  )
+  all_element <- vapply(
+    c("groups", "selection", "group.selection", "friends", "weights"),
+    function(nm) {
+      all(vapply(x, function(lh) {
+        !is.null(lh[["control.gcpo"]][[nm]])
+      }, TRUE))
+    },
+    TRUE
+  )
+  c.gcpo <- lapply(
+    seq_along(x),
+    function(k) {
+      bru_obs_control_gcpo(x[[k]],
+        index_offset = sum(response_sizes[seq_len(k - 1)]),
+        index_length = response_sizes[k],
+        force_weights = any_element["weights"]
+      )
+    }
+  )
+
+  # If given in one model, must be given in all models
+  c.gcpo.combined <- list()
+  for (nm in c("groups", "selection", "group.selection")) {
+    if (any_element[nm]) {
+      if (!all_element[nm]) {
+        stop(glue::glue(
+          "control.gcpo${nm} given in some, but not all, observation modes"
+        ))
+      }
+      c.gcpo.combined[[nm]] <-
+        do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
+    }
+  }
+  # Combine list/vector
+  c.gcpo.combined[["friends"]] <-
+    do.call("c", lapply(c.gcpo, function(lh) lh[["friends"]]))
+  if (any_element[["weights"]]) {
+    c.gcpo.combined[["weights"]] <-
+      unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
+  }
+  c.gcpo.new <- list()
+  if (!is.null(control.gcpo)) {
+    c.gcpo.new <- modifyList(c.gcpo.new, control.gcpo)
+  }
+  for (idx in seq_along(c.gcpo)) {
+    # TODO: Detect multiple conflicting option settings
+    c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo[[idx]])
+  }
+  c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo.combined)
+
+  c.gcpo.new
+}
+
+
+
 bru_obs_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
     # Only needed pre-2.12.0.9014
@@ -2737,9 +3470,10 @@ bru_obs_expr <- function(lhood, components) {
 #' @export
 #' @inheritParams bru_obs
 #' @inheritParams bru
-#' @param \dots Further arguments passed on to [bru_obs()]. In particular,
-#'   optional `E`, a single numeric used rescale all integration weights by a
-#'   fixed factor.
+#' @param \dots Further arguments passed on to [bru_obs()].
+#' @details
+#' The `E` and `weights` arguments are evaluated in the data context, like for
+#' [bru_obs()].
 #' @return An [bru()] object
 #' @examples
 #' \donttest{
@@ -2795,6 +3529,8 @@ lgcp <- function(components,
                  samplers = NULL,
                  ips = NULL,
                  formula = . ~ .,
+                 E = NULL,
+                 weights = NULL,
                  ...,
                  options = list(),
                  .envir = parent.frame()) {
@@ -2808,6 +3544,8 @@ lgcp <- function(components,
     formula = formula, data = data,
     domain = domain, samplers = samplers, ips = ips,
     ...,
+    E = {{ E }},
+    weights = {{ weights }},
     options = options,
     .envir = .envir
   )
@@ -4140,6 +4878,60 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 }
 
 
+bru_timer_do <- function(timer, task = NULL, iteration = NA_integer_) {
+  if (is.null(timer)) {
+    timer <- data.frame(
+      Task = character(0),
+      Iteration = integer(0),
+      Time = as.difftime(numeric(0), units = "secs"),
+      System = as.difftime(numeric(0), units = "secs"),
+      Elapsed = as.difftime(numeric(0), units = "secs")
+    )
+  }
+  tag <- list(
+    time = proc.time(),
+    task = task,
+    iter = iteration
+  )
+  old_tag <- attr(timer, "bru_timer_tag", exact = TRUE)
+  if (!is.null(old_tag)) {
+    ptm <- tag$time - old_tag$time
+    if (!is.na(ptm[4])) {
+      ptm[1] <- ptm[1] + ptm[4]
+    }
+    if (!is.na(ptm[5])) {
+      ptm[2] <- ptm[2] + ptm[5]
+    }
+
+    if (is.null(old_tag$task)) {
+      old_tag$task <- "Unknown"
+    }
+    if (is.null(old_tag$iter)) {
+      old_tag$iter <- NA_integer_
+    }
+    timer <- rbind(
+      timer,
+      data.frame(
+        Task = old_tag$task,
+        Iteration = old_tag$iter,
+        Time = as.difftime(unname(ptm[1]), units = "secs"),
+        System = as.difftime(unname(ptm[2]), units = "secs"),
+        Elapsed = as.difftime(unname(ptm[3]), units = "secs")
+      )
+    )
+  }
+  attr(timer, "bru_timer_tag") <- if (is.null(task)) {
+    NULL
+  } else {
+    tag
+  }
+  timer
+}
+bru_timer_done <- function(timer) {
+  bru_timer_do(timer, task = NULL)
+}
+
+
 #' Iterated INLA
 #'
 #' This is an internal wrapper for iterated runs of `INLA::inla`.
@@ -4168,32 +4960,11 @@ tidy_states <- function(states, value_name = "value", id_name = "iteration") {
 #' an element `error` with the error object.
 #' @keywords internal
 
-
 iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
-  add_timing <- function(timings, task, iteration = NA_integer_) {
-    AbsTime <- proc.time()
-    if (!is.na(AbsTime[4])) {
-      AbsTime[1] <- AbsTime[1] + AbsTime[4]
-    }
-    if (!is.na(AbsTime[5])) {
-      AbsTime[2] <- AbsTime[2] + AbsTime[2]
-    }
-    return(rbind(
-      timings,
-      data.frame(
-        Task = task,
-        Iteration = iteration,
-        Time = AbsTime[1],
-        System = AbsTime[2],
-        Elapsed = AbsTime[3]
-      )
-    ))
-  }
-
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
 
-  timings <- add_timing(NULL, "Start")
+  timings <- bru_timer_do(NULL, "Preprocess", 1L)
 
   inla.options <- bru_options_inla(options)
 
@@ -4202,6 +4973,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   original_log <- character(0) # Updated further below
   # Local utility method for collecting information object:
   collect_misc_info <- function(...) {
+    timings <- bru_timer_done(timings)
     if (is.null(orig_track)) {
       track_df <- list()
       for (label in names(states[[1]])) {
@@ -4350,11 +5122,11 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         rbind(
           orig_timings,
           data.frame(
-            Task = timings$Task[-1],
-            Iteration = timings$Iteration[-1] + iteration_offset,
-            Time = as.difftime(diff(timings$Time), units = "secs"),
-            System = as.difftime(diff(timings$System), units = "secs"),
-            Elapsed = as.difftime(diff(timings$Elapsed), units = "secs")
+            Task = timings$Task,
+            Iteration = timings$Iteration + iteration_offset,
+            Time = timings$Time,
+            System = timings$System,
+            Elapsed = timings$Elapsed
           )
         )
       },
@@ -4376,7 +5148,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     inla.options,
     list(
       control.mode = list(),
-      control.predictor = list(compute = TRUE)
+      control.predictor = list(compute = TRUE),
+      control.compute = list()
     )
   )
 
@@ -4386,6 +5159,13 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   # Extract the control.family information for each likelihood
   inla.options[["control.family"]] <-
     bru_obs_control_family(lhoods, inla.options[["control.family"]])
+
+  # Combine the control.gcpo information from all the likelihoods
+  inla.options[["control.compute"]][["control.gcpo"]] <-
+    bru_obs_control_gcpo(
+      lhoods,
+      inla.options[["control.compute"]][["control.gcpo"]]
+    )
 
   initial <-
     if (is.null(initial)) {
@@ -4575,6 +5355,10 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   do_final_integration <- (options$bru_max_iter == 1)
   do_final_theta_no_restart <- FALSE
   while (!interrupt) {
+    if (k > 1L) {
+      timings <- bru_timer_do(timings, "Preprocess", k)
+    }
+
     if ((k >= options$bru_max_iter) && !do_final_integration) {
       do_final_integration <- TRUE
       bru_log_message(
@@ -4710,7 +5494,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         )
     }
 
-    timings <- add_timing(timings, "Preprocess", k)
+    timings <- bru_timer_do(timings, "Run inla()", k)
 
     result <- fm_try_callstack(
       do.call(
@@ -4720,7 +5504,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )
     )
 
-    timings <- add_timing(timings, "Run inla()", k)
+    timings <- bru_timer_do(timings, "Postprocess", k)
 
     if (inherits(result, "try-error")) {
       bru_log_warn(
@@ -4820,6 +5604,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
+          timings <- bru_timer_do(timings, "Line search", k)
           line_weights <-
             extract_property(
               result = result,
@@ -4841,8 +5626,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             options = options
           )
           state <- line_search[["state"]]
-          timings <- add_timing(timings, "Line search", k)
         }
+        timings <- bru_timer_do(timings, "Linearise", k)
 
         bru_log_message(
           "iinla: Evaluate component linearisations",
@@ -4941,6 +5726,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
     k <- k + 1L
   }
+
+  timings <- bru_timer_done(timings)
 
   result[["bru_iinla"]] <- collect_misc_info()
   class(result) <- c("iinla", class(result))

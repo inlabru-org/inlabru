@@ -47,6 +47,8 @@ navbar:
         href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
+      - text: LGCPs - Spatial covariates and group CV
+        href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
         href: articles/2d_lgcp_distancesampling.html
       - text: LGCPs - Plot sampling
@@ -117,6 +119,7 @@ reference:
 - title: "Posterior evaluation"
   desc: "Functions for evaluating posterior properties."
   contents:
+  - starts_with("bru_names")
   - starts_with("generate")
   - starts_with("predict")
   - starts_with("spde.posterior")

@@ -5,6 +5,7 @@
 \alias{like}
 \alias{bru_obs_list}
 \alias{bru_obs_list.list}
+\alias{bru_obs_list.bru_obs}
 \alias{bru_obs_list.bru_obs_list}
 \alias{c.bru_obs}
 \alias{c.bru_obs_list}
@@ -31,6 +32,7 @@ bru_obs(
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
+  control.gcpo = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
@@ -40,38 +42,26 @@ bru_obs(
 )
 
 like(
-  formula = . ~ .,
-  family = "gaussian",
-  data = NULL,
-  response_data = NULL,
+  ...,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
   scale = NULL,
-  domain = NULL,
-  samplers = NULL,
-  ips = NULL,
-  used = NULL,
-  allow_combine = NULL,
-  control.family = NULL,
-  tag = NULL,
   options = list(),
-  .envir = parent.frame(),
-  mesh = deprecated(),
-  include = deprecated(),
-  exclude = deprecated(),
-  include_latent = deprecated()
+  .envir = parent.frame()
 )
 
-bru_obs_list(...)
+bru_obs_list(..., .tag = NULL)
 
-\method{bru_obs_list}{list}(object, ..., .envir = NULL)
+\method{bru_obs_list}{list}(object, ..., .tag = NULL)
 
-\method{bru_obs_list}{bru_obs_list}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs}(..., .tag = NULL)
 
-\method{c}{bru_obs}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs_list}(..., .tag = NULL)
 
-\method{c}{bru_obs_list}(..., .envir = NULL)
+\method{c}{bru_obs}(...)
+
+\method{c}{bru_obs_list}(...)
 
 \method{[}{bru_obs_list}(x, i)
 
@@ -162,12 +152,26 @@ defined by non-NULL \code{aggregate}, overriding the default,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
      weights = .data.[["weight"]],
-     n_block = bru_response_size(.response_data.))
+     n_block = bru_response_size(.response_data.),
+     block_response = ".block")
 }\if{html}{\out{</div>}}
 
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.
+
+From \verb{2.13.0.9016}, it will look for a \code{block_response} element in the
+list, which should be the name of a response variable in \code{response_data} to
+match the \code{block} information against, allowing character or factor
+aggregation block information to be used by replacing \code{block} with
+\code{match(block, block_response)}. If not supplied, the name
+\code{".block"} is tried. If that isn't available, the \code{block} information must
+be supplied directly as a numeric or integer vector, indexing into the rows
+of the response variable. Having no \code{block_response} variable is equivalent
+to having
+\code{response_data$.block = seq_len(bru_response_size(response_data))}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
+
+\item{control.gcpo}{A optional \code{list} of \code{INLA::control.gcpo} options}
 
 \item{tag}{character; Name that can be used to identify the relevant parts
 of INLA predictor vector output, via \code{\link[=bru_index]{bru_index()}}.}
@@ -182,11 +186,12 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
 \code{used} instead.}
 
-\item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
-
 \item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
-\item{object}{A list of \code{bru_obs} objects}
+\item{.tag}{Optional name to assign to a single \code{bru_obs} object. Reserved
+for internal use.}
+
+\item{object}{A list of \code{bru_obs} and/or \code{bru_obs_list} objects}
 
 \item{x}{\code{bru_obs_list} object from which to extract element(s)}
 
@@ -204,8 +209,15 @@ made aware of the change. The name change is to avoid issues with namespace
 clashes, e.g. with \code{data.table::like()}, and also to signal that the function
 defines observation models, not just likelihood functions.
 }
+\details{
+The \code{E}, \code{Ntrials}, \code{weights}, and \code{scale} arguments are evaluated in the
+data context, with values from \code{response_data} taking precedence over \code{data}.
+}
 \section{Methods (by generic)}{
 \itemize{
+\item \code{bru_obs_list(bru_obs)}: Combine one or more lists of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
+
 \item \code{c(bru_obs)}: Combine several \code{bru_obs} objects into a \code{bru_obs_list} object
 
 }}
@@ -219,8 +231,7 @@ method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_o
 \item \code{bru_obs_list(list)}: Combine one or more lists of \code{bru_obs} observation model objects
 into a \code{bru_obs_list} object
 
-\item \code{bru_obs_list(bru_obs_list)}: Combine a list of \code{bru_obs} observation model objects
-into a \code{bru_obs_list} object
+\item \code{bru_obs_list(bru_obs_list)}: Combine one or more \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
 \item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
 

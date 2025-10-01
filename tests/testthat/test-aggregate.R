@@ -88,13 +88,15 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   obs <- data.frame(
     x = c(10, 20, 30),
     y = c(1000, 2000, 3000),
-    z = c(10, 20, 30)
+    z = c(10, 20, 30),
+    the_group_char = c("a", "b", "c")
   )
   pred <- data.frame(
     x = c(1, 2, 3, 4, 5, 6),
     y = c(1, 20, 3, 40, 5, 60),
     weights = c(1, 1, 1, 1, 1, 1),
-    grp = c(1, 1, 2, 2, 2, 3)
+    grp = c(1, 1, 2, 2, 2, 3),
+    grp_char = c("a", "a", "b", "b", "b", "c")
   )
   domain <- list()
 
@@ -152,13 +154,14 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     )
   })
 
+  # Missing block information
   expect_error(
     {
       bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
-        data = pred,
+        data = c(as.list(pred), list(.block = NULL)),
         aggregate = "average",
         aggregate_input = list(
           weights = weights,
@@ -180,6 +183,61 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     ),
     fixed = TRUE
   )
+
+  # Character block information without matching response block information
+  expect_error(
+    {
+      bru_obs(
+        z ~ Intercept + x + y,
+        family = "normal",
+        response_data = obs,
+        data = pred,
+        aggregate = "average",
+        aggregate_input = list(
+          weights = weights,
+          block = grp_char,
+          n_block = bru_response_size(.response_data.)
+        ),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = 6,
+              fixed = TRUE
+            )
+          )
+        )
+      )
+    },
+    paste0(
+      "'character' aggregation block information detected."
+    ),
+    fixed = TRUE
+  )
+
+  # Character block information without match response block information
+  expect_no_error({
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      aggregate_input = list(
+        weights = weights,
+        block = grp_char,
+        n_block = bru_response_size(.response_data.),
+        block_response = "the_group_char"
+      ),
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    )
+  })
 })
 
 

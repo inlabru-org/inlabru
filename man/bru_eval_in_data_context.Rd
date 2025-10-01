@@ -14,12 +14,9 @@ bru_eval_in_data_context(
 \arguments{
 \item{input}{An expression to be evaluated}
 
-\item{data}{list of data objects in priority order. Named elements will
-be available as \code{.name.} in the evaluation. The \code{input} expression is
-evaluated with each non-NULL \code{data} object as \code{envir}, in order,
-until success. If there are no non-NULL data objects, the expression is
-evaluated in an empty environment, potentially falling back to enclosing
-environment variables.}
+\item{data}{list of data objects in priority order. Named elements will be
+available as whole objects \code{.name.} as well as pronouns \code{.name} in the
+evaluation.}
 
 \item{default}{Value used if the expression is evaluated as NULL. Default
 NULL}
@@ -32,7 +29,8 @@ The result of expression evaluation
 \description{
 Evaluate an expression in a series of data contexts, also making
 the objects directly available as names surrounded by ".", stopping when
-the expression evaluation completes with no error.
+the expression evaluation completes with no error, as well as \code{tidy}
+evaluation pronouns, e.g. \code{.data}.
 
 This is an internal inlabru method, not intended for general use.
 }
@@ -40,20 +38,16 @@ This is an internal inlabru method, not intended for general use.
 # The A values come from the 'data' element, and the B values come from
 # the 'response_data' element, as that is listed first.
 bru_eval_in_data_context(
-  quote(
-    list(A = .data.$x, B = x)
-  ),
+  list(A = .data$x, B = x),
   list(
     response_data = tibble::tibble(x = 1:5),
     data = tibble::tibble(x = 1:10)
   )
 )
 # Both A and B come from the 'data' element, as 'x' is found there,
-# terminating the evaluation attempt.
+# and the data objects are listed in order of precedence.
 bru_eval_in_data_context(
-  quote(
-    list(A = .data.$x, B = x)
-  ),
+  list(A = .data$x, B = x),
   list(
     data = tibble::tibble(x = 1:10),
     response_data = tibble::tibble(x = 1:5)

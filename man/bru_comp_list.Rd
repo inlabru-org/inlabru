@@ -6,22 +6,28 @@
 \alias{component_list}
 \alias{bru_comp_list.formula}
 \alias{bru_comp_list.list}
+\alias{bru_comp_list.bru_comp}
+\alias{bru_comp_list.bru_comp_list}
 \alias{c.bru_comp_list}
 \alias{c.bru_comp}
 \alias{[.bru_comp_list}
 \title{Methods for inlabru component lists}
 \usage{
-bru_comp_list(object, lhoods = NULL, .envir = parent.frame(), ...)
+bru_comp_list(object, ..., .envir = parent.frame())
 
-\method{bru_comp_list}{formula}(object, lhoods = NULL, .envir = parent.frame(), ...)
+\method{bru_comp_list}{formula}(object, ..., lhoods = NULL, .envir = parent.frame())
 
 \method{bru_comp_list}{list}(
   object,
+  ...,
   lhoods = NULL,
   .envir = parent.frame(),
-  inputs = NULL,
-  ...
+  inputs = NULL
 )
+
+\method{bru_comp_list}{bru_comp}(object, ..., .envir = parent.frame())
+
+\method{bru_comp_list}{bru_comp_list}(object, ..., .envir = parent.frame())
 
 \method{c}{bru_comp_list}(...)
 
@@ -32,11 +38,11 @@ bru_comp_list(object, lhoods = NULL, .envir = parent.frame(), ...)
 \arguments{
 \item{object}{The object to operate on}
 
-\item{lhoods}{A \link{bru_obs_list} object}
+\item{\dots}{Parameters passed on to other methods. Also see Details.}
 
 \item{.envir}{An evaluation environment for non-formula input}
 
-\item{\dots}{Parameters passed on to other methods. Also see Details.}
+\item{lhoods}{A \link{bru_obs_list} object}
 
 \item{inputs}{A tree-like list of component input evaluations,
 from \code{\link[=bru_input.bru_obs_list]{bru_input.bru_obs_list()}}.}
@@ -54,8 +60,14 @@ Constructor methods for inlabru component lists. Syntax details are given in
 \item \code{bru_comp_list(formula)}: Convert a component formula
 into a \code{bru_comp_list} object
 
-\item \code{bru_comp_list(list)}: Combine a list of components and/or component
-formulas into a \code{bru_comp_list} object
+\item \code{bru_comp_list(list)}: Combine a list of components, component lists,
+and/or component formulas into a single \code{bru_comp_list} object
+
+\item \code{bru_comp_list(bru_comp)}: Place a single \code{bru_comp} object into a
+\code{bru_comp_list} object.
+
+\item \code{bru_comp_list(bru_comp_list)}: Make sure a \code{bru_comp_list} object is fully
+configured.
 
 }}
 \section{Methods (by generic)}{

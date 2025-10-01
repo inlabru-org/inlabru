@@ -18,7 +18,7 @@ as_bru_obs <- function(x, ...) {
 
 #' @rdname as_bru_obs
 #' @export
-as_bru_obs_list <- function(x, ...) {
+as_bru_obs_list <- function(x, .tag = NULL) {
   if (is.null(x)) {
     return(NULL)
   }
@@ -32,27 +32,30 @@ as_bru_obs.bru_obs <- function(x, ...) {
 }
 
 #' @rdname as_bru_obs
+#' @param .tag character; optional name for the single observation model in the
+#'   returned [bru_obs_list] object. Default is `NULL`, which results in
+#'   automatic naming based on the `tag` attribute of `x`, if present.
 #' @export
-as_bru_obs_list.bru_obs <- function(x, ...) {
-  bru_obs_list(list(x), ...)
+as_bru_obs_list.bru_obs <- function(x, .tag = NULL) {
+  bru_obs_list(x, .tag = .tag)
 }
 
 #' @rdname as_bru_obs
 #' @export
-as_bru_obs_list.list <- function(x, ...) {
-  bru_obs_list(x, ...)
+as_bru_obs_list.list <- function(x, .tag = NULL) {
+  bru_obs_list(x)
 }
 
 #' @rdname as_bru_obs
 #' @export
-as_bru_obs_list.bru_obs_list <- function(x, ...) {
-  bru_obs_list(x, ...)
+as_bru_obs_list.bru_obs_list <- function(x, .tag = NULL) {
+  bru_obs_list(x)
 }
 
 #' @rdname as_bru_obs
 #' @export
-as_bru_obs_list.bru <- function(x, ...) {
-  bru_obs_list(x[["bru_info"]][["lhoods"]], ...)
+as_bru_obs_list.bru <- function(x, .tag = NULL) {
+  bru_obs_list(x[["bru_info"]][["lhoods"]])
 }
 
 #' @title Conversion methods for `bru_comp` and `bru_comp_list` objects

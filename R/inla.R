@@ -8,6 +8,7 @@
 #' @returns A character vector with standardised names
 #' @examples
 #' bru_standardise_names("Precision for the Gaussian observations")
+#' @seealso [bru_names()]
 #' @export
 #' @keywords internal
 bru_standardise_names <- function(x) {
@@ -32,6 +33,46 @@ bru_standardise_names <- function(x) {
   new_names
 }
 
+
+#' @title Extract standardised names from a bru or inla result object
+#' @description
+#' Extracts the names of fixed effects, random effects, and hyperparameters,
+#' converted with [bru_standardise_names()]
+#' @param x an `inla` or [bru()] result object
+#' @returns A character vector with standardised names
+#' @export
+#' @examples
+#' if (bru_safe_inla()) {
+#'   fit <- bru(y ~ 1 + x + z(z, model = "iid"),
+#'     data = data.frame(
+#'       y = rnorm(10),
+#'       x = rnorm(10),
+#'       z = rep(seq_len(2), 5)
+#'     )
+#'   )
+#'   bru_names(fit)
+#' }
+bru_names <- function(x) {
+  UseMethod("bru_names")
+}
+#' @export
+#' @rdname bru_names
+bru_names.inla <- function(x) {
+  bru_standardise_names(c(
+    rownames(x[["summary.fixed"]]),
+    names(x[["summary.random"]]),
+    rownames(x[["summary.hyperpar"]])
+  ))
+}
+#' @export
+#' @rdname bru_names
+bru_names.bru <- function(x) {
+  bru_standardise_names(c(
+    rownames(x[["summary.fixed"]]),
+    names(x[["summary.random"]]),
+    rownames(x[["summary.hyperpar"]])
+  ))
+}
 
 
 
