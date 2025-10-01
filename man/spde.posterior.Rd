@@ -5,7 +5,7 @@
 \title{Posteriors of SPDE hyper parameters and Matern correlation or
 covariance function.}
 \usage{
-spde.posterior(result, name, what = "range")
+spde.posterior(result, name, what = "range", quantile = 0.95)
 }
 \arguments{
 \item{result}{An object inheriting from \code{inla}.}
@@ -15,6 +15,8 @@ spde.posterior(result, name, what = "range")
 
 \item{what}{One of "range", "log.range", "variance", "log.variance",
 "matern.correlation" or "matern.covariance".}
+
+\item{quantile}{The target credible probability. Default 0.95.}
 }
 \value{
 A \code{prediction} object.

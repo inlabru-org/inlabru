@@ -12,7 +12,7 @@
 \item{mapping}{a set of aesthetic mappings created by \code{aes}. These are passed
 on to \code{geom_tile}.}
 
-\item{...}{Arguments passed on to \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
 A \code{geom_tile} with reversed y scale.

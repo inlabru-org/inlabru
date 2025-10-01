@@ -23,7 +23,6 @@ test_that("basic intercept model", {
 test_that("basic intercept model, spatial data", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(bru_safe_sp())
 
   options <- list(
     control.inla = list(h = 0.005)
@@ -32,7 +31,7 @@ test_that("basic intercept model, spatial data", {
   mydata <- local_basic_intercept_testdata()
   mydata$coord1 <- 11
   mydata$coord2 <- 12
-  sp::coordinates(mydata) <- c("coord1", "coord2")
+  mydata <- sf::st_as_sf(mydata, coords = c("coord1", "coord2"))
 
   fit <- bru(mycomp,
     family = "normal",

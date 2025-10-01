@@ -1,30 +1,5 @@
 # GENERICS ----
 
-#' Obtain component inputs
-#'
-#' @export
-#' @rdname input_eval
-input_eval <- function(...) {
-  UseMethod("input_eval")
-}
-#' Obtain indices
-#'
-#' Indexes into to the components
-#'
-#' @export
-#' @rdname index_eval
-index_eval <- function(...) {
-  UseMethod("index_eval")
-}
-#' Obtain inla index subset information
-#'
-#' Subsets for `INLA::f()` compatible indexing
-#'
-#' @export
-#' @rdname inla_subset_eval
-inla_subset_eval <- function(...) {
-  UseMethod("inla_subset_eval")
-}
 #' @title Add component input/latent mappers
 #' @description Add missing mappers between input data and latent variables,
 #' based on likelihood data
@@ -127,6 +102,7 @@ add_mappers <- function(...) {
 #'
 #' @rdname bru_comp
 #' @aliases component
+#' @seealso [bru_input()], [summary.bru_comp()]
 #'
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
 #' Finn Lindgren \email{Finn.Lindgren@@gmail.com}
@@ -163,7 +139,8 @@ bru_component <- function(...) {
 #' `main` takes an R expression that evaluates to where the latent variables
 #' should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 #' Arguments starting with weights, group, replicate behave similarly to main,
-#' but for the corresponding features of `INLA::f()`.
+#' but for the corresponding features of `INLA::f()`. `main` supports `tidy`
+#' evaluation expressions, with `.data` and `.env` pronouns.
 #' @param model Either one of "const" (same as "offset"), "factor_full",
 #' "factor_contrast", "linear",
 #' "fixed", or a model name or
@@ -216,7 +193,7 @@ bru_component <- function(...) {
 #' @param replicate,replicate_mapper,replicate_layer,replicate_selector,nrep
 #' Optional specification of indices for an independent
 #' replication model. Same syntax as for `main`
-#' @param marginal May specify a `bru_mapper_marginal()` mapper,
+#' @param marginal May specify a `bm_marginal()` mapper,
 #' that is applied before scaling by `weights`.
 #' @param A.msk `r lifecycle::badge("deprecated")` and has no effect.
 #' @param .envir Evaluation environment
@@ -225,9 +202,8 @@ bru_component <- function(...) {
 #' @details The `bru_comp.character` method is inlabru's equivalent to
 #'   `INLA`'s `f()` function but adds functionality that is unique to inlabru.
 #'
-#' Deprecated parameters:
-#' * map: Use `main` instead.
-#' * mesh: Use `mapper` instead.
+#'   The `main`, `weights`, `group`, `replicate`, and `*_layer` arguments
+#'   support `tidy` evaluation expressions, with `.data` and `.env` pronouns.
 #'
 #' @rdname bru_comp
 #' @aliases bru_comp
@@ -316,14 +292,20 @@ bru_comp.character <- function(object,
   # Force evaluation of explicit inputs
   force(values)
 
-  if (!is.null(substitute(group)) &&
-    !identical(deparse(substitute(group)), "1L")) {
-    if (is.null(control.group)) {
-      control.group <- INLA::inla.set.control.group.default()
+  include_group <- !missing(group) ||
+    !missing(ngroup) || !missing(group_mapper)
+  include_repl <- !missing(replicate) ||
+    !missing(nrep) || !missing(replicate_mapper)
+  if (include_group) {
+    if (!is.null(substitute(group)) &&
+      !identical(deparse(substitute(group)), "1L")) {
+      if (is.null(control.group)) {
+        control.group <- INLA::inla.set.control.group.default()
+      }
+      group_model <- control.group$model
+    } else {
+      group_model <- "exchangeable"
     }
-    group_model <- control.group$model
-  } else {
-    group_model <- "exchangeable"
   }
 
   if ("map" %in% names(sys.call())) {
@@ -348,10 +330,15 @@ bru_comp.character <- function(object,
 
   if (is.null(n)) {
     arg_names <- names(list(...))
-    if ("Cmatrix" %in% arg_names) {
-      if (is.matrix(list(...)[["Cmatrix"]]) ||
-        inherits(list(...)[["Cmatrix"]], "Matrix")) {
-        n <- nrow(list(...)[["Cmatrix"]])
+    if ("Z" %in% arg_names) {
+      Zmat <- list(...)[["Z"]]
+      if (is.matrix(Zmat) || inherits(Zmat, "Matrix")) {
+        n <- nrow(Zmat) + ncol(Zmat)
+      }
+    } else if ("Cmatrix" %in% arg_names) {
+      Cmat <- list(...)[["Cmatrix"]]
+      if (is.matrix(Cmat) || inherits(Cmat, "Matrix")) {
+        n <- nrow(Cmat)
       }
     } else if ("graph" %in% arg_names) {
       n <- INLA::inla.read.graph(list(...)[["graph"]], size.only = TRUE)
@@ -359,77 +346,93 @@ bru_comp.character <- function(object,
   }
 
   # Convert ngroup and nrep to bru_mapper info
-  if (!is.null(ngroup)) {
-    if (!is.null(group_mapper)) {
-      stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
+  if (include_group) {
+    if (!is.null(ngroup)) {
+      if (!is.null(group_mapper)) {
+        stop("At most one of 'ngroup' and 'group_mapper' should be supplied.")
+      }
+      group_mapper <- bm_index(ngroup)
+      ngroup <- NULL
     }
-    group_mapper <- bru_mapper_index(ngroup)
-    ngroup <- NULL
   }
-  if (!is.null(nrep)) {
-    if (!is.null(replicate_mapper)) {
-      stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
+  if (include_repl) {
+    if (!is.null(nrep)) {
+      if (!is.null(replicate_mapper)) {
+        stop("At most one of 'nrep' and 'replicate_mapper' should be supplied.")
+      }
+      replicate_mapper <- bm_index(nrep)
+      nrep <- NULL
     }
-    replicate_mapper <- bru_mapper_index(nrep)
-    nrep <- NULL
   }
 
-  # Default component (to be filled)
-  component <- list(
+  inp <- bru_input_create(
+    {{ main }},
     label = label,
-    inla.formula = NULL,
+    layer = {{ main_layer }},
+    selector = main_selector
+  )
+  subcomp <- list(
     main = bru_subcomp(
-      input = bru_input(
-        substitute(main),
-        label = label,
-        layer = substitute(main_layer),
-        selector = main_selector
-      ),
+      input = inp,
       mapper = mapper,
-      model = model,
       n = n,
+      model = model,
       values = values,
       season.length = season.length,
       nrow = nrow,
       ncol = ncol
+    )
+  )
+  if (include_group) {
+    subcomp$group <-
+      bru_subcomp(
+        input = bru_input_create(
+          {{ group }},
+          label = glue("{label}.group"),
+          layer = {{ group_layer }},
+          selector = group_selector
+        ),
+        mapper = group_mapper,
+        n = NULL,
+        model = group_model
+      )
+  }
+  if (include_repl) {
+    subcomp$replicate <-
+      bru_subcomp(
+        input = bru_input_create(
+          {{ replicate }},
+          label = glue("{label}.repl"),
+          layer = {{ replicate_layer }},
+          selector = replicate_selector
+        ),
+        mapper = replicate_mapper,
+        n = NULL,
+        model = "iid"
+      )
+  }
+  if (!is.null(substitute(weights))) {
+    subcomp$weights <-
+      bru_input_create(
+        {{ weights }},
+        label = glue("{label}.weights"),
+        layer = {{ weights_layer }},
+        selector = weights_selector
+      )
+  }
+  # Default component (to be filled)
+  component <- c(
+    list(
+      label = label,
+      inla.formula = NULL
     ),
-    group = bru_subcomp(
-      input = bru_input(
-        substitute(group),
-        label = paste0(label, ".group"),
-        layer = substitute(group_layer),
-        selector = group_selector
-      ),
-      mapper = group_mapper,
-      n = NULL,
-      model = group_model
-    ),
-    replicate = bru_subcomp(
-      input = bru_input(
-        substitute(replicate),
-        label = paste0(label, ".repl"),
-        layer = substitute(replicate_layer),
-        selector = replicate_selector
-      ),
-      mapper = replicate_mapper,
-      n = NULL,
-      model = "iid"
-    ),
-    weights =
-      if (is.null(substitute(weights))) {
-        NULL
-      } else {
-        bru_input(
-          substitute(weights),
-          label = paste0(label, ".weights"),
-          layer = substitute(weights_layer),
-          selector = weights_selector
-        )
-      },
-    copy = copy,
-    marginal = marginal,
-    env = .envir,
-    env_extra = envir_extra
+    subcomp,
+    list(
+      copy = copy,
+      marginal = marginal,
+      env = .envir,
+      env_extra = envir_extra
+    )
   )
 
   # Main bit
@@ -442,22 +445,24 @@ bru_comp.character <- function(object,
   names(fcall)[2] <- ""
   # 'main' and 'weights' are the only regular parameter allowed to be nameless,
   # and only if they are the first parameters (position 3 and 4 in fcall)
-  if (is.null(names(fcall)) || identical(names(fcall)[3], "")) {
+  if ((length(fcall) >= 3L) &&
+    (is.null(names(fcall)) || (names(fcall)[3] %in% c("", NA_character_)))) {
     names(fcall)[3] <- "main"
   }
-  if (is.null(names(fcall)) || identical(names(fcall)[4], "")) {
+  if ((length(fcall) >= 4L) &&
+    (is.null(names(fcall)) || (names(fcall)[4] %in% c("", NA_character_)))) {
     names(fcall)[4] <- "weights"
   }
-  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% "")
+  unnamed_arguments <- which(names(fcall[-c(1, 2)]) %in% c("", NA_character_))
   if (length(unnamed_arguments) > 0) {
     # Without this check, R gives the error
     #   'In str2lang(s) : parsing result not of length one, but 0'
     # in the INLA call instead, which isn't very informative.
-    stop(paste0(
-      "Unnamed arguments detected in component '", label, "'.\n",
+    stop(glue(
+      "Unnamed arguments detected in component '{label}'.\n",
       "  Only 'main' and 'weights' parameters may be unnamed.\n",
       "  Unnamed arguments at position(s) ",
-      paste0(unnamed_arguments, collapse = ", ")
+      glue_collapse(unnamed_arguments, sep = ", ")
     ))
   }
 
@@ -466,22 +471,18 @@ bru_comp.character <- function(object,
     # The offset is included either automatically for ~ . linear models,
     # or explicitly by name in the predictor expression, so no INLA formula
     # component is needed.
-    component$inla.formula <- as.formula(paste0("~ ."),
-      env = .envir
-    )
-    component$main$mapper <- bru_mapper_const()
-    component$group$mapper <- bru_mapper_index(1L)
-    component$replicate$mapper <- bru_mapper_index(1L)
+    component$inla.formula <- as.formula("~ .", env = .envir)
+    component$main$mapper <- bm_const()
+    component$group <- NULL
+    component$replicate <- NULL
     # Add scalable multi-mapper
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
+          mapper = bm_multi(list(
+            main = component$main$mapper
           )),
-          scale = bru_mapper_scale()
+          scale = bm_scale()
         )
       )
   } else {
@@ -492,7 +493,7 @@ bru_comp.character <- function(object,
       #    assign(model_name, component$copy, envir = component$env_extra)
     } else {
       # Store model name or object in the environment
-      model_name <- paste0("BRU_", label, "_main_model")
+      model_name <- glue("BRU_{label}_main_model")
       fcall[["model"]] <- as.symbol(model_name)
       assign(model_name, component$main$model, envir = component$env_extra)
     }
@@ -527,7 +528,7 @@ bru_comp.character <- function(object,
     )
     for (arg in names(suffixes)) {
       if (arg %in% names(fcall)) {
-        fcall[[arg]] <- as.symbol(paste0(label, ".", suffixes[[arg]]))
+        fcall[[arg]] <- as.symbol(glue("{label}.{suffixes[[arg]]}"))
       }
     }
 
@@ -553,7 +554,7 @@ bru_comp.character <- function(object,
       if (is.null(component$main$values)) {
         fcall <- fcall[!("values" %in% names(fcall))]
       } else {
-        values_name <- paste0("BRU_", label, "_values")
+        values_name <- glue("BRU_{label}_values")
         fcall[["values"]] <- as.symbol(values_name)
         assign(
           values_name,
@@ -566,7 +567,7 @@ bru_comp.character <- function(object,
       if (component$main$type %in% c("factor", "fixed")) {
         if (is.null(fcall[["hyper"]])) {
           # TODO: allow configuration of the precision via prec.linear
-          fixed_hyper_name <- paste0("BRU_", label, "_main_fixed_hyper")
+          fixed_hyper_name <- glue("BRU_{label}_main_fixed_hyper")
           fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
           assign(
             fixed_hyper_name,
@@ -613,9 +614,8 @@ bru_comp.character <- function(object,
 #' @aliases bru_component_list
 #' @aliases component_list
 bru_comp_list <- function(object,
-                          lhoods = NULL,
-                          .envir = parent.frame(),
-                          ...) {
+                          ...,
+                          .envir = parent.frame()) {
   UseMethod("bru_comp_list")
 }
 
@@ -641,8 +641,9 @@ bru_comp_list <- function(object,
 #' # Individual component
 #' eff <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 bru_comp_list.formula <- function(object,
+                                  ...,
                                   lhoods = NULL,
-                                  .envir = parent.frame(), ...) {
+                                  .envir = parent.frame()) {
   if (!is.null(environment(object))) {
     .envir <- environment(object)
   }
@@ -651,12 +652,12 @@ bru_comp_list.formula <- function(object,
   object <- auto_intercept(object)
 
   code <- bru_formula_to_bru_obs_code(object)
-  parsed <- lapply(code, function(x) parse(text = x))
+  parsed <- lapply(code, function(x) rlang::parse_expr(x))
   components <- lapply(
     parsed,
     function(component.expression) {
-      eval(component.expression,
-        envir = .envir
+      rlang::eval_bare(component.expression,
+        env = .envir
       )
     }
   )
@@ -668,16 +669,16 @@ bru_comp_list.formula <- function(object,
 
 
 
-#' @describeIn bru_comp_list Combine a list of components and/or component
-#'   formulas into a `bru_comp_list` object
+#' @describeIn bru_comp_list Combine a list of components, component lists,
+#'   and/or component formulas into a single `bru_comp_list` object
 #' @param inputs A tree-like list of component input evaluations,
-#' from [input_eval.bru_obs_list()].
+#' from [bru_input.bru_obs_list()].
 #' @export
 bru_comp_list.list <- function(object,
+                               ...,
                                lhoods = NULL,
                                .envir = parent.frame(),
-                               inputs = NULL,
-                               ...) {
+                               inputs = NULL) {
   # Maybe the list has been given an environment?
   if (!is.null(environment(object))) {
     .envir <- environment(object)
@@ -685,35 +686,33 @@ bru_comp_list.list <- function(object,
     # Later code needs an actual environment
     .envir <- new.env()
   }
-  if (any(vapply(object, function(x) inherits(x, "formula"), TRUE))) {
-    object <-
-      do.call(
-        c,
-        lapply(
-          object,
-          function(x) {
-            if (inherits(x, "formula")) {
-              bru_comp_list(x, lhoods = lhoods, .envir = .envir)
-            } else {
-              list(x)
-            }
-          }
-        )
-      )
+  is_comp <- vapply(object, function(x) inherits(x, "bru_comp"), TRUE)
+  if (!all(is_comp)) {
+    is_comp_list <- vapply(object, function(x) {
+      inherits(x, "bru_comp_list")
+    }, TRUE)
+    if (!all(is_comp_list)) {
+      object <- lapply(seq_along(object), function(k) {
+        bru_comp_list(object[[k]], .envir = .envir)
+      })
+    }
+    object <- unlist(object, recursive = FALSE)
   }
-  stopifnot(all(vapply(object, function(x) inherits(x, "bru_comp"), TRUE)))
-  class(object) <- c("bru_comp_list", "list")
+  object <- structure(
+    object,
+    class = c("bru_comp_list", "list")
+  )
   environment(object) <- .envir
 
   object <- set_list_names(object, tag = "label", priority = "name")
   if (anyDuplicated(names(object))) {
     stop(paste0(
       "Duplicated component labels detected: ",
-      paste0(
-        "'",
-        sort(unique(names(object)[duplicated(names(object))])),
-        "'",
-        collapse = ", "
+      glue_collapse(
+        glue(
+          "'{sort(unique(names(object)[duplicated(names(object))]))}'"
+        ),
+        sep = ", "
       )
     ))
   }
@@ -725,7 +724,23 @@ bru_comp_list.list <- function(object,
   object
 }
 
+#' @export
+#' @describeIn bru_comp_list Place a single `bru_comp` object into a
+#'   `bru_comp_list` object.
+bru_comp_list.bru_comp <- function(object,
+                                   ...,
+                                   .envir = parent.frame()) {
+  bru_comp_list(list(object), .envir = .envir, ...)
+}
 
+#' @export
+#' @describeIn bru_comp_list Make sure a `bru_comp_list` object is fully
+#'   configured.
+bru_comp_list.bru_comp_list <- function(object,
+                                        ...,
+                                        .envir = parent.frame()) {
+  bru_comp_list(list(object), .envir = .envir, ...)
+}
 
 
 
@@ -735,17 +750,7 @@ bru_comp_list.list <- function(object,
 #' objects. The environment from the first argument will be applied to the
 #' resulting `bru_comp_list`.
 `c.bru_comp_list` <- function(...) {
-  stopifnot(all(vapply(
-    list(...),
-    function(x) inherits(x, "bru_comp_list"),
-    TRUE
-  )))
-  env <- environment(list(...)[[1]])
-  object <- NextMethod()
-  class(object) <- c("bru_comp_list", "list")
-  environment(object) <- env
-  object <- set_list_names(object, tag = "label", priority = "name")
-  object
+  bru_comp_list(list(...), .envir = environment(list(...)[[1]]))
 }
 
 #' @export
@@ -753,17 +758,7 @@ bru_comp_list.list <- function(object,
 #'   objects from [bru_comp()]. The environment from the first argument
 #'   will be applied to the resulting `bru_comp_list`.
 `c.bru_comp` <- function(...) {
-  stopifnot(all(vapply(
-    list(...),
-    function(x) inherits(x, "bru_comp"),
-    TRUE
-  )))
-  env <- environment(list(...)[[1]])
-  object <- list(...)
-  class(object) <- c("bru_comp_list", "list")
-  environment(object) <- env
-  object <- set_list_names(object, tag = "label", priority = "name")
-  object
+  bru_comp_list(list(...), .envir = environment(list(...)[[1]]))
 }
 
 #' @export
@@ -788,6 +783,11 @@ bru_comp_list.list <- function(object,
 #'   determine the appropriate mapper(s).
 #' @param component A [component] object
 #' @param lhoods A [bru_obs_list] object
+#' @param inputs A precomputed list of inputs, as returned by
+#'   [bru_input.bru_comp_list()]
+#' @param lh_data A list of data object, one for each likelihood in `lhoods`
+#'   that is used to determine the mapper(s). If `NULL`, the data is
+#'   or inputs are used instead.
 #' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
@@ -798,23 +798,31 @@ bru_comp_list.list <- function(object,
 #' @keywords internal
 #' @export
 
-add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
-  # Filter out lhoods that don't use/support the component
-  keep_lh <-
-    vapply(lhoods,
-      function(lh, label) {
-        label %in% bru_used(lh)[["effect"]]
-      },
-      TRUE,
-      label = component$label
-    )
-  lh <- lhoods[keep_lh]
-  inputs <- inputs[keep_lh]
+add_mappers.bru_comp <- function(component,
+                                 lhoods,
+                                 inputs = NULL,
+                                 lh_data = NULL,
+                                 ...) {
+  if (is.null(lh_data)) {
+    # Filter out lhoods that don't use/support the component
+    keep_lh <-
+      vapply(lhoods,
+        function(lh, label) {
+          label %in% bru_used(lh)[["effect"]]
+        },
+        TRUE,
+        label = component$label
+      )
+    lh <- lhoods[keep_lh]
+    inputs <- inputs[keep_lh]
+
+    lh_data <- lapply(lh, function(x) x[["data"]])
+  }
 
   component$main <- add_mapper(
     component$main,
     label = component$label,
-    lhoods = lh,
+    data = lh_data,
     inputs = lapply(
       inputs,
       function(x) x[[component$label]][["mapper"]][["main"]]
@@ -822,52 +830,59 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
     env = component$env,
     require_indexed = FALSE
   )
-  component$group <- add_mapper(
-    component$group,
-    label = component$label,
-    lhoods = lh,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["group"]]
-    ),
-    env = component$env,
-    require_indexed = TRUE
-  )
-  component$replicate <- add_mapper(
-    component$replicate,
-    label = component$label,
-    lhoods = lh,
-    inputs = lapply(
-      inputs,
-      function(x) x[[component$label]][["mapper"]][["replicate"]]
-    ),
-    env = component$env,
-    require_indexed = TRUE
+  if (!is.null(component[["group"]])) {
+    component$group <- add_mapper(
+      component$group,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["group"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  if (!is.null(component[["replicate"]])) {
+    component$replicate <- add_mapper(
+      component$replicate,
+      label = component$label,
+      data = lh_data,
+      inputs = lapply(
+        inputs,
+        function(x) x[[component$label]][["mapper"]][["replicate"]]
+      ),
+      env = component$env,
+      require_indexed = TRUE
+    )
+  }
+  comp_mapper <- bm_multi(
+    lapply(
+      component[intersect(
+        c("main", "group", "replicate"),
+        names(component)
+      )],
+      function(subcomp) {
+        subcomp[["mapper"]]
+      }
+    )
   )
   # Add scalable multi-mapper
   if (is.null(component[["marginal"]])) {
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
-          scale = bru_mapper_scale()
+          mapper = comp_mapper,
+          scale = bm_scale()
         )
       )
   } else {
     component[["mapper"]] <-
-      bru_mapper_pipe(
+      bm_pipe(
         list(
-          mapper = bru_mapper_multi(list(
-            main = component$main$mapper,
-            group = component$group$mapper,
-            replicate = component$replicate$mapper
-          )),
+          mapper = comp_mapper,
           marginal = component[["marginal"]],
-          scale = bru_mapper_scale()
+          scale = bm_scale()
         )
       )
   }
@@ -875,21 +890,25 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
   fcall <- component$fcall
 
   # Set ngroup and nrep defaults
-  if (is.null(component$group$n)) {
-    fcall[["ngroup"]] <- 1
-  } else {
-    fcall[["ngroup"]] <- component$group$n
+  if (!is.null(component[["group"]])) {
+    if (is.null(component$group[["n"]])) {
+      fcall[["ngroup"]] <- 1L
+    } else {
+      fcall[["ngroup"]] <- component$group$n
+    }
   }
-  if (is.null(component$replicate$n)) {
-    fcall[["nrep"]] <- 1
-  } else {
-    fcall[["nrep"]] <- component$replicate$n
+  if (!is.null(component[["replicate"]])) {
+    if (is.null(component$replicate[["n"]])) {
+      fcall[["nrep"]] <- 1L
+    } else {
+      fcall[["nrep"]] <- component$replicate$n
+    }
   }
 
   if (is.null(component$main$values)) {
     fcall <- fcall[!("values" %in% names(fcall))]
   } else {
-    values_name <- paste0("BRU_", component$label, "_values")
+    values_name <- glue("BRU_{component$label}_values")
     fcall[["values"]] <- as.symbol(values_name)
     assign(values_name, component$main$values, envir = component$env_extra)
   }
@@ -898,12 +917,9 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
     # Update the formula that will be presented to INLA
     component$inla.formula <-
       as.formula(
-        paste0(
+        glue(
           "~ . + ",
-          paste0(
-            deparse(fcall),
-            collapse = "\n"
-          )
+          glue_collapse(deparse(fcall), sep = "\n")
         ),
         env = component$env
       )
@@ -917,13 +933,20 @@ add_mappers.bru_comp <- function(component, lhoods, inputs = NULL, ...) {
 #' @param components A `bru_comp_list` object
 #' @export
 #' @rdname add_mappers
-add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
+add_mappers.bru_comp_list <- function(components,
+                                      lhoods,
+                                      inputs = NULL,
+                                      lh_data = NULL,
+                                      ...) {
   if (is.null(inputs)) {
-    inputs <- input_eval(lhoods, components = components)
+    inputs <- bru_input(lhoods, components = components)
   }
   is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
   for (k in which(!is_copy)) {
-    components[[k]] <- add_mappers(components[[k]], lhoods, inputs = inputs)
+    components[[k]] <- add_mappers(
+      components[[k]], lhoods,
+      inputs = inputs, lh_data = lh_data
+    )
   }
   for (k in which(is_copy)) {
     if (is.null(components[[k]][["copy"]])) {
@@ -933,31 +956,15 @@ add_mappers.bru_comp_list <- function(components, lhoods, inputs = NULL, ...) {
       ))
     }
     if (is.null(components[[components[[k]][["copy"]]]])) {
-      stop(paste0(
-        "Could not find component '",
-        components[[k]][["copy"]],
-        "' to use as copy for component '",
-        components[[k]][["label"]],
-        "'."
+      stop(glue(
+        "Could not find component '{components[[k]][['copy']]}'",
+        " to use as copy for component '{components[[k]][['label']]}'."
       ))
     }
     components[[k]]$mapper <-
       components[[components[[k]][["copy"]]]][["mapper"]]
   }
   components
-}
-
-bru_input <- function(input, label = NULL, layer = NULL, selector = NULL) {
-  inp <- structure(
-    list(
-      input = input,
-      label = label,
-      layer = layer,
-      selector = selector
-    ),
-    class = "bru_input"
-  )
-  inp
 }
 
 bru_subcomp <- function(input = NULL,
@@ -1043,7 +1050,7 @@ bru_subcomp <- function(input = NULL,
     if (!inherits(mapper, "bru_mapper")) {
       stop(
         "Unknown mapper class '",
-        paste0(class(mapper), collapse = ", "),
+        glue_collapse(class(mapper), sep = ", "),
         "'"
       )
     }
@@ -1189,10 +1196,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 }
 
 
-# @param inputs list with the subcomponent inputs, for each lhoods element;
+# @param inputs list with precomputed inputs, for each lhoods element;
+# @param data list of data objects, one for each lhoods element
 # lapply(full_inputs,
 #        function(x) x[[component$label]][["mapper"]][[subcomponent_label]])
-add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
+add_mapper <- function(subcomp, label, data = NULL, env = NULL,
                        inputs = NULL,
                        require_indexed = FALSE) {
   if (is.null(subcomp[["mapper"]])) {
@@ -1202,10 +1210,10 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
   }
   if (!is.null(subcomp[["mapper"]])) {
     if (!inherits(subcomp[["mapper"]], "bru_mapper")) {
-      stop(paste0(
+      stop(glue(
         "Unknown mapper of type '",
-        paste0(class(subcomp[["mapper"]]), collapse = ", "),
-        "' for ", label
+        glue_collapse(class(subcomp[["mapper"]]), sep = ", "),
+        "' for {label}"
       ))
     }
   } else if (is.null(subcomp[["input"]][["input"]])) {
@@ -1218,35 +1226,35 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       require_indexed = require_indexed
     )
   } else {
-    if (!is.null(lhoods)) {
-      if (length(lhoods) > 0) {
-        if (is.null(inputs)) {
+    if (!is.null(data) || !is.null(inputs)) {
+      if (is.null(inputs) || (length(inputs) == 0)) {
+        if (!is.null(data) && (length(data) > 0)) {
           inputs <- lapply(
-            lhoods,
-            function(lh) {
-              input_eval(
+            data,
+            function(dat) {
+              bru_input(
                 subcomp$input,
-                data = lh$data,
+                data = dat,
                 env = env,
                 label = subcomp$input$label,
                 null.on.fail = TRUE
               )
             }
           )
-        }
-      } else {
-        # Component not directly used in any likelihood.
-        # Attempt to evaluate with no data;
-        # useful for intercept-like components only used via the
-        # *_latent technique.
-        inputs <- list(
-          input_eval(subcomp$input,
-            data = NULL,
-            env = env,
-            label = subcomp$input$label,
-            null.on.fail = TRUE
+        } else {
+          # Component not directly used in any likelihood.
+          # Attempt to evaluate with no data;
+          # useful for intercept-like components only used via the
+          # *_latent technique.
+          inputs <- list(
+            bru_input(subcomp$input,
+              data = NULL,
+              env = env,
+              label = subcomp$input$label,
+              null.on.fail = TRUE
+            )
           )
-        )
+        }
       }
       # Check for
       # 1) All NULL; Deprecated unless input is NULL. Since version 2.1.14,
@@ -1255,12 +1263,12 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
       # TODO: Check for vector/matrix/coordinate inconsistency
       null.results <- vapply(inputs, function(x) is.null(x), TRUE)
       if (all(null.results)) {
-        msg <- paste0(
-          "All covariate evaluations for '", label,
-          "' are NULL; an intercept component was likely intended.\n",
+        msg <- glue(
+          "All covariate evaluations for '{label}'",
+          " are NULL; an intercept component was likely intended.\n",
           "  Implicit latent intercept component specification is ",
           "deprecated since version 2.1.14.\n",
-          "  Use explicit notation '+ ", label, "(1)' instead",
+          "  Use explicit notation '+ {label}(1)' instead",
           if (identical(label, "Intercept")) {
             " (or '+1' for '+ Intercept(1)')"
           },
@@ -1299,9 +1307,10 @@ add_mapper <- function(subcomp, label, lhoods = NULL, env = NULL,
     mapper_n <- ibm_n(subcomp[["mapper"]], inla_f = TRUE)
     if (!is.null(subcomp[["n"]]) &&
       subcomp[["n"]] != mapper_n) {
-      stop(paste0(
-        "Size mismatch, n=", subcomp[["n"]], " != ibm_n(inla_f = TRUE)=",
-        mapper_n, " mapper for label ", label
+      stop(glue(
+        "Size mismatch, n={subcomp[['n']]}  != ",
+        "ibm_n(inla_f = TRUE)={mapper_n}, ",
+        " in mapper for label '{label}'."
       ))
     }
     subcomp[["n"]] <- mapper_n
@@ -1328,7 +1337,7 @@ make_values <- function(subcomp_n, subcomp_values, input_values, label) {
     return(input_values)
   }
 
-  stop(paste0("No mapper, no n, and no values given for ", label))
+  stop(glue("No mapper, no n, and no values given for '{label}'"))
 }
 
 make_submapper <- function(subcomp_n,
@@ -1343,9 +1352,7 @@ make_submapper <- function(subcomp_n,
   if (identical(subcomp_type, "inlalattice")) {
     if (is.null(subcomp_nrow_ncol)) {
       stop(
-        "nrow and ncol must be provided for inla lattice model '",
-        label,
-        "'."
+        glue("nrow and ncol must be provided for inla lattice model '{label}'.")
       )
     }
     n <- prod(subcomp_nrow_ncol)
@@ -1354,7 +1361,7 @@ make_submapper <- function(subcomp_n,
     }
     subcomp_n <- n
     return(
-      bru_mapper_index(n = subcomp_n)
+      bm_index(n = subcomp_n)
     )
   }
 
@@ -1364,7 +1371,7 @@ make_submapper <- function(subcomp_n,
     is.character(values) ||
     (!is.null(subcomp_type) && (subcomp_type %in% "factor"))) {
     return(
-      bru_mapper_factor(
+      bm_factor(
         values,
         factor_mapping = subcomp_factor_mapping,
         indexed = require_indexed
@@ -1382,34 +1389,42 @@ make_submapper <- function(subcomp_n,
         )
       )
     }
-    mapper <- bru_mapper_index(n = ceiling(max(values)))
+    mapper <- bm_index(n = ceiling(max(values)))
     return(mapper)
   }
   if (all(values == 1)) {
     if (require_indexed) {
-      return(bru_mapper_index(n = 1L))
+      return(bm_index(n = 1L))
     }
-    return(bru_mapper_linear())
+    return(bm_linear())
   }
   if (require_indexed) {
     return(
-      bru_mapper_factor(values,
+      bm_factor(values,
         factor_mapping = "full",
         indexed = TRUE
       )
     )
   }
 
-  return(bru_mapper_linear())
+  return(bm_linear())
 }
 
 
+#' @title
 #' Extract mapper information from INLA model component objects
 #'
+#' @description
 #' The component definitions will automatically attempt to extract mapper
 #' information from any model object by calling the generic `bru_get_mapper`.
 #' Any class method implementation should return a [bru_mapper] object suitable
 #' for the given latent model.
+#'
+#' @details
+#' Before implementing your own `bru_get_mapper` method, check if there
+#' is already a general method available that handles your model class, such as
+#' [bru_get_mapper.inla.spde()], [bru_get_mapper.inla.rgeneric()], and
+#' [bru_get_mapper.inla.cgeneric()].
 #'
 #' @param model A model component object
 #' @param \dots Arguments passed on to other methods
@@ -1439,23 +1454,45 @@ bru_get_mapper <- function(model, ...) {
 #' which is assumed to be of a class supporting relevant `fmesher` methods.
 #' @export
 bru_get_mapper.inla.spde <- function(model, ...) {
-  bru_mapper_fmesher(model[["mesh"]])
+  bm_fmesher(model[["mesh"]])
 }
 
-#' @describeIn bru_get_mapper Returns the mapper given by a call to
-#'   `model$f$rgeneric$definition("mapper")`. To support this for your own
-#'   `inla.rgeneric` models, add a `"mapper"` option to the `cmd` argument of
-#'   your rgeneric definition function. You will need to store the mapper in
-#'   your object as well.  Alternative, define your model using a subclass and
-#'   define a corresponding `bru_get_mapper.subclass` method that should return
-#'   the corresponding `bru_mapper` object.
+#' @describeIn bru_get_mapper Returns the mapper given by a pre-computed mapper,
+#'   or an index mapper mapping the size of the model graph.
+#'
+#'   The easiest method to define a mapper for an `inla.rgeneric` model is to
+#'   store the mapper in the object.
+#'   Alternatively, define your model using a subclass and define a
+#'   `bru_get_mapper.<subclass>` method that should return the
+#'   corresponding `bru_mapper` object.
+#'
+#' The order of precedence for the mapper construction when calling
+#' `bru_get_mapper(model)` has the following precedence:
+#'
+#' 1. `bru_get_mapper.<subclass>`, if `model` has a subclass, otherwise
+#' 2. `model[["mapper"]]` if that is `NULL`, and otherwise
+#' 3. [bm_index()] using the size of the graph returned by `model[["f"]][["n"]]`
 #' @export
 bru_get_mapper.inla.rgeneric <- function(model, ...) {
-  if (is.null(model[["f"]][["rgeneric"]][["definition"]])) {
-    NULL
-  } else {
-    model[["f"]][["rgeneric"]][["definition"]]("mapper")
+  if (!is.null(model[["mapper"]])) {
+    return(model[["mapper"]])
   }
+  if (!is.null(model[["f"]][["n"]])) {
+    return(bm_index(n = model[["f"]][["n"]]))
+  }
+  NULL
+}
+
+#' @describeIn bru_get_mapper Works the same as the method of `inla.rgeneric`
+#' @export
+bru_get_mapper.inla.cgeneric <- function(model, ...) {
+  if (!is.null(model[["mapper"]])) {
+    return(model[["mapper"]])
+  }
+  if (!is.null(model[["f"]][["n"]])) {
+    return(bm_index(n = model[["f"]][["n"]]))
+  }
+  NULL
 }
 
 #' @describeIn bru_get_mapper Tries to call the `bru_get_mapper`,
@@ -1467,13 +1504,14 @@ bru_get_mapper_safely <- function(model, ...) {
   m <- tryCatch(
     bru_get_mapper(model, ...),
     error = function(e) {
+      NULL
     }
   )
   if (!is.null(m) && !inherits(m, "bru_mapper")) {
     stop(paste0(
       "The bru_get_mapper method for model class '",
-      paste0(class(model), collapse = ", "),
-      "' did not return a bru_mapper object"
+      glue_collapse(class(model), sep = ", "),
+      "' did not return a bru_mapper object."
     ))
   }
   m
@@ -1499,15 +1537,15 @@ make_mapper <- function(subcomp,
     }
     stop(paste0(
       "Unknown mapper of type '",
-      paste0(class(mapper), collapse = ", "),
+      glue_collapse(class(mapper), sep = ", "),
       "' for ", label
     ))
   }
   if (subcomp[["type"]] %in% c("linear", "specialnonlinear")) {
-    return(bru_mapper_linear())
+    return(bm_linear())
   }
   if (subcomp[["type"]] %in% c("offset", "const")) {
-    return(bru_mapper_const())
+    return(bm_const())
   }
   if (subcomp[["type"]] %in% c("fixed")) {
     if (!is.null(subcomp[["values"]])) {
@@ -1521,13 +1559,13 @@ make_mapper <- function(subcomp,
     } else if (!is.null(subcomp[["n"]])) {
       labels <- as.character(seq_len(subcomp[["n"]]))
     } else {
-      stop(paste0(
-        "Need to specify at least one of values (labels), input, or n for '",
-        subcomp[["label"]],
-        "' of component '", label, "'."
+      stop(glue(
+        "Need to specify at least one of values (labels), input, or n for ",
+        "'{subcomp[['label']]}'",
+        " of component '{label}'."
       ))
     }
-    return(bru_mapper_matrix(labels))
+    return(bm_matrix(labels))
   }
   allow_interpolation <- TRUE
   stopifnot(bru_safe_inla(multicore = TRUE))
@@ -1542,9 +1580,9 @@ make_mapper <- function(subcomp,
       mapper_names <- c("u", "v")
       allow_interpolation <- FALSE
     } else {
-      mapper_names <- paste0("u", seq_len(inla_model[["aug.factor"]]))
+      mapper_names <- glue("u{seq_len(inla_model[['aug.factor']])}")
     }
-    labels <- paste0(subcomp[["input"]][["label"]], "_", mapper_names)
+    labels <- glue("{subcomp[['input']][['label']]}_{mapper_names}")
   }
 
   mappers <- lapply(
@@ -1566,7 +1604,7 @@ make_mapper <- function(subcomp,
 
   if (length(mapper_names) > 1L) {
     names(mappers) <- mapper_names
-    return(bru_mapper_collect(mappers, hidden = TRUE))
+    return(bm_collect(mappers, hidden = TRUE))
   }
   return(mappers[[1]])
 }
@@ -1619,10 +1657,8 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 
     # Make code
     if (is.fixed) {
-      codes[[k]] <- paste0(
-        fname, '("', label, '", main = ', label,
-        ', model = "linear"',
-        add, ")"
+      codes[[k]] <- glue(
+        '{fname}("{label}", main = {label}, model = "linear"{add})'
       )
     } else {
       # Add extra code before final bracket
@@ -1637,17 +1673,15 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
       if (is.offset) {
         codes[[k]] <-
           sub(
-            paste0(label, "("),
-            paste0(
-              fname, '("', label, '"',
-              ', model = "const", main = '
-            ),
+            glue("{label}("),
+            glue('{fname}("{label}", model = "const", main = '),
             code,
             fixed = TRUE
           )
       } else {
-        codes[[k]] <- sub(paste0(label, "("),
-          paste0(fname, "(\"", label, "\", "),
+        codes[[k]] <- sub(
+          glue("{label}("),
+          glue('{fname}("{label}", '),
           code,
           fixed = TRUE
         )
@@ -1668,7 +1702,7 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 #'
 #' @keywords internal
 #' @param object Object to be summarised.
-#' @param ... Passed on to other summary methods.
+#' @param \dots Passed on to other summary methods.
 #' @param depth The depth of which to expand the component mapper.
 #' Default `Inf`, to traverse the entire mapper tree.
 #' @param verbose logical; If `TRUE`, includes more details of the
@@ -1676,7 +1710,7 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 #' definition information.  Default `TRUE`.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#'
+#' @seealso [bru_comp()], [summary.bru_input()]
 #' @export
 #' @method summary bru_comp
 
@@ -1691,7 +1725,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
           if (is.null(object[[x]][["input"]][["input"]])) {
             NULL
           } else {
-            paste0(x, " = ", object[[x]][["type"]])
+            glue("{x} = {object[[x]][['type']]}")
           }
         }
       )),
@@ -1706,11 +1740,15 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
           } else {
             obj <- object[[x]][["input"]]
           }
-          format(obj,
-            verbose = verbose,
-            ...,
-            label.override = x
-          )
+          if (!is.null(obj)) {
+            format(obj,
+              verbose = verbose,
+              ...,
+              label.override = x
+            )
+          } else {
+            NULL
+          }
         }
       )),
       collapse = ", "
@@ -1746,20 +1784,14 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
       if (is.null(object[["copy"]])) {
         NULL
       } else {
-        paste0("(=", object[["copy"]], ")")
+        glue("(={object[['copy']]})")
       },
       ": ",
       paste0(
         unlist(lapply(
           c("main", "group", "replicate", "weights"),
           function(x) {
-            if (identical(x, "weights")) {
-              format(object[[x]],
-                verbose = verbose,
-                ...,
-                label.override = x
-              )
-            } else {
+            if (!is.null(object[[x]])) {
               format(object[[x]],
                 verbose = verbose,
                 ...,
@@ -1870,78 +1902,6 @@ print.bru_subcomp <- function(x,
   invisible(x)
 }
 
-#' @export
-#' @method format bru_input
-#' @param type character; if non-NULL, added to the output'; `label =
-#'   type(input)`.
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.bru_comp
-format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
-                             type = NULL) {
-  inp <- x[["input"]]
-  if (!is.null(label.override)) {
-    lab <- label.override
-  } else {
-    lab <- x[["label"]]
-  }
-  if (is.null(inp)) {
-    text <- ""
-  } else if (is.null(type)) {
-    text <-
-      paste0(
-        lab, " = ",
-        paste0(deparse(inp), collapse = "\n")
-      )
-  } else {
-    text <-
-      paste0(
-        lab, " = ",
-        type, "(",
-        paste0(deparse(inp), collapse = "\n"),
-        ")"
-      )
-  }
-  text
-}
-
-#' @export
-#' @method summary bru_input
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.bru_comp
-summary.bru_input <- function(object,
-                              verbose = TRUE,
-                              ...,
-                              label.override = NULL) {
-  res <- structure(
-    list(
-      text = format(object,
-        verbose = verbose,
-        ...,
-        label.override = label.override
-      )
-    ),
-    class = "summary_bru_input"
-  )
-  return(res)
-}
-
-#' @export
-#' @method print bru_input
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname summary.bru_comp
-print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
-  cat(
-    format(x,
-      verbose = verbose,
-      ...,
-      label.override = label.override
-    ),
-    "\n",
-    sep = ""
-  )
-  return(invisible(x))
-}
-
 
 
 #' @export
@@ -1954,11 +1914,11 @@ print.summary_component <- function(x, ...) {
     for (name in names(x)) {
       if (!is.null(x[[name]])) {
         if (name %in% "Label") {
-          cat("Label:", "\t", x[[name]], "\n", sep = "")
+          cat(glue("Label:\t{x[[name]]}"), "\n")
         } else if (name %in% "Mapper") {
-          cat("  ", "Map: ", x[[name]], "\n", sep = "")
+          cat(glue("  Map:\t{x[[name]]}"), "\n")
         } else {
-          cat("  ", name, ":", "\t", x[[name]], "\n", sep = "")
+          cat(glue("  {name}:\t{x[[name]]}"), "\n")
         }
       }
     }
@@ -1986,519 +1946,4 @@ print.summary_bru_subcomp <- function(x, ...) {
     cat(x[["text"]], "\n", sep = "")
   }
   invisible(x)
-}
-
-#' @export
-#' @rdname summary.bru_comp
-
-print.summary_bru_input <- function(x, ...) {
-  if (!is.null(x[["text"]])) {
-    cat(x[["text"]], "\n", sep = "")
-  }
-  invisible(x)
-}
-
-
-
-#' @section Simple covariates and the input parameters:
-#'
-#' It is not unusual for a random effect act on a transformation of a covariate.
-#' In other frameworks this would mean that the transformed covariate would have
-#' to be calculated in advance and added to the data frame that is usually
-#' provided via the `data` parameter. inlabru provides the option to do this
-#' transformation automatically. For instance, one might be interested in the
-#' effect of a covariate \eqn{x^2}. In inla and other frameworks this would
-#' require to add a column `xsquared` to the input data frame and use the
-#' formula
-#'
-#' \itemize{\item{`formula = y ~ f(xsquared, model = "linear")`,}}
-#'
-#' In inlabru this can be achieved in several ways of using the `main` parameter
-#' (`map` in version 2.1.13 and earlier), which does not need to be named.
-#'
-#' \itemize{
-#' \item{`components = y ~ psi(x^2, model = "linear")`}
-#' \item{`components = y ~ psi(main = x^2, model = "linear")`}
-#' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
-#' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
-#'
-#' }
-#'
-#' In the first example inlabru will interpret the map parameter as an
-#' expression to be evaluated within the data provided. Since \eqn{x} is a known
-#' covariate it will know how to calculate it. The second example is an
-#' expression as well but it uses a function called `mySquareFun`. This function
-#' is defined by user but has to be accessible within the work space when
-#' setting up the components. The third example provides the function
-#' `myOtherSquareFun`. In this case, inlabru will call the function as
-#' `myOtherSquareFun(.data.)`, where `.data.` is the data provided via the
-#' [bru_obs()] `data` parameter. The function needs to know what parts of the
-#' data to use to construct the needed output. For example,
-#' ```
-#' myOtherSquareFun <- function(data) {
-#'   data[ ,"x"]^2
-#' }
-#' ```
-#'
-#' @section Spatial Covariates:
-#'
-#' When fitting spatial models it is common to work with covariates that depend
-#' on space, e.g. sea surface temperature or elevation. Although it is
-#' straightforward to add this data to the input data frame or write a covariate
-#' function like in the previous section there is an even more convenient way in
-#' inlabru. Spatial covariates are often stored as `SpatialPixelsDataFrame`,
-#' `SpatialPixelsDataFrame` or `RasterLayer` objects. These can be provided
-#' directly via the input expressions if they are supported by [eval_spatial()],
-#' and the [bru_obs()] data is an `sf` or `SpatialPointsDataFrame` object.
-#' `inlabru` will then automatically evaluate and/or interpolate the covariate
-#' at your data locations when using code like
-#' ```
-#' components = y ~ psi(mySpatialPixels, model = "linear")
-#' ```
-#' For more precise control, use the the `layer` and `selector` arguments (see
-#' [bru_comp()]), or call [eval_spatial()] directly, e.g.:
-#' ```
-#' components = y ~ psi(eval_spatial(mySpatialPixels, where = .data.),
-#'                      model = "linear")
-#' ```
-#'
-#' @section Coordinates:
-#'
-#' A common spatial modelling component when using inla are SPDE models. An
-#' important feature of inlabru is that it will automatically calculate the so
-#' called A-matrix (a component model matrix) which maps SPDE values at the mesh
-#' vertices to values at the data locations. For this purpose, the input can be
-#' set to `coordinates`, which is the `sp` package function that extracts point
-#' coordinates from the `SpatialPointsDataFrame` that was provided as input to
-#' [bru_obs()]. The code for this would look as follows:
-#' ```
-#' components = y ~ field(coordinates, model = inla.spde2.matern(...))
-#' ```
-#' Since `coordinates` is a function from the `sp` package, this results in
-#' evaluation of `sp::coordinates(.data.)`, which loses any CRS information
-#' from the data object.
-#'
-#' For `sf` data with a geometry column (by default named `geometry`), use
-#' ```
-#' components = y ~ field(geometry, model = inla.spde2.matern(...))
-#' ```
-#' Since the CRS information is part of the geometry column of the `sf` object,
-#' this retains CRS information, so this is more robust, and allows the model
-#' to be built on a different CRS than the observation data.
-#'
-#'
-#' @export
-#' @keywords internal
-#' @param component A [component].
-#' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
-#' covariates and/or point locations.
-#' If `NULL`, return the component's map.
-#' @param ... Unused.
-#' @return An list of mapper input values, formatted for the full component
-#'   mapper (of type `bru_mapper_pipe`)
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com}, Finn Lindgren
-#'   \email{finn.lindgren@@gmail.com}
-#' @rdname input_eval
-input_eval.bru_comp <- function(component,
-                                data,
-                                ...) {
-  bru_log_message(
-    paste0("input_eval.bru_comp(", component$label, ")"),
-    verbosity = 4
-  )
-
-  if (is.null(component[["mapper"]])) {
-    part_names <- c("main", "group", "replicate")
-  } else {
-    stopifnot(inherits(component[["mapper"]], "bru_mapper_pipe"))
-
-    # The names should be a subset of main, group, replicate
-    part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
-  }
-  mapper_val <- list()
-  for (part in part_names) {
-    mapper_val[[part]] <-
-      input_eval(
-        component[[part]]$input,
-        data,
-        env = component$env,
-        label = part,
-        ...
-      )
-  }
-  if (is.null(component[["weights"]])) {
-    scale_val <- NULL
-  } else {
-    scale_val <-
-      input_eval(
-        component[["weights"]],
-        data,
-        env = component$env,
-        label = paste(component$label, "(weights)"),
-        ...
-      )
-  }
-  # Any potential length mismatches must be handled by bru_mapper_multi and
-  # bru_mapper_collect, since e.g. 'main' might take a list() input object.
-  list(mapper = mapper_val, scale = scale_val)
-}
-
-#' @export
-#' @rdname input_eval
-input_eval.bru_model <- function(model, lhoods, ...) {
-  input_eval(lhoods, components = model[["effects"]])
-}
-
-#' @param components A [bru_comp_list].
-#' @export
-#' @rdname input_eval
-input_eval.bru_comp_list <-
-  function(components,
-           data,
-           ...) {
-    bru_log_message("input_eval.bru_comp_list", verbosity = 4)
-    lapply(components, function(x) input_eval(x, data = data, ...))
-  }
-
-#' @describeIn input_eval Computes the component inputs for included components
-#' for each model likelihood
-#'
-#' @param lhoods A [bru_obs_list] object
-#' @export
-input_eval.bru_obs_list <- function(lhoods, components, ...) {
-  bru_log_message(
-    "Evaluate component inputs for each observation model",
-    verbosity = 3L
-  )
-  lapply(
-    lhoods,
-    function(lh) {
-      included <- bru_used(lh)[["effect"]]
-
-      input_eval(
-        components[included],
-        data = lh[["data"]],
-        ...
-      )
-    }
-  )
-}
-
-
-input_eval_layer <- function(layer, selector = NULL, envir, enclos,
-                             label,
-                             e_input) {
-  input_layer <- tryCatch(
-    eval(layer, envir = envir, enclos = enclos),
-    error = function(e) {
-      e
-    }
-  )
-  if (inherits(input_layer, "error")) {
-    stop(paste0(
-      "Failed to evaluate 'layer' input '",
-      paste0(deparse(layer), collapse = "\n"),
-      "' for '",
-      paste0(label, ":layer"),
-      "'."
-    ))
-  }
-  if (is.null(input_layer) && is.null(selector)) {
-    if (label %in% names(e_input)) {
-      input_layer <- label
-    }
-  }
-  input_layer
-}
-
-
-#' @describeIn input_eval Attempts to evaluate a component input (e.g. `main`,
-#' `group`, `replicate`, or `weight`), and process the results:
-#' 1. If `eval()` failed, return NULL or map everything to 1
-#'    (see the `null.on.fail` argument). This should normally not
-#'    happen, unless the component use logic is incorrect,
-#'    (e.g. via `used` or `include`/`exclude`)
-#'    leading to missing columns for a certain likelihood in a
-#'    multi-`bru_obs()` model.
-#' 2. If we obtain a function, apply the function to the data object
-#' 3. If we obtain an object supported by [eval_spatial()], extract the values
-#'    of that data frame at the point locations
-#' 4. Else we obtain a vector and return as-is. This happens when input
-#'    references a column of the data points, or some other complete expression
-#'
-#' @seealso [bru_comp()]
-#' @export
-input_eval.bru_input <- function(input, data, env = NULL,
-                                 null.on.fail = FALSE, ...) {
-  bru_log_message(
-    paste0("input_eval.bru_input(", input$label, ")"),
-    verbosity = 5
-  )
-  # Evaluate the map with the data in an environment
-  enclos <-
-    if (is.null(env)) {
-      parent.frame()
-    } else {
-      env
-    }
-  envir <- new.env(parent = enclos)
-  if (is.list(data)) {
-    for (nm in names(data)) {
-      assign(nm, data[[nm]], envir = envir)
-    }
-  } else {
-    data_df <- as.data.frame(data)
-    for (nm in names(data_df)) {
-      assign(nm, data_df[[nm]], envir = envir)
-    }
-  }
-  assign(".data.", data, envir = envir)
-
-  e_input <- tryCatch(
-    eval(input$input, envir = envir, enclos = enclos),
-    error = function(e) {
-      e
-    }
-  )
-
-  # ## Need to handle varying input lengths.
-  # ## auto-expansion of scalars needs to happen elsewhere, where it's needed,
-  # ## e.g. when using component A-matrices to construct a default linear model
-  # ## A matrix.
-  #  n <- nrow(as.data.frame(data))
-
-  handle_problems <- function(val) {
-    if (is.null(val)) {
-      return(NULL)
-    }
-    if (inherits(e_input, "simpleError")) {
-      if (null.on.fail) {
-        return(NULL)
-      }
-
-      val <- 1
-      input_string <- paste0(deparse(input$input), collapse = "\n")
-      if (identical(input_string, "coordinates")) {
-        warning(
-          paste0(
-            "The input evaluation '",
-            input_string,
-            "' for '", input$label,
-            "' failed. Perhaps you need to load the 'sp' package ",
-            "with 'library(sp)'?",
-            " Attempting 'sp::coordinates'."
-          ),
-          immediate. = TRUE
-        )
-        input$input <- expression(sp::coordinates)
-        return(input_eval(
-          input,
-          data = data,
-          env = env,
-          null.on.fail = null.on.fail,
-          ...
-        ))
-      } else {
-        stop(
-          paste0(
-            "The input evaluation '",
-            input_string,
-            "' for '", input$label,
-            "' failed. Perhaps the data object doesn't contain ",
-            "the needed variables?"
-          )
-        )
-      }
-    }
-    val
-  }
-
-  e_input <- handle_problems(e_input)
-  if (is.null(e_input)) {
-    return(NULL)
-  }
-
-  if (is.function(e_input)) {
-    # Allow but detect failures:
-    val <- tryCatch(
-      e_input(data),
-      error = function(e) {
-        e
-      }
-    )
-
-    val <- handle_problems(val)
-    if (is.null(val)) {
-      return(NULL)
-    }
-
-    if (identical(as.character(input$input), "coordinates")) {
-      tryCatch(
-        expr = {
-          # Return SpatialPoints instead of a matrix
-          val <- as.data.frame(val)
-          sp::coordinates(val) <- seq_len(ncol(val))
-          # Allow proj4string failures:
-          data_crs <- tryCatch(fm_CRS(data),
-            error = function(e) {
-            }
-          )
-          if (!fm_crs_is_null(data_crs)) {
-            sp::proj4string(val) <- data_crs
-          }
-          val
-        },
-        error = function(e) {
-          NULL
-        }
-      )
-    }
-  } else if (inherits(e_input, "formula")) {
-    # Allow but detect failures:
-    val <- tryCatch(
-      MatrixModels::model.Matrix(e_input, data = data, sparse = TRUE),
-      error = function(e) {
-        e
-      }
-    )
-    val <- handle_problems(val)
-    if (is.null(val)) {
-      return(NULL)
-    }
-    val <- as(val, "Matrix")
-  } else if (inherits(
-    e_input,
-    gsub(
-      pattern = "^eval_spatial\\.([^*]*)\\*?",
-      replacement = "\\1",
-      x = format(utils::.S3methods("eval_spatial"))
-    )
-  )) {
-    input_layer <-
-      input_eval_layer(
-        layer = input[["layer"]],
-        selector = input[["selector"]],
-        envir = envir,
-        enclos = enclos,
-        label = input[["label"]],
-        e_input = e_input
-      )
-    layer <- extract_layer(
-      data,
-      input_layer,
-      input[["selector"]]
-    )
-    check_layer(e_input, data, layer)
-    val <- eval_spatial(
-      e_input,
-      data,
-      layer = layer,
-      selector = NULL
-    )
-    #  } else if ((input$label %in% c("offset", "const")) &&
-    #    is.numeric(e_input) &&
-    #    (length(e_input) == 1)) {
-    #    val <- rep(e_input, n)
-  } else {
-    val <- e_input
-  }
-
-  # ## Need to allow different sizes; K %*% effect needs to have same length as
-  # response, but the input and effect effect itself doesn't.
-  #  # Always return as many rows as data has
-  #  if (is.vector(val) && (length(val) == 1) && (n > 1)) {
-  #    val <- rep(val, n)
-  #  }
-
-  # Check if any of the locations are NA. If we are dealing with
-  # SpatialGridDataFrame try to fix that by filling in nearest neighbour values.
-  # # TODO: Check how to deal with this fully in the case of multilikelihood
-  # models
-  # Answer: should respect the lhood "include/exclude" info for the component
-  # list
-  if ((inherits(e_input, c(
-    "SpatialGridDataFrame",
-    "SpatialPixelsDataFrame",
-    "SpatRaster"
-  ))) &&
-    any(is.na(as.data.frame(val)))) {
-    msg <- paste0(
-      "Model input '",
-      paste0(deparse(input$input), collapse = "\n"),
-      "' for '", input$label,
-      "' returned some NA values.\n",
-      "Attempting to fill in spatially by nearest available value.\n",
-      "To avoid this basic covariate imputation, supply complete data."
-    )
-    bru_log_warn(msg)
-
-    val <- bru_fill_missing(
-      data = e_input, where = data, values = val,
-      layer = layer, selector = NULL
-    )
-  }
-
-  # Check for NA values.
-  # TODO: update 2022-11-04:
-  # iid models now by default are given _index mappers, which treat NAs
-  # as zero.  An option to turn on a warning could be useful for checking
-  # models that aren't supposed to have NA inputs.
-  #
-  #  if (any(is.na(unlist(as.vector(val))))) {
-  #    # TODO: remove this check and make sure NAs are handled properly
-  #    # elsewhere,
-  #    # if possible. Problem: treating NA as "no effect" can have negative side
-  #    # effects. For spatial covariates, can be handled by infill, but a
-  #    # general
-  #    # solution doesn't exist, so not sure how to deal with this.
-  #    stop(sprintf(
-  #      "Input '%s' of component '%s' has returned NA values. Please design
-  #       your argument as to return non-NA for all points in your model
-  #       domain/mesh.",
-  #      as.character(input$input)[[1]], label
-  #    ))
-  #  }
-
-  val
-}
-
-
-
-
-#' @export
-#' @keywords internal
-#' @param component A [component].
-#' @param inla_f logical; when `TRUE`, must result in
-#' values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
-#' @param ... Unused.
-#' @return a list of indices into the latent variables compatible with the
-#' component mapper.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
-#'   Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname index_eval
-
-index_eval.bru_comp <- function(component, inla_f, ...) {
-  idx <- ibm_values(component[["mapper"]], inla_f = inla_f, multi = TRUE)
-  names(idx) <- paste0(component[["label"]], c("", ".group", ".repl"))
-  idx
-}
-
-
-#' @export
-#' @rdname index_eval
-
-index_eval.bru_comp_list <- function(components, inla_f, ...) {
-  lapply(components, function(x) index_eval(x, inla_f = inla_f, ...))
-}
-
-#' @export
-#' @keywords internal
-#' @param components A component list.
-#' @param ... Unused.
-#' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname inla_subset_eval
-
-inla_subset_eval.bru_comp_list <- function(components, ...) {
-  lapply(components, function(x) ibm_inla_subset(x[["mapper"]], multi = TRUE))
 }

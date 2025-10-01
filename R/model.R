@@ -92,7 +92,7 @@ bru_model <- function(components,
     stop("No observation models provided.")
   }
 
-  inputs <- input_eval(lhoods, components = components, null.on.fail = FALSE)
+  inputs <- bru_input(lhoods, components = components, null.on.fail = FALSE)
 
   # Back up environment
   env <- environment(components)
@@ -155,7 +155,12 @@ summary.bru_model <- function(object, ...) {
   result <- structure(
     list(
       components =
-        summary(object[["effects"]], ...)
+        summary(object[["effects"]], ...),
+      lhoods = if (is.null(object[["lhoods"]])) {
+        NULL
+      } else {
+        summary(object[["lhoods"]], ...)
+      }
     ),
     class = "summary_bru_model"
   )
@@ -166,7 +171,12 @@ summary.bru_model <- function(object, ...) {
 #' @param x An object to be printed
 #' @rdname bru_model
 print.summary_bru_model <- function(x, ...) {
+  cat("Latent components:\n")
   print(x[["components"]])
+  if (!is.null(x[["lhoods"]])) {
+    cat("Observation models:\n")
+    print(x[["lhoods"]])
+  }
   invisible(x)
 }
 
@@ -234,7 +244,7 @@ evaluate_model <- function(model,
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input)) {
-    input <- input_eval(
+    input <- bru_input(
       components = model$effects[used$effect],
       data = data
     )
@@ -351,7 +361,7 @@ evaluate_effect_single_state <- function(...) {
 #' * `evaluate_effect_single_state.bru_mapper`:
 #'   A vector of the latent component state.
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
-#' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
+#' @param \dots Optional additional parameters, e.g. `inla_f`. Normally unused.
 #' @param label Option label used for any warning messages, specifying the
 #' affected component.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -766,42 +776,7 @@ bru_comp_eval <- function(main,
 
 
 
-#' Compute all component inputs
-#'
-#' Computes the component inputs for included components
-#' for each model likelihood
-#'
-#' @param model A `bru_model` object
-#' @param lhoods A `bru_obs_list` object
-#' @rdname evaluate_inputs
-#' @keywords internal
-evaluate_inputs <- function(model, lhoods) {
-  stopifnot(inherits(model, "bru_model"))
-  input_eval(model, lhoods = lhoods)
-}
 
-#' Compute all index values
-#'
-#' Computes the index values matrices for included components
-#'
-#' @param model A [bru_model] object
-#' @param used A [bru_used()] object
-#' @return A named list of `idx_full` and `idx_inla`,
-#' named list of indices, and `inla_subset`, and `inla_subset`,
-#' a named list of logical subset specifications for extracting the `INLA::f()`
-#' compatible index subsets.
-#' @rdname evaluate_index
-#' @keywords internal
-evaluate_index <- function(model, used) {
-  stopifnot(inherits(model, "bru_model"))
-  included <- union(used[["effect"]], used[["latent"]])
-
-  list(
-    idx_full = index_eval(model[["effects"]][included], inla_f = FALSE),
-    idx_inla = index_eval(model[["effects"]][included], inla_f = TRUE),
-    inla_subset = inla_subset_eval(model[["effects"]][included])
-  )
-}
 
 
 #' @include mappers.R
@@ -812,13 +787,15 @@ evaluate_index <- function(model, used) {
 #' [bru] model objects and related classes.
 #'
 #' @inheritParams bru_mapper_generics
+#' @inheritParams ibm_linear
+#' @inheritParams ibm_simplify
 #'
 #' @name bru_model_mapper_methods
 #' @rdname bru_model_mapper_methods
 NULL
 
 #' @describeIn bru_model_mapper_methods Returns a list (one element per
-#'   observation model) of [bm_list] objects, each with one [bru_mapper_taylor]
+#'   observation model) of [bm_list] objects, each with one [bm_taylor]
 #'   entry for each included component.
 #' @export
 ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
@@ -864,8 +841,9 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
   mappers
 }
 
-#' @rdname bru_model_mapper_methods
+#' @rdname ibm_linear
 #' @export
+#' @family specific [bru_comp] mapper method implementations
 ibm_linear.bru_comp <- function(mapper,
                                 input,
                                 state = NULL,
@@ -925,6 +903,7 @@ ibm_simplify.bru_comp <- function(mapper,
 
 #' @rdname bru_model_mapper_methods
 #' @export
+#' @family specific [bru_comp_list] mapper method implementations
 ibm_simplify.bru_comp_list <- function(mapper,
                                        input = NULL,
                                        state = NULL,
@@ -948,11 +927,10 @@ ibm_simplify.bru_comp_list <- function(mapper,
 # Methods for the `ibm_linear()` and `ibm_simplify()` methods for
 # [bru] model objects and related classes.
 #
-#' @inheritParams bru_mapper_generics
-#'
 #' @export
-#' @rdname bm_list
+#' @rdname bru_model_mapper_methods
 #' @export
+#' @family specific [bm_list] mapper method implementations
 ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
@@ -977,7 +955,7 @@ ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   as_bm_list(mappers)
 }
 
-#' @rdname bm_list
+#' @rdname bru_model_mapper_methods
 #' @export
 ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
   label <- names(mapper)

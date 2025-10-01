@@ -1,9 +1,8 @@
 test_that("Mexdolphin: Hazard rate detection function", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(bru_safe_sp())
 
-  mexdolphin <- inlabru::mexdolphin_sp()
+  mexdolphin <- inlabru::mexdolphin_sf
 
   sig <- function(x) bru_forward_transformation(qexp, x, rate = 1 / 8)
   hr <- function(distance, sigma) {
@@ -181,7 +180,7 @@ test_that("Marginal parameter transformation", {
     sigma(
       1,
       prec.linear = 1,
-      marginal = bru_mapper_marginal(
+      marginal = bm_marginal(
         qfun = qexp,
         pfun = pexp,
         dfun = dexp,

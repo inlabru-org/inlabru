@@ -43,7 +43,7 @@ a \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log
 \item{verbosity}{integer value for limiting the highest verbosity level being
 returned.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{\dots}{further arguments passed to or from other methods.}
 
 \item{timestamp}{If \code{TRUE}, include the timestamp of each message. Default
 \code{TRUE}.}

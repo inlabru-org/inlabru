@@ -18,7 +18,7 @@ glplot(object, ...)
 \arguments{
 \item{object}{an object used to select a method.}
 
-\item{...}{Parameters passed on to \code{plot_rgl.fm_mesh_2d()}}
+\item{\dots}{Parameters passed on to \code{plot_rgl.fm_mesh_2d()}}
 
 \item{add}{If TRUE, add the points to an existing plot. If FALSE, create new
 plot.}

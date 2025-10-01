@@ -87,22 +87,25 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
 
   obs <- data.frame(
     x = c(10, 20, 30),
-    y = c(10, 20, 30),
-    z = c(10, 20, 30)
+    y = c(1000, 2000, 3000),
+    z = c(10, 20, 30),
+    the_group_char = c("a", "b", "c")
   )
   pred <- data.frame(
     x = c(1, 2, 3, 4, 5, 6),
     y = c(1, 20, 3, 40, 5, 60),
     weights = c(1, 1, 1, 1, 1, 1),
-    grp = c(1, 1, 2, 2, 2, 3)
+    grp = c(1, 1, 2, 2, 2, 3),
+    grp_char = c("a", "a", "b", "b", "b", "c")
   )
+  domain <- list()
 
-  comp <- ~ Intercept(1) + x
+  comp <- ~ Intercept(1) + x + y
 
   fit <- bru(
     comp,
     bru_obs(
-      z ~ Intercept + x,
+      z ~ Intercept + x + y,
       family = "normal",
       response_data = obs,
       data = pred,
@@ -125,13 +128,13 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
 
   expect_equal(
     fit$summary.fixed$mean,
-    c(3.033, 4.426),
+    c(3.636, 3.889, 0.0505),
     tolerance = midtol
   )
 
   expect_no_error({
     bru_obs(
-      z ~ Intercept + x,
+      z ~ Intercept + x + y,
       family = "normal",
       response_data = obs,
       data = pred,
@@ -151,13 +154,14 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     )
   })
 
+  # Missing block information
   expect_error(
     {
       bru_obs(
-        z ~ Intercept + x,
+        z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
-        data = pred,
+        data = c(as.list(pred), list(.block = NULL)),
         aggregate = "average",
         aggregate_input = list(
           weights = weights,
@@ -179,6 +183,138 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     ),
     fixed = TRUE
   )
+
+  # Character block information without matching response block information
+  expect_error(
+    {
+      bru_obs(
+        z ~ Intercept + x + y,
+        family = "normal",
+        response_data = obs,
+        data = pred,
+        aggregate = "average",
+        aggregate_input = list(
+          weights = weights,
+          block = grp_char,
+          n_block = bru_response_size(.response_data.)
+        ),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = 6,
+              fixed = TRUE
+            )
+          )
+        )
+      )
+    },
+    paste0(
+      "'character' aggregation block information detected."
+    ),
+    fixed = TRUE
+  )
+
+  # Character block information without match response block information
+  expect_no_error({
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      aggregate_input = list(
+        weights = weights,
+        block = grp_char,
+        n_block = bru_response_size(.response_data.),
+        block_response = "the_group_char"
+      ),
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    )
+  })
+})
+
+
+test_that("Aggregated Gaussian observations, using domain/samplers feature", {
+  local_bru_safe_inla()
+
+  obs <- data.frame(
+    x = c(10, 20, 30),
+    z = c(10, 20, 30)
+  )
+  pred <- data.frame(
+    y = c((1 + 20) / 2, (3 + 40 + 5) / 3, 60)
+  )
+  domain <- list(x = 1:6)
+  samplers <- list(x = list(1:2, 3:5, 6))
+
+  comp <- ~ Intercept(1) + x + y
+
+  fit <- bru(
+    comp,
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      domain = domain,
+      samplers = samplers,
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    ),
+    options = list(control.inla = list(
+      int.strategy = "eb"
+    ))
+  )
+
+  expect_equal(
+    fit$summary.fixed$mean,
+    c(3.636, 3.889, 0.0505),
+    tolerance = midtol
+  )
+
+  expect_error(
+    {
+      bru_model(
+        comp,
+        bru_obs(
+          z ~ Intercept + x + y,
+          family = "normal",
+          response_data = obs,
+          data = NULL,
+          aggregate = "average",
+          domain = domain,
+          samplers = samplers,
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = 6,
+                fixed = TRUE
+              )
+            )
+          )
+        )
+      )
+    },
+    paste0(
+      "The input evaluation 'y' for 'y' failed.\n",
+      "Perhaps the data object doesn't contain the needed variables?"
+    ),
+    fixed = TRUE
+  )
 })
 
 
@@ -195,7 +331,7 @@ test_that("Aggregated Poisson observations, using mapper", {
 
   # Aggregation by summation on the intensity/expectation scale
   # (log-sum-exp since the predictor is log-intensity)
-  agg <- bru_mapper_logsumexp(rescale = FALSE, n_block = nrow(obs))
+  agg <- bm_logsumexp(rescale = FALSE, n_block = nrow(obs))
 
   comp <- ~ Intercept(1) + x
 
@@ -266,7 +402,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
   )
 
   # Aggregation by average:
-  agg <- bru_mapper_aggregate(rescale = TRUE, n_block = nrow(obs))
+  agg <- bm_aggregate(rescale = TRUE, n_block = nrow(obs))
 
   comp <- ~ Intercept(1) + x
 

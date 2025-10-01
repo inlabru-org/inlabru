@@ -5,10 +5,13 @@
 \alias{like}
 \alias{bru_obs_list}
 \alias{bru_obs_list.list}
+\alias{bru_obs_list.bru_obs}
 \alias{bru_obs_list.bru_obs_list}
 \alias{c.bru_obs}
 \alias{c.bru_obs_list}
 \alias{[.bru_obs_list}
+\alias{like_list}
+\alias{bru_like_list}
 \title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
@@ -29,6 +32,7 @@ bru_obs(
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
+  control.gcpo = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
@@ -38,40 +42,32 @@ bru_obs(
 )
 
 like(
-  formula = . ~ .,
-  family = "gaussian",
-  data = NULL,
-  response_data = NULL,
+  ...,
   E = NULL,
   Ntrials = NULL,
   weights = NULL,
   scale = NULL,
-  domain = NULL,
-  samplers = NULL,
-  ips = NULL,
-  used = NULL,
-  allow_combine = NULL,
-  control.family = NULL,
-  tag = NULL,
   options = list(),
-  .envir = parent.frame(),
-  mesh = deprecated(),
-  include = deprecated(),
-  exclude = deprecated(),
-  include_latent = deprecated()
+  .envir = parent.frame()
 )
 
-bru_obs_list(...)
+bru_obs_list(..., .tag = NULL)
 
-\method{bru_obs_list}{list}(object, ..., .envir = NULL)
+\method{bru_obs_list}{list}(object, ..., .tag = NULL)
 
-\method{bru_obs_list}{bru_obs_list}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs}(..., .tag = NULL)
 
-\method{c}{bru_obs}(..., .envir = NULL)
+\method{bru_obs_list}{bru_obs_list}(..., .tag = NULL)
 
-\method{c}{bru_obs_list}(..., .envir = NULL)
+\method{c}{bru_obs}(...)
+
+\method{c}{bru_obs_list}(...)
 
 \method{[}{bru_obs_list}(x, i)
+
+like_list(...)
+
+bru_like_list(...)
 }
 \arguments{
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -86,13 +82,14 @@ processes via \code{family = "cp"}.
 As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
 a convenient interface to fitting Cox processes.}
 
-\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{sf}, or
-\code{SpatialPoints[DataFrame]}
-object.}
+\item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{tibble},
+or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
+\code{SpatialPoints[DataFrame]} objects.}
 
 \item{response_data}{Observation/response-specific data for models that need
 different size/format for inputs and response variables, as a \code{data.frame},
-\code{sf}, or \code{SpatialPoints[DataFrame]} object.}
+\code{tibble}, or \code{sf}. Since \verb{2.12.0.9023}, deprecated support for
+\code{SpatialPoints[DataFrame]} objects.}
 
 \item{data_extra}{object convertible with \code{as.list()} with additional
 variables to be made available in predictor evaluations. Variables with
@@ -123,51 +120,58 @@ location uncertainty.}
 \item{scale}{Fixed (optional) scale parameters of the precision for several
 models, such as Gaussian and student-t response models.}
 
-\item{domain, samplers, ips}{Arguments used for \code{family="cp"}.
+\item{domain, samplers, ips}{Arguments used for \code{family="cp"} and \verb{aggregate=}.
 \describe{
-\item{\code{domain}}{Named list of domain definitions.}
-\item{\code{samplers}}{Integration subdomain for 'cp' family.}
-\item{\code{ips}}{Integration points for 'cp' family. Defaults
+\item{\code{domain}}{Named list of domain definitions, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
+\verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
+\item{\code{ips}}{Integration points. Defaults
 to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
 overrides \code{domain} and \code{samplers}.}
 }}
 
-\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object, that overrides
-the \code{include}, \code{exclude}, \code{include_latent} arguments.
-When \code{used} is \code{NULL} (default), the information about what effects and
+\item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,
+\code{NULL}, the information about what effects and
 latent vectors are made available to the predictor evaluation is defined by
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{used <- bru_used(
-  formula,
-  effect = include,
-  effect_exclude = exclude,
-  latent = include_latent
-)
-}\if{html}{\out{</div>}}}
+\code{bru_used(formula)}, which will include all effects and latent vectors
+used by the predictor expression.}
 
 \item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
 several rows of the input data to influence the same row. When \code{NULL},
 defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
 \code{list}, or the likelihood construction requires it.}
 
-\item{aggregate}{character ("none", "sum", "average", "logsumexp", or
-"logaverageexp", as defined by \code{bru_mapper_aggregate(type = aggregate)})
-or an aggregation \code{bru_mapper} object
-(\code{\link[=bru_mapper_aggregate]{bru_mapper_aggregate()}} or \code{\link[=bru_mapper_logsumexp]{bru_mapper_logsumexp()}}). Default \code{NULL},
-interpreted as "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available
-from version \verb{2.12.0.9013}.}
+\item{aggregate}{character ("none" or a valid name for the \code{type} argument of
+\code{\link[=bm_aggregate]{bm_aggregate()}}) or an aggregation \code{bru_mapper} object (\code{\link[=bm_aggregate]{bm_aggregate()}},
+\code{\link[=bm_logsumexp]{bm_logsumexp()}}, or \code{\link[=bm_logitaverage]{bm_logitaverage()}}). Default \code{NULL}, interpreted as
+"none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version
+\verb{2.12.0.9013}.}
 
 \item{aggregate_input}{\code{NULL} or an optional input list to the mapper
 defined by non-NULL \code{aggregate}, overriding the default,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
      weights = .data.[["weight"]],
-     n_block = bru_response_size(.response_data.))
+     n_block = bru_response_size(.response_data.),
+     block_response = ".block")
 }\if{html}{\out{</div>}}
 
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.
+
+From \verb{2.13.0.9016}, it will look for a \code{block_response} element in the
+list, which should be the name of a response variable in \code{response_data} to
+match the \code{block} information against, allowing character or factor
+aggregation block information to be used by replacing \code{block} with
+\code{match(block, block_response)}. If not supplied, the name
+\code{".block"} is tried. If that isn't available, the \code{block} information must
+be supplied directly as a numeric or integer vector, indexing into the rows
+of the response variable. Having no \code{block_response} variable is equivalent
+to having
+\code{response_data$.block = seq_len(bru_response_size(response_data))}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
+
+\item{control.gcpo}{A optional \code{list} of \code{INLA::control.gcpo} options}
 
 \item{tag}{character; Name that can be used to identify the relevant parts
 of INLA predictor vector output, via \code{\link[=bru_index]{bru_index()}}.}
@@ -180,37 +184,14 @@ on to \code{\link[=bru_options]{bru_options()}}}
 \code{data}. Defaults to the calling environment.}
 
 \item{include, exclude, include_latent}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}, use
-\code{used} instead.
-
-Arguments controlling what components
-and effects are available for use in the predictor expression.
-\describe{
-\item{\code{include}}{
-Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the \code{\link[=bru_used]{bru_used()}}
-method is used to extract the variable names from the formula.
-}
-\item{\code{exclude}}{
-Character vector of component labels to be excluded from the effect list
-determined by the \code{include} argument. Default is \code{NULL}; do not remove
-any components from the inclusion list.
-}
-\item{\code{include_latent}}{Character vector.
-Specifies which latent state variables are directly available to the
-predictor expression, with a \verb{_latent} suffix. This also makes evaluator
-functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
-and \code{replicate}, taking values for where to evaluate the component effect
-that are different than those defined in the component definition itself
-(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the \code{\link[=bru_used]{bru_used()}} method
-auto-detects use of \verb{_latent} and \verb{_eval} in the predictor expression.
-}
-}}
-
-\item{mesh}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Ignored.}
+\code{used} instead.}
 
 \item{\dots}{For \code{bru_obs_list.bru_obs}, one or more \code{bru_obs} objects}
 
-\item{object}{A list of \code{bru_obs} objects}
+\item{.tag}{Optional name to assign to a single \code{bru_obs} object. Reserved
+for internal use.}
+
+\item{object}{A list of \code{bru_obs} and/or \code{bru_obs_list} objects}
 
 \item{x}{\code{bru_obs_list} object from which to extract element(s)}
 
@@ -228,8 +209,15 @@ made aware of the change. The name change is to avoid issues with namespace
 clashes, e.g. with \code{data.table::like()}, and also to signal that the function
 defines observation models, not just likelihood functions.
 }
+\details{
+The \code{E}, \code{Ntrials}, \code{weights}, and \code{scale} arguments are evaluated in the
+data context, with values from \code{response_data} taking precedence over \code{data}.
+}
 \section{Methods (by generic)}{
 \itemize{
+\item \code{bru_obs_list(bru_obs)}: Combine one or more lists of \code{bru_obs} observation model objects
+into a \code{bru_obs_list} object
+
 \item \code{c(bru_obs)}: Combine several \code{bru_obs} objects into a \code{bru_obs_list} object
 
 }}
@@ -243,10 +231,17 @@ method for \code{inlabru} prior to version \verb{2.12.0}. Use \code{\link[=bru_o
 \item \code{bru_obs_list(list)}: Combine one or more lists of \code{bru_obs} observation model objects
 into a \code{bru_obs_list} object
 
-\item \code{bru_obs_list(bru_obs_list)}: Combine a list of \code{bru_obs} observation model objects
-into a \code{bru_obs_list} object
+\item \code{bru_obs_list(bru_obs_list)}: Combine one or more \code{bru_obs_list} objects into a \code{bru_obs_list} object
 
 \item \code{c(bru_obs_list)}: Combine several \code{bru_obs_list} objects into a \code{bru_obs_list} object
+
+\item \code{like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0}. For later versions, use
+\code{as_bru_obs_list()}, \code{bru_obs_list()}, or \code{c()}.
+
+\item \code{bru_like_list()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Backwards compatibility for versions \verb{<= 2.12.0.9017}. For later versions,
+use \code{as_bru_obs_list()}, \code{bru_obs_list()} or \code{c()}.
 
 }}
 \examples{

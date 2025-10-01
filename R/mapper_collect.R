@@ -15,17 +15,20 @@
 #' Constructs a concatenated collection mapping
 #' @export
 #' @inheritParams bru_mapper_generics
-#' @inheritParams bru_mapper_scale
-#' @inheritParams bru_mapper_multi
+#' @inheritParams bm_scale
+#' @inheritParams bm_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @examples
-#' (m <- bru_mapper_collect(list(
-#'   a = bru_mapper_index(2),
-#'   b = bru_mapper_index(3)
+#' (m <- bm_collect(list(
+#'   a = bm_index(2),
+#'   b = bm_index(3)
 #' ), hidden = FALSE))
 #' ibm_eval2(m, list(a = c(1, 2), b = c(1, 3, 2)), 1:5)
-bru_mapper_collect <- function(mappers, hidden = FALSE) {
+#'
+#' @rdname bm_collect
+#' @family specific [bm_collect] method implementations
+bm_collect <- function(mappers, hidden = FALSE) {
   mapper <- list(
     mappers = as_bm_list(mappers),
     n_multi = lapply(mappers, ibm_n),
@@ -36,15 +39,22 @@ bru_mapper_collect <- function(mappers, hidden = FALSE) {
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
-  bru_mapper_define(mapper, new_class = "bru_mapper_collect")
+  bru_mapper_define(mapper, new_class = "bm_collect")
 }
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_n.bru_mapper_collect <- function(mapper,
-                                     inla_f = FALSE,
-                                     multi = FALSE,
-                                     ...) {
+#' @rdname bm_collect
+bru_mapper_collect <- function(...) {
+  bm_collect(...)
+}
+
+#' @export
+#' @rdname ibm_n
+#' @family specific [bm_collect] method implementations
+ibm_n.bm_collect <- function(mapper,
+                             inla_f = FALSE,
+                             multi = FALSE,
+                             ...) {
   if (multi) {
     mapper[["n_multi"]]
   } else if (mapper[["hidden"]] && inla_f) {
@@ -78,11 +88,12 @@ bm_collect_indexing <- function(mapper, input) {
 
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_n_output.bru_mapper_collect <- function(mapper, input,
-                                            state = NULL,
-                                            inla_f = FALSE,
-                                            multi = FALSE, ...) {
+#' @rdname ibm_n_output
+#' @family specific [bm_collect] method implementations
+ibm_n_output.bm_collect <- function(mapper, input,
+                                    state = NULL,
+                                    inla_f = FALSE,
+                                    multi = FALSE, ...) {
   if (mapper[["hidden"]] && inla_f) {
     return(ibm_n_output(mapper[["mappers"]][[1]], input = input))
   }
@@ -119,11 +130,12 @@ ibm_n_output.bru_mapper_collect <- function(mapper, input,
 
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_values.bru_mapper_collect <- function(mapper,
-                                          inla_f = FALSE,
-                                          multi = FALSE,
-                                          ...) {
+#' @rdname ibm_values
+#' @family specific [bm_collect] method implementations
+ibm_values.bm_collect <- function(mapper,
+                                  inla_f = FALSE,
+                                  multi = FALSE,
+                                  ...) {
   if (multi) {
     mapper[["values_multi"]]
   } else if (mapper[["hidden"]] && inla_f) {
@@ -134,11 +146,12 @@ ibm_values.bru_mapper_collect <- function(mapper,
 }
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_is_linear.bru_mapper_collect <- function(mapper,
-                                             inla_f = FALSE,
-                                             multi = FALSE,
-                                             ...) {
+#' @rdname ibm_is_linear
+#' @family specific [bm_collect] method implementations
+ibm_is_linear.bm_collect <- function(mapper,
+                                     inla_f = FALSE,
+                                     multi = FALSE,
+                                     ...) {
   if (mapper[["hidden"]] && inla_f && !multi) {
     ibm_is_linear(mapper[["mappers"]][[1]])
   } else if (multi) {
@@ -194,10 +207,10 @@ bm_collect_sub_lin <- function(mapper, input, state,
 
 
 
-#' @describeIn bru_mapper_collect
+#' @describeIn ibm_jacobian
 #' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [ibm_names.bru_mapper_collect()].
+#' The names must match the sub-mappers, see [ibm_names.bm_collect()].
 #' Each list element should take a format accepted by the corresponding
 #' sub-mapper. In case each element is a vector, the input can be given as a
 #' data.frame with named columns, a matrix with named columns, or a matrix
@@ -205,10 +218,11 @@ bm_collect_sub_lin <- function(mapper, input, state,
 #' the mapper definition, the input format should instead match that of
 #' the first, non-hidden, sub-mapper.
 #' @export
-ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
-                                            inla_f = FALSE, multi = FALSE,
-                                            ...,
-                                            sub_lin = NULL) {
+#' @family specific [bm_collect] method implementations
+ibm_jacobian.bm_collect <- function(mapper, input, state = NULL,
+                                    inla_f = FALSE, multi = FALSE,
+                                    ...,
+                                    sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_collect_sub_lin(mapper, input, state, inla_f = inla_f)
   }
@@ -225,11 +239,12 @@ ibm_jacobian.bru_mapper_collect <- function(mapper, input, state = NULL,
 
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_eval.bru_mapper_collect <- function(mapper, input, state,
-                                        inla_f = FALSE, multi = FALSE,
-                                        ...,
-                                        sub_lin = NULL) {
+#' @rdname ibm_eval
+#' @family specific [bm_collect] method implementations
+ibm_eval.bm_collect <- function(mapper, input, state,
+                                inla_f = FALSE, multi = FALSE,
+                                ...,
+                                sub_lin = NULL) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_collect_sub_lin(mapper, input, state, inla_f = inla_f)
   }
@@ -245,10 +260,11 @@ ibm_eval.bru_mapper_collect <- function(mapper, input, state,
 
 
 #' @export
-#' @rdname bru_mapper_collect
-ibm_linear.bru_mapper_collect <- function(mapper, input, state,
-                                          inla_f = FALSE,
-                                          ...) {
+#' @rdname ibm_linear
+#' @family specific [bm_collect] method implementations
+ibm_linear.bm_collect <- function(mapper, input, state,
+                                  inla_f = FALSE,
+                                  ...) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)
   }
@@ -266,7 +282,7 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
     ...,
     sub_lin = sub_lin
   )
-  bru_mapper_taylor(
+  bm_taylor(
     offset = eval2$offset,
     jacobian = eval2$jacobian,
     state0 = state,
@@ -277,18 +293,19 @@ ibm_linear.bru_mapper_collect <- function(mapper, input, state,
 
 
 
-#' @describeIn bru_mapper_collect
+#' @describeIn ibm_invalid_output
 #' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
-#' The names must match the sub-mappers, see [ibm_names.bru_mapper_collect()].
+#' The names must match the sub-mappers, see [ibm_names.bm_collect()].
 #' Each list element should take a format accepted by the corresponding
 #' sub-mapper. In case each element is a vector, the input can be given as a
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
 #' @export
-ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
-                                                  inla_f = FALSE,
-                                                  multi = FALSE, ...) {
+#' @family specific [bm_collect] method implementations
+ibm_invalid_output.bm_collect <- function(mapper, input, state,
+                                          inla_f = FALSE,
+                                          multi = FALSE, ...) {
   if (mapper[["hidden"]] && inla_f) {
     return(
       ibm_invalid_output(
@@ -339,18 +356,36 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
 }
 
 #' @return
-#' * `[`-indexing a `bru_mapper_collect` extracts a subset
-#'   `bru_mapper_collect` object (for drop `FALSE`) or an individual sub-mapper
+#' * `[`-indexing a `bm_collect` extracts a subset
+#'   `bm_collect` object (for drop `FALSE`) or an individual sub-mapper
 #'   (for drop `TRUE`, and `i` identifies a single element)
 #' @export
 #' @param x object from which to extract element(s)
 #' @param i indices specifying element(s) to extract
 #' @param drop logical;
-#' For `[.bru_mapper_collect`, whether to extract an individual mapper when
+#' For `[.bm_collect`, whether to extract an individual mapper when
 #' `i` identifies a single element. If `FALSE`, a list of sub-mappers is
-#' returned (suitable e.g. for creating a new `bru_mapper_collect` object).
+#' returned (suitable e.g. for creating a new `bm_collect` object).
 #' Default: `TRUE`
-#' @rdname bru_mapper_collect
+#' @rdname bm_collect
+#' @family specific [bm_collect] method implementations
+`[.bm_collect` <- function(x, i, drop = TRUE) {
+  if (is.logical(i)) {
+    i <- which(i)
+  }
+  mapper <- x[["mappers"]][i]
+  if (drop) {
+    if (length(mapper) == 1) {
+      mapper <- mapper[[1]]
+    } else if (length(mapper) == 0) {
+      mapper <- NULL
+    }
+  }
+  mapper
+}
+
+#' @export
+#' @rdname bm_collect
 `[.bru_mapper_collect` <- function(x, i, drop = TRUE) {
   if (is.logical(i)) {
     i <- which(i)
@@ -366,17 +401,27 @@ ibm_invalid_output.bru_mapper_collect <- function(mapper, input, state,
   mapper
 }
 
-#' @return
-#' * The `names()` method for `bru_mapper_collect` returns the names from the
+#' @describeIn ibm_names Returns the names from the
 #' sub-mappers list
 #' @export
-#' @rdname bru_mapper_collect
-`ibm_names.bru_mapper_collect` <- function(mapper) {
+#' @family specific [bm_collect] method implementations
+`ibm_names.bm_collect` <- function(mapper) {
   names(mapper[["mappers"]])
 }
 
 #' @export
-#' @rdname bru_mapper_collect
+#' @rdname ibm_names
+#' @family specific [bm_collect] method implementations
+`ibm_names<-.bm_collect` <- function(mapper, value) {
+  names(mapper[["mappers"]]) <- value
+  names(mapper[["n_multi"]]) <- value
+  names(mapper[["values_multi"]]) <- value
+  mapper
+}
+
+#' @export
+#' @rdname ibm_names
+#' @family specific [bm_collect] method implementations
 `ibm_names<-.bru_mapper_collect` <- function(mapper, value) {
   names(mapper[["mappers"]]) <- value
   names(mapper[["n_multi"]]) <- value

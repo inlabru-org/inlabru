@@ -12,22 +12,26 @@
 \usage{
 as_bru_obs(x, ...)
 
-as_bru_obs_list(x, ...)
+as_bru_obs_list(x, .tag = NULL)
 
 \method{as_bru_obs}{bru_obs}(x, ...)
 
-\method{as_bru_obs_list}{bru_obs}(x, ...)
+\method{as_bru_obs_list}{bru_obs}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{list}(x, ...)
+\method{as_bru_obs_list}{list}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{bru_obs_list}(x, ...)
+\method{as_bru_obs_list}{bru_obs_list}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{bru}(x, ...)
+\method{as_bru_obs_list}{bru}(x, .tag = NULL)
 }
 \arguments{
 \item{x}{An object to convert to \link{bru_obs} or \link{bru_obs_list}}
 
 \item{\dots}{Additional arguments passed to sub-methods.}
+
+\item{.tag}{character; optional name for the single observation model in the
+returned \link{bru_obs_list} object. Default is \code{NULL}, which results in
+automatic naming based on the \code{tag} attribute of \code{x}, if present.}
 }
 \value{
 An object of class \link{bru_obs} or \link{bru_obs_list}.

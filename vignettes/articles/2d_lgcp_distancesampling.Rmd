@@ -110,7 +110,7 @@ transformation mapper that converts a $N(0, 1)$ latent variable into an
 exponentially distributed variable with expectation 8 (this is a somewhat
 arbitrary value, but motivated by the maximum observation distance `W`):
 ```{r results="hide",warning=FALSE,message=FALSE, eval = FALSE}
-bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ```
 
 
@@ -135,7 +135,7 @@ We need to now separately define the components of the model
 cmp <- ~ mySPDE(main = geometry, model = matern) +
   sigma(1,
     prec.linear = 1,
-    marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+    marginal = bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
   ) +
   Intercept(1)
 ```
@@ -414,7 +414,7 @@ Half-normal first
 formula <- distance ~ log(hn(distance, sigma)) + Intercept
 cmp <- ~ sigma(1,
   prec.linear = 1,
-  marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  marginal = bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ) +
   Intercept(1)
 dfit <- lgcp(
@@ -433,7 +433,7 @@ Hazard-rate next
 formula1 <- distance ~ log(hr(distance, sigma)) + Intercept
 cmp <- ~ sigma(1,
   prec.linear = 1,
-  marginal = bru_mapper_marginal(qexp, pexp, dexp, rate = 1 / 8)
+  marginal = bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ) +
   Intercept(1)
 dfit1 <- lgcp(

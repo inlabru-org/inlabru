@@ -70,7 +70,7 @@ bru_used(x = NULL, ...)
 \arguments{
 \item{x}{An object that contains information about used components}
 
-\item{...}{Parameters passed on to the other methods}
+\item{\dots}{Parameters passed on to the other methods}
 
 \item{effect}{character; components used as effects. When \code{NULL}, auto-detect
 components to include all components in a predictor expression.}

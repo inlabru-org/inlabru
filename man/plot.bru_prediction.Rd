@@ -14,7 +14,7 @@
 
 \item{y}{Ignored argument but required for S3 compatibility.}
 
-\item{...}{Arguments passed on to \code{\link[=gg.prediction]{gg.prediction()}}.}
+\item{\dots}{Arguments passed on to \code{\link[=gg.prediction]{gg.prediction()}}.}
 }
 \value{
 an object of class \code{gg}

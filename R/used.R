@@ -38,7 +38,7 @@ bru_used_upgrade <- function(lhoods, labels) {
 #'
 #' @param x Object to be updated
 #' @param labels character vector of component labels
-#' @param ... Unused
+#' @param \dots Unused
 #' @returns An updated version of `x`
 #' @keywords internal
 #' @export
@@ -131,7 +131,7 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 
 #' @param join Whether to join list output into a single object; Default
 #' may depend on the input object class
-#' @param ... Parameters passed on to the other methods
+#' @param \dots Parameters passed on to the other methods
 #' @returns A `bru_used` object (a list with elements `effect`
 #' and `latent`), or a list of such objects
 #' (for methods with `join = FALSE`)

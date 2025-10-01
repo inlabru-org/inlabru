@@ -24,7 +24,7 @@ generate(object, ...)
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \code{\link[=bru]{bru()}}.}
 
-\item{...}{additional, unused arguments.}
+\item{\dots}{additional, unused arguments.}
 
 \item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
 needed for sampling.}
@@ -79,7 +79,7 @@ expressions defined in the component definition itself, e.g.
 \code{field_eval(cbind(x, y))} for a component that was defined with
 \code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
-For "iid" models with \code{mapper = bru_mapper_index(n)}, \code{rnorm()} is used to
+For "iid" models with \code{mapper = bm_index(n)}, \code{rnorm()} is used to
 generate new realisations for indices greater than \code{n}.
 }
 \examples{

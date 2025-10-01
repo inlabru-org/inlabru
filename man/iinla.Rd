@@ -12,7 +12,7 @@ iinla(model, lhoods, inputs = NULL, initial = NULL, options)
 \item{lhoods}{A list of likelihood objects from \code{\link[=bru_obs]{bru_obs()}}}
 
 \item{inputs}{Optional pre-computed  list of per-likelihood component
-evaluations, from \code{\link[=input_eval.bru_obs_list]{input_eval.bru_obs_list()}}.}
+evaluations, from \code{\link[=bru_input.bru_obs_list]{bru_input.bru_obs_list()}}.}
 
 \item{initial}{A previous \code{bru} result or a list of named latent variable
 initial states (missing elements are set to zero), to be used as starting

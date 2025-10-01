@@ -13,7 +13,7 @@
 where the geometry name is obtained from \code{attr(data, "sf_column")}.
 This is merged with the user supplied mapping.}
 
-\item{...}{Arguments passed on to \code{geom_sf} or \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_sf} or \code{geom_tile}.}
 
 \item{geom}{Either "sf" (default) or "tile". For "tile", uses
 \code{geom_tile(..., stat = "sf_coordinates")}, intended for converting point data

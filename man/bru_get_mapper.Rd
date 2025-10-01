@@ -4,6 +4,7 @@
 \alias{bru_get_mapper}
 \alias{bru_get_mapper.inla.spde}
 \alias{bru_get_mapper.inla.rgeneric}
+\alias{bru_get_mapper.inla.cgeneric}
 \alias{bru_get_mapper_safely}
 \title{Extract mapper information from INLA model component objects}
 \usage{
@@ -12,6 +13,8 @@ bru_get_mapper(model, ...)
 \method{bru_get_mapper}{inla.spde}(model, ...)
 
 \method{bru_get_mapper}{inla.rgeneric}(model, ...)
+
+\method{bru_get_mapper}{inla.cgeneric}(model, ...)
 
 bru_get_mapper_safely(model, ...)
 }
@@ -29,19 +32,36 @@ information from any model object by calling the generic \code{bru_get_mapper}.
 Any class method implementation should return a \link{bru_mapper} object suitable
 for the given latent model.
 }
+\details{
+Before implementing your own \code{bru_get_mapper} method, check if there
+is already a general method available that handles your model class, such as
+\code{\link[=bru_get_mapper.inla.spde]{bru_get_mapper.inla.spde()}}, \code{\link[=bru_get_mapper.inla.rgeneric]{bru_get_mapper.inla.rgeneric()}}, and
+\code{\link[=bru_get_mapper.inla.cgeneric]{bru_get_mapper.inla.cgeneric()}}.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{bru_get_mapper(inla.spde)}: Extract an indexed mapper for
 the \code{model$mesh} object contained in the model object,
 which is assumed to be of a class supporting relevant \code{fmesher} methods.
 
-\item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a call to
-\code{model$f$rgeneric$definition("mapper")}. To support this for your own
-\code{inla.rgeneric} models, add a \code{"mapper"} option to the \code{cmd} argument of
-your rgeneric definition function. You will need to store the mapper in
-your object as well.  Alternative, define your model using a subclass and
-define a corresponding \code{bru_get_mapper.subclass} method that should return
-the corresponding \code{bru_mapper} object.
+\item \code{bru_get_mapper(inla.rgeneric)}: Returns the mapper given by a pre-computed mapper,
+or an index mapper mapping the size of the model graph.
+
+The easiest method to define a mapper for an \code{inla.rgeneric} model is to
+store the mapper in the object.
+Alternatively, define your model using a subclass and define a
+\verb{bru_get_mapper.<subclass>} method that should return the
+corresponding \code{bru_mapper} object.
+
+The order of precedence for the mapper construction when calling
+\code{bru_get_mapper(model)} has the following precedence:
+\enumerate{
+\item \verb{bru_get_mapper.<subclass>}, if \code{model} has a subclass, otherwise
+\item \code{model[["mapper"]]} if that is \code{NULL}, and otherwise
+\item \code{\link[=bm_index]{bm_index()}} using the size of the graph returned by \code{model[["f"]][["n"]]}
+}
+
+\item \code{bru_get_mapper(inla.cgeneric)}: Works the same as the method of \code{inla.rgeneric}
 
 }}
 \section{Functions}{
@@ -69,28 +89,27 @@ if (bru_safe_inla()) {
 the individual mappers for specific implementation details.
 
 Other mappers: 
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_aggregate}()},
-\code{\link{bru_mapper_collect}()},
-\code{\link{bru_mapper_const}()},
-\code{\link{bru_mapper_factor}()},
-\code{\link{bru_mapper_fmesher}()},
-\code{\link{bru_mapper_generics}},
-\code{\link{bru_mapper_harmonics}()},
-\code{\link{bru_mapper_index}()},
-\code{\link{bru_mapper_linear}()},
-\code{\link{bru_mapper_logsumexp}()},
-\code{\link{bru_mapper_marginal}()},
-\code{\link{bru_mapper_matrix}()},
-\code{\link{bru_mapper_mesh_B}()},
-\code{\link{bru_mapper_multi}()},
-\code{\link{bru_mapper_pipe}()},
-\code{\link{bru_mapper_repeat}()},
-\code{\link{bru_mapper_scale}()},
-\code{\link{bru_mapper_shift}()},
-\code{\link{bru_mapper_sum}()},
-\code{\link{bru_mapper_taylor}()}
+\code{\link{bm_aggregate}()},
+\code{\link{bm_collect}()},
+\code{\link{bm_const}()},
+\code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
+\code{\link{bm_fmesher}()},
+\code{\link{bm_harmonics}()},
+\code{\link{bm_index}()},
+\code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
+\code{\link{bm_logsumexp}()},
+\code{\link{bm_marginal}()},
+\code{\link{bm_matrix}()},
+\code{\link{bm_mesh_B}()},
+\code{\link{bm_multi}()},
+\code{\link{bm_pipe}()},
+\code{\link{bm_repeat}()},
+\code{\link{bm_scale}()},
+\code{\link{bm_shift}()},
+\code{\link{bm_sum}()},
+\code{\link{bm_taylor}()},
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

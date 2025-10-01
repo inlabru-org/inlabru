@@ -12,7 +12,7 @@ bru_timings(object, ...)
 \arguments{
 \item{object}{A fitted \code{bru} object}
 
-\item{...}{unused}
+\item{\dots}{unused}
 }
 \description{
 Extracts a data.frame or tibble with information about the \code{Time} (CPU),

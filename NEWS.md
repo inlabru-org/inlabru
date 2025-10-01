@@ -1,40 +1,99 @@
 # inlabru (development version)
 
-## General features
+## New features
+
+* Add `bru_names()` method for extracting the inlabru standardised names of
+  fixed effects, latent components, and hyperparameters from a fitted `bru`
+  object. (version `2.13.0.9011`)
+* Add `bm_logitaverage()` mapper, for weighted logit-averages
+  (version `2.13.0.9010`)
+
+## Updated features
+
+* Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
+  the support for `inla.rgeneric`, to standardise where to store a
+  pre-constructed mapper, so that external packages will no longer need to
+  add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes,
+  if the mapper is pre-computed.
+  (version `2.13.0.9005`)
+* Remove unused `group` and `replicate` parts of each latent component, speeding
+  up component evaluation and linearisation. (version `2.13.0.9006`)
+* Allow index extraction from duplicated tags in `bru_index()`, returning
+  all matching indices. (version `2.13.0.9014`)
+* Code refactor and storage streamlining for `bru_obs()` to prepare for
+  future extensions. (version `2.13.0.9015`)
+* Add `block_response` element to `bru_obs(aggregate_input)` list input,
+  to allow specifying a block-wise response variable to match for aggregated
+  predictors. (version `2.13.0.9016`)
+
+## Bug fixes
+
+* Fix logic for `bru_set_missing<inla.surv>()` to correctly handle the
+  `inla.surv()` class variations (version `2.13.0.9002`)
+* Handle changing number of hyperparameters in inla tracing
+  (version `2.13.0.9004`)
+* Robustify internal `extended_bind_rows()` method for unifying XY/XYZ `sf`
+  coordinate columns (version `2.13.0.9009`)
+
+# inlabru 2.13.0
+
+## New features
+
+* Allow the optional `weights` argument to `bru_obs(family = "cp")`/`lgcp()`
+  to contain individual point observation weights, so that the `eta` contribution to
+  the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
+  `2.12.0.9006`)
+* Automatically detect purely additive linear models (version `2.12.0.9014`)
+* Add experimental predictor aggregation helper feature
+  `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
+  specification of models with aggregation as the final step of the predictor
+  evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`). Includes support
+  for constructing the aggregation information, via `domain`,`samplers`, or
+  precomputed `ips` (version `2.12.0.9022`)
+* Add `bru_set_missing()` method for setting missing values in the
+  `bru_obs` data, e.g. for use in cross-validation or prior sampling
+  (version `2.12.0.9024`)
+
+## Updates features
 
 * Add automated support for INLA models with hidden states, beyond the "bym" and
   "bym2" models (version `2.12.0.9002`)
 * Add automatic mapper support for INLA lattice models "rw2d", "rw2diid", and
   "matern2d" (version `2.12.0.9004`)
-* Allow `bru_obs(family = "cp")`/`lgcp()` optional `weights` argument to contain
-  individual point observation weights, so that the `eta` contribution to
-  the log-likelihood is `sum(weights * eta)` instead of `sum(eta)` (version
-  `2.12.0.9006`)
 * Add `inputs` data to the `bru_info` object, so that the component inputs
   can be pre-evaluated before automated mapper construction, and avoiding
   duplicate evaluation in `iinla()`. This can halve the pre-processing
   time for large spatial and spatio-temporal models (version `2.12.0.9010`)
 * Add `bru_log()` data for warnings and errors reported by inlabru (version
   `2.12.0.9011`)
-* Add experimental predictor aggregation helper feature
-  `bru_obs(..., aggregate = ..., aggregate_input = ...)` to simplify
-  specification of models with aggregation as the final step of the predictor
-  evaluation (version `2.12.0.9013`, bugfix in `2.12.0.9016`)
-* Automatically detect purely additive linear models (version `2.12.0.9014`)
 * Rename `bru_like` object class to `bru_obs` (version `2.12.0.9017`)
+  and temporarily re-reintroduce `like_list()` and `bru_like_list()` as aliases
+  for `bru_obs_list()` (version `2.12.0.9020`)
+* Add `quantile` argument to `spde.posterior()` for controlling the credible
+  interval calculations, like `materncov.bands()`, which is now also exported
+  (version `2.12.0.9019`)
+* Remove `dic` and `waic` from default `control.compute`
+  `bru_options`, to match INLA defaults (version `2.12.0.9024`)
 
 ## New and updated mapper features
 
-* Add `bru_mapper_sum()` mapper, for automated adding the output of
+* The standard mapper class names have been shortened from `bru_mapper_<type>`
+  to `bm_<type>`, to make code using them more readable. Objects of the old
+  class names will be converted to the new classes internally, so that old
+  stored objects will still work. Constructors of the form `bru_mapper_<type>()`
+  call the corresponding new constructor `bm_<type>()` (version `2.12.0.9021`)
+* Add `bm_sum()` mapper, for automated adding the output of
   multiple mappers, optionally with a single common input (version `2.12.0.9001`)
-* Add `interleaved` option to `bru_mapper_repeat()` to allow interleaved
+* Add `interleaved` option to `bm_repeat()` to allow interleaved
   states for summation of a repeated mapper (version `2.12.0.9001`)
-* Allow `n_block` in `input` argument to `bru_mapper_aggregate` and
-  `bru_mapper_logsumexp` evaluation methods, overriding the optional mapper
+* Allow `n_block` in `input` argument to `bm_aggregate` and
+  `bm_logsumexp` evaluation methods, overriding the optional mapper
   object setting (version `2.12.0.9005`)
-* Allow `character` block information in `bru_mapper_aggregate` and
-  `bru_mapper_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
-  (version `2.12.0.9013`)
+* (Note: due to the difficulty of ensuring correct output ordering,
+   and `fmesher` will refuse `character` block input from version `0.5.0`.
+   Was: Allow `character` block information in `bm_aggregate` and
+  `bm_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
+  (version `2.12.0.9013`))
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 * Code refactor to expand `bm_list` mapper list handling, removing unnecessary
@@ -43,6 +102,10 @@
 
 ## Bugfixes and deprecations
   
+* Give deprecation warnings for `Spatial` object inputs to `bru_obs()`, as
+  maintaining the fallback support code is becoming increasingly time-consuming,
+  and the `sf` package is now the recommended spatial data handling package.
+  (version `2.12.0.9023`)
 * Bugfix for `generate.bru()` for evaluation of expressions in the absence of
   `newdata` (version `2.12.0.9007`)
 * Use `mid` locations for `ibm_values()` for non-indexed `fm_mesh_1d` mapper

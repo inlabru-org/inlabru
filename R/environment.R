@@ -231,11 +231,7 @@ bru_log_offset <- function(x = NULL,
     which_found <- max(which(found))
     found <- marks[[which_found]]
   } else {
-    warning(paste0(
-      "Log bookmark '",
-      bookmark,
-      "' not found; assuming start of log."
-    ))
+    warning(glue("Log bookmark '{bookmark}' not found; assuming start of log."))
     marks <- c(0L, log_length)
     which_found <- 1L
   }
@@ -359,7 +355,7 @@ bru_log.bru <- function(x, verbosity = NULL) {
 
 #' @describeIn bru_log Format a `bru_log` object for printing.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
-#' @param ... further arguments passed to or from other methods.
+#' @param \dots further arguments passed to or from other methods.
 #' @param timestamp If `TRUE`, include the timestamp of each message. Default
 #'   `TRUE`.
 #' @export
@@ -370,14 +366,10 @@ bru_log.bru <- function(x, verbosity = NULL) {
 format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   msg <- x[["log"]][["message"]]
   if (timestamp) {
-    msg <- paste0(
-      x[["log"]][["timestamp"]], ": ", msg
-    )
+    msg <- glue("{x[['log']][['timestamp']]}: {msg}")
   }
   if (verbosity) {
-    msg <- paste0(
-      msg, " (level ", x[["log"]][["verbosity"]], ")"
-    )
+    msg <- glue("{msg} (level {x[['log']][['verbosity']]})")
   }
   msg
 }
@@ -629,7 +621,7 @@ bru_log_warn <- function(
 #'   The `_get`, `_set`, and `_reset` functions operate on a global
 #'   package options override object. In many cases, setting options in
 #'   specific calls to [bru()] is recommended instead.
-#' @param ... A collection of named options, optionally including one or more
+#' @param \dots A collection of named options, optionally including one or more
 #'   [`bru_options`] objects. Options specified later override the previous
 #'   options.
 #' @return `bru_options()` returns a `bru_options` object.
@@ -801,7 +793,10 @@ bru_options_default <- function() {
     # inla options
     E = 1,
     Ntrials = 1,
-    control.compute = list(config = TRUE, dic = TRUE, waic = TRUE),
+    control.compute = list(
+      config = TRUE,
+      control.gcpo = list()
+    ),
     control.inla = list(int.strategy = "auto"),
     control.fixed = list(expand.factor.strategy = "inla")
   )
@@ -821,12 +816,16 @@ bru_options_deprecated <- function(args) {
     }
     deprecated_args <- deprecated_args[!depr_list]
     if (any(nzchar(names(deprecated_args)) == 0)) {
-      warning(paste0(
-        "Ignoring deprecated global options '",
-        paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0],
-          collapse = "', '"
+      warning(glue(
+        "Ignoring deprecated global options ",
+        glue_collapse(
+          glue("'{depr}'",
+            depr =
+              names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+          ),
+          sep = ", "
         ),
-        "'."
+        ".",
       ))
       names_args <- setdiff(
         names_args,
@@ -837,11 +836,11 @@ bru_options_deprecated <- function(args) {
     }
     if (length(deprecated_args) > 0) {
       warning(paste0(
-        "Converting deprecated global option(s) '",
-        paste0(names(deprecated_args), collapse = "', '"),
-        "' to new option(s) '",
-        paste0(deprecated_args, collapse = "', '"),
-        "'."
+        "Converting deprecated global option(s) ",
+        glue_collapse(glue("'{names(deprecated_args)}'"), sep = ", "),
+        " to new option(s) ",
+        glue_collapse(glue("'{deprecated_args}'"), sep = ", "),
+        "."
       ))
       names_args <- names(args)
       names_args[names_args %in% names(deprecated_args)] <-
@@ -947,7 +946,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     disallowed_null <- disallowed_null[are_null[disallowed_null]]
     if (length(disallowed_null) > 0) {
       warning(paste0(
-        paste0("'", disallowed_null, "'", collapse = ", "),
+        glue_collapse(glue("'{disallowed_null}'"), sep = ", "),
         " should not be set to NULL."
       ))
     }
@@ -1072,7 +1071,7 @@ bru_options_set_local <- function(...,
 #' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
 #' @param include_global logical; If `TRUE`, include global override options
 #' @param include_default logical; If `TRUE`, include default options
-#' @param ... Further parameters, currently ignored
+#' @param \dots Further parameters, currently ignored
 #'
 #' @examples
 #' if (interactive()) {
@@ -1172,27 +1171,24 @@ print.summary_bru_options <- function(x, ...) {
   traverse <- function(tree, prefix = "") {
     for (name in sort(names(tree))) {
       if (tree[[name]]$is_list) {
-        cat(paste0(prefix, name, " =\n"))
+        cat(glue("{prefix}{name} ="), "\n")
         traverse(
           tree[[name]]$value,
-          prefix = paste0(prefix, "\t")
+          prefix = glue("{prefix}\t")
         )
       } else {
-        cat(paste0(
-          prefix,
-          name, " =\t",
-          tree[[name]]$value,
-          "\t(",
-          tree[[name]]$origin,
-          ")\n"
-        ))
+        cat(glue(
+          "{prefix}{name} =",
+          "\t{tree[[name]]$value}",
+          "\t({tree[[name]]$origin})"
+        ), "\n")
       }
     }
   }
 
   if (!is.null(x[["legend"]])) {
     cat("Legend:\n")
-    cat(paste0("  ", x[["legend"]], collapse = "\n"))
+    cat(glue_collapse("  {x[['legend']]}", sep = "\n"))
   }
   cat("Options for inlabru:\n")
   traverse(x[["value"]], prefix = "  ")

@@ -162,8 +162,7 @@ test_that("1D LGCP fitting, compressed format", {
   skip_on_cran()
   local_bru_safe_inla()
   bru_options_set_local(
-    control.inla = list(int.strategy = "eb"),
-    control.compute = list(dic = FALSE, waic = FALSE)
+    control.inla = list(int.strategy = "eb")
   )
 
   data(Poisson2_1D, package = "inlabru", envir = environment())

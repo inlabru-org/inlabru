@@ -1,17 +1,17 @@
 test_that("2D LGCP fitting", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not(bru_safe_sp())
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
   skip_if_not_installed("terra")
   skip_if_not_installed("sf")
-  gorillas <- gorillas_sp()
+  gorillas <- gorillas_sf
+  gorillas$gcov <- gorillas_sf_gcov()
 
   # Uses the component label to pick the covariate layer to extract,
   # so doesn't need an explicit main_layer="vegetation".
 
-  mdl <- coordinates ~ vegetation(
+  mdl <- geometry ~ vegetation(
     main = gorillas$gcov$vegetation,
     model = "iid"
   ) - Intercept
@@ -19,7 +19,7 @@ test_that("2D LGCP fitting", {
   fit <- lgcp(
     mdl, gorillas$nests,
     samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
+    domain = list(geometry = gorillas$mesh),
     options = list(
       control.inla = list(
         int.strategy = "eb",
@@ -41,16 +41,16 @@ test_that("2D LGCP fitting", {
 
   # test_that("2D LGCP fitting: Continuous covariate (as function)", {
   elev <- gorillas$gcov$elevation
-  elev$elevation <- elev$elevation - mean(elev$elevation, na.rm = TRUE)
+  elev <- elev - mean(terra::values(elev), na.rm = TRUE)
 
-  mdl2 <- coordinates ~ beta.elev(
+  mdl2 <- geometry ~ beta.elev(
     main = elev,
     main_layer = "elevation",
     model = "linear"
   ) + Intercept(1)
   fit2 <- lgcp(mdl2, gorillas$nests,
     samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
+    domain = list(geometry = gorillas$mesh),
     options = list(
       control.inla = list(
         int.strategy = "eb",
@@ -72,27 +72,18 @@ test_that("2D LGCP fitting", {
     tolerance = midtol
   )
 
-  f.elev <- function(xy, crs) {
-    spp <- sp::SpatialPoints(
-      as.data.frame(xy),
-      proj4string = fm_CRS(crs)
-    )
-    v <- sp::over(spp, elev)
-    v[is.na(v)] <- 0 # NAs are a problem! Remove them
-    v$elevation
+  f.elev <- function(xy) {
+    eval_spatial(elev, xy)
   }
 
-  mdl3 <- coordinates ~ beta.elev(
-    main = f.elev(
-      sp::coordinates(.data.),
-      fm_CRS(.data.)
-    ),
+  mdl3 <- geometry ~ beta.elev(
+    main = f.elev(.data.$geometry),
     model = "linear"
   ) +
     Intercept(1)
   fit3 <- lgcp(mdl3, gorillas$nests,
     samplers = gorillas$boundary,
-    domain = list(coordinates = gorillas$mesh),
+    domain = list(geometry = gorillas$mesh),
     options = list(
       control.inla = list(
         int.strategy = "eb",

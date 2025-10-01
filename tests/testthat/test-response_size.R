@@ -90,7 +90,7 @@ test_that("Complex list data handling", {
     .block = rep(1:n, m),
     x2 = rnorm(n)
   )
-  agg <- bru_mapper_logsumexp()
+  agg <- bm_logsumexp()
   resp_data <- with(data, data.frame(Y = rpois(n, lambda = exp(
     1 +
       ibm_eval(

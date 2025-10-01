@@ -19,11 +19,11 @@ bru_make_stack(...)
 
 \item{lin}{Linearisation information
 \itemize{
-\item For \code{.bru_obs}, a \code{bru_mapper_taylor} object
-\item For \code{.bru_obs_list}, a list of \code{bru_mapper_taylor} objects
+\item For \code{.bru_obs}, a \code{bm_taylor} object
+\item For \code{.bru_obs_list}, a list of \code{bm_taylor} objects
 }}
 
-\item{idx}{Output from \code{evaluate_index(...)}}
+\item{idx}{Output from \code{\link[=bru_index.bru_model]{bru_index.bru_model()}}}
 
 \item{family_index}{integer specifying the family sequence index of the
 observation model}

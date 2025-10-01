@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{A SpatialGridDataFrame object.}
 
-\item{...}{Arguments passed on to \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}.}
+\item{\dots}{Arguments passed on to \code{\link[=gg.SpatialPixelsDataFrame]{gg.SpatialPixelsDataFrame()}}.}
 }
 \value{
 A \code{geom_tile} value.

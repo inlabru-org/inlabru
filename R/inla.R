@@ -8,6 +8,7 @@
 #' @returns A character vector with standardised names
 #' @examples
 #' bru_standardise_names("Precision for the Gaussian observations")
+#' @seealso [bru_names()]
 #' @export
 #' @keywords internal
 bru_standardise_names <- function(x) {
@@ -32,6 +33,46 @@ bru_standardise_names <- function(x) {
   new_names
 }
 
+
+#' @title Extract standardised names from a bru or inla result object
+#' @description
+#' Extracts the names of fixed effects, random effects, and hyperparameters,
+#' converted with [bru_standardise_names()]
+#' @param x an `inla` or [bru()] result object
+#' @returns A character vector with standardised names
+#' @export
+#' @examples
+#' if (bru_safe_inla()) {
+#'   fit <- bru(y ~ 1 + x + z(z, model = "iid"),
+#'     data = data.frame(
+#'       y = rnorm(10),
+#'       x = rnorm(10),
+#'       z = rep(seq_len(2), 5)
+#'     )
+#'   )
+#'   bru_names(fit)
+#' }
+bru_names <- function(x) {
+  UseMethod("bru_names")
+}
+#' @export
+#' @rdname bru_names
+bru_names.inla <- function(x) {
+  bru_standardise_names(c(
+    rownames(x[["summary.fixed"]]),
+    names(x[["summary.random"]]),
+    rownames(x[["summary.hyperpar"]])
+  ))
+}
+#' @export
+#' @rdname bru_names
+bru_names.bru <- function(x) {
+  bru_standardise_names(c(
+    rownames(x[["summary.fixed"]]),
+    names(x[["summary.random"]]),
+    rownames(x[["summary.hyperpar"]])
+  ))
+}
 
 
 
@@ -228,7 +269,7 @@ post.sample.structured <- function(result, n, seed = NULL,
         )
         #        }
         #        else {
-        #         vals[[name]] <- smpl.hyperpar[paste0("Beta for ", name)]
+        #         vals[[name]] <- smpl.hyperpar[glue("Beta for {name}")]
         #        }
       }
     }
@@ -275,7 +316,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
   }
   idx <- match(name, .contents[["tag"]])
   if (is.na(idx)) {
-    warning(paste0("Element '", name, "' not found in posterior sample."))
+    warning(glue("Element '{name}' not found in posterior sample."))
     return(numeric(0L))
   }
   vals <- smpl[.contents[["start"]][idx] +
@@ -466,7 +507,7 @@ plotmarginal.inla <- function(result,
         link,
         result$marginals.random[[varname]][[index]]
       )
-      ovarname <- paste0(ovarname, " ", index)
+      ovarname <- glue("{ovarname} {index}")
       if (ovarname %in% rownames(vars)) {
         if (!identical(vars[ovarname, "ID"], as.character(index - 1))) {
           # Use factor level name
@@ -530,7 +571,7 @@ plotmarginal.inla <- function(result,
       ggplot2::geom_line(ggplot2::aes(y = .data[["mean"]]), col = 2) +
       ggplot2::geom_line(ggplot2::aes(y = .data[["mid"]]), col = 2, lty = 2) +
       ggplot2::ylab("mode and quantiles") +
-      ggplot2::xlab(paste0(varname, " ID"))
+      ggplot2::xlab(glue("{varname} ID"))
   }
 }
 

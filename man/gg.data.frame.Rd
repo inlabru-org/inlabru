@@ -7,7 +7,7 @@
 \method{gg}{data.frame}(...)
 }
 \arguments{
-\item{...}{Arguments passed on to \code{\link[=gg.bru_prediction]{gg.bru_prediction()}}.}
+\item{\dots}{Arguments passed on to \code{\link[=gg.bru_prediction]{gg.bru_prediction()}}.}
 }
 \value{
 Concatenation of a \code{geom_line} value and optionally a \code{geom_ribbon}

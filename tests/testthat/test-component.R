@@ -13,7 +13,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
 
   # Using label as input:
   cmp0 <- bru_comp_list(
@@ -23,7 +23,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
 
   cmp <- bru_comp_list(
     ~ beta(main = x, model = "linear", values = 1),
@@ -32,28 +32,28 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
-  expect_equal(as.character(cmp$main$input$input), "x")
+  expect_equal(rlang::as_label(cmp$main$input$input), "x")
 
   # Covariate mapping
   df <- data.frame(x = 1:10)
-  inp <- input_eval(cmp, data = df)
+  inp <- bru_input(cmp, data = df)
   expect_equal(
     inp,
     list(
       mapper = list(
-        main = 1:10,
-        group = 1,
-        replicate = 1
+        main = 1:10 # ,
+        #        group = 1,
+        #        replicate = 1
       ),
       scale = NULL
     )
   )
 
-  idx <- index_eval(cmp, inla_f = FALSE)
+  idx <- bru_index(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
-  expect_equal(names(idx)[2], "beta.group")
-  expect_equal(names(idx)[3], "beta.repl")
+  #  expect_equal(names(idx)[2], "beta.group")
+  #  expect_equal(names(idx)[3], "beta.repl")
   expect_equal(idx$beta, 1)
 
   # A-matrix
@@ -72,7 +72,7 @@ test_that("Component construction: linear model", {
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   cmps <- bru_comp_list(list(cmp))
-  inps <- input_eval(cmps, data = df)
+  inps <- bru_input(cmps, data = df)
   v <- evaluate_effect_single_state(
     cmps,
     input = inps,
@@ -98,7 +98,7 @@ test_that("Component construction: duplicate detection", {
 
 test_that("Component construction: offset", {
   cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
-  inp <- input_eval(cmp, data = data.frame(a = 11:15))
+  inp <- bru_input(cmp, data = data.frame(a = 11:15))
   val <- evaluate_effect_single_state(cmp,
     input = inp,
     state = NULL
@@ -138,7 +138,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -156,7 +156,7 @@ test_that("Component construction: terra", {
   cmp <- bru_comp_list(~ -1 + something(r, model = "linear"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -175,7 +175,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(r, model = "linear", main_layer = 1),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -194,7 +194,7 @@ test_that("Component construction: terra", {
     ~ -1 + something(r, model = "linear", main_layer = "elevation"),
     lhoods = llik
   )
-  inp <- input_eval(cmp, data = data)
+  inp <- bru_input(cmp, data = data)
   comp_lin <- ibm_linear(cmp,
     input = inp,
     state = list(something = 2),
@@ -409,7 +409,7 @@ test_that("Component construction: unsafe intercepts", {
     },
     paste0(
       "The input evaluation 'something_unknown' for 'something_unknown' ",
-      "failed. Perhaps the data object doesn't contain the needed variables?"
+      "failed.\nPerhaps the data object doesn't contain the needed variables?"
     )
   )
 })
@@ -434,15 +434,15 @@ test_that("Component inputs: non-numeric input detection", {
   )
 
   # No model specified (argument unnamed), geometry invalid for
-  # bru_mapper_linear:
+  # bm_linear:
   cmp <- bru_comp_list(~ Intercept(1) + field(geometry, matern))
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
 
   expect_error(
-    ibm_eval(bru_mapper_linear(), input = df$geometry, state = 1),
-    "The input to a bru_mapper_linear evaluation must be numeric or logical."
+    ibm_eval(bm_linear(), input = df$geometry, state = 1),
+    "The input to a bm_linear evaluation must be numeric or logical."
   )
 
   cmp <- bru_comp_list(
@@ -451,7 +451,7 @@ test_that("Component inputs: non-numeric input detection", {
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
-  input <- input_eval(model$effects$field, data = df)
+  input <- bru_input(model$effects$field, data = df)
 
   expect_error(
     ibm_eval(
@@ -459,6 +459,6 @@ test_that("Component inputs: non-numeric input detection", {
       input = input,
       state = rep(1, fm_dof(mesh))
     ),
-    "The input to a bru_mapper_scale evaluation must be numeric or logical."
+    "The input to a bm_scale evaluation must be numeric or logical."
   )
 })
