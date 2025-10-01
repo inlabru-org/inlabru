@@ -36,7 +36,7 @@ if (interactive()) {
 
   chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
   plot(chess$white)
-  }
+}
 
 }
 \author{
