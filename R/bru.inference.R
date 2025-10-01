@@ -2192,10 +2192,13 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 #'   From `2.13.0.9016`, it will look for a `block_response` element in the
 #'   list, which should be the name of a response variable in `response_data` to
 #'   match the `block` information against, allowing character or factor
-#'   aggregation block information to be used. In not supplied, the name
+#'   aggregation block information to be used by replacing `block` with
+#'   `match(block, block_response)`. If not supplied, the name
 #'   `".block"` is tried. If that isn't available, the `block` information must
 #'   be supplied directly as a numeric or integer vector, indexing into the rows
-#'   of the response variable.
+#'   of the response variable. Having no `block_response` variable is equivalent
+#'   to having
+#'   `response_data$.block = seq_len(bru_response_size(response_data))`.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
@@ -2552,6 +2555,13 @@ bru_response_size <- function(object) {
 #' @export
 bru_response_size.default <- function(object) {
   NROW(object)
+}
+
+#' @describeIn bru_response_size Extract the number of observations from an
+#'   object supporting `NROW(object[[1]])`.
+#' @export
+bru_response_size.list <- function(object) {
+  NROW(object[[1]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from an

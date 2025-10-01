@@ -160,10 +160,13 @@ defined by non-NULL \code{aggregate}, overriding the default,
 From \verb{2.13.0.9016}, it will look for a \code{block_response} element in the
 list, which should be the name of a response variable in \code{response_data} to
 match the \code{block} information against, allowing character or factor
-aggregation block information to be used. In not supplied, the name
+aggregation block information to be used by replacing \code{block} with
+\code{match(block, block_response)}. If not supplied, the name
 \code{".block"} is tried. If that isn't available, the \code{block} information must
 be supplied directly as a numeric or integer vector, indexing into the rows
-of the response variable.}
+of the response variable. Having no \code{block_response} variable is equivalent
+to having
+\code{response_data$.block = seq_len(bru_response_size(response_data))}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 

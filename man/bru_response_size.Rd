@@ -3,6 +3,7 @@
 \name{bru_response_size}
 \alias{bru_response_size}
 \alias{bru_response_size.default}
+\alias{bru_response_size.list}
 \alias{bru_response_size.inla.surv}
 \alias{bru_response_size.bru_obs}
 \alias{bru_response_size.bru_obs_list}
@@ -13,6 +14,8 @@
 bru_response_size(object)
 
 \method{bru_response_size}{default}(object)
+
+\method{bru_response_size}{list}(object)
 
 \method{bru_response_size}{inla.surv}(object)
 
@@ -37,6 +40,9 @@ Extract the number of response values from \code{bru} and related objects.
 \itemize{
 \item \code{bru_response_size(default)}: Extract the number of observations from an
 object supporting \code{NROW()}.
+
+\item \code{bru_response_size(list)}: Extract the number of observations from an
+object supporting \code{NROW(object[[1]])}.
 
 \item \code{bru_response_size(inla.surv)}: Extract the number of observations from an
 \code{inla.surv} object.
