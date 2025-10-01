@@ -1518,10 +1518,11 @@ bru_agg_input <- function(input, data_list, .envir) {
   })
 
   if (!is.null(aggregate_input[["block_response"]])) {
-    if (is.null(data_list$response_data[[aggregate_input[["block_response"]]]])) {
+    blk_resp <- aggregate_input[["block_response"]]
+    if (is.null(data_list$response_data[[blk_resp]])) {
       msg <- glue::glue(
-        '`block_response` variable "{aggregate_input[["block_response"]]}" ',
-        'not found in `response_data`.'
+        '`block_response` variable "{blk_resp}" ',
+        "not found in `response_data`."
       )
 
       bru_log_abort(msg)
@@ -1529,9 +1530,10 @@ bru_agg_input <- function(input, data_list, .envir) {
   } else {
     aggregate_input[["block_response"]] <- ".block"
   }
-  if (!is.null(data_list$response_data[[aggregate_input[["block_response"]]]])) {
+  blk_resp <- aggregate_input[["block_response"]]
+  if (!is.null(data_list$response_data[[blk_resp]])) {
     agg_block_resp_expr <- rlang::parse_expr(
-      glue::glue('.response_data[["{aggregate_input[["block_response"]]}"]]')
+      glue::glue('.response_data[["{blk_resp}"]]')
     )
     block_response <- bru_eval_in_data_context(
       !!agg_block_resp_expr,
@@ -1703,9 +1705,9 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       int.args = options[["bru_int_args"]]
     )
     if ((inherits(samplers, "Spatial") ||
-         inherits(data, "Spatial") ||
-         inherits(response[["coordinates"]], "Spatial")) &&
-        inherits(ips, "sf")) {
+      inherits(data, "Spatial") ||
+      inherits(response[["coordinates"]], "Spatial")) &&
+      inherits(ips, "sf")) {
       ips <- sf::as_Spatial(ips)
     }
   }
@@ -1731,11 +1733,11 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       sp::coordnames(ips) <- new_coordnames$ips
     } else {
       if (inherits(response, c("sf", "sfc")) ||
-          (is.list(response) &&
-           any(vapply(
-             response,
-             function(x) inherits(x, c("sf", "sfc")), TRUE
-           )))) {
+        (is.list(response) &&
+          any(vapply(
+            response,
+            function(x) inherits(x, c("sf", "sfc")), TRUE
+          )))) {
         ips <- sf::st_as_sf(ips)
         ips_is_Spatial <- FALSE
       }
@@ -1775,7 +1777,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   } else {
     data <- tibble::as_tibble(response)
     if (("geometry" %in% names(data)) &&
-        inherits(data$geometry, "sfc")) {
+      inherits(data$geometry, "sfc")) {
       sf::st_geometry(data) <- "geometry"
     }
   }
@@ -1785,7 +1787,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
   if ((length(additional_data_names) > 0) &&
-      (NROW(data_) == N_data)) {
+    (NROW(data_) == N_data)) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
   }
 
@@ -1840,12 +1842,12 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
-                       BRU_aggregate = TRUE,
-                       BRU_point_weights = point_weights
+        BRU_aggregate = TRUE,
+        BRU_point_weights = point_weights
       ),
       dplyr::bind_cols(ips,
-                       BRU_aggregate = FALSE,
-                       BRU_point_weights = 0.0
+        BRU_aggregate = FALSE,
+        BRU_point_weights = 0.0
       )
     )
   } else {
@@ -1887,9 +1889,9 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 
 bru_obs_family_cp <- function(lh, options, .envir) {
   if (inherits(lh[["data"]], "Spatial") ||
-      inherits(lh[["BRU_original_response_data"]], "Spatial") ||
-      inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
-      inherits(lh[["integration_info"]][["ips"]], "Spatial")) {
+    inherits(lh[["BRU_original_response_data"]], "Spatial") ||
+    inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
+    inherits(lh[["integration_info"]][["ips"]], "Spatial")) {
     return(bru_obs_family_cp_sp(lh, options, .envir))
   }
 
@@ -2000,7 +2002,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
   data <- tibble::as_tibble(response)
   if (("geometry" %in% names(data)) &&
-      inherits(data$geometry, "sfc")) {
+    inherits(data$geometry, "sfc")) {
     sf::st_geometry(data) <- "geometry"
   }
 
@@ -2010,7 +2012,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
   if ((length(additional_data_names) > 0) &&
-      (NROW(data_) == N_data)) {
+    (NROW(data_) == N_data)) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
   }
 
@@ -2061,12 +2063,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
-                       BRU_aggregate = TRUE,
-                       BRU_point_weights = point_weights
+        BRU_aggregate = TRUE,
+        BRU_point_weights = point_weights
       ),
       dplyr::bind_cols(ips,
-                       BRU_aggregate = FALSE,
-                       BRU_point_weights = 0.0
+        BRU_aggregate = FALSE,
+        BRU_point_weights = 0.0
       )
     )
   } else {
@@ -2188,12 +2190,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #'
 #'   From `2.13.0.9016`, it will look for a `block_response` element in the
-#'   list, which should be the name of a response variable in `response_data`
-#'   to match the `block` information against, allowing character or factor
+#'   list, which should be the name of a response variable in `response_data` to
+#'   match the `block` information against, allowing character or factor
 #'   aggregation block information to be used. In not supplied, the name
-#'   `".block"` is tried. If that isn't available, the `block` information must be
-#'   supplied directly as a numeric or integer vector, indexing into the rows of
-#'   the response variable.
+#'   `".block"` is tried. If that isn't available, the `block` information must
+#'   be supplied directly as a numeric or integer vector, indexing into the rows
+#'   of the response variable.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].

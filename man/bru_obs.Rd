@@ -158,12 +158,12 @@ defined by non-NULL \code{aggregate}, overriding the default,
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.
 
 From \verb{2.13.0.9016}, it will look for a \code{block_response} element in the
-list, which should be the name of a response variable in \code{response_data}
-to match the \code{block} information against, allowing character or factor
+list, which should be the name of a response variable in \code{response_data} to
+match the \code{block} information against, allowing character or factor
 aggregation block information to be used. In not supplied, the name
-\code{".block"} is tried. If that isn't available, the \code{block} information must be
-supplied directly as a numeric or integer vector, indexing into the rows of
-the response variable.}
+\code{".block"} is tried. If that isn't available, the \code{block} information must
+be supplied directly as a numeric or integer vector, indexing into the rows
+of the response variable.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
 
