@@ -32,6 +32,7 @@ bru_obs(
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
+  control.gcpo = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
@@ -157,6 +158,8 @@ defined by non-NULL \code{aggregate}, overriding the default,
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
+
+\item{control.gcpo}{A optional \code{list} of \code{INLA::control.gcpo} options}
 
 \item{tag}{character; Name that can be used to identify the relevant parts
 of INLA predictor vector output, via \code{\link[=bru_index]{bru_index()}}.}

@@ -1,0 +1,888 @@
+---
+title: "LGCPs - Spatial covariates"
+author: "David Borchers and Finn Lindgren and Hans Montcho"
+date: "Generated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LGCPs - Spatial covariates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+.cache_dir <- file.path("2d_lgcp_covars_groupcv_cache")
+.cache_recompute <- !file.exists(.cache_dir)
+if (.cache_recompute) {
+  dir.create(.cache_dir, recursive = TRUE)
+}
+.vignette_cache <- FALSE
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5,
+  eval = TRUE
+)
+```
+Set things up
+
+```{r results="hide",warning=FALSE,message=FALSE}
+library(INLA)
+library(inlabru)
+library(fmesher)
+library(RColorBrewer)
+library(ggplot2)
+bru_safe_sp(force = TRUE)
+# Activate DIC output
+bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
+```
+
+Introduction
+----------------------------------
+
+We are going to fit spatial models to the gorilla data, using factor and continuous explanatory
+variables in this practical. We will fit one using the factor variable `vegetation`, the other using
+the continuous covariate `elevation`
+
+(Jump to the bottom of the practical if you want to start gently with a 1D example!)
+
+Get the data
+-----------------------------------
+
+```{r }
+data(gorillas_sf, package = "inlabru")
+```
+
+This dataset is a list (see `help(gorillas_sf)` for details. Extract the objects
+you need from the list, for convenience:
+
+```{r }
+nests <- gorillas_sf$nests
+mesh <- gorillas_sf$mesh
+boundary <- gorillas_sf$boundary
+gcov <- gorillas_sf_gcov()
+```
+
+Factor covariates
+-----------------------------------
+
+Look at the vegetation type, nests and boundary:
+
+
+```{r warning=FALSE,message=FALSE}
+ggplot() +
+  gg(gcov$vegetation) +
+  gg(boundary, alpha = 0.2) +
+  gg(nests, color = "white", cex = 0.5)
+```
+
+Or, with the mesh:
+
+
+```{r warning=FALSE,message=FALSE}
+ggplot() +
+  gg(gcov$vegetation) +
+  gg(mesh) +
+  gg(boundary, alpha = 0.2) +
+  gg(nests, color = "white", cex = 0.5)
+```
+
+#### A model with vegetation type only
+
+It seems that vegetation type might be a good predictor because nearly all the nests fall in 
+vegetation type `Primary`. So we construct a model with vegetation type as a fixed effect.
+To do this, we need to tell 'lgcp' how to find the vegetation type at any point in
+space, and we do this by creating model components with a fixed effect that we
+call `vegetation` (we could call it
+anything), as follows:
+
+
+```{r warning=FALSE,message=FALSE}
+comp1 <- geometry ~ vegetation(gcov$vegetation, model = "factor_full") - 1
+```
+
+Notes:
+* We need to tell 'lgcp' that this is a factor fixed effect, which we do 
+with `model="factor_full"`, giving one coefficient for each factor level.
+* We need to be careful about overparameterisation when using factors.
+Unlike regression models like 'lm()', 'glm()' or 'gam()', 'lgcp()',
+`inlabru` does not automatically remove the first level and absorb it into
+an intercept. Instead, we can either use `model="factor_full"` without an intercept,
+or `model="factor_contrast"`, which does remove the first level.
+
+```{r warning=FALSE,message=FALSE}
+comp1alt <- geometry ~ vegetation(gcov$vegetation, model = "factor_contrast") +
+  Intercept(1)
+```
+
+To enable group.cv calculations, we need to split the domain into spatial regions,
+and compute the association of each observed point to these subregions.
+
+```{r warning=FALSE,message=FALSE}
+source("hexagon_tiling.R")
+cvpart <- cv_hex(boundary, cellsize = 0.5, n_group = 3)
+ggplot() +
+  gg(cvpart, aes(fill = group), alpha = 0.5) +
+  gg(boundary, alpha = 0) +
+  gg(nests, color = "white", cex = 0.5)
+
+cvpart$block_ID <- seq_len(nrow(cvpart))
+cvpart$group <- NULL
+a <- sf::st_intersects(nests, cvpart)
+if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
+  stop("Point in none or multiple polygons")
+}
+
+nests$.block <- unlist(a)
+```
+
+
+Fit the model as usual:
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+fit1 <- lgcp(
+  comp1,
+  nests,
+  samplers = cvpart,
+  domain = list(geometry = mesh),
+  control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets = 2),
+  options = list(bru_verbose = 0)
+)
+#  options = list(control.compute = list(control.gcpo = list(enable = TRUE))))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "fit1.rds")
+if ((!.cache_recompute) &&
+  file.exists(.cache_file)) {
+  fit1 <- readRDS(file = .cache_file)
+} else {
+  fit1 <- lgcp(
+    comp1,
+    nests,
+    samplers = cvpart,
+    domain = list(geometry = mesh),
+    control.gcpo = list(enable = FALSE, type.cv = "joint", num.level.sets = 2),
+    options = list(bru_verbose = 0)
+  )
+  saveRDS(fit1, .cache_file)
+}
+```
+
+Predict the intensity, and plot the median intensity surface. (In older
+versions, predicting takes some time because we did not have vegetation values
+outside the mesh so 'inlabru' needed to predict these first. Since v2.0.0, the
+vegetation has been pre-extended.)
+
+The `predict` function of `inlabru` takes into its `data` argument an `sf`
+object or other object supported by the predictor evaluation code (for
+non-geographical data, typically a `data.frame`). We can use the `inlabru`
+function `pixels` to generate an `sf` object with points only within the
+boundary, using its `mask` argument, as shown below.
+
+
+```{r warning=FALSE,message=FALSE}
+pred.df <- fm_pixels(mesh, mask = boundary)
+int1 <- predict(fit1, pred.df, ~ exp(vegetation))
+
+# gg() with sf points and geom = "tile" plots a raster
+ggplot() +
+  gg(int1, geom = "tile") +
+  gg(boundary, alpha = 0, lwd = 2) +
+  gg(nests, color = "DarkGreen")
+```
+
+Not surprisingly, given that most nests are in `Primary` vegetation, the high
+density is in this vegetation. But there are substantial patches of predicted
+high density that have no nests, and some areas of predicted low density that
+have nests. What about the estimated abundance (there are really 647 nests
+there):
+
+```{r warning=FALSE,message=FALSE}
+ips <- fm_int(mesh, boundary)
+Lambda1 <- predict(fit1, ips, ~ sum(weight * exp(vegetation)))
+Lambda1
+```
+
+#### Continuous limit of WAIC
+
+```{r}
+int_points <- fm_int(domain = list(geometry = mesh), boundary)
+block_int_points <- fm_int(domain = list(geometry = mesh), cvpart)
+agg <- bm_aggregate(type = "sum", n_block = 1L)
+agg_block <- bm_aggregate(type = "sum", n_block = max(block_int_points$.block))
+pred <- predict(fit1,
+  newdata = cbind(
+    dplyr::bind_rows(nests, int_points, block_int_points),
+    part = c(
+      rep("Y", nrow(nests)),
+      rep("int", nrow(int_points)),
+      rep("block_int", nrow(block_int_points))
+    )
+  ),
+  formula = ~ {
+    eta <- {
+      vegetation
+    }
+    log_lambda_y <- eta[part == "Y"]
+    lambda_y <- exp(log_lambda_y)
+    # Full domain
+    lambda_int <- sum(weight[part == "int"] * (1 - exp(eta[part == "int"])))
+    log_like <- sum(log_lambda_y) + lambda_int
+    # Blockwise
+    lambda_block_int <- ibm_eval(agg_block,
+      input = list(
+        block = .block[part == "block_int"],
+        weights = weight[part == "block_int"]
+      ),
+      state = (1 - exp(eta[part == "block_int"]))
+    )
+    block_log_like <- lambda_block_int +
+      ibm_eval(agg_block,
+        input = list(block = .block[part == "Y"]),
+        state = log_lambda_y
+      )
+    block_like <- exp(block_log_like)
+    list(
+      log_lambda_y = log_lambda_y,
+      lambda_y = lambda_y,
+      lambda_int = lambda_int,
+      log_like = log_like,
+      block_log_like = block_log_like,
+      block_like = block_like
+    )
+  },
+  n.samples = 2000
+)
+# Limit:
+lppd_limit <- sum(log(pred$lambda_y$mean)) + pred$lambda_int$mean
+p_WAIC_limit <- sum(pred$log_lambda_y$sd^2)
+p_DIC <- 2 * pred$log_like$sd^2
+WAIC_limit <- -2 * (lppd_limit - p_WAIC_limit)
+DIC <- -2 * (lppd_limit - p_DIC)
+# Blockwise:
+lppd_blockwise <- sum(log(pred$block_like$mean))
+p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
+WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
+# Collect
+IC_results <-
+  data.frame(
+    type = c("DIC", "WAIC_limit", "WAIC_blockwise", "DIC_INLA", "WAIC_INLA"),
+    lppd = c(
+      lppd_limit,
+      lppd_limit,
+      lppd_blockwise,
+      fit1$dic$dic / (-2) + fit1$dic$p.eff + sum(int_points$weight),
+      NA
+    ),
+    p_eff = c(
+      p_DIC,
+      p_WAIC_limit,
+      p_WAIC_blockwise,
+      fit1$dic$p.eff,
+      fit1$waic$p.eff
+    ),
+    IC = c(
+      DIC,
+      WAIC_limit,
+      WAIC_blockwise,
+      fit1$dic$dic,
+      fit1$waic$waic
+    )
+  )
+knitr::kable(IC_results)
+```
+
+#### Cross validation with NA setting
+
+```{r}
+fit2prep <- bru_set_missing(
+  fit1,
+  keep = list(-which(fit1$bru_info$lhoods[[1]]$response_data$BRU_block == 8L))
+)
+fit2 <- bru_rerun(fit2prep)
+```
+
+
+#### A model with vegetation type and a SPDE type smoother
+Lets try to `explain` the pattern in nest distribution that is not captured by 
+the vegetation covariate, using an SPDE:
+
+
+```{r results='hide',warning=FALSE,message=FALSE}
+pcmatern <- inla.spde2.pcmatern(mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.1, 0.01)
+)
+
+comp2 <- geometry ~
+  -1 +
+  vegetation(gcov$vegetation, model = "factor_full") +
+  mySmooth(geometry, model = pcmatern)
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+fit2 <- lgcp(comp2, nests, samplers = boundary, domain = list(geometry = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "fit2.rds")
+if ((!.cache_recompute) &&
+  file.exists(.cache_file)) {
+  fit2 <- readRDS(file = .cache_file)
+} else {
+  fit2 <- lgcp(comp2,
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
+  saveRDS(fit2, .cache_file)
+}
+```
+
+And plot the posterior median intensity surface
+
+```{r warning=FALSE,message=FALSE}
+int2 <- predict(fit2, pred.df, ~ exp(mySmooth + vegetation), n.samples = 1000)
+
+ggplot() +
+  gg(int2, aes(fill = q0.5), geom = "tile") +
+  gg(boundary, alpha = 0, lwd = 2) +
+  gg(nests)
+```
+
+... and the expected integrated intensity (mean of abundance)
+
+
+```{r warning=FALSE,message=FALSE}
+Lambda2 <- predict(
+  fit2,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(mySmooth + vegetation))
+)
+Lambda2
+```
+
+Look at the contributions to the linear predictor from the SPDE and from
+vegetation:
+```{r warning=FALSE,message=FALSE}
+lp2 <- predict(fit2, pred.df, ~ list(
+  smooth_veg = mySmooth + vegetation,
+  smooth = mySmooth,
+  veg = vegetation
+))
+```
+
+The function `scale_fill_gradientn` sets the scale for the plot legend. Here we
+set it to span the range of the three linear predictor components being plotted
+(medians are plotted by default).
+
+
+```{r warning=FALSE,message=FALSE}
+lprange <- range(lp2$smooth_veg$median, lp2$smooth$median, lp2$veg$median)
+csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
+
+plot.lp2 <- ggplot() +
+  gg(lp2$smooth_veg, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("mySmooth + vegetation")
+
+plot.lp2.spde <- ggplot() +
+  gg(lp2$smooth, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("mySmooth")
+
+plot.lp2.veg <- ggplot() +
+  gg(lp2$veg, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("vegetation")
+
+multiplot(plot.lp2, plot.lp2.spde, plot.lp2.veg, cols = 3)
+```
+
+#### A model with SPDE only
+
+Do we need vegetation at all? Fit a model with only an SPDE + Intercept, and
+choose between models on the basis of DIC, using `deltaIC()`.
+
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
+fit3 <- lgcp(comp3,
+  data = nests,
+  samplers = boundary,
+  domain = list(geometry = mesh),
+  options = list(control.compute(dic = TRUE))
+)
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+comp3 <- geometry ~ mySmooth(geometry, model = pcmatern) + Intercept(1)
+.cache_file <- file.path(.cache_dir, "fit3.rds")
+if ((!.cache_recompute) &&
+  file.exists(.cache_file)) {
+  fit3 <- readRDS(file = .cache_file)
+} else {
+  fit3 <- lgcp(comp3,
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh),
+    options = list(control.compute(dic = TRUE))
+  )
+  saveRDS(fit3, .cache_file)
+}
+```
+
+```{r results='hide',warning=FALSE,message=FALSE}
+int3 <- predict(fit3, pred.df, ~ exp(mySmooth + Intercept))
+
+ggplot() +
+  gg(int3, geom = "tile") +
+  gg(boundary, alpha = 0) +
+  gg(nests)
+```
+```{r warning=FALSE,message=FALSE}
+Lambda3 <- predict(
+  fit3,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(mySmooth + Intercept))
+)
+Lambda3
+```
+```{r warning=FALSE,message=FALSE}
+knitr::kable(deltaIC(fit1, fit2, fit3, criterion = c("DIC")))
+```
+NOTE: the behaviour of DIC is currently a bit unclear, and is being
+investigated.
+WAIC is related to leave-one-out cross-validation, and is not appropriate to
+use with the current current LGCP likelihood implementation.
+
+Classic mode:
+```{r echo=FALSE}
+knitr::kable(
+  dplyr::tribble(
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit2", 2224.131, 0.00000,
+    "fit3", 2274.306, 50.17504,
+    "fit1", 3124.784, 900.65339
+  )
+)
+```
+
+Experimental mode:
+```{r echo=FALSE}
+knitr::kable(
+  dplyr::tribble(
+    ~Model, ~DIC, ~Delta.DIC,
+    "fit1", -563.3583, 0.000,
+    "fit3", 509.4010, 1072.759,
+    "fit2", 597.6459, 1161.004
+  )
+)
+```
+
+#### CV and SPDE parameters for Model 2
+
+We are going with Model `fit2`. Lets look at the spatial distribution of the 
+coefficient of variation
+
+```{r results="hide",warning=FALSE,message=FALSE}
+ggplot() +
+  gg(int2, aes(fill = sd / mean), geom = "tile") +
+  gg(boundary, alpha = 0) +
+  gg(nests)
+```
+
+Plot the vegetation "fixed effect" posteriors. First get their names - from
+`$marginals.random$vegetation` of the fitted object, which contains the fixed
+effect marginal distribution data
+
+```{r warning=FALSE,message=FALSE}
+flist <- vector("list", NROW(fit2$summary.random$vegetation))
+for (i in seq_along(flist)) flist[[i]] <- plot(fit2, "vegetation", index = i)
+multiplot(plotlist = flist, cols = 3)
+```
+
+Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors
+and the Matern correlation and covariance functions for this model.
+
+```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+spde.range <- spde.posterior(fit2, "mySmooth", what = "range")
+spde.logvar <- spde.posterior(fit2, "mySmooth", what = "log.variance")
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.logvar)
+
+multiplot(range.plot, var.plot)
+corplot <- plot(spde.posterior(fit2, "mySmooth", what = "matern.correlation"))
+covplot <- plot(spde.posterior(fit2, "mySmooth", what = "matern.covariance"))
+multiplot(covplot, corplot)
+```
+
+Continuous covariates
+-----------------------------------
+
+Now lets try a model with elevation as a (continuous) explanatory variable.
+(First centre elevations for more stable fitting.)
+
+```{r results="hide",warning=FALSE,message=FALSE}
+elev <- gcov$elevation
+elev <- elev - mean(terra::values(elev), na.rm = TRUE)
+
+ggplot() +
+  gg(elev, geom = "tile") +
+  gg(boundary, alpha = 0)
+```
+
+
+The elevation variable here is of class 'SpatRaster', that can be handled in the
+same way as the vegetation covariate, with automatic evaluation via an
+`eval_spatial()` method. However, since in some cases data may be stored
+differently, other methods are needed to access the stored values, or there's
+some post-processing to be done. In such cases, we can define a function that
+knows how to evaluate the covariate at arbitrary points in the survey region,
+and call that function in the component definition. The method `eval_spatial()`
+is the method that handles this automatically, and supports `terra` `SpatRaster`
+and `sf` geometry points objects, and mismatching coordinate systems as well.
+In the following evaluator example function, we only add infilling of missing
+values as a post-processing step.
+
+```{r results="hide",warning=FALSE,message=FALSE}
+# Note: this method is usually not needed; the automatic invocation of
+# `eval_spatial()` method by the component input evaluator is usually
+# sufficient.
+f.elev <- function(where) {
+  # Extract the values
+  v <- eval_spatial(elev, where, layer = "elevation")
+  # Fill in missing values; this example would work for
+  # SpatialPixelsDataFrame data
+  # if (any(is.na(v))) {
+  #   v <- bru_fill_missing(elev, where, v)
+  # }
+  v
+}
+```
+
+For brevity we are not going to consider models with elevation only, with
+elevation and a SPDE, and with SPDE only. We will just fit one with elevation
+and SPDE.
+We create our model to pass to lgcp thus:
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+matern <- inla.spde2.pcmatern(mesh,
+  prior.sigma = c(0.1, 0.01),
+  prior.range = c(0.1, 0.01)
+)
+
+ecomp <- geometry ~ elev(f.elev(.data.), model = "linear") +
+  mySmooth(geometry, model = matern) + Intercept(1)
+```
+
+Note how the elevation effect is defined. We could alternatively use the `terra`
+grid object directly (causing `inlabru` to automatically call `eval_spatial()`),
+like in the vegetation case:
+we specified it like
+```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
+elev(elev, model = "factor_full")
+```
+whereas with the special function method we specify the covariate like this:
+```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
+elev(f.elev(.data.), model = "linear")
+```
+Most applications can use the automatic method, and the special function method
+is included only as an example of how to handle more complex cases.
+
+We also now include an intercept term in the model.
+
+The model is fitted in the usual way:
+```{r results="hide",warning=FALSE,message=FALSE,eval=FALSE}
+efit <- lgcp(ecomp, nests, samplers = boundary, domain = list(geometry = mesh))
+```
+```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
+.cache_file <- file.path(.cache_dir, "efit.rds")
+if ((!.cache_recompute) &&
+  file.exists(.cache_file)) {
+  efit <- readRDS(file = .cache_file)
+} else {
+  efit <- lgcp(ecomp,
+    nests,
+    samplers = boundary,
+    domain = list(geometry = mesh)
+  )
+  saveRDS(efit, .cache_file)
+}
+```
+
+Summary and model selection
+
+
+```{r warning=FALSE,message=FALSE}
+summary(efit)
+deltaIC(fit1, fit2, fit3, efit)
+```
+
+Predict and plot the density
+
+
+```{r results="hide",warning=FALSE,message=FALSE}
+e.pred <- predict(
+  efit,
+  pred.df,
+  ~ list(
+    int = exp(mySmooth + elev + Intercept),
+    int.log = mySmooth + elev + Intercept
+  )
+)
+
+p1 <- ggplot() +
+  gg(e.pred$int, aes(fill = log(sd)), geom = "tile") +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+")
+p2 <- ggplot() +
+  gg(e.pred$int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
+  gg(boundary, alpha = 0) +
+  gg(nests, shape = "+")
+library(patchwork)
+p1 | p2
+```
+
+Now look at the elevation and SPDE effects in space. Leave out the Intercept
+because it swamps the spatial effects of elevation and the SPDE in the 
+plots and we are interested in comparing the effects of elevation and the SPDE.
+
+First we need to predict on the linear predictor scale.
+```{r warning=FALSE,message=FALSE,echo=TRUE}
+e.lp <- predict(
+  efit,
+  pred.df,
+  ~ list(
+    smooth_elev = mySmooth + elev,
+    elev = elev,
+    smooth = mySmooth
+  )
+)
+```
+
+The code below, which is very similar to that used for the vegetation factor
+variable, produces the plots we want.
+
+
+```{r warning=FALSE,message=FALSE, fig.height=5, fig.width=13}
+lprange <- range(e.lp$smooth_elev$mean, e.lp$elev$mean, e.lp$smooth$mean)
+
+library(RColorBrewer)
+csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
+
+plot.e.lp <- ggplot() +
+  gg(e.lp$smooth_elev, mask = boundary, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("SPDE + elevation")
+
+plot.e.lp.spde <- ggplot() +
+  gg(e.lp$smooth, mask = boundary, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("SPDE")
+
+plot.e.lp.elev <- ggplot() +
+  gg(e.lp$elev, mask = boundary, geom = "tile") +
+  csc +
+  theme(legend.position = "bottom") +
+  gg(boundary, alpha = 0) +
+  ggtitle("elevation")
+
+multiplot(plot.e.lp,
+  plot.e.lp.spde,
+  plot.e.lp.elev,
+  cols = 3
+)
+```
+
+You might also want to look at the posteriors of the fixed effects and of the
+SPDE. Adapt the code used for the vegetation factor to do this.
+
+```{r warning=FALSE,message=FALSE}
+LambdaE <- predict(
+  efit,
+  fm_int(mesh, boundary),
+  ~ sum(weight * exp(Intercept + elev + mySmooth))
+)
+LambdaE
+```
+
+
+```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+flist <- vector("list", NROW(efit$summary.fixed))
+for (i in seq_along(flist)) {
+  flist[[i]] <- plot(efit, rownames(efit$summary.fixed)[i])
+}
+multiplot(plotlist = flist, cols = 2)
+```
+
+Plot the SPDE parameter posteriors and the Matern correlation and covariance
+functions for this model.
+
+```{r results="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+spde.range <- spde.posterior(efit, "mySmooth", what = "range")
+spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
+range.plot <- plot(spde.range)
+var.plot <- plot(spde.logvar)
+
+multiplot(range.plot, var.plot)
+corplot <- plot(spde.posterior(efit, "mySmooth", what = "matern.correlation"))
+covplot <- plot(spde.posterior(efit, "mySmooth", what = "matern.covariance"))
+multiplot(covplot, corplot)
+```
+
+Also estimate abundance. The `data.frame` in the second call leads to inclusion
+of `N` in the prediction object, for easier plotting.
+
+```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
+Lambda <- predict(
+  efit, fm_int(mesh, boundary),
+  ~ sum(weight * exp(mySmooth + elev + Intercept))
+)
+Lambda
+
+Nest.e <- predict(
+  efit,
+  fm_int(mesh, boundary),
+  ~ data.frame(
+    N = 200:1000,
+    density = dpois(200:1000,
+      lambda = sum(weight * exp(mySmooth + elev + Intercept))
+    )
+  ),
+  n.samples = 2000
+)
+```
+
+Plot in the same way as in previous practicals
+
+```{r }
+Nest.e$plugin_estimate <- dpois(Nest.e$N, lambda = Lambda$median)
+ggplot(data = Nest.e) +
+  geom_line(aes(x = N, y = mean, colour = "Posterior")) +
+  geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
+```
+
+### Non-spatial evaluation of the covariate effect
+
+The previous examples of posterior prediction focused on spatial prediction.
+It is also possible to evaluate the effect of a covariate directly, by bypassing
+the component definition input. This is done by adding the suffix `_eval()` to
+the end of the component name in the predictor expression, and supplying data
+that is sufficient for evaluating , and supplying data needed by the input
+arguments to this function, see `bru_comp_eval()`.
+
+Note on backwards version support, starting with version `2.2.8`
+Prior to version `2.8.0`, this feature required setting the `include`
+argument to `character(0)` to disable normal component evaluation for all
+components.
+From version `2.8.0`, `inlabru` automatically detects which model components
+are used by the prediction expression, including the use of component `_eval()`
+calls, making the `include` argument unnecessary. From version `2.11.0`,
+the `include`, `exclude`, and `include_latent` arguments have been deprecated in
+favour of the `used` argument that takes input generated by `bru_used()`, with
+a deprecation warning being generated from version `2.12.0.9003`.
+
+Since the elevation effect in this model is linear, the resulting plot isn't
+very interesting, but the same method can be applied to non-linear effects
+(e.g. "rw2") as well, and combined into general R expressions.
+
+```{r}
+elev.pred <- predict(
+  efit,
+  data.frame(elevation = seq(0, 100, length.out = 1000)),
+  formula = ~ elev_eval(elevation)
+  # include = character(0) # Not needed from version 2.8.0
+)
+
+ggplot(elev.pred) +
+  geom_line(aes(elevation, mean)) +
+  geom_ribbon(
+    aes(elevation,
+      ymin = q0.025,
+      ymax = q0.975
+    ),
+    alpha = 0.2
+  ) +
+  geom_ribbon(
+    aes(elevation,
+      ymin = mean - 1 * sd,
+      ymax = mean + 1 * sd
+    ),
+    alpha = 0.2
+  )
+```
+
+
+A 1D Example
+----------------
+Try fitting a 1-dimensional model to the point data in the `inlabru` dataset
+`Poisson2_1D`. This comes with a covariate function called `cov2_1D`. Try to
+reproduce the plot below (used in lectures) showing the effects of the
+`Intercept + z` and the `SPDE`. (You may find it helpful to build on the model
+you fitted in the previous practical, adding the covariate to the model
+specification.)
+
+```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
+data(Poisson2_1D)
+x <- seq(0, 55, length.out = 50)
+mesh <- fm_mesh_1d(x, degree = 2, boundary = "free")
+
+process_model <- inla.spde2.pcmatern(
+  mesh,
+  prior.sigma = c(1, 0.01),
+  prior.range = c(5, 0.01),
+  constr = TRUE
+)
+comp <- x ~
+  z(cov2_1D(x), model = "linear") +
+  smooth(x, model = process_model) +
+  Intercept(1)
+
+fitcov1D <- lgcp(comp,
+  pts2,
+  domain = list(x = mesh),
+  samplers = tibble::tibble(x = cbind(0, 55))
+)
+pr.df <- data.frame(x = x)
+prcov1D <- predict(
+  fitcov1D,
+  pr.df,
+  ~ list(
+    Intensity = exp(z + smooth + Intercept),
+    z = exp(z + Intercept),
+    smooth = exp(smooth)
+  ),
+  n.samples = 2000
+)
+
+ggplot() +
+  gg(prcov1D$Intensity,
+    aes(colour = "Intensity", fill = "Intensity"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  gg(prcov1D$smooth,
+    aes(colour = "Smooth", fill = "Smooth"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  gg(prcov1D$z,
+    aes(colour = "z-effect", fill = "z-effect"),
+    alpha = 0.2,
+    lwd = 1.25
+  ) +
+  geom_line(aes(x, lambda2_1D(x), colour = "True intensity"), lwd = 1.25) +
+  geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
+  xlab(quote(bold(s))) +
+  ylab(quote(hat(lambda)(bold(s)) ~ ~"and its components")) +
+  guides(colour = guide_legend("Quantity"), fill = "none")
+```
