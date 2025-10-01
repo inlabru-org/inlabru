@@ -79,7 +79,7 @@ navbar:
         href: articles/linearapprox.html
       - text: Code internal flow diagrams for model evaluation
         href: articles/devel_flow.html
-      - text: CLass and method information tables
+      - text: Class and method information tables
         href: articles/classes.html
 
 redirects:
