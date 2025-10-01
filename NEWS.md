@@ -22,6 +22,9 @@
   all matching indices. (version `2.13.0.9014`)
 * Code refactor and storage streamlining for `bru_obs()` to prepare for
   future extensions. (version `2.13.0.9015`)
+* Add `block_response` element to `bru_obs(aggregate_input)` list input,
+  to allow specifying a block-wise response variable to match for aggregated
+  predictors. (version `2.13.0.9016`)
 
 ## Bug fixes
 

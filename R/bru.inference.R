@@ -1478,19 +1478,6 @@ bru_agg_input <- function(input, data_list, .envir) {
       .envir = .envir
     )
   }
-  if (is.character(aggregate_input[["block"]])) {
-    msg <- paste0(
-      "'character' aggregation block information detected.\n",
-      "Please use a numeric or integer vector for the block information ",
-      "instead.\n",
-      "If you want to use a character vector, ",
-      "please convert it to a factor first,\n",
-      "making sure the factor level order matches your intended order,\n",
-      "and use `as.integer()`."
-    )
-
-    bru_log_abort(msg)
-  }
   if (is.null(aggregate_input[["weights"]])) {
     aggregate_input[["weights"]] <- bru_eval_in_data_context(
       .data[["weight"]],
@@ -1511,7 +1498,7 @@ bru_agg_input <- function(input, data_list, .envir) {
     )
   }
   lapply(c("block", "weights", "n_block"), function(nm) {
-    if (!is.numeric(aggregate_input[[nm]])) {
+    if (is.null(aggregate_input[[nm]])) {
       bru_log_abort(
         glue::glue(
           "Aggregation requested, but `aggregate_input[['{nm}']]` ",
@@ -1520,6 +1507,47 @@ bru_agg_input <- function(input, data_list, .envir) {
       )
     }
   })
+
+  if (is.null(aggregate_input[["block_response"]])) {
+    aggregate_input[["block_response"]] <- ".block"
+  }
+  if (!is.null(data_list$response_data[[aggregate_input[["block_response"]]]])) {
+    agg_block_resp_expr <- rlang::parse_expr(
+      glue::glue('.response_data[["{aggregate_input[["block_response"]]}"]]')
+    )
+    block_response <- bru_eval_in_data_context(
+      !!agg_block_resp_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+
+    aggregate_input[["block"]] <-
+      match(aggregate_input[["block"]], block_response)
+  }
+
+  if (is.character(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'character' aggregation block information detected.\n",
+      "Please use a numeric or integer vector for the block information ",
+      "instead.\n",
+      "If you want to use a character vector, supply a `block_response`\n",
+      "argument with the name of a response variableto match the character ",
+      "vector to."
+    )
+
+    bru_log_abort(msg)
+  }
+
+  if (any(is.na(aggregate_input[["block"]]))) {
+    msg <- paste0(
+      "'NA' aggregation block information detected.",
+      "Either the `block` information was out of range, or a match was not ",
+      "found when using `.response_data$block_response`."
+    )
+
+    bru_log_abort(msg)
+  }
 
   aggregate_input
 }
@@ -1924,9 +1952,18 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 #'   ```
 #'   list(block = .data.[[".block"]],
 #'        weights = .data.[["weight"]],
-#'        n_block = bru_response_size(.response_data.))
+#'        n_block = bru_response_size(.response_data.),
+#'        block_response = ".block")
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
+#'
+#'   From `2.13.0.9016`, it will look for a `block_response` element in the
+#'   list, which should be the name of a response variable in `response_data`
+#'   to match the `block` information against, allowing character or factor
+#'   aggregation block information to be used. In not supplied, the name
+#'   `".block"` is tried. If that isn't available, the `block` information must be
+#'   supplied directly as a numeric or integer vector, indexing into the rows of
+#'   the response variable.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
