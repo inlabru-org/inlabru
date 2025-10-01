@@ -32,6 +32,7 @@ bru_obs(
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
+  control.gcpo = NULL,
   tag = NULL,
   options = list(),
   .envir = parent.frame(),
@@ -169,6 +170,8 @@ to having
 \code{response_data$.block = seq_len(bru_response_size(response_data))}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}
+
+\item{control.gcpo}{A optional \code{list} of \code{INLA::control.gcpo} options}
 
 \item{tag}{character; Name that can be used to identify the relevant parts
 of INLA predictor vector output, via \code{\link[=bru_index]{bru_index()}}.}

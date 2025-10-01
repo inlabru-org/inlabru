@@ -1782,13 +1782,22 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     }
   }
   orig_response_data <- NULL
-  N_data <- NROW(data)
+  n_block <- max(ips$.block)
+  if (".block" %in% names(data_)) {
+    n_block <- max(max(data_$.block), n_block)
+    N_data <- base::tabulate(data_$.block, n_block)
+  } else {
+    N_data <- NROW(data)
+  }
 
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
   if ((length(additional_data_names) > 0) &&
-    (NROW(data_) == N_data)) {
+    (NROW(data_) == sum(N_data))) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
+  }
+  if (is.null(data[[".block"]])) {
+    data$.block <- 1L
   }
 
   if (ips_is_Spatial) {
@@ -1801,9 +1810,9 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 
   # Use 'weights' for per-point weighting of eta
   if (length(response_data[["BRU_weights"]]) == 1L) {
-    point_weights <- rep(response_data[["BRU_weights"]], N_data)
+    point_weights <- rep(response_data[["BRU_weights"]], sum(N_data))
   } else {
-    stopifnot(length(response_data[["BRU_weights"]]) == N_data)
+    stopifnot(length(response_data[["BRU_weights"]]) == sum(N_data))
     point_weights <- response_data[["BRU_weights"]]
   }
   response_data[["BRU_weights"]] <- 1L
@@ -1812,17 +1821,30 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     allow_combine <- TRUE
     new_response_data <- tibble::tibble(
       BRU_E = c(
-        0,
+        rep(0, length(N_data[N_data > 0])),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
       BRU_response = c(
-        N_data,
+        N_data[N_data > 0],
         rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        which(N_data > 0),
+        ips[[".block"]]
       ),
       BRU_weights = response_data[["BRU_weights"]][1],
       BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
       BRU_scale = response_data[["BRU_scale"]][1]
     )
+
+    lh$data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
+    lh$data_extra[["BRU_cp_n_block"]] <- n_block
+    lh$data_extra[["BRU_cp_agg"]] <-
+      bm_aggregate(
+        type = "average",
+        n_block = n_block
+      )
+
     if (lh$is_additive) {
       lh$expr_text <- "BRU_EXPRESSION"
     }
@@ -1834,8 +1856,11 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
           if (length(BRU_eta) == 1L) {{
             BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
           }}
-          c(mean(BRU_point_weights[BRU_aggregate] *
-                 BRU_eta[BRU_aggregate]),
+          c(ibm_eval(
+              BRU_cp_agg,
+              list(block = .block[BRU_aggregate]),
+              state = BRU_eta[BRU_aggregate] *
+                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
         }}")
     lh$expr <- parse(text = lh$expr_text)
@@ -1850,15 +1875,34 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
         BRU_point_weights = 0.0
       )
     )
+
+    group_cv_block <- c(which(N_data > 0), ips$.block)
+    # Would like:
+    # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
+    #   which(group_cv_block == i)
+    # })
+    # Current inla.group.cv interface (2025-08-28)
+    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+      which(group_cv_block == group_cv_block[i])
+    })
+
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
+      list(friends = group_cv_friends)
+    )
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
-        rep(0, N_data),
+        rep(0, sum(N_data)),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
       BRU_response = c(
         point_weights,
         rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        data[[".block"]],
+        ips[[".block"]]
       ),
       BRU_weights = response_data[["BRU_weights"]][1],
       BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
@@ -1885,7 +1929,6 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 
   lh
 }
-
 
 bru_obs_family_cp <- function(lh, options, .envir) {
   if (inherits(lh[["data"]], "Spatial") ||
@@ -2007,13 +2050,22 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   }
 
   orig_response_data <- NULL
-  N_data <- NROW(data)
+  n_block <- max(ips$.block)
+  if (".block" %in% names(data_)) {
+    n_block <- max(max(data_$.block), n_block)
+    N_data <- base::tabulate(data_$.block, n_block)
+  } else {
+    N_data <- NROW(data)
+  }
 
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
   if ((length(additional_data_names) > 0) &&
-    (NROW(data_) == N_data)) {
+    (NROW(data_) == sum(N_data))) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
+  }
+  if (is.null(data[[".block"]])) {
+    data$.block <- 1L
   }
 
   if ("geometry" %in% names(ips)) {
@@ -2022,9 +2074,9 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
   # Use 'weights' for per-point weighting of eta
   if (length(response_data[["BRU_weights"]]) == 1L) {
-    point_weights <- rep(response_data[["BRU_weights"]], N_data)
+    point_weights <- rep(response_data[["BRU_weights"]], sum(N_data))
   } else {
-    stopifnot(length(response_data[["BRU_weights"]]) == N_data)
+    stopifnot(length(response_data[["BRU_weights"]]) == sum(N_data))
     point_weights <- response_data[["BRU_weights"]]
   }
   response_data[["BRU_weights"]] <- 1L
@@ -2033,17 +2085,30 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     allow_combine <- TRUE
     new_response_data <- tibble::tibble(
       BRU_E = c(
-        0,
+        rep(0, length(N_data[N_data > 0])),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
       BRU_response = c(
-        N_data,
+        N_data[N_data > 0],
         rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        which(N_data > 0),
+        ips[[".block"]]
       ),
       BRU_weights = response_data[["BRU_weights"]][1],
       BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
       BRU_scale = response_data[["BRU_scale"]][1]
     )
+
+    lh$data_extra[["BRU_cp_block_subset"]] <- which(N_data > 0)
+    lh$data_extra[["BRU_cp_n_block"]] <- n_block
+    lh$data_extra[["BRU_cp_agg"]] <-
+      bm_aggregate(
+        type = "average",
+        n_block = n_block
+      )
+
     if (lh$is_additive) {
       lh$expr_text <- "BRU_EXPRESSION"
     }
@@ -2055,8 +2120,11 @@ bru_obs_family_cp <- function(lh, options, .envir) {
           if (length(BRU_eta) == 1L) {{
             BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
           }}
-          c(mean(BRU_point_weights[BRU_aggregate] *
-                 BRU_eta[BRU_aggregate]),
+          c(ibm_eval(
+              BRU_cp_agg,
+              list(block = .block[BRU_aggregate]),
+              state = BRU_eta[BRU_aggregate] *
+                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
         }}")
     lh$expr <- parse(text = lh$expr_text)
@@ -2071,6 +2139,21 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         BRU_point_weights = 0.0
       )
     )
+
+    group_cv_block <- c(which(N_data > 0), ips$.block)
+    # Would like:
+    # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
+    #   which(group_cv_block == i)
+    # })
+    # Current inla.group.cv interface (2025-08-28)
+    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+      which(group_cv_block == group_cv_block[i])
+    })
+
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
+      list(friends = group_cv_friends)
+    )
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
@@ -2080,6 +2163,10 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       BRU_response = c(
         point_weights,
         rep(0, NROW(ips))
+      ),
+      BRU_block = c(
+        data[[".block"]],
+        ips[[".block"]]
       ),
       BRU_weights = response_data[["BRU_weights"]][1],
       BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
@@ -2097,6 +2184,132 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
   lh
 }
+
+
+check_used_deprecation <- function(used,
+                                   include,
+                                   exclude,
+                                   include_latent,
+                                   formula) {
+  if (lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)) {
+    if (!lifecycle::is_present(include)) {
+      include <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect = include)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include)",
+        "bru_obs(used)",
+        c(
+          "The provided `include` value may be ignored.",
+          "If auto-detection doesn't work, use `bru_used(effect = include)`"
+        )
+      )
+    }
+    if (!lifecycle::is_present(exclude)) {
+      exclude <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `exclude` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(effect_exclude = exclude)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(exclude)",
+        "bru_obs(used)",
+        c(
+          "The provided `exclude` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(effect_exclude = exclude)`"
+          )
+        )
+      )
+    }
+    if (!lifecycle::is_present(include_latent)) {
+      include_latent <- NULL
+    } else {
+      bru_log_message(
+        paste0(
+          "The `include_latent` argument of `bru_obs()` is deprecated ",
+          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "If auto-detection doesn't work, use ",
+          "`used = bru_used(latent = include_latent)` instead."
+        ),
+        verbosity = 1L
+      )
+      lifecycle::deprecate_warn(
+        "2.11.0",
+        "bru_obs(include_latent)",
+        "bru_obs(used)",
+        c(
+          "The provided `include_latent` value may be ignored.",
+          paste0(
+            "If auto-detection doesn't work, ",
+            "use `bru_used(latent = include_latent)`"
+          )
+        )
+      )
+    }
+    if (is.null(used)) {
+      used <- bru_used(formula,
+                       effect = include,
+                       effect_exclude = exclude,
+                       latent = include_latent
+      )
+    }
+  }
+  used
+}
+
+bru_obs_handle_allow_combine <- function(allow_combine,
+                                         data,
+                                         response_data,
+                                         aggregate) {
+  if (!is.logical(allow_combine)) {
+    if (!is.null(aggregate)) {
+      allow_combine <- TRUE
+    } else if (!is.null(response_data)) {
+      bru_log_warn(
+        paste0(
+          "Non-null response data supplied; ",
+          "guessing allow_combine=TRUE.",
+          "\n  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else if (is.list(data) && !is.data.frame(data)) {
+      bru_log_warn(
+        paste0(
+          "Non data-frame list-like data supplied; ",
+          "guessing allow_combine=TRUE.\n",
+          "  Specify allow_combine explicitly to avoid this warning."
+        )
+      )
+      allow_combine <- TRUE
+    } else {
+      allow_combine <- FALSE
+    }
+  }
+  allow_combine
+}
+
+
 
 
 check_used_deprecation <- function(used,
@@ -2324,6 +2537,7 @@ bru_obs_handle_allow_combine <- function(allow_combine,
 #'   to having
 #'   `response_data$.block = seq_len(bru_response_size(response_data))`.
 #' @param control.family A optional `list` of `INLA::control.family` options
+#' @param control.gcpo A optional `list` of `INLA::control.gcpo` options
 #' @param tag character; Name that can be used to identify the relevant parts
 #' of INLA predictor vector output, via [bru_index()].
 #' @param options A [bru_options] options object or a list of options passed
@@ -2360,6 +2574,7 @@ bru_obs <- function(formula = . ~ .,
                     aggregate = NULL,
                     aggregate_input = NULL,
                     control.family = NULL,
+                    control.gcpo = NULL,
                     tag = NULL,
                     options = list(),
                     .envir = parent.frame(),
@@ -2371,6 +2586,16 @@ bru_obs <- function(formula = . ~ .,
 
   # Some defaults
   inla.family <- family
+
+  default.control.gcpo <- list()
+  if (is.null(control.gcpo)) {
+    control.gcpo <- default.control.gcpo
+  } else {
+    control.gcpo <- modifyList(
+      default.control.gcpo,
+      control.gcpo
+    )
+  }
 
   formula_char <- as.character(formula)
 
@@ -2486,6 +2711,7 @@ bru_obs <- function(formula = . ~ .,
       used = used,
       allow_combine = allow_combine,
       control.family = control.family,
+      control.gcpo = control.gcpo,
       tag = tag,
       BRU_original_response_data = original_response_data
     ),
@@ -2979,10 +3205,12 @@ print.bru_obs_list <- function(x, ...) {
 
 #' Utility functions for bru observation model objects
 #' @param x Object of `bru_obs` or `bru_obs_list` type
+#' @param \dots Further arguments passed on to the submethods
 #' @export
 #' @keywords internal
 #' @returns * `bru_obs_inla_family()` returns a string or vector of strings
 #' @rdname bru_obs_methods
+#' @name bru_obs_methods
 #' @seealso [summary.bru_obs()]
 bru_obs_inla_family <- function(x, ...) {
   UseMethod("bru_obs_inla_family")
@@ -3054,6 +3282,131 @@ bru_obs_control_family.bru_obs_list <- function(x,
   }
   control.family
 }
+
+#' @export
+#' @keywords internal
+#' @returns * `bru_obs_control_gcpo()` returns a list with
+#'   `INLA::control.gcpo` options, with predictor/response variable indices
+#'   unified for multi-observation models.
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo <- function(x, ...) {
+  UseMethod("bru_obs_control_gcpo")
+}
+
+#' @param index_offset integer; offset to add to indices in `control.gcpo`
+#' @param index_length integer; length of the response vector for the
+#'   observation model. Defaults to `bru_response_size(x)`.
+#' @param force_weights logical; if `TRUE`, ensure that `control.gcpo$weights`
+#'   is populated. This is needed if any of the observation models in a
+#'   `bru_obs_list` has non-null `control.gcpo$weights`.
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo.bru_obs <- function(x,
+                                         index_offset,
+                                         index_length = bru_response_size(x),
+                                         force_weights,
+                                         ...) {
+  c.gcpo <- x[["control.gcpo"]]
+  for (nm in intersect(
+    c("groups", "selection", "group.selection", "friends"),
+    names(c.gcpo)
+  )) {
+    if (nm == "groups") {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) {
+        v$idx <- v$idx + index_offset
+        v
+      })
+    } else {
+      c.gcpo[[nm]] <- lapply(c.gcpo[[nm]], function(v) v + index_offset)
+    }
+  }
+  if (!("friends" %in% names(c.gcpo))) {
+    c.gcpo[["friends"]] <- as.list(index_offset + seq_len(index_length))
+  }
+  if (force_weights && !("weights" %in% names(c.gcpo))) {
+    c.gcpo[["weights"]] <- rep(1.0, index_length)
+  } else if ("weights" %in% names(c.gcpo)) {
+    if (length(c.gcpo[["weights"]]) != index_length) {
+      stop(glue::glue(
+        "Length of control.gcpo$weights ({length(c.gcpo[['weights']])}) ",
+        "does not match response length ({index_length})"
+      ))
+    }
+  }
+  c.gcpo
+}
+
+#' @param control.gcpo list of INLA `control.gcpo` default options
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_control_gcpo.bru_obs_list <- function(x,
+                                              control.gcpo = NULL,
+                                              ...) {
+  # Update the control.gcpo information for each likelihood
+  response_sizes <- bru_response_size(x)
+  any_element <- vapply(
+    c("groups", "selection", "group.selection", "friends", "weights"),
+    function(nm) {
+      any(vapply(x, function(lh) {
+        !is.null(lh[["control.gcpo"]][[nm]])
+      }, TRUE))
+    },
+    TRUE
+  )
+  all_element <- vapply(
+    c("groups", "selection", "group.selection", "friends", "weights"),
+    function(nm) {
+      all(vapply(x, function(lh) {
+        !is.null(lh[["control.gcpo"]][[nm]])
+      }, TRUE))
+    },
+    TRUE
+  )
+  c.gcpo <- lapply(
+    seq_along(x),
+    function(k) {
+      bru_obs_control_gcpo(x[[k]],
+        index_offset = sum(response_sizes[seq_len(k - 1)]),
+        index_length = response_sizes[k],
+        force_weights = any_element["weights"]
+      )
+    }
+  )
+
+  # If given in one model, must be given in all models
+  c.gcpo.combined <- list()
+  for (nm in c("groups", "selection", "group.selection")) {
+    if (any_element[nm]) {
+      if (!all_element[nm]) {
+        stop(glue::glue(
+          "control.gcpo${nm} given in some, but not all, observation modes"
+        ))
+      }
+      c.gcpo.combined[[nm]] <-
+        do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
+    }
+  }
+  # Combine list/vector
+  c.gcpo.combined[["friends"]] <-
+    do.call("c", lapply(c.gcpo, function(lh) lh[["friends"]]))
+  if (any_element[["weights"]]) {
+    c.gcpo.combined[["weights"]] <-
+      unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
+  }
+  c.gcpo.new <- list()
+  if (!is.null(control.gcpo)) {
+    c.gcpo.new <- modifyList(c.gcpo.new, control.gcpo)
+  }
+  for (idx in seq_along(c.gcpo)) {
+    # TODO: Detect multiple conflicting option settings
+    c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo[[idx]])
+  }
+  c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo.combined)
+
+  c.gcpo.new
+}
+
+
 
 bru_obs_expr <- function(lhood, components) {
   if (is.null(lhood[["expr"]])) {
@@ -4795,7 +5148,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     inla.options,
     list(
       control.mode = list(),
-      control.predictor = list(compute = TRUE)
+      control.predictor = list(compute = TRUE),
+      control.compute = list()
     )
   )
 
@@ -4805,6 +5159,13 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   # Extract the control.family information for each likelihood
   inla.options[["control.family"]] <-
     bru_obs_control_family(lhoods, inla.options[["control.family"]])
+
+  # Combine the control.gcpo information from all the likelihoods
+  inla.options[["control.compute"]][["control.gcpo"]] <-
+    bru_obs_control_gcpo(
+      lhoods,
+      inla.options[["control.compute"]][["control.gcpo"]]
+    )
 
   initial <-
     if (is.null(initial)) {

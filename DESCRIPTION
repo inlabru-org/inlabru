@@ -125,6 +125,7 @@ Collate:
     'environment.R'
     'fmesher.R'
     'ggplot.R'
+    'hexagon_tiling.R'
     'inla.R'
     'inlabru-package.R'
     'local_testthat.R'
