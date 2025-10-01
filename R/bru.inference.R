@@ -1517,7 +1517,16 @@ bru_agg_input <- function(input, data_list, .envir) {
     }
   })
 
-  if (is.null(aggregate_input[["block_response"]])) {
+  if (!is.null(aggregate_input[["block_response"]])) {
+    if (is.null(data_list$response_data[[aggregate_input[["block_response"]]]])) {
+      msg <- glue::glue(
+        '`block_response` variable "{aggregate_input[["block_response"]]}" ',
+        'not found in `response_data`.'
+      )
+
+      bru_log_abort(msg)
+    }
+  } else {
     aggregate_input[["block_response"]] <- ".block"
   }
   if (!is.null(data_list$response_data[[aggregate_input[["block_response"]]]])) {
