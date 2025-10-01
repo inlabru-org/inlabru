@@ -30,14 +30,21 @@ cv_partition <- function(samplers,
                          ...) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- terra::rast(terra::ext(sf::st_as_sf(fmesher::fm_nonconvex_hull(samplers, ...))),
+    grid <- terra::rast(
+      terra::ext(sf::st_as_sf(
+        fmesher::fm_nonconvex_hull(samplers, ...)
+      )),
       crs = fmesher::fm_crs(samplers)$input,
-      nrows = nrows, ncols = ncols
+      nrows = nrows,
+      ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- terra::rast(terra::ext(sf::st_as_sf(fmesher::fm_nonconvex_hull(samplers, ...))),
+    grid <- terra::rast(
+      terra::ext(sf::st_as_sf(
+        fmesher::fm_nonconvex_hull(samplers, ...)
+      )),
       crs = fmesher::fm_crs(samplers)$input,
       resolution = resolution
     )
@@ -106,7 +113,7 @@ cv_partition <- function(samplers,
 #'
 #'   chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
 #'   plot(chess$white)
-#'   }
+#' }
 #'
 cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
   bnd <- fmesher::fm_nonconvex_hull(samplers, convex = -0.01, ...)

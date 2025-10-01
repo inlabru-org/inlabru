@@ -2192,8 +2192,8 @@ check_used_deprecation <- function(used,
                                    include_latent,
                                    formula) {
   if (lifecycle::is_present(include) ||
-      lifecycle::is_present(exclude) ||
-      lifecycle::is_present(include_latent)) {
+    lifecycle::is_present(exclude) ||
+    lifecycle::is_present(include_latent)) {
     if (!lifecycle::is_present(include)) {
       include <- NULL
     } else {
@@ -2268,9 +2268,9 @@ check_used_deprecation <- function(used,
     }
     if (is.null(used)) {
       used <- bru_used(formula,
-                       effect = include,
-                       effect_exclude = exclude,
-                       latent = include_latent
+        effect = include,
+        effect_exclude = exclude,
+        latent = include_latent
       )
     }
   }
@@ -2318,8 +2318,8 @@ check_used_deprecation <- function(used,
                                    include_latent,
                                    formula) {
   if (lifecycle::is_present(include) ||
-      lifecycle::is_present(exclude) ||
-      lifecycle::is_present(include_latent)) {
+    lifecycle::is_present(exclude) ||
+    lifecycle::is_present(include_latent)) {
     if (!lifecycle::is_present(include)) {
       include <- NULL
     } else {
@@ -2394,9 +2394,9 @@ check_used_deprecation <- function(used,
     }
     if (is.null(used)) {
       used <- bru_used(formula,
-                       effect = include,
-                       effect_exclude = exclude,
-                       latent = include_latent
+        effect = include,
+        effect_exclude = exclude,
+        latent = include_latent
       )
     }
   }
