@@ -34,7 +34,6 @@ library(inlabru)
 library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
-bru_safe_sp(force = TRUE)
 bru_options_set(control.compute = list(dic = TRUE)) # Activate DIC output
 ```
 
