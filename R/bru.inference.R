@@ -1382,33 +1382,42 @@ bru_is_additive.formula <- function(x, ...) {
 }
 
 
+# Returns TRUE if any argument is a Spatial* object, and gives deprecation
+# messages.
 check_sp_data_deprecation <- function(...) {
   .caller <- sys.call(-1)[[1]]
   obj <- list(...)
   nms <- names(obj)
-  lapply(nms, function(nm) {
-    if (inherits(obj[[nm]], "Spatial")) {
-      if (!is.null(.caller)) {
-        lifecycle::deprecate_warn(
-          "2.12.0.9023",
-          as.character(glue::glue(
-            "{deparse(.caller)}({nm} = ",
-            "'has deprecated support for `Spatial` input')"
-          )),
-          I("`sf` input")
-        )
+  result <- vapply(
+    nms,
+    function(nm) {
+      if (inherits(obj[[nm]], "Spatial")) {
+        if (!is.null(.caller)) {
+          lifecycle::deprecate_warn(
+            "2.12.0.9023",
+            as.character(glue::glue(
+              "{deparse(.caller)}({nm} = ",
+              "'has deprecated support for `Spatial` input')"
+            )),
+            I("`sf` input")
+          )
+        } else {
+          lifecycle::deprecate_warn(
+            "2.12.0.9023",
+            I(as.character(glue::glue(
+              "{nm} has deprecated support for `Spatial` input"
+            ))),
+            I("`sf` input")
+          )
+        }
+        TRUE
       } else {
-        lifecycle::deprecate_warn(
-          "2.12.0.9023",
-          I(as.character(glue::glue(
-            "{nm} has deprecated support for `Spatial` input"
-          ))),
-          I("`sf` input")
-        )
+        FALSE
       }
-    }
-  })
-  invisible()
+    },
+    logical(1)
+  )
+  invisible(any(result))
 }
 
 
@@ -1605,7 +1614,7 @@ bru_obs_agg <- function(lh,
 
 
 
-bru_obs_family_cp <- function(lh, options, .envir) {
+bru_obs_family_cp_sp <- function(lh, options, .envir) {
   if (!is.null(lh[["aggregate"]])) {
     stop("The 'aggregate' feature cannot be used with family='cp'.")
   }
@@ -1685,9 +1694,9 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       int.args = options[["bru_int_args"]]
     )
     if ((inherits(samplers, "Spatial") ||
-      inherits(data, "Spatial") ||
-      inherits(response[["coordinates"]], "Spatial")) &&
-      inherits(ips, "sf")) {
+         inherits(data, "Spatial") ||
+         inherits(response[["coordinates"]], "Spatial")) &&
+        inherits(ips, "sf")) {
       ips <- sf::as_Spatial(ips)
     }
   }
@@ -1713,11 +1722,11 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       sp::coordnames(ips) <- new_coordnames$ips
     } else {
       if (inherits(response, c("sf", "sfc")) ||
-        (is.list(response) &&
-          any(vapply(
-            response,
-            function(x) inherits(x, c("sf", "sfc")), TRUE
-          )))) {
+          (is.list(response) &&
+           any(vapply(
+             response,
+             function(x) inherits(x, c("sf", "sfc")), TRUE
+           )))) {
         ips <- sf::st_as_sf(ips)
         ips_is_Spatial <- FALSE
       }
@@ -1757,7 +1766,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   } else {
     data <- tibble::as_tibble(response)
     if (("geometry" %in% names(data)) &&
-      inherits(data$geometry, "sfc")) {
+        inherits(data$geometry, "sfc")) {
       sf::st_geometry(data) <- "geometry"
     }
   }
@@ -1767,7 +1776,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
   if ((length(additional_data_names) > 0) &&
-    (NROW(data_) == N_data)) {
+      (NROW(data_) == N_data)) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
   }
 
@@ -1822,12 +1831,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
-        BRU_aggregate = TRUE,
-        BRU_point_weights = point_weights
+                       BRU_aggregate = TRUE,
+                       BRU_point_weights = point_weights
       ),
       dplyr::bind_cols(ips,
-        BRU_aggregate = FALSE,
-        BRU_point_weights = 0.0
+                       BRU_aggregate = FALSE,
+                       BRU_point_weights = 0.0
       )
     )
   } else {
@@ -1854,6 +1863,218 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       proj4string = fm_CRS(data_crs),
       match.ID = FALSE
     )
+  }
+
+  lh$data <- data
+  lh$allow_combine <- TRUE
+  lh$response_data <- new_response_data
+  lh$response <- "BRU_response"
+  lh$inla.family <- "poisson"
+  lh$integration_info$ips <- NULL
+
+  lh
+}
+
+
+bru_obs_family_cp <- function(lh, options, .envir) {
+  if (inherits(lh[["data"]], "Spatial") ||
+      inherits(lh[["BRU_original_response_data"]], "Spatial") ||
+      inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
+      inherits(lh[["integration_info"]][["ips"]], "Spatial")) {
+    return(bru_obs_family_cp_sp(lh, options, .envir))
+  }
+
+  if (!is.null(lh[["aggregate"]])) {
+    stop("The 'aggregate' feature cannot be used with family='cp'.")
+  }
+
+  response <- lh[["response_data"]][[lh[["response"]]]]
+  orig_response_data <- lh[["BRU_original_response_data"]]
+  response_data <- lh[["response_data"]]
+  data <- lh[["data"]]
+  formula <- lh[["formula"]]
+  domain <- lh[["integration_info"]][["domain"]]
+  samplers <- lh[["integration_info"]][["samplers"]]
+  ips <- lh[["integration_info"]][["ips"]]
+
+  response_expr_text <- as.character(formula)[2]
+
+  # Catch and handle special cases:
+  if (is.null(response) || !inherits(response, "list")) {
+    domain_names <- trimws(strsplit(response_expr_text, split = "\\+")[[1]])
+    if (!is.null(domain_names)) {
+      # "a + b" conversion to list(a = a, b = b)
+      domain_expr <- paste0(
+        "list(",
+        paste0(
+          vapply(
+            domain_names, function(x) {
+              if (identical(x, "coordinates")) {
+                glue("{x} = sp::{x}(.data.)")
+              } else {
+                glue("{x} = {x}")
+              }
+            },
+            ""
+          ),
+          collapse = ", "
+        ),
+        ")"
+      )
+      response_expr <- rlang::parse_expr(domain_expr)
+    }
+    response <- tryCatch(
+      expr = bru_eval_in_data_context(
+        !!response_expr,
+        data = list(response_data = orig_response_data, data = data),
+        default = NULL,
+        .envir = .envir
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+
+  if (is.null(response)) {
+    stop(paste0(
+      "You called bru_obs() with family='cp' but the evaluated ",
+      "response information is NULL"
+    ))
+  }
+
+  if (is.null(ips)) {
+    if (is.null(domain)) {
+      stop(paste0(
+        "The family='cp' model requires a 'domain' specification compatible ",
+        "with 'fmesher::fm_int()'"
+      ))
+    }
+    if (!setequal(names(response), names(domain))) {
+      stop(glue("
+          Mismatch between response and domain names:
+            names(response) = ({glue_collapse(names(response), sep = ', ')})
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
+    }
+
+    ips <- fm_int(
+      domain = domain,
+      samplers = samplers,
+      int.args = options[["bru_int_args"]]
+    )
+  }
+
+  if (length(unique(response_data[["BRU_E"]])) > 1) {
+    bru_log_warn(
+      "Exposure/effort parameter E should be a scalar for likelihood 'cp'."
+    )
+  }
+
+  # TODO: check that the crs info is the same
+
+  # For non-Spatial models:
+  # Use the response data list as the actual data object, since that's now the
+  # canonical place where the point information is given.  This also allows
+  # response_data to be used when constructing the response list. This makes
+  # it a strict requirement that the predictor can be evaluated as a pure
+  # function of the domain data.  When implementing sf support, might be able
+  # to give explicit access to spatial coordinates, but otherwise the user can
+  # extract it from the geometry with st_coordinates(geometry)[,1] or similar.
+  # For Spatial models, keep the old behaviour for backwards compatibility for
+  # now, but can likely realign that in the future after more testing.
+  # Save general response data to add to response (precomputed covariates etc)
+  if (!is.null(orig_response_data)) {
+    data_ <- orig_response_data
+  } else {
+    data_ <- data
+  }
+
+  data <- tibble::as_tibble(response)
+  if (("geometry" %in% names(data)) &&
+      inherits(data$geometry, "sfc")) {
+    sf::st_geometry(data) <- "geometry"
+  }
+
+  orig_response_data <- NULL
+  N_data <- NROW(data)
+
+  # Add back additional data
+  additional_data_names <- setdiff(names(data_), names(data))
+  if ((length(additional_data_names) > 0) &&
+      (NROW(data_) == N_data)) {
+    data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
+  }
+
+  if ("geometry" %in% names(ips)) {
+    sf::st_geometry(ips) <- "geometry"
+  }
+
+  # Use 'weights' for per-point weighting of eta
+  if (length(response_data[["BRU_weights"]]) == 1L) {
+    point_weights <- rep(response_data[["BRU_weights"]], N_data)
+  } else {
+    stopifnot(length(response_data[["BRU_weights"]]) == N_data)
+    point_weights <- response_data[["BRU_weights"]]
+  }
+  response_data[["BRU_weights"]] <- 1L
+
+  if (identical(options[["bru_compress_cp"]], TRUE)) {
+    allow_combine <- TRUE
+    new_response_data <- tibble::tibble(
+      BRU_E = c(
+        0,
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        N_data,
+        rep(0, NROW(ips))
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+    if (lh$is_additive) {
+      lh$expr_text <- "BRU_EXPRESSION"
+    }
+    lh$expr_text <- glue("
+        {{
+          BRU_eta <- {{
+            {lh$expr_text}
+          }}
+          if (length(BRU_eta) == 1L) {{
+            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
+          }}
+          c(mean(BRU_point_weights[BRU_aggregate] *
+                 BRU_eta[BRU_aggregate]),
+            BRU_eta[!BRU_aggregate])
+        }}")
+    lh$expr <- parse(text = lh$expr_text)
+
+    data <- extended_bind_rows(
+      dplyr::bind_cols(data,
+                       BRU_aggregate = TRUE,
+                       BRU_point_weights = point_weights
+      ),
+      dplyr::bind_cols(ips,
+                       BRU_aggregate = FALSE,
+                       BRU_point_weights = 0.0
+      )
+    )
+  } else {
+    new_response_data <- data.frame(
+      BRU_E = c(
+        rep(0, N_data),
+        response_data[["BRU_E"]] * ips[["weight"]]
+      ),
+      BRU_response = c(
+        point_weights,
+        rep(0, NROW(ips))
+      ),
+      BRU_weights = response_data[["BRU_weights"]][1],
+      BRU_Ntrials = response_data[["BRU_Ntrials"]][1],
+      BRU_scale = response_data[["BRU_scale"]][1]
+    )
+    data <- extended_bind_rows(data, ips)
   }
 
   lh$data <- data
