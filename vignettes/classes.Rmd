@@ -151,7 +151,8 @@ info_sep_wide <- lapply(
       tidyr::pivot_wider(names_from = Class, values_from = Support) |>
       convert_NAs() |>
       dplyr::arrange(Generic)
-  })
+  }
+)
 ```
 
 ```{css,echo=FALSE}
