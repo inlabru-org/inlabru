@@ -117,7 +117,15 @@ bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @returns * `bru_index(bru)`: An `integer` vector.
 bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
-  bru_index(object[["bru_info"]][["lhoods"]], tag = tag, what = what, ...)
+  bru_index(object[["bru_info"]], tag = tag, what = what, ...)
+}
+#' @describeIn bru_index Extract the index vector for "APredictor" for one or
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination
+#'   of `tag` and `what`.
+#' @export
+#' @returns * `bru_index(bru_info)`: An `integer` vector.
+bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
+  bru_index(object[["lhoods"]], tag = tag, what = what, ...)
 }
 
 #' @export

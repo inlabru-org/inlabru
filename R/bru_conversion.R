@@ -55,7 +55,13 @@ as_bru_obs_list.bru_obs_list <- function(x, .tag = NULL) {
 #' @rdname as_bru_obs
 #' @export
 as_bru_obs_list.bru <- function(x, .tag = NULL) {
-  bru_obs_list(x[["bru_info"]][["lhoods"]])
+  as_bru_obs_list(x[["bru_info"]])
+}
+
+#' @rdname as_bru_obs
+#' @export
+as_bru_obs_list.bru_info <- function(x, .tag = NULL) {
+  bru_obs_list(x[["lhoods"]])
 }
 
 #' @title Conversion methods for `bru_comp` and `bru_comp_list` objects

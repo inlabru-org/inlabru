@@ -295,7 +295,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
     state = state[used[["effect"]]]
   )
 
-  lhood_expr <- bru_obs_expr(lhood, model[["effects"]])
+  lhood_expr <- bru_obs_expr(lhood)
   n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(

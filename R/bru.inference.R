@@ -461,7 +461,7 @@ summary.bru_info <- function(object, verbose = TRUE, ...) {
       inlabru_version = object[["inlabru_version"]],
       INLA_version = object[["INLA_version"]],
       components = summary(object[["model"]], verbose = verbose, ...),
-      lhoods = summary(object[["lhoods"]], verbose = verbose, ...)
+      lhoods = summary(as_bru_obs_list(object), verbose = verbose, ...)
     ),
     class = "summary_bru_info"
   )
@@ -682,7 +682,7 @@ bru <- function(components = ~ Intercept(1),
   if (options$bru_run) {
     result <- iinla(
       model = info[["model"]],
-      lhoods = info[["lhoods"]],
+      lhoods = as_bru_obs_list(info),
       inputs = info[["inputs"]],
       options = info[["options"]]
     )
@@ -729,7 +729,7 @@ bru_rerun <- function(result, options = list()) {
 
   result <- iinla(
     model = info[["model"]],
-    lhoods = info[["lhoods"]],
+    lhoods = as_bru_obs_list(info),
     inputs = info[["inputs"]],
     initial = result,
     options = info[["options"]]
@@ -832,11 +832,24 @@ bru_set_missing <- function(object, keep = FALSE, ...) {
   UseMethod("bru_set_missing")
 }
 #' @export
+#' @param x Object on which to apply `bru_set_missing()`
+#' @param value Value to be passed as `keep` to `bru_set_missing()`
+#' @describeIn bru_set_missing Setter method for `bru_set_missing()`
+`bru_set_missing<-` <- function(x, ..., value) {
+  object <- bru_set_missing(x, keep = value, ...)
+  object
+}
+#' @export
 #' @rdname bru_set_missing
 bru_set_missing.bru <- function(object, keep = FALSE, ...) {
   object <- bru_check_object_bru(object)
-  object[["bru_info"]][["lhoods"]] <-
-    bru_set_missing(object[["bru_info"]][["lhoods"]], keep = keep, ...)
+  bru_set_missing(object[["bru_info"]], ...) <- keep
+  object
+}
+#' @export
+#' @rdname bru_set_missing
+bru_set_missing.bru_info <- function(object, keep = FALSE, ...) {
+  bru_set_missing(object[["lhoods"]], ...) <- keep
   object
 }
 #' @export
@@ -867,10 +880,7 @@ bru_set_missing.bru_obs_list <- function(object, keep = FALSE, ...) {
     }
   }
   for (idx in idxs) {
-    object[[idx]] <- bru_set_missing(object[[idx]],
-      keep = keep[[idx]],
-      ...
-    )
+    bru_set_missing(object[[idx]], ...) <- keep[[idx]]
   }
   object
 }
@@ -883,12 +893,8 @@ bru_set_missing.bru_obs <- function(object, keep = FALSE, ...) {
   if (isFALSE(keep)) {
     keep <- -seq_len(bru_response_size(object))
   }
-  object[["response_data"]][[object[["response"]]]] <-
-    bru_set_missing(
-      object[["response_data"]][[object[["response"]]]],
-      keep = keep,
-      ...
-    )
+  bru_set_missing(object[["response_data"]][[object[["response"]]]],
+                  ...) <- keep
   object
 }
 
@@ -912,6 +918,8 @@ bru_set_missing.default <- function(object, keep = FALSE, ...) {
 #' @examplesIf bru_safe_inla()
 #' (obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
 #' bru_set_missing(obs, keep = c(1, 4))
+#' bru_set_missing(obs) <- -(1:2)
+#' obs
 #'
 bru_set_missing.data.frame <- function(object, keep = FALSE, ...) {
   if (is.null(keep) || isTRUE(keep)) {
@@ -3408,7 +3416,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 
 
 
-bru_obs_expr <- function(lhood, components) {
+bru_obs_expr <- function(lhood) {
   if (is.null(lhood[["expr"]])) {
     # Only needed pre-2.12.0.9014
     # Later versions construct expressions for all models,
@@ -4218,10 +4226,7 @@ nonlin_predictor <- function(param, state) {
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_obs_expr(
-              param[["lhoods"]][[lh_idx]],
-              param[["model"]][["effects"]]
-            ),
+            predictor = bru_obs_expr(param[["lhoods"]][[lh_idx]]),
             format = "matrix",
             n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
           )

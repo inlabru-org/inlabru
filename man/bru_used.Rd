@@ -7,6 +7,7 @@
 \alias{bru_used.expression}
 \alias{bru_used.formula}
 \alias{bru_used.bru}
+\alias{bru_used.bru_info}
 \alias{bru_used.list}
 \alias{bru_used.bru_obs}
 \alias{bru_used.bru_used}
@@ -54,6 +55,8 @@ bru_used(x = NULL, ...)
 )
 
 \method{bru_used}{bru}(x, ..., join = TRUE)
+
+\method{bru_used}{bru_info}(x, ..., join = TRUE)
 
 \method{bru_used}{list}(x, ..., join = TRUE)
 
@@ -137,6 +140,9 @@ right-hand side is used).
 
 \item \code{bru_used(bru)}: Extract the \code{bru_used} information for the collection
 of observation models used in a \code{bru} object.
+
+\item \code{bru_used(bru_info)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru_info} object.
 
 \item \code{bru_used(list)}: Extract the \code{bru_used} information for each element
 of a list, and optionally join into a single \code{bru_used} object.
