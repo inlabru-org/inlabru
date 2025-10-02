@@ -52,7 +52,7 @@ For \code{bru} and \code{bru_obs_list},
 \item{an unnamed list of the same length as the number of observation
 models, with elements compatible with the \code{bru_obs} method, or}
 \item{a named list with elements compatible with the \code{bru_obs} method,
-and only the named \code{bro_obs} models are acted upon, i.e. the elements
+and only the named \code{bru_obs} models are acted upon, i.e. the elements
 not present in the list are treated as \code{keep = TRUE}.}
 }
 

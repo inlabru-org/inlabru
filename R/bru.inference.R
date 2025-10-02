@@ -774,7 +774,7 @@ bru_rerun <- function(result, options = list()) {
 #'   \item{an unnamed list of the same length as the number of observation
 #'     models, with elements compatible with the `bru_obs` method, or}
 #'   \item{a named list with elements compatible with the `bru_obs` method,
-#'     and only the named `bro_obs` models are acted upon, i.e. the elements
+#'     and only the named `bru_obs` models are acted upon, i.e. the elements
 #'     not present in the list are treated as `keep = TRUE`.}
 #' }
 #'
