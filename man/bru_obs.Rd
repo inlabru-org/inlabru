@@ -28,7 +28,7 @@ bru_obs(
   samplers = NULL,
   ips = NULL,
   used = NULL,
-  allow_combine = NULL,
+  is_rowwise = NULL,
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
@@ -38,7 +38,8 @@ bru_obs(
   .envir = parent.frame(),
   include = deprecated(),
   exclude = deprecated(),
-  include_latent = deprecated()
+  include_latent = deprecated(),
+  allow_combine = deprecated()
 )
 
 like(
@@ -136,10 +137,12 @@ latent vectors are made available to the predictor evaluation is defined by
 \code{bru_used(formula)}, which will include all effects and latent vectors
 used by the predictor expression.}
 
-\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
-several rows of the input data to influence the same row. When \code{NULL},
-defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
-\code{list}, or the likelihood construction requires it.}
+\item{is_rowwise, allow_combine}{logical; If \code{is_rowwise} is \code{FALSE}, the
+predictor expression may involve several rows of the input data to
+influence the same row. When \code{NULL}, it defaults to \code{TRUE}, unless
+\code{response_data} is non-\code{NULL}, or \code{data} is a \code{list}, or the likelihood
+construction requires it. The \code{allow_combine} argument is a deprecated and
+inverted version, such that \code{is_rowwise = !allow_combine}.}
 
 \item{aggregate}{character ("none" or a valid name for the \code{type} argument of
 \code{\link[=bm_aggregate]{bm_aggregate()}}) or an aggregation \code{bru_mapper} object (\code{\link[=bm_aggregate]{bm_aggregate()}},

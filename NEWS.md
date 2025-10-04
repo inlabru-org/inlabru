@@ -25,6 +25,9 @@
 * Add `block_response` element to `bru_obs(aggregate_input)` list input,
   to allow specifying a block-wise response variable to match for aggregated
   predictors. (version `2.13.0.9016`)
+* Deprecate the `bru_obs(allow_combine)` argument with its logical inverse,
+  `bru_obs(is_rowwise)`, to make the meaning clearer.
+  (version `2.13.0.9017`)
 
 ## Bug fixes
 

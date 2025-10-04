@@ -10,6 +10,7 @@
 \alias{bru_used.bru_info}
 \alias{bru_used.list}
 \alias{bru_used.bru_obs}
+\alias{bru_used.bru_pred_expr}
 \alias{bru_used.bru_used}
 \alias{format.bru_used}
 \alias{summary.bru_used}
@@ -61,6 +62,8 @@ bru_used(x = NULL, ...)
 \method{bru_used}{list}(x, ..., join = TRUE)
 
 \method{bru_used}{bru_obs}(x, ...)
+
+\method{bru_used}{bru_pred_expr}(x, ...)
 
 \method{bru_used}{bru_used}(x, labels = NULL, ...)
 
@@ -147,8 +150,11 @@ of observation models used in a \code{bru_info} object.
 \item \code{bru_used(list)}: Extract the \code{bru_used} information for each element
 of a list, and optionally join into a single \code{bru_used} object.
 
-\item \code{bru_used(bru_obs)}: Extract the \code{bru_used} information for the collection
-of observation models used in a \code{bru} observation model \code{bru_obs} object.
+\item \code{bru_used(bru_obs)}: Extract the \code{bru_used} information for the observation
+model predictor used in a \code{bru} observation model \code{bru_obs} object.
+
+\item \code{bru_used(bru_pred_expr)}: Extract the \code{bru_used} information for an observation
+model predictor \code{bru_pred_expr} object.
 
 \item \code{bru_used(bru_used)}: Convenience method that takes
 an existing \code{bru_used} object and calls \code{\link[=bru_used_update]{bru_used_update()}}

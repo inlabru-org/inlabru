@@ -100,7 +100,7 @@ test_that("bru: linear predictor detection", {
   )
   expect_equal(
     as.character(bru_obs_expr(as_bru_obs_list(fit)[[1]])),
-    "x + Intercept + z_latent",
+    "x + z_latent + Intercept",
     info = "Should construct correct expression"
   )
   expect_false(

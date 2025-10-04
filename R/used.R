@@ -1,36 +1,3 @@
-# Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
-bru_used_upgrade <- function(lhoods, labels) {
-  for (k in seq_along(lhoods)) {
-    if (is.null(lhoods[[k]][["used"]]) &&
-      is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["include_components"]],
-        latent = lhoods[[k]][["include_latent"]],
-        effect_exclude = lhoods[[k]][["exclude_components"]],
-      )
-
-      lhoods[[k]][["include_components"]] <- NULL
-      lhoods[[k]][["exclude_components"]] <- NULL
-      lhoods[[k]][["include_latent"]] <- NULL
-    } else if (!is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["effect"]],
-        latent = lhoods[[k]][["latent"]]
-      )
-      lhoods[[k]][["used_components"]] <- NULL
-    } else {
-      used <- bru_used(lhoods[[k]])
-    }
-
-    used <- bru_used_update(used, labels = labels)
-    lhoods[[k]][["used"]] <- used
-  }
-  lhoods
-}
-
-
 #' Update used_component information objects
 #'
 #' Merge available component labels information with used components
@@ -59,29 +26,46 @@ bru_used_update.bru_obs_list <- function(x, labels, ...) {
 #' @rdname bru_used_update
 #' @export
 bru_used_update.bru_obs <- function(x, labels, ...) {
+  x[["pred_expr"]] <- bru_used_update(
+    x[["pred_expr"]],
+    labels = labels,
+    ...
+  )
+  x[["is_additive"]] <- x[["pred_expr"]][["is_additive"]]
+  x[["linear"]] <- x[["pred_expr"]][["is_linear"]]
+  x[["expr_text"]] <- x[["pred_expr"]][["pred_text"]]
+  x[["expr"]] <- x[["pred_expr"]][["pred_expr"]]
+  x[["used"]] <- x[["pred_expr"]][["used"]]
+  x
+}
+
+#' @rdname bru_used_update
+#' @export
+bru_used_update.bru_pred_expr <- function(x, labels, ...) {
   pre_used <- bru_used(x)
   used <- bru_used_update(pre_used, labels = labels, ...)
   if (isTRUE(x[["is_additive"]])) {
     if ((length(used$latent) > 0) ||
       (length(setdiff(pre_used$effect, used$effect)) > 0)) {
       x[["is_additive"]] <- FALSE
-      x[["linear"]] <- FALSE
+      x[["is_linear"]] <- FALSE
 
-      if (is.null(x[["expr"]])) {
-        expr_text <- paste0(pre_used$effect, collapse = " + ")
+      if (is.null(x[["pred_expr"]])) {
+        pred_text <- paste0(pre_used$effect, collapse = " + ")
         if (length(pre_used$latent) > 0) {
-          expr_text <- paste(
-            expr_text,
+          pred_text <- paste(
+            pred_text,
             paste0(pre_used$latent, "_latent", collapse = " + "),
             sep = " + "
           )
         }
-        x[["expr"]] <- parse(text = expr_text)
+        x[["pred_text"]] <- pred_text
+        x[["pred_expr"]] <- parse(text = x[["pred_text"]])
       }
     } else {
-      if (is.null(x[["expr"]])) {
-        expr_text <- paste0(used$effect, collapse = " + ")
-        x[["expr"]] <- parse(text = expr_text)
+      if (is.null(x[["pred_expr"]])) {
+        x[["pred_text"]] <- paste0(used$effect, collapse = " + ")
+        x[["pred_expr"]] <- parse(text = x[["pred_text"]])
       }
     }
   }
@@ -408,10 +392,17 @@ bru_used.list <- function(x, ..., join = TRUE) {
   used
 }
 
-#' @describeIn bru_used Extract the `bru_used` information for the collection
-#' of observation models used in a `bru` observation model `bru_obs` object.
+#' @describeIn bru_used Extract the `bru_used` information for the observation
+#'   model predictor used in a `bru` observation model `bru_obs` object.
 #' @export
 bru_used.bru_obs <- function(x, ...) {
+  bru_used(x[["pred_expr"]], ...)
+}
+
+#' @describeIn bru_used Extract the `bru_used` information for an observation
+#'   model predictor `bru_pred_expr` object.
+#' @export
+bru_used.bru_pred_expr <- function(x, ...) {
   bru_used(x[["used"]], ...)
 }
 
