@@ -1916,9 +1916,9 @@ print.summary_component <- function(x, ...) {
         if (name %in% "Label") {
           cat(glue("Label:\t{x[[name]]}"), "\n")
         } else if (name %in% "Mapper") {
-          cat(glue("  Map:\t{x[[name]]}"), "\n")
+          cat(glue("  Map:\t{glue::glue_collapse(x[[name]])}"), "\n")
         } else {
-          cat(glue("  {name}:\t{x[[name]]}"), "\n")
+          cat(glue("  {name}:\t{glue::glue_collapse(x[[name]])}"), "\n")
         }
       }
     }
