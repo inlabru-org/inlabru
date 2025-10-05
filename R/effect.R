@@ -292,6 +292,8 @@ bru_comp.character <- function(object,
   # Force evaluation of explicit inputs
   force(values)
 
+  include_weights <- !missing(weights) &&
+    (!is.null(substitute(weights)))
   include_group <- !missing(group) ||
     !missing(ngroup) || !missing(group_mapper)
   include_repl <- !missing(replicate) ||
@@ -345,7 +347,10 @@ bru_comp.character <- function(object,
     }
   }
 
-  # Convert ngroup and nrep to bru_mapper info
+  # Convert weights, ngroup, and nrep to bru_mapper info
+  if (include_weights) {
+    weights_mapper <- bm_scale()
+  }
   if (include_group) {
     if (!is.null(ngroup)) {
       if (!is.null(group_mapper)) {
@@ -411,7 +416,7 @@ bru_comp.character <- function(object,
         model = "iid"
       )
   }
-  if (!is.null(substitute(weights))) {
+  if (include_weights) {
     subcomp$weights <-
       bru_input_create(
         {{ weights }},
@@ -478,11 +483,17 @@ bru_comp.character <- function(object,
     # Add scalable multi-mapper
     component[["mapper"]] <-
       bm_pipe(
-        list(
-          mapper = bm_multi(list(
-            main = component$main$mapper
-          )),
-          scale = bm_scale()
+        c(
+          list(
+            mapper = bm_multi(list(
+              main = component$main$mapper
+            ))
+          ),
+          if (include_weights) {
+            list(scale = weights_mapper)
+          } else {
+            NULL
+          }
         )
       )
   } else {
@@ -868,24 +879,24 @@ add_mappers.bru_comp <- function(component,
     )
   )
   # Add scalable multi-mapper
-  if (is.null(component[["marginal"]])) {
-    component[["mapper"]] <-
-      bm_pipe(
-        list(
-          mapper = comp_mapper,
-          scale = bm_scale()
-        )
-      )
+  if (!is.null(component[["marginal"]])) {
+    marginal_mapper <- list(marginal = component[["marginal"]])
   } else {
-    component[["mapper"]] <-
-      bm_pipe(
-        list(
-          mapper = comp_mapper,
-          marginal = component[["marginal"]],
-          scale = bm_scale()
-        )
-      )
+    marginal_mapper <- NULL
   }
+  if (!is.null(component[["weights"]])) {
+    weights_mapper <- list(scale = bm_scale())
+  } else {
+    weights_mapper <- NULL
+  }
+  component[["mapper"]] <-
+    bm_pipe(
+      c(
+        list(mapper = comp_mapper),
+        marginal_mapper,
+        weights_mapper
+      )
+    )
 
   fcall <- component$fcall
 
