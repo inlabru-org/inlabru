@@ -892,145 +892,6 @@ bru_get_parse_data <- function(x) {
   )
 }
 
-#' @title Check for predictor expression additivity
-#' @description Checks if a predictor expression is additive or not
-#' @param x A predictor `expression`, `formula`, or parse information
-#'   `data.frame`.
-#' @param \dots Arguments passed on recursively.
-#' @param verbose logical; if `TRUE`, print diagnostic parsing information.
-#' @return `TRUE` if the expression is detected to be additive, `FALSE`
-#'   otherwise.
-#' @keywords internal
-#' @export
-bru_is_additive <- function(x, ...) {
-  UseMethod("bru_is_additive")
-}
-
-#' @rdname bru_is_additive
-#' @export
-bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
-  if (root_id == 0) {
-    root_id <- x$id[x$parent == 0]
-    if (length(root_id) != 1L) {
-      stop("Cannot determine parser root id")
-    }
-  }
-
-  x_root <- x[x$id == root_id, , drop = FALSE]
-  if (x_root$token == "SYMBOL") {
-    if (verbose) {
-      message("SYMBOL found")
-    }
-    return(TRUE)
-  }
-  if (x_root$token == "expr") {
-    if (verbose) {
-      message("expr found, may be additive")
-    }
-    x_terms <- x[x$parent == root_id, , drop = FALSE]
-    if (nrow(x_terms) < 1L) {
-      if (verbose) {
-        message("No terms found, assuming non-additive")
-      }
-      return(FALSE)
-    }
-    if (nrow(x_terms) == 1L) {
-      if (verbose) {
-        message("Only one term, checking for symbol")
-      }
-      add <- x_terms$token[1] == "SYMBOL"
-      if (add && verbose) {
-        message("SYMBOL found")
-      }
-      return(add)
-    }
-    if (nrow(x_terms) == 2L) {
-      if (x_terms$token[1] != "'+'") {
-        if (verbose) {
-          message("Only two terms and no '+' found, assuming non-additive")
-        }
-        return(FALSE)
-      }
-      if (verbose) {
-        message("'+' found, may be additive")
-      }
-      add <- bru_is_additive(
-        x = x,
-        root_id = x_terms$id[2],
-        ...,
-        verbose = verbose
-      )
-      return(all(add))
-    }
-    if (nrow(x_terms) >= 4L) {
-      if (verbose) {
-        message("More than 3 terms, assuming non-additive")
-      }
-      return(FALSE)
-    }
-    if (x_terms$token[2] == "'+'") {
-      if (verbose) {
-        message("'+' found, may be additive")
-      }
-      add <- c(
-        bru_is_additive(x = x, root_id = x_terms$id[1], verbose = verbose),
-        bru_is_additive(x = x, root_id = x_terms$id[3], verbose = verbose)
-      )
-      return(all(add))
-    }
-    if ((x_terms$token[1] == "'('") && (x_terms$token[3] == "')'")) {
-      if (x_terms$token[2] == "expr") {
-        if (verbose) {
-          message("(expr) found, may be additive")
-        }
-        add <- bru_is_additive(
-          x = x,
-          root_id = x_terms$id[2],
-          verbose = verbose
-        )
-        return(add)
-      }
-    }
-  }
-
-  if (verbose) {
-    message("No known additive structure found, assuming non-additive")
-  }
-
-  return(FALSE)
-}
-
-#' @rdname bru_is_additive
-#' @export
-bru_is_additive.character <- function(x, ...) {
-  bru_is_additive(
-    bru_get_parse_data(x),
-    root_id = 0,
-    ...
-  )
-}
-
-#' @rdname bru_is_additive
-#' @export
-bru_is_additive.expression <- function(x, ...) {
-  bru_is_additive(
-    bru_get_parse_data(as.character(x)),
-    root_id = 0,
-    ...
-  )
-}
-
-#' @rdname bru_is_additive
-#' @export
-bru_is_additive.formula <- function(x, ...) {
-  bru_is_additive(
-    bru_get_parse_data(as.character(x)[length(x)]),
-    root_id = 0,
-    ...
-  )
-}
-
-
 # Returns TRUE if any argument is a Spatial* object, and gives deprecation
 # messages.
 check_sp_data_deprecation <- function(...) {
@@ -3581,7 +3442,7 @@ generate.bru <- function(object,
           latent = NULL
         )
     }
-    used <- bru_used_update(used, labels = names(object$bru_info$model$effects))
+    used <- bru_used_update(used, labels = names(as_bru_comp_list(object)))
 
     vals <- evaluate_model(
       model = object$bru_info$model,
@@ -4801,15 +4662,16 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       result <- initial
     }
   } else if (is.list(initial)) {
-    state <- initial[intersect(names(model[["effects"]]), names(initial))]
-    for (lab in names(model[["effects"]])) {
+    comp_lst <- as_bru_comp_list(model)
+    state <- initial[intersect(names(comp_lst), names(initial))]
+    for (lab in names(comp_lst)) {
       if (is.null(state[[lab]])) {
-        state[[lab]] <- rep(0, ibm_n(model[["effects"]][[lab]][["mapper"]]))
+        state[[lab]] <- rep(0, ibm_n(comp_lst[[lab]][["mapper"]]))
       } else if (length(state[[lab]]) == 1) {
         state[[lab]] <-
           rep(
             state[[lab]],
-            ibm_n(model[["effects"]][[lab]][["mapper"]])
+            ibm_n(comp_lst[[lab]][["mapper"]])
           )
       }
     }
@@ -5046,7 +4908,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         stk.data,
         do.call(c, c(
           lapply(
-            model$effects,
+            as_bru_comp_list(model),
             function(xx) as.list(xx$env_extra)
           ),
           use.names = FALSE
@@ -5110,7 +4972,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       do.call(
         INLA::inla,
         inla.options.merged,
-        envir = environment(model$effects)
+        envir = environment(as_bru_comp_list(model))
       )
     )
 

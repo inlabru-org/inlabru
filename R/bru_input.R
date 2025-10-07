@@ -173,7 +173,7 @@ bru_input.bru_comp <- function(component,
 #' @export
 #' @rdname bru_input
 bru_input.bru_model <- function(model, lhoods, ...) {
-  bru_input(lhoods, components = model[["effects"]])
+  bru_input(lhoods, components = as_bru_comp_list(model))
 }
 
 #' @param components A [bru_comp_list].

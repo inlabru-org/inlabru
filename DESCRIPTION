@@ -109,6 +109,7 @@ Collate:
     'bru_conversion.R'
     'bru_index.R'
     'bru_input.R'
+    'bru_is.R'
     'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'

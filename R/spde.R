@@ -193,7 +193,7 @@ spde.posterior <- function(result, name, what = "range",
                            quantile = 0.95) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
-  spdespec <- result$bru_info$model$effects[[name]]$main$model
+  spdespec <- as_bru_comp_list(result)[[name]]$main$model
   spderesult <- INLA::inla.spde.result(result, name, spdespec)
 
   if (what == "matern.correlation" || what == "matern.covariance") {
@@ -211,7 +211,7 @@ spde.posterior <- function(result, name, what = "range",
       corr <- TRUE
       ylab <- "Matern Correlation"
       out <- materncov.bands(
-        result$bru_info$model$effects[[name]]$main$mapper$mesh,
+        as_bru_comp_list(result)[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = NULL,
@@ -221,7 +221,7 @@ spde.posterior <- function(result, name, what = "range",
       corr <- FALSE
       ylab <- "Matern Covariance"
       out <- materncov.bands(
-        result$bru_info$model$effects[[name]]$main$mapper$mesh,
+        as_bru_comp_list(result)[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = log.variance,

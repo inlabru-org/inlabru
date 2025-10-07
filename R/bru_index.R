@@ -180,10 +180,11 @@ bru_index.bru_model <- function(object, used, ...) {
   stopifnot(inherits(object, "bru_model"))
   included <- union(used[["effect"]], used[["latent"]])
 
+  comp_lst <- as_bru_comp_list(object)[included]
   list(
-    idx_full = bru_index(object[["effects"]][included], inla_f = FALSE),
-    idx_inla = bru_index(object[["effects"]][included], inla_f = TRUE),
-    inla_subset = inla_subset_eval(object[["effects"]][included])
+    idx_full = bru_index(comp_lst, inla_f = FALSE),
+    idx_inla = bru_index(comp_lst, inla_f = TRUE),
+    inla_subset = inla_subset_eval(comp_lst)
   )
 }
 

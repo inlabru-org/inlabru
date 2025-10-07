@@ -61,7 +61,23 @@ as_bru_obs_list.bru <- function(x, .tag = NULL) {
 #' @rdname as_bru_obs
 #' @export
 as_bru_obs_list.bru_info <- function(x, .tag = NULL) {
-  bru_obs_list(x[["lhoods"]])
+  # When/if lhoods is moved to the bru_model class, this code can be simplified.
+  if (is.null(x[["lhoods"]])) {
+    as_bru_obs_list(x[["model"]])
+  } else {
+    bru_obs_list(x[["lhoods"]])
+  }
+}
+
+#' @rdname as_bru_obs
+#' @export
+as_bru_obs_list.bru_model <- function(x, .tag = NULL) {
+  # When/if lhoods is moved to the bru_model class, this code can be simplified.
+  if (is.null(x[["lhoods"]])) {
+    bru_obs_list(list())
+  } else {
+    bru_obs_list(x[["lhoods"]])
+  }
 }
 
 #' @title Conversion methods for `bru_comp` and `bru_comp_list` objects
@@ -112,7 +128,21 @@ as_bru_comp_list.bru_comp <- function(x, ...) {
 #' @describeIn as_bru_comp Extract the component list from a [bru()] object.
 #' @export
 as_bru_comp_list.bru <- function(x, ...) {
-  bru_comp_list(x[["bru_info"]][["model"]][["effects"]], ...)
+  as_bru_comp_list(x[["bru_info"]], ...)
+}
+
+#' @describeIn as_bru_comp Extract the component list from a [bru_info()]
+#'   object.
+#' @export
+as_bru_comp_list.bru_info <- function(x, ...) {
+  as_bru_comp_list(x[["model"]], ...)
+}
+
+#' @describeIn as_bru_comp Extract the component list from a [bru_model()]
+#'   object.
+#' @export
+as_bru_comp_list.bru_model <- function(x, ...) {
+  as_bru_comp_list(x[["effects"]], ...)
 }
 
 #' @rdname as_bru_comp

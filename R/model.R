@@ -155,11 +155,16 @@ summary.bru_model <- function(object, ...) {
   result <- structure(
     list(
       components =
-        summary(object[["effects"]], ...),
-      lhoods = if (is.null(object[["lhoods"]])) {
-        NULL
-      } else {
-        summary(object[["lhoods"]], ...)
+        summary(as_bru_comp_list(object), ...),
+      lhoods = {
+        # Once lhoods is moved into bru_model, the NULL part will no longer be
+        # needed, and as_bru_obs_list() can be used instead.
+        bru_obs_lst <- object[["lhoods"]]
+        if (is.null(bru_obs_lst)) {
+          NULL
+        } else {
+          summary(bru_obs_lst, ...)
+        }
       }
     ),
     class = "summary_bru_model"
@@ -238,20 +243,21 @@ evaluate_model <- function(model,
                            used = NULL,
                            n_pred = NULL,
                            ...) {
-  used <- bru_used(used, labels = names(model$effects))
+  comp_lst <- as_bru_comp_list(model)
+  used <- bru_used(used, labels = names(comp_lst))
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input)) {
     input <- bru_input(
-      components = model$effects[used$effect],
+      components = comp_lst[used$effect],
       data = data
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
     comp_simple <- ibm_simplify(
-      model$effects[used$effect],
+      comp_lst[used$effect],
       input = input,
       inla_f = TRUE
     )
@@ -322,7 +328,7 @@ evaluate_state <- function(model,
     )
   } else if (is.null(result)) {
     state <- list(lapply(
-      model[["effects"]],
+      as_bru_comp_list(model),
       function(x) {
         rep(0.0, ibm_n(x[["mapper"]]))
       }
@@ -491,7 +497,8 @@ evaluate_predictor <- function(model,
       parent.frame()
     }
 
-  used <- bru_used(used, labels = names(model$effects))
+  comp_lst <- as_bru_comp_list(model)
+  used <- bru_used(used, labels = names(comp_lst))
 
   # General evaluation environment
   envir <- new.env(parent = enclos)
@@ -531,18 +538,18 @@ evaluate_predictor <- function(model,
   # Rename component states from label to label_latent
   state_names <- as.list(expand_labels(
     names(state[[1]]),
-    names(model$effects),
+    names(comp_lst),
     suffix = "_latent"
   ))
   names(state_names) <- names(state[[1]])
 
   # Construct _eval function names
   eval_names <- as.list(expand_labels(
-    intersect(names(state[[1]]), names(model$effects)),
-    intersect(names(state[[1]]), names(model$effects)),
+    intersect(names(state[[1]]), names(comp_lst)),
+    intersect(names(state[[1]]), names(comp_lst)),
     suffix = "_eval"
   ))
-  names(eval_names) <- intersect(names(state[[1]]), names(model$effects))
+  names(eval_names) <- intersect(names(state[[1]]), names(comp_lst))
 
   eval_fun_factory <-
     function(.comp, .envir, .enclos) {
@@ -648,7 +655,7 @@ evaluate_predictor <- function(model,
     assign(
       eval_names[[nm]],
       eval_fun_factory(
-        model$effects[[nm]],
+        comp_lst[[nm]],
         .envir = envir,
         .enclos = enclos
       ),
@@ -810,7 +817,7 @@ ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
       input,
       function(inp) {
         ibm_linear(
-          model[["effects"]],
+          as_bru_comp_list(model),
           input = inp,
           state = state,
           ...
@@ -873,7 +880,7 @@ ibm_simplify.bru_model <- function(mapper, input = NULL, state = NULL, ...) {
       input,
       function(inp) {
         ibm_simplify(
-          model[["effects"]],
+          as_bru_comp_list(model),
           input = inp,
           state = state,
           ...

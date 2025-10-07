@@ -9,6 +9,7 @@
 \alias{as_bru_obs_list.bru_obs_list}
 \alias{as_bru_obs_list.bru}
 \alias{as_bru_obs_list.bru_info}
+\alias{as_bru_obs_list.bru_model}
 \title{Conversion methods for \code{bru_obs} and \code{bru_obs_list} objects}
 \usage{
 as_bru_obs(x, ...)
@@ -26,6 +27,8 @@ as_bru_obs_list(x, .tag = NULL)
 \method{as_bru_obs_list}{bru}(x, .tag = NULL)
 
 \method{as_bru_obs_list}{bru_info}(x, .tag = NULL)
+
+\method{as_bru_obs_list}{bru_model}(x, .tag = NULL)
 }
 \arguments{
 \item{x}{An object to convert to \link{bru_obs} or \link{bru_obs_list}}

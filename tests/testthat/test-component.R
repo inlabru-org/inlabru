@@ -451,11 +451,11 @@ test_that("Component inputs: non-numeric input detection", {
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
-  input <- bru_input(model$effects$field, data = df)
+  input <- bru_input(as_bru_comp_list(model)$field, data = df)
 
   expect_error(
     ibm_eval(
-      model$effects$field$mapper,
+      as_bru_comp_list(model)$field$mapper,
       input = input,
       state = rep(1, fm_dof(mesh))
     ),

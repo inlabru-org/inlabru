@@ -315,10 +315,12 @@ bru_compute_linearisation.bru_obs <- function(lhood,
   offset <- pred0
   # Either this loop or the internal bru_comp specific loop
   # can in principle be parallelised.
+  comp_lst <- as_bru_comp_list(model)
+  additive_and_rowwise <- bru_is_additive(lhood) &&
+    lhood[["pred_expr"]][["is_rowwise"]]
   for (label in union(used[["effect"]], used[["latent"]])) {
-    if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
-      if (lhood[["pred_expr"]][["is_additive"]] &&
-        lhood[["pred_expr"]][["is_rowwise"]]) {
+    if (ibm_n(comp_lst[[label]][["mapper"]]) > 0) {
+      if (additive_and_rowwise) {
         # If additive and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
@@ -338,7 +340,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
       } else {
         B[[label]] <-
           bru_compute_linearisation(
-            model[["effects"]][[label]],
+            comp_lst[[label]],
             model = model,
             lhood_expr = lhood_expr,
             data = data,
