@@ -2883,36 +2883,25 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 
 
 bru_obs_expr <- function(lhood) {
-  if (is.null(lhood[["expr"]])) {
-    # Only needed pre-2.12.0.9014
-    # Later versions construct expressions for all models,
-    # when calling bru_used_update.bru_obs()
-    expr_text <- "BRU_EXPRESSION"
-    if (utils::packageVersion("inlabru") >= "2.12.0.9014") {
-      warning(
-        paste0(
-          "Code comment in `bru_obs_expr` claims lhood[['expr']] cannot ",
-          "be null, but it is null."
-        ),
-        immediate. = TRUE
-      )
-    }
-  } else {
-    expr_text <- as.character(lhood[["expr"]])
+  pred_text <- lhood[["pred_expr"]]$pred_text
+  if (is.null(pred_text)) {
+    pred_text <- "BRU_EXPRESSION"
   }
   if (grepl(
     pattern = "BRU_EXPRESSION",
-    x = expr_text
+    x = pred_text,
+    fixed = TRUE
   )) {
     included <- bru_used(lhood)[["effect"]]
-    expr_text <-
+    pred_text <-
       gsub(
         pattern = "BRU_EXPRESSION",
         replacement = paste0(included, collapse = " + "),
-        x = expr_text
+        x = pred_text,
+        fixed = TRUE
       )
   }
-  parse(text = expr_text)
+  parse(text = pred_text)
 }
 
 
