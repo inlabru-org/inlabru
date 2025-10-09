@@ -59,4 +59,3 @@ object.
 \seealso{
 \code{\link[=as_bru_obs]{as_bru_obs()}}, \code{\link[=as_bru_obs_list]{as_bru_obs_list()}}
 }
-\keyword{internal}

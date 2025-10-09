@@ -6,7 +6,6 @@
 #' @param x An object to convert to [bru_obs] or [bru_obs_list]
 #' @param \dots Additional arguments passed to sub-methods.
 #' @returns An object of class [bru_obs] or [bru_obs_list].
-#' @keywords internal
 #' @export
 #' @seealso [as_bru_comp_list()]
 as_bru_obs <- function(x, ...) {
@@ -86,7 +85,6 @@ as_bru_obs_list.bru_model <- function(x, .tag = NULL) {
 #' @param x An object to convert to [bru_comp] or [bru_comp_list]
 #' @param \dots Additional arguments passed on to [bru_comp_list()].
 #' @returns An object of class [bru_comp_list].
-#' @keywords internal
 #' @export
 #' @rdname as_bru_comp
 #' @name as_bru_comp

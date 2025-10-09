@@ -148,4 +148,3 @@ bru_index(fit, what = "missing")
 Fabian E. Bachl \email{bachlfab@gmail.com},
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
-\keyword{internal}

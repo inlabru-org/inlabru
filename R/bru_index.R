@@ -129,7 +129,6 @@ bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
 }
 
 #' @export
-#' @keywords internal
 #' @param object A [component].
 #' @param inla_f logical; when `TRUE`, must result in
 #' values compatible with `INLA::f(...)`

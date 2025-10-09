@@ -292,10 +292,7 @@ bru <- function(components = ~ Intercept(1),
   )
 
   # Set max iterations to 1 if all likelihood formulae are linear
-  if (all(vapply(
-    bru.model[["lhoods"]],
-    function(lh) isTRUE(lh[["linear"]]), TRUE
-  ))) {
+  if (all(vapply(bru.model[["lhoods"]], bru_is_linear, TRUE))) {
     options$bru_max_iter <- 1
   }
 
@@ -1116,21 +1113,19 @@ bru_obs_agg <- function(lh,
       .envir = .envir
     )
 
-    pred_text <- lh$pred_expr$pred_text
-    if (is.null(pred_text)) {
-      pred_text <- "BRU_EXPRESSION"
-    }
+    pred_text <- bru_pred_expr(lh, format = "text_raw")
     pred_text <- glue(
       "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
       " state = {{{pred_text}}})}}"
     )
-    lh$pred_expr <- bru_pred_expr(pred_text,
+    lh$pred_expr <- bru_pred_expr(
+      pred_text,
       used = lh$pred_expr$used,
+      is_rowwise = FALSE,
       .envir = lh$pred_expr$.envir
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- FALSE
-    lh$pred_expr$is_rowwise <- FALSE
     lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
     lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
 
@@ -1361,10 +1356,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
         n_block = n_block
       )
 
-    pred_text <- lh$pred_expr$pred_text
-    if (is.null(pred_text)) {
-      pred_text <- "BRU_EXPRESSION"
-    }
+    pred_text <- bru_pred_expr(lh, format = "text_raw")
     pred_text <- glue("
         {{
           BRU_eta <- {{
@@ -1380,14 +1372,15 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
                 BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
         }}")
-    old_pred_expr <- lh$pred_expr
-    lh$pred_expr <- bru_pred_expr(pred_text,
+    old_pred_expr <- bru_pred_expr(lh)
+    lh$pred_expr <- bru_pred_expr(
+      pred_text,
       used = lh$pred_expr$used,
+      is_rowwise = FALSE,
       .envir = lh$pred_expr$.envir
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
-    lh$pred_expr$is_rowwise <- FALSE
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
@@ -1475,7 +1468,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   samplers <- lh[["integration_info"]][["samplers"]]
   ips <- lh[["integration_info"]][["ips"]]
 
-  response_expr_text <- lh$pred_expr$resp_text
+  response_expr_text <- bru_pred_expr(lh)$resp_text
 
   # Catch and handle special cases:
   if (is.null(response) || !inherits(response, "list")) {
@@ -1632,10 +1625,8 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         n_block = n_block
       )
 
-    pred_text <- lh$pred_expr$pred_text
-    if (is.null(pred_text)) {
-      pred_text <- "BRU_EXPRESSION"
-    }
+    old_pred_expr <- bru_pred_expr(lh)
+    pred_text <- bru_pred_expr(old_pred_expr, format = "text_raw")
     pred_text <- glue("
         {{
           BRU_eta <- {{
@@ -1651,14 +1642,14 @@ bru_obs_family_cp <- function(lh, options, .envir) {
                 BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
         }}")
-    old_pred_expr <- lh$pred_expr
-    lh$pred_expr <- bru_pred_expr(pred_text,
+    lh$pred_expr <- bru_pred_expr(
+      pred_text,
       used = lh$pred_expr$used,
+      is_rowwise = FALSE,
       .envir = lh$pred_expr$.envir
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
-    lh$pred_expr$is_rowwise <- FALSE
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
@@ -1853,62 +1844,6 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 }
 
 
-
-bru_pred_expr <- function(x, used = NULL, .envir = parent.frame()) {
-  resp_text <- NULL
-  if (inherits(x, "formula")) {
-    formula_text <- deparse1(x, collapse = "\n")
-    x <- as.character(x)
-    pred_text <- x[length(x)]
-    if (length(x) > 2) {
-      resp_text <- x[2]
-    }
-  } else {
-    pred_text <- x
-    formula_text <- glue::glue("~ {pred_text}")
-  }
-  is_additive <- bru_is_additive(pred_text)
-  is_additive_dot <- identical(pred_text, ".")
-  if (!is_additive_dot) {
-    pred_expr <- parse(text = pred_text)
-  } else {
-    pred_text <- NULL
-    pred_expr <- NULL
-  }
-  if (is.null(resp_text)) {
-    resp_expr <- NULL
-  } else {
-    resp_expr <- parse(text = resp_text)
-  }
-  structure(
-    list(
-      formula_text = formula_text,
-      pred_text = pred_text,
-      pred_expr = pred_expr,
-      is_additive = is_additive,
-      # Also depends on component defs, so may be changed later:
-      is_linear = is_additive,
-      is_rowwise = NULL,
-      used = if (is.null(used)) bru_used(pred_text) else used,
-      .envir = .envir,
-      resp_text = resp_text,
-      resp_expr = resp_expr
-    ),
-    class = "bru_pred_expr"
-  )
-}
-
-bru_obs_pred_expr_deprecation_fallback <- function(lh) {
-  # return(lh)
-  lh$is_additive <- lh$pred_expr$is_additive
-  # Also depends on component defs, so may be changed later:
-  lh$linear <- lh$pred_expr$is_linear
-  lh$expr_text <- lh$pred_expr$pred_text
-  lh$expr <- lh$pred_expr$pred_expr
-  lh$used <- lh$pred_expr$used
-  lh$allow_combine <- !lh$pred_expr$is_rowwise
-  lh
-}
 
 
 
@@ -2544,10 +2479,10 @@ summary.bru_obs <- function(object, verbose = TRUE, ...) {
       family = object[["family"]],
       data_class = class(object[["data"]]),
       response_class = class(object[["response_data"]][[object[["response"]]]]),
-      predictor = glue::glue("{object$pred_expr$formula_text}"),
-      is_additive = object[["pred_expr"]][["is_additive"]],
-      is_linear = object[["pred_expr"]][["is_linear"]],
-      is_rowwise = object[["pred_expr"]][["is_rowwise"]],
+      predictor = glue::glue("{bru_pred_expr(object, format = 'formula_text')}"),
+      is_additive = bru_is_additive(object),
+      is_linear = bru_is_linear(object),
+      is_rowwise = bru_is_rowwise(object),
       used = bru_used(object),
       tag = object[["tag"]]
     ),
@@ -2878,30 +2813,6 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
   c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo.combined)
 
   c.gcpo.new
-}
-
-
-
-bru_obs_expr <- function(lhood) {
-  pred_text <- lhood[["pred_expr"]]$pred_text
-  if (is.null(pred_text)) {
-    pred_text <- "BRU_EXPRESSION"
-  }
-  if (grepl(
-    pattern = "BRU_EXPRESSION",
-    x = pred_text,
-    fixed = TRUE
-  )) {
-    included <- bru_used(lhood)[["effect"]]
-    pred_text <-
-      gsub(
-        pattern = "BRU_EXPRESSION",
-        replacement = paste0(included, collapse = " + "),
-        x = pred_text,
-        fixed = TRUE
-      )
-  }
-  parse(text = pred_text)
 }
 
 
@@ -3681,7 +3592,9 @@ nonlin_predictor <- function(param, state) {
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_obs_expr(param[["lhoods"]][[lh_idx]]),
+            predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
+              format = "expression"
+            ),
             format = "matrix",
             n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
           )

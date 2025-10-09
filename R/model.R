@@ -121,14 +121,15 @@ bru_model <- function(components,
 
   # Check linearity
   for (lh in seq_along(lhoods)) {
-    if (lhoods[[lh]][["linear"]]) {
+    if (bru_is_linear(lhoods[[lh]])) {
       used_lh <- bru_used(lhoods[[lh]])
-      used_lh <- unique(c(used_lh$effect, used_lh$latent))
-      lhoods[[lh]][["linear"]] <-
-        all(vapply(components[used_lh], function(cmp) {
+      lhoods[[lh]][["pred_expr"]][["is_linear"]] <-
+        (length(used_lh$latent) == 0) &&
+        all(vapply(components[used_lh$effect], function(cmp) {
           ibm_is_linear(cmp$mapper)
         }, TRUE))
     }
+    lhoods[[lh]] <- bru_obs_pred_expr_deprecation_fallback(lhoods[[lh]])
   }
 
   # Make model

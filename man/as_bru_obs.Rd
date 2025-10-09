@@ -49,4 +49,3 @@ objects.
 \seealso{
 \code{\link[=as_bru_comp_list]{as_bru_comp_list()}}
 }
-\keyword{internal}

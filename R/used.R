@@ -31,11 +31,7 @@ bru_used_update.bru_obs <- function(x, labels, ...) {
     labels = labels,
     ...
   )
-  x[["is_additive"]] <- x[["pred_expr"]][["is_additive"]]
-  x[["linear"]] <- x[["pred_expr"]][["is_linear"]]
-  x[["expr_text"]] <- x[["pred_expr"]][["pred_text"]]
-  x[["expr"]] <- x[["pred_expr"]][["pred_expr"]]
-  x[["used"]] <- x[["pred_expr"]][["used"]]
+  x <- bru_obs_pred_expr_deprecation_fallback(x)
   x
 }
 
@@ -53,6 +49,7 @@ bru_used_update.bru_pred_expr <- function(x, labels, ...) {
       if (is.null(x[["pred_expr"]])) {
         pred_text <- paste0(pre_used$effect, collapse = " + ")
         if (length(pre_used$latent) > 0) {
+          x[["is_rowwise"]] <- FALSE
           pred_text <- paste(
             pred_text,
             paste0(pre_used$latent, "_latent", collapse = " + "),

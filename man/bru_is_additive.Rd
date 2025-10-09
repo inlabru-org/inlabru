@@ -2,7 +2,6 @@
 % Please edit documentation in R/bru_is.R
 \name{bru_is_additive}
 \alias{bru_is_additive}
-\alias{bru_is_additive.data.frame}
 \alias{bru_is_additive.character}
 \alias{bru_is_additive.expression}
 \alias{bru_is_additive.formula}
@@ -13,13 +12,11 @@
 \usage{
 bru_is_additive(x, ...)
 
-\method{bru_is_additive}{data.frame}(x, root_id = 0, ..., verbose = FALSE)
+\method{bru_is_additive}{character}(x, ..., verbose = FALSE)
 
-\method{bru_is_additive}{character}(x, ...)
+\method{bru_is_additive}{expression}(x, ..., verbose = FALSE)
 
-\method{bru_is_additive}{expression}(x, ...)
-
-\method{bru_is_additive}{formula}(x, ...)
+\method{bru_is_additive}{formula}(x, ..., verbose = FALSE)
 
 \method{bru_is_additive}{bru_pred_expr}(x, ...)
 
@@ -42,4 +39,8 @@ otherwise.
 \description{
 Checks if a predictor expression is additive or not
 }
-\keyword{internal}
+\examples{
+bru_is_additive(~ x + y)
+bru_is_additive(~ x * y)
+
+}

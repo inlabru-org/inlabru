@@ -34,6 +34,7 @@ Other mapper methods:
 \code{\link{ibm_eval2}()},
 \code{\link{ibm_invalid_output}()},
 \code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
 \code{\link{ibm_jacobian}()},
 \code{\link{ibm_linear}()},
 \code{\link{ibm_n}()},

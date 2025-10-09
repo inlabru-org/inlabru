@@ -112,6 +112,19 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 ibm_is_linear <- function(mapper, ...) {
   UseMethod("ibm_is_linear")
 }
+#' @title Check if a mapper is rowwise
+#' @description
+#' Implementations must return `TRUE` or `FALSE`.
+#' If `TRUE` (returned by the default method unless the mapper
+#' contains an `is_rowwise` variable), users of the mapper
+#' may assume the mapper uses its inputs in "rowwise" manner, so that
+#' blockwise evaluation is always possible.
+#' @export
+#' @family mapper methods
+#' @inheritParams ibm_n
+ibm_is_rowwise <- function(mapper, ...) {
+  UseMethod("ibm_is_rowwise")
+}
 
 #' @title Jacobian of a mapper
 #' @description
@@ -838,6 +851,14 @@ make_bm_class_from_old <- function(mapper) {
     # Remove the bru_mapper_ prefix, and add bm_ prefix
     cls[idx] <- sub("^bru_mapper_", "bm_", cls[idx])
     class(mapper) <- cls
+
+    if (inherits(
+      mapper,
+      c("bm_aggregate", "bm_multi", "bm_collect", "bm_sum", "bm_pipe")
+    )) {
+      mapper[["is_rowwise"]] <- FALSE
+    }
+
     return(mapper)
   }
   NULL
@@ -913,6 +934,21 @@ ibm_is_linear.default <- function(mapper, ...) {
   }
   if (!is.null(mapper[["is_linear"]])) {
     mapper[["is_linear"]]
+  } else {
+    TRUE
+  }
+}
+
+#' @describeIn ibm_is_rowwise
+#' Returns logical
+#' `is_rowwise` from the mapper object if it exists, and otherwise `TRUE`.
+#' @export
+ibm_is_rowwise.default <- function(mapper, ...) {
+  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+    return(ibm_is_rowwise(mapper_new, ...))
+  }
+  if (!is.null(mapper[["is_rowwise"]])) {
+    mapper[["is_rowwise"]]
   } else {
     TRUE
   }
@@ -2294,7 +2330,8 @@ bm_aggregate <- function(rescale = FALSE,
   bru_mapper_define(
     list(
       rescale = rescale,
-      n_block = n_block
+      n_block = n_block,
+      is_rowwise = FALSE
     ),
     new_class = "bm_aggregate"
   )
@@ -2468,6 +2505,7 @@ bm_logsumexp <- function(rescale = FALSE,
     list(
       rescale = rescale,
       n_block = n_block,
+      is_rowwise = FALSE,
       is_linear = FALSE
     ),
     new_class = c("bm_logsumexp", "bm_aggregate")
@@ -2596,7 +2634,9 @@ bm_logitaverage <- function(n_block = NULL) {
   # Inherit class bm_aggregate to reuse common methods
   bru_mapper_define(
     list(
+      rescale = TRUE,
       n_block = n_block,
+      is_rowwise = FALSE,
       is_linear = FALSE
     ),
     new_class = c("bm_logitaverage", "bm_aggregate")
@@ -3009,9 +3049,11 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
 bm_pipe <- function(mappers) {
   mappers <- as_bm_list(mappers)
   is_linear_multi <- vapply(mappers, function(x) ibm_is_linear(x), TRUE)
+  is_rowwise_multi <- vapply(mappers, function(x) ibm_is_rowwise(x), TRUE)
   n_multi <- vapply(mappers, function(x) as.integer(ibm_n(x)), 0L)
   n <- ibm_n(mappers[[1]])
   is_linear <- all(is_linear_multi)
+  is_rowwise <- all(is_rowwise_multi)
   the_names <- names(mappers)
   if (is.null(the_names)) {
     the_names <- as.character(seq_along(mappers))
@@ -3024,6 +3066,7 @@ bm_pipe <- function(mappers) {
       mappers = mappers,
       is_linear_multi,
       is_linear = is_linear,
+      is_rowwise = is_rowwise,
       n_multi = n_multi,
       n = n,
       names = the_names
@@ -3287,11 +3330,13 @@ bm_multi <- function(mappers, simplify = FALSE) {
     values_inla_multi = lapply(mappers, function(x) {
       ibm_values(x, inla_f = TRUE)
     }),
-    is_linear_multi = lapply(mappers, ibm_is_linear)
+    is_linear_multi = lapply(mappers, ibm_is_linear),
+    is_rowwise_multi = lapply(mappers, ibm_is_rowwise)
   )
   mapper[["n"]] <- prod(unlist(mapper[["n_multi"]]))
   mapper[["n_inla"]] <- prod(unlist(mapper[["n_inla_multi"]]))
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
+  mapper[["is_rowwise"]] <- all(unlist(mapper[["is_rowwise_multi"]]))
 
   if (!mapper[["is_linear"]]) {
     stop("bm_multi sub-mappers must be linear mappers")

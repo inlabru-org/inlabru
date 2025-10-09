@@ -10,6 +10,7 @@
 \alias{bru_is_linear.bru_pred_expr}
 \alias{bru_is_linear.bru_comp_list}
 \alias{bru_is_linear.bru_comp}
+\alias{bru_is_linear.bru_mapper}
 \title{Check for predictor linearity}
 \usage{
 bru_is_linear(x, ...)
@@ -29,6 +30,8 @@ bru_is_linear(x, ...)
 \method{bru_is_linear}{bru_comp_list}(x, ...)
 
 \method{bru_is_linear}{bru_comp}(x, ...)
+
+\method{bru_is_linear}{bru_mapper}(x, ...)
 }
 \arguments{
 \item{x}{A object containing a predictor definition}
@@ -42,4 +45,10 @@ otherwise.
 \description{
 Checks if a predictor expression is linear (or affine)
 }
-\keyword{internal}
+\examples{
+bru_is_linear(bru_pred_expr(~ x + y))
+bru_is_linear(bru_pred_expr(~ x * y))
+bru_is_linear(bm_scale())
+bru_is_linear(bm_logsumexp())
+
+}

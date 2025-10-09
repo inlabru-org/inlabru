@@ -34,11 +34,13 @@ bm_collect <- function(mappers, hidden = FALSE) {
     n_multi = lapply(mappers, ibm_n),
     values_multi = lapply(mappers, ibm_values),
     hidden = hidden,
-    is_linear_multi = lapply(mappers, ibm_is_linear)
+    is_linear_multi = lapply(mappers, ibm_is_linear),
+    is_rowwise_multi = lapply(mappers, ibm_is_rowwise)
   )
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
+  mapper[["is_rowwise"]] <- hidden && all(mapper[["is_rowwise_multi"]][[1]])
   bru_mapper_define(mapper, new_class = "bm_collect")
 }
 

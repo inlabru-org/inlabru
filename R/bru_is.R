@@ -4,8 +4,13 @@
 #' @param \dots Arguments passed on recursively.
 #' @return `TRUE` if the expression is detected to be linear, `FALSE`
 #'   otherwise.
-#' @keywords internal
 #' @export
+#' @examples
+#' bru_is_linear(bru_pred_expr(~ x + y))
+#' bru_is_linear(bru_pred_expr(~ x * y))
+#' bru_is_linear(bm_scale())
+#' bru_is_linear(bm_logsumexp())
+#'
 bru_is_linear <- function(x, ...) {
   UseMethod("bru_is_linear")
 }
@@ -49,7 +54,12 @@ bru_is_linear.bru_comp_list <- function(x, ...) {
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_comp <- function(x, ...) {
-  ibm_is_linear(x[["mapper"]])
+  bru_is_linear(x[["mapper"]])
+}
+#' @rdname bru_is_linear
+#' @export
+bru_is_linear.bru_mapper <- function(x, ...) {
+  ibm_is_linear(x)
 }
 
 
@@ -61,15 +71,16 @@ bru_is_linear.bru_comp <- function(x, ...) {
 #' @param verbose logical; if `TRUE`, print diagnostic parsing information.
 #' @return `TRUE` if the expression is detected to be additive, `FALSE`
 #'   otherwise.
-#' @keywords internal
 #' @export
+#' @examples
+#' bru_is_additive(~ x + y)
+#' bru_is_additive(~ x * y)
+#'
 bru_is_additive <- function(x, ...) {
   UseMethod("bru_is_additive")
 }
 
-#' @rdname bru_is_additive
-#' @export
-bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
+bru_is_additive_data_frame <- function(x, root_id = 0, ..., verbose = FALSE) {
   if (root_id == 0) {
     root_id <- x$id[x$parent == 0]
     if (length(root_id) != 1L) {
@@ -115,7 +126,7 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
       if (verbose) {
         message("'+' found, may be additive")
       }
-      add <- bru_is_additive(
+      add <- bru_is_additive_data_frame(
         x = x,
         root_id = x_terms$id[2],
         ...,
@@ -134,8 +145,16 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
         message("'+' found, may be additive")
       }
       add <- c(
-        bru_is_additive(x = x, root_id = x_terms$id[1], verbose = verbose),
-        bru_is_additive(x = x, root_id = x_terms$id[3], verbose = verbose)
+        bru_is_additive_data_frame(
+          x = x,
+          root_id = x_terms$id[1],
+          verbose = verbose
+        ),
+        bru_is_additive_data_frame(
+          x = x,
+          root_id = x_terms$id[3],
+          verbose = verbose
+        )
       )
       return(all(add))
     }
@@ -144,7 +163,7 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
         if (verbose) {
           message("(expr) found, may be additive")
         }
-        add <- bru_is_additive(
+        add <- bru_is_additive_data_frame(
           x = x,
           root_id = x_terms$id[2],
           verbose = verbose
@@ -163,8 +182,8 @@ bru_is_additive.data.frame <- function(x, root_id = 0, ..., verbose = FALSE) {
 
 #' @rdname bru_is_additive
 #' @export
-bru_is_additive.character <- function(x, ...) {
-  bru_is_additive(
+bru_is_additive.character <- function(x, ..., verbose = FALSE) {
+  bru_is_additive_data_frame(
     bru_get_parse_data(x),
     root_id = 0,
     ...
@@ -173,8 +192,8 @@ bru_is_additive.character <- function(x, ...) {
 
 #' @rdname bru_is_additive
 #' @export
-bru_is_additive.expression <- function(x, ...) {
-  bru_is_additive(
+bru_is_additive.expression <- function(x, ..., verbose = FALSE) {
+  bru_is_additive_data_frame(
     bru_get_parse_data(as.character(x)),
     root_id = 0,
     ...
@@ -183,8 +202,8 @@ bru_is_additive.expression <- function(x, ...) {
 
 #' @rdname bru_is_additive
 #' @export
-bru_is_additive.formula <- function(x, ...) {
-  bru_is_additive(
+bru_is_additive.formula <- function(x, ..., verbose = FALSE) {
+  bru_is_additive_data_frame(
     bru_get_parse_data(as.character(x)[length(x)]),
     root_id = 0,
     ...
@@ -206,4 +225,52 @@ bru_is_additive.bru_obs <- function(x, ...) {
 #' @export
 bru_is_additive.bru_obs_list <- function(x, ...) {
   vapply(x, function(lh) bru_is_linear(lh, ...), logical(1))
+}
+
+
+
+
+#' @title Check for predictor rowwise evaluability
+#' @description Checks if a predictor expression may be evaluated rowwise
+#' @param x An object containing a predictor definition
+#' @param \dots Arguments passed on to submethods.
+#' @return `TRUE` if the expression is believed to be rowwise, `FALSE`
+#'   otherwise.
+#' @export
+#' @examples
+#' bru_is_rowwise(bru_pred_expr(~ x + y))
+#'
+bru_is_rowwise <- function(x, ...) {
+  UseMethod("bru_is_rowwise")
+}
+
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_pred_expr <- function(x, ...) {
+  isTRUE(x[["is_rowwise"]])
+}
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_obs <- function(x, ...) {
+  bru_is_rowwise(x[["pred_expr"]], ...)
+}
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_obs_list <- function(x, ...) {
+  vapply(x, function(lh) bru_is_rowwise(lh, ...), logical(1))
+}
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_comp_list <- function(x, ...) {
+  vapply(x, bru_is_rowwise, logical(1))
+}
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_comp <- function(x, ...) {
+  bru_is_rowwise(x[["mapper"]])
+}
+#' @rdname bru_is_rowwise
+#' @export
+bru_is_rowwise.bru_mapper <- function(x, ...) {
+  ibm_is_rowwise(x)
 }

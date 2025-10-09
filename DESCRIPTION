@@ -139,6 +139,7 @@ Collate:
     'nlinla.R'
     'object_upgrade.R'
     'plotsample.R'
+    'pred_expr.R'
     'rgl.R'
     'sampling.R'
     'spatstat.R'

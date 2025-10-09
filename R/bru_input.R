@@ -117,7 +117,6 @@ bru_input_create <- function(input,
 #'
 #'
 #' @export
-#' @keywords internal
 #' @param component A [bru_comp] object.
 #' @param data A `data.frame`, `tibble`, `sf`, `list`, or `Spatial*` object of
 #' covariates and/or point locations.
