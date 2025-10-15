@@ -193,6 +193,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     # To specifically test pardiso, need to override locally
     control.compute = list(smtp = "taucs"),
     inla.mode = "compact",
+    bru_compat_pre_2_14_enable = FALSE,
     envir = envir
   )
   sp_version <- tryCatch(

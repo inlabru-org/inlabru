@@ -31,7 +31,7 @@ bru_used_update.bru_obs <- function(x, labels, ...) {
     labels = labels,
     ...
   )
-  x <- bru_obs_pred_expr_deprecation_fallback(x)
+  x <- bru_compat_pre_2_14_bru_obs(x)
   x
 }
 

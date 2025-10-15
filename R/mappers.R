@@ -424,7 +424,12 @@ format.bru_mapper <- function(x, ...,
       depth = depth
     ))
   }
-  paste0(initial, ibm_shortname(x))
+  text <- paste0(initial, ibm_shortname(x))
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    text <- glue("{text}({format(inp, label.override = '')})")
+  }
+  as.character(text)
 }
 
 #' @export

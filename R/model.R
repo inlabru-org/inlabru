@@ -125,11 +125,11 @@ bru_model <- function(components,
       used_lh <- bru_used(lhoods[[lh]])
       lhoods[[lh]][["pred_expr"]][["is_linear"]] <-
         (length(used_lh$latent) == 0) &&
-        all(vapply(components[used_lh$effect], function(cmp) {
-          ibm_is_linear(cmp$mapper)
-        }, TRUE))
+          all(vapply(components[used_lh$effect], function(cmp) {
+            ibm_is_linear(cmp$mapper)
+          }, TRUE))
     }
-    lhoods[[lh]] <- bru_obs_pred_expr_deprecation_fallback(lhoods[[lh]])
+    lhoods[[lh]] <- bru_compat_pre_2_14_bru_obs(lhoods[[lh]])
   }
 
   # Make model

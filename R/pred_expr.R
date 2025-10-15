@@ -73,8 +73,10 @@ bru_pred_expr.default <- function(x, ..., used = NULL, is_rowwise = NULL,
   )
 }
 
-bru_obs_pred_expr_deprecation_fallback <- function(lh) {
-  # return(lh)
+bru_compat_pre_2_14_bru_obs <- function(lh) {
+  if (!isTRUE(bru_options_get("bru_compat_pre_2_14_enable"))) {
+    return(lh)
+  }
   lh$is_additive <- lh$pred_expr$is_additive
   # Also depends on component defs, so may be changed later:
   lh$linear <- lh$pred_expr$is_linear
@@ -130,11 +132,11 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
     pred_text <- "BRU_EXPRESSION"
   }
   if (!identical(format, "text_raw") &&
-      grepl(
-        pattern = "BRU_EXPRESSION",
-        x = pred_text,
-        fixed = TRUE
-      )) {
+    grepl(
+      pattern = "BRU_EXPRESSION",
+      x = pred_text,
+      fixed = TRUE
+    )) {
     included <- bru_used(x)[["effect"]]
     pred_text <-
       gsub(

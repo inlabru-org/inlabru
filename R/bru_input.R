@@ -134,6 +134,11 @@ bru_input.bru_comp <- function(component,
   )
 
   if (is.null(component[["mapper"]])) {
+    stop(glue("Component mapper for '{component$label}' is NULL"))
+  }
+  return(bru_input(component[["mapper"]], data = data, ...))
+
+  if (is.null(component[["mapper"]])) {
     part_names <- intersect(c("main", "group", "replicate"), names(component))
   } else {
     stopifnot(inherits(component[["mapper"]], c("bm_pipe", "bru_mapper_pipe")))
@@ -531,16 +536,18 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
   }
   if (is.null(inp)) {
     text <- ""
-  } else if (is.null(type)) {
-    text <-
-      glue("{lab} = ", glue_collapse(rlang::as_label(inp), sep = "\n"))
   } else {
-    text <-
-      glue(
-        "{lab} = {type}(",
-        glue_collapse(rlang::as_label(inp), sep = "\n"),
-        ")"
-      )
+    the_input <- glue_collapse(rlang::as_label(inp), sep = "\n")
+    if (is.null(lab) || identical(lab, "")) {
+      the_lab <- ""
+    } else {
+      the_lab <- glue("{lab} = ")
+    }
+    if (is.null(type)) {
+      text <- glue(the_lab, the_input)
+    } else {
+      text <- glue(the_lab, "{type}(", the_input, ")")
+    }
   }
   text
 }
@@ -592,4 +599,188 @@ print.summary_bru_input <- function(x, ...) {
     cat(x[["text"]], "\n", sep = "")
   }
   invisible(x)
+}
+
+
+
+
+
+#' @title Interface between `bru_input` and `bru_mapper`
+#' @description Associate [bru_input] objects with [bru_mapper] objects.
+#' @name ibm_input
+NULL
+
+#' @describeIn ibm_input Add an existing `bru_input` to a `bru_mapper`.
+#' @param input A `bru_input` object, or `NULL` to remove any existing input.
+#'   Alternatively, an existing `bru_mapper` object with or without associated
+#'   input can be provided, in which case the input from that mapper
+#'   is copied.
+#' @export
+#' @examples
+#' (m <- bm_autodetect())
+#' ibm_input_available(m)
+#' (m <- ibm_input_create(m, cos(x)))
+#' ibm_input_available(m)
+#' ibm_input_set(bm_linear(), m)
+#'
+ibm_input_set <- function(mapper, input) {
+  stopifnot(inherits(mapper, "bru_mapper"))
+  inp <- input
+  if (inherits(input, "bru_mapper")) {
+    if (ibm_input_available(input)) {
+      inp <- ibm_input_get(input)
+    } else {
+      inp <- NULL
+    }
+  }
+  stopifnot(is.null(inp) || inherits(inp, "bru_input"))
+  # Use a special name that is unlikely to conflict with user-defined names.
+  mapper[[".input"]] <- inp
+  mapper
+}
+#' @describeIn ibm_input Create and add a `bru_input` to a `bru_mapper`.
+#' @export
+ibm_input_create <- function(mapper, ...) {
+  stopifnot(inherits(mapper, "bru_mapper"))
+  ibm_input_set(mapper, bru_input_create(...))
+}
+#' @describeIn ibm_input Check if a `bru_input` is associated with a
+#' `bru_mapper`.
+#' @export
+ibm_input_available <- function(mapper) {
+  !is.null(mapper[[".input"]])
+}
+#' @describeIn ibm_input Get the `bru_input` associated with a `bru_mapper`.
+#' @export
+ibm_input_get <- function(mapper) {
+  stopifnot(ibm_input_available(mapper))
+  mapper[[".input"]]
+}
+#' @describeIn ibm_input Evaluate the input associated with a `bru_mapper`.
+#' @export
+bru_input.bru_mapper <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bru_mapper({label})"),
+    verbosity = 5
+  )
+  if (!ibm_input_available(input)) {
+    stop(glue(
+      "No input defined for mapper '{label}'.",
+      "\n Use `ibm_input_create()` or `ibm_input_set()` to assign one,",
+      "\n like `bm_<type>(...) |> ibm_input_create(<expr>, ...)`."
+    ))
+  }
+  inp <- ibm_input_get(input)
+  bru_input(inp, ..., label = label)
+}
+#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_pipe`
+#' object.
+#' @export
+bru_input.bm_pipe <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bm_pipe({label})"),
+    verbosity = 5
+  )
+  indexing <- names(input$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(input$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_multi`
+#' object.
+#' @export
+bru_input.bm_multi <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bm_multi({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(input)) {
+    inp <- ibm_input_get(input)
+    return(bru_input(inp, ..., label = label))
+  }
+  indexing <- names(input$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(input$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a
+#'   `bm_collect` object.
+#' @export
+bru_input.bm_collect <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bm_collect({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(input)) {
+    inp <- ibm_input_get(input)
+    return(bru_input(inp, ..., label = label))
+  }
+  indexing <- names(input$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(input$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @describeIn ibm_input Evaluate the inputs for the sub-mapper in a `bm_repeat`
+#' object.
+#' @export
+bru_input.bm_repeat <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bm_repeat({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(input)) {
+    inp <- ibm_input_get(input)
+    return(bru_input(inp, ..., label = label))
+  }
+  bru_input(input[["mapper"]], ..., label = label)
+}
+#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_sum`
+#' object.
+bru_input.bm_sum <- function(input, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input.bm_sum({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(input)) {
+    inp <- ibm_input_get(input)
+    return(bru_input(inp, ..., label = label))
+  }
+  indexing <- names(input$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(input$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+
+
+
+#' @describeIn ibm_input Create a `bru_mapper` placeholder object of class
+#'   `bm_autodetect`. The main purpose of this class is to attach [bru_input]
+#'   information to it, which is later used to determine a suitable 'real'
+#'   mapper type.
+#' @export
+bm_autodetect <- function() {
+  bru_mapper_define(
+    list(n = 1L),
+    new_class = "bm_autodetect"
+  )
 }

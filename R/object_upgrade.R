@@ -413,6 +413,42 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.13.0.9017"
     }
 
+    if (utils::compareVersion("2.13.0.9018", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9018")
+
+      # Update component input storage to mapper-attached storage
+      if (!is.null(object[["model"]][["effects"]])) {
+        object[["model"]][["effects"]] <-
+          lapply(object[["model"]][["effects"]], function(x) {
+            for (subcomp in c("main", "group", "replicate")) {
+              if (!is.null(x[[subcomp]][["input"]]) &&
+                inherits(x[[subcomp]][["weights"]], "bru_input") &&
+                is.null(x[[subcomp]][["mapper"]][[".input"]])) {
+                x[[subcomp]][["mapper"]][[".input"]] <- x[[subcomp]][["input"]]
+                x[[subcomp]][["input"]] <- NULL
+              }
+            }
+            if (!is.null(x[["marginal"]]) &&
+              is.null(x[["marginal"]][[".input"]])) {
+              x[["marginal"]][[".input"]] <- bru_input_create(NULL)
+            }
+            if (!is.null(x[["weights"]]) &&
+              inherits(x[["weights"]], "bru_input")) {
+              weights_input <- x[["weights"]]
+              x[["weights"]] <- bm_scale()
+              x[["weights"]][[".input"]] <- weights_input
+            }
+            x <- bru_comp_update_mapper(x)
+            x <- bru_compat_pre_2_14_bru_comp(x)
+            x
+          })
+        class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
+      }
+
+
+      object[["inlabru_version"]] <- "2.13.0.9018"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 

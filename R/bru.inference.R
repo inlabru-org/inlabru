@@ -1129,7 +1129,7 @@ bru_obs_agg <- function(lh,
     lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
     lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
 
-    lh <- bru_obs_pred_expr_deprecation_fallback(lh)
+    lh <- bru_compat_pre_2_14_bru_obs(lh)
   }
 
   lh
@@ -1362,9 +1362,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
           BRU_eta <- {{
             {pred_text}
           }}
-          if (length(BRU_eta) == 1L) {{
-            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
-          }}
+          BRU_eta <- rep_len(BRU_eta, length(BRU_aggregate))
           c(ibm_eval(
               BRU_cp_agg,
               list(block = .block[BRU_aggregate]),
@@ -1443,7 +1441,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   lh$inla.family <- "poisson"
   lh$integration_info$ips <- NULL
 
-  lh <- bru_obs_pred_expr_deprecation_fallback(lh)
+  lh <- bru_compat_pre_2_14_bru_obs(lh)
 
   lh
 }
@@ -1632,9 +1630,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
           BRU_eta <- {{
             {pred_text}
           }}
-          if (length(BRU_eta) == 1L) {{
-            BRU_eta <- rep(BRU_eta, length(BRU_aggregate))
-          }}
+          BRU_eta <- rep_len(BRU_eta, length(BRU_aggregate))
           c(ibm_eval(
               BRU_cp_agg,
               list(block = .block[BRU_aggregate]),
@@ -1703,7 +1699,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   lh$inla.family <- "poisson"
   lh$integration_info$ips <- NULL
 
-  lh <- bru_obs_pred_expr_deprecation_fallback(lh)
+  lh <- bru_compat_pre_2_14_bru_obs(lh)
 
   lh
 }
@@ -2124,7 +2120,7 @@ bru_obs <- function(formula = . ~ .,
   )
 
   lh$formula <- formula
-  lh <- bru_obs_pred_expr_deprecation_fallback(lh)
+  lh <- bru_compat_pre_2_14_bru_obs(lh)
 
   if (!is.null(aggregate)) {
     lh <- bru_obs_agg(lh,
@@ -2479,7 +2475,8 @@ summary.bru_obs <- function(object, verbose = TRUE, ...) {
       family = object[["family"]],
       data_class = class(object[["data"]]),
       response_class = class(object[["response_data"]][[object[["response"]]]]),
-      predictor = glue::glue("{bru_pred_expr(object, format = 'formula_text')}"),
+      predictor =
+        glue::glue("{bru_pred_expr(object, format = 'formula_text')}"),
       is_additive = bru_is_additive(object),
       is_linear = bru_is_linear(object),
       is_rowwise = bru_is_rowwise(object),
@@ -3004,9 +3001,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' When seed != 0, overridden to "1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
-#' @param drop logical; If `keep=FALSE`, `newdata` is a `Spatial*DataFrame`, and
-#'   the prediciton summary has the same number of rows as `newdata`, then the
-#'   output is a `Spatial*DataFrame` object. Default `FALSE`.
+#' @param drop logical; If `drop=FALSE`, and
+#'   the prediction summary has the same number of rows as `newdata`, then the
+#'   output is a joined object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample()`
 #' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection

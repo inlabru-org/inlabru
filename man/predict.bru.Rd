@@ -47,9 +47,9 @@ When seed != 0, overridden to "1:1"}
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 
-\item{drop}{logical; If \code{keep=FALSE}, \code{newdata} is a \code{Spatial*DataFrame}, and
-the prediciton summary has the same number of rows as \code{newdata}, then the
-output is a \code{Spatial*DataFrame} object. Default \code{FALSE}.}
+\item{drop}{logical; If \code{drop=FALSE}, and
+the prediction summary has the same number of rows as \code{newdata}, then the
+output is a joined object. Default \code{FALSE}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 

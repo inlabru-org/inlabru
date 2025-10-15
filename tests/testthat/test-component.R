@@ -1,7 +1,7 @@
 test_that("Component construction: linear model", {
   local_bru_safe_inla()
 
-  df <- data.frame(x = 1:10, response = 1:10)
+  df <- data.frame(x = 1:10, W = rep(1, 10), response = 1:10)
 
   llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = df)))
 
@@ -13,7 +13,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp0$main$mapper)$input), "x")
 
   # Using label as input:
   cmp0 <- bru_comp_list(
@@ -23,19 +23,19 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(rlang::as_label(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp0$main$mapper)$input), "x")
 
   cmp <- bru_comp_list(
-    ~ beta(main = x, model = "linear", values = 1),
+    ~ beta(main = x, weights = W, model = "linear", values = 1),
     lhoods = llik
   )[["beta"]]
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
-  expect_equal(rlang::as_label(cmp$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp$main$mapper)$input), "x")
 
   # Covariate mapping
-  df <- data.frame(x = 1:10)
+  df <- data.frame(x = 1:10, W = 1)
   inp <- bru_input(cmp, data = df)
   expect_equal(
     inp,
@@ -45,7 +45,7 @@ test_that("Component construction: linear model", {
         #        group = 1,
         #        replicate = 1
       ),
-      scale = NULL
+      scale = rep_len(1, 10)
     )
   )
 
