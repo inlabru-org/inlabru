@@ -159,42 +159,13 @@ bru_input.bru_comp <- function(component,
   if (is.null(component[["mapper"]])) {
     stop(glue("Component mapper for '{component$label}' is NULL"))
   }
-  return(bru_input(component[["mapper"]], data = data, ..., label = component$label))
 
-  if (is.null(component[["mapper"]])) {
-    part_names <- intersect(c("main", "group", "replicate"), names(component))
-  } else {
-    stopifnot(inherits(component[["mapper"]], c("bm_pipe", "bru_mapper_pipe")))
-
-    # The names should be a subset of main, group, replicate
-    part_names <- ibm_names(component[["mapper"]][["mappers"]][[1]])
-  }
-  mapper_val <- list()
-  for (part in part_names) {
-    mapper_val[[part]] <-
-      bru_input(
-        component[[part]]$input,
-        data,
-        env = component$env,
-        label = part,
-        ...
-      )
-  }
-  if (is.null(component[["weights"]])) {
-    scale_val <- NULL
-  } else {
-    scale_val <-
-      bru_input(
-        component[["weights"]],
-        data,
-        env = component$env,
-        label = paste(component$label, "(weights)"),
-        ...
-      )
-  }
-  # Any potential length mismatches must be handled by bm_multi and
-  # bm_collect, since e.g. 'main' might take a list() input object.
-  list(mapper = mapper_val, scale = scale_val)
+  bru_input(
+    component[["mapper"]],
+    data = data,
+    ...,
+    label = component$label
+  )
 }
 
 #' @param model A [bru_model] object.
@@ -513,7 +484,8 @@ bru_input.bru_input <- function(input, data, env = NULL,
 }
 
 #' @export
-#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` from `2.12.0.9023`.
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` from
+#'   `2.12.0.9023`.
 #' Use `bru_input()` instead.
 input_eval <- function(...) {
   lifecycle::deprecate_warn(
@@ -524,9 +496,9 @@ input_eval <- function(...) {
   bru_input(...)
 }
 
-#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` since version
-#'   `2.12.0.9023`. Use [bru_input()] instead. Computes the component inputs for
-#'   included components for each observation model.
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` since
+#'   version `2.12.0.9023`. Use [bru_input()] instead. Computes the component
+#'   inputs for included components for each observation model.
 #' @keywords internal
 evaluate_inputs <- function(...) {
   lifecycle::deprecate_warn(

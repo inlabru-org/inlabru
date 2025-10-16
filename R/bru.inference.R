@@ -1639,7 +1639,8 @@ bru_obs_family_cp <- function(lh, options, .envir) {
           eta[!data$BRU_aggregate]
         )
       }
-    pred_text <- glue("BRU_cp_predictor({{ {pred_text} }}, .data., .data_extra.)")
+    pred_text <-
+      glue("BRU_cp_predictor({{ {pred_text} }}, .data., .data_extra.)")
     lh$pred_expr <- bru_pred_expr(
       pred_text,
       used = lh$pred_expr$used,
