@@ -3069,7 +3069,7 @@ bm_pipe <- function(mappers) {
   bru_mapper_define(
     list(
       mappers = mappers,
-      is_linear_multi,
+      is_linear_multi = is_linear_multi,
       is_linear = is_linear,
       is_rowwise = is_rowwise,
       n_multi = n_multi,
