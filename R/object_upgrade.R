@@ -422,7 +422,7 @@ bru_info_upgrade <- function(object,
           lapply(object[["model"]][["effects"]], function(x) {
             for (subcomp in c("main", "group", "replicate")) {
               if (!is.null(x[[subcomp]][["input"]]) &&
-                inherits(x[[subcomp]][["weights"]], "bru_input") &&
+                inherits(x[[subcomp]][["input"]], "bru_input") &&
                 is.null(x[[subcomp]][["mapper"]][[".input"]])) {
                 x[[subcomp]][["mapper"]][[".input"]] <- x[[subcomp]][["input"]]
                 x[[subcomp]][["input"]] <- NULL
@@ -430,7 +430,7 @@ bru_info_upgrade <- function(object,
             }
             if (!is.null(x[["marginal"]]) &&
               is.null(x[["marginal"]][[".input"]])) {
-              x[["marginal"]][[".input"]] <- bru_input_create(NULL)
+              x[["marginal"]][[".input"]] <- new_bru_input(NULL)
             }
             if (!is.null(x[["weights"]]) &&
               inherits(x[["weights"]], "bru_input")) {

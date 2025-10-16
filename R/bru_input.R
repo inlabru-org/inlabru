@@ -1,22 +1,36 @@
-#' Obtain component inputs
+#' @include deprecated.R
+
+#' @title Store and evaluate component inputs
+#' @description Store and evaluate component inputs, including support for
+#'   non-standard-evaluation with `rlang`, automatic transfer to
+#'   function calls, [eval_spatial()], and [MatrixModels::model.Matrix()].
 #'
-#' @export
+#'   These functions are normally only called internally, but users may find
+#'   it useful to call them directly to experiment, and to make advanced
+#'   model definitions using [ibm_input_set]/[ibm_input_new()].
+#' @name bru_input
 #' @rdname bru_input
-#' @param \dots Passed on to sub-methods.
-#' @seealso [summary.bru_input()], [bru_comp()]
-bru_input <- function(...) {
-  UseMethod("bru_input")
-}
+NULL
+
 #' @describeIn bru_input Create a `bru_input` object.
+#' @param input An expression to be evaluated
+#' @param label character; optional label used to identify the object in
+#'   informational messages.
+#' @param layer Optional expression that evaluates layer names or indices for
+#'   use with [eval_spatial()]
+#' @param selector character or integer; optional selector for use with
+#'   use with [eval_spatial()]
+#' @param \dots Passed on to sub-methods.
 #' @export
 #' @examples
-#' (inp <- bru_input_create(x, "LABEL"))
+#' (inp <- new_bru_input(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
-bru_input_create <- function(input,
-                             label = NULL,
-                             layer = NULL,
-                             selector = NULL,
-                             ...) {
+#'
+new_bru_input <- function(input,
+                          label = NULL,
+                          layer = NULL,
+                          selector = NULL,
+                          ...) {
   inp <- structure(
     list(
       input = rlang::enquo(input),
@@ -29,6 +43,13 @@ bru_input_create <- function(input,
   inp
 }
 
+#' @describeIn bru_input Evaluate inputs
+#'
+#' @export
+#' @seealso [summary.bru_input()], [bru_comp()]
+bru_input <- function(...) {
+  UseMethod("bru_input")
+}
 #' @section Simple covariates and the input parameters:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate.
@@ -50,7 +71,6 @@ bru_input_create <- function(input,
 #' \item{`components = y ~ psi(main = x^2, model = "linear")`}
 #' \item{`components = y ~ psi(mySquareFun(x), model = "linear")`,}
 #' \item{`components = y ~ psi(myOtherSquareFun, model = "linear")`,}
-#'
 #' }
 #'
 #' In the first example inlabru will interpret the map parameter as an
@@ -68,6 +88,9 @@ bru_input_create <- function(input,
 #'   data[ ,"x"]^2
 #' }
 #' ```
+#'
+#' Interactions can be handled by a formula input and `model = "fixed"`:
+#' `components = y ~ 0 + name(~ 1 + x:z, model = "fixed")`
 #'
 #' @section Spatial Covariates:
 #'
@@ -174,13 +197,14 @@ bru_input.bru_comp <- function(component,
   list(mapper = mapper_val, scale = scale_val)
 }
 
+#' @param model A [bru_model] object.
 #' @export
 #' @rdname bru_input
 bru_input.bru_model <- function(model, lhoods, ...) {
   bru_input(lhoods, components = as_bru_comp_list(model))
 }
 
-#' @param components A [bru_comp_list].
+#' @param components A [bru_comp_list] object.
 #' @export
 #' @rdname bru_input
 bru_input.bru_comp_list <-
@@ -194,7 +218,7 @@ bru_input.bru_comp_list <-
 #' @describeIn bru_input Computes the component inputs for included components
 #' for each model likelihood
 #'
-#' @param lhoods A [bru_obs_list] object
+#' @param lhoods A [bru_obs_list] object.
 #' @export
 bru_input.bru_obs_list <- function(lhoods, components, ...) {
   bru_log_message(
@@ -243,18 +267,25 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
 
 #' @describeIn bru_input Attempts to evaluate a component input (e.g. `main`,
 #' `group`, `replicate`, or `weight`), and process the results:
-#' 1. If `eval()` failed, return NULL or map everything to 1
+#' 1. If `rlang::eval_tidy()` failed, return NULL or map everything to 1
 #'    (see the `null.on.fail` argument). This should normally not
 #'    happen, unless the component use logic is incorrect,
-#'    (e.g. via `used` or `include`/`exclude`)
+#'    (via `used`)
 #'    leading to missing columns for a certain likelihood in a
 #'    multi-`bru_obs()` model.
 #' 2. If we obtain a function, apply the function to the data object
 #' 3. If we obtain an object supported by [eval_spatial()], extract the values
 #'    of that data frame at the point locations
-#' 4. Else we obtain a vector and return as-is. This happens when input
+#' 4. If we obtain a formula, call `ModelMatrix::model.Matrix()`
+#' 5. Else we obtain a vector and return as-is. This happens when input
 #'    references a column of the data points, or some other complete expression
 #'
+#' @param env environment in which to evaluate the input expression. Default
+#'   is `parent.frame()`
+#' @param null.on.fail logical; if `TRUE`, return `NULL` if the input evaluation
+#'   fails. If `FALSE` (default), return a vector of 1s and issue a warning
+#'   (only for deprecated use of `coordinates` without having loaded the `sp`
+#'   package), or stop with an error.
 #' @export
 bru_input.bru_input <- function(input, data, env = NULL,
                                 null.on.fail = FALSE, ...) {
@@ -482,7 +513,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
 }
 
 #' @export
-#' @describeIn bru_input `r lifecycle::badge("deprecated")` from `2.12.0.9023`.
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` from `2.12.0.9023`.
 #' Use `bru_input()` instead.
 input_eval <- function(...) {
   lifecycle::deprecate_warn(
@@ -493,7 +524,7 @@ input_eval <- function(...) {
   bru_input(...)
 }
 
-#' @describeIn bru_input `r lifecycle::badge("deprecated")` since version
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")` since version
 #'   `2.12.0.9023`. Use [bru_input()] instead. Computes the component inputs for
 #'   included components for each observation model.
 #' @keywords internal
@@ -509,7 +540,6 @@ evaluate_inputs <- function(...) {
 
 #' Summarise component inputs
 #'
-#' @keywords internal
 #' @param object Object to be summarised.
 #' @param \dots Passed on to other summary methods.
 #' @param verbose logical; If `TRUE`, includes more details of the
@@ -518,14 +548,14 @@ evaluate_inputs <- function(...) {
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com}
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @seealso [bru_input()], [bru_comp()]
-#' @export
-#' @method format bru_input
 #' @param label.override character; If not `NULL`, use this label instead of
 #' the object's label.
 #' @param type character; if non-NULL, added to the output'; `label =
 #'   type(input)`.
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.bru_input
+#' @export
+#' @method format bru_input
 format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
                              type = NULL) {
   inp <- x[["input"]]
@@ -608,9 +638,11 @@ print.summary_bru_input <- function(x, ...) {
 #' @title Interface between `bru_input` and `bru_mapper`
 #' @description Associate [bru_input] objects with [bru_mapper] objects.
 #' @name ibm_input
+#' @seealso [bru_input()]
 NULL
 
 #' @describeIn ibm_input Add an existing `bru_input` to a `bru_mapper`.
+#' @param mapper A `bru_mapper` object.
 #' @param input A `bru_input` object, or `NULL` to remove any existing input.
 #'   Alternatively, an existing `bru_mapper` object with or without associated
 #'   input can be provided, in which case the input from that mapper
@@ -619,7 +651,7 @@ NULL
 #' @examples
 #' (m <- bm_autodetect())
 #' ibm_input_available(m)
-#' (m <- ibm_input_create(m, cos(x)))
+#' (m <- ibm_input_new(m, cos(x)))
 #' ibm_input_available(m)
 #' ibm_input_set(bm_linear(), m)
 #'
@@ -639,10 +671,11 @@ ibm_input_set <- function(mapper, input) {
   mapper
 }
 #' @describeIn ibm_input Create and add a `bru_input` to a `bru_mapper`.
+#' @param \dots Passed on to [new_bru_input()].
 #' @export
-ibm_input_create <- function(mapper, ...) {
+ibm_input_new <- function(mapper, ...) {
   stopifnot(inherits(mapper, "bru_mapper"))
-  ibm_input_set(mapper, bru_input_create(...))
+  ibm_input_set(mapper, new_bru_input(...))
 }
 #' @describeIn ibm_input Check if a `bru_input` is associated with a
 #' `bru_mapper`.
@@ -656,7 +689,8 @@ ibm_input_get <- function(mapper) {
   stopifnot(ibm_input_available(mapper))
   mapper[[".input"]]
 }
-#' @describeIn ibm_input Evaluate the input associated with a `bru_mapper`.
+#' @describeIn bru_input Evaluate the input associated with a `bru_mapper`.
+#' @seealso [ibm_input]
 #' @export
 bru_input.bru_mapper <- function(input, ..., label = "<unknown>") {
   bru_log_message(
@@ -666,14 +700,14 @@ bru_input.bru_mapper <- function(input, ..., label = "<unknown>") {
   if (!ibm_input_available(input)) {
     stop(glue(
       "No input defined for mapper '{label}'.",
-      "\n Use `ibm_input_create()` or `ibm_input_set()` to assign one,",
-      "\n like `bm_<type>(...) |> ibm_input_create(<expr>, ...)`."
+      "\n Use `ibm_input_new()` or `ibm_input_set()` to assign one,",
+      "\n like `bm_<type>(...) |> ibm_input_new(<expr>, ...)`."
     ))
   }
   inp <- ibm_input_get(input)
   bru_input(inp, ..., label = label)
 }
-#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_pipe`
+#' @describeIn bru_input Evaluate the inputs for each sub-mapper in a `bm_pipe`
 #' object.
 #' @export
 bru_input.bm_pipe <- function(input, ..., label = "<unknown>") {
@@ -691,7 +725,7 @@ bru_input.bm_pipe <- function(input, ..., label = "<unknown>") {
     bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_multi`
+#' @describeIn bru_input Evaluate the inputs for each sub-mapper in a `bm_multi`
 #' object.
 #' @export
 bru_input.bm_multi <- function(input, ..., label = "<unknown>") {
@@ -713,7 +747,7 @@ bru_input.bm_multi <- function(input, ..., label = "<unknown>") {
     bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a
+#' @describeIn bru_input Evaluate the inputs for each sub-mapper in a
 #'   `bm_collect` object.
 #' @export
 bru_input.bm_collect <- function(input, ..., label = "<unknown>") {
@@ -735,7 +769,7 @@ bru_input.bm_collect <- function(input, ..., label = "<unknown>") {
     bru_input(input$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @describeIn ibm_input Evaluate the inputs for the sub-mapper in a `bm_repeat`
+#' @describeIn bru_input Evaluate the inputs for the sub-mapper in a `bm_repeat`
 #' object.
 #' @export
 bru_input.bm_repeat <- function(input, ..., label = "<unknown>") {
@@ -749,8 +783,9 @@ bru_input.bm_repeat <- function(input, ..., label = "<unknown>") {
   }
   bru_input(input[["mapper"]], ..., label = label)
 }
-#' @describeIn ibm_input Evaluate the inputs for each sub-mapper in a `bm_sum`
+#' @describeIn bru_input Evaluate the inputs for each sub-mapper in a `bm_sum`
 #' object.
+#' @export
 bru_input.bm_sum <- function(input, ..., label = "<unknown>") {
   bru_log_message(
     glue("bru_input.bm_sum({label})"),

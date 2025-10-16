@@ -2,19 +2,23 @@
 % Please edit documentation in R/bru_input.R
 \name{bru_input}
 \alias{bru_input}
-\alias{bru_input_create}
+\alias{new_bru_input}
 \alias{bru_input.bru_comp}
 \alias{bru_input.bru_model}
 \alias{bru_input.bru_comp_list}
 \alias{bru_input.bru_obs_list}
 \alias{bru_input.bru_input}
-\alias{input_eval}
-\alias{evaluate_inputs}
-\title{Obtain component inputs}
+\alias{bru_input.bru_mapper}
+\alias{bru_input.bm_pipe}
+\alias{bru_input.bm_multi}
+\alias{bru_input.bm_collect}
+\alias{bru_input.bm_repeat}
+\alias{bru_input.bm_sum}
+\title{Store and evaluate component inputs}
 \usage{
-bru_input(...)
+new_bru_input(input, label = NULL, layer = NULL, selector = NULL, ...)
 
-bru_input_create(input, label = NULL, layer = NULL, selector = NULL, ...)
+bru_input(...)
 
 \method{bru_input}{bru_comp}(component, data, ...)
 
@@ -26,11 +30,30 @@ bru_input_create(input, label = NULL, layer = NULL, selector = NULL, ...)
 
 \method{bru_input}{bru_input}(input, data, env = NULL, null.on.fail = FALSE, ...)
 
-input_eval(...)
+\method{bru_input}{bru_mapper}(input, ..., label = "<unknown>")
 
-evaluate_inputs(...)
+\method{bru_input}{bm_pipe}(input, ..., label = "<unknown>")
+
+\method{bru_input}{bm_multi}(input, ..., label = "<unknown>")
+
+\method{bru_input}{bm_collect}(input, ..., label = "<unknown>")
+
+\method{bru_input}{bm_repeat}(input, ..., label = "<unknown>")
+
+\method{bru_input}{bm_sum}(input, ..., label = "<unknown>")
 }
 \arguments{
+\item{input}{An expression to be evaluated}
+
+\item{label}{character; optional label used to identify the object in
+informational messages.}
+
+\item{layer}{Optional expression that evaluates layer names or indices for
+use with \code{\link[=eval_spatial]{eval_spatial()}}}
+
+\item{selector}{character or integer; optional selector for use with
+use with \code{\link[=eval_spatial]{eval_spatial()}}}
+
 \item{\dots}{Passed on to sub-methods.}
 
 \item{component}{A \link{bru_comp} object.}
@@ -38,9 +61,19 @@ evaluate_inputs(...)
 \item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
 covariates and/or point locations.}
 
-\item{lhoods}{A \link{bru_obs_list} object}
+\item{model}{A \link{bru_model} object.}
 
-\item{components}{A \link{bru_comp_list}.}
+\item{lhoods}{A \link{bru_obs_list} object.}
+
+\item{components}{A \link{bru_comp_list} object.}
+
+\item{env}{environment in which to evaluate the input expression. Default
+is \code{parent.frame()}}
+
+\item{null.on.fail}{logical; if \code{TRUE}, return \code{NULL} if the input evaluation
+fails. If \code{FALSE} (default), return a vector of 1s and issue a warning
+(only for deprecated use of \code{coordinates} without having loaded the \code{sp}
+package), or stop with an error.}
 }
 \value{
 \itemize{
@@ -49,7 +82,13 @@ for the full component mapper (of type \link{bm_pipe})
 }
 }
 \description{
-Obtain component inputs
+Store and evaluate component inputs, including support for
+non-standard-evaluation with \code{rlang}, automatic transfer to
+function calls, \code{\link[=eval_spatial]{eval_spatial()}}, and \code{\link[MatrixModels:model.Matrix]{MatrixModels::model.Matrix()}}.
+
+These functions are normally only called internally, but users may find
+it useful to call them directly to experiment, and to make advanced
+model definitions using \link{ibm_input_set}/\code{\link[=ibm_input_new]{ibm_input_new()}}.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -59,30 +98,43 @@ for each model likelihood
 \item \code{bru_input(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},
 \code{group}, \code{replicate}, or \code{weight}), and process the results:
 \enumerate{
-\item If \code{eval()} failed, return NULL or map everything to 1
+\item If \code{rlang::eval_tidy()} failed, return NULL or map everything to 1
 (see the \code{null.on.fail} argument). This should normally not
 happen, unless the component use logic is incorrect,
-(e.g. via \code{used} or \code{include}/\code{exclude})
+(via \code{used})
 leading to missing columns for a certain likelihood in a
 multi-\code{bru_obs()} model.
 \item If we obtain a function, apply the function to the data object
 \item If we obtain an object supported by \code{\link[=eval_spatial]{eval_spatial()}}, extract the values
 of that data frame at the point locations
+\item If we obtain a formula, call \code{ModelMatrix::model.Matrix()}
 \item Else we obtain a vector and return as-is. This happens when input
 references a column of the data points, or some other complete expression
 }
 
+\item \code{bru_input(bru_mapper)}: Evaluate the input associated with a \code{bru_mapper}.
+
+\item \code{bru_input(bm_pipe)}: Evaluate the inputs for each sub-mapper in a \code{bm_pipe}
+object.
+
+\item \code{bru_input(bm_multi)}: Evaluate the inputs for each sub-mapper in a \code{bm_multi}
+object.
+
+\item \code{bru_input(bm_collect)}: Evaluate the inputs for each sub-mapper in a
+\code{bm_collect} object.
+
+\item \code{bru_input(bm_repeat)}: Evaluate the inputs for the sub-mapper in a \code{bm_repeat}
+object.
+
+\item \code{bru_input(bm_sum)}: Evaluate the inputs for each sub-mapper in a \code{bm_sum}
+object.
+
 }}
 \section{Functions}{
 \itemize{
-\item \code{bru_input_create()}: Create a \code{bru_input} object.
+\item \code{new_bru_input()}: Create a \code{bru_input} object.
 
-\item \code{input_eval()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from \verb{2.12.0.9023}.
-Use \code{bru_input()} instead.
-
-\item \code{evaluate_inputs()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} since version
-\verb{2.12.0.9023}. Use \code{\link[=bru_input]{bru_input()}} instead. Computes the component inputs for
-included components for each observation model.
+\item \code{bru_input()}: Evaluate inputs
 
 }}
 \section{Simple covariates and the input parameters}{
@@ -107,7 +159,6 @@ In inlabru this can be achieved in several ways of using the \code{main} paramet
 \item{\code{components = y ~ psi(main = x^2, model = "linear")}}
 \item{\code{components = y ~ psi(mySquareFun(x), model = "linear")},}
 \item{\code{components = y ~ psi(myOtherSquareFun, model = "linear")},}
-
 }
 
 In the first example inlabru will interpret the map parameter as an
@@ -125,6 +176,9 @@ data to use to construct the needed output. For example,
   data[ ,"x"]^2
 \}
 }\if{html}{\out{</div>}}
+
+Interactions can be handled by a formula input and \code{model = "fixed"}:
+\code{components = y ~ 0 + name(~ 1 + x:z, model = "fixed")}
 }
 
 \section{Spatial Covariates}{
@@ -181,14 +235,16 @@ to be built on a different CRS than the observation data.
 }
 
 \examples{
-(inp <- bru_input_create(x, "LABEL"))
+(inp <- new_bru_input(x, "LABEL"))
 bru_input(inp, data.frame(x = 1:3))
+
 }
 \seealso{
 \code{\link[=summary.bru_input]{summary.bru_input()}}, \code{\link[=bru_comp]{bru_comp()}}
+
+\link{ibm_input}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}, Finn Lindgren
 \email{finn.lindgren@gmail.com}
 }
-\keyword{internal}

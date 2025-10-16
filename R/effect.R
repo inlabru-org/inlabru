@@ -367,7 +367,7 @@ bru_comp.character <- function(object,
     }
   }
 
-  inp <- bru_input_create(
+  inp <- new_bru_input(
     {{ main }},
     label = label,
     layer = {{ main_layer }},
@@ -388,7 +388,7 @@ bru_comp.character <- function(object,
   if (include_group) {
     subcomp$group <-
       bru_subcomp(
-        input = bru_input_create(
+        input = new_bru_input(
           {{ group }},
           label = glue("{label}.group"),
           layer = {{ group_layer }},
@@ -402,7 +402,7 @@ bru_comp.character <- function(object,
   if (include_repl) {
     subcomp$replicate <-
       bru_subcomp(
-        input = bru_input_create(
+        input = new_bru_input(
           {{ replicate }},
           label = glue("{label}.repl"),
           layer = {{ replicate_layer }},
@@ -414,7 +414,7 @@ bru_comp.character <- function(object,
       )
   }
   if (include_weights) {
-    weights_input <- bru_input_create(
+    weights_input <- new_bru_input(
       {{ weights }},
       label = glue("{label}.weights"),
       layer = {{ weights_layer }},
@@ -438,7 +438,7 @@ bru_comp.character <- function(object,
         } else if (ibm_input_available(marginal)) {
           marginal
         } else {
-          ibm_input_create(
+          ibm_input_new(
             marginal,
             NULL,
             label = glue("{label}.marginal"),
@@ -498,11 +498,11 @@ bru_comp.character <- function(object,
         c(
           list(
             mapper = bm_multi(list(
-              main = component$main$mapper
+              main = component[["main"]][["mapper"]]
             ))
           ),
           if (include_weights) {
-            list(scale = weights_mapper)
+            list(scale = component[["weights"]])
           } else {
             NULL
           }

@@ -113,6 +113,7 @@ reference:
   - matches("^bru_rerun$")
   - matches("^bru_options$")
   - starts_with("bru_comp")
+  - starts_with("bru_input")
   - starts_with("lgcp")
   - starts_with("bru_response_size")
   - starts_with("bru_set_missing")
