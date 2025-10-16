@@ -43,7 +43,7 @@ needs to be set before use. Default: \code{NULL}}
 constructed from the expression),
 \item \code{"formula_text"} (a text version of the "formula"),
 \item \code{"text_raw"} (plain text, without substituting \code{BRU_EXPRESSION}), or
-\item \code{"rest_text"} (plain text of the response side of the formula).
+\item \code{"resp_text"} (plain text of the response side of the formula).
 }}
 }
 \description{

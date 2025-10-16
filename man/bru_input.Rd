@@ -28,7 +28,14 @@ bru_input(...)
 
 \method{bru_input}{bru_obs_list}(lhoods, components, ...)
 
-\method{bru_input}{bru_input}(input, data, env = NULL, null.on.fail = FALSE, ...)
+\method{bru_input}{bru_input}(
+  input,
+  data = NULL,
+  mask = NULL,
+  .envir = parent.frame(),
+  null.on.fail = FALSE,
+  ...
+)
 
 \method{bru_input}{bru_mapper}(input, ..., label = "<unknown>")
 
@@ -67,7 +74,7 @@ covariates and/or point locations.}
 
 \item{components}{A \link{bru_comp_list} object.}
 
-\item{env}{environment in which to evaluate the input expression. Default
+\item{.envir}{environment in which to evaluate the input expression. Default
 is \code{parent.frame()}}
 
 \item{null.on.fail}{logical; if \code{TRUE}, return \code{NULL} if the input evaluation

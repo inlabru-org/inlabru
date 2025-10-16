@@ -1302,7 +1302,7 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
               bru_input(
                 mapper_input,
                 data = dat,
-                env = env,
+                .envir = env,
                 label = mapper_input$label,
                 null.on.fail = TRUE
               )
@@ -1316,7 +1316,7 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
           inputs <- list(
             bru_input(mapper_input,
               data = NULL,
-              env = env,
+              .envir = env,
               label = mapper_input$label,
               null.on.fail = TRUE
             )

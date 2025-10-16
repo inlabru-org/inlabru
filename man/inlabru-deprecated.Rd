@@ -38,17 +38,18 @@ replicate the row belongs to, in the sense used in
 resulting matrix.}
 }
 \description{
-Some of these functions may stil attempt to do their job, but will be removed
+Some of these functions may still attempt to do their job, but will be removed
 in a future version.
 }
 \section{Functions}{
 \itemize{
-\item \code{input_eval()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from \verb{2.12.0.9023}.
+\item \code{input_eval()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from
+\verb{2.12.0.9023}.
 Use \code{bru_input()} instead.
 
-\item \code{evaluate_inputs()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} since version
-\verb{2.12.0.9023}. Use \code{\link[=bru_input]{bru_input()}} instead. Computes the component inputs for
-included components for each observation model.
+\item \code{evaluate_inputs()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} since
+version \verb{2.12.0.9023}. Use \code{\link[=bru_input]{bru_input()}} instead. Computes the component
+inputs for included components for each observation model.
 
 \item \code{gmap()}: Plot a map using extent of a spatial object
 

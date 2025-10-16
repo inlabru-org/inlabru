@@ -211,11 +211,14 @@ bru_input.bru_obs_list <- function(lhoods, components, ...) {
 }
 
 
-bru_input_layer <- function(layer, selector = NULL, envir, enclos,
+bru_input_layer <- function(layer,
+                            selector = NULL,
+                            mask,
+                            .envir = parent.frame(),
                             label,
                             e_input) {
   input_layer <- tryCatch(
-    rlang::eval_tidy(layer, data = envir, env = enclos),
+    rlang::eval_tidy(layer, data = mask, env = .envir),
     error = function(e) {
       e
     }
@@ -251,38 +254,34 @@ bru_input_layer <- function(layer, selector = NULL, envir, enclos,
 #' 5. Else we obtain a vector and return as-is. This happens when input
 #'    references a column of the data points, or some other complete expression
 #'
-#' @param env environment in which to evaluate the input expression. Default
+#' @param .envir environment in which to evaluate the input expression. Default
 #'   is `parent.frame()`
 #' @param null.on.fail logical; if `TRUE`, return `NULL` if the input evaluation
 #'   fails. If `FALSE` (default), return a vector of 1s and issue a warning
 #'   (only for deprecated use of `coordinates` without having loaded the `sp`
 #'   package), or stop with an error.
 #' @export
-bru_input.bru_input <- function(input, data, env = NULL,
+bru_input.bru_input <- function(input,
+                                data = NULL,
+                                mask = NULL,
+                                .envir = parent.frame(),
                                 null.on.fail = FALSE, ...) {
   bru_log_message(
     glue("bru_input(bru_input) for ({input$label})"),
     verbosity = 5
   )
   # Evaluate the map with the data in an environment
-  enclos <-
-    if (is.null(env)) {
-      parent.frame()
-    } else {
-      env
-    }
-  if (is.list(data)) {
-    envir <- rlang::as_data_mask(data)
-  } else if (inherits(data, "Spatial")) {
-    envir <- rlang::as_data_mask(as.data.frame(data))
-  } else {
-    envir <- rlang::as_data_mask(tibble::as_tibble(data))
+  if (is.null(mask)) {
+    mask <- bru_data_mask(list(data = data))
   }
-  assign(".data.", data, envir = envir)
+  orig_data <- data
+  if (!is.null(data) && !is.list(data)) {
+    data <- tibble::as_tibble(data)
+  }
 
-  inp <- rlang::as_quosure(input$input, env = enclos)
+  inp <- rlang::as_quosure(input$input, env = .envir)
   e_input <- tryCatch(
-    rlang::eval_tidy(inp, data = envir, env = enclos),
+    rlang::eval_tidy(inp, data = mask, env = .envir),
     error = function(e) {
       e
     }
@@ -315,11 +314,12 @@ bru_input.bru_input <- function(input, data, env = NULL,
           ),
           immediate. = TRUE
         )
-        input$input <- rlang::as_quosure(sp::coordinates, env = enclos)
+        input$input <- rlang::as_quosure(sp::coordinates, env = .envir)
         return(bru_input(
           input,
-          data = data,
-          env = enclos,
+          data = orig_data,
+          mask = mask,
+          .envir = .envir,
           null.on.fail = null.on.fail,
           ...
         ))
@@ -343,7 +343,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
   if (is.function(e_input)) {
     # Allow but detect failures:
     val <- tryCatch(
-      e_input(data),
+      e_input(orig_data),
       error = function(e) {
         e
       }
@@ -361,7 +361,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
           val <- as.data.frame(val)
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_CRS(data),
+          data_crs <- tryCatch(fm_CRS(orig_data),
             error = function(e) {
             }
           )
@@ -400,8 +400,8 @@ bru_input.bru_input <- function(input, data, env = NULL,
       bru_input_layer(
         layer = input[["layer"]],
         selector = input[["selector"]],
-        envir = envir,
-        enclos = enclos,
+        mask = mask,
+        .envir = .envir,
         label = input[["label"]],
         e_input = e_input
       )
@@ -413,7 +413,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
     check_layer(e_input, data, layer)
     val <- eval_spatial(
       e_input,
-      data,
+      orig_data,
       layer = layer,
       selector = NULL
     )
@@ -454,7 +454,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
     bru_log_warn(msg)
 
     val <- bru_fill_missing(
-      data = e_input, where = data, values = val,
+      data = e_input, where = orig_data, values = val,
       layer = layer, selector = NULL
     )
   }

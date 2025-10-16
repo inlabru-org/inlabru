@@ -645,6 +645,39 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
+bru_data_mask <- function(data) {
+  data_orig <- data
+  data <- lapply(data, function(x) {
+    if (!is.null(x) && !is.list(x)) {
+      x <- tibble::as_tibble(x)
+    }
+    x
+  })
+  top_envir <- rlang::new_environment()
+  nms <- names(data)
+  for (nm in setdiff(nms, "")) {
+    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
+  }
+  success <- FALSE
+  result <- NULL
+  bottom_envir <- top_envir
+  for (k in rev(seq_along(data))) {
+    if (is.null(data[[k]])) {
+      next
+    }
+    bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
+  }
+  mask <- rlang::new_data_mask(bottom_envir, top_envir)
+  for (nm in setdiff(nms, "")) {
+    if (is.null(data[[nm]])) {
+      next
+    }
+    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
+  }
+  class(mask) <- c("bru_data_mask", class(mask))
+  mask
+}
+
 #' @title Evaluate expressions in data contexts
 #' @description Evaluate an expression in a series of data contexts, also making
 #'   the objects directly available as names surrounded by ".", stopping when
@@ -688,34 +721,13 @@ bru_eval_in_data_context <- function(input,
                                      .envir = parent.frame()) {
   input <- rlang::enquo(input)
   deparse_input <- rlang::expr_text(input)
-  data_orig <- data
-  data <- lapply(data, function(x) {
-    if (!is.null(x) && !is.list(x)) {
-      x <- tibble::as_tibble(x)
-    }
-    x
-  })
-  top_envir <- rlang::new_environment()
-  nms <- names(data)
-  for (nm in setdiff(nms, "")) {
-    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
+  if (inherits(data, "bru_data_mask")) {
+    mask <- data
+  } else {
+    mask <- bru_data_mask(data)
   }
   success <- FALSE
   result <- NULL
-  bottom_envir <- top_envir
-  for (k in rev(seq_along(data))) {
-    if (is.null(data[[k]])) {
-      next
-    }
-    bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
-  }
-  mask <- rlang::new_data_mask(bottom_envir, top_envir)
-  for (nm in setdiff(nms, "")) {
-    if (is.null(data[[nm]])) {
-      next
-    }
-    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
-  }
   result <- try(
     rlang::eval_tidy(input, data = mask, env = .envir),
     silent = TRUE
