@@ -393,7 +393,6 @@ bru_info_upgrade <- function(object,
           lapply(object[["lhoods"]], function(x) {
             x[["pred_expr"]] <- structure(
               list(
-                formula_text = deparse1(x[["formula"]], collapse = "\n"),
                 pred_text = deparse1(x[["expr"]], collapse = "\n"),
                 pred_expr = x[["expr"]],
                 is_additive = x[["is_additive"]],

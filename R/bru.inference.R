@@ -1625,19 +1625,21 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
     old_pred_expr <- bru_pred_expr(lh)
     pred_text <- bru_pred_expr(old_pred_expr, format = "text_raw")
-    pred_text <- glue("
-        {{
-          BRU_eta <- {{
-            {pred_text}
-          }}
-          BRU_eta <- rep_len(BRU_eta, length(BRU_aggregate))
-          c(ibm_eval(
-              BRU_cp_agg,
-              list(block = .block[BRU_aggregate]),
-              state = BRU_eta[BRU_aggregate] *
-                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
-            BRU_eta[!BRU_aggregate])
-        }}")
+    resp_text <- bru_pred_expr(old_pred_expr, format = "resp_text")
+    lh$data_extra[["BRU_cp_predictor"]] <-
+      function(eta, data, data_extra) {
+        eta <- rep_len(eta, length(data$BRU_aggregate))
+        c(
+          ibm_eval(
+            data_extra$BRU_cp_agg,
+            list(block = data$.block[data$BRU_aggregate]),
+            state = eta[data$BRU_aggregate] *
+              data$BRU_point_weights[data$BRU_aggregate]
+          )[data_extra$BRU_cp_block_subset],
+          eta[!data$BRU_aggregate]
+        )
+      }
+    pred_text <- glue("BRU_cp_predictor({{ {pred_text} }}, .data., .data_extra.)")
     lh$pred_expr <- bru_pred_expr(
       pred_text,
       used = lh$pred_expr$used,
@@ -1646,6 +1648,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
+    lh$pred_expr$resp_text <- resp_text
 
     data <- extended_bind_rows(
       dplyr::bind_cols(data,
@@ -5097,6 +5100,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
     k <- k + 1L
   }
+
+  bru_log_message("iinla: Computation completed", verbosity = 3)
 
   timings <- bru_timer_done(timings)
 

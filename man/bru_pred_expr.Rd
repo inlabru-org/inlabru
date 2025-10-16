@@ -41,8 +41,9 @@ needs to be set before use. Default: \code{NULL}}
 \item \code{"expr"} (an \code{rlang} expression),
 \item \code{"formula"} (the original formula input if available, otherwise
 constructed from the expression),
-\item \code{"formula_text"} (a text version of the "formula"), or
-\item \code{"text_raw"} (plain text, without substituting \code{BRU_EXPRESSION}).
+\item \code{"formula_text"} (a text version of the "formula"),
+\item \code{"text_raw"} (plain text, without substituting \code{BRU_EXPRESSION}), or
+\item \code{"rest_text"} (plain text of the response side of the formula).
 }}
 }
 \description{

@@ -57,7 +57,6 @@ bru_pred_expr.default <- function(x, ..., used = NULL, is_rowwise = NULL,
   }
   structure(
     list(
-      formula_text = formula_text,
       pred_text = pred_text,
       pred_expr = pred_expr,
       is_additive = is_additive,
@@ -106,8 +105,9 @@ bru_pred_expr.bru_obs <- function(x, ...) {
 #' * `"expr"` (an `rlang` expression),
 #' * `"formula"` (the original formula input if available, otherwise
 #'   constructed from the expression),
-#' * `"formula_text"` (a text version of the "formula"), or
-#' * `"text_raw"` (plain text, without substituting `BRU_EXPRESSION`).
+#' * `"formula_text"` (a text version of the "formula"),
+#' * `"text_raw"` (plain text, without substituting `BRU_EXPRESSION`), or
+#' * `"resp_text"` (plain text of the response side of the formula).
 #' @export
 bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
   format <- match.arg(
@@ -120,7 +120,8 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
       "expr",
       "formula",
       "formula_text",
-      "text_raw"
+      "text_raw",
+      "resp_text"
     )
   )
   if (identical(format, "object")) {
@@ -152,19 +153,21 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
     expression = parse(text = pred_text),
     quo = rlang::parse_quo(pred_text, env = x[[".envir"]]),
     expr = rlang::parse_expr(pred_text),
-    formula = if (is.null(x[["formula_text"]])) {
-      as.formula(glue::glue("~ {pred_text}"),
-        env = x[[".envir"]]
-      )
-    } else {
-      as.formula(x[["formula_text"]], env = x[[".envir"]])
+    formula = {
+      formula_text <- bru_pred_expr(x, format = "formula_text")
+      as.formula(formula_text, env = x[[".envir"]])
     },
     formula_text = if (is.null(x[["formula_text"]])) {
-      glue::glue("~ {pred_text}")
+      if (!is.null(x[["resp_text"]])) {
+        glue::glue("{x$resp_text} ~ {pred_text}")
+      } else {
+        glue::glue("~ {pred_text}")
+      }
     } else {
       x[["formula_text"]]
     },
     text_raw = pred_text,
+    resp_text = x[["resp_text"]],
     stop(glue::glue("Unknown format '{format}'"))
   )
 }

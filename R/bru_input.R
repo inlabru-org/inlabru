@@ -159,7 +159,7 @@ bru_input.bru_comp <- function(component,
   if (is.null(component[["mapper"]])) {
     stop(glue("Component mapper for '{component$label}' is NULL"))
   }
-  return(bru_input(component[["mapper"]], data = data, ...))
+  return(bru_input(component[["mapper"]], data = data, ..., label = component$label))
 
   if (is.null(component[["mapper"]])) {
     part_names <- intersect(c("main", "group", "replicate"), names(component))
