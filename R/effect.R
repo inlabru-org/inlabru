@@ -1314,7 +1314,8 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
           # useful for intercept-like components only used via the
           # *_latent technique.
           inputs <- list(
-            bru_input(mapper_input,
+            bru_input(
+              mapper_input,
               data = NULL,
               .envir = env,
               label = mapper_input$label,

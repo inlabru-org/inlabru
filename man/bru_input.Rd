@@ -3,11 +3,12 @@
 \name{bru_input}
 \alias{bru_input}
 \alias{new_bru_input}
-\alias{bru_input.bru_comp}
-\alias{bru_input.bru_model}
-\alias{bru_input.bru_comp_list}
-\alias{bru_input.bru_obs_list}
 \alias{bru_input.bru_input}
+\alias{bru_input.bru_comp}
+\alias{bru_input.bru_comp_list}
+\alias{bru_input.bru_model}
+\alias{bru_input.bru_obs}
+\alias{bru_input.bru_obs_list}
 \alias{bru_input.bru_mapper}
 \alias{bru_input.bm_pipe}
 \alias{bru_input.bm_multi}
@@ -20,37 +21,39 @@ new_bru_input(input, label = NULL, layer = NULL, selector = NULL, ...)
 
 bru_input(...)
 
-\method{bru_input}{bru_comp}(component, data, ...)
-
-\method{bru_input}{bru_model}(model, lhoods, ...)
-
-\method{bru_input}{bru_comp_list}(components, data, ...)
-
-\method{bru_input}{bru_obs_list}(lhoods, components, ...)
-
 \method{bru_input}{bru_input}(
-  input,
+  x,
   data = NULL,
   mask = NULL,
-  .envir = parent.frame(),
   null.on.fail = FALSE,
+  .envir = parent.frame(),
   ...
 )
 
-\method{bru_input}{bru_mapper}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_comp}(x, ..., label = x$label)
 
-\method{bru_input}{bm_pipe}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_comp_list}(x, ...)
 
-\method{bru_input}{bm_multi}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_model}(x, lhoods, ...)
 
-\method{bru_input}{bm_collect}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_obs}(x, components, ...)
 
-\method{bru_input}{bm_repeat}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_obs_list}(x, components, ...)
 
-\method{bru_input}{bm_sum}(input, ..., label = "<unknown>")
+\method{bru_input}{bru_mapper}(x, ..., label = "<unknown>")
+
+\method{bru_input}{bm_pipe}(x, ..., label = "<unknown>")
+
+\method{bru_input}{bm_multi}(x, ..., label = "<unknown>")
+
+\method{bru_input}{bm_collect}(x, ..., label = "<unknown>")
+
+\method{bru_input}{bm_repeat}(x, ..., label = "<unknown>")
+
+\method{bru_input}{bm_sum}(x, ..., label = "<unknown>")
 }
 \arguments{
-\item{input}{An expression to be evaluated}
+\item{input}{An expression to be evaluated.}
 
 \item{label}{character; optional label used to identify the object in
 informational messages.}
@@ -63,29 +66,53 @@ use with \code{\link[=eval_spatial]{eval_spatial()}}}
 
 \item{\dots}{Passed on to sub-methods.}
 
-\item{component}{A \link{bru_comp} object.}
+\item{x}{A \code{bru_input} object, or other object for recursive evaluation.}
 
 \item{data}{A \code{data.frame}, \code{tibble}, \code{sf}, \code{list}, or \verb{Spatial*} object of
 covariates and/or point locations.}
 
-\item{model}{A \link{bru_model} object.}
-
-\item{lhoods}{A \link{bru_obs_list} object.}
-
-\item{components}{A \link{bru_comp_list} object.}
-
-\item{.envir}{environment in which to evaluate the input expression. Default
-is \code{parent.frame()}}
+\item{mask}{A \code{bru_data_mask} object, constructed internally.}
 
 \item{null.on.fail}{logical; if \code{TRUE}, return \code{NULL} if the input evaluation
 fails. If \code{FALSE} (default), return a vector of 1s and issue a warning
 (only for deprecated use of \code{coordinates} without having loaded the \code{sp}
 package), or stop with an error.}
+
+\item{.envir}{environment in which to evaluate the input expression. Default
+is \code{parent.frame()}}
+
+\item{lhoods}{A \code{bru_obs_list} object containing all observations models.}
+
+\item{components}{A \code{bru_comp_list} object containing all components
+defined in the model.}
 }
 \value{
 \itemize{
 \item \code{bru_input(bru_comp)}: A list of mapper input values, formatted
 for the full component mapper (of type \link{bm_pipe})
+}
+
+\itemize{
+\item \code{bru_input(bru_comp_list)}: A list of mapper input values,
+with one entry for each component.
+}
+
+\itemize{
+\item \code{bru_input(bru_model)}: A list of mapper input values,
+with one entry for each observation model, each containing a list
+of inputs for the components used by the corresponding observation model.
+}
+
+\itemize{
+\item \code{bru_input(bru_obs_list)}: A list of mapper input values,
+with one entry for each observation model, each containing a list
+of inputs for the components used by the corresponding observation model.
+}
+
+\itemize{
+\item \code{bru_input(bru_obs_list)}: A list of mapper input values,
+with one entry for each observation model, each containing a list
+of inputs for the components used by the corresponding observation model.
 }
 }
 \description{
@@ -99,9 +126,6 @@ model definitions using \link{ibm_input_set}/\code{\link[=ibm_input_new]{ibm_inp
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_input(bru_obs_list)}: Computes the component inputs for included components
-for each model likelihood
-
 \item \code{bru_input(bru_input)}: Attempts to evaluate a component input (e.g. \code{main},
 \code{group}, \code{replicate}, or \code{weight}), and process the results:
 \enumerate{
@@ -118,6 +142,9 @@ of that data frame at the point locations
 \item Else we obtain a vector and return as-is. This happens when input
 references a column of the data points, or some other complete expression
 }
+
+\item \code{bru_input(bru_model)}: Computes the component inputs for included components
+for each observation model.
 
 \item \code{bru_input(bru_mapper)}: Evaluate the input associated with a \code{bru_mapper}.
 

@@ -252,7 +252,7 @@ evaluate_model <- function(model,
   }
   if (is.null(input)) {
     input <- bru_input(
-      components = comp_lst[used$effect],
+      comp_lst[used$effect],
       data = data
     )
   }
