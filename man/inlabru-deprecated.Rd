@@ -38,8 +38,8 @@ replicate the row belongs to, in the sense used in
 resulting matrix.}
 }
 \description{
-Some of these functions may still attempt to do their job, but will be removed
-in a future version.
+Some of these functions may still attempt to do their job, but will be
+removed in a future version.
 }
 \section{Functions}{
 \itemize{

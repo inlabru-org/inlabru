@@ -36,7 +36,6 @@ needs to be set before use. Default: \code{NULL}}
 \itemize{
 \item \code{"object"} (the default),
 \item \code{"text"} (plain text),
-\item \code{"expression"} (a \code{base} \code{expression}),
 \item \code{"quo"} (an \code{rlang} quosure),
 \item \code{"expr"} (an \code{rlang} expression),
 \item \code{"formula"} (the original formula input if available, otherwise

@@ -45,7 +45,7 @@ bru_pred_expr.default <- function(x, ..., used = NULL, is_rowwise = NULL,
   is_additive <- bru_is_additive(pred_text)
   is_additive_dot <- identical(pred_text, ".")
   if (!is_additive_dot) {
-    pred_expr <- parse(text = pred_text)
+    pred_expr <- rlang::parse_expr(pred_text)
   } else {
     pred_text <- NULL
     pred_expr <- NULL
@@ -53,7 +53,7 @@ bru_pred_expr.default <- function(x, ..., used = NULL, is_rowwise = NULL,
   if (is.null(resp_text)) {
     resp_expr <- NULL
   } else {
-    resp_expr <- parse(text = resp_text)
+    resp_expr <- rlang::parse_expr(resp_text)
   }
   structure(
     list(
@@ -100,7 +100,6 @@ bru_pred_expr.bru_obs <- function(x, ...) {
 #' @param format Character; one of
 #' * `"object"` (the default),
 #' * `"text"` (plain text),
-#' * `"expression"` (a `base` `expression`),
 #' * `"quo"` (an `rlang` quosure),
 #' * `"expr"` (an `rlang` expression),
 #' * `"formula"` (the original formula input if available, otherwise
@@ -115,7 +114,6 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
     c(
       "object",
       "text",
-      "expression",
       "quo",
       "expr",
       "formula",
@@ -150,7 +148,6 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
 
   switch(format,
     text = pred_text,
-    expression = parse(text = pred_text),
     quo = rlang::parse_quo(pred_text, env = x[[".envir"]]),
     expr = rlang::parse_expr(pred_text),
     formula = {

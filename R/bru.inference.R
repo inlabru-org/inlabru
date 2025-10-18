@@ -645,7 +645,18 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-bru_data_mask <- function(data) {
+bru_data_mask <- function(data,
+                          pronouns = NULL,
+                          objects = NULL) {
+  if (is.null(pronouns) || is.null(objects)) {
+    nms <- setdiff(names(data), "")
+    if (is.null(pronouns)) {
+      pronouns <- nms
+    }
+    if (is.null(objects)) {
+      objects <- nms
+    }
+  }
   data_orig <- data
   data <- lapply(data, function(x) {
     if (!is.null(x) && !is.list(x)) {
@@ -654,12 +665,16 @@ bru_data_mask <- function(data) {
     x
   })
   top_envir <- rlang::new_environment()
-  nms <- names(data)
-  for (nm in setdiff(nms, "")) {
-    assign(glue::glue(".{nm}."), data_orig[[nm]], envir = top_envir)
+  if (length(objects) > 0) {
+    dot2_nms <- paste0(".", objects, ".")
+    names(dot2_nms) <- objects
+    for (nm in objects) {
+      if (is.null(data_orig[[nm]])) {
+        next
+      }
+      assign(dot2_nms[nm], data_orig[[nm]], envir = top_envir)
+    }
   }
-  success <- FALSE
-  result <- NULL
   bottom_envir <- top_envir
   for (k in rev(seq_along(data))) {
     if (is.null(data[[k]])) {
@@ -668,12 +683,17 @@ bru_data_mask <- function(data) {
     bottom_envir <- rlang::new_environment(data[[k]], parent = bottom_envir)
   }
   mask <- rlang::new_data_mask(bottom_envir, top_envir)
-  for (nm in setdiff(nms, "")) {
-    if (is.null(data[[nm]])) {
-      next
+  if (length(pronouns) > 0) {
+    dot_nms <- paste0(".", pronouns)
+    names(dot_nms) <- pronouns
+    for (nm in pronouns) {
+      if (is.null(data[[nm]])) {
+        next
+      }
+      mask[[dot_nms[nm]]] <- rlang::as_data_pronoun(data[[nm]])
     }
-    mask[[glue::glue(".{nm}")]] <- rlang::as_data_pronoun(data[[nm]])
   }
+  mask[[".mask"]] <- rlang::as_data_pronoun(mask)
   class(mask) <- c("bru_data_mask", class(mask))
   mask
 }
@@ -1721,11 +1741,14 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 }
 
 
-check_used_deprecation <- function(used,
-                                   include,
-                                   exclude,
-                                   include_latent,
-                                   expr_text) {
+bru_obs_check_used_deprecation <- function(
+    used,
+    include,
+    exclude,
+    include_latent,
+    expr_text,
+    env = rlang::caller_env(),
+    user_env = rlang::caller_env(2)) {
   if (lifecycle::is_present(include) ||
     lifecycle::is_present(exclude) ||
     lifecycle::is_present(include_latent)) {
@@ -1748,7 +1771,9 @@ check_used_deprecation <- function(used,
         c(
           "The provided `include` value may be ignored.",
           "If auto-detection doesn't work, use `bru_used(effect = include)`"
-        )
+        ),
+        env = env,
+        user_env = user_env
       )
     }
     if (!lifecycle::is_present(exclude)) {
@@ -1773,7 +1798,9 @@ check_used_deprecation <- function(used,
             "If auto-detection doesn't work, ",
             "use `bru_used(effect_exclude = exclude)`"
           )
-        )
+        ),
+        env = env,
+        user_env = user_env
       )
     }
     if (!lifecycle::is_present(include_latent)) {
@@ -1798,7 +1825,9 @@ check_used_deprecation <- function(used,
             "If auto-detection doesn't work, ",
             "use `bru_used(latent = include_latent)`"
           )
-        )
+        ),
+        env = env,
+        user_env = user_env
       )
     }
     if (is.null(used)) {
@@ -2032,7 +2061,7 @@ bru_obs <- function(formula = . ~ .,
 
   # Only for deprecated include/exclude/include_latent argument handling:
   formula_char <- as.character(formula)
-  used <- check_used_deprecation(
+  used <- bru_obs_check_used_deprecation(
     used = used,
     include = rlang::maybe_missing(include),
     exclude = rlang::maybe_missing(exclude),
@@ -3189,6 +3218,57 @@ predict.bru <- function(object,
 }
 
 
+bru_generate_check_used_deprecation <- function(
+    include,
+    exclude,
+    env = rlang::caller_env(),
+    user_env = rlang::caller_env(2)) {
+  if (lifecycle::is_present(include)) {
+    bru_log_message(
+      paste0(
+        "The `include` argument to `generate.bru()` is deprecated. ",
+        "If auto-detection doesn't work, use ",
+        "`used = bru_used(effect = include)`."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_soft(
+      "2.12.0.9003",
+      "generate(include)",
+      "generate(used)",
+      "If auto-detection doesn't work, use `bru_used(effect = include)`",
+      env = env,
+      user_env = user_env
+    )
+  } else {
+    include <- NULL
+  }
+  if (lifecycle::is_present(exclude)) {
+    bru_log_message(
+      paste0(
+        "The `exclude` argument to `generate.bru()` is deprecated. ",
+        "If auto-detection doesn't work, use ",
+        "`used = bru_used(effect_exclude = exclude)`."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_soft(
+      "2.12.0.9003",
+      "generate(exclude)",
+      "generate(used)",
+      paste0(
+        "If auto-detection doesn't work, ",
+        "use `bru_used(effect_exclude = exclude)`"
+      ),
+      env = env,
+      user_env = user_env
+    )
+  } else {
+    exclude <- NULL
+  }
+  list(include = include, exclude = exclude)
+}
+
 #' Sampling based on bru posteriors
 #'
 #' @description
@@ -3303,55 +3383,20 @@ generate.bru <- function(object,
   } else {
     # TODO: clarify the output format, and use the format parameter
 
+    inc_exc <- bru_generate_check_used_deprecation(
+      include,
+      exclude
+    )
     if (is.null(used)) {
-      if (lifecycle::is_present(include)) {
-        bru_log_message(
-          paste0(
-            "The `include` argument to `generate.bru()` is deprecated. ",
-            "If auto-detection doesn't work, use ",
-            "`used = bru_used(effect = include)`."
-          ),
-          verbosity = 1L
-        )
-        lifecycle::deprecate_soft(
-          "2.12.0.9003",
-          "generate(include)",
-          "generate(used)",
-          "If auto-detection doesn't work, use `bru_used(effect = include)`"
-        )
-      } else {
-        include <- NULL
-      }
-      if (lifecycle::is_present(exclude)) {
-        bru_log_message(
-          paste0(
-            "The `exclude` argument to `generate.bru()` is deprecated. ",
-            "If auto-detection doesn't work, use ",
-            "`used = bru_used(effect_exclude = exclude)`."
-          ),
-          verbosity = 1L
-        )
-        lifecycle::deprecate_soft(
-          "2.12.0.9003",
-          "generate(exclude)",
-          "generate(used)",
-          paste0(
-            "If auto-detection doesn't work, ",
-            "use `bru_used(effect_exclude = exclude)`"
-          )
-        )
-      } else {
-        exclude <- NULL
-      }
       used <-
         bru_used(
           formula,
           effect = if (is.null(formula)) {
             character(0)
           } else {
-            include
+            inc_exc$include
           },
-          effect_exclude = exclude,
+          effect_exclude = inc_exc$exclude,
           latent = NULL
         )
     }
@@ -3541,9 +3586,6 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3,
       MARGIN = 1, mean, na.rm = TRUE
     )
-    if (max_moment >= 3) {
-      smy[["skew"]] <- skew
-    }
     # eK + 3 >= skew^2 + 1
     # eK >= skew^2 - 2
     # Use 1/N normalisation of the sample sd
@@ -3555,21 +3597,22 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
         na.rm = TRUE
       )
     )
-    if (max_moment >= 4) {
-      smy[["ekurtosis"]] <- ekurtosis
-    }
 
     # Add Monte Carlo standard errors
     # Var(s) \approx (eK + 2) \sigma^2 / (4 n):
     # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
-    smy[["sd.mc_std_err"]] <-
+    sd.mc_std_err <-
       sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
         smy[["sd"]] / sqrt(4 * N)
     # Include sd MC error in estimate of mean MC error:
-    smy[["mean.mc_std_err"]] <- (
-      smy[["sd"]] +
-        smy[["sd.mc_std_err"]] * 2
-    ) / sqrt(N)
+    smy[["mean.mc_std_err"]] <- (smy[["sd"]] + sd.mc_std_err * 2) / sqrt(N)
+    smy[["sd.mc_std_err"]] <- sd.mc_std_err
+    if (max_moment >= 3) {
+      smy[["skew"]] <- skew
+    }
+    if (max_moment >= 4) {
+      smy[["ekurtosis"]] <- ekurtosis
+    }
   }
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
@@ -3606,7 +3649,7 @@ nonlin_predictor <- function(param, state) {
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
             predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
-              format = "expression"
+              format = "expr"
             ),
             format = "matrix",
             n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])

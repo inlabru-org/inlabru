@@ -484,9 +484,9 @@ evaluate_predictor <- function(model,
   format <- match.arg(format, c("auto", "matrix", "list"))
   pred.envir <- environment(predictor)
   if (inherits(predictor, "formula")) {
-    predictor <- parse(
-      text = as.character(predictor)[length(as.character(predictor))]
-    )
+    pred_text <- as.character(predictor)
+    pred_text <- pred_text[length(pred_text)]
+    predictor <- rlang::parse_expr(pred_text)
   }
   formula.envir <- environment(model$formula)
   enclos <-
@@ -513,28 +513,6 @@ evaluate_predictor <- function(model,
   #
   # Note: Since 2.7.0.9019, no longer converts Spatial*DataFrame to data frame
   # here; coordinates must be accessed via sp::coordinates() if needed.
-  if (!is.null(data)) {
-    if (inherits(data, "Spatial")) {
-      for (nm in names(data)) {
-        assign(nm, data[[nm]], envir = envir)
-      }
-    } else {
-      list2env(data, envir = envir)
-    }
-  }
-  assign(".data.", data, envir = envir)
-
-  nms <- setdiff(names(data_extra), names(data))
-  if (!is.null(data_extra[nms])) {
-    if (inherits(data_extra, "Spatial")) {
-      for (nm in nms) {
-        assign(nm, data_extra[[nm]], envir = envir)
-      }
-    } else {
-      list2env(data_extra[nms], envir = envir)
-    }
-  }
-  assign(".data_extra.", data_extra, envir = envir)
 
   # Rename component states from label to label_latent
   state_names <- as.list(expand_labels(
@@ -576,10 +554,10 @@ evaluate_predictor <- function(model,
           replicate <- rep(1, n_input)
         }
         if (!.is_offset && is.null(.state)) {
-          .state <- eval(
-            parse(text = .label),
-            envir = .envir,
-            enclos = .enclos
+          .state <- rlang::eval_tidy(
+            rlang::parse_expr(.label),
+            data = data_mask,
+            env = .envir
           )
         }
         .input <- list(
@@ -619,10 +597,10 @@ evaluate_predictor <- function(model,
             state = .state
           )
           if (any(not_ok)) {
-            .cache_state_index <- eval(
-              parse(text = ".cache_state_index"),
-              envir = .envir,
-              enclos = .enclos
+            .cache_state_index <- rlang::eval_tidy(
+              rlang::parse_expr(".cache_state_index"),
+              data = data_mask,
+              env = .envir
             )
             if (!identical(.cache_state_index, .iid_cache_index)) {
               .iid_cache_index <<- .cache_state_index
@@ -631,10 +609,10 @@ evaluate_predictor <- function(model,
             key <- as.character(main[not_ok])
             not_cached <- !(key %in% names(.iid_cache))
             if (any(not_cached)) {
-              .prec <- eval(
-                parse(text = .iid_precision),
-                envir = .envir,
-                enclos = .enclos
+              .prec <- rlang::eval_tidy(
+                rlang::parse_expr(.iid_precision),
+                data = data_mask,
+                env = .envir
               )
               for (k in unique(key[not_cached])) {
                 .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
@@ -652,16 +630,14 @@ evaluate_predictor <- function(model,
       }
       eval_fun
     }
+  eval_list <- list()
   for (nm in names(eval_names)) {
-    assign(
-      eval_names[[nm]],
+    eval_list[[eval_names[[nm]]]] <-
       eval_fun_factory(
         comp_lst[[nm]],
         .envir = envir,
         .enclos = enclos
-      ),
-      envir = envir
-    )
+      )
   }
 
   # Remove problematic objects:
@@ -670,17 +646,27 @@ evaluate_predictor <- function(model,
 
   n <- length(state)
   for (k in seq_len(n)) {
-    # Keep track of the iteration index so the iid cache can be invalidated
-    assign(".cache_state_index", k, envir = envir)
+    state_df <- state[[k]]
+    names(state_df) <- state_names[names(state_df)]
+    data_mask <- bru_data_mask(
+      list(
+        effects[[k]],
+        # effects = effects[[k]],
+        state_df,
+        # latent = state[[k]],
+        data = data,
+        data_extra = data_extra,
+        eval_list,
+        # Keep track of the iteration index so the iid cache can be
+        # invalidated
+        list(.cache_state_index = k)
+      )
+    )
 
-    for (nm in names(state[[k]])) {
-      assign(state_names[[nm]], state[[k]][[nm]], envir = envir)
-    }
-    for (nm in names(effects[[k]])) {
-      assign(nm, effects[[k]][[nm]], envir = envir)
-    }
-
-    result_ <- eval(predictor, envir = envir, enclos = enclos)
+    result_ <- rlang::eval_tidy(predictor,
+      data = data_mask,
+      env = envir
+    )
     if (!is.null(n_pred) && is.numeric(result_) && length(result_) == 1) {
       result_ <- rep(result_, n_pred)
     }

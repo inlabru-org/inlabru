@@ -57,12 +57,12 @@ bru_used_update.bru_pred_expr <- function(x, labels, ...) {
           )
         }
         x[["pred_text"]] <- pred_text
-        x[["pred_expr"]] <- parse(text = x[["pred_text"]])
+        x[["pred_expr"]] <- rlang::parse_expr(x[["pred_text"]])
       }
     } else {
       if (is.null(x[["pred_expr"]])) {
         x[["pred_text"]] <- paste0(used$effect, collapse = " + ")
-        x[["pred_expr"]] <- parse(text = x[["pred_text"]])
+        x[["pred_expr"]] <- rlang::parse_expr(x[["pred_text"]])
       }
     }
   }
@@ -261,6 +261,13 @@ bru_used_vars.expression <- function(x, functions = FALSE) {
   bru_used_vars(ex, functions = functions)
 }
 
+#' @rdname bru_used_vars
+#' @export
+bru_used_vars.quosure <- function(x, functions = FALSE) {
+  ex <- deparse1(rlang::quo_get_expr(x), collapse = "\n")
+  bru_used_vars(ex, functions = functions)
+}
+
 #' @describeIn bru_used_vars Only the right-hand side is used.
 #' @export
 bru_used_vars.formula <- function(x, functions = FALSE) {
@@ -320,6 +327,26 @@ bru_used.expression <- function(x, ...,
                                 labels = NULL) {
   attributes(x) <- NULL
   y <- deparse1(x, collapse = "\n")
+  bru_used(
+    x = y,
+    ...,
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
+}
+
+#' @describeIn bru_used Create a `bru_used` object from an `rlang` `expr`
+#'   object.
+#' @export
+bru_used.quosure <- function(x, ...,
+                             effect = NULL,
+                             effect_exclude = NULL,
+                             latent = NULL,
+                             labels = NULL) {
+  y <- deparse1(rlang::quo_get_expr(x), collapse = "\n")
+  attributes(y) <- NULL
   bru_used(
     x = y,
     ...,

@@ -391,10 +391,18 @@ bru_info_upgrade <- function(object,
       if (!is.null(object[["lhoods"]])) {
         object[["lhoods"]] <-
           lapply(object[["lhoods"]], function(x) {
+            pred_text <- deparse1(x[["expr"]], collapse = "\n")
+            pred_text <- gsub(
+              pattern = "^expression\\(",
+              replacement = "(",
+              x = pred_text,
+              fixed = FALSE
+            )
+            pred_expr <- x[["expr"]]
             x[["pred_expr"]] <- structure(
               list(
-                pred_text = deparse1(x[["expr"]], collapse = "\n"),
-                pred_expr = x[["expr"]],
+                pred_text = pred_text,
+                pred_expr = rlang::parse_expr(pred_text),
                 is_additive = x[["is_additive"]],
                 is_rowwise = !x[["allow_combine"]],
                 is_linear = x[["linear"]],

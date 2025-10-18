@@ -5,6 +5,7 @@
 \alias{bru_used.NULL}
 \alias{bru_used.character}
 \alias{bru_used.expression}
+\alias{bru_used.quosure}
 \alias{bru_used.formula}
 \alias{bru_used.bru}
 \alias{bru_used.bru_info}
@@ -38,6 +39,15 @@ bru_used(x = NULL, ...)
 )
 
 \method{bru_used}{expression}(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+)
+
+\method{bru_used}{quosure}(
   x,
   ...,
   effect = NULL,
@@ -137,6 +147,9 @@ vectors.
 representation of an expression.
 
 \item \code{bru_used(expression)}: Create a \code{bru_used} object from an expression object.
+
+\item \code{bru_used(quosure)}: Create a \code{bru_used} object from an \code{rlang} \code{expr}
+object.
 
 \item \code{bru_used(formula)}: Create a \code{bru_used} object from a formula (only the
 right-hand side is used).

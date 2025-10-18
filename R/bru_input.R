@@ -179,8 +179,8 @@ bru_input.bru_input <- function(x,
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_CRS(orig_data),
-                               error = function(e) {
-                               }
+            error = function(e) {
+            }
           )
           if (!fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
@@ -260,7 +260,7 @@ bru_input.bru_input <- function(x,
     "SpatialPixelsDataFrame",
     "SpatRaster"
   ))) &&
-  any(is.na(as.data.frame(val)))) {
+    any(is.na(as.data.frame(val)))) {
     msg <- glue(
       "Model input '",
       glue_collapse(rlang::as_label(x$input), sep = "\n"),
@@ -442,7 +442,9 @@ bru_input.bru_obs <- function(x, components, ...) {
   bru_input(
     components[included],
     data = x[["data"]],
-    mask = bru_data_mask(list(data = x[["data"]])),
+    mask = bru_data_mask(
+      list(data = x[["data"]], data_extra = x[["data_extra"]])
+    ),
     ...
   )
 }
