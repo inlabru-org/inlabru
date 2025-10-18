@@ -446,9 +446,9 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 #' @export
 format.bru_used <- function(x, ...) {
   if (is.null(x[["effect"]])) {
-    s <- paste0("effects[<not yet initialised>]")
+    s <- paste0("effect[<not yet initialised>]")
   } else {
-    s <- paste0("effects[", paste0(x$effect, collapse = ", "), "]")
+    s <- paste0("effect[", paste0(x$effect, collapse = ", "), "]")
   }
   if (is.null(x[["latent"]])) {
     s <- paste0(s, ", latent[<not yet initialised>]")
