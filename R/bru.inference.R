@@ -3063,7 +3063,8 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
 #' For "iid" models with `mapper = bm_index(n)`, `rnorm()` is used to
-#' generate new realisations for indices greater than `n`.
+#' generate new realisations for indices greater than `n`, if accessed
+#' via `<name>_eval(...)`.
 #'
 #' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values
 #'   and other summary statistics attached. Non-S4 object outputs have the class
@@ -3311,7 +3312,8 @@ bru_generate_check_used_deprecation <- function(
 #' `field(coordinates, ...)` (see also [bru_comp_eval()]).
 #'
 #' For "iid" models with `mapper = bm_index(n)`, `rnorm()` is used to
-#' generate new realisations for indices greater than `n`.
+#' generate new realisations for indices greater than `n`, if accessed
+#' via `<name>_eval(...)`.
 #'
 #' @return List of generated samples
 #' @seealso [predict.bru]
