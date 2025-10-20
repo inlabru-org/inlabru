@@ -8,6 +8,8 @@
 \alias{bru_pred_expr.bru_info}
 \alias{bru_pred_expr.bru}
 \alias{bru_pred_expr.bru_pred_expr}
+\alias{format.bru_pred_expr}
+\alias{print.bru_pred_expr}
 \title{Predictor expression handler object}
 \usage{
 new_bru_pred_expr(
@@ -29,6 +31,10 @@ bru_pred_expr(x, ...)
 \method{bru_pred_expr}{bru}(x, ...)
 
 \method{bru_pred_expr}{bru_pred_expr}(x, ..., format = "object")
+
+\method{format}{bru_pred_expr}(x, ...)
+
+\method{print}{bru_pred_expr}(x, ...)
 }
 \arguments{
 \item{x}{For creation, a formula or character string giving the predictor

@@ -184,10 +184,15 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
       as.formula(formula_text, env = x[[".envir"]])
     },
     formula_text = if (is.null(x[["formula_text"]])) {
-      if (!is.null(x[["resp_text"]])) {
-        glue::glue("{x$resp_text} ~ {pred_text}")
+      if (is.null(pred_text) || identical(pred_text, "")) {
+        p_txt <- "."
       } else {
-        glue::glue("~ {pred_text}")
+        p_txt <- pred_text
+      }
+      if (!is.null(x[["resp_text"]])) {
+        glue::glue("{x$resp_text} ~ {p_txt}")
+      } else {
+        glue::glue("~ {p_txt}")
       }
     } else {
       x[["formula_text"]]
@@ -196,4 +201,31 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
     resp_text = x[["resp_text"]],
     stop(glue::glue("Unknown format '{format}'"))
   )
+}
+
+
+
+
+#' @rdname bru_pred_expr
+#' @export
+#' @importFrom glue glue
+format.bru_pred_expr <- function(x, ...) {
+  glue::glue(
+    "    Predictor: {predictor}\n",
+    "    Additive/Linear/Rowwise: {is_additive}/{is_linear}/{is_rowwise}\n",
+    "    Used components: {format(used)}",
+    predictor = bru_pred_expr(x, format = 'formula_text'),
+    is_additive = bru_is_additive(x),
+    is_linear = bru_is_linear(x),
+    is_rowwise = bru_is_rowwise(x),
+    used = bru_used(x)
+  )
+}
+
+#' @rdname bru_pred_expr
+#' @export
+#' @importFrom glue glue
+print.bru_pred_expr <- function(x, ...) {
+  cat(format(x), sep = "\n")
+  invisible(x)
 }
