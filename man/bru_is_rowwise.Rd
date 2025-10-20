@@ -37,6 +37,6 @@ otherwise.
 Checks if a predictor expression may be evaluated rowwise
 }
 \examples{
-bru_is_rowwise(bru_pred_expr(~ x + y))
+bru_is_rowwise(new_bru_pred_expr(~ x + y))
 
 }

@@ -48,7 +48,7 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    bru_pred_expr(as_bru_obs_list(fit)[[1]], format = "text"),
+    bru_pred_expr(fit, format = "text")[[1]],
     "x + z + Intercept",
     info = "Should construct correct expression"
   )

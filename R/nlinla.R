@@ -288,14 +288,15 @@ bru_compute_linearisation.bru_obs <- function(lhood,
                                               eps,
                                               ...) {
   used <- bru_used(lhood)
-  is_rowwise <- bru_pred_expr(lhood)[["is_rowwise"]]
+  pred_expr <- bru_pred_expr(lhood)
+  is_rowwise <- bru_is_rowwise(pred_expr)
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
     input = input[used[["effect"]]],
     state = state[used[["effect"]]]
   )
 
-  lhood_expr <- bru_pred_expr(lhood, format = "expr")
+  lhood_expr <- bru_pred_expr(pred_expr, format = "expr")
   n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(
@@ -316,8 +317,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
   # Either this loop or the internal bru_comp specific loop
   # can in principle be parallelised.
   comp_lst <- as_bru_comp_list(model)
-  additive_and_rowwise <- bru_is_additive(lhood) &&
-    bru_pred_expr(lhood)[["is_rowwise"]]
+  additive_and_rowwise <- bru_is_additive(lhood) && is_rowwise
   for (label in union(used[["effect"]], used[["latent"]])) {
     if (ibm_n(comp_lst[[label]][["mapper"]]) > 0) {
       if (additive_and_rowwise) {
@@ -351,7 +351,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
             effects = effects,
             pred0 = pred0,
             used = used,
-            is_rowwise = bru_pred_expr(lhood)[["is_rowwise"]],
+            is_rowwise = is_rowwise,
             eps = eps,
             n_pred = n_pred,
             ...

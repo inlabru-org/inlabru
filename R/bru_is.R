@@ -6,8 +6,8 @@
 #'   otherwise.
 #' @export
 #' @examples
-#' bru_is_linear(bru_pred_expr(~ x + y))
-#' bru_is_linear(bru_pred_expr(~ x * y))
+#' bru_is_linear(new_bru_pred_expr(~ x + y))
+#' bru_is_linear(new_bru_pred_expr(~ x * y))
 #' bru_is_linear(bm_scale())
 #' bru_is_linear(bm_logsumexp())
 #'
@@ -238,7 +238,7 @@ bru_is_additive.bru_obs_list <- function(x, ...) {
 #'   otherwise.
 #' @export
 #' @examples
-#' bru_is_rowwise(bru_pred_expr(~ x + y))
+#' bru_is_rowwise(new_bru_pred_expr(~ x + y))
 #'
 bru_is_rowwise <- function(x, ...) {
   UseMethod("bru_is_rowwise")

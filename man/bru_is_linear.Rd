@@ -46,8 +46,8 @@ otherwise.
 Checks if a predictor expression is linear (or affine)
 }
 \examples{
-bru_is_linear(bru_pred_expr(~ x + y))
-bru_is_linear(bru_pred_expr(~ x * y))
+bru_is_linear(new_bru_pred_expr(~ x + y))
+bru_is_linear(new_bru_pred_expr(~ x * y))
 bru_is_linear(bm_scale())
 bru_is_linear(bm_logsumexp())
 

@@ -1150,7 +1150,7 @@ bru_obs_agg <- function(lh,
       "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
       " state = {{{pred_text}}})}}"
     )
-    lh$pred_expr <- bru_pred_expr(
+    lh$pred_expr <- new_bru_pred_expr(
       pred_text,
       used = lh$pred_expr$used,
       is_rowwise = FALSE,
@@ -1403,7 +1403,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
             BRU_eta[!BRU_aggregate])
         }}")
     old_pred_expr <- bru_pred_expr(lh)
-    lh$pred_expr <- bru_pred_expr(
+    lh$pred_expr <- new_bru_pred_expr(
       pred_text,
       used = lh$pred_expr$used,
       is_rowwise = FALSE,
@@ -1498,7 +1498,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   samplers <- lh[["integration_info"]][["samplers"]]
   ips <- lh[["integration_info"]][["ips"]]
 
-  response_expr_text <- bru_pred_expr(lh)$resp_text
+  response_expr_text <- bru_pred_expr(lh, format = "resp_text")
 
   # Catch and handle special cases:
   if (is.null(response) || !inherits(response, "list")) {
@@ -1673,7 +1673,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       }
     pred_text <-
       glue("BRU_cp_predictor({{ {pred_text} }}, .data., .data_extra.)")
-    lh$pred_expr <- bru_pred_expr(
+    lh$pred_expr <- new_bru_pred_expr(
       pred_text,
       used = lh$pred_expr$used,
       is_rowwise = FALSE,
@@ -2070,7 +2070,7 @@ bru_obs <- function(formula = . ~ .,
   )
 
   # Build expressions from formula:
-  pred_expr <- bru_pred_expr(formula,
+  pred_expr <- new_bru_pred_expr(formula,
     used = used,
     .envir = .envir
   )

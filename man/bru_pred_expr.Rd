@@ -2,16 +2,31 @@
 % Please edit documentation in R/pred_expr.R
 \name{bru_pred_expr}
 \alias{bru_pred_expr}
-\alias{bru_pred_expr.default}
+\alias{new_bru_pred_expr}
 \alias{bru_pred_expr.bru_obs}
+\alias{bru_pred_expr.bru_obs_list}
+\alias{bru_pred_expr.bru_info}
+\alias{bru_pred_expr.bru}
 \alias{bru_pred_expr.bru_pred_expr}
 \title{Predictor expression handler object}
 \usage{
+new_bru_pred_expr(
+  x,
+  ...,
+  used = NULL,
+  is_rowwise = NULL,
+  .envir = parent.frame()
+)
+
 bru_pred_expr(x, ...)
 
-\method{bru_pred_expr}{default}(x, ..., used = NULL, is_rowwise = NULL, .envir = parent.frame())
-
 \method{bru_pred_expr}{bru_obs}(x, ...)
+
+\method{bru_pred_expr}{bru_obs_list}(x, ...)
+
+\method{bru_pred_expr}{bru_info}(x, ...)
+
+\method{bru_pred_expr}{bru}(x, ...)
 
 \method{bru_pred_expr}{bru_pred_expr}(x, ..., format = "object")
 }
@@ -51,18 +66,33 @@ latent variables are used, whether the predictor is additive/linear/rowwise.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_pred_expr(default)}: Create a \code{bru_pred_expr} object from a formula or
-character string.
-
 \item \code{bru_pred_expr(bru_obs)}: Accessor for the \code{bru_pred_expr} object stored
 inside a \code{bru_obs} object.
+
+\item \code{bru_pred_expr(bru_obs_list)}: Accessor for the \code{bru_pred_expr} objects stored
+inside a \code{bru_obs_list} object.
+
+\item \code{bru_pred_expr(bru_info)}: Accessor for the \code{bru_pred_expr} object stored
+inside a \code{bru_info} object.
+
+\item \code{bru_pred_expr(bru)}: Accessor for the \code{bru_pred_expr} object stored
+inside a \code{bru} object.
 
 \item \code{bru_pred_expr(bru_pred_expr)}: Access a \code{bru_pred_expr} object or convert it to
 text or expression object.
 
 }}
+\section{Functions}{
+\itemize{
+\item \code{new_bru_pred_expr()}: Create a \code{bru_pred_expr} object from a formula or
+character string.
+
+\item \code{bru_pred_expr()}: Accessor generic for \code{bru_pred_expr} objects,
+including ones stored inside other objects.
+
+}}
 \examples{
-(bru_pred_expr(~ x + z + Intercept))
+(new_bru_pred_expr(~ x + z + Intercept))
 
 }
 \keyword{internal}

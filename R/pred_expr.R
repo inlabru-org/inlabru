@@ -12,9 +12,9 @@
 #'
 #' @keywords internal
 #' @export
-bru_pred_expr <- function(x, ...) {
-  UseMethod("bru_pred_expr")
-}
+#' @rdname bru_pred_expr
+#' @name bru_pred_expr
+NULL
 
 #' @describeIn bru_pred_expr Create a `bru_pred_expr` object from a formula or
 #' character string.
@@ -26,10 +26,10 @@ bru_pred_expr <- function(x, ...) {
 #' @param .envir The environment in which to evaluate the expression.
 #' @export
 #' @examples
-#' (bru_pred_expr(~ x + z + Intercept))
+#' (new_bru_pred_expr(~ x + z + Intercept))
 #'
-bru_pred_expr.default <- function(x, ..., used = NULL, is_rowwise = NULL,
-                                  .envir = parent.frame()) {
+new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
+                              .envir = parent.frame()) {
   resp_text <- NULL
   if (inherits(x, "formula")) {
     formula_text <- deparse1(x, collapse = "\n")
@@ -86,6 +86,14 @@ bru_compat_pre_2_14_bru_obs <- function(lh) {
   lh
 }
 
+#' @describeIn bru_pred_expr Accessor generic for `bru_pred_expr` objects,
+#'   including ones stored inside other objects.
+#'
+#' @keywords internal
+#' @export
+bru_pred_expr <- function(x, ...) {
+  UseMethod("bru_pred_expr")
+}
 
 
 #' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` object stored
@@ -93,6 +101,27 @@ bru_compat_pre_2_14_bru_obs <- function(lh) {
 #' @export
 bru_pred_expr.bru_obs <- function(x, ...) {
   bru_pred_expr(x[["pred_expr"]], ...)
+}
+
+#' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` objects stored
+#' inside a `bru_obs_list` object.
+#' @export
+bru_pred_expr.bru_obs_list <- function(x, ...) {
+  lapply(x, function(y) bru_pred_expr(y[["pred_expr"]], ...))
+}
+
+#' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` object stored
+#' inside a `bru_info` object.
+#' @export
+bru_pred_expr.bru_info <- function(x, ...) {
+  bru_pred_expr(as_bru_obs_list(x), ...)
+}
+
+#' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` object stored
+#' inside a `bru` object.
+#' @export
+bru_pred_expr.bru <- function(x, ...) {
+  bru_pred_expr(as_bru_obs_list(x), ...)
 }
 
 #' @describeIn bru_pred_expr Access a `bru_pred_expr` object or convert it to
