@@ -78,11 +78,75 @@ bru_info.character <- function(method,
 
 #' @export
 #' @describeIn bru_info Extract the `bru_info` object from an estimated [bru()]
-#'   result object. The default print method show information about model
+#'   result object. The default print method shows information about model
 #'   components and observation models.
 bru_info.bru <- function(object, ...) {
   object <- bru_check_object_bru(object)
   object[["bru_info"]]
+}
+
+#' @export
+#' @describeIn bru_info Extract the `bru_info` object from an estimated [bru()]
+#'   result object. The default print method shows information about model
+#'   components and observation models.
+as_bru_info <- function(object, ...) {
+  UseMethod("as_bru_info")
+}
+#' @export
+#' @describeIn bru_info Extract a `bru_info` object.
+as_bru_info.bru_info <- function(object, ...) {
+  object <- bru_info_upgrade(object)
+  object
+}
+#' @export
+#' @describeIn bru_info Extract the `bru_info` object from an estimated [bru()]
+#'   result object.
+as_bru_info.bru <- function(object, ...) {
+  object <- bru_check_object_bru(object)
+  object[["bru_info"]]
+}
+
+
+#' @title Extract INLA formula
+#'
+#' @description
+#' Extracts the INLA formula used in a `bru` model
+#'
+#' @param x An object containing information about an INLA formula
+#' @param \dots Additional arguments passed on to submethods
+#' @export
+#' @keywords internal
+bru_inla_formula <- function(x, ...) {
+  UseMethod("bru_inla_formula")
+}
+#' @rdname bru_inla_formula
+#' @export
+bru_inla_formula.bru <- function(x, ...) {
+  bru_inla_formula(as_bru_info(x), ...)
+}
+#' @rdname bru_inla_formula
+#' @export
+bru_inla_formula.bru_info <- function(x, ...) {
+  formula <- x[["model"]][["formula"]]
+  if (is.null(formula)) {
+    components <- x[["model"]][["effects"]]
+    used <- bru_used(x)
+    included <- union(used$effect, used$latent)
+    formula <- bru_inla_formula(components[included])
+    formula <- update.formula(formula, BRU_response ~ .)
+  }
+  formula
+}
+
+#' @rdname bru_inla_formula
+#' @export
+bru_inla_formula.bru_comp_list <- function(x, ...) {
+  formula <- . ~ 0
+  for (cmp in seq_along(x)) {
+    formula <- update.formula(formula, x[[cmp]]$inla.formula)
+  }
+  environment(formula) <- environment(x)
+  formula
 }
 
 
@@ -112,10 +176,10 @@ summary.bru_info <- function(object, verbose = TRUE, ...) {
 print.summary_bru_info <- function(x, ...) {
   cat(glue("inlabru version: {x$inlabru_version}"), "\n")
   cat(glue("INLA version: {x$INLA_version}"), "\n")
-  cat(paste0("Components:"), "\n")
   print(x$components)
-  cat(paste0("Observation models:"), "\n")
-  print(x$lhoods)
+  if (!is.null(x$lhoods)) {
+    print(x$lhoods)
+  }
   invisible(x)
 }
 
@@ -2591,8 +2655,8 @@ print.summary_bru_obs <- function(x, ...) {
   cat(
     glue_data(
       lh,
-      "  Family: '{family}'\n",
-      "    Tag: {tag}\n",
+      "  Model tag: {tag}\n",
+      "    Family: '{family}'\n",
       "    Data class: {data_class}\n",
       "    Response class: {response_class}\n",
       "    Predictor: {predictor}\n",
@@ -2633,6 +2697,7 @@ print.summary_bru_obs <- function(x, ...) {
 #' @rdname bru_obs_print
 #' @export
 print.summary_bru_obs_list <- function(x, ...) {
+  cat("Observation models:\n")
   for (lh in x) {
     print(lh)
   }

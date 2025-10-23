@@ -214,7 +214,7 @@ format.bru_pred_expr <- function(x, ...) {
     "    Predictor: {predictor}\n",
     "    Additive/Linear/Rowwise: {is_additive}/{is_linear}/{is_rowwise}\n",
     "    Used components: {format(used)}",
-    predictor = bru_pred_expr(x, format = 'formula_text'),
+    predictor = bru_pred_expr(x, format = "formula_text"),
     is_additive = bru_is_additive(x),
     is_linear = bru_is_linear(x),
     is_rowwise = bru_is_rowwise(x),

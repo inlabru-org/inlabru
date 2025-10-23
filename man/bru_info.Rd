@@ -4,6 +4,9 @@
 \alias{bru_info}
 \alias{bru_info.character}
 \alias{bru_info.bru}
+\alias{as_bru_info}
+\alias{as_bru_info.bru_info}
+\alias{as_bru_info.bru}
 \alias{summary.bru_info}
 \alias{print.summary_bru_info}
 \alias{print.bru_info}
@@ -14,6 +17,12 @@ bru_info(...)
 \method{bru_info}{character}(method, ..., inlabru_version = NULL, INLA_version = NULL)
 
 \method{bru_info}{bru}(object, ...)
+
+as_bru_info(object, ...)
+
+\method{as_bru_info}{bru_info}(object, ...)
+
+\method{as_bru_info}{bru}(object, ...)
 
 \method{summary}{bru_info}(object, verbose = TRUE, ...)
 
@@ -48,7 +57,22 @@ The \code{bru_info} class is used to store metadata about \code{bru} models.
 \item \code{bru_info(character)}: Create a \code{bru_info} object
 
 \item \code{bru_info(bru)}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
-result object. The default print method show information about model
+result object. The default print method shows information about model
 components and observation models.
+
+}}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{as_bru_info(bru_info)}: Extract a \code{bru_info} object.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{as_bru_info()}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
+result object. The default print method shows information about model
+components and observation models.
+
+\item \code{as_bru_info(bru)}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
+result object.
 
 }}

@@ -97,23 +97,18 @@ bru_model <- function(components,
   # Back up environment
   env <- environment(components)
 
-  # Create joint formula that will be used by inla
-  formula <- BRU_response ~ -1
+  # Complete the used component definitions based on data
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
-
-  # Complete the used component definitions based on data
   components <- bru_comp_list(
     components[included],
     lhoods = lhoods,
     inputs = inputs
   )
 
-  for (cmp in included) {
-    if (!(components[[cmp]][["main"]][["type"]] %in% c("offset", "const"))) {
-      formula <- update.formula(formula, components[[cmp]]$inla.formula)
-    }
-  }
+  # Create joint formula that will be used by inla
+  formula <- bru_inla_formula(components)
+  formula <- update.formula(formula, BRU_response ~ .)
 
   # Restore environment
   environment(components) <- env
