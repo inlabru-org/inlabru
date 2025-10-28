@@ -125,7 +125,7 @@ matern <- inla.spde2.pcmatern(mexdolphin$mesh,
 )
 ```
 Here, the range is probabilistically limited by $P(\text{range}\leq 50)=0.01$
-and the standard deviation of the spatial field is limited by $P(\text{sd}\leq
+and the standard deviation of the spatial field is limited by $P(\text{sd}\geq
 2)=0.01$.
 
 We need to now separately define the components of the model 
