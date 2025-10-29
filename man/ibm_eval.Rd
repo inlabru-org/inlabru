@@ -14,6 +14,7 @@
 \alias{ibm_eval.bm_marginal}
 \alias{ibm_eval.bm_pipe}
 \alias{ibm_eval.bm_multi}
+\alias{ibm_eval.bm_reparam}
 \alias{ibm_eval.bm_collect}
 \alias{ibm_eval.bm_repeat}
 \alias{ibm_eval.bm_sum}
@@ -50,6 +51,8 @@ ibm_eval(mapper, input, state = NULL, ...)
   jacobian = NULL,
   pre_A = deprecated()
 )
+
+\method{ibm_eval}{bm_reparam}(mapper, input, state = NULL, ..., jacobian = NULL)
 
 \method{ibm_eval}{bm_collect}(
   mapper,

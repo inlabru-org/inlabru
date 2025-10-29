@@ -18,6 +18,7 @@
 \alias{ibm_n.bm_pipe}
 \alias{ibm_n.bm_multi}
 \alias{ibm_n.bm_harmonics}
+\alias{ibm_n.bm_reparam}
 \alias{ibm_n.bm_collect}
 \alias{ibm_n.bm_repeat}
 \alias{ibm_n.bm_sum}
@@ -54,6 +55,8 @@ ibm_n(mapper, inla_f = FALSE, ...)
 \method{ibm_n}{bm_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
 \method{ibm_n}{bm_harmonics}(mapper, inla_f = FALSE, ...)
+
+\method{ibm_n}{bm_reparam}(mapper, ...)
 
 \method{ibm_n}{bm_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 

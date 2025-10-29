@@ -783,3 +783,81 @@ test_that("Repeat mapper works", {
       )
   })
 })
+
+test_that("Reparam mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  withr::local_seed(12345L)
+  u <- rnorm(8)
+  data <- data.frame(
+    x = rep_len(c(1, 2, 3, 2, 3, 4, 5, 6, 7, 8), 10 * 2)
+  )
+  data$y <- c(
+    u[1L:4L] + cumsum(u[5L:8L]),
+    cumsum(u[5L:8L])
+  )[data$x]
+
+  B <- rbind(
+    c(1, 0, 0, 0, 1, 0, 0, 0),
+    c(0, 1, 0, 0, 1, 1, 0, 0),
+    c(0, 0, 1, 0, 1, 1, 1, 0),
+    c(0, 0, 0, 1, 1, 1, 1, 1),
+    c(0, 0, 0, 0, 1, 0, 0, 0),
+    c(0, 0, 0, 0, 1, 1, 0, 0),
+    c(0, 0, 0, 0, 1, 1, 1, 0),
+    c(0, 0, 0, 0, 1, 1, 1, 1)
+  )
+
+  expect_no_error({
+    fit_bru_pipe <-
+      bru(
+        ~ 0 + field(
+          list(AA = B, BB = x),
+          model = "iid",
+          mapper = bm_pipe(list(AA = bm_matrix(ncol(B)), BB = bm_index(8))),
+          constr = FALSE
+        ),
+        bru_obs(
+          formula = y ~ .,
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          )))
+        ),
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  expect_no_error({
+    fit_bru_reparam <-
+      bru(
+        ~ 0 + field(
+          x,
+          model = "iid",
+          mapper = bm_reparam(bm_index(8), B = B)
+        ),
+        bru_obs(
+          formula = y ~ .,
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          )))
+        ),
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  expect_equal(
+    fit_bru_pipe$summary.fixed,
+    fit_bru_reparam$summary.fixed
+  )
+
+  expect_equal(
+    fit_bru_pipe$summary.random$field,
+    fit_bru_reparam$summary.random$field
+  )
+
+  expect_equal(
+    fit_bru_pipe$summary.hyperpar,
+    fit_bru_reparam$summary.hyperpar
+  )
+})

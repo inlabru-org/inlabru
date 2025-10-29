@@ -709,6 +709,45 @@ format.bm_repeat <- function(x, ...,
   txt
 }
 
+#' @export
+#' @method format bm_reparam
+#' @rdname bm_summary
+#' @examples
+#' mapper <-
+#'   bm_reparam(
+#'     bm_multi(
+#'       list(
+#'         A = bm_index(2),
+#'         B = bm_index(3)
+#'       )
+#'     ),
+#'     matrix(1:36, nrow = 6)
+#'   )
+#' summary(mapper)
+#' summary(mapper, depth = 0)
+format.bm_reparam <- function(x, ...,
+                              prefix = "",
+                              initial = prefix,
+                              depth = 1) {
+  txt <- NextMethod()
+  sub_prefix <- paste0(prefix, "      ")
+  txt <-
+    paste0(
+      txt,
+      "(",
+      paste0(
+        format(
+          x[["mapper"]],
+          prefix = sub_prefix,
+          initial = "",
+          depth = depth
+        )
+      ),
+      ")"
+    )
+  txt
+}
+
 
 #' @param sep character; separator for printing the summary.
 #' @export
@@ -1221,8 +1260,9 @@ bru_mapper.fm_mesh_2d <- function(mesh, ...) {
 ## The following methods are only used for old stored mapper objects
 
 #' @title Deprecated methods
-#' @description Deprecated methods only used for old stored
-#' `bru_mapper_fm_mesh_1d` and `bru_mapper_fm_mesh_2d` objects.
+#' @description `r lifecycle::badge("deprecated")`
+#'   Deprecated methods only used for old stored
+#'   `bru_mapper_fm_mesh_1d` and `bru_mapper_fm_mesh_2d` objects.
 #' @keywords internal
 #' @name bm_fm_mesh_old
 #' @rdname bm_fm_mesh_old
@@ -3855,148 +3895,101 @@ ibm_jacobian.bm_harmonics <- function(mapper,
 
 
 
-## _mesh_B ####
+## _reparam ####
 
-#' @title Mapper for basis conversion
-#' @param mesh object supported by `bru_mapper`, typically `fm_mesh_2d` or
-#' `fm_mesh_1d`
-#' @param B a square or tall basis conversion matrix
+#' @title Mapper for reparameterising mapper states
+#' @param mapper A `bru_mapper` object
+#' @param B a square or rectangular basis conversion matrix
+# @param \dots Arguments passed on to submethods
 #' @export
-#' @description Creates a mapper for handling basis conversions
+#' @description Creates a mapper for handling basis conversions. Functionally
+#'   equivalent to `bm_pipe(list(bm_matrix(ncol(B)), mapper))`, but with an
+#'   internally stored matrix input `B` for efficiency, and allowing the mapper
+#'   `input` format to be identical to that of the original `mapper`.
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
-#' @rdname bm_mesh_B
+#' @rdname bm_reparam
+#' @examples
+#' # 2->2 reparameterisation; (u1,u2) -> (u1, u1 + u2)
+#' (m <- bm_reparam(bm_index(2), B = matrix(c(1, 1, 0, 1), 2, 2)))
+#'
+#' # 2->3 reparameterisation; (u1,u2) -> (u1, u2, u1+u2)
+#' # This is an example of a low-rank representation of a higher-dimensional
+#' # state vector.
+#' (m <- bm_reparam(bm_index(3), B = cbind(c(1, 0, 1), c(0, 1, 1))))
+#'
+bm_reparam <- function(mapper, B) {
+  map_n <- ibm_n(mapper)
+  stopifnot(is.na(map_n) || (map_n == nrow(B)))
+  map <- list(
+    mapper = mapper,
+    B = B,
+    n = ncol(B),
+    is_linear = ibm_is_linear(mapper),
+    is_rowwise = ibm_is_rowwise(mapper)
+  )
+  bru_mapper_define(map, new_class = "bm_reparam")
+}
+
+
+#' @title Deprecated basis conversion mapper
+#' @description `r lifecycle::badge("deprecated")`
+#'  Old deprecated name for [bm_reparam()]
+#' @param mesh Object supported by a [bru_mapper()] method.
+#' @param B a square or tall basis conversion matrix
+#' @export
+#' @keywords internal
 bm_mesh_B <- function(mesh, B) {
-  stopifnot(nrow(B) >= ncol(B))
-  mapper <- list(mapper = bru_mapper(mesh), B = B)
-  bru_mapper_define(mapper, new_class = "bm_mesh_B")
+  bm_reparam(bru_mapper(mesh), B)
 }
 
 #' @export
-#' @rdname bm_mesh_B
-#' @param \dots Arguments passed on to [bm_mesh_B()]
+#' @describeIn bm_mesh_B `r lifecycle::badge("deprecated")`
+#'   Deprecated name for `bm_mesh_B`
 bru_mapper_mesh_B <- function(...) {
   bm_mesh_B(...)
 }
 
 #' @export
-#' @rdname bm_mesh_B
+#' @rdname ibm_n
 #' @inheritParams ibm_n
-ibm_n.bm_mesh_B <- function(mapper, ...) {
-  ncol(mapper[["B"]])
+ibm_n.bm_reparam <- function(mapper, ...) {
+  mapper[["n"]]
 }
 #' @export
-#' @rdname bm_mesh_B
-#' @inheritParams ibm_values
-ibm_values.bm_mesh_B <- function(mapper, ...) {
-  seq_len(ibm_n(mapper, ...))
+#' @rdname ibm_values
+ibm_values.bm_reparam <- function(mapper, ...) {
+  seq_len(mapper[["n"]])
 }
-#' @param input The values for which to produce a mapping matrix
 #' @export
-#' @rdname bm_mesh_B
-#' @inheritParams ibm_jacobian
-ibm_jacobian.bm_mesh_B <- function(mapper, input, ...) {
+#' @rdname ibm_n_output
+ibm_n_output.bm_reparam <- function(mapper, ...) {
+  ibm_n_output(mapper[["mapper"]], ...)
+}
+#' @export
+#' @rdname ibm_jacobian
+ibm_jacobian.bm_reparam <- function(mapper, input, state = NULL, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  A <- ibm_jacobian(mapper[["mapper"]], input = input, ...)
+  if (!is.null(state)) {
+    state <- mapper[["B"]] %*% state
+  }
+  A <- ibm_jacobian(mapper[["mapper"]], input = input, state = state, ...)
   A %*% mapper[["B"]]
 }
-
-
-# pcmatern_B ####
-
-#' @title Make hierarchical mesh basis functions
 #' @export
-#' @keywords internal
-#' @rdname pcmatern_B
-make_hierarchical_mesh_basis <- function(mesh, forward = TRUE) {
-  # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
-  # only the computational neighbourhood structure:
-  fem <- fm_fem(mesh, order = 1)
-  G <- (fem$g1 != 0) * 1.0
-  G <- G - Matrix::Diagonal(nrow(G), diag(G))
-
-  # First point for each disconnected mesh component
-  # Calculate graph distances
-  ii <- list()
-  jj <- list()
-  xx <- list()
-  D <- rep(Inf, nrow(G))
-  while (!all(is.finite(D))) {
-    set <- rep(FALSE, nrow(G))
-    front <- rep(FALSE, nrow(G))
-    start <- min(which(!is.finite(D)))
-    front[start] <- TRUE
-    max_dist <- -1
-    while (any(front)) {
-      max_dist <- max_dist + 1
-      D[front] <- max_dist
-      set <- set | front
-      front <- (as.vector(G %*% front) > 0.5) & !set
-    }
-    set[set] <- (D[set] < max_dist)
-    ii[[length(ii) + 1]] <- which(set)
-    jj[[length(jj) + 1]] <- rep(length(jj) + 1, sum(set))
-    xx[[length(xx) + 1]] <- (max_dist - D[set]) / max_dist
+#' @rdname ibm_eval
+ibm_eval.bm_reparam <- function(mapper, input, state = NULL, ...,
+                                jacobian = NULL) {
+  if (is.null(input)) {
+    return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-
-  # Iteratively add basis functions for the point furthest away from the the
-  # previous core points, i.e. where D is maximal.  The radius of each is equal
-  # to the initial D-value for the new point.
-  while (any(D > 0)) {
-    D_local <- rep(Inf, nrow(G))
-    set <- rep(FALSE, nrow(G))
-    front <- rep(FALSE, nrow(G))
-    start <- which.max(D) # The first maximal distance point
-    front[start] <- TRUE
-    max_dist <- D[start]
-    for (the_dist in c(0, seq_len(max_dist))) {
-      D[front] <- pmin(D[front], the_dist)
-      D_local[front] <- the_dist
-      set <- set | front
-      front <- (as.vector(G %*% front) > 0.5) & !set
-    }
-    set[set] <- (D_local[set] < max_dist)
-    ii[[length(ii) + 1]] <- which(set)
-    jj[[length(jj) + 1]] <- rep(length(jj) + 1, sum(set))
-    xx[[length(xx) + 1]] <- (max_dist - D_local[set]) / max_dist
+  if (!is.null(state)) {
+    state <- mapper[["B"]] %*% state
   }
-
-  if (forward) {
-    B <- Matrix::sparseMatrix(
-      i = unlist(ii),
-      j = unlist(jj),
-      x = unlist(xx),
-      dims = c(nrow(G), length(ii))
-    )
-  } else {
-    B <- Matrix::sparseMatrix(
-      i = unlist(ii),
-      j = length(ii) + 1 - unlist(jj),
-      x = unlist(xx),
-      dims = c(nrow(G), length(ii))
-    )
-  }
-  B
-}
-
-#' @export
-#' @keywords internal
-#' @describeIn pcmatern_B Construct a pcmatern model with basis change
-#' `r lifecycle::badge("experimental")`
-inla.spde2.pcmatern_B <- function(mesh, ..., B) {
-  model <- INLA::inla.spde2.pcmatern(mesh, ...)
-  model$n.spde <- ncol(B)
-  model$f$n <- ncol(B)
-  if (nrow(B) != ncol(B)) {
-    stop("Rectangular B not supported")
-  }
-  # TODO: check that it's a stationary model, since non-stationary would need a
-  # different precision structure (should use rgeneric or cgeneric) and
-  # different B0, B1, B2 matrices
-  model$param.inla$M0 <- Matrix::t(B) %*% model$param.inla$M0 %*% B
-  model$param.inla$M1 <- Matrix::t(B) %*% model$param.inla$M1 %*% B
-  model$param.inla$M2 <- Matrix::t(B) %*% model$param.inla$M2 %*% B
-  model
+  # Note: Have to prevent the jacobian to be fed through, as it's the jacobian
+  # for the remapped state, not the original state.
+  val <- ibm_eval(mapper[["mapper"]], input = input, state = state, ...)
+  val
 }

@@ -17,6 +17,7 @@
 \alias{ibm_values.bm_marginal}
 \alias{ibm_values.bm_pipe}
 \alias{ibm_values.bm_multi}
+\alias{ibm_values.bm_reparam}
 \alias{ibm_values.bm_collect}
 \alias{ibm_values.bm_repeat}
 \alias{ibm_values.bm_sum}
@@ -51,6 +52,8 @@ ibm_values(mapper, inla_f = FALSE, ...)
 \method{ibm_values}{bm_pipe}(mapper, ...)
 
 \method{ibm_values}{bm_multi}(mapper, inla_f = FALSE, multi = FALSE, ...)
+
+\method{ibm_values}{bm_reparam}(mapper, ...)
 
 \method{ibm_values}{bm_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 

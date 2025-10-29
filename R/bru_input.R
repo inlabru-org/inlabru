@@ -695,6 +695,10 @@ bru_input.bm_pipe <- function(x, ..., label = "<unknown>") {
     glue("bru_input.bm_pipe({label})"),
     verbosity = 5
   )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input(inp, ..., label = label))
+  }
   indexing <- names(x$mappers)
   if (is.null(indexing)) {
     indexing <- seq_along(x$mappers)

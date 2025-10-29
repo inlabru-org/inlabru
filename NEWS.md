@@ -7,6 +7,8 @@
   object. (version `2.13.0.9011`)
 * Add `bm_logitaverage()` mapper, for weighted logit-averages
   (version `2.13.0.9010`)
+* Add `bm_reparam()` mapper, for fixed-matrix reparameterisations of existing
+  mappers (version `2.13.0.9019`)
 
 ## Updated features
 

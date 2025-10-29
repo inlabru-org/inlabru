@@ -21,6 +21,7 @@
 \alias{ibm_jacobian.bm_pipe}
 \alias{ibm_jacobian.bm_multi}
 \alias{ibm_jacobian.bm_harmonics}
+\alias{ibm_jacobian.bm_reparam}
 \alias{ibm_jacobian.bm_collect}
 \alias{ibm_jacobian.bm_repeat}
 \alias{ibm_jacobian.bm_sum}
@@ -71,6 +72,8 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 )
 
 \method{ibm_jacobian}{bm_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
+
+\method{ibm_jacobian}{bm_reparam}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_collect}(
   mapper,
