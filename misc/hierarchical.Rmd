@@ -1,11 +1,16 @@
 ---
 title: "Untitled"
 author: "Finn Lindgren"
-date: "2023-01-28"
-output: html_document
+date: "2023-01-28 and 2025-10-30"
+output:
+  pdf_document: default
+  html_document: default
 header-includes:
-  - \newcommand{\wt}[1]{\widetilde{#1}}
-  - \DeclareMathOperator{\argmax}{arg\,max}
+- \newcommand{\wt}[1]{\widetilde{#1}}
+- \DeclareMathOperator{\argmax}{arg\,max}
+- \DeclareMathOperator{\dist}{dist}
+- \newcommand{\VV}{\mathcal{V}}
+- \newcommand{\BB}{\mathcal{B}}
 ---
 
 ```{r setup, include=FALSE}
@@ -15,19 +20,118 @@ devtools::load_all("~/git/inlabru/")
 
 ## Hierarchical basis
 
-Let $d(a, b)$ denote the distance between two nodes, $a$, and $b$.
-Let $V_K=\{v_k;k=1,\dots,K\}$ be the set of points included at step $k$ of the algorithm
 
-1. Let $v_1$ be the initial node and let $V_1=\{v_1\}$
-2. Let $D=\max_v d(v_1, v)$
-3. Let $\wt{b}^D_1\equiv b^D_1\equiv 1$
-4. Let $B_1 = \wt{b}^D_1$
-5. For $K=1,\dots,N_V-1$:
-    1. Let $D=\max_v \min_{1\leq k \leq K} d(v_k, v)$
-    3. Find $v_{K+1} = \argmax_v \min_{1\leq k \leq K} d(v_k, v)$
-    4. Let $b^{D}_k(v) = \max(0, D - d(v_k, v))$ for all $1\leq k \leq K$.
-    5. Normalise $\wt{b}^D_k(v) = b^D_k(v) / \sum_{j=1}^{K+1} b^D_j(v)$
-    6. Let $V_{K+1}=V_K\cup\{v_{K+1}\}$ and $B_{K+1} = \wt{b}^D_{K+1}$
+Let $\dist(a, b)$ denote the distance between two nodes, $a$, and $b$.
+Let $V_K=\{v_k;k=1,\dots,K\}$ be the set of root nodes included after step $K$
+of the algorithm.
+
+1. Let $V_1$ be a set of initial nodes, one for each disconnected component
+   of the graph, and and let $\VV_1=V_1$
+2. Let $d_1(v)=\min_{v_k\in V_1}\dist(v_k, v)$ and $D_1=\max_v d_1(v)$
+3. Let $\wt{b}^{D_1}_{v_k}(v)= b^{D_1}_{v_k}(v)= \mathbb{I}[\text{$v$ is in the same component as $v_k$}]$,
+   for each $v_k\in V_1$.
+4. Let $\BB_1 = \{\wt{b}^{D_1}_{v_k};\, v_k\in V_1\}$
+5. For $K=2,\dots,$ until $|\VV_{K}|=N_V$:
+    a. Let $D_K=\max_v d_{K-1}(v)$
+    b. Find $V_{K} = \{v;\, d_{K-1}(v) =D_K\}$ and let $\VV_K=\VV_{K-1}\cup V_K$.
+    c. Let $b^{D_K}_{v_k}(v) = \max(0, D_K - \dist(v_k, v))$ for each $v_k\in\VV_K$.
+    d. Normalise $\wt{b}^{D_K}_{v_k}(v) = b^{D_K}_{v_k}(v) / \sum_{v_j\in\VV_K} b^{D_k}_{v_j}(v)$
+       for each $v_k\in V_K$.
+    e. Add $\wt{b}^{D_K}_{v_k}$, for all $v_k\in V_K$, to the basis set:
+       $\BB_{K} = \BB_{K-1} \cup \{\wt{b}^{D_K}_{v_k};\, v_k\in V_K\}$
+    f. Let $d_{K}(v)=\min_{v_j\in V_K} \min(d_{K-1}(v), \dist(v_k,v))$
+    
+Step 5b and the subsequent steps need to handle ties, i.e. when there is no unique $v_K$.
+If there are multiple candidates for $v_K$, one could consider $=\min_v \{v;d_{K-1}(v)=D_K\}$,
+but this may result in extremal points for the other candidates, such that some of the
+$\wt{b}^{D_K}_k(v)$ become ill-behaved at or near those points, when no basis function is non-zero.
+Handling all the ties at the same time seems like a reasonable solution to this problem.
+
+In step 5c, for $v_k\in\VV_{K-1}$,
+$$
+b^{D_K}_{v_k}(v) = \max(0, b^{D_{K-1}}_{v_k}(v) + D_{K} - D_{K-1}),
+$$
+and for $v_k\in V_K$,
+$$
+b^{D_K}_{v_k}(v) = \max(0, D_K - \dist(v_k,v)) .
+$$
+```{r}
+library(ggplot2)
+xy <- as.data.frame(expand.grid(x = seq(0, 1, length.out = 50), y = seq(0, 1, length.out = 50)))
+B <- data.frame(
+  B1 = pmax(0, 1 - sqrt(xy$x^2 + xy$y^2)),
+  B2 = pmax(0, 1 - sqrt((xy$x - 1)^2 + xy$y^2)),
+  B3 = pmax(0, 1 - sqrt(xy$x^2 + (xy$y - 1)^2)),
+  B4 = pmax(0, 1 - sqrt((xy$x - 1)^2 + (xy$y - 1)^2))
+)
+ggplot(cbind(xy, B)) +
+  geom_contour_filled(aes(x, y, z = (B2 + 1e-6) / (B1 + B2 + B3 + 3e-6))) +
+  coord_fixed()
+```
+
+
+
+### Misc
+
+```{r}
+hole <- fm_segm(rbind(c(-2,-2), c(0,4), c(3,0)),is.bnd = TRUE)
+mesh <- fmesher::fm_mesh_intersection(fmesher::fmexample$mesh, hole)
+plot(mesh)
+
+m <- fm_subdivide(mesh, 1)
+B <- list()
+for (method in c("graphdistance", "laplace", "graphlaplace")) {
+ B[[method]] <- make_hierarchical_mesh_basis(m, method = method)
+}
+
+require("ggplot2") && require("patchwork")
+print(
+  ggplot(
+    data =
+      data.frame(
+        idx = seq_len(ncol(B$graphdistance)),
+        nnz = as.vector(Matrix::colSums(0 != B$graphdistance)),
+        distance = as.vector(Matrix::colSums(B$graphdistance)),
+        laplace = as.vector(Matrix::colSums(B$laplace)),
+        graph = as.vector(Matrix::colSums(B$graphlaplace))
+      )
+  ) +
+    geom_point(aes(x = idx, y = nnz, color = "nnz")) +
+    geom_point(aes(x = idx, y = distance, color = "distance")) +
+    geom_point(aes(x = idx, y = laplace, color = "laplace")) +
+    geom_point(aes(x = idx, y = graph, color = "graph")) +
+    scale_y_log10() +
+    scale_x_log10()
+)
+   
+idx <- seq_len(200)
+theta <- qr.solve(B$laplace[, idx, drop = FALSE], m$loc[, 1])
+print(
+  ggplot() +
+    gg(m, col = B$laplace[, idx, drop = FALSE] %*% theta, nx = 60, ny = 60) +
+    geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+    scale_fill_distiller(palette = "RdBu")
+)
+idx0 <- 1
+idx <- 1:2
+theta <- rep(1, length(idx))
+print(
+  (
+    ggplot() +
+      gg(m, col = B$graphdistance[, idx0, drop = TRUE], nx = 60, ny = 60) +
+      geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+      scale_fill_distiller(palette = "RdBu")
+  ) |
+    (
+      ggplot() +
+        gg(m, col = B$graphdistance[, idx0, drop = FALSE] / (B$graphdistance[, idx, drop = FALSE] %*% theta), nx = 60, ny = 60) +
+        geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+        scale_fill_distiller(palette = "RdBu")
+    )
+)
+```
+
+
 
 ## Equivalent variational adjustment 
 
@@ -51,3 +155,28 @@ B^\top Q_{u|y} B B^{-1} \mu_{u|y} &= B^\top b_u + \delta \\
 Q_{u|y} \mu_{u|y} &= b_u + B^{-\top} \delta
 \end{aligned}
 $$
+
+## Fractional approximation
+
+Require $p\geq\alpha$.
+Require $-2p-1-\lambda > -1$ for integrability at 0, i.e. $\lambda > -2p$.
+Require $2p-2p-1-\lambda < -1$ for integrability at $\infty$, i.e. $\lambda < 0$.
+\begin{align*}
+\int_0^\infty (z^\alpha - \sum_{i=0}^p b_i z^i)^2 z^{-2p-1-\lambda} dz
+&= \int_0^\infty z^{2\alpha - 2p -1 - \lambda} dz
+- 2 \sum_{i=0}^p b_i \int_0^\infty z^{\alpha + i - 2p -1 - \lambda} dz
++ \sum_{i=0}^p \sum_{j=0}^p b_i b_j \int_0^\infty z^{i + j - 2p -1 - \lambda} dz \\
+&= \frac{1}{2(p + \lambda) - 2\alpha}
+- 2 \sum_{i=0}^p b_i \frac{1}{2(p + \lambda) - (\alpha + i)}
++ \sum_{i=0}^p \sum_{j=0}^p b_i b_j \frac{1}{2(p + \lambda) - (i + j)} \\
+&= \frac{1}{2(p + \lambda) - 2\alpha}
+- 2 \sum_{i=0}^p b_i \frac{1}{2(p + \lambda) - (\alpha + i)}
++ b^\top H b,
+\end{align*}
+where $H = \left(\frac{1}{2(p + \lambda) - (i + j)}\right)_{i,j=0}^p$.
+Parsimonius choice for $\kappa>0$ was $\lambda=\alpha-\lfloor\alpha\rfloor$, but
+we need $-2p<\lambda<0$ here.
+Minimising wrt. $b$ gives
+\begin{align*}
+H b = \left(\frac{1}{2(p + \lambda) - (\alpha + i)}\right)_{i=0}^p
+\end{align*}

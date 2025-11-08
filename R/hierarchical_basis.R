@@ -8,48 +8,155 @@
 #' @description `r lifecycle::badge("experimental")` Construct hierarchical
 #'   basis functions. This is highly experimental and may change or be removed
 #'   in future versions.
+#' @param mesh A `fmesher` object.
+#' @param forward logical; if `TRUE` (default), the basis functions are
+#'   constructed in forward order; otherwise in reverse order.
+#' @param method Character; one of `"laplace"` (default), `"graphdistance"` or
+#'   `"graphlaplace"`. The method used to construct the basis functions. See
+#'   Details.
+#' @param alpha Numeric; only used if `method = "laplace"`. The approximate
+#'   Laplacian power used to construct the basis functions. Default is
+#'   `(1 + fm_manifold_dim(mesh)) / 2`, which gives an approximately linear
+#'   function along the shortest path. Must be in the range `[1, 2]`. See
+#'   Details.
+#' @details The hierarchical basis functions are constructed by iteratively
+#'   adding basis functions centered at the point furthest away from the
+#'   previously added basis functions. The radius of each basis function is
+#'   equal to the distance to the previously added basis functions at the time
+#'   of addition. Three methods are available to construct the basis functions:
+#'   \describe{
+#'     \item{`laplace`}{The basis functions are constructed using a combination
+#'       of
+#'  two operators, the Laplacian and the squared Laplacian (the biharmonic
+#'  operator). This approximates the Laplacian raised to the power `alpha`. The
+#'  default value for `alpha` gives an approximately linear function along the
+#'  shortest path.one based on the standard FEM stiffness matrix, and one based
+#'  on the graph Laplacian. The `alpha` parameter controls the weight between
+#'  the two operators, with `alpha = 1` using only the Laplacian and `alpha = 2`
+#'  using only the squared Laplacian.}
+#'    \item{`graphdistance`}{The basis functions are constructed using a simple
+#'  neighbour distance-based approach, where the basis function value
+#'  decreases by equal amounts for each traversed edge.}
+#'    \item{`graphlaplace`}{The basis functions are constructed using the
+#'  graph Laplacian only.}
+#'  }
+#' @returns A sparse matrix of class `dgCMatrix`, where each column
+#'   corresponds to a basis function.
 #' @export
 #' @keywords internal
 #' @rdname pcmatern_B
 #' @examples
-#' m <- fmesher::fm_subdivide(fmesher::fmexample$mesh, 1))
-#' B <- list()
-#' for (method in c("distance", "laplace", "graph")) {
-#'   B[[method]] <- make_hierarchical_mesh_basis(m, method = method)
-#' }
+#' m <- fmesher::fmexample$mesh
+#' B <- make_hierarchical_mesh_basis(m, method = "laplace2", alpha = 1.5)
+#'
 #' \donttest{
-#' if (require("ggplot2")) {
+#' m <- fmesher::fm_subdivide(fmesher::fmexample$mesh, 1)
+#' B <- list()
+#' for (method in c(
+#'   "laplace", "laplace2",
+#'   "graphdistance",
+#'   "graphlaplace", "graphlaplace2"
+#' )) {
+#'   B[[method]] <- make_hierarchical_mesh_basis(
+#'     m,
+#'     method = method, alpha = 1.5
+#'   )
+#' }
+#' if (require("ggplot2") && require("patchwork")) {
 #'   print(
 #'     ggplot(
 #'       data =
 #'         data.frame(
-#'           idx = seq_len(ncol(B$distance)),
-#'           nnz = as.vector(Matrix::colSums(0 != B$distance)),
-#'           distance = as.vector(Matrix::colSums(B$distance)),
+#'           idx = seq_len(ncol(B$laplace)),
+#'           nnz = as.vector(Matrix::colSums(0 != B$laplace)),
 #'           laplace = as.vector(Matrix::colSums(B$laplace)),
-#'           graph = as.vector(Matrix::colSums(B$graph))
+#'           laplace2 = as.vector(Matrix::colSums(B$laplace2)),
+#'           distance = as.vector(Matrix::colSums(B$graphdistance)),
+#'           graph = as.vector(Matrix::colSums(B$graphlaplace)),
+#'           graph2 = as.vector(Matrix::colSums(B$graphlaplace2))
 #'         )
 #'     ) +
 #'       geom_point(aes(x = idx, y = nnz, color = "nnz")) +
-#'       geom_point(aes(x = idx, y = distance, color = "distance")) +
 #'       geom_point(aes(x = idx, y = laplace, color = "laplace")) +
-#'       geom_point(aes(x = idx, y = graph, color = "graph")) +
+#'       geom_point(aes(x = idx, y = laplace2, color = "laplace2")) +
+#'       geom_point(aes(x = idx, y = distance, color = "graphdistance")) +
+#'       geom_point(aes(x = idx, y = graph, color = "graphlaplace")) +
 #'       scale_y_log10() +
 #'       scale_x_log10()
 #'   )
 #'
-#'   idx <- seq_len(200)
-#'   theta <- qr.solve(B$laplace[, idx, drop = FALSE], m$loc[, 1])
+#'   idx <- seq_len(fm_dof(m))
+#'   idx <- seq_len(10)
+#'   method <- "laplace"
+#'   theta <- qr.solve(B[[method]][, idx, drop = FALSE], m$loc[, 1])
 #'   print(
 #'     ggplot() +
-#'       gg(m, col = B$laplace[, idx, drop = FALSE] %*% theta, nx = 60, ny = 60) +
+#'       gg(m,
+#'         col = B[[method]][, idx, drop = FALSE] %*% theta - m$loc[, 1],
+#'         nx = 60, ny = 60
+#'       ) +
 #'       geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
 #'       scale_fill_distiller(palette = "RdBu")
+#'   )
+#'
+#'   ev <- fm_evaluator(m, dims = c(60, 60))
+#'   df <- NULL
+#'   for (method in c(
+#'     "laplace", "laplace2",
+#'     "graphdistance",
+#'     "graphlaplace", "graphlaplace2"
+#'   )) {
+#'     fun_cumulative <- 1e-16
+#'     for (k in 1:28) {
+#'       fun_orig <- as.vector(B[[method]][, k, drop = FALSE])
+#'       fun_cumulative <- fun_cumulative + fun_orig
+#'       fun_norm <- fun_orig / fun_cumulative
+#'       df <- rbind(
+#'         df,
+#'         data.frame(
+#'           x = ev$lattice$loc[, 1],
+#'           y = ev$lattice$loc[, 2],
+#'           orig = as.vector(fm_evaluate(ev, fun_orig)),
+#'           norm = as.vector(fm_evaluate(ev, fun_norm)),
+#'           index = k,
+#'           fun = paste0(
+#'             "fun",
+#'             formatC(k, width = 2, format = "d", flag = "0")
+#'           ),
+#'           method = method
+#'         )
+#'       )
+#'     }
+#'   }
+#'   df$norm[df$fun == "fun01"] <- NA
+#'   df$orig[df$orig == 0] <- NA
+#'   df$norm[df$norm == 0] <- NA
+#'   print(
+#'     ggplot(data = df[df$index <= 4, ]) +
+#'       geom_tile(aes(x, y, fill = orig),
+#'         na.rm = TRUE
+#'       ) +
+#'       geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+#'       geom_contour(aes(x, y, z = orig),
+#'         breaks = seq_len(29 - 15) / (30 - 15), #* 2-0.5,
+#'         na.rm = TRUE, col = "black", alpha = 0.5
+#'       ) +
+#'       geom_contour(aes(x, y, z = norm),
+#'         breaks = seq_len(29 - 15) / (30 - 15), #* 2-0.5,
+#'         na.rm = TRUE, col = "red", alpha = 0.5
+#'       ) +
+#'       scale_fill_distiller(palette = "RdBu", limits = c(0, 1)) + #* 2-0.5) +
+#'       facet_wrap(vars(fun, method))
 #'   )
 #' }
 #' }
 #'
-make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL) {
+make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL,
+                                         alpha = 1) {
+  if (is.null(alpha)) {
+    alpha <- (1 + fmesher::fm_manifold_dim(mesh)) / 2
+  }
+  stopifnot((alpha >= 1) && (alpha <= 2))
   # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
   # only the computational neighbourhood structure:
   fem <- fm_fem(mesh, order = 2)
@@ -86,7 +193,9 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL) {
       max_dist = max_dist,
       G = G,
       Gadj = Gadj,
-      method = method
+      method = method,
+      G2 = G2,
+      alpha = alpha
     )
     ii[[length(ii) + 1]] <- ijx[["ii"]]
     jj[[length(jj) + 1]] <- length(jj) + ijx[["jj"]]
@@ -117,7 +226,9 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL) {
       max_dist = max_dist,
       G = G,
       Gadj = Gadj,
-      method = method
+      method = method,
+      G2 = G2,
+      alpha = alpha
     )
     ii[[length(ii) + 1]] <- ijx[["ii"]]
     jj[[length(jj) + 1]] <- length(jj) + ijx[["jj"]]
@@ -142,8 +253,13 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL) {
   B
 }
 
-make_basis_fcn <- function(start, inner, D, max_dist, G, Gadj, method = NULL) {
-  method <- match.arg(method, c("distance", "laplace", "graphlaplace"))
+make_basis_fcn <- function(start, inner, D, max_dist, G, Gadj, method = NULL,
+                           G2 = NULL, alpha = 1) {
+  method <- match.arg(method, c(
+    "graphdistance",
+    "laplace", "laplace2",
+    "graphlaplace", "graphlaplace2"
+  ))
   front <- D == max_dist
   if (is.logical(inner)) {
     inner <- which(inner)
@@ -156,19 +272,55 @@ make_basis_fcn <- function(start, inner, D, max_dist, G, Gadj, method = NULL) {
   ii <- c(start, inner)
   jj <- rep(1, length(ii))
   xx <- switch(method,
-    "distance" = {
+    "graphdistance" = {
       c(1, (max_dist - D[inner]) / max_dist)
     },
     "laplace" = {
-      b <- G[inner, start, drop = FALSE]
-      L <- G[inner, inner, drop = FALSE]
-      c(1, -as.vector(Matrix::solve(L, b)))
+      val <- 0
+      if (alpha < 2) {
+        b1 <- G[inner, start, drop = FALSE]
+        L1 <- G[inner, inner, drop = FALSE]
+        val <- val + (2 - alpha) * c(1, -as.vector(Matrix::solve(L1, b1)))
+      }
+      if (alpha > 1) {
+        b2 <- G2[inner, start, drop = FALSE]
+        L2 <- G2[inner, inner, drop = FALSE]
+        val <- val + (alpha - 1) * c(1, -as.vector(Matrix::solve(L2, b2)))
+      }
+      val
+    },
+    "laplace2" = {
+      M <- G * (2 - alpha)
+      M <- M + G2 * (alpha - 1)
+      b <- M[inner, start, drop = FALSE]
+      L <- M[inner, inner, drop = FALSE]
+      val <- c(1, -as.vector(Matrix::solve(L, b)))
+      val
     },
     "graphlaplace" = {
-      Glaplace <- Matrix::Diagonal(nrow(G), Matrix::rowSums(Gadj)) - Gadj
-      b <- Glaplace[inner, start, drop = FALSE]
-      L <- Glaplace[inner, inner, drop = FALSE]
-      c(1, -as.vector(Matrix::solve(L, b)))
+      G1 <- Matrix::Diagonal(nrow(G), Matrix::rowSums(Gadj)) - Gadj
+      G2 <- G1 %*% G1
+      val <- 0
+      if (alpha < 2) {
+        b1 <- G1[inner, start, drop = FALSE]
+        L1 <- G1[inner, inner, drop = FALSE]
+        val <- val + (2 - alpha) * c(1, -as.vector(Matrix::solve(L1, b1)))
+      }
+      if (alpha > 1) {
+        b2 <- G2[inner, start, drop = FALSE]
+        L2 <- G2[inner, inner, drop = FALSE]
+        val <- val + (alpha - 1) * c(1, -as.vector(Matrix::solve(L2, b2)))
+      }
+      val
+    },
+    "graphlaplace2" = {
+      G1 <- Matrix::Diagonal(nrow(G), Matrix::rowSums(Gadj)) - Gadj
+      G2 <- G1 %*% G1
+      M <- (2 - alpha) * G1 + (alpha - 1) * G2
+      b <- M[inner, start, drop = FALSE]
+      L <- M[inner, inner, drop = FALSE]
+      val <- c(1, -as.vector(Matrix::solve(L, b)))
+      val
     }
   )
   list(ii = ii, jj = jj, xx = xx)
