@@ -441,7 +441,8 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' and covariates needed to evaluate the model.
 #' @param data_extra Additional data for the predictor evaluation. Variables
 #' with the same name as in `data` will be ignored, unless accessed via
-#' `.data_extra.[["name"]]` or `.data_extra.$name`.
+#' `.data_extra.[["name"]]` or `.data_extra.$name`, or via pronouns;
+#'  see Details.
 #' @param state A list where each element is a list of named latent state
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
@@ -460,9 +461,21 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' Default: "auto"
 #' @param n_pred integer. If provided, scalar predictor results are expanded to
 #' vectors of length `n_pred`.
-#' @details For each component, e.g. "name", the state values are available as
-#'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
-#'   see [bru_comp_eval()].
+#' @details For each component, e.g. "name", the latent state values are
+#'   available as `name_latent`, and arbitrary evaluation can be done with
+#'   `name_eval(...)`, see [bru_comp_eval()].
+#'
+#'   The evaluation supports several [rlang::as_data_pronoun()] data masking
+#'   pronouns, to access variables from different data sources, and some of
+#'   these also have corresponding full objects, with an appended `.` in the
+#'   name. The full objects can be passed as arguments to functions.
+#'   \describe{
+#'   \item{.effect/.effect.}{refers to the `effects` vectors}
+#'   \item{.latent/.latent.}{refers to the latent state vectors}
+#'   \item{.data/.data.}{refers to the main `data` argument}
+#'   \item{.data_extra/.data_extra.}{refers to the `data_extra` argument}
+#'   \item{.env}{refers to the evaluation environment of the predictor}
+#'   }
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -645,10 +658,9 @@ evaluate_predictor <- function(model,
     names(state_df) <- state_names[names(state_df)]
     data_mask <- bru_data_mask(
       list(
-        effects[[k]],
-        # effects = effects[[k]],
+        effect = effects[[k]],
         state_df,
-        # latent = state[[k]],
+        latent = state[[k]],
         data = data,
         data_extra = data_extra,
         eval_list,
