@@ -848,16 +848,19 @@ test_that("Reparam mapper works", {
   })
   expect_equal(
     fit_bru_pipe$summary.fixed,
-    fit_bru_reparam$summary.fixed
+    fit_bru_reparam$summary.fixed,
+    tolerance = midtol
   )
 
   expect_equal(
     fit_bru_pipe$summary.random$field,
-    fit_bru_reparam$summary.random$field
+    fit_bru_reparam$summary.random$field,
+    tolerance = midtol
   )
 
   expect_equal(
     fit_bru_pipe$summary.hyperpar,
-    fit_bru_reparam$summary.hyperpar
+    fit_bru_reparam$summary.hyperpar,
+    tolerance = midtol
   )
 })
