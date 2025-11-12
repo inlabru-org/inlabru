@@ -202,8 +202,8 @@ print.bru_model <- function(x, ...) {
 #' @param input Precomputed inputs list for the components
 #' @param comp_simple Precomputed [bm_list] of simplified mappers for the
 #' components
-#' @param predictor A formula or an expression to be evaluated given the
-#' posterior or for each sample thereof. The default (`NULL`) returns a
+#' @param predictor A formula or a [bru_pred_expr] expression to be evaluated
+#' given the posterior or for each sample thereof. The default (`NULL`) returns a
 #' `data.frame` containing the sampled effects. In case of a formula the right
 #' hand side is used for evaluation.
 #' @param format character; determines the storage format of predictor output.
@@ -240,7 +240,20 @@ evaluate_model <- function(model,
                            n_pred = NULL,
                            ...) {
   comp_lst <- as_bru_comp_list(model)
-  used <- bru_used(used, labels = names(comp_lst))
+  if (inherits(predictor, "bru_pred_expr")) {
+    if (!is.null(used)) {
+      warning(
+        paste0(
+          "Overriding `used` argument to `evaluate_model()` ",
+          "in favour of `bru_used(predictor)`."
+        )
+      )
+    }
+    used <- bru_used(predictor, labels = names(comp_lst))
+    predictor <- bru_pred_expr(predictor, format = "formula")
+  } else {
+    used <- bru_used(used, labels = names(comp_lst))
+  }
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
@@ -447,7 +460,7 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
 #' each computed by [evaluate_effect_single_state.bru_comp_list()]
-#' @param predictor Either a formula or expression
+#' @param predictor Either a formula or [bru_pred_expr] expression
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
 #' Available options:
@@ -490,6 +503,19 @@ evaluate_predictor <- function(model,
                                n_pred = NULL) {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
+  comp_lst <- as_bru_comp_list(model)
+  if (inherits(predictor, "bru_pred_expr")) {
+    if (!is.null(used)) {
+      warning(
+        paste0(
+          "Overriding `used` argument to `evaluate_predictor()` ",
+          "in favour of `bru_used(predictor)`."
+        )
+      )
+    }
+    used <- bru_used(predictor, labels = names(comp_lst))
+    predictor <- bru_pred_expr(predictor, format = "formula")
+  }
   pred.envir <- environment(predictor)
   if (inherits(predictor, "formula")) {
     pred_text <- as.character(predictor)
@@ -506,7 +532,6 @@ evaluate_predictor <- function(model,
       parent.frame()
     }
 
-  comp_lst <- as_bru_comp_list(model)
   used <- bru_used(used, labels = names(comp_lst))
 
   # General evaluation environment

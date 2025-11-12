@@ -3469,12 +3469,13 @@ generate.bru <- function(object,
     }
     used <- bru_used_update(used, labels = names(as_bru_comp_list(object)))
 
+    pred <- new_bru_pred_expr(formula, used = used)
+
     vals <- evaluate_model(
       model = object$bru_info$model,
       state = state,
       data = newdata,
-      predictor = formula,
-      used = used
+      predictor = pred
     )
     vals
   }

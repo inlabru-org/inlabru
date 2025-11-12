@@ -30,25 +30,37 @@ NULL
 #'
 new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
                               .envir = parent.frame()) {
+  pred_text <- NULL
   resp_text <- NULL
-  if (inherits(x, "formula")) {
-    formula_text <- deparse1(x, collapse = "\n")
-    x <- as.character(x)
-    pred_text <- x[length(x)]
-    if (length(x) > 2) {
-      resp_text <- x[2]
+  if (is.null(x)) {
+    is_additive <- NA
+    is_additive_dot <- NA
+  } else {
+    if (inherits(x, "formula")) {
+      form.envir <- environment(x)
+      if (!is.null(form.envir)) {
+        .envir <- form.envir
+      }
+      formula_text <- deparse1(x, collapse = "\n")
+      x <- as.character(x)
+      pred_text <- x[length(x)]
+      if (length(x) > 2) {
+        resp_text <- x[2]
+      }
+    } else {
+      pred_text <- x
+      formula_text <- glue::glue("~ {pred_text}")
     }
-  } else {
-    pred_text <- x
-    formula_text <- glue::glue("~ {pred_text}")
+    is_additive <- bru_is_additive(pred_text)
+    is_additive_dot <- identical(pred_text, ".")
+    if (is_additive_dot) {
+      pred_text <- NULL
+    }
   }
-  is_additive <- bru_is_additive(pred_text)
-  is_additive_dot <- identical(pred_text, ".")
-  if (!is_additive_dot) {
-    pred_expr <- rlang::parse_expr(pred_text)
-  } else {
-    pred_text <- NULL
+  if (is.null(pred_text)) {
     pred_expr <- NULL
+  } else {
+    pred_expr <- rlang::parse_expr(pred_text)
   }
   if (is.null(resp_text)) {
     resp_expr <- NULL
@@ -57,6 +69,11 @@ new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
   }
   structure(
     list(
+      # TODO: Encode type of expression construction; full expression (expr),
+      # additive (additive), list of effects and/or latent state vectors (list),
+      # the latter also needing "hyper" information, so that generate.bru
+      # can rely on this class for all use cases.
+      type = "expr", # One of "expr", "additive", "list"
       pred_text = pred_text,
       pred_expr = pred_expr,
       is_additive = is_additive,

@@ -31,7 +31,7 @@ see Details.}
 \item{effects}{A list where each element is list of named evaluated effects,
 each computed by \code{\link[=evaluate_effect_single_state.bru_comp_list]{evaluate_effect_single_state.bru_comp_list()}}}
 
-\item{predictor}{Either a formula or expression}
+\item{predictor}{Either a formula or \link{bru_pred_expr} expression}
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object, or NULL (default)}
 

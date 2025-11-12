@@ -3,10 +3,7 @@
 \name{bru_used}
 \alias{bru_used}
 \alias{bru_used.NULL}
-\alias{bru_used.character}
-\alias{bru_used.expression}
-\alias{bru_used.quosure}
-\alias{bru_used.formula}
+\alias{bru_used.default}
 \alias{bru_used.bru}
 \alias{bru_used.bru_info}
 \alias{bru_used.list}
@@ -20,50 +17,9 @@
 \usage{
 bru_used(x = NULL, ...)
 
-\method{bru_used}{`NULL`}(
-  x = NULL,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
+\method{bru_used}{`NULL`}(x = NULL, ...)
 
-\method{bru_used}{character}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{bru_used}{expression}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{bru_used}{quosure}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{bru_used}{formula}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
+\method{bru_used}{default}(x, ...)
 
 \method{bru_used}{bru}(x, ..., join = TRUE)
 
@@ -88,20 +44,11 @@ bru_used(x = NULL, ...)
 
 \item{\dots}{Parameters passed on to the other methods}
 
-\item{effect}{character; components used as effects. When \code{NULL}, auto-detect
-components to include all components in a predictor expression.}
-
-\item{effect_exclude}{character; components to specifically exclude from
-effect evaluation. When \code{NULL}, do not specifically exclude any components.}
-
-\item{latent}{character; components used as \verb{_latent} or \verb{_eval()}. When
-\code{NULL}, auto-detect components.}
+\item{join}{Whether to join list output into a single object; Default
+may depend on the input object class}
 
 \item{labels}{character; component labels passed on to
 \code{\link[=bru_used_update]{bru_used_update()}}}
-
-\item{join}{Whether to join list output into a single object; Default
-may depend on the input object class}
 }
 \value{
 A \code{bru_used} object (a list with elements \code{effect}
@@ -113,46 +60,11 @@ Create or extract information about which components are used by a model, or
 its individual observation models. If a non-NULL \code{labels} argument is
 supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \code{bru_used} objects.
 }
-\details{
-The arguments \code{effect}, \code{effect_exclude}, and \code{latent} control what
-components and effects are available for use in predictor expressions.
-\describe{
-\item{\code{effect}}{
-Character vector of component labels that are used as effects
-by the predictor expression; If \code{NULL} (default), the names
-are extracted from the formula.
-}
-\item{\code{exclude}}{
-Character vector of component labels to be excluded from the effect list
-even if they have been auto-detected as being necessary.
-Default is \code{NULL}; do not remove any components from the inclusion list.
-}
-\item{\code{include_latent}}{Character vector.
-Specifies which latent state variables need to be directly available to the
-predictor expression, with a \verb{_latent} suffix. This also makes evaluator
-functions with suffix \verb{_eval} available, taking parameters \code{main}, \code{group},
-and \code{replicate}, taking values for where to evaluate the component effect
-that are different than those defined in the component definition itself
-(see \code{\link[=bru_comp_eval]{bru_comp_eval()}}). If \code{NULL}, the use of \verb{_latent} and \verb{_eval}
-in the predictor expression is detected automatically.
-}
-}
-}
 \section{Methods (by class)}{
 \itemize{
-\item \code{bru_used(`NULL`)}: Create a \code{bru_used} object from effect name character
-vectors.
+\item \code{bru_used(`NULL`)}: Create a \code{bru_used} object by calling \code{\link[=new_bru_used]{new_bru_used()}}.
 
-\item \code{bru_used(character)}: Create a \code{bru_used} object from a \code{character}
-representation of an expression.
-
-\item \code{bru_used(expression)}: Create a \code{bru_used} object from an expression object.
-
-\item \code{bru_used(quosure)}: Create a \code{bru_used} object from an \code{rlang} \code{expr}
-object.
-
-\item \code{bru_used(formula)}: Create a \code{bru_used} object from a formula (only the
-right-hand side is used).
+\item \code{bru_used(default)}: Create a \code{bru_used} object by calling \code{\link[=new_bru_used]{new_bru_used()}}
 
 \item \code{bru_used(bru)}: Extract the \code{bru_used} information for the collection
 of observation models used in a \code{bru} object.
@@ -184,18 +96,19 @@ if \code{labels} is non-NULL.
 
 }}
 \examples{
-(used <- bru_used(~.))
+(used <- new_bru_used(~.))
 bru_used(used, labels = c("a", "c"))
-(used <- bru_used(~ a + b + c_latent + d_latent))
+(used <- new_bru_used(~ a + b + c_latent + d_latent))
 bru_used(used, labels = c("a", "c"))
-(used <- bru_used(expression(a + b + c_latent + d_latent)))
+(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
 bru_used(used, labels = c("a", "c"))
 
 }
 \seealso{
 Other bru_used: 
 \code{\link{bru_used_update}()},
-\code{\link{bru_used_vars}()}
+\code{\link{bru_used_vars}()},
+\code{\link{new_bru_used}()}
 }
 \concept{bru_used}
 \keyword{internal}

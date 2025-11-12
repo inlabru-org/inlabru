@@ -35,7 +35,8 @@ information.
 \seealso{
 Other bru_used: 
 \code{\link{bru_used}()},
-\code{\link{bru_used_vars}()}
+\code{\link{bru_used_vars}()},
+\code{\link{new_bru_used}()}
 }
 \concept{bru_used}
 \keyword{internal}
