@@ -2500,7 +2500,8 @@ bru_obs_handle_allow_combine <- function(allow_combine,
 #'   `aggregate=`, see [fmesher::fm_int()].}
 #' \item{`ips`}{Integration points. Defaults
 #'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
-#'   overrides `domain` and `samplers`.}
+#'   overrides `domain` and `samplers`. `fmesher::fm_int_object()` can be used
+#'   for manually constructed integration schemes.}
 #' }
 #' @param used Either `NULL` (default) or a [bru_used()] object. When,
 #'   `NULL`, the information about what effects and
