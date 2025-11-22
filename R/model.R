@@ -203,9 +203,9 @@ print.bru_model <- function(x, ...) {
 #' @param comp_simple Precomputed [bm_list] of simplified mappers for the
 #' components
 #' @param predictor A formula or a [bru_pred_expr] expression to be evaluated
-#' given the posterior or for each sample thereof. The default (`NULL`) returns a
-#' `data.frame` containing the sampled effects. In case of a formula the right
-#' hand side is used for evaluation.
+#'   given the posterior or for each sample thereof. The default (`NULL`)
+#'   returns a `data.frame` containing the sampled effects. In case of a formula
+#'   the right hand side is used for evaluation.
 #' @param format character; determines the storage format of predictor output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,

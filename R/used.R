@@ -196,8 +196,8 @@ new_bru_used <- function(x = NULL,
   UseMethod("new_bru_used", x)
 }
 
-#' @describeIn new_bru_used Create a `bru_used` object from effect name character
-#'   vectors.
+#' @describeIn new_bru_used Create a `bru_used` object from effect name
+#'   character vectors.
 #' @export
 new_bru_used.NULL <- function(x = NULL,
                               ...,
@@ -369,7 +369,8 @@ new_bru_used.character <- function(x, ...,
 }
 
 
-#' @describeIn new_bru_used Create a `bru_used` object from an expression object.
+#' @describeIn new_bru_used Create a `bru_used` object from an expression
+#'   object.
 #' @export
 new_bru_used.expression <- function(x, ...,
                                     effect = NULL,

@@ -118,13 +118,14 @@ in the predictor expression is detected automatically.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{new_bru_used(`NULL`)}: Create a \code{bru_used} object from effect name character
-vectors.
+\item \code{new_bru_used(`NULL`)}: Create a \code{bru_used} object from effect name
+character vectors.
 
 \item \code{new_bru_used(character)}: Create a \code{bru_used} object from a \code{character}
 representation of an expression.
 
-\item \code{new_bru_used(expression)}: Create a \code{bru_used} object from an expression object.
+\item \code{new_bru_used(expression)}: Create a \code{bru_used} object from an expression
+object.
 
 \item \code{new_bru_used(quosure)}: Create a \code{bru_used} object from an \code{rlang} \code{expr}
 object.

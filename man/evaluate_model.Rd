@@ -46,9 +46,9 @@ and covariates needed to evaluate the predictor.}
 components}
 
 \item{predictor}{A formula or a \link{bru_pred_expr} expression to be evaluated
-given the posterior or for each sample thereof. The default (\code{NULL}) returns a
-\code{data.frame} containing the sampled effects. In case of a formula the right
-hand side is used for evaluation.}
+given the posterior or for each sample thereof. The default (\code{NULL})
+returns a \code{data.frame} containing the sampled effects. In case of a formula
+the right hand side is used for evaluation.}
 
 \item{format}{character; determines the storage format of predictor output.
 Available options:
