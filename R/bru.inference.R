@@ -4152,7 +4152,10 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
 
     # Get 3rd and 4rt central moments
     # Use 1/N normalisation of the sample sd
-    skew <- rowMeans(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3, na.rm = TRUE)
+    skew <- rowMeans(
+      ((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3,
+      na.rm = TRUE
+    )
     if (max_moment >= 3) {
       smy[["skew"]] <- skew
     }
@@ -4161,7 +4164,10 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     # Use 1/N normalisation of the sample sd
     ekurtosis <- pmax(
       skew^2 - 2,
-      rowMeans(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3, na.rm = TRUE)
+      rowMeans(
+        ((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3,
+        na.rm = TRUE
+      )
     )
     if (max_moment >= 4) {
       smy[["ekurtosis"]] <- ekurtosis

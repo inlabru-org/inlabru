@@ -184,7 +184,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
       ),
       shape = 20, size = 2
     ) +
-    ggplot2::xlab(all.vars(update.formula(predictor, .~0))) +
+    ggplot2::xlab(all.vars(update.formula(predictor, . ~ 0))) +
     ggplot2::ylab("count")
 
   attr(pint, "ggp") <- ggp
