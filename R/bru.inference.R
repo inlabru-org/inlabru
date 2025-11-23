@@ -1559,7 +1559,7 @@ bru_agg_input <- function(input, data_list, .envir) {
     bru_log_abort(msg)
   }
 
-  if (any(is.na(aggregate_input[["block"]]))) {
+  if (anyNA(aggregate_input[["block"]])) {
     msg <- paste0(
       "'NA' aggregation block information detected.",
       "Either the `block` information was out of range, or a match was not ",
@@ -1768,7 +1768,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     if ("coordinates" %in% names(response)) {
       idx <- names(response) %in% "coordinates"
       data <- as.data.frame(response$coordinates)
-      if (any(!idx)) {
+      if (!all(idx)) {
         data <- dplyr::bind_cols(data, as.data.frame(response[!idx]))
       }
     } else {
@@ -4119,13 +4119,13 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
   } else {
     if (length(probs) == 0) {
       smy <- data.frame(
-        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        rowMeans(data, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE)
       )
       qs_names <- NULL
     } else if (length(probs) == 1) {
       smy <- data.frame(
-        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        rowMeans(data, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
         as.matrix(apply(data,
           MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
@@ -4135,7 +4135,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
       qs_names <- paste0("q", probs)
     } else {
       smy <- data.frame(
-        apply(data, MARGIN = 1, mean, na.rm = TRUE),
+        rowMeans(data, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
         t(apply(data,
           MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
@@ -4152,9 +4152,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
 
     # Get 3rd and 4rt central moments
     # Use 1/N normalisation of the sample sd
-    skew <- apply(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3,
-      MARGIN = 1, mean, na.rm = TRUE
-    )
+    skew <- rowMeans(((data - smy$mean) / smy$sd)^3 * (N / (N - 1))^3, na.rm = TRUE)
     if (max_moment >= 3) {
       smy[["skew"]] <- skew
     }
@@ -4163,11 +4161,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     # Use 1/N normalisation of the sample sd
     ekurtosis <- pmax(
       skew^2 - 2,
-      apply(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3,
-        MARGIN = 1,
-        mean,
-        na.rm = TRUE
-      )
+      rowMeans(((data - smy$mean) / smy$sd)^4 * (N / (N - 1))^4 - 3, na.rm = TRUE)
     )
     if (max_moment >= 4) {
       smy[["ekurtosis"]] <- ekurtosis
@@ -4289,7 +4283,7 @@ bru_line_search <- function(model,
                             options) {
   # Metrics ----
   pred_scalprod <- function(delta1, delta2) {
-    if (any(!is.finite(delta1)) || any(!is.finite(delta2))) {
+    if (!all(is.finite(delta1)) || !all(is.finite(delta2))) {
       Inf
     } else {
       sum(delta1 * delta2 * weights)
@@ -4383,7 +4377,7 @@ bru_line_search <- function(model,
 
   # Contraction methods ----
   if (do_finite || do_contract) {
-    nonfin <- any(!is.finite(nonlin_pred))
+    nonfin <- !all(is.finite(nonlin_pred))
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
@@ -4400,7 +4394,7 @@ bru_line_search <- function(model,
         param = nonlin_param,
         state = state
       )
-      nonfin <- any(!is.finite(nonlin_pred))
+      nonfin <- !all(is.finite(nonlin_pred))
       norm0 <- pred_norm(nonlin_pred - lin_pred0)
       norm1 <- pred_norm(nonlin_pred - lin_pred1)
 

@@ -246,7 +246,7 @@ gg.bru_prediction <- function(data,
   if (length(quant_names) > 0) {
     quant_probs <- as.numeric(sub("^q", "", quant_names))
     quant_names <- quant_names[order(quant_probs)]
-    quant_probs <- quant_probs[order(quant_probs)]
+    quant_probs <- sort(quant_probs)
     lqname <- quant_names[1]
     uqname <- quant_names[length(quant_names)]
   }

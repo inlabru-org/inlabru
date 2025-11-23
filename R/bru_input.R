@@ -437,7 +437,7 @@ bru_input.bru_input <- function(input, data, env = NULL,
     "SpatialPixelsDataFrame",
     "SpatRaster"
   ))) &&
-    any(is.na(as.data.frame(val)))) {
+    anyNA(as.data.frame(val))) {
     msg <- glue(
       "Model input '",
       glue_collapse(rlang::as_label(input$input), sep = "\n"),

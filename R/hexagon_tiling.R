@@ -51,7 +51,7 @@ cv_partition <- function(samplers,
   }
 
   gridPolygon <- terra::as.polygons(grid)
-  if (chess == TRUE) {
+  if (isTRUE(chess)) {
     # no idea how it works
     # spatSample(x = gridPolygon, size = 0.5*nrow(gridPolygon),
     #            method="random", strata=NULL, chess="black")
@@ -77,10 +77,11 @@ cv_partition <- function(samplers,
     #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
   } else {
     # Extract the boundary with subpolygons only
-    sf::st_as_sf(
-      gridPolygon <- terra::intersect(gridPolygon, terra::vect(samplers))
+    gridPolygon <- sf::st_as_sf(
+      terra::intersect(gridPolygon, terra::vect(samplers))
     )
   }
+  gridPolygon
 }
 
 

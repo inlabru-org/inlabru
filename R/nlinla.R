@@ -105,7 +105,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     x = numeric(0)
   )
 
-  if (any(!is.finite(pred0))) {
+  if (!all(is.finite(pred0))) {
     warning(
       "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
       immediate. = TRUE
@@ -221,7 +221,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
         }
       } else {
-        if (any(!is.finite(pred_eps))) {
+        if (!all(is.finite(pred_eps))) {
           warning(
             "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
             label,
@@ -236,7 +236,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
         }
       }
       nonzero <- is.finite(values)
-      if (any(!nonzero)) {
+      if (!all(nonzero)) {
         warning(
           "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
           "derivatives for '",

@@ -442,7 +442,7 @@ sample.lgcp <- function(mesh,
         }
 
         # What to return
-        if (sum(vapply(sampled.points, length, 1L)) > 0) {
+        if (sum(lengths(sampled.points)) > 0) {
           ret <- do.call(rbind, sampled.points)
         } else {
           ret <- sampled.points[[1]]
@@ -459,7 +459,7 @@ sample.lgcp <- function(mesh,
       }
     }
     if (multi.samples) {
-      ret <- do.call(rbind, result[vapply(result, length, 1L) > 0])
+      ret <- do.call(rbind, result[lengths(result) > 0])
     }
 
     if (is.geocent) {

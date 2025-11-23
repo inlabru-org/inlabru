@@ -250,7 +250,7 @@ check_layer <- function(data, where, layer) {
   names_data <- names(data)
   if (is.character(layer)) {
     unique_layer <- unique(layer)
-    if (any(!(unique_layer %in% names_data))) {
+    if (!all((unique_layer %in% names_data))) {
       stop(
         paste0(
           "Input layer name(s) '",
@@ -265,7 +265,7 @@ check_layer <- function(data, where, layer) {
     }
   } else if (is.numeric(layer)) {
     ok_layer <- (layer >= 1) & (layer <= length(names_data))
-    if (any(!ok_layer)) {
+    if (!all(ok_layer)) {
       stop(
         paste0(
           "Input layer(s) nr ",
@@ -639,7 +639,7 @@ bru_fill_missing <- function(data, where, values,
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
 
-  if (any(is.na(layer))) {
+  if (anyNA(layer)) {
     stop("NAs detected in the 'layer' information.")
   }
 
