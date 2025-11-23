@@ -985,7 +985,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     # Check valid max_iter
     opt <- options[[name]]
     if (name == "bru_max_iter") {
-      if (!is.numeric(opt) || !(opt > 0)) {
+      if (!is.numeric(opt) || opt <= 0) {
         ok <- FALSE
         warning("'bru_max_iter' should be a positive integer.")
       }

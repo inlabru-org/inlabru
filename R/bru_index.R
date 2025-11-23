@@ -81,7 +81,7 @@ bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
   off <- c(0L, cumsum(size))
   if (is.character(tag)) {
     ok_tags <- tag %in% names(object)
-    if (any(!ok_tags)) {
+    if (!all(ok_tags)) {
       stop(glue(
         "Invalid tag(s) {{{glue_collapse(tag[!ok_tags], sep = ', ')}}} for ",
         "bru object with tags {{",
@@ -98,7 +98,7 @@ bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
   } else {
     ok_tags <- (tag >= 1L) &
       (tag <= length(object))
-    if (any(!ok_tags)) {
+    if (!all(ok_tags)) {
       stop(glue(
         "Invalid tag indices {{{glue_collapse(tag[!ok_tags], sep = ', ')}}}",
         " for bru object with tag indices {{1, ..., ",

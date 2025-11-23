@@ -135,7 +135,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
     xx <- 0:(nobs + 1L)
     cdff <- function(p) pbinom(xx, size = nobs, prob = p)
     zz <- apply(qq[k, , drop = FALSE], MARGIN = 2, cdff)
-    zz <- apply(zz, MARGIN = 1, mean)
+    zz <- rowMeans(zz)
     pint[[k]] <- vapply(probs, function(pr) xx[sum(zz < pr) + 1L], 0.0)
   }
   pint <- data.frame(do.call(rbind, pint))

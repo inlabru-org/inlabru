@@ -128,7 +128,8 @@ models, such as Gaussian and student-t response models.}
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
 to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}.}
+overrides \code{domain} and \code{samplers}. \code{fmesher::fm_int_object()} can be used
+for manually constructed integration schemes.}
 }}
 
 \item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,

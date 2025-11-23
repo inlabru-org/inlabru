@@ -61,7 +61,7 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",
@@ -659,7 +659,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",
@@ -813,7 +813,7 @@ bru_timings_plot <- function(x) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",

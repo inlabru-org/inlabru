@@ -415,7 +415,8 @@ format.bru_mapper <- function(x, ...,
                               prefix = "",
                               initial = prefix,
                               depth = 1) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(x))) {
+  mapper_new <- make_bm_class_from_old(x)
+  if (!is.null(mapper_new)) {
     return(format(
       mapper_new,
       ...,
@@ -497,7 +498,8 @@ summary.bru_mapper <- function(object, ...,
                                prefix = "",
                                initial = prefix,
                                depth = 1) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(object))) {
+  mapper_new <- make_bm_class_from_old(object)
+  if (!is.null(mapper_new)) {
     return(summary(
       mapper_new,
       ...,
@@ -914,7 +916,8 @@ make_bm_class_from_old <- function(mapper) {
 #' first checks for a 'n_inla' element.
 #' @export
 ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_n(mapper_new, inla_f = inla_f, ...))
   }
   if (inla_f && !is.null(mapper[["n_inla"]])) {
@@ -937,7 +940,8 @@ ibm_n_output.default <- function(mapper,
                                  state = NULL,
                                  inla_f = FALSE,
                                  ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_n_output(
       mapper_new,
       input = input,
@@ -956,7 +960,8 @@ ibm_n_output.default <- function(mapper,
 #' it doesn't exist.
 #' @export
 ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_values(mapper_new, inla_f = inla_f, ...))
   }
   if (inla_f && !is.null(mapper[["values_inla"]])) {
@@ -973,7 +978,8 @@ ibm_values.default <- function(mapper, inla_f = FALSE, ...) {
 #' `is_linear` from the mapper object if it exists, and otherwise `TRUE`.
 #' @export
 ibm_is_linear.default <- function(mapper, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_is_linear(mapper_new, ...))
   }
   if (!is.null(mapper[["is_linear"]])) {
@@ -988,7 +994,8 @@ ibm_is_linear.default <- function(mapper, ...) {
 #' `is_rowwise` from the mapper object if it exists, and otherwise `TRUE`.
 #' @export
 ibm_is_rowwise.default <- function(mapper, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_is_rowwise(mapper_new, ...))
   }
   if (!is.null(mapper[["is_rowwise"]])) {
@@ -1007,7 +1014,8 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
       "NULL mapper detected."
     ))
   }
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_jacobian(mapper_new, input = input, state = state, ...))
   }
   stop(paste0(
@@ -1028,7 +1036,8 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
 #' ```
 #' @export
 ibm_linear.default <- function(mapper, input, state, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_linear(mapper_new, input = input, state = state, ...))
   }
   eval2 <- ibm_eval2(mapper, input = input, state = state, ...)
@@ -1047,7 +1056,8 @@ ibm_linear.default <- function(mapper, input, state, ...) {
 #' output of [ibm_linear()] is returned for linear mappers.
 #' @export
 ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_simplify(mapper_new, input = input, state = state, ...))
   }
   if (ibm_is_linear(mapper)) {
@@ -1075,7 +1085,8 @@ ibm_eval.default <- function(mapper,
                              state = NULL,
                              ...,
                              jacobian = NULL) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_eval(
       mapper_new,
       input = input,
@@ -1110,7 +1121,8 @@ ibm_eval.default <- function(mapper,
 #' is more efficient than separate or sequential construction.
 #' @export
 ibm_eval2.default <- function(mapper, input, state, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_eval2(mapper_new, input = input, state = state, ...))
   }
   jacobian <- ibm_jacobian(mapper, input, state, ...)
@@ -1129,7 +1141,8 @@ ibm_eval2.default <- function(mapper, input, state, ...) {
 #' @export
 #' @describeIn ibm_names Returns `NULL`
 ibm_names.default <- function(mapper, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_names(mapper_new, ...))
   }
   NULL
@@ -1143,7 +1156,8 @@ ibm_names.default <- function(mapper, ...) {
 #' vector values and `multi=1` data.frame values.
 #' @export
 ibm_inla_subset.default <- function(mapper, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_inla_subset(mapper_new, ...))
   }
   values_full <- ibm_values(mapper, inla_f = FALSE, ...)
@@ -1173,7 +1187,8 @@ ibm_inla_subset.default <- function(mapper, ...) {
 #' Returns an all-`FALSE` logical vector.
 #' @export
 ibm_invalid_output.default <- function(mapper, input, state, ...) {
-  if (!is.null(mapper_new <- make_bm_class_from_old(mapper))) {
+  mapper_new <- make_bm_class_from_old(mapper)
+  if (!is.null(mapper_new)) {
     return(ibm_invalid_output(mapper_new, input = input, state = state, ...))
   }
   rep(FALSE, ibm_n_output(mapper, input = input, state = state, ...))
