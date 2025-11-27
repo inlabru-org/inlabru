@@ -629,6 +629,9 @@ bru_compat_pre_2_14_bru_comp <- function(comp) {
   if (!isTRUE(bru_options_get("bru_compat_pre_2_14_enable"))) {
     return(comp)
   }
+  if (!inherits(comp, "bru_comp")) {
+    class(comp) <- c("bru_comp", class(comp))
+  }
   comp$main$input <- ibm_input_get(comp$main$mapper)
   if (!is.null(comp$group)) {
     comp$group$input <- ibm_input_get(comp$group$mapper)
