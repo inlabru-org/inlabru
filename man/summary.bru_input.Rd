@@ -39,4 +39,3 @@ Fabian E. Bachl \email{bachlfab@gmail.com}
 
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
-\keyword{internal}

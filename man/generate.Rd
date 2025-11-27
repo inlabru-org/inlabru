@@ -80,7 +80,8 @@ expressions defined in the component definition itself, e.g.
 \code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
 For "iid" models with \code{mapper = bm_index(n)}, \code{rnorm()} is used to
-generate new realisations for indices greater than \code{n}.
+generate new realisations for indices greater than \code{n}, if accessed
+via \verb{<name>_eval(...)}.
 }
 \examples{
 \donttest{

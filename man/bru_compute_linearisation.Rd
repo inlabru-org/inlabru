@@ -22,7 +22,7 @@ bru_compute_linearisation(...)
   effects,
   pred0,
   used,
-  allow_combine,
+  is_rowwise,
   eps,
   n_pred = NULL,
   ...
@@ -86,7 +86,7 @@ expression
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object for the predictor expression}
 
-\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may
+\item{is_rowwise}{logical; If \code{FALSE}, the predictor expression may
 involve several rows of the input data to influence the same row.}
 
 \item{eps}{The finite difference step size}

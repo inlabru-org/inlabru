@@ -11,6 +11,7 @@
 \alias{ibm_n_output.bm_marginal}
 \alias{ibm_n_output.bm_pipe}
 \alias{ibm_n_output.bm_multi}
+\alias{ibm_n_output.bm_reparam}
 \alias{ibm_n_output.bm_collect}
 \alias{ibm_n_output.bm_repeat}
 \alias{ibm_n_output.bm_sum}
@@ -33,6 +34,8 @@ ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 \method{ibm_n_output}{bm_pipe}(mapper, input, state = NULL, ..., n_state = NULL)
 
 \method{ibm_n_output}{bm_multi}(mapper, input, ...)
+
+\method{ibm_n_output}{bm_reparam}(mapper, ...)
 
 \method{ibm_n_output}{bm_collect}(mapper, input, state = NULL, inla_f = FALSE, multi = FALSE, ...)
 
@@ -84,6 +87,7 @@ Other mapper methods:
 \code{\link{ibm_inla_subset}()},
 \code{\link{ibm_invalid_output}()},
 \code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
 \code{\link{ibm_jacobian}()},
 \code{\link{ibm_linear}()},
 \code{\link{ibm_n}()},

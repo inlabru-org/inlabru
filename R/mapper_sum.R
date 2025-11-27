@@ -39,11 +39,13 @@ bm_sum <- function(mappers, single_input = FALSE) {
     n_multi = lapply(mappers, ibm_n),
     values_multi = lapply(mappers, ibm_values),
     is_linear_multi = lapply(mappers, ibm_is_linear),
+    is_rowwise_multi = lapply(mappers, ibm_is_rowwise),
     single_input = single_input
   )
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
+  mapper[["is_rowwise"]] <- all(unlist(mapper[["is_rowwise_multi"]]))
   bru_mapper_define(mapper, new_class = "bm_sum")
 }
 

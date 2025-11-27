@@ -3,7 +3,6 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{fm_sp2segment}
 \alias{fm_cprod}
 \alias{fm_crs}
 \alias{fm_int}
@@ -15,6 +14,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{fmesher}{\code{\link[fmesher]{fm_cprod}}, \code{\link[fmesher]{fm_crs}}, \code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_pixels}}, \code{\link[fmesher:fmesher-deprecated]{fm_sp2segment}}}
+  \item{fmesher}{\code{\link[fmesher]{fm_cprod}}, \code{\link[fmesher]{fm_crs}}, \code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_pixels}}}
 }}
 

@@ -117,11 +117,18 @@ bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @returns * `bru_index(bru)`: An `integer` vector.
 bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
-  bru_index(object[["bru_info"]][["lhoods"]], tag = tag, what = what, ...)
+  bru_index(object[["bru_info"]], tag = tag, what = what, ...)
+}
+#' @describeIn bru_index Extract the index vector for "APredictor" for one or
+#'   more specified observation [bru_obs()] sub-models. Accepts any combination
+#'   of `tag` and `what`.
+#' @export
+#' @returns * `bru_index(bru_info)`: An `integer` vector.
+bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
+  bru_index(object[["lhoods"]], tag = tag, what = what, ...)
 }
 
 #' @export
-#' @keywords internal
 #' @param object A [component].
 #' @param inla_f logical; when `TRUE`, must result in
 #' values compatible with `INLA::f(...)`
@@ -172,10 +179,11 @@ bru_index.bru_model <- function(object, used, ...) {
   stopifnot(inherits(object, "bru_model"))
   included <- union(used[["effect"]], used[["latent"]])
 
+  comp_lst <- as_bru_comp_list(object)[included]
   list(
-    idx_full = bru_index(object[["effects"]][included], inla_f = FALSE),
-    idx_inla = bru_index(object[["effects"]][included], inla_f = TRUE),
-    inla_subset = inla_subset_eval(object[["effects"]][included])
+    idx_full = bru_index(comp_lst, inla_f = FALSE),
+    idx_inla = bru_index(comp_lst, inla_f = TRUE),
+    inla_subset = inla_subset_eval(comp_lst)
   )
 }
 

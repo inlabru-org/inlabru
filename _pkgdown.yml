@@ -113,6 +113,7 @@ reference:
   - matches("^bru_rerun$")
   - matches("^bru_options$")
   - starts_with("bru_comp")
+  - starts_with("bru_input")
   - starts_with("lgcp")
   - starts_with("bru_response_size")
   - starts_with("bru_set_missing")
@@ -133,13 +134,32 @@ reference:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
   - starts_with("bru_timings")
+- title: "Object/property extraction/queries"
+  desc: "Functions for extracting or querying properties of objects."
+  contents:
+  - starts_with("as_bru_")
+  - starts_with("as_bru_obs")
+  - starts_with("as_bru_obs_list")
+  - starts_with("as_bru_comp_list")
+  - starts_with("bru_is_")
+  - starts_with("bru_is_linear")
+  - starts_with("bru_is_additive")
+  - starts_with("bru_is_rowwise")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
+- subtitle: "Low level and wrapper methods"
   contents:
   - starts_with("bru_get_mapper")
-  - starts_with("bru_mapper")
-  - starts_with("ibm_")
+  - matches("^bru_mapper$")
+- subtitle: "Constructor methods"
+  contents:
   - starts_with("bm_")
+- subtitle: "Evaluator methods"
+  contents:
+  - matches("^bru_mapper_generics$")
+  - starts_with("ibm_")
+- subtitle: "Conversion and helper methods"
+  contents:
   - starts_with("as_bru_mapper")
   - starts_with("as_bm_list")
   - starts_with("bru_forward_transformation")

@@ -48,19 +48,16 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_obs_expr(
-      fit$bru_info$lhoods[[1]],
-      fit$bru_info$effects
-    )),
+    bru_pred_expr(fit, format = "text")[[1]],
     "x + z + Intercept",
     info = "Should construct correct expression"
   )
   expect_true(
-    fit$bru_info$lhoods[[1]][["is_additive"]],
+    bru_is_additive(as_bru_obs_list(fit)[[1]]),
     info = "Should detect additive predictor"
   )
   expect_true(
-    fit$bru_info$lhoods[[1]][["linear"]],
+    bru_is_linear(as_bru_obs_list(fit)[[1]]),
     info = "Should detect linear predictor"
   )
   expect_equal(
@@ -76,19 +73,16 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_obs_expr(
-      fit$bru_info$lhoods[[1]],
-      fit$bru_info$effects
-    )),
+    bru_pred_expr(as_bru_obs_list(fit)[[1]], format = "text"),
     "x + Intercept",
     info = "Should construct correct expression"
   )
   expect_true(
-    fit$bru_info$lhoods[[1]][["is_additive"]],
+    bru_is_additive(as_bru_obs_list(fit)[[1]]),
     info = "Should detect additive predictor"
   )
   expect_true(
-    fit$bru_info$lhoods[[1]][["linear"]],
+    bru_is_linear(as_bru_obs_list(fit)[[1]]),
     info = "Should detect linear predictor"
   )
   expect_equal(
@@ -105,19 +99,16 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_obs_expr(
-      fit$bru_info$lhoods[[1]],
-      fit$bru_info$effects
-    )),
-    "x + Intercept + z_latent",
+    bru_pred_expr(as_bru_obs_list(fit)[[1]], format = "text"),
+    "x + z_latent + Intercept",
     info = "Should construct correct expression"
   )
   expect_false(
-    fit$bru_info$lhoods[[1]][["is_additive"]],
+    bru_is_additive(as_bru_obs_list(fit)[[1]]),
     info = "Should detect non-additive predictor"
   )
   expect_false(
-    fit$bru_info$lhoods[[1]][["linear"]],
+    bru_is_linear(as_bru_obs_list(fit)[[1]]),
     info = "Should detect non-linear predictor, due to non-pure additivity"
   )
   expect_equal(
@@ -136,19 +127,16 @@ test_that("bru: linear predictor detection", {
     options = list(bru_run = FALSE)
   )
   expect_equal(
-    as.character(bru_obs_expr(
-      fit$bru_info$lhoods[[1]],
-      fit$bru_info$effects
-    )),
+    bru_pred_expr(as_bru_obs_list(fit)[[1]], format = "text"),
     "x + Intercept + something",
     info = "Should construct correct expression"
   )
   expect_false(
-    fit$bru_info$lhoods[[1]][["is_additive"]],
+    bru_is_additive(as_bru_obs_list(fit)[[1]]),
     info = "Should detect non-additive predictor"
   )
   expect_false(
-    fit$bru_info$lhoods[[1]][["linear"]],
+    bru_is_linear(as_bru_obs_list(fit)[[1]]),
     info = "Should detect non-linear predictor, due to missing variable"
   )
   expect_equal(

@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.13.0.9016
+Version: 2.13.0.9020
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -52,7 +52,7 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.3.3
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.5.0),
+    fmesher (>= 0.5.0.9013),
     methods,
     R (>= 3.6),
     stats
@@ -103,11 +103,14 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
+    'access_trace.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru_conversion.R'
     'bru_index.R'
+    'deprecated.R'
     'bru_input.R'
+    'bru_is.R'
     'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
@@ -120,22 +123,24 @@ Collate:
     'data.toygroups.R'
     'data.toypoints.R'
     'deltaIC.R'
-    'deprecated.R'
     'effect.R'
     'environment.R'
     'fmesher.R'
     'ggplot.R'
     'hexagon_tiling.R'
+    'mappers.R'
+    'hierarchical_basis.R'
     'inla.R'
     'inlabru-package.R'
     'local_testthat.R'
-    'mappers.R'
     'mapper_collect.R'
     'mapper_repeat.R'
     'mapper_sum.R'
     'model.R'
     'nlinla.R'
+    'object_upgrade.R'
     'plotsample.R'
+    'pred_expr.R'
     'rgl.R'
     'sampling.R'
     'spatstat.R'

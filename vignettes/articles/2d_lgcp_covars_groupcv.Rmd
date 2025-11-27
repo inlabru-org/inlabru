@@ -296,7 +296,7 @@ knitr::kable(IC_results)
 ```{r}
 fit2prep <- bru_set_missing(
   fit1,
-  keep = list(-which(fit1$bru_info$lhoods[[1]]$response_data$BRU_block == 8L))
+  keep = list(-which(as_bru_obs_list(fit1)[[1]]$response_data$BRU_block == 8L))
 )
 fit2 <- bru_rerun(fit2prep)
 ```

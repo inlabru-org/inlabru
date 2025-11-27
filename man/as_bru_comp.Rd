@@ -7,6 +7,8 @@
 \alias{as_bru_comp_list.bru_comp_list}
 \alias{as_bru_comp_list.bru_comp}
 \alias{as_bru_comp_list.bru}
+\alias{as_bru_comp_list.bru_info}
+\alias{as_bru_comp_list.bru_model}
 \alias{as_bru_comp_list.list}
 \alias{as_bru_comp_list.formula}
 \title{Conversion methods for \code{bru_comp} and \code{bru_comp_list} objects}
@@ -22,6 +24,10 @@ as_bru_comp_list(x, ...)
 \method{as_bru_comp_list}{bru_comp}(x, ...)
 
 \method{as_bru_comp_list}{bru}(x, ...)
+
+\method{as_bru_comp_list}{bru_info}(x, ...)
+
+\method{as_bru_comp_list}{bru_model}(x, ...)
 
 \method{as_bru_comp_list}{list}(x, ...)
 
@@ -43,8 +49,13 @@ objects.
 \itemize{
 \item \code{as_bru_comp_list(bru)}: Extract the component list from a \code{\link[=bru]{bru()}} object.
 
+\item \code{as_bru_comp_list(bru_info)}: Extract the component list from a \code{\link[=bru_info]{bru_info()}}
+object.
+
+\item \code{as_bru_comp_list(bru_model)}: Extract the component list from a \code{\link[=bru_model]{bru_model()}}
+object.
+
 }}
 \seealso{
 \code{\link[=as_bru_obs]{as_bru_obs()}}, \code{\link[=as_bru_obs_list]{as_bru_obs_list()}}
 }
-\keyword{internal}

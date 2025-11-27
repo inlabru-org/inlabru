@@ -108,7 +108,7 @@ inla_result_latent_idx <- function(result) {
 
 #' Extract a summary property from all results of an inla result
 #'
-#' @param result an `inla` result object
+#' @param result an `inla` result object with a `bru_info` element
 #' @param property character; "mean", "sd", "mode", or some other column
 #' identifier for inla result `$summary.fixed`, `$summary.random$label`, and
 #' `$summary.hyperpar`, or "joint_mode". For "joint_mode", the joint latent mode
@@ -169,15 +169,17 @@ extract_property <- function(result, property,
     }
   }
 
-  fac.names <- names(result$model$effects)[
+  comp_lst <- as_bru_comp_list(result$bru_info)
+  fac.names <- names(comp_lst)[
     vapply(
-      result$model$effects,
+      comp_lst,
       function(e) {
         identical(e$type, "factor")
       },
       TRUE
     )
   ]
+
   # TODO: Consider whether to extract/convert effect$type == "factor" models
   # from random effects into fixed effects
   #
@@ -276,9 +278,10 @@ post.sample.structured <- function(result, n, seed = NULL,
 
     # For effects that were modeled via factors we attach an extra vector
     # holding the samples
-    fac.names <- names(result$bru_info$model$effects)[
+    comp_lst <- as_bru_comp_list(result)
+    fac.names <- names(comp_lst)[
       vapply(
-        result$bru_info$model$effects,
+        comp_lst,
         function(e) {
           identical(e$main$type, "factor")
         },
@@ -287,7 +290,7 @@ post.sample.structured <- function(result, n, seed = NULL,
     ]
     for (name in fac.names) {
       # TODO: figure out how to interact this with group and replicate info
-      names(vals[[name]]) <- result$bru_info$model$effects[[name]]$main$values
+      names(vals[[name]]) <- comp_lst[[name]]$main$values
     }
 
     if (length(smpl.hyperpar) > 0) {

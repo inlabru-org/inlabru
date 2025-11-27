@@ -7,6 +7,8 @@
   object. (version `2.13.0.9011`)
 * Add `bm_logitaverage()` mapper, for weighted logit-averages
   (version `2.13.0.9010`)
+* Add `bm_reparam()` mapper, for fixed-matrix reparameterisations of existing
+  mappers (version `2.13.0.9019`)
 
 ## Updated features
 
@@ -20,11 +22,16 @@
   up component evaluation and linearisation. (version `2.13.0.9006`)
 * Allow index extraction from duplicated tags in `bru_index()`, returning
   all matching indices. (version `2.13.0.9014`)
-* Code refactor and storage streamlining for `bru_obs()` to prepare for
-  future extensions. (version `2.13.0.9015`)
+* Code refactor and storage updates for `bru_obs()` and `bru_comp()` objects
+  to prepare for future extensions. For 2.14, the compatibility option
+  `bru_compat_pre_2_14_enable` is set to `TRUE` (version `2.13.0.9015`,
+  `2.13.0.9017`, `2.13.0.9018`)
 * Add `block_response` element to `bru_obs(aggregate_input)` list input,
   to allow specifying a block-wise response variable to match for aggregated
   predictors. (version `2.13.0.9016`)
+* Deprecate the `bru_obs(allow_combine)` argument with its logical inverse,
+  `bru_obs(is_rowwise)`, to make the meaning clearer.
+  (version `2.13.0.9017`)
 
 ## Bug fixes
 

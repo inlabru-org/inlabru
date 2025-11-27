@@ -4,6 +4,7 @@
 \alias{bru_used_vars}
 \alias{bru_used_vars.character}
 \alias{bru_used_vars.expression}
+\alias{bru_used_vars.quosure}
 \alias{bru_used_vars.formula}
 \title{Extract basic variable names from expression}
 \usage{
@@ -12,6 +13,8 @@ bru_used_vars(x, functions = FALSE)
 \method{bru_used_vars}{character}(x, functions = FALSE)
 
 \method{bru_used_vars}{expression}(x, functions = FALSE)
+
+\method{bru_used_vars}{quosure}(x, functions = FALSE)
 
 \method{bru_used_vars}{formula}(x, functions = FALSE)
 }
@@ -50,7 +53,8 @@ bru_used_vars(expression(a ~ b))
 \seealso{
 Other bru_used: 
 \code{\link{bru_used}()},
-\code{\link{bru_used_update}()}
+\code{\link{bru_used_update}()},
+\code{\link{new_bru_used}()}
 }
 \concept{bru_used}
 \keyword{internal}
