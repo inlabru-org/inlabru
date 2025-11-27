@@ -34,8 +34,8 @@ or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
 \item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}. \code{fmesher::fm_int_object()} can be used
+to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}. \code{\link[fmesher:new_fm_int]{fmesher::new_fm_int()}} can be used
 for manually constructed integration schemes.}
 }}
 

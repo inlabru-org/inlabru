@@ -2015,8 +2015,8 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #' \item{`samplers`}{Integration domain for `family="cp"` or subdomains for
 #'   `aggregate=`, see [fmesher::fm_int()].}
 #' \item{`ips`}{Integration points. Defaults
-#'   to `fmesher::fm_int(domain, samplers)`. If explicitly given,
-#'   overrides `domain` and `samplers`. `fmesher::fm_int_object()` can be used
+#'   to [fmesher::fm_int]`(domain, samplers)`. If explicitly given,
+#'   overrides `domain` and `samplers`. [fmesher::new_fm_int()] can be used
 #'   for manually constructed integration schemes.}
 #' }
 #' @param used Either `NULL` (default) or a [bru_used()] object. When,
