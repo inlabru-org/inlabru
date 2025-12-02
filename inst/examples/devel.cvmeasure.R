@@ -56,10 +56,10 @@ if (bru_safe_inla() &&
 
   pred_collect <-
     rbind(
-      pred$joint %>% dplyr::mutate(component = "joint"),
-      pred$field %>% dplyr::mutate(component = "field"),
-      pred$veg %>% dplyr::mutate(component = "veg")
-    ) %>%
+      pred$joint |> dplyr::mutate(component = "joint"),
+      pred$field |> dplyr::mutate(component = "field"),
+      pred$veg |> dplyr::mutate(component = "veg")
+    ) |>
     dplyr::mutate(var = sd^2)
 
   # Plot component mean
