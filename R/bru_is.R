@@ -177,7 +177,7 @@ bru_is_additive_data_frame <- function(x, root_id = 0, ..., verbose = FALSE) {
     message("No known additive structure found, assuming non-additive")
   }
 
-  return(FALSE)
+  FALSE
 }
 
 #' @rdname bru_is_additive

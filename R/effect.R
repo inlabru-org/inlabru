@@ -1245,11 +1245,11 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- length(inp_values)
   }
 
-  return(list(
+  list(
     inp_values = inp_values,
     n_values = n_values,
     is_list
-  ))
+  )
 }
 
 
@@ -1482,7 +1482,7 @@ make_submapper <- function(subcomp_n,
     )
   }
 
-  return(bm_linear())
+  bm_linear()
 }
 
 
@@ -1687,7 +1687,7 @@ make_mapper <- function(subcomp,
     names(mappers) <- mapper_names
     return(bm_collect(mappers, hidden = TRUE))
   }
-  return(mappers[[1]])
+  mappers[[1]]
 }
 
 #' Convert components to R code

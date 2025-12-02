@@ -26,7 +26,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
       return(FALSE)
     }
   }
-  return(TRUE)
+  TRUE
 }
 
 #' Convert SpatialPoints and boundary polygon to spatstat ppp object

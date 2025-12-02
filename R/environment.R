@@ -88,7 +88,7 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   }
   index <- offset + seq_len(log_length - offset)
   x <- x[index]
-  return(invisible(x))
+  invisible(x)
 }
 
 
@@ -236,7 +236,7 @@ bru_log_offset <- function(x = NULL,
     which_found <- 1L
   }
   which_found <- max(1L, min(length(marks), which_found + offset))
-  return(marks[[which_found]])
+  marks[[which_found]]
 }
 
 #' @export

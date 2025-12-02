@@ -200,7 +200,7 @@ ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
 
   # Combine the matrices (A1, A2, A3, ...) -> cbind(A1, A2, A3, ...)
   A <- do.call(cbind, A)
-  return(A)
+  A
 }
 
 
@@ -294,7 +294,7 @@ ibm_invalid_output.bm_sum <- function(mapper, input, state,
   for (k in seq_len(length(invalid) - 1L) + 1L) {
     invalid_ <- invalid_ | invalid[[k]]
   }
-  return(invalid_)
+  invalid_
 }
 
 #' @return

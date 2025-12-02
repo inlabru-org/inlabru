@@ -305,7 +305,7 @@ post.sample.structured <- function(result, n, seed = NULL,
   #
   # Return
   #
-  return(ssmpl)
+  ssmpl
 }
 
 extract_entries <- function(name, smpl, .contents = NULL) {
@@ -324,7 +324,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
   }
   vals <- smpl[.contents[["start"]][idx] +
     seq_len(.contents[["length"]][idx]) - 1L]
-  return(vals)
+  vals
 }
 
 #' Backwards compatibility to handle mexpand for INLA <= 24.06.02
@@ -693,5 +693,5 @@ variables.inla <- function(result, include.random = TRUE) {
   }
 
   variables <- do.call(rbind, c(list(fixed, hyperpar), random))
-  return(variables)
+  variables
 }

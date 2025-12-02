@@ -106,7 +106,9 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
     cutoff = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20
   )
 
-  dset <- list(effort = newdata, mesh = mesh)
-  class(dset) <- c("dsdata", "list")
-  return(dset)
+  dset <- structure(
+    list(effort = newdata, mesh = mesh),
+    class = c("dsdata", "list")
+  )
+  dset
 }

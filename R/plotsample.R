@@ -140,7 +140,7 @@ plotsample <- function(spdf,
   # extract only those nests inside the polygons (neat!)
   dets <- spdf[plots, ]
 
-  return(list(plots = plots, dets = dets))
+  list(plots = plots, dets = dets)
 }
 
 

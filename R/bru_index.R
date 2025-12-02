@@ -58,7 +58,7 @@ bru_index.bru_obs <- function(object, what = NULL, ...) {
   if (identical(what, "observed")) {
     return(idx[!miss])
   }
-  return(idx[miss])
+  idx[miss]
 }
 
 #' @describeIn bru_index Extract the index vector for "APredictor" for one or
@@ -72,7 +72,7 @@ bru_index.bru_obs <- function(object, what = NULL, ...) {
 #' @returns * `bru_index(bru_obs_list)`: An `integer` vector.
 bru_index.bru_obs_list <- function(object, tag = NULL, what = NULL, ...) {
   if (is.null(tag)) {
-    tag <- seq_len(length(object))
+    tag <- seq_along(object)
   }
   if (length(tag) == 0L) {
     return(integer(0))

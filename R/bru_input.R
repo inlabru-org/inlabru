@@ -580,7 +580,7 @@ summary.bru_input <- function(object,
     ),
     class = "summary_bru_input"
   )
-  return(res)
+  res
 }
 
 #' @export
@@ -598,7 +598,7 @@ print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
     "\n",
     sep = ""
   )
-  return(invisible(x))
+  invisible(x)
 }
 
 #' @export

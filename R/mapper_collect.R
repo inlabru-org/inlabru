@@ -236,7 +236,7 @@ ibm_jacobian.bm_collect <- function(mapper, input, state = NULL,
 
   # Combine the matrices (A1, A2, A3, ...) -> bdiag(A1, A2, A3, ...)
   A <- Matrix::.bdiag(A)
-  return(A)
+  A
 }
 
 
@@ -354,7 +354,7 @@ ibm_invalid_output.bm_collect <- function(mapper, input, state,
 
   # Combine the vectors (v1, v2, v3) -> c(v1, v2, v3)
   invalid_ <- do.call(c, invalid)
-  return(invalid_)
+  invalid_
 }
 
 #' @return

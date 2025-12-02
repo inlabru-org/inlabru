@@ -260,5 +260,5 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL,
     attr(ret, "type") <- tmp[["type"]]
   }
 
-  return(ret)
+  ret
 }

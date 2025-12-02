@@ -103,7 +103,7 @@ bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
     return(mappers[[1]])
   }
   mapper_ <- bm_sum(mappers, single_input = TRUE)
-  return(mapper_)
+  mapper_
 }
 
 #' @export
@@ -185,7 +185,7 @@ ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
       n_rep = mapper[["n_rep"]]
     )
   }
-  return(A)
+  A
 }
 
 

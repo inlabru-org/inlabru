@@ -399,7 +399,7 @@ bru <- function(components = ~ Intercept(1),
   # Add bru information to the result
   result$bru_info <- info
   class(result) <- c("bru", class(result))
-  return(result)
+  result
 }
 
 
@@ -446,7 +446,7 @@ bru_rerun <- function(result, options = list()) {
   # Add bru information to the result
   result$bru_info <- info
   class(result) <- c("bru", class(result))
-  return(result)
+  result
 }
 
 #' @title Set missing values in observation models
@@ -850,7 +850,7 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
   )
   new_coordnames[from_ips] <- ips_coordnames[from_ips]
 
-  dummies <- seq_len(length(new_coordnames))
+  dummies <- seq_along(new_coordnames)
   dummies <- setdiff(dummies, c(from_data, from_ips))
 
   new_coordnames[dummies] <-
@@ -3689,7 +3689,7 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
   if (!is.null(x)) {
     smy <- expand_to_dataframe(x, smy)
   }
-  return(smy)
+  smy
 }
 
 
@@ -4372,7 +4372,7 @@ tidy_state <- function(state, value_name = "value") {
 }
 tidy_states <- function(states, value_name = "value", id_name = "iteration") {
   df <- lapply(states, function(x) tidy_state(x, value_name = value_name))
-  id <- rep(seq_len(length(states)), each = nrow(df[[1]]))
+  id <- rep(seq_along(states), each = nrow(df[[1]]))
   df <- do.call(rbind, df)
   df[[id_name]] <- id
   df
@@ -5235,7 +5235,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
 
   result[["bru_iinla"]] <- collect_misc_info()
   class(result) <- c("iinla", class(result))
-  return(result)
+  result
 }
 
 
@@ -5393,7 +5393,7 @@ summary.bru <- function(object, verbose = FALSE, ...) {
   }
 
   class(result) <- "summary_bru"
-  return(result)
+  result
 }
 
 

@@ -82,5 +82,5 @@ deltaIC <- function(..., criterion = "DIC") {
   if ("WAIC" %in% criterion) {
     result <- cbind(result, data.frame(WAIC = waic, Delta.WAIC = dwaic))
   }
-  return(result)
+  result
 }

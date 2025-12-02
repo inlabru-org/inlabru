@@ -83,7 +83,7 @@ bru_safe_inla <- function(multicore = NULL,
       INLA::inla.setOption(num.threads = "1:1")
     }
   }
-  return(TRUE)
+  TRUE
 }
 
 
@@ -116,7 +116,7 @@ check_package_version_and_load <-
       }
       return(NA_character_)
     }
-    return(version)
+    version
   }
 
 
@@ -202,7 +202,7 @@ bru_safe_sp <- function(quietly = FALSE,
       }
     }
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }
 
 

@@ -1066,7 +1066,7 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
     }
     return(ibm_linear(mapper, input = input, state = state, ...))
   }
-  return(mapper)
+  mapper
 }
 
 
@@ -2171,7 +2171,7 @@ ibm_values.bm_shift <- function(mapper, ...,
 #' @family specific [bm_shift] method implementations
 ibm_jacobian.bm_shift <- function(mapper, input, state = NULL, ...) {
   stopifnot(!is.null(state))
-  return(Matrix::Diagonal(n = length(state), 1.0))
+  Matrix::Diagonal(n = length(state), 1.0)
 }
 
 
@@ -2187,7 +2187,7 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
   shift <- as.vector(input)
   ok <- !is.na(shift)
   shift[!ok] <- 0
-  return(state + shift)
+  state + shift
 }
 
 
@@ -2281,19 +2281,18 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
   if (is.null(input)) {
     # No scaling
     return(Matrix::Diagonal(n = length(state), 1.0))
-  } else {
-    if (!(is.numeric(input) ||
-      is.logical(input) ||
-      is(input, "Matrix"))) {
-      stop(
-        "The input to a bm_scale evaluation must be numeric or logical."
-      )
-    }
-    scale <- as.vector(input)
-    ok <- !is.na(scale)
-    scale[!ok] <- 0
-    return(Matrix::Diagonal(n = length(state), scale))
   }
+  if (!(is.numeric(input) ||
+        is.logical(input) ||
+        is(input, "Matrix"))) {
+    stop(
+      "The input to a bm_scale evaluation must be numeric or logical."
+    )
+  }
+  scale <- as.vector(input)
+  ok <- !is.na(scale)
+  scale[!ok] <- 0
+  Matrix::Diagonal(n = length(state), scale)
 }
 
 
@@ -2319,7 +2318,7 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
   scale <- as.vector(input)
   ok <- !is.na(scale)
   scale[!ok] <- 0
-  return(scale * state)
+  scale * state
 }
 
 
@@ -3032,7 +3031,7 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
       ) /
         (2 * eps)
   }
-  return(Matrix::Diagonal(n = length(state), der))
+  Matrix::Diagonal(n = length(state), der)
 }
 
 
@@ -3075,7 +3074,7 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
       )
     )
   }
-  return(as.vector(val))
+  as.vector(val)
 }
 
 
@@ -3189,7 +3188,7 @@ ibm_n_output.bm_pipe <- function(mapper,
       ..., n_state = n
     )
   }
-  return(n)
+  n
 }
 
 #' @export
@@ -3330,7 +3329,7 @@ ibm_simplify.bm_pipe <- function(mapper,
     )
   }
 
-  return(mapper)
+  mapper
 }
 
 
@@ -3558,7 +3557,7 @@ ibm_jacobian.bm_multi <- function(mapper,
   for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
     A_ <- fm_row_kron(sub_A[[k + 1]], A_)
   }
-  return(A_)
+  A_
 }
 
 

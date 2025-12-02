@@ -148,5 +148,5 @@ cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
 
   hex_cell_ <- sf::st_intersection(hex_groups, samplers)
 
-  return(hex_cell_["group"])
+  hex_cell_["group"]
 }

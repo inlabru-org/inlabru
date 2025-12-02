@@ -680,7 +680,7 @@ test_that("Marginal mapper", {
     if (log) {
       return(val)
     }
-    return(exp(val))
+    exp(val)
   }
   m1_d <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
   m1_dq <- bm_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)

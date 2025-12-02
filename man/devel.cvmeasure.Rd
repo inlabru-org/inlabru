@@ -35,8 +35,7 @@ if (bru_safe_inla() &&
   require("terra", quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
-  require("dplyr", quietly = TRUE) &&
-  require("magrittr", quietly = TRUE)) {
+  require("dplyr", quietly = TRUE)) {
   # Load Gorilla data
 
   gorillas <- gorillas_sf
