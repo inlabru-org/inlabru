@@ -55,7 +55,7 @@ if (bru_safe_inla() &&
 
   cmp <- geometry ~ 0 +
     vegetation(gorillas$gcov$vegetation, model = "factor_contrast") +
-    spde(geometry, model = pcmatern) -
+    spde(geometry, model = pcmatern) +
     Intercept(1)
 
   fit <- lgcp(
