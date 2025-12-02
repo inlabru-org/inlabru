@@ -128,8 +128,8 @@ models, such as Gaussian and student-t response models.}
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
 to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}. \code{\link[fmesher:new_fm_int]{fmesher::new_fm_int()}} can be used
-for manually constructed integration schemes.}
+overrides \code{domain} and \code{samplers}. \code{fmesher::new_fm_int()} (from fmesher
+\verb{0.5.0.9013}) can be used for manually constructed integration schemes.}
 }}
 
 \item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,

@@ -2016,8 +2016,8 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   `aggregate=`, see [fmesher::fm_int()].}
 #' \item{`ips`}{Integration points. Defaults
 #'   to [fmesher::fm_int]`(domain, samplers)`. If explicitly given,
-#'   overrides `domain` and `samplers`. [fmesher::new_fm_int()] can be used
-#'   for manually constructed integration schemes.}
+#'   overrides `domain` and `samplers`. `fmesher::new_fm_int()` (from fmesher
+#'   `0.5.0.9013`) can be used for manually constructed integration schemes.}
 #' }
 #' @param used Either `NULL` (default) or a [bru_used()] object. When,
 #'   `NULL`, the information about what effects and

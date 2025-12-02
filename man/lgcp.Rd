@@ -35,8 +35,8 @@ or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
 to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}. \code{\link[fmesher:new_fm_int]{fmesher::new_fm_int()}} can be used
-for manually constructed integration schemes.}
+overrides \code{domain} and \code{samplers}. \code{fmesher::new_fm_int()} (from fmesher
+\verb{0.5.0.9013}) can be used for manually constructed integration schemes.}
 }}
 
 \item{formula}{a \code{formula} where the right hand side is a general R
