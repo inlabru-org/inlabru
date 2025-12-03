@@ -4558,7 +4558,11 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       ## e.g.
       ## bru_rerun(..., options = list(control.mode = list(fixed = TRUE)))
       orig_n <- NCOL(orig_inla_track[["theta"]])
-      new_n <- vapply(inla_track, function(x) NCOL(x[["theta"]]), 0L)
+      if (length(inla_track) > 0) {
+        new_n <- vapply(inla_track, function(x) NCOL(x[["theta"]]), 0L)
+      } else {
+        new_n <- orig_n
+      }
       if (max(new_n) > orig_n) {
         if (is.null(orig_inla_track[["theta"]])) {
           orig_inla_track[["theta"]] <- matrix(NA_real_,

@@ -586,7 +586,7 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_inla()) {
+#' if (bru_safe_sp()) {
 #'   points <-
 #'     sp::SpatialPointsDataFrame(
 #'       matrix(1:6, 3, 2),
