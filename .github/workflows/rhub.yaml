@@ -81,7 +81,21 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
-          extra-repositories: 'https://inla.r-inla-download.org/R/testing'
+      - name: Extra repositories
+        run: |
+          #
+          add_repo <- function(repo) {
+            for (i in seq_along(repo)) {
+              message("Adding repository ", names(repo)[i], " = ", repo[i], ".")
+              cat(
+                append = TRUE, sep = "\n", file = "~/.Rprofile",
+                sprintf("options(repos = c(%s = \"%s\", getOption(\"repos\")))", names(repo)[i], repo[i])
+              )
+            }
+          }
+          add_repo(c(INLA = "https://inla.r-inla-download.org/R/testing"))
+        shell: Rscript {0}
+        working-directory: ${{github.action_path}}
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
