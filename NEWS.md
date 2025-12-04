@@ -44,6 +44,8 @@
 * Add logic for `bru_fill_missing()` to handle missing values in `sf` input
   data, so that e.g. `bru_fill_missing(input, input, input$values)` works as
   expected (version `2.13.0.9022`)
+* Handle `bru` object upgrades from 2.12.0; the 2.12.0.9014 upgrade step needed
+  to introduce the "bru_obs" classname earlier (version `2.13.0.9023`)
 
 # inlabru 2.13.0
 

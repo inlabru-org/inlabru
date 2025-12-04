@@ -9,7 +9,7 @@ bru_check_object_bru <- function(object,
 }
 
 # Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
-bru_used_upgrade <- function(lhoods, labels) {
+bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
     if (is.null(lhoods[[k]][["used"]]) &&
       is.null(lhoods[[k]][["used_components"]])) {
@@ -191,7 +191,7 @@ bru_info_upgrade <- function(object,
         }
       }
       object[["lhoods"]] <-
-        bru_used_upgrade(
+        bru_used_upgrade_2.7.0.9017_to_2.7.0.9021(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
@@ -217,7 +217,7 @@ bru_info_upgrade <- function(object,
         }
       }
       object[["lhoods"]] <-
-        bru_used_upgrade(
+        bru_used_upgrade_2.7.0.9017_to_2.7.0.9021(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
@@ -234,7 +234,7 @@ bru_info_upgrade <- function(object,
       }
 
       object[["lhoods"]] <-
-        bru_used_upgrade(
+        bru_used_upgrade_2.7.0.9017_to_2.7.0.9021(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
@@ -282,14 +282,25 @@ bru_info_upgrade <- function(object,
 
     if (utils::compareVersion("2.12.0.9014", old_ver) > 0) {
       message("Upgrading bru_info to 2.12.0.9014")
-      # Update is_additive/linear storage
 
+      # Add bru_obs class name, to support old bru_like objects.
+      # Technically for 2.12.0.9017, but the upgrade code needs it for 2014
+      if (!is.null(object[["lhoods"]])) {
+        object[["lhoods"]] <-
+          lapply(object[["lhoods"]], function(x) {
+            class(x) <- c("bru_obs", class(x))
+            x
+          })
+        class(object[["lhoods"]]) <- c("bru_obs_list", "list")
+      }
+
+      # Update is_additive/linear storage
       object[["lhoods"]][["is_additive"]] <-
         object[["lhoods"]][["linear"]]
 
       # Update predictor expression
       object[["lhoods"]] <-
-        bru_used_upgrade(
+        bru_used_update(
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
