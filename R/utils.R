@@ -586,17 +586,21 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_sp()) {
+#' if (require("sf", quietly = TRUE)) {
 #'   points <-
-#'     sp::SpatialPointsDataFrame(
-#'       matrix(1:6, 3, 2),
-#'       data = data.frame(val = c(NA, NA, NA))
+#'     sf::st_as_sf(
+#'     data.frame(
+#'       x = 1:3,
+#'       y = 4:6,
+#'       val = c(NA, NA, NA)
+#'     ),
+#'     coords = c("x", "y")
 #'     )
 #'   input_coord <- expand.grid(x = 0:7, y = 0:7)
 #'   input <-
-#'     sp::SpatialPixelsDataFrame(
-#'       input_coord,
-#'       data = data.frame(val = as.vector(input_coord$y))
+#'   sf::st_as_sf(
+#'     cbind(input_coord, val = as.vector(input_coord$y)),
+#'     coords = c("x", "y")
 #'     )
 #'   points$val <- bru_fill_missing(input, points, points$val)
 #'   print(points)
@@ -608,6 +612,7 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #'   print(input$val[c(3, 30)])
 #' }
 #' }
+
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
                              batch_size = deprecated()) {
@@ -677,6 +682,16 @@ bru_fill_missing <- function(data, where, values,
   } else {
     data_values <- data[[layer]]
     data_coord <- data
+  }
+  data_notok <- is.na(data_values)
+  if (all(data_notok)) {
+    stop("All data values are NA; unable to fill missing values.")
+  }
+  data_values <- data_values[!data_notok]
+  if (inherits(data_coord, "sf")) {
+    data_coord <- data_coord[!data_notok, , drop = FALSE]
+  } else {
+    data_coord <- data_coord[!data_notok, , drop = FALSE]
   }
 
   where <- fm_transform(where, crs = data_crs, passthrough = TRUE)

@@ -41,6 +41,9 @@
   (version `2.13.0.9004`)
 * Robustify internal `extended_bind_rows()` method for unifying XY/XYZ `sf`
   coordinate columns (version `2.13.0.9009`)
+* Add logic for `bru_fill_missing()` to handle missing values in `sf` input
+  data, so that e.g. `bru_fill_missing(input, input, input$values)` works as
+  expected (version `2.13.0.9022`)
 
 # inlabru 2.13.0
 
