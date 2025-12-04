@@ -90,7 +90,7 @@ Suggests:
     spatstat.data,
     sphereplot,
     splancs,
-    terra,
+    terra (>= 1.7-66),
     tidyterra,
     testthat (>= 3.2.0),
     tidyr,
