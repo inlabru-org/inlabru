@@ -64,10 +64,10 @@ jobs:
           brew install cairo
           brew install --cask xquartz
           brew install pkg-config
-          brew install proj@9
-          brew install gdal
-          brew install gsl
           brew install udunits
+#          brew install proj@9
+#          brew install gdal
+#          brew install gsl
 
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
