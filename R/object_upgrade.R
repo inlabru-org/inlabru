@@ -299,11 +299,11 @@ bru_info_upgrade <- function(object,
         object[["lhoods"]][["linear"]]
 
       # Update predictor expression
-      object[["lhoods"]] <-
-        bru_used_update(
-          object[["lhoods"]],
-          labels = names(object[["model"]][["effects"]])
-        )
+      # object[["lhoods"]] <-
+      #   bru_used_update(
+      #     object[["lhoods"]],
+      #     labels = names(object[["model"]][["effects"]])
+      #   )
 
       object[["inlabru_version"]] <- "2.12.0.9014"
     }
@@ -400,31 +400,32 @@ bru_info_upgrade <- function(object,
 
       # Update lhoods to new bru_pred_expr object storage format
       if (!is.null(object[["lhoods"]])) {
+        lhood_upgrader <- function(x) {
+          pred_text <- rlang::expr_deparse(x[["expr"]])
+          pred_text <- gsub(
+            pattern = "^expression\\(",
+            replacement = "(",
+            x = pred_text,
+            fixed = FALSE
+          )
+          pred_expr <- x[["expr"]]
+          x[["pred_expr"]] <- structure(
+            list(
+              pred_text = pred_text,
+              pred_expr = rlang::parse_expr(pred_text),
+              is_additive = x[["is_additive"]],
+              is_rowwise = !x[["allow_combine"]],
+              is_linear = x[["linear"]],
+              used = x[["used"]],
+              .envir = x[[".envir"]],
+              resp_text = as.character(x[["formula"]])[2]
+            ),
+            class = "bru_pred_expr"
+          )
+          x
+        }
         object[["lhoods"]] <-
-          lapply(object[["lhoods"]], function(x) {
-            pred_text <- deparse1(x[["expr"]], collapse = "\n")
-            pred_text <- gsub(
-              pattern = "^expression\\(",
-              replacement = "(",
-              x = pred_text,
-              fixed = FALSE
-            )
-            pred_expr <- x[["expr"]]
-            x[["pred_expr"]] <- structure(
-              list(
-                pred_text = pred_text,
-                pred_expr = rlang::parse_expr(pred_text),
-                is_additive = x[["is_additive"]],
-                is_rowwise = !x[["allow_combine"]],
-                is_linear = x[["linear"]],
-                used = x[["used"]],
-                .envir = x[[".envir"]],
-                resp_text = as.character(x[["formula"]])[2]
-              ),
-              class = "bru_pred_expr"
-            )
-            x
-          })
+          lapply(object[["lhoods"]], lhood_upgrader)
         class(object[["lhoods"]]) <- c("bru_obs_list", "list")
       }
 

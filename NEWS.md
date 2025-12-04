@@ -45,7 +45,9 @@
   data, so that e.g. `bru_fill_missing(input, input, input$values)` works as
   expected (version `2.13.0.9022`)
 * Handle `bru` object upgrades from 2.12.0; the 2.12.0.9014 upgrade step needed
-  to introduce the "bru_obs" classname earlier (version `2.13.0.9023`)
+  to introduce the `"bru_obs"` classname earlier, and upgrades through
+  2.13.0.9017, that introduced a new predictor expression storage system
+  (version `2.13.0.9024`)
 
 # inlabru 2.13.0
 
