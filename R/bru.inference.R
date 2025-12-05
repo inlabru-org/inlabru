@@ -191,8 +191,6 @@ print.bru_info <- function(x, ...) {
 }
 
 
-
-
 #' @title Extract timing information from fitted [bru] object
 #' @description
 #' Extracts a data.frame or tibble with information about the `Time` (CPU),
@@ -276,8 +274,6 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 
   lhoods
 }
-
-
 
 
 #' @title Convenient model fitting using (iterated) INLA
@@ -831,10 +827,6 @@ bru_eval_in_data_context <- function(input,
 }
 
 
-
-
-
-
 complete_coordnames <- function(data_coordnames, ips_coordnames) {
   new_coordnames <- character(
     max(
@@ -1025,12 +1017,13 @@ check_sp_data_deprecation <- function(...) {
 
 
 bru_agg_data <- function(
-    data,
-    ips = NULL,
-    domain = NULL,
-    samplers = NULL,
-    options,
-    .envir) {
+  data,
+  ips = NULL,
+  domain = NULL,
+  samplers = NULL,
+  options,
+  .envir
+) {
   if (is.null(ips)) {
     if (!is.null(domain)) {
       ips <- fm_int(
@@ -1176,7 +1169,6 @@ bru_agg_input <- function(input, data_list, .envir) {
 }
 
 
-
 bru_obs_agg <- function(lh,
                         aggregate = NULL,
                         aggregate_input = NULL,
@@ -1230,7 +1222,6 @@ bru_obs_agg <- function(lh,
 
   lh
 }
-
 
 
 bru_obs_family_cp_sp <- function(lh, options, .envir) {
@@ -1806,13 +1797,14 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
 
 bru_obs_check_used_deprecation <- function(
-    used,
-    include,
-    exclude,
-    include_latent,
-    expr_text,
-    env = rlang::caller_env(),
-    user_env = rlang::caller_env(2)) {
+  used,
+  include,
+  exclude,
+  include_latent,
+  expr_text,
+  env = rlang::caller_env(),
+  user_env = rlang::caller_env(2)
+) {
   if (lifecycle::is_present(include) ||
     lifecycle::is_present(exclude) ||
     lifecycle::is_present(include_latent)) {
@@ -1947,9 +1939,6 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
   }
   pred_expr
 }
-
-
-
 
 
 #' @title Observation model construction for usage with [bru()]
@@ -2299,10 +2288,6 @@ like <- function(...,
 }
 
 
-
-
-
-
 #' @title Response size queries
 #'
 #' @description
@@ -2530,7 +2515,6 @@ bru_obs_list.bru_obs_list <- function(..., .tag = NULL) {
 }
 
 
-
 #' @describeIn bru_obs
 #' Combine several `bru_obs` objects into a `bru_obs_list` object
 #' @export
@@ -2545,7 +2529,6 @@ c.bru_obs <- function(...) {
 c.bru_obs_list <- function(...) {
   bru_obs_list(list(...))
 }
-
 
 
 #' @export
@@ -2645,7 +2628,6 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
     class = "summary_bru_obs_list"
   )
 }
-
 
 
 #' @rdname bru_obs_print
@@ -2924,10 +2906,6 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 }
 
 
-
-
-
-
 #' @title Log Gaussian Cox process (LGCP) inference using INLA
 #'
 #' @description
@@ -3033,8 +3011,6 @@ lgcp <- function(components,
   )
   bru(components, lik, options = options, .envir = .envir)
 }
-
-
 
 
 expand_to_dataframe <- function(x, data = NULL) {
@@ -3286,10 +3262,11 @@ predict.bru <- function(object,
 
 
 bru_generate_check_used_deprecation <- function(
-    include,
-    exclude,
-    env = rlang::caller_env(),
-    user_env = rlang::caller_env(2)) {
+  include,
+  exclude,
+  env = rlang::caller_env(),
+  user_env = rlang::caller_env(2)
+) {
   if (lifecycle::is_present(include)) {
     bru_log_message(
       paste0(
@@ -3481,7 +3458,6 @@ generate.bru <- function(object,
     vals
   }
 }
-
 
 
 # Monte Carlo method for estimating posterior
@@ -3691,8 +3667,6 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
   }
   smy
 }
-
-
 
 
 lin_predictor <- function(lin, state) {
@@ -5362,10 +5336,6 @@ list.data <- function(formula) {
 
   elist
 }
-
-
-
-
 
 
 #' Summary for an inlabru fit

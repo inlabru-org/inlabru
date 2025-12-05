@@ -133,7 +133,6 @@ ibm_values.bm_repeat <- function(mapper, ...) {
 }
 
 
-
 bm_repeat_sub_lin <- function(mapper, input, state,
                               ...) {
   # We need all the sub_lin objects even for linear mappers
@@ -156,7 +155,6 @@ bm_repeat_sub_lin <- function(mapper, input, state,
     )
   sub_lin
 }
-
 
 
 #' @describeIn ibm_jacobian The input should take the format of the
@@ -235,8 +233,6 @@ ibm_linear.bm_repeat <- function(mapper, input, state,
     values_mapper = mapper
   )
 }
-
-
 
 
 #' @describeIn ibm_invalid_output

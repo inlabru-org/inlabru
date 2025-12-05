@@ -75,14 +75,6 @@ bru_names.bru <- function(x) {
 }
 
 
-
-
-
-
-
-
-
-
 inla_result_latent_idx <- function(result) {
   do.call(
     c,
@@ -196,7 +188,6 @@ extract_property <- function(result, property,
 
   ret
 }
-
 
 
 ##
@@ -473,8 +464,6 @@ bru_inla.stack.mjoin <- function(...,
     ))
   }
 }
-
-
 
 
 #' @rdname plot.bru

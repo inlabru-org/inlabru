@@ -11,8 +11,6 @@ add_mappers <- function(...) {
 }
 
 
-
-
 # CONSTRUCTORS ----
 
 #' @title Latent model component construction
@@ -643,8 +641,6 @@ bru_compat_pre_2_14_bru_comp <- function(comp) {
 }
 
 
-
-
 #' Methods for inlabru component lists
 #'
 #' Constructor methods for inlabru component lists. Syntax details are given in
@@ -710,9 +706,6 @@ bru_comp_list.formula <- function(object,
   environment(object) <- .envir
   bru_comp_list(components, lhoods = lhoods, .envir = .envir)
 }
-
-
-
 
 
 #' @describeIn bru_comp_list Combine a list of components, component lists,
@@ -789,8 +782,6 @@ bru_comp_list.bru_comp_list <- function(object,
 }
 
 
-
-
 #' @export
 #' @describeIn bru_comp_list The `...` arguments should be `bru_comp_list`
 #' objects. The environment from the first argument will be applied to the
@@ -818,8 +809,6 @@ bru_comp_list.bru_comp_list <- function(object,
   environment(object) <- env
   object
 }
-
-
 
 
 bru_comp_update_mapper <- function(component) {
@@ -876,8 +865,7 @@ bru_comp_update_mapper <- function(component) {
 #' @return A `component` object with completed mapper information
 #' @examples
 #' \dontrun{
-#' if (interactive() && bru_safe_inla()) {
-#' }
+#' if (interactive() && bru_safe_inla()) {}
 #' }
 #' @rdname add_mappers
 #' @keywords internal
@@ -1131,8 +1119,6 @@ bru_subcomp <- function(input = NULL,
 
   subcomponent
 }
-
-
 
 
 make_unique_inputs <- function(inp, allow_list = FALSE) {
@@ -1774,8 +1760,6 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
 }
 
 
-
-
 # OPERATORS ----
 
 
@@ -1961,7 +1945,6 @@ print.bru_subcomp <- function(x,
   cat(text, "\n", sep = "")
   invisible(x)
 }
-
 
 
 #' @export

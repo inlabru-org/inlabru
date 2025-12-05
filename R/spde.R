@@ -167,7 +167,6 @@ materncov.bands <- function(manifold, dist, log.range,
 }
 
 
-
 #' @title Posteriors of SPDE hyper parameters and Matern correlation or
 #'   covariance function.
 #'

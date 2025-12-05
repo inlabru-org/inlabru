@@ -97,7 +97,6 @@ bm_sum_prepare_input <- function(mapper, input) {
 }
 
 
-
 #' @export
 #' @rdname ibm_n_output
 #' @family specific [bm_sum] method implementations
@@ -171,7 +170,6 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
     )
   sub_lin
 }
-
 
 
 #' @describeIn ibm_jacobian
@@ -250,8 +248,6 @@ ibm_linear.bm_sum <- function(mapper, input, state,
     values_mapper = mapper
   )
 }
-
-
 
 
 #' @describeIn ibm_invalid_output

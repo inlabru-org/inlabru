@@ -62,7 +62,6 @@ test_that("Component construction: default mesh/mapping, data is list", {
 })
 
 
-
 test_that("Component construction: unsafe intercepts, data is list", {
   local_bru_safe_inla()
 
@@ -82,7 +81,6 @@ test_that("Component construction: unsafe intercepts, data is list", {
     )
   )
 })
-
 
 
 test_that("Component construction: separate response_data input", {

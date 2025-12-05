@@ -206,7 +206,6 @@ bru_safe_sp <- function(quietly = FALSE,
 }
 
 
-
 #' Expand labels
 #'
 #' @param labels character vector; original labels
@@ -238,11 +237,6 @@ extract_vectorlist_column <- function(thelist) {
     list(1)
   )
 }
-
-
-
-
-
 
 
 check_layer <- function(data, where, layer) {
@@ -326,8 +320,6 @@ extract_layer <- function(where, layer, selector) {
   }
   layer
 }
-
-
 
 
 #' Evaluate spatial covariates
@@ -489,7 +481,7 @@ eval_spatial.SpatRaster <- function(data,
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
     handle_crs <- (!fm_crs_is_null(fm_crs(where)) &&
-        !fm_crs_is_null(fm_crs(data)))
+      !fm_crs_is_null(fm_crs(data)))
     if (handle_crs) {
       where <- fmesher::fm_transform(where, fm_crs(data))
     }
@@ -500,7 +492,7 @@ eval_spatial.SpatRaster <- function(data,
     }
   } else {
     if (!fm_crs_is_null(fm_crs(where)) &&
-        !fm_crs_is_null(fm_crs(data))) {
+      !fm_crs_is_null(fm_crs(data))) {
       where <- terra::project(where, data)
     }
   }
@@ -569,18 +561,18 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' if (require("sf", quietly = TRUE)) {
 #'   points <-
 #'     sf::st_as_sf(
-#'     data.frame(
-#'       x = 1:3,
-#'       y = 4:6,
-#'       val = c(NA, NA, NA)
-#'     ),
-#'     coords = c("x", "y")
+#'       data.frame(
+#'         x = 1:3,
+#'         y = 4:6,
+#'         val = c(NA, NA, NA)
+#'       ),
+#'       coords = c("x", "y")
 #'     )
 #'   input_coord <- expand.grid(x = 0:7, y = 0:7)
 #'   input <-
-#'   sf::st_as_sf(
-#'     cbind(input_coord, val = as.vector(input_coord$y)),
-#'     coords = c("x", "y")
+#'     sf::st_as_sf(
+#'       cbind(input_coord, val = as.vector(input_coord$y)),
+#'       coords = c("x", "y")
 #'     )
 #'   points$val <- bru_fill_missing(input, points, points$val)
 #'   print(points)
@@ -592,7 +584,6 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #'   print(input$val[c(3, 30)])
 #' }
 #' }
-
 bru_fill_missing <- function(data, where, values,
                              layer = NULL, selector = NULL,
                              batch_size = deprecated()) {
@@ -687,7 +678,6 @@ bru_fill_missing <- function(data, where, values,
 
   values
 }
-
 
 
 # Resave data

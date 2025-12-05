@@ -41,7 +41,6 @@ bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
 }
 
 
-
 bru_info_upgrade <- function(object,
                              new_version = getNamespaceVersion("inlabru")) {
   object_full <- object

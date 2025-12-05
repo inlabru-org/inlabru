@@ -69,8 +69,6 @@ bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
 }
 
 
-
-
 #' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_make_stack

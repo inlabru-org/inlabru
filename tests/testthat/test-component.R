@@ -82,7 +82,6 @@ test_that("Component construction: linear model", {
 })
 
 
-
 test_that("Component construction: duplicate detection", {
   expect_error(
     bru_comp_list(
@@ -93,7 +92,6 @@ test_that("Component construction: duplicate detection", {
     regexp = "Duplicated component labels detected: 'beta'"
   )
 })
-
 
 
 test_that("Component construction: offset", {
@@ -109,7 +107,6 @@ test_that("Component construction: offset", {
     ignore_attr = TRUE
   )
 })
-
 
 
 test_that("Component construction: terra", {
@@ -225,8 +222,6 @@ test_that("Component construction: terra", {
 })
 
 
-
-
 test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -293,7 +288,6 @@ test_that("Component construction: default index/mesh/mapping construction", {
     seq_along(sort(unique(lik$data$x), na.last = NA))
   )
 })
-
 
 
 test_that("Component construction: main iid factor construction", {
@@ -394,7 +388,6 @@ test_that("Component construction: replicate iid factor construction", {
   local_bru_safe_inla()
   expect_no_error(bru(cmp2, lik))
 })
-
 
 
 test_that("Component construction: unsafe intercepts", {

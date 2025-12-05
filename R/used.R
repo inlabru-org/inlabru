@@ -322,7 +322,6 @@ bru_used_vars.formula <- function(x, functions = FALSE) {
 }
 
 
-
 #' @describeIn bru_used Create a `bru_used` object by calling [new_bru_used()]
 #' @export
 bru_used.default <- function(x, ...) {

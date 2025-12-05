@@ -156,7 +156,6 @@ test_that("mdata", {
 })
 
 
-
 test_that("surv", {
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.26")

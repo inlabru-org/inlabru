@@ -784,7 +784,6 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 }
 
 
-
 #' @title Plot inlabru iteration timings
 #'
 #' @description

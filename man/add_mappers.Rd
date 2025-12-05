@@ -41,8 +41,7 @@ determine the appropriate mapper(s).
 }
 \examples{
 \dontrun{
-if (interactive() && bru_safe_inla()) {
-}
+if (interactive() && bru_safe_inla()) {}
 }
 }
 \keyword{internal}

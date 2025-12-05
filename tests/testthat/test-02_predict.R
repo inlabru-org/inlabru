@@ -124,7 +124,6 @@ test_that("bru: factor component", {
 })
 
 
-
 test_that("bru: predict with _eval", {
   skip_on_cran()
   local_bru_safe_inla()

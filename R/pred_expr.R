@@ -221,8 +221,6 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
 }
 
 
-
-
 #' @rdname bru_pred_expr
 #' @export
 #' @importFrom glue glue

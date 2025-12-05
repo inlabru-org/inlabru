@@ -41,7 +41,6 @@ test_that("Missing data infilling", {
 })
 
 
-
 test_that("Laplace distribution", {
   q <- -5:5
   rate <- 2

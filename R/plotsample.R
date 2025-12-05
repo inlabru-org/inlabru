@@ -144,7 +144,6 @@ plotsample <- function(spdf,
 }
 
 
-
 #' @title Convert a plot sample of points into one of counts.
 #'
 #' @description

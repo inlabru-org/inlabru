@@ -228,8 +228,6 @@ bru_is_additive.bru_obs_list <- function(x, ...) {
 }
 
 
-
-
 #' @title Check for predictor rowwise evaluability
 #' @description Checks if a predictor expression may be evaluated rowwise
 #' @param x An object containing a predictor definition

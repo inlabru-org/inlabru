@@ -126,9 +126,6 @@ test_that("eval_spatial.Spatial*", {
 })
 
 
-
-
-
 test_that("eval_spatial.sf", {
   # Load the Gorilla data
   data(gorillas_sf, package = "inlabru", envir = environment())
@@ -149,7 +146,6 @@ test_that("eval_spatial.sf", {
 
   expect_equal(nests$something_char, as.character(nests$something_num))
 })
-
 
 
 test_that("eval_spatial.stars", {

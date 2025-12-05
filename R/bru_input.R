@@ -179,8 +179,7 @@ bru_input.bru_input <- function(x,
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
           data_crs <- tryCatch(fm_CRS(orig_data),
-            error = function(e) {
-            }
+            error = function(e) {}
           )
           if (!fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
@@ -612,9 +611,6 @@ print.summary_bru_input <- function(x, ...) {
 }
 
 
-
-
-
 #' @title Interface between `bru_input` and `bru_mapper`
 #' @description Associate [bru_input] objects with [bru_mapper] objects.
 #' @name ibm_input
@@ -789,7 +785,6 @@ bru_input.bm_sum <- function(x, ..., label = "<unknown>") {
     bru_input(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-
 
 
 #' @describeIn ibm_input Create a `bru_mapper` placeholder object of class

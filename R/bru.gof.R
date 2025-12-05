@@ -194,7 +194,6 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
 }
 
 
-
 #' Variance and correlations measures for prediction components
 #'
 #' Calculates local and integrated variance and correlation measures as

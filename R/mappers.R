@@ -85,7 +85,6 @@ ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 }
 
 
-
 #' @title Value vector for a mapping
 #' @description
 #' When `inla_f=TRUE`, implementations must return a vector that
@@ -264,8 +263,6 @@ ibm_invalid_output <- function(mapper, input, state, ...) {
 }
 
 
-
-
 #' Methods for mapper lists
 #'
 #' `bru_mapper` lists can be combined into `bm_list` lists.
@@ -377,8 +374,6 @@ as_bru_mapper.bru_subcomp <- function(x) {
   class(object) <- c("bm_list", "list")
   object
 }
-
-
 
 
 # Summaries ----
@@ -1070,7 +1065,6 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
 }
 
 
-
 #' @describeIn ibm_eval
 #' Verifies that the mapper is linear
 #' with [ibm_is_linear()], and then computes a linear mapping
@@ -1137,7 +1131,6 @@ ibm_eval2.default <- function(mapper, input, state, ...) {
 }
 
 
-
 #' @export
 #' @describeIn ibm_names Returns `NULL`
 ibm_names.default <- function(mapper, ...) {
@@ -1193,9 +1186,6 @@ ibm_invalid_output.default <- function(mapper, input, state, ...) {
   }
   rep(FALSE, ibm_n_output(mapper, input = input, state = state, ...))
 }
-
-
-
 
 
 ## _fmesher ####
@@ -2029,7 +2019,6 @@ ibm_jacobian.bm_factor <- function(mapper, input, ...) {
 }
 
 
-
 ## _const ####
 
 #' @title Constant mapper
@@ -2191,8 +2180,6 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
 }
 
 
-
-
 ## _scale ####
 
 #' @title Mapper for element-wise scaling
@@ -2283,8 +2270,8 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
     return(Matrix::Diagonal(n = length(state), 1.0))
   }
   if (!(is.numeric(input) ||
-        is.logical(input) ||
-        is(input, "Matrix"))) {
+    is.logical(input) ||
+    is(input, "Matrix"))) {
     stop(
       "The input to a bm_scale evaluation must be numeric or logical."
     )
@@ -2294,9 +2281,6 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
   scale[!ok] <- 0
   Matrix::Diagonal(n = length(state), scale)
 }
-
-
-
 
 
 #' @export
@@ -2320,8 +2304,6 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
   scale[!ok] <- 0
   scale * state
 }
-
-
 
 
 ## _aggregate ####
@@ -2480,7 +2462,6 @@ ibm_values.bm_aggregate <- function(mapper, ...,
 }
 
 
-
 #' @export
 #' @describeIn ibm_jacobian
 #' `input` should be a list with elements `block`
@@ -2520,10 +2501,6 @@ ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
     )
   val
 }
-
-
-
-
 
 
 ## _logsumexp ####
@@ -2659,9 +2636,6 @@ ibm_eval.bm_logsumexp <- function(mapper, input, state = NULL,
     )
   val
 }
-
-
-
 
 
 ## _logitaverage ####
@@ -2819,9 +2793,6 @@ ibm_eval.bm_logitaverage <- function(mapper, input, state = NULL,
   }
   val
 }
-
-
-
 
 
 ## _marginal ####
@@ -3035,9 +3006,6 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
 }
 
 
-
-
-
 #' @export
 #' @describeIn ibm_eval When `xor(mapper[["inverse"]], reverse)` is
 #' `FALSE`, `ibm_eval()`
@@ -3076,11 +3044,6 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
   }
   as.vector(val)
 }
-
-
-
-
-
 
 
 ## _pipe ####
@@ -3206,8 +3169,6 @@ ibm_jacobian.bm_pipe <- function(mapper, input, state = NULL, ...) {
 }
 
 
-
-
 #' @export
 #' @rdname ibm_eval
 #' @family specific [bm_pipe] method implementations
@@ -3259,8 +3220,6 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
   }
   list(offset = state_k, jacobian = A)
 }
-
-
 
 
 #' @describeIn ibm_simplify
@@ -3331,8 +3290,6 @@ ibm_simplify.bm_pipe <- function(mapper,
 
   mapper
 }
-
-
 
 
 ## _multi ####
@@ -3559,7 +3516,6 @@ ibm_jacobian.bm_multi <- function(mapper,
   }
   A_
 }
-
 
 
 #' @export
@@ -3900,13 +3856,6 @@ ibm_jacobian.bm_harmonics <- function(mapper,
   }
   as(A, "Matrix")
 }
-
-
-
-
-
-
-
 
 
 ## _reparam ####

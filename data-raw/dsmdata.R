@@ -78,7 +78,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # newdata[1:3, ]
 
 
-
   # Automated mesh construction
   loc <- rbind(
     as.matrix(segdata[, c("start.x", "start.y")]),

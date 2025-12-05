@@ -773,9 +773,6 @@ gg.SpatRaster <- function(data, ...) {
 }
 
 
-
-
-
 #' Geom for fm_mesh_2d objects
 #'
 #' @description
@@ -1130,7 +1127,6 @@ plot.prediction <- function(x, y = NULL, ...) {
 }
 
 
-
 #' @title Multiple ggplots on a page.
 #'
 #' @description
@@ -1210,7 +1206,6 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
     }
   }
 }
-
 
 
 # Default color palette for plots using \link{gg}

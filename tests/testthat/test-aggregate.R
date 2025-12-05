@@ -81,7 +81,6 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
 })
 
 
-
 test_that("Aggregated Gaussian observations, using aggregate feature", {
   local_bru_safe_inla()
 
@@ -316,7 +315,6 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
     fixed = TRUE
   )
 })
-
 
 
 test_that("Aggregated Poisson observations, using mapper", {

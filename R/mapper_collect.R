@@ -164,7 +164,6 @@ ibm_is_linear.bm_collect <- function(mapper,
 }
 
 
-
 bm_collect_sub_lin <- function(mapper, input, state,
                                inla_f = FALSE,
                                ...) {
@@ -206,7 +205,6 @@ bm_collect_sub_lin <- function(mapper, input, state,
     )
   sub_lin
 }
-
 
 
 #' @describeIn ibm_jacobian
@@ -291,8 +289,6 @@ ibm_linear.bm_collect <- function(mapper, input, state,
     values_mapper = mapper
   )
 }
-
-
 
 
 #' @describeIn ibm_invalid_output

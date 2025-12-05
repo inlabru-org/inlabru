@@ -34,9 +34,6 @@ bru_env_get <- function() {
 }
 
 
-
-
-
 # inlabru log methods ----
 
 #' @title Clear log contents
@@ -562,16 +559,17 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' @param .frame The throwing context, for when `.internal` is `TRUE`
 #' @export
 bru_log_abort <- function(
-    msg,
-    ...,
-    domain = NULL,
-    appendLF = TRUE,
-    verbosity = 1L,
-    allow_verbose = TRUE,
-    verbose = FALSE,
-    verbose_store = NULL,
-    call = rlang::caller_env(),
-    .frame = rlang::caller_env()) {
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+) {
   bru_log_message(
     msg,
     domain = domain,
@@ -587,16 +585,17 @@ bru_log_abort <- function(
 #' @describeIn bru_log_message Store a log message and throw a warning.
 #' @export
 bru_log_warn <- function(
-    msg,
-    ...,
-    domain = NULL,
-    appendLF = TRUE,
-    verbosity = 1L,
-    allow_verbose = TRUE,
-    verbose = FALSE,
-    verbose_store = NULL,
-    call = rlang::caller_env(),
-    .frame = rlang::caller_env()) {
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+) {
   bru_log_message(
     msg,
     domain = domain,
@@ -897,7 +896,6 @@ bru_options_deprecated <- function(args) {
 }
 
 
-
 #' Additional bru options
 #'
 #' Construct a `bru_options` object including the default and global options,
@@ -948,7 +946,6 @@ bru_options_inla <- function(options) {
 }
 
 
-
 #' @describeIn bru_options Checks for valid contents of a `bru_options`
 #' object, and produces warnings for invalid options.
 #' @param options An `bru_options` object to be checked
@@ -994,7 +991,6 @@ bru_options_check <- function(options, ignore_null = TRUE) {
 
   ok
 }
-
 
 
 #' @param name Either `NULL`, or single option name string, or character vector
@@ -1092,7 +1088,6 @@ bru_options_set_local <- function(...,
   withr::defer(bru_options_set(original_options, .reset = TRUE), envir = .envir)
   invisible(bru_options_set(..., .reset = .reset))
 }
-
 
 
 #' @title Print inlabru options

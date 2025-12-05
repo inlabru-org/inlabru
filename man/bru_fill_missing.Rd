@@ -44,18 +44,18 @@ Computes nearest-available-value imputation for missing values in space
 if (require("sf", quietly = TRUE)) {
   points <-
     sf::st_as_sf(
-    data.frame(
-      x = 1:3,
-      y = 4:6,
-      val = c(NA, NA, NA)
-    ),
-    coords = c("x", "y")
+      data.frame(
+        x = 1:3,
+        y = 4:6,
+        val = c(NA, NA, NA)
+      ),
+      coords = c("x", "y")
     )
   input_coord <- expand.grid(x = 0:7, y = 0:7)
   input <-
-  sf::st_as_sf(
-    cbind(input_coord, val = as.vector(input_coord$y)),
-    coords = c("x", "y")
+    sf::st_as_sf(
+      cbind(input_coord, val = as.vector(input_coord$y)),
+      coords = c("x", "y")
     )
   points$val <- bru_fill_missing(input, points, points$val)
   print(points)

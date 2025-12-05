@@ -141,8 +141,6 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
 }
 
 
-
-
 # p = 0.5 + 0.5 * sign(q) * (1 - exp(-abs(q)))
 #   = 0.5 + 0.5 * sign(q) - 0.5 * sign(q) * exp(-abs(q))
 # 2p = 1 + sign(q) - sign(q) * exp(-abs(q))

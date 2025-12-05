@@ -75,9 +75,6 @@ test_that("1D LGCP fitting", {
 })
 
 
-
-
-
 test_data_discrete <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   xx <- ceiling(pts2$x)
@@ -153,9 +150,6 @@ test_that("1D LGCP fitting, discrete point domain", {
   expect_equal(Lambda$mean, 130.127, tolerance = hitol)
   expect_equal(Lambda$sd, 11.09, tolerance = 1)
 })
-
-
-
 
 
 test_that("1D LGCP fitting, compressed format", {

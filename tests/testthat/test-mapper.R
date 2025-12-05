@@ -397,7 +397,6 @@ test_that("Multi-mapper bru input with offset", {
 })
 
 
-
 test_that("User defined mappers", {
   # .S3method was unavailable in R 3.6!
   skip_if_not(utils::compareVersion("4", R.Version()$major) <= 0)
@@ -444,7 +443,6 @@ test_that("User defined mappers", {
     label = "Non-interactive bru() call"
   )
 })
-
 
 
 test_that("Collect mapper, direct construction", {
@@ -609,7 +607,6 @@ test_that("Collect mapper, automatic construction", {
 })
 
 
-
 test_that("Collect mapper works", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -641,7 +638,6 @@ test_that("Collect mapper works", {
       )
   })
 })
-
 
 
 test_that("Marginal mapper", {
@@ -730,7 +726,6 @@ test_that("Mesh 2d mapper", {
 })
 
 
-
 test_that("Repeat mapper, direct construction", {
   withr::local_seed(1234L)
 
@@ -752,8 +747,6 @@ test_that("Repeat mapper, direct construction", {
   A <- as(as(as(A, "dMatrix"), "generalMatrix"), "CsparseMatrix")
   expect_equal(ibm_jacobian(mapper, data), A)
 })
-
-
 
 
 test_that("Repeat mapper works", {

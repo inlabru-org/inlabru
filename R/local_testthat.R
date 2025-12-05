@@ -37,7 +37,6 @@ local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
 }
 
 
-
 #' @describeIn local_testthat Wrapper for [bru_options_set_local()],
 #' to locally override the global package options.
 #' @return `local_bru_options_set()` returns a copy of the global override
@@ -54,7 +53,6 @@ local_bru_options_set <- function(...,
                                   envir = parent.frame()) {
   bru_options_set_local(..., .reset = .reset, .envir = envir)
 }
-
 
 
 #' @export

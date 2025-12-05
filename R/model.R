@@ -189,8 +189,6 @@ print.bru_model <- function(x, ...) {
 }
 
 
-
-
 #' Evaluate or sample from a posterior result given a model and locations
 #'
 #' @export
@@ -354,8 +352,6 @@ evaluate_state <- function(model,
 }
 
 
-
-
 #' @export
 #' @rdname evaluate_effect
 evaluate_effect_single_state <- function(...) {
@@ -441,8 +437,6 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
   comp_simple <- ibm_simplify(components, input = input, state = state, ...)
   evaluate_effect_single_state(comp_simple, input = input, state = state, ...)
 }
-
-
 
 
 #' Evaluate component effects or expressions
@@ -729,7 +723,6 @@ evaluate_predictor <- function(model,
 }
 
 
-
 #' Evaluate component values in predictor expressions
 #'
 #' In predictor expressions, `name_eval(...)` can be used to evaluate
@@ -798,11 +791,6 @@ bru_comp_eval <- function(main,
     "'bru_comp_eval(...)'.  See ?bru_comp_eval for more information."
   ))
 }
-
-
-
-
-
 
 
 #' @include mappers.R

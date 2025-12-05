@@ -2,7 +2,6 @@ source(here::here("data-raw", "dsmdata.tools.R"))
 source(here::here("data-raw", "dsmdata.R"))
 
 
-
 # Old methods needed to import mexdolphins data
 
 as.spatial.dsdata <- function(dset, cnames, crs) {
@@ -92,15 +91,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   # Return detections ("points") and effort ("samplers")
   list(points = points, samplers = samplers, mesh = dset$mesh)
 }
-
-
-
-
-
-
-
-
-
 
 
 #' Mexdolphin data import
