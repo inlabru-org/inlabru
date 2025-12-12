@@ -242,9 +242,13 @@ gg.bru_prediction <- function(data,
     names(data)[names(data) == new_quant_names[[quant_name]]] <- quant_name
   }
   # Find quantile levels
-  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*$", names(data))]
+  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*%?$", names(data))]
   if (length(quant_names) > 0) {
-    quant_probs <- as.numeric(sub("^q", "", quant_names))
+    perc <- grepl("%$", quant_names)
+    quant_probs <- as.numeric(
+      sub("%$", "", sub("^q", "", quant_names))
+    )
+    quant_probs[perc] <- quant_probs[perc] / 100
     quant_names <- quant_names[order(quant_probs)]
     quant_probs <- sort(quant_probs)
     lqname <- quant_names[1]
