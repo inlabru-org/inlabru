@@ -10,7 +10,7 @@
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
 #'     `fm_manifold(mesh)`, or an object supported by
-#'     [fmesher::fm_manifold(manifold)].
+#'     [fmesher::fm_manifold()].
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by

@@ -152,18 +152,19 @@ if (bru_safe_inla() &&
   # or covariates. However, this is not true for the smooth spatial effects 'field'.
   # In order to predict 'field' we have to define where (in space) to predict. For
   # this purpose, the second argument of the predict function can take \code{data.frame}
-  # objects as well as Spatial objects. For instance, we might want to predict
+  # objects as well as sf (and legacy sp/Spatial) objects. For instance, we
+  # might want to predict
   # 'field' at the locations of the mesh vertices. Using
 
   vrt <- fm_vertices(gorillas$mesh, format = "sf")
 
-  # we obtain these vertices as a SpatialPointsDataFrame
+  # we obtain these vertices as an sf object with POINT geometries
 
   ggplot() +
     gg(gorillas$mesh) +
     gg(vrt, color = "red")
 
-  # Predicting 'mySmooth' at these locations works as follows
+  # Predicting 'field' at these locations works as follows
 
   field <- predict(fit, vrt, ~field)
 
