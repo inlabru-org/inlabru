@@ -65,8 +65,8 @@ jobs:
           brew install --cask xquartz
           brew install pkg-config
           brew install udunits
-#          brew install proj@9
           brew install gdal
+#          brew install proj@9
 #          brew install gsl
 
       - name: Install system dependencies on Linux (GL)
