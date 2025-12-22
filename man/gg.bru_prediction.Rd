@@ -50,8 +50,9 @@ Requires the \code{ggplot2} package.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    require(sn, quietly = TRUE) &&
-    require(ggplot2, quietly = TRUE)) {
+    require("sn", quietly = TRUE) &&
+    require("ggplot2", quietly = TRUE) &&
+    require("patchwork", quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))
@@ -72,7 +73,7 @@ if (bru_safe_inla() &&
   xpost
 
   # For a single variable like 'x' the default plotting method invoked by gg() will
-  # show these statisics in a fashion similar to a box plot:
+  # show these statistics in a fashion similar to a box plot:
   ggplot() +
     gg(xpost)
 
@@ -99,7 +100,7 @@ if (bru_safe_inla() &&
 
   p2 <- ggplot() +
     gg(fit$summary.fixed, bar = TRUE)
-  multiplot(p1, p2)
+  (p1 / p2)
 
   # By default, if the prediction has more than one row, gg will plot the column 'mean' against
   # the row index. This is for instance usefuul for predicting and plotting function

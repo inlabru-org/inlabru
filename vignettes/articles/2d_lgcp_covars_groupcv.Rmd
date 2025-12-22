@@ -34,6 +34,7 @@ library(inlabru)
 library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
+library(patchwork)
 # Activate DIC output
 bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
 ```
@@ -381,25 +382,25 @@ csc <- scale_fill_gradientn(colours = brewer.pal(9, "YlOrRd"), limits = lprange)
 plot.lp2 <- ggplot() +
   gg(lp2$smooth_veg, geom = "tile") +
   csc +
-  theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("mySmooth + vegetation")
 
 plot.lp2.spde <- ggplot() +
   gg(lp2$smooth, geom = "tile") +
   csc +
-  theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("mySmooth")
 
 plot.lp2.veg <- ggplot() +
   gg(lp2$veg, geom = "tile") +
   csc +
-  theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("vegetation")
 
-multiplot(plot.lp2, plot.lp2.spde, plot.lp2.veg, cols = 3)
+(plot.lp2 + plot.lp2.spde + plot.lp2.veg) +
+  plot_layout(ncol = 3, guides = "collect") &
+  guides(fill = guide_legend("value")) &
+  theme(legend.position = "right")
 ```
 
 #### A model with SPDE only
@@ -499,8 +500,12 @@ effect marginal distribution data
 
 ```{r warning=FALSE,message=FALSE}
 flist <- vector("list", NROW(fit2$summary.random$vegetation))
-for (i in seq_along(flist)) flist[[i]] <- plot(fit2, "vegetation", index = i)
-multiplot(plotlist = flist, cols = 3)
+for (i in seq_along(flist)) {
+  flist[[i]] <- plot(fit2, "vegetation", index = i)
+  flist_combined <- if (i == 1) flist[[i]] else flist_combined + flist[[i]]
+}
+flist_combined +
+  plot_layout(ncol = 3, guides = "collect")
 ```
 
 Use `spde.posterior( )` to obtain and then plot the SPDE parameter posteriors
@@ -511,11 +516,11 @@ spde.range <- spde.posterior(fit2, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(fit2, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
 var.plot <- plot(spde.logvar)
+(range.plot / var.plot)
 
-multiplot(range.plot, var.plot)
 corplot <- plot(spde.posterior(fit2, "mySmooth", what = "matern.correlation"))
 covplot <- plot(spde.posterior(fit2, "mySmooth", what = "matern.covariance"))
-multiplot(covplot, corplot)
+(covplot / corplot)
 ```
 
 Continuous covariates
@@ -642,8 +647,7 @@ p2 <- ggplot() +
   gg(e.pred$int.log, aes(fill = exp(mean + sd^2 / 2)), geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
-library(patchwork)
-p1 | p2
+(p1 | p2)
 ```
 
 Now look at the elevation and SPDE effects in space. Leave out the Intercept
@@ -683,22 +687,19 @@ plot.e.lp <- ggplot() +
 plot.e.lp.spde <- ggplot() +
   gg(e.lp$smooth, mask = boundary, geom = "tile") +
   csc +
-  theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("SPDE")
 
 plot.e.lp.elev <- ggplot() +
   gg(e.lp$elev, mask = boundary, geom = "tile") +
   csc +
-  theme(legend.position = "bottom") +
   gg(boundary, alpha = 0) +
   ggtitle("elevation")
 
-multiplot(plot.e.lp,
-  plot.e.lp.spde,
-  plot.e.lp.elev,
-  cols = 3
-)
+(plot.e.lp + plot.e.lp.spde + plot.e.lp.elev) +
+  plot_layout(ncol = 3, guides = "collect") &
+  guides(fill = guide_legend("value")) &
+  theme(legend.position = "right")
 ```
 
 You might also want to look at the posteriors of the fixed effects and of the
@@ -718,8 +719,10 @@ LambdaE
 flist <- vector("list", NROW(efit$summary.fixed))
 for (i in seq_along(flist)) {
   flist[[i]] <- plot(efit, rownames(efit$summary.fixed)[i])
+  flist_combined <- if (i == 1) flist[[i]] else flist_combined + flist[[i]]
 }
-multiplot(plotlist = flist, cols = 2)
+flist_combined +
+    plot_layout(ncol = 2, guides = "collect")
 ```
 
 Plot the SPDE parameter posteriors and the Matern correlation and covariance
@@ -730,11 +733,11 @@ spde.range <- spde.posterior(efit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(efit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
 var.plot <- plot(spde.logvar)
+(range.plot / var.plot)
 
-multiplot(range.plot, var.plot)
 corplot <- plot(spde.posterior(efit, "mySmooth", what = "matern.correlation"))
 covplot <- plot(spde.posterior(efit, "mySmooth", what = "matern.covariance"))
-multiplot(covplot, corplot)
+(covplot / corplot)
 ```
 
 Also estimate abundance. The `data.frame` in the second call leads to inclusion
