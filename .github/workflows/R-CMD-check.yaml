@@ -109,6 +109,8 @@ jobs:
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
           sessioninfo::session_info(pkgs, include_base = TRUE)
+          rgdal::gdal_config()
+          sf::sf_proj_info("proj")
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
