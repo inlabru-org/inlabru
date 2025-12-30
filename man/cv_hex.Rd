@@ -14,8 +14,7 @@ partitions to be created}
 
 \item{n_group}{number of cv folds}
 
-\item{\dots}{Passed on to \code{fm_nonconvex_hull()}, e.g. \code{resolution}
-Output:}
+\item{\dots}{Passed on to \code{fm_nonconvex_hull()}, e.g. \code{resolution}}
 }
 \value{
 a partitioned sf object as required

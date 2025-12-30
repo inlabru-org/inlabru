@@ -99,8 +99,7 @@ cv_partition <- function(samplers,
 #' @param cellsize hexagon cellsize, see [sf::st_make_grid()] description
 #' @param n_group number of cv folds
 #' @param \dots Passed on to `fm_nonconvex_hull()`, e.g. `resolution`
-#' Output:
-#' @return a partitioned sf object as required
+#' @returns a partitioned sf object as required
 #'
 #' @keywords internal
 #' @export

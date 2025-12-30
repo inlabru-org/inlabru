@@ -1,15 +1,14 @@
-test_that("Join gcpo", {
-  ## example on behavior of bru_obs_control_gcpo.bru_obs_list
-
-  ##  I just want to check the functionality of control.cgpo .
-  ## So from bru_inference, I will just return(inla.options)
-
-
+test_that("Joint gcpo", {
   skip_if_not_installed("sf")
   local_bru_safe_inla()
 
   ## partition
-  cvpart <- cv_hex(gorillas_sf$boundary, cellsize = 0.5, n_group = 3)
+  cvpart <- cv_hex(
+    gorillas_sf$boundary,
+    cellsize = 0.5,
+    n_group = 3,
+    resolution = c(95, 80)
+  )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
