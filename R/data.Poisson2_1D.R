@@ -31,7 +31,7 @@
 #' @examples
 #' \donttest{
 #' if (require("ggplot2", quietly = TRUE) &&
-#'    require("patchwork", quietly = TRUE)) {
+#'   require("patchwork", quietly = TRUE)) {
 #'   data(Poisson2_1D)
 #'   p1 <- ggplot(countdata2) +
 #'     geom_point(data = countdata2, aes(x = x, y = count), col = "blue") +

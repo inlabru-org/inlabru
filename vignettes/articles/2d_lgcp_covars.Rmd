@@ -589,7 +589,7 @@ for (i in seq_along(flist)) {
   flist_combined <- if (i == 1) flist[[i]] else flist_combined + flist[[i]]
 }
 flist_combined +
-    plot_layout(ncol = 2, guides = "collect")
+  plot_layout(ncol = 2, guides = "collect")
 ```
 
 Plot the SPDE parameter posteriors and the Matern correlation and covariance

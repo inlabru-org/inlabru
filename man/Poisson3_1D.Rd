@@ -45,7 +45,7 @@ widths.
 \examples{
 \donttest{
 if (require("ggplot2", quietly = TRUE) &&
-   require("patchwork", quietly = TRUE)) {
+  require("patchwork", quietly = TRUE)) {
   data(Poisson3_1D)
   # first the plots for the 10-bin case:
   p1a <- ggplot(countdata3a) +

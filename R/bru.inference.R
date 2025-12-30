@@ -2912,13 +2912,15 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
   exc <- names(c.gcpo.combined)
   if (!is.null(control.gcpo)) {
     c.gcpo.combined <- merge_list_check(c.gcpo.combined,
-                                        control.gcpo,
-                                        exclude = exc)
+      control.gcpo,
+      exclude = exc
+    )
   }
   for (idx in seq_along(c.gcpo)) {
     c.gcpo.combined <- merge_list_check(c.gcpo.combined,
-                                        c.gcpo[[idx]],
-                                        exclude = exc)
+      c.gcpo[[idx]],
+      exclude = exc
+    )
   }
 
   c.gcpo.combined

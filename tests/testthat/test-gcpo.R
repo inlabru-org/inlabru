@@ -15,8 +15,10 @@ test_that("Join gcpo", {
   nblock <- nrow(cvpart)
 
   ## split
-  gorillas_nests_major <- gorillas_sf$nests[gorillas_sf$nests$group == "major", ]
-  gorillas_nests_minor <- gorillas_sf$nests[gorillas_sf$nests$group == "minor", ]
+  gorillas_nests_major <-
+    gorillas_sf$nests[gorillas_sf$nests$group == "major", ]
+  gorillas_nests_minor <-
+    gorillas_sf$nests[gorillas_sf$nests$group == "minor", ]
 
   # blocks for each nest
   a <- sf::st_intersects(gorillas_nests_major, cvpart)
