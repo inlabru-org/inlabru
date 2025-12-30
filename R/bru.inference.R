@@ -2878,7 +2878,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     if (any_element[nm]) {
       if (!all_element[nm]) {
         stop(glue::glue(
-          "control.gcpo${nm} given in some, but not all, observation modes"
+          "control.gcpo${nm} given in some, but not all, observation models"
         ))
       }
       c.gcpo.combined[[nm]] <-
@@ -2892,17 +2892,36 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     c.gcpo.combined[["weights"]] <-
       unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
   }
-  c.gcpo.new <- list()
+
+  merge_list_check <- function(a, b, exclude = character(0)) {
+    for (nm in setdiff(names(b), exclude)) {
+      if (nm %in% names(a)) {
+        if (identical(a[[nm]], b[[nm]])) {
+          next
+        }
+        stop(glue::glue(
+          "Cannot merge control.gcpo lists: ",
+          "both contain element '{nm}' with conflicting content."
+        ))
+      }
+      a[[nm]] <- b[[nm]]
+    }
+    a
+  }
+
+  exc <- names(c.gcpo.combined)
   if (!is.null(control.gcpo)) {
-    c.gcpo.new <- modifyList(c.gcpo.new, control.gcpo)
+    c.gcpo.combined <- merge_list_check(c.gcpo.combined,
+                                        control.gcpo,
+                                        exclude = exc)
   }
   for (idx in seq_along(c.gcpo)) {
-    # TODO: Detect multiple conflicting option settings
-    c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo[[idx]])
+    c.gcpo.combined <- merge_list_check(c.gcpo.combined,
+                                        c.gcpo[[idx]],
+                                        exclude = exc)
   }
-  c.gcpo.new <- modifyList(c.gcpo.new, c.gcpo.combined)
 
-  c.gcpo.new
+  c.gcpo.combined
 }
 
 

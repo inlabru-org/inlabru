@@ -48,6 +48,8 @@
   to introduce the `"bru_obs"` classname earlier, and upgrades through
   2.13.0.9017, that introduced a new predictor expression storage system
   (version `2.13.0.9024`)
+* Fix bug in `bru_obs_control_gcpo()` for multi-observation models.
+  (version `2.13.0.9025`)
 
 # inlabru 2.13.0
 
