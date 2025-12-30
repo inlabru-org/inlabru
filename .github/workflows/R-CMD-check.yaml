@@ -108,15 +108,14 @@ jobs:
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          sessioninfo::session_info(pkgs, include_base = TRUE)
-          tryCatch({
-          sf::sf_proj_info("have_datum_files")
-          sf::sf_proj_info("proj")
-          sf::sf_proj_info("ellps")
-          sf::sf_proj_info("datum")
-          sf::sf_proj_info("units")
-          sf::sf_proj_info("path")
-          }, warning = function(w) message(w), error = function(e) message(e))
+          print(sessioninfo::session_info(pkgs, include_base = TRUE))
+          print(sf::sf_proj_info("have_datum_files"))
+          print(sf::sf_proj_info("proj"))
+          print(sf::sf_proj_info("ellps"))
+          print(sf::sf_proj_info("datum"))
+          print(sf::sf_proj_info("units"))
+          print(sf::sf_proj_info("prime_meridians"))
+          print(sf::sf_proj_info("path"))
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
