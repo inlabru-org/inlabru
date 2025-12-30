@@ -130,7 +130,7 @@ ggplot() +
 cvpart$block_ID <- seq_len(nrow(cvpart))
 cvpart$group <- NULL
 a <- sf::st_intersects(nests, cvpart)
-if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
+if (any(lengths(a) != 1)) {
   stop("Point in none or multiple polygons")
 }
 
