@@ -104,6 +104,8 @@ jobs:
           }
         shell: Rscript {0}
 
+# Terra check:
+# https://github.com/ncss-tech/soilDB/issues/375#issuecomment-3618556750
       - name: Session info
         run: |
           options(width = 100)
@@ -116,6 +118,15 @@ jobs:
           print(sf::sf_proj_info("units"))
           print(sf::sf_proj_info("prime_meridians"))
           print(sf::sf_proj_info("path"))
+          .terra_can_initialize_spatial_object <- function() {
+            requireNamespace("terra", quietly = TRUE) && tryCatch({
+              terra::rast(matrix(0), crs = "OGC:CRS84")
+              terra::vect("POINT (0 0)", crs = "OGC:CRS84")
+              # warning("smoke test")
+              TRUE
+            }, warning = FALSE, error = FALSE)
+          }
+          print(paste0("terra works: ", .terra_can_initialize_spatial_object()))
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
