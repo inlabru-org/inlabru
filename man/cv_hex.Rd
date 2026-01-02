@@ -12,12 +12,13 @@ partitions to be created}
 
 \item{cellsize}{hexagon cellsize, see \code{\link[sf:st_make_grid]{sf::st_make_grid()}} description}
 
-\item{n_group}{number of cv folds}
+\item{n_group}{number of cv folds.}
 
 \item{\dots}{Passed on to \code{fm_nonconvex_hull()}, e.g. \code{resolution}}
 }
 \value{
-a partitioned sf object as required
+a hexagonal partition covering the \code{samplers} object, with a \code{group}
+integer variable indicating the fold assignment, 1, 2, ..., \code{n_group}.
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Both the interface and function name
