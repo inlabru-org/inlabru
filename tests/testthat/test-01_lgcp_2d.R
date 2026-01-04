@@ -1,7 +1,7 @@
 test_that("2D LGCP fitting (sf)", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
 
   withr::local_seed(123L)
@@ -140,7 +140,7 @@ test_that("2D LGCP fitting (sp)", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
   withr::local_options(lifecycle_verbosity = "quiet")
 

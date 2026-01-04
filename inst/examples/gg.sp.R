@@ -1,6 +1,6 @@
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      requireNamespace("terra", quietly = TRUE) &&
+      bru_safe_terra(quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data

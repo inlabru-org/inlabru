@@ -133,16 +133,15 @@ check_package_version_and_load <-
 #' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
 #' potentially after forcing the evolution status to `2L`.
 #' Default `FALSE`
-#' @param minimum_version character; the minimum required INLA version.
-#' Default 1.4-5 (should always match the requirement in the package
+#' @param minimum_version character; the minimum required version.
+#' Default 2.1 (should always match the requirement in the package
 #' DESCRIPTION)
 #' @return Returns (invisibly) `FALSE` if a potential issue is detected, and
 #'   give a message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_sp() &&
-#'   require("sp")) {
+#' if (bru_safe_sp()) {
 #'   # Run sp dependent calculations
 #' }
 #' }
@@ -150,7 +149,7 @@ check_package_version_and_load <-
 #' @keywords internal
 bru_safe_sp <- function(quietly = FALSE,
                         force = FALSE,
-                        minimum_version = "1.4-5") {
+                        minimum_version = "2.1") {
   sp_version <-
     check_package_version_and_load(
       pkg = "sp",
@@ -202,6 +201,63 @@ bru_safe_sp <- function(quietly = FALSE,
       }
     }
   }
+  invisible(TRUE)
+}
+
+
+#' @title Check for potential `terra` installation issues
+#'
+#' @description
+#' Loads the terra package with `requireNamespace("terra", quietly = TRUE)`,
+#' and checks whether `eval_spatial()` successfully extracts non-NA values.
+#' NA values may appear when there is a GDAL/PROJ installation issue that causes
+#' it to not find the `proj.db` database file.
+#'
+#' For use in package tests and examples that depend on `terra`.
+#'
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default
+#'   `FALSE`
+#' @param minimum_version character; the minimum required version.
+#' Default 1.7-66 (should always match the requirement in the package
+#' DESCRIPTION)
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and
+#'   give a message if `quietly` is `FALSE`. Otherwise returns `TRUE`
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_terra()) {
+#'   # Run terra dependent calculations
+#' }
+#' }
+#'
+#' @keywords internal
+bru_safe_terra <- function(quietly = FALSE,
+                           minimum_version = "1.7-66") {
+  terra_version <-
+    check_package_version_and_load(
+      pkg = "terra",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(terra_version)) {
+    return(invisible(FALSE))
+  }
+
+  gcov <- gorillas_sf_gcov()
+  where <- inlabru::gorillas_sf$nests[seq_len(5), , drop = FALSE]
+  values <- eval_spatial(gcov, where = where)
+  if (any(is.na(values))) {
+    if (!quietly) {
+      message(
+        paste0(
+          "Potential issue detected with 'terra' package spatial evaluation,\n",
+          "likely due to GDAL/PROJ installation issues."
+        )
+      )
+    }
+    return(invisible(FALSE))
+  }
+
   invisible(TRUE)
 }
 

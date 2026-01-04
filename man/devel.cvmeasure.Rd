@@ -32,7 +32,7 @@ if (bru_safe_inla() &&
   require("ggplot2", quietly = TRUE) &&
   require("patchwork", quietly = TRUE) &&
   require("sn", quietly = TRUE) &&
-  require("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
   require("dplyr", quietly = TRUE)) {

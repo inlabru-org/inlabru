@@ -97,7 +97,7 @@ via \verb{<name>_eval(...)}.
 if (bru_safe_inla() &&
     require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE) &&
-    require("terra", quietly = TRUE) &&
+    bru_safe_terra(quietly = TRUE) &&
     require("sf", quietly = TRUE)) {
 
   # Load the Gorilla data

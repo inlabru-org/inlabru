@@ -96,8 +96,7 @@ if (bru_safe_inla() &&
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   bru_safe_sp() &&
-  require("sp") &&
-  require("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE)) {
   gorillas <- gorillas_sp()
   pts <- sample.lgcp(gorillas$mesh,

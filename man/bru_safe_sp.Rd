@@ -4,7 +4,7 @@
 \alias{bru_safe_sp}
 \title{Check for potential \code{sp} version compatibility issues}
 \usage{
-bru_safe_sp(quietly = FALSE, force = FALSE, minimum_version = "1.4-5")
+bru_safe_sp(quietly = FALSE, force = FALSE, minimum_version = "2.1")
 }
 \arguments{
 \item{quietly}{logical; if \code{TRUE}, prints diagnostic messages. Default
@@ -16,8 +16,8 @@ If \code{force} is \code{TRUE}, return \code{TRUE} if the package configuration 
 potentially after forcing the evolution status to \code{2L}.
 Default \code{FALSE}}
 
-\item{minimum_version}{character; the minimum required INLA version.
-Default 1.4-5 (should always match the requirement in the package
+\item{minimum_version}{character; the minimum required version.
+Default 2.1 (should always match the requirement in the package
 DESCRIPTION)}
 }
 \value{
@@ -31,8 +31,7 @@ unavailable.
 }
 \examples{
 \dontrun{
-if (bru_safe_sp() &&
-  require("sp")) {
+if (bru_safe_sp()) {
   # Run sp dependent calculations
 }
 }

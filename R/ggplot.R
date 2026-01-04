@@ -712,7 +712,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
@@ -745,7 +745,7 @@ gg.SpatialPixels <- function(data, ...) {
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("tidyterra", quietly = TRUE)) {
 #'   # Load Gorilla covariates
 #'

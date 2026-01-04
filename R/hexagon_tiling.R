@@ -28,6 +28,7 @@ cv_partition <- function(samplers,
                          ncols = NULL,
                          chess = TRUE,
                          ...) {
+  requireNamespace("terra")
   # Create a grid for the given boundary
   if (is.null(resolution)) {
     grid <- terra::rast(

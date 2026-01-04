@@ -66,7 +66,7 @@ makepoly <- function(start, width, height) {
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
-#'   require("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("sf", quietly = TRUE)) {
 #'   gorillas <- gorillas_sp()
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
@@ -165,7 +165,7 @@ plotsample <- function(spdf,
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
-#'   require("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("sf", quietly = TRUE) &&
 #'   require("patchwork", quietly = TRUE)) {
 #'   gorillas <- gorillas_sp()

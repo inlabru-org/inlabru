@@ -20,7 +20,7 @@ Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
   # Load Gorilla covariates
 

@@ -3,7 +3,7 @@ test_that("2D LGCP fitting", {
   local_bru_safe_inla()
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
   gorillas <- gorillas_sf
   gorillas$gcov <- gorillas_sf_gcov()

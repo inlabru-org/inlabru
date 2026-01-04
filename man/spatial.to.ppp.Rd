@@ -27,7 +27,7 @@ create the \code{ppp} object.
 if (require("spatstat.geom") &&
   bru_safe_sp() &&
   require("sp") &&
-  require("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE)) {
   # Load Gorilla data
 
