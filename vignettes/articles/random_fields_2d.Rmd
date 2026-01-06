@@ -29,6 +29,7 @@ library(inlabru)
 library(fmesher)
 library(mgcv)
 library(ggplot2)
+library(patchwork)
 ```
 
 Make a shortcut to a nicer colour scale:

@@ -102,6 +102,7 @@ setting some options.
 # libraries
 library(maps)
 library(ggplot2)
+library(patchwork)
 library(sf)
 library(terra)
 library(tidyterra) # raster plotting
