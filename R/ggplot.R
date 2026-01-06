@@ -142,20 +142,12 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 }
 
 
-#' Geom for data.frame
-#'
+#' @describeIn gg.bru_prediction
 #' This geom constructor will simply call [gg.bru_prediction()] for the data
 #' provided.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name gg.data.frame
 #' @export
 #' @param \dots Arguments passed on to [gg.bru_prediction()].
-#' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon`
-#'   value.
-#' @family geomes for inla and inlabru predictions
-#' @example inst/examples/gg.prediction.R
 
 gg.data.frame <- function(...) {
   gg.bru_prediction(...)
@@ -1098,20 +1090,12 @@ plot.bru <- function(x, ...) {
   }
 }
 
-#' @title Plot prediction using ggplot2
-#'
-#' @description
+#' @describeIn gg.bru_prediction
 #' Generates a base ggplot2 using `ggplot()` and adds a geom for input `x` using
-#' [gg].
+#' [gg.bru_prediction()]. Returns a ggplot object.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name plot.bru_prediction
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
-#' @param \dots Arguments passed on to [gg.prediction()].
-#' @return an object of class `gg`
-#' @example inst/examples/gg.prediction.R
 #' @export
 #' @method plot bru_prediction
 
@@ -1121,7 +1105,7 @@ plot.bru_prediction <- function(x, y = NULL, ...) {
     gg(x, ...)
 }
 
-#' @rdname plot.bru_prediction
+#' @describeIn gg.bru_prediction Identical to [gg.bru_prediction()].
 #' @export
 #' @method plot prediction
 plot.prediction <- function(x, y = NULL, ...) {
@@ -1162,18 +1146,26 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'     geom_line(mapping = aes(x, z), color = "blue")
 #'   pl3 <- ggplot(data = df) +
 #'     geom_path(mapping = aes(y, z), color = "magenta")
+#'
 #'   multiplot(
 #'     pl1, pl2, pl3,
 #'     layout = rbind(c(1, 2), c(3, 3))
 #'   )
 #'
+#'   # Recommended alternative using the patchwork package:
 #'   if (require("patchwork")) {
-#'     (pl1 + pl2) / pl3
+#'     (pl1 | pl2) / pl3
 #'   }
 #' }
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
+  lifecycle::deprecate_soft(
+    "2.13.0.9026",
+    "multiplot()",
+    details = "Please use the 'patchwork' package for combining ggplots."
+  )
+
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 

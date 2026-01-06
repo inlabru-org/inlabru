@@ -74,9 +74,9 @@ This function coerces the \code{SpatialPoints} into a \code{data.frame} and uses
     # Change color
 
     ggplot() +
-      gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
-      gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-      gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
+      gg(mexdolphin$ppoly, color = "green") + # survey boundary; SpatialPolygon
+      gg(mexdolphin$samplers, color = "red") + # ship transects; SpatialLines
+      gg(mexdolphin$points, color = "blue") # dolphin sightings; SpatialPoints
 
 
     # Visualize data annotations: line width by segment number

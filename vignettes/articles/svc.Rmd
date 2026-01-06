@@ -639,7 +639,7 @@ ps_range95 <- make_plot_site(
 ```
 ```{r svc_plots, warning=F, message=F, fig.width=8, fig.align='center'}
 # plot together
-multiplot(ps, pa, pe, pt, cols = 2)
+((ps | pa) / (pe | pt))
 ```
 The map for the posterior mean of $\tau_s$ shows that robins have 
 decreased in the southern part of the study area and increased in 
@@ -648,7 +648,7 @@ is shifting northward as winters become warmer due to climate change.
 
 ```{r svc_plots_range95, warning=F, message=F, fig.width=8, fig.align='center'}
 # plot together
-multiplot(ps_range95, pa_range95, pe_range95, pt_range95, cols = 2)
+((ps_range95 | pa_range95) / (pe_range95 | pt_range95))
 ```
 
 ## More information
