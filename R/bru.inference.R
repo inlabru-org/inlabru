@@ -900,52 +900,16 @@ extended_bind_rows <- function(...) {
     }
 
     # Individual elements in sf columns may have different XY/XYZ properties,
-    # so need to find out if any of them have Z, and then extend all others
-    # to have Z too. M is essentially ignored here, so the results may have a
-    # mix of with/without M, as sf::st_zm currently doesn't support drop=FALSE
-    # for M features.
-    ncol_minmax <- lapply(
-      sf_data_idx_,
-      function(i) {
-        range(vapply(
-          dt[[i]][[nm]], function(x) {
-            if (inherits(x, c("XY", "XYM"))) {
-              2L
-            } else if (inherits(x, c("XYZ", "XYZM"))) {
-              3L
-            } else {
-              0L
-            }
-          },
-          0L
-        ))
-      }
-    )
-    ncol_min_ <- vapply(ncol_minmax, function(x) x[1], 0L)
-    ncol_max_ <- vapply(ncol_minmax, function(x) x[2], 0L)
-    if (min(ncol_min_) != max(ncol_max_)) {
-      # Some dimension mismatch
-      ncol_max <- max(ncol_max_)
-      for (ii in which(ncol_min_ < ncol_max)) {
-        i <- sf_data_idx_[ii]
-        # Extend columns
-        if (nrow(dt[[i]]) > 0) {
-          dt[[i]][[nm]] <-
-            sf::st_zm(dt[[i]][[nm]], drop = FALSE, what = "Z")
-        } else {
-          dt[[i]][[nm]] <-
-            sf::st_as_sf(
-              as.data.frame(
-                matrix(0.0, 0L, ncol_max)
-              ),
-              coords = seq_len(ncol_max),
-              crs = fm_crs(dt[[i]][[nm]])
-            )$geometry
-        }
-      }
+    # so need to find out if any of them have Z or M, and then extend all others
+    # to have Z too. M is handled by fmesher::fm_zm, but not sf::st_zm
+    dt_nm <- lapply(dt[sf_data_idx_], function(x) x[[nm]])
+    dt_nm <- fmesher::fm_zm(dt_nm)
+    for (i in seq_along(sf_data_idx_)) {
+      dt[sf_data_idx_[i]][[nm]] <- dt_nm[[i]][[nm]]
     }
   }
-  # Technically, we only need this if at lest one of the objects is a tibble
+
+  # Technically, we only need this if at least one of the objects is a tibble
   dt <- lapply(dt, function(object) {
     if (!tibble::is_tibble(object)) {
       if (inherits(object, "sf")) {
@@ -3187,6 +3151,11 @@ predict.bru <- function(object,
     ))
   }
 
+  if (inherits(newdata, "sf")) {
+    # Make sure coordinates have unified XY/XYZ/XYM/XYZM structure:
+    newdata <- fmesher::fm_zm(newdata)
+  }
+
   vals <- generate(
     object,
     newdata = newdata,
@@ -3469,6 +3438,11 @@ generate.bru <- function(object,
     used <- bru_used_update(used, labels = names(as_bru_comp_list(object)))
 
     pred <- new_bru_pred_expr(formula, used = used)
+
+    if (inherits(newdata, "sf")) {
+      # Make sure coordinates have unified XY/XYZ/XYM/XYZM structure:
+      newdata <- fmesher::fm_zm(newdata)
+    }
 
     vals <- evaluate_model(
       model = object$bru_info$model,
