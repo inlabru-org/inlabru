@@ -218,8 +218,8 @@ pl_posterior_sample <- ggplot() +
 # Common colour scale for the truth and estimate:
 csc <- colsc(truth$field, pred$mean, pred$sample)
 ((pl_truth + csc) |
-    (pl_posterior_mean + csc) |
-    (pl_posterior_sample + csc))
+  (pl_posterior_mean + csc) |
+  (pl_posterior_sample + csc))
 ```
 
 Plot the SPDE parameter and fixed effect parameter posteriors.
