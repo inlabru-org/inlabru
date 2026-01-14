@@ -1719,8 +1719,17 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     #   which(group_cv_block == i)
     # })
     # Current inla.group.cv interface (2025-08-28)
-    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
-      which(group_cv_block == group_cv_block[i])
+    # Inefficient implementation:
+    # group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+    #   which(group_cv_block == group_cv_block[i])
+    # })
+    # Faster version:
+    grp_index <- seq_len(max(group_cv_block))
+    group_cv_friends_groups <- lapply(grp_index, function(i) {
+      which(group_cv_block == i)
+    })
+    group_cv_friends <- lapply(group_cv_block, function(i) {
+      group_cv_friends_groups[[i]]
     })
 
     lh$control.gcpo <- modifyList(

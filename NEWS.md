@@ -32,6 +32,8 @@
 * Deprecate the `bru_obs(allow_combine)` argument with its logical inverse,
   `bru_obs(is_rowwise)`, to make the meaning clearer.
   (version `2.13.0.9017`)
+* Speed up group.cv friends structure generation for `bru_obs()` with large
+  numbers of samplers or observations. (version `2.13.0.9027`)
 
 ## Bug fixes
 
