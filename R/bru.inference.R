@@ -1757,14 +1757,6 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         BRU_point_weights = 0.0
       )
     )
-
-    group_cv_block <- c(which(N_data > 0), ips$.block)
-    group_cv_friends <- convert_group_cv_blocks_to_friends_list(group_cv_block)
-
-    lh$control.gcpo <- modifyList(
-      lh$control.gcpo,
-      list(friends = group_cv_friends)
-    )
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
@@ -1785,6 +1777,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     )
     data <- extended_bind_rows(data, ips)
   }
+  group_cv_block <- new_response_data$BRU_block
+  group_cv_friends <- convert_group_cv_blocks_to_friends_list(group_cv_block)
+  lh$control.gcpo <- modifyList(
+    lh$control.gcpo,
+    list(friends = group_cv_friends)
+  )
 
   lh$data <- data
   lh$response_data <- new_response_data
@@ -4673,11 +4671,12 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     bru_obs_control_family(lhoods, inla.options[["control.family"]])
 
   # Combine the control.gcpo information from all the likelihoods
-  inla.options[["control.compute"]][["control.gcpo"]] <-
+  control.gcpo.combined <-
     bru_obs_control_gcpo(
       lhoods,
       inla.options[["control.compute"]][["control.gcpo"]]
     )
+  inla.options[["control.compute"]][["control.gcpo"]] <- control.gcpo.combined
 
   initial <-
     if (is.null(initial)) {
@@ -4983,6 +4982,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             )
           )
       }
+      inla.options.merged[["control.compute"]][["control.gcpo"]] <-
+        control.gcpo.combined
     } else {
       # Compute the minimal amount required
       # Note: configs = TRUE only because latent indexing into mode$x is
@@ -5005,6 +5006,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             control.predictor = list(compute = TRUE)
           )
         )
+      inla.options.merged[["control.compute"]][["control.gcpo"]] <- NULL
     }
 
     timings <- bru_timer_do(timings, "Run inla()", k)
