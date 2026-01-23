@@ -32,7 +32,8 @@ bru_index <- function(object, ...) {
 #'     y ~ .,
 #'     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
 #'     tag = "B"
-#'   )
+#'   ),
+#'   options = list(bru_run = FALSE) # We only need the model structure
 #' )
 #' bru_index(fit)
 #' bru_index(fit, "A")
