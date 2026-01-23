@@ -1442,20 +1442,22 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       )
     )
 
-    group_cv_block <- c(which(N_data > 0), ips$.block)
-    # Would like:
-    # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
-    #   which(group_cv_block == i)
-    # })
-    # Current inla.group.cv interface (2025-08-28)
-    group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
-      which(group_cv_block == group_cv_block[i])
-    })
+    if (!is.null(lh$control.gcpo)) {
+      group_cv_block <- c(which(N_data > 0), ips$.block)
+      # Would like:
+      # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
+      #   which(group_cv_block == i)
+      # })
+      # Current inla.group.cv interface (2025-08-28)
+      group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
+        which(group_cv_block == group_cv_block[i])
+      })
 
-    lh$control.gcpo <- modifyList(
-      lh$control.gcpo,
-      list(friends = group_cv_friends)
-    )
+      lh$control.gcpo <- modifyList(
+        lh$control.gcpo,
+        list(friends = group_cv_friends)
+      )
+    }
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
@@ -1760,7 +1762,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
-        rep(0, N_data),
+        rep(0, length(point_weights)),
         response_data[["BRU_E"]] * ips[["weight"]]
       ),
       BRU_response = c(
@@ -1777,12 +1779,14 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     )
     data <- extended_bind_rows(data, ips)
   }
-  group_cv_block <- new_response_data$BRU_block
-  group_cv_friends <- convert_group_cv_blocks_to_friends_list(group_cv_block)
-  lh$control.gcpo <- modifyList(
-    lh$control.gcpo,
-    list(friends = group_cv_friends)
-  )
+  if (!is.null(lh$control.gcpo)) {
+    group_cv_block <- new_response_data$BRU_block
+    group_cv_friends <- convert_group_cv_blocks_to_friends_list(group_cv_block)
+    lh$control.gcpo <- modifyList(
+      lh$control.gcpo,
+      list(friends = group_cv_friends)
+    )
+  }
 
   lh$data <- data
   lh$response_data <- new_response_data
@@ -2102,16 +2106,6 @@ bru_obs <- function(formula = . ~ .,
 
   # Some defaults
   inla.family <- family
-
-  default.control.gcpo <- list()
-  if (is.null(control.gcpo)) {
-    control.gcpo <- default.control.gcpo
-  } else {
-    control.gcpo <- modifyList(
-      default.control.gcpo,
-      control.gcpo
-    )
-  }
 
   # Only for deprecated include/exclude/include_latent argument handling:
   formula_char <- as.character(formula)
@@ -2786,7 +2780,8 @@ bru_obs_control_family.bru_obs_list <- function(x,
 #' @keywords internal
 #' @returns * `bru_obs_control_gcpo()` returns a list with
 #'   `INLA::control.gcpo` options, with predictor/response variable indices
-#'   unified for multi-observation models.
+#'   unified for multi-observation models. If a `bru_obs` model has a NULL
+#'   `control.gcpo` argument, an empty list is returned for that model.
 #' @rdname bru_obs_methods
 bru_obs_control_gcpo <- function(x, ...) {
   UseMethod("bru_obs_control_gcpo")
@@ -2806,6 +2801,9 @@ bru_obs_control_gcpo.bru_obs <- function(x,
                                          force_weights,
                                          ...) {
   c.gcpo <- x[["control.gcpo"]]
+  if (is.null(c.gcpo)) {
+    return(list())
+  }
   for (nm in intersect(
     c("groups", "selection", "group.selection", "friends"),
     names(c.gcpo)

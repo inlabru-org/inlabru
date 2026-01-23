@@ -177,8 +177,8 @@ predictor; this is slow and intended for debugging purposes only.}
 \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
 part of the Poisson process likelihood (\code{family = "cp"}) into
 either a single term,
-with \eqn{y=n}{y=n}, and predictor \code{mean(eta)}, or a blockwise
-version of this. Default: \code{TRUE}}
+with \eqn{y=n}{y=n}, and predictor \code{mean(eta)}, or a blockwise version of
+this. Default: \code{FALSE} (was \code{TRUE} prior to version \verb{2.13.0.9031}.)}
 \item{bru_debug}{
 logical; when \code{TRUE}, activate temporary debug features for package
 development. Default: \code{FALSE}}

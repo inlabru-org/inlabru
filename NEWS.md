@@ -37,6 +37,10 @@
   speedup in `2.13.0.9029`)
 * Only enable `control.gcpo` computation in the final `inla()` iteration
   (version `2.13.0.9030`)
+* Only enable `control.gcpo` for "cp" models if `control.gcpo` list input
+  is supplied (version `2.13.0.9031`)
+* Set option `bru_compress_cp = FALSE` by default, to avoid dense precision
+  matrix blocks (version `2.13.0.9031`)
 
 ## Bug fixes
 

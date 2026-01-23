@@ -783,9 +783,9 @@ bru_options_default <- function() {
     #' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
     #' part of the Poisson process likelihood (`family = "cp"`) into
     #' either a single term,
-    #' with \eqn{y=n}{y=n}, and predictor `mean(eta)`, or a blockwise
-    #' version of this. Default: `TRUE`}
-    bru_compress_cp = TRUE,
+    #' with \eqn{y=n}{y=n}, and predictor `mean(eta)`, or a blockwise version of
+    #' this. Default: `FALSE` (was `TRUE` prior to version `2.13.0.9031`.)}
+    bru_compress_cp = FALSE,
     #' \item{bru_debug}{
     #' logical; when `TRUE`, activate temporary debug features for package
     #' development. Default: `FALSE`}
