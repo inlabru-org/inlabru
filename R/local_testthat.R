@@ -141,9 +141,23 @@ local_bru_safe_inla <- function(multicore = FALSE,
     )
     if (inherits(inla.call, "simpleError")) {
       return(testthat::skip(
-        "inla.getOption('inla.call') failed, skip INLA tests."
+        "inla.getOption('inla.call') failed, skipping INLA tests."
       ))
     }
+
+    if (all(grepl("\\.run$", inla.call))) {
+      inla.binary <- gsub("\\.run$", "", inla.call)
+      if (!file.exists(inla.binary)) {
+        return(testthat::skip(
+          paste0(
+            "INLA binary '", inla.binary, "' not found. ",
+            "INLA not installed correctly, or with platform mismatch.\n",
+            "Skipping INLA tests."
+          )
+        ))
+      }
+    }
+
 
     # Save the num.threads option so it can be restored
     local_inla_options_set(

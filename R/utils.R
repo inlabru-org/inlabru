@@ -56,6 +56,20 @@ bru_safe_inla <- function(multicore = NULL,
     }
     return(FALSE)
   }
+  if (all(grepl("\\.run$", inla.call))) {
+    inla.binary <- gsub("\\.run$", "", inla.call)
+    if (!file.exists(inla.binary)) {
+      if (!quietly) {
+        message(
+          paste0(
+            "INLA binary '", inla.binary, "' not found. ",
+            "INLA not installed correctly, or with platform mismatch."
+          )
+        )
+      }
+      return(FALSE)
+    }
+  }
 
   if (is.null(multicore)) {
     multicore <-
