@@ -106,6 +106,7 @@ Collate:
     '0_inlabru_envir.R'
     'RcppExports.R'
     'access_trace.R'
+    'access_trace_methods.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru_conversion.R'

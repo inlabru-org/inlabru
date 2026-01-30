@@ -1,0 +1,11 @@
+devtools::load_all()
+access_trace_reset()
+access_trace_add("bru_obs")
+access_trace_add("bru_comp")
+access_trace_add("bru_used")
+access_trace_add("bru")
+access_trace_add("bru_obs")
+access_trace_add("bru_pred_expr")
+access_trace_add("bru_input")
+access_trace_add("bru_mapper")
+
