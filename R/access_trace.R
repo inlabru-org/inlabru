@@ -1,4 +1,4 @@
-access_trace <- function(name) {
+access_trace <- function(name, package = NULL) {
   method <- fmesher::fm_caller_name(-1)
   access_method_ <- list(
     "^\\$<-" = "$<-",
@@ -55,20 +55,65 @@ access_trace <- function(name) {
   } else {
     ""
   }
+
+  fun_package <- function(fun_name) {
+    fun <- tryCatch(
+      get(fun_name, mode = "function", inherits = TRUE),
+      error = function(e) NULL
+    )
+    if (is.null(fun)) {
+      return("")
+    }
+    env <- environment(fun)
+    pkg <- ""
+    while (!is.null(env)) {
+      if (identical(env, .GlobalEnv)) {
+        pkg <- "global"
+        break
+      }
+      env_name <- environmentName(env)
+      if (!is.null(env_name) && !identical(env_name, "")) {
+        pkg <- env_name
+        break
+      }
+      env <- parent.env(env)
+    }
+    pkg
+  }
+
   class_name <- sub(paste0("^", method_text, "\\."), "", method)
   idx <- -3
   caller <- fmesher::fm_caller_name(idx)
-  if (identical(caller, "FUN")) {
+  if (caller %in% c("", "FUN")) {
     idx <- idx - 1L
     cal <- fmesher::fm_caller_name(idx)
-    caller <- paste0(cal, ":FUN")
+    caller <- c(caller, cal)
   }
-  idx <- idx - 1L
-  cal <- fmesher::fm_caller_name(idx)
-  caller <- paste0(cal, ":", caller)
+  for (i in seq_len(1)) {
+    idx <- idx - 1L
+    cal <- fmesher::fm_caller_name(idx)
+    caller <- c(caller, cal)
+  }
+  caller_packages <- vapply(caller, fun_package, character(1))
+  if (any(caller_packages %in% package)) {
+    return(invisible())
+  }
+  caller <- paste0(caller, collapse = ":")
+
+  if (!is.character(name)) {
+    if (is.integer(name)) {
+      name <- "<integer>"
+    } else if (is.numeric(name)) {
+      name <- "<numeric>"
+    } else if (is.logical(name)) {
+      name <- "<logical>"
+    } else {
+      name <- "<unknown>"
+    }
+  }
+
   print(glue::glue("{caller}: {class_name}{open_text}{name}{close_text}"))
 }
-
 
 
 access_trace_reset <- function(file = "R/access_trace_methods.R") {
@@ -85,27 +130,62 @@ access_trace_reset <- function(file = "R/access_trace_methods.R") {
 }
 
 
+# @param class_name
+# @param method_names
+# @param file
+# @param package character vector; If non-NULL, only trace access outside of
+# this package or packages
 access_trace_add <- function(
-    class_name,
-    method_names = c("$", "[[", "[", "$<-", "[[<-", "[<-"),
-    file = "R/access_trace_methods.R") {
+  class_name,
+  method_names = c("$", "[[", "[", "$<-", "[[<-", "[<-"),
+  file = "R/access_trace_methods.R",
+  package = NULL
+) {
+  package <- union(package, c("base", "utils"))
+
   write(
     c("", glue::glue("# Class {class_name} ####"), ""),
     file = file,
     append = TRUE,
     sep = ""
   )
-  for (method_name in method_names) {
-    if (method_name %in% c("$<-", "[[<-", "[<-")) {
-      extra_arguments <- ", value"
+  arguments_ <-
+    list(
+      "$" = "name",
+      "[[" = "i",
+      "[" = "i",
+      "$<-" = "name, value",
+      "[[<-" = "i, value",
+      "[<-" = "i, value"
+    )
+  trace_name_ <-
+    list(
+      "$" = "name",
+      "[[" = "i",
+      "[" = "i",
+      "$<-" = "name",
+      "[[<-" = "i",
+      "[<-" = "i"
+    )
+  package_text <-
+    if (is.null(package)) {
+      "NULL"
     } else {
-      extra_arguments <- ""
+      paste0("c(", paste0('\"', package, '\"', collapse = ", "), ")")
     }
+  for (method_name in method_names) {
+    full_name <- paste0(method_name, ".", class_name)
+    if (exists(full_name, mode = "function")) {
+      warning("Method ", full_name, " already exists; skipping generation.")
+      next
+    }
+    arguments <- arguments_[[method_name]]
+    trace_name <- trace_name_[[method_name]]
     code <- c(glue::glue(
       "#' @export
        #'
-       `{method_name}.{class_name}` <- function(x, name{extra_arguments}) {{
-         access_trace(name)
+       `{full_name}` <- function(x, {arguments}) {{
+         access_trace({trace_name}, package = {package_text})
          NextMethod()
        }}"
     ), "")
