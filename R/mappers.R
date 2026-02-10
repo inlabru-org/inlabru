@@ -2824,18 +2824,19 @@ require_args <- function(fun, req) {
 #' \eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
 #' quantile function. The `...` arguments are used as parameter arguments to
 #' `qfun`, `pfun`, `dfun`, and `dqfun`.
-#' @param qfun A quantile function, supporting `lower.tail` and `log.p`
-#'   arguments, like [stats::qnorm()].
-#' @param pfun A CDF, supporting `lower.tail` and `log.p` arguments,
+#' @param qfun A quantile function, supporting arguments `p`, `lower.tail`, and
+#'   `log.p`, like [stats::qnorm()].
+#' @param pfun A CDF, supporting arguments `q`, `lower.tail`, and `log.p`,
 #' like [stats::pnorm()].  Only needed and used when
 #' `xor(mapper[["inverse"]], reverse)` is `TRUE` in a method call.
 #' Default `NULL`
-#' @param dfun A pdf, supporting `log` argument,
+#' @param dfun A pdf, supporting arguments `x` and `log`,
 #' like [stats::dnorm()]. If `NULL` (default), uses finite
 #' differences on `qfun` or `pfun` instead.
 #' @param dqfun A function evaluating the reciprocal of the derivative of
-#'   `qfun`. If `NULL` (default), uses `dfun(qfun(...),...)` or finite
-#'   differences on `qfun` or `pfun` instead.
+#'   `qfun`, i.e. the density at a given CDF value. If `NULL` (default), uses
+#'   `dfun(qfun(...),...)` or finite differences on `qfun` or `pfun` instead.
+#'   Must support the same arguments as `qfun`.
 #' @param inverse logical; If `FALSE` (default), [bm_marginal()]
 #' defines a mapping from standard Normal to a specified distribution.
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
@@ -2858,10 +2859,11 @@ bm_marginal <- function(qfun,
                         dqfun = NULL,
                         ...,
                         inverse = FALSE) {
-  require_args(qfun, c("lower.tail", "log.p"))
-  require_args(pfun, c("lower.tail", "log.p"))
-  require_args(dfun, "log")
-  require_args(dqfun, c("lower.tail", "log.p", "log"))
+  arg_names <- ...names()
+  require_args(qfun, c("p", "lower.tail", "log.p", arg_names))
+  require_args(pfun, c("q", "lower.tail", "log.p", arg_names))
+  require_args(dfun, c("x", "log", arg_names))
+  require_args(dqfun, c("p", "lower.tail", "log.p", "log", arg_names))
   bru_mapper_define(
     list(
       qfun = qfun,
