@@ -168,7 +168,6 @@ local_bru_safe_inla <- function(multicore = FALSE,
 
     local_inla_options_set(
       inla.timeout = 60,
-      fmesher.timeout = 30,
       fmesher.evolution = 2L,
       fmesher.evolution.warn = TRUE,
       fmesher.evolution.verbosity = "stop",
