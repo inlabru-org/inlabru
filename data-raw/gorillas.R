@@ -138,11 +138,19 @@ import_gorillas_sf <- function(overwrite = FALSE) {
 
   # Build mesh
   bnd <- fm_as_segm(boundary)
-  mesh <- fm_mesh_2d_inla(
+  bnd2 <- fm_nonconvex_hull(bnd, 1500)
+  mesh_old <- fm_mesh_2d_inla(
     interior = bnd,
     max.edge = 222,
     crs = crs
   ) # With higher max.edge we run into various INLA errors/warnings
+  hex_loc <- fm_hexagon_lattice(boundary, edge_len = 150)
+  mesh <- fm_mesh_2d_inla(
+    loc = hex_loc,
+    boundary = c(bnd, bnd2),
+    max.edge = c(200, 500),
+    crs = crs
+  )
 
   # Turn covariates into SGDF
   gcov <- NULL
@@ -207,8 +215,11 @@ import_gorillas_sf <- function(overwrite = FALSE) {
   gorillas_sf$plotsample <- sample_9x9_60pc
 
   # Extrapolate covariate
+  # Expand by 1.5*max.edge into the extension
   pxl_ <- fm_pixels(
     gorillas_sf$mesh,
+    xlim = fm_bbox(bnd)[[1]] / 1000 + c(-1, 1) * 1.5 * 500 / 1000,
+    ylim = fm_bbox(bnd)[[2]] / 1000 + c(-1, 1) * 1.5 * 500 / 1000,
     mask = FALSE,
     dims = c(220, 180),
     format = "sf"

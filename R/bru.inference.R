@@ -3000,7 +3000,6 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 #'   # Plot the intensity
 #'   ggplot() +
 #'     gg(lambda, geom = "tile") +
-#'     geom_fm(data = data$mesh, alpha = 0, linewidth = 0.05) +
 #'     gg(data$nests, col = "red", alpha = 0.2)
 #' }
 #' }
