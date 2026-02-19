@@ -1788,6 +1788,9 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     )
   }
 
+  if (inherits(data, "sf")) {
+    data <- fmesher::fm_zm(data)
+  }
   lh$data <- data
   lh$response_data <- new_response_data
   lh$response <- "BRU_response"

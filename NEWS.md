@@ -52,6 +52,9 @@
   coordinate columns (version `2.13.0.9009`)
 * Robustify sf coordinate handling in `generate()` and `predict()` 
   (version `2.13.0.9027`)
+* Robustify sf coordinate handling in `bru_obs_family_cp()`  for unifying XY/XYZ
+  coordinate columns
+  (version `2.13.0.9033`)
 * Add logic for `bru_fill_missing()` to handle missing values in `sf` input
   data, so that e.g. `bru_fill_missing(input, input, input$values)` works as
   expected (version `2.13.0.9022`)
