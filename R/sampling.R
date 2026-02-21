@@ -519,7 +519,7 @@ sample.lgcp <- function(mesh,
           )[-1, , drop = FALSE]
         }
       } else {
-        st_crs(ret) <- fm_crs(NA_character_)
+        sf::st_crs(ret) <- fm_crs(NA_character_)
       }
     }
 
