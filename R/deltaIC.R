@@ -53,7 +53,8 @@ deltaIC <- function(..., criterion = "DIC") {
         "WAIC values from INLA are not well-defined for point process models.",
         " Use with caution, or better, not at all."
       ),
-      .immediately = TRUE)
+      .immediately = TRUE
+    )
   }
 
   names <- as.character(substitute(list(...)))[-1L]

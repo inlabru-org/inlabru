@@ -50,8 +50,7 @@ For multiple samples, the \code{data.frame} output has a
 column \code{'sample'} giving the index for each sample.
 object of point locations.
 
-For the old (pre version \verb{2.13.0.9034}) \code{sp} output format, use \code{as(ret, "Spatial")} or
-\code{sf::as_Spatial(ret)}.
+For the old (pre version \verb{2.13.0.9034}) \code{sp} output format, use \code{as(ret, "Spatial")} or \code{sf::as_Spatial(ret)}.
 }
 \description{
 This function provides point samples from one- and two-dimensional

@@ -42,8 +42,8 @@
 #'   column `'sample'` giving the index for each sample.
 #' object of point locations.
 #'
-#' For the old (pre version `2.13.0.9034`) `sp` output format, use `as(ret, "Spatial")` or
-#' `sf::as_Spatial(ret)`.
+#' For the old (pre version `2.13.0.9034`) `sp` output format, use `as(ret,
+#' "Spatial")` or `sf::as_Spatial(ret)`.
 #'
 #' @details
 #' * For crs-less meshes on R2: Lambda is interpreted in the raw coordinate
