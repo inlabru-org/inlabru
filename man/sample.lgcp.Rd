@@ -105,6 +105,16 @@ if (bru_safe_inla() &&
   ggplot() +
     gg(gorillas$mesh) +
     gg(pts)
+
+  pts <- sample.lgcp(gorillas$mesh,
+    loglambda = base::scale(gorillas$mesh$loc) * 2,
+    samplers = gorillas$boundary,
+    ignore.CRS = TRUE
+  )
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(pts, aes(color = as.factor(sample))) +
+    labs(color = "Sample")
 }
 }
 

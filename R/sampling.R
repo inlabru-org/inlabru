@@ -92,6 +92,16 @@
 #'   ggplot() +
 #'     gg(gorillas$mesh) +
 #'     gg(pts)
+#'
+#'   pts <- sample.lgcp(gorillas$mesh,
+#'     loglambda = base::scale(gorillas$mesh$loc) * 2,
+#'     samplers = gorillas$boundary,
+#'     ignore.CRS = TRUE
+#'   )
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(pts, aes(color = as.factor(sample))) +
+#'     labs(color = "Sample")
 #' }
 #' }
 #'
@@ -184,7 +194,7 @@ sample.lgcp <- function(mesh,
     }
     input.crs <- fm_crs(mesh)
     use.crs <- !is.na(input.crs) && !ignore.CRS
-    is.geocent <- (mesh$manifold == "S2")
+    is.geocent <- fmesher::fm_crs_is_geocent(mesh)
 
     if (is.geocent || use.crs) {
       strategies <- c("triangulated", "sliced-spherical", "spherical")
@@ -469,19 +479,15 @@ sample.lgcp <- function(mesh,
       }
 
       if (multi.samples) {
-        result[[sample]] <-
-          sp::SpatialPointsDataFrame(
-            ret,
-            data = data.frame(sample = rep(sample, length(ret)))
-          )
+        result[[sample]] <- cbind(ret, sample = rep(sample, NROW(ret)))
       }
     }
     if (multi.samples) {
-      ret <- do.call(rbind, result[lengths(result) > 0])
+      ret <- do.call(rbind, result)
     }
 
     if (is.geocent) {
-      if (length(ret) > 0) {
+      if (NROW(ret) > 0) {
         ret <- fm_transform(ret, crs = fm_crs("globe"))
       } else if (multi.samples) {
         if (use.crs) {
@@ -503,7 +509,7 @@ sample.lgcp <- function(mesh,
       }
     } else {
       if (use.crs) {
-        if (length(ret) > 0) {
+        if (NROW(ret) > 0) {
           ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
           ret <- sf::st_as_sf(
@@ -524,15 +530,29 @@ sample.lgcp <- function(mesh,
     }
 
     # Only retain points within the samplers
-    if (!is.null(samplers) && (length(ret) > 0)) {
+    if (!is.null(samplers) && (NROW(ret) > 0)) {
       if (inherits(samplers, "fm_mesh_2d")) {
         proj <- fm_basis(samplers, ret, full = TRUE)
         ret <- ret[proj$ok, , drop = FALSE]
       } else if (inherits(samplers, "Spatial")) {
-        ok <- !is.na(sp::over(sf::as_Spatial(ret), samplers))
+        ret_ <- sf::as_Spatial(ret)
+        if (use.crs) {
+          ret_ <- fm_transform(ret_, fm_crs(samplers))
+        } else {
+          fm_crs(ret_) <- fm_crs(NA_character_)
+          fm_crs(samplers) <- fm_crs(NA_character_)
+        }
+        ok <- !is.na(sp::over(ret_, samplers))
         ret <- ret[ok, , drop = FALSE]
       } else {
-        idx <- sf::st_within(sf::st_as_sf(ret), samplers)
+        ret_ <- sf::st_as_sf(ret)
+        if (use.crs) {
+          ret_ <- fm_transform(ret_, fm_crs(samplers))
+        } else {
+          fm_crs(ret_) <- fm_crs(NA_character_)
+          fm_crs(samplers) <- fm_crs(NA_character_)
+        }
+        idx <- sf::st_within(ret_, samplers)
         ok <- vapply(idx, function(x) length(x) > 0, TRUE)
         ret <- ret[ok, , drop = FALSE]
       }
