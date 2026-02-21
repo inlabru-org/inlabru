@@ -41,6 +41,8 @@
   is supplied (version `2.13.0.9031`)
 * Set option `bru_compress_cp = FALSE` by default, to avoid dense precision
   matrix blocks (version `2.13.0.9031`)
+* Convert `sample.lgcp()` to `sf` internals and output format
+  (version `2.13.0.9033`).
 
 ## Bug fixes
 
