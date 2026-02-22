@@ -299,7 +299,9 @@ knitr::kable(IC_results)
 ```{r}
 fit_veg2_prep <- bru_set_missing(
   fit_veg,
-  keep = list(-which(as_bru_obs_list(fit1)[[1]]$response_data$BRU_block == 8L))
+  keep = list(-which(
+    as_bru_obs_list(fit_veg)[[1]]$response_data$BRU_block == 8L
+  ))
 )
 fit_veg2 <- bru_rerun(fit_veg2_prep)
 ```
