@@ -1,0 +1,186 @@
+---
+title: "LGCPs - Distance sampling and per-transect covariates"
+author: "Finn Lindgren"
+date: "Generated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LGCPs - Distance sampling and per-transect covariates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+.cache_dir <- file.path("2d_lgcp_per_transect_covars_cache")
+.cache_recompute <- !file.exists(.cache_dir)
+if (.cache_recompute) {
+  dir.create(.cache_dir, recursive = TRUE)
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5,
+  eval = TRUE
+)
+```
+Set things up
+
+```{r results="hide",warning=FALSE,message=FALSE}
+library(INLA)
+library(inlabru)
+library(tibble)
+library(sf)
+library(fmesher)
+library(dplyr)
+library(ggplot2)
+library(fmesher)
+library(RColorBrewer)
+```
+
+Construct sampler transects, with a per-transect covariate, `visibility`:
+```{r}
+samplers <- st_sf(
+  bind_rows(
+    tibble(
+      transect = 1L,
+      geometry = fm_as_sfc(fm_segm(rbind(c(0, 0), c(100, 0)),
+        is.bnd = FALSE
+      )),
+      visibility = 1
+    ),
+    tibble(
+      transect = 2L,
+      geometry = fm_as_sfc(fm_segm(rbind(c(100, 0), c(100, 50)),
+        is.bnd = FALSE
+      )),
+      visibility = 0.5
+    )
+  )
+)
+```
+Point observations, with marks `distance` and `transect`:
+```{r}
+intensity <- 0.1
+set.seed(1324L)
+N_expected <- c(100 * 10 * intensity * 1, 50 * 10 * intensity * 0.5)
+N <- c(rpois(1, N_expected[1]), rpois(1, N_expected[2]))
+obs_coord <- rbind(
+  tibble(
+    x = runif(N[1], 0, 100),
+    y = 0,
+    transect = 1L,
+    distance = abs(runif(N[1], -5, 5))
+  ),
+  tibble(
+    x = 100,
+    y = runif(N[2], 0, 50),
+    transect = 2L,
+    distance = abs(runif(N[2], -5, 5))
+  )
+)
+observations <- st_as_sf(obs_coord, coords = c("x", "y"))
+```
+
+Domain of interest:
+```{r}
+bnd <- fm_as_sfc(fm_segm(
+  rbind(c(-30, -40), c(125, -20), c(135, 70), c(-20, 40), c(-30, -40)),
+  is.bnd = TRUE
+))
+```
+
+Computational meshes:
+```{r}
+mesh <- fm_mesh_2d(
+  loc = fm_hexagon_lattice(bnd, edge_len = 5),
+  boundary = bnd,
+  max.edge = c(10, 25)
+)
+
+# Distance mesh for integration scheme
+distance_mesh <- fm_mesh_1d(
+  seq(0, 5, length.out = 21),
+  boundary = "free"
+)
+```
+
+Transect integration scheme, including per-transect covariates:
+```{r}
+ips <- fm_int(
+  domain = list(
+    geometry = fm_subdivide(mesh, 1),
+    distance = distance_mesh
+  ),
+  samplers = samplers
+)
+```
+
+Join per-transect covariates into the point observations, so they are available
+for model fitting:
+```{r}
+obs_with_transect_info <- observations |>
+  left_join(as_tibble(samplers),
+    by = "transect",
+    suffix = c("", ".sampler")
+  )
+
+
+ggplot() +
+  geom_fm(data = mesh) +
+  geom_sf(data = ips, aes(size = weight, color = visibility), alpha = 0.2) +
+  scale_size_area() +
+  geom_sf(data = samplers, color = "blue") +
+  geom_sf(
+    data = obs_with_transect_info, aes(shape = as.factor(transect)),
+    color = "red"
+  ) +
+  theme_minimal()
+```
+
+
+## Model fitting
+
+Fitting model with visibility.
+```{r results="hide"}
+cmp <- ~ Intercept(1) +
+  visibility(log(visibility), model = "linear") +
+  twosided(log(2), model = "const")
+obs <- bru_obs(
+  formula = geometry + distance ~ Intercept + visibility + twosided,
+  family = "cp",
+  domain = list(
+    geometry = fm_subdivide(mesh, 1),
+    distance = distance_mesh
+  ),
+  samplers = samplers,
+  data = obs_with_transect_info,
+  options = list(control.inla = list(int.strategy = "eb"))
+)
+fit_vis <- bru(
+  cmp,
+  obs,
+  options = list(
+    bru_verbose = FALSE
+  )
+)
+```
+```{r}
+summary(fit_vis)
+```
+Posterior predictive interval and median for the intensity
+(true value `r intensity`)
+```{r}
+rbind(
+  True = c(NA, intensity, NA),
+  Estimated = exp(fit_vis$summary.fixed[1, c(
+    "0.025quant",
+    "0.5quant",
+    "0.975quant"
+  )])
+)
+```
+Note: The true expected point counts for the two transects, taking the visibility into account are
+`r N_expected[1]` and `r N_expected[2]`, respectively. The observed point counts
+were `r N[1]` and `r N[2]`, respectively.
