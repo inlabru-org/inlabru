@@ -768,7 +768,7 @@ Plot in the same way as in previous practicals
 
 ```{r }
 Nest_elev_field$plugin_estimate <-
-  dpois(Nest_elev_field$N, lambda = Lambda$median)
+  dpois(Nest_elev_field$N, lambda = Lambda_elev_field$median)
 ggplot(data = Nest_elev_field) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
   geom_line(aes(x = N, y = plugin_estimate, colour = "Plugin"))
