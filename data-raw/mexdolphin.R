@@ -231,4 +231,3 @@ import_mexdolphin_sf <- function() {
 
 # mexdolphin_sf <- import_mexdolphin_sf()
 # use_data(mexdolphin_sf, compress = "xz", overwrite = TRUE)
-

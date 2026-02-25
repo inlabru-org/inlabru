@@ -587,7 +587,7 @@ bru_comp.character <- function(object,
           fixed_hyper_name <- glue("BRU_{label}_main_fixed_hyper")
           fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
           bru_comp_env_extra(component, fixed_hyper_name) <-
-             list(prec = list(
+            list(prec = list(
               initial = log(INLA::inla.set.control.fixed.default()$prec),
               fixed = TRUE
             ))
