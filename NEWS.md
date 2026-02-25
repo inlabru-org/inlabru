@@ -9,6 +9,11 @@
   (version `2.13.0.9010`)
 * Add `bm_reparam()` mapper, for fixed-matrix reparameterisations of existing
   mappers (version `2.13.0.9019`)
+* Add `bru_comp_env_extra()` getter and setter methods for the `env_extra`
+  element of `bru_comp()` objects, to allow storing extra information for use in
+  component definitions. Mostly for internal use, but may be used by external
+  packages needing to store and access special data.
+  (version `2.13.0.9035`)
 
 ## Updated features
 

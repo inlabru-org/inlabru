@@ -4949,7 +4949,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         do.call(c, c(
           lapply(
             as_bru_comp_list(model),
-            function(xx) as.list(xx$env_extra)
+            function(xx) as.list(bru_comp_env_extra(xx))
           ),
           use.names = FALSE
         ))

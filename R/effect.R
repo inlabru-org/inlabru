@@ -511,12 +511,12 @@ bru_comp.character <- function(object,
       # Store copy-model name or object in the environment
       #    model_name <- paste0("BRU_", label, "_copy_model")
       #    fcall[["copy"]] <- component$copy # as.symbol(model_name)
-      #    assign(model_name, component$copy, envir = component$env_extra)
+      #    bru_comp_env_extra(component, model_name) <- component$copy
     } else {
       # Store model name or object in the environment
       model_name <- glue("BRU_{label}_main_model")
       fcall[["model"]] <- as.symbol(model_name)
-      assign(model_name, component$main$model, envir = component$env_extra)
+      bru_comp_env_extra(component, model_name) <- component$main$model
     }
 
     # Remove parameters inlabru supports but INLA doesn't,
@@ -577,11 +577,7 @@ bru_comp.character <- function(object,
       } else {
         values_name <- glue("BRU_{label}_values")
         fcall[["values"]] <- as.symbol(values_name)
-        assign(
-          values_name,
-          component$main$values,
-          envir = component$env_extra
-        )
+        bru_comp_env_extra(component, values_name) <- component$main$values
       }
 
       # Setup factor precision parameter
@@ -590,14 +586,11 @@ bru_comp.character <- function(object,
           # TODO: allow configuration of the precision via prec.linear
           fixed_hyper_name <- glue("BRU_{label}_main_fixed_hyper")
           fcall[["hyper"]] <- as.symbol(fixed_hyper_name)
-          assign(
-            fixed_hyper_name,
-            list(prec = list(
+          bru_comp_env_extra(component, fixed_hyper_name) <-
+             list(prec = list(
               initial = log(INLA::inla.set.control.fixed.default()$prec),
               fixed = TRUE
-            )),
-            envir = component$env_extra
-          )
+            ))
         }
       }
     }
@@ -811,6 +804,46 @@ bru_comp_list.bru_comp_list <- function(object,
 }
 
 
+#' Get/set component environment data
+#'
+#' @description Get or set data in the component's `env_extra` environment. If
+#'   `name` is `NULL`, the entire `env_extra` environment is returned.
+#' @param x A `bru_comp` object
+#' @param name The name of the variable to get or set in `env_extra`. Names
+#'   prefixed by `"BRU_"` are reserved for internal use and should not be set
+#'   by users or external package authors.
+#' @param value The value to set for `name` in `env_extra` (for the setter
+#'   function).
+#' @return For the getter, either the entire `env_extra` environment or the
+#'   value of `name` in `env_extra`. For the setter, the modified `bru_comp`
+#'   object.
+#' @export
+#' @rdname bru_comp_env_extra
+#' @seealso bru_comp
+#' @examples
+#' if (bru_safe_inla()) {
+#'   cmp <- bru_comp("x", x)
+#'   as.list(bru_comp_env_extra(cmp))
+#'
+#'   cmp <- bru_comp("x", x, model = "fixed")
+#'   as.list(bru_comp_env_extra(cmp))
+#' }
+#'
+bru_comp_env_extra <- function(x, name = NULL) {
+  if (is.null(name)) {
+    return(x[["env_extra"]])
+  }
+  get(name, envir = x[["env_extra"]], inherits = FALSE)
+}
+
+#' @describeIn bru_comp_env_extra Set data in the component's `env_extra`
+#' environment
+`bru_comp_env_extra<-` <- function(x, name, value) {
+  assign(name, value, envir = x[["env_extra"]])
+  x
+}
+
+
 bru_comp_update_mapper <- function(component) {
   # Core component multi-mapper
   core_mapper <- list(
@@ -954,7 +987,7 @@ add_mappers.bru_comp <- function(component,
   } else {
     values_name <- glue("BRU_{component$label}_values")
     fcall[["values"]] <- as.symbol(values_name)
-    assign(values_name, component$main$values, envir = component$env_extra)
+    bru_comp_env_extra(component, values_name) <- component$main$values
   }
 
   if (!(component[["main"]][["type"]] %in% c("offset", "const"))) {
