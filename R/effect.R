@@ -806,17 +806,17 @@ bru_comp_list.bru_comp_list <- function(object,
 
 #' Get/set component environment data
 #'
-#' @description Get or set data in the component's `env_extra` environment. If
-#'   `name` is `NULL`, the entire `env_extra` environment is returned.
+#' @description Get or set data in the component's `env_extra` and `env`
+#'   environments. If `name` is `NULL`, the entire environment is returned.
 #' @param x A `bru_comp` object
-#' @param name The name of the variable to get or set in `env_extra`. Names
+#' @param name The name of the variable to get or set. Names
 #'   prefixed by `"BRU_"` are reserved for internal use and should not be set
 #'   by users or external package authors.
 #' @param value The value to set for `name` in `env_extra` (for the setter
 #'   function).
-#' @return For the getter, either the entire `env_extra` environment or the
-#'   value of `name` in `env_extra`. For the setter, the modified `bru_comp`
-#'   object.
+#' @return For the getter, either the entire environment or the
+#'   value of `name` in the environment. For the setters, the modified
+#'   `bru_comp` object.
 #' @export
 #' @rdname bru_comp_env_extra
 #' @seealso bru_comp
@@ -827,6 +827,8 @@ bru_comp_list.bru_comp_list <- function(object,
 #'
 #'   cmp <- bru_comp("x", x, model = "fixed")
 #'   as.list(bru_comp_env_extra(cmp))
+#'
+#'   bru_comp_env(cmp)
 #' }
 #'
 bru_comp_env_extra <- function(x, name = NULL) {
@@ -840,6 +842,24 @@ bru_comp_env_extra <- function(x, name = NULL) {
 #' environment
 `bru_comp_env_extra<-` <- function(x, name, value) {
   assign(name, value, envir = x[["env_extra"]])
+  x
+}
+
+#' @describeIn bru_comp_env_extra Get the component's `env` environment, or an
+#'   element from that environment.
+#' Note that in most cases this environment is the global R environment.
+bru_comp_env <- function(x, name = NULL) {
+  if (is.null(name)) {
+    return(x[["env"]])
+  }
+  get(name, envir = x[["env"]], inherits = FALSE)
+}
+
+#' @describeIn bru_comp_env_extra Set data in the component's `env` environment.
+#' Note that in most cases this environment is the global R environment, so
+#' modifying it is normally not recommended.
+`bru_comp_env<-` <- function(x, name, value) {
+  assign(name, value, envir = x[["env"]])
   x
 }
 
