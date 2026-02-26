@@ -843,6 +843,7 @@ bru_comp_env_extra <- function(x, name = NULL) {
 
 #' @describeIn bru_comp_env_extra Set data in the component's `env_extra`
 #' environment
+#' @export
 `bru_comp_env_extra<-` <- function(x, name, value) {
   assign(name, value, envir = x[["env_extra"]])
   x
@@ -851,6 +852,7 @@ bru_comp_env_extra <- function(x, name = NULL) {
 #' @describeIn bru_comp_env_extra Get the component's `env` environment, or an
 #'   element from that environment.
 #' Note that in most cases this environment is the global R environment.
+#' @export
 bru_comp_env <- function(x, name = NULL) {
   if (is.null(name)) {
     return(x[["env"]])
@@ -861,6 +863,7 @@ bru_comp_env <- function(x, name = NULL) {
 #' @describeIn bru_comp_env_extra Set data in the component's `env` environment.
 #' Note that in most cases this environment is the global R environment, so
 #' modifying it is normally not recommended.
+#' @export
 `bru_comp_env<-` <- function(x, name, value) {
   assign(name, value, envir = x[["env"]])
   x
