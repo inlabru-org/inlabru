@@ -194,8 +194,11 @@ bru_component <- function(...) {
 #' @param marginal May specify a `bm_marginal()` mapper,
 #' that is applied before scaling by `weights`.
 #' @param A.msk `r lifecycle::badge("deprecated")` and has no effect.
-#' @param .envir Evaluation environment
-#' @param envir_extra TODO: check/fix this parameter.
+#' @param .envir Evaluation environment. Can later be accessed via
+#'   [bru_comp_env()]. Default: `parent.frame()`
+#' @param envir_extra Environment for storing `INLA::f()` argument values.
+#'   If NULL, an new environment is created. Can be accessed via
+#'  [bru_comp_env_extra()]
 #'
 #' @details The `bru_comp.character` method is inlabru's equivalent to
 #'   `INLA`'s `f()` function but adds functionality that is unique to inlabru.
