@@ -47,8 +47,6 @@ navbar:
         href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
-      - text: LGCPs - Spatial covariates and group CV (work in progress)
-        href: articles/2d_lgcp_covars_groupcv.html
       - text: LGCPs - Distance sampling
         href: articles/2d_lgcp_distancesampling.html
       - text: LGCPs - Plot sampling
