@@ -67,6 +67,7 @@ bru_input <- function(...) {
 #' @rdname bru_input_text
 #' @export
 #' @examples
+#' (inp <- new_bru_input(x, "LABEL"))
 #' bru_input_text(inp)
 #' if (bru_safe_inla()) {
 #'   bru_input_text(bru_comp("x", cos(y)))
