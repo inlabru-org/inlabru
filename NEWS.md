@@ -14,6 +14,8 @@
   component definitions. Mostly for internal use, but may be used by external
   packages needing to store and access special data.
   (version `2.13.0.9035`)
+* Add `bru_input_text()` methods for extracting the component input information
+  as text, e.g. for use in error messages (version `2.13.0.9036`)
 
 ## Updated features
 

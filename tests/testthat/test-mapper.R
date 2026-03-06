@@ -570,13 +570,13 @@ test_that("Collect mapper, automatic construction", {
     )
 
     if (inla_f) {
-      input <- list(mapper = list(
+      input <- list(core = list(
         main = data$val,
         group = rep(1, 3),
         replicate = rep(1, 3)
       ))
     } else {
-      input <- list(mapper = list(
+      input <- list(core = list(
         main = list(u = data$val),
         group = rep(1, 3),
         replicate = rep(1, 3)

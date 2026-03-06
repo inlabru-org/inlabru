@@ -467,6 +467,23 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.13.0.9018"
     }
 
+    if (utils::compareVersion("2.13.0.9036", old_ver) > 0) {
+      message("Upgrading bru_info to 2.13.0.9036")
+
+      # Update component input storage to mapper-attached storage
+      if (!is.null(object[["model"]][["effects"]])) {
+        object[["model"]][["effects"]] <-
+          lapply(object[["model"]][["effects"]], function(x) {
+            x <- bru_comp_update_mapper(x)
+            x <- bru_compat_pre_2_14_bru_comp(x)
+            x
+          })
+        class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
+      }
+
+      object[["inlabru_version"]] <- "2.13.0.9036"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 

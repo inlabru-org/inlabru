@@ -26,6 +26,11 @@ NULL
 #' (inp <- new_bru_input(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
 #'
+#' bru_input_text(inp)
+#' if (bru_safe_inla()) {
+#'   bru_input_text(bru_comp("x", cos(y)))
+#' }
+#'
 new_bru_input <- function(input,
                           label = NULL,
                           layer = NULL,
@@ -49,6 +54,13 @@ new_bru_input <- function(input,
 #' @seealso [summary.bru_input()], [bru_comp()]
 bru_input <- function(...) {
   UseMethod("bru_input")
+}
+
+#' @describeIn bru_input Extract input definitions as text
+#'
+#' @export
+bru_input_text <- function(...) {
+  UseMethod("bru_input_text")
 }
 
 #' @describeIn bru_input Attempts to evaluate a component input (e.g. `main`,
@@ -299,6 +311,22 @@ bru_input.bru_input <- function(x,
   val
 }
 
+#' @describeIn bru_input Extract the input definitions from a `bru_input`
+#'   object, as a named character vector
+#' @export
+bru_input_text.bru_input <- function(x,
+                                     .envir = parent.frame(),
+                                     ...) {
+  bru_log_message(
+    glue("bru_input_text(bru_input) for ({x$label})"),
+    verbosity = 5
+  )
+
+  inp <- paste0(rlang::as_label(x$input), collapse = "\n")
+
+  inp
+}
+
 #' @section Simple covariates and the input parameters:
 #'
 #' It is not unusual for a random effect act on a transformation of a covariate.
@@ -407,6 +435,23 @@ bru_input.bru_comp <- function(x, ..., label = x$label) {
   bru_input(x[["mapper"]], ..., label = label)
 }
 
+#' @describeIn bru_input Extract the input definition as a named character
+#' vector.
+#' @return * `bru_input(bru_comp)`: A character vector of mapper input values.
+#' @export
+bru_input_text.bru_comp <- function(x, ..., label = x$label) {
+  bru_log_message(
+    glue("bru_input.bru_comp({label})"),
+    verbosity = 4
+  )
+
+  if (is.null(x[["mapper"]])) {
+    stop(glue("Component mapper for '{label}' is NULL"))
+  }
+
+  bru_input_text(x[["mapper"]], ..., label = label)
+}
+
 #' @return * `bru_input(bru_comp_list)`: A list of mapper input values,
 #'   with one entry for each component.
 #' @export
@@ -414,6 +459,15 @@ bru_input.bru_comp <- function(x, ..., label = x$label) {
 bru_input.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input(bru_comp_list)", verbosity = 4)
   lapply(x, function(xx) bru_input(xx, ...))
+}
+
+#' @return * `bru_input_text(bru_comp_list)`: A list of mapper input definition
+#'   text strings, with one entry for each component.
+#' @export
+#' @rdname bru_input
+bru_input_text.bru_comp_list <- function(x, ...) {
+  bru_log_message("bru_input_text(bru_comp_list)", verbosity = 4)
+  lapply(x, function(xx) bru_input_text(xx, ...))
 }
 
 #' @describeIn bru_input Computes the component inputs for included components
@@ -783,6 +837,124 @@ bru_input.bm_sum <- function(x, ..., label = "<unknown>") {
   }
   lapply(indexing, function(idx) {
     bru_input(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+
+
+#' @describeIn bru_input Extract the input definitions associated with a
+#'   `bru_mapper`.
+#' @seealso [ibm_input]
+#' @export
+bru_input_text.bru_mapper <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bru_mapper({label})"),
+    verbosity = 5
+  )
+  if (!ibm_input_available(x)) {
+    stop(glue(
+      "No input defined for mapper '{label}'.",
+      "\n Use `ibm_input_new()` or `ibm_input_set()` to assign one,",
+      "\n like `bm_<type>(...) |> ibm_input_new(<expr>, ...)`."
+    ))
+  }
+  inp <- ibm_input_get(x)
+  bru_input_text(inp, ..., label = label)
+}
+#' @rdname bru_input
+#' @export
+bru_input_text.bm_pipe <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bm_pipe({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input_text(inp, ..., label = label))
+  }
+  indexing <- names(x$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(x$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @rdname bru_input
+#' @export
+bru_input_text.bm_multi <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bm_multi({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input_text(inp, ..., label = label))
+  }
+  indexing <- names(x$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(x$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @rdname bru_input
+#' @export
+bru_input_text.bm_collect <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bm_collect({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input_text(inp, ..., label = label))
+  }
+  indexing <- names(x$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(x$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
+  })
+}
+#' @rdname bru_input
+#' @export
+bru_input_text.bm_repeat <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bm_repeat({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input_text(inp, ..., label = label))
+  }
+  bru_input_text(x[["mapper"]], ..., label = label)
+}
+#' @rdname bru_input
+#' @export
+bru_input_text.bm_sum <- function(x, ..., label = "<unknown>") {
+  bru_log_message(
+    glue("bru_input_text.bm_sum({label})"),
+    verbosity = 5
+  )
+  if (ibm_input_available(x)) {
+    inp <- ibm_input_get(x)
+    return(bru_input_text(inp, ..., label = label))
+  }
+  indexing <- names(x$mappers)
+  if (is.null(indexing)) {
+    indexing <- seq_along(x$mappers)
+  } else {
+    names(indexing) <- indexing
+  }
+  lapply(indexing, function(idx) {
+    bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
 

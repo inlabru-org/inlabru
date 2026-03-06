@@ -498,7 +498,7 @@ bru_comp.character <- function(object,
       bm_pipe(
         c(
           list(
-            mapper = bm_multi(list(
+            core = bm_multi(list(
               main = component[["main"]][["mapper"]]
             ))
           ),
@@ -873,7 +873,7 @@ bru_comp_env <- function(x, name = NULL) {
 bru_comp_update_mapper <- function(component) {
   # Core component multi-mapper
   core_mapper <- list(
-    mapper = bm_multi(
+    core = bm_multi(
       lapply(
         component[intersect(
           c("main", "group", "replicate"),
@@ -957,7 +957,7 @@ add_mappers.bru_comp <- function(component,
     data = lh_data,
     inputs = lapply(
       inputs,
-      function(x) x[[component$label]][["mapper"]][["main"]]
+      function(x) x[[component$label]][["core"]][["main"]]
     ),
     env = component$env,
     require_indexed = FALSE
@@ -969,7 +969,7 @@ add_mappers.bru_comp <- function(component,
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["mapper"]][["group"]]
+        function(x) x[[component$label]][["core"]][["group"]]
       ),
       env = component$env,
       require_indexed = TRUE
@@ -982,7 +982,7 @@ add_mappers.bru_comp <- function(component,
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["mapper"]][["replicate"]]
+        function(x) x[[component$label]][["core"]][["replicate"]]
       ),
       env = component$env,
       require_indexed = TRUE
@@ -1301,7 +1301,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
 # @param inputs list with precomputed inputs, for each lhoods element;
 # @param data list of data objects, one for each lhoods element
 # lapply(full_inputs,
-#        function(x) x[[component$label]][["mapper"]][[subcomponent_label]])
+#        function(x) x[[component$label]][["core"]][[subcomponent_label]])
 add_mapper <- function(subcomp, label, data = NULL, env = NULL,
                        inputs = NULL,
                        require_indexed = FALSE) {

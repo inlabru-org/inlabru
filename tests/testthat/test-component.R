@@ -40,7 +40,7 @@ test_that("Component construction: linear model", {
   expect_equal(
     inp,
     list(
-      mapper = list(
+      core = list(
         main = 1:10 # ,
         #        group = 1,
         #        replicate = 1
@@ -240,8 +240,8 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
-      input = c(1, NA, 4),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(main = c(1, NA, 4))),
       state = c(11, 12, 13, 14)
     ),
     c(11, 0, 14)
@@ -310,8 +310,8 @@ test_that("Component construction: main iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(main = as.factor(c(1, NA, 4)))),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)
@@ -343,8 +343,11 @@ test_that("Component construction: group iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$group,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(
+        main = rep(1, 3),
+        group = as.factor(c(1, NA, 4))
+      )),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)
@@ -378,8 +381,11 @@ test_that("Component construction: replicate iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$replicate,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(
+        main = rep(1, 3),
+        replicate = as.factor(c(1, NA, 4))
+      )),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)

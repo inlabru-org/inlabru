@@ -571,7 +571,7 @@ evaluate_predictor <- function(model,
                            weights = NULL,
                            .state = NULL) {
         n_input <- ibm_n_output(
-          .mapper[["mappers"]][["mapper"]][["mappers"]][["main"]],
+          .mapper[["mappers"]][["core"]][["mappers"]][["main"]],
           input = main
         )
         if (is.null(group)) {
@@ -588,7 +588,7 @@ evaluate_predictor <- function(model,
           )
         }
         .input <- list(
-          mapper = list(
+          core = list(
             main = main,
             group = group,
             replicate = replicate
