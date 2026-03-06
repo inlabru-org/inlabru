@@ -296,8 +296,16 @@ lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
 # Collect
 IC_results <-
   data.frame(
-    type = c("DIC", "WAIC_limit", "WAIC_blocksplit", "WAIC_blockwise",
-             "DIC_INLA", "DIC_INLA_adjusted", "WAIC_INLA", "WAIC_INLA_adjusted"),
+    type = c(
+      "DIC",
+      "WAIC_limit",
+      "WAIC_blocksplit",
+      "WAIC_blockwise",
+      "DIC_INLA",
+      "DIC_INLA_adjusted",
+      "WAIC_INLA",
+      "WAIC_INLA_adjusted"
+    ),
     lppd = c(
       lppd_limit,
       lppd_limit,
