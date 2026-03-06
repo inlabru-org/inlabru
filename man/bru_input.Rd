@@ -3,13 +3,9 @@
 \name{bru_input}
 \alias{bru_input}
 \alias{new_bru_input}
-\alias{bru_input_text}
 \alias{bru_input.bru_input}
-\alias{bru_input_text.bru_input}
 \alias{bru_input.bru_comp}
-\alias{bru_input_text.bru_comp}
 \alias{bru_input.bru_comp_list}
-\alias{bru_input_text.bru_comp_list}
 \alias{bru_input.bru_model}
 \alias{bru_input.bru_obs}
 \alias{bru_input.bru_obs_list}
@@ -19,19 +15,11 @@
 \alias{bru_input.bm_collect}
 \alias{bru_input.bm_repeat}
 \alias{bru_input.bm_sum}
-\alias{bru_input_text.bru_mapper}
-\alias{bru_input_text.bm_pipe}
-\alias{bru_input_text.bm_multi}
-\alias{bru_input_text.bm_collect}
-\alias{bru_input_text.bm_repeat}
-\alias{bru_input_text.bm_sum}
 \title{Store and evaluate component inputs}
 \usage{
 new_bru_input(input, label = NULL, layer = NULL, selector = NULL, ...)
 
 bru_input(...)
-
-bru_input_text(...)
 
 \method{bru_input}{bru_input}(
   x,
@@ -42,15 +30,9 @@ bru_input_text(...)
   ...
 )
 
-\method{bru_input_text}{bru_input}(x, .envir = parent.frame(), ...)
-
 \method{bru_input}{bru_comp}(x, ..., label = x$label)
 
-\method{bru_input_text}{bru_comp}(x, ..., label = x$label)
-
 \method{bru_input}{bru_comp_list}(x, ...)
-
-\method{bru_input_text}{bru_comp_list}(x, ...)
 
 \method{bru_input}{bru_model}(x, lhoods, ...)
 
@@ -69,18 +51,6 @@ bru_input_text(...)
 \method{bru_input}{bm_repeat}(x, ..., label = "<unknown>")
 
 \method{bru_input}{bm_sum}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bru_mapper}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bm_pipe}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bm_multi}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bm_collect}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bm_repeat}(x, ..., label = "<unknown>")
-
-\method{bru_input_text}{bm_sum}(x, ..., label = "<unknown>")
 }
 \arguments{
 \item{input}{An expression to be evaluated.}
@@ -123,17 +93,8 @@ for the full component mapper (of type \link{bm_pipe})
 }
 
 \itemize{
-\item \code{bru_input(bru_comp)}: A character vector of mapper input values.
-}
-
-\itemize{
 \item \code{bru_input(bru_comp_list)}: A list of mapper input values,
 with one entry for each component.
-}
-
-\itemize{
-\item \code{bru_input_text(bru_comp_list)}: A list of mapper input definition
-text strings, with one entry for each component.
 }
 
 \itemize{
@@ -203,25 +164,11 @@ object.
 object.
 
 }}
-\section{Methods (by generic)}{
-\itemize{
-\item \code{bru_input_text(bru_input)}: Extract the input definitions from a \code{bru_input}
-object, as a named character vector
-
-}}
 \section{Functions}{
 \itemize{
 \item \code{new_bru_input()}: Create a \code{bru_input} object.
 
 \item \code{bru_input()}: Evaluate inputs
-
-\item \code{bru_input_text()}: Extract input definitions as text
-
-\item \code{bru_input_text(bru_comp)}: Extract the input definition as a named character
-vector.
-
-\item \code{bru_input_text(bru_mapper)}: Extract the input definitions associated with a
-\code{bru_mapper}.
 
 }}
 \section{Simple covariates and the input parameters}{
@@ -327,9 +274,9 @@ bru_input(inp, data.frame(x = 1:3))
 
 }
 \seealso{
-\code{\link[=summary.bru_input]{summary.bru_input()}}, \code{\link[=bru_comp]{bru_comp()}}
+\code{\link[=bru_input_text]{bru_input_text()}}
 
-\link{ibm_input}
+\code{\link[=summary.bru_input]{summary.bru_input()}}, \code{\link[=bru_comp]{bru_comp()}}
 
 \link{ibm_input}
 }

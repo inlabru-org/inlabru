@@ -21,15 +21,11 @@ NULL
 #' @param selector character or integer; optional selector for use with
 #'   use with [eval_spatial()]
 #' @param \dots Passed on to sub-methods.
+#' @seealso [bru_input_text()]
 #' @export
 #' @examples
 #' (inp <- new_bru_input(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
-#'
-#' bru_input_text(inp)
-#' if (bru_safe_inla()) {
-#'   bru_input_text(bru_comp("x", cos(y)))
-#' }
 #'
 new_bru_input <- function(input,
                           label = NULL,
@@ -56,9 +52,26 @@ bru_input <- function(...) {
   UseMethod("bru_input")
 }
 
-#' @describeIn bru_input Extract input definitions as text
+#' @title Extract input definitions as text
 #'
+#' @description
+#' Extract input definitions from the [bru_input] information stored in bru
+#' model components.  Primarily intended for diagnostic use, as the output does
+#' not currently contain all information, such as the layer and selector
+#' information for spatial covariates.
+#'
+#' @inheritParams bru_input
+#'
+#' @seealso [bru_input()]
+#' @keywords internal
+#' @rdname bru_input_text
 #' @export
+#' @examples
+#' bru_input_text(inp)
+#' if (bru_safe_inla()) {
+#'   bru_input_text(bru_comp("x", cos(y)))
+#' }
+#'
 bru_input_text <- function(...) {
   UseMethod("bru_input_text")
 }
@@ -311,7 +324,7 @@ bru_input.bru_input <- function(x,
   val
 }
 
-#' @describeIn bru_input Extract the input definitions from a `bru_input`
+#' @describeIn bru_input_text Extract the input definitions from a `bru_input`
 #'   object, as a named character vector
 #' @export
 bru_input_text.bru_input <- function(x,
@@ -435,7 +448,7 @@ bru_input.bru_comp <- function(x, ..., label = x$label) {
   bru_input(x[["mapper"]], ..., label = label)
 }
 
-#' @describeIn bru_input Extract the input definition as a named character
+#' @describeIn bru_input_text Extract the input definition as a named character
 #' vector.
 #' @return * `bru_input(bru_comp)`: A character vector of mapper input values.
 #' @export
@@ -464,7 +477,7 @@ bru_input.bru_comp_list <- function(x, ...) {
 #' @return * `bru_input_text(bru_comp_list)`: A list of mapper input definition
 #'   text strings, with one entry for each component.
 #' @export
-#' @rdname bru_input
+#' @rdname bru_input_text
 bru_input_text.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input_text(bru_comp_list)", verbosity = 4)
   lapply(x, function(xx) bru_input_text(xx, ...))
@@ -841,7 +854,7 @@ bru_input.bm_sum <- function(x, ..., label = "<unknown>") {
 }
 
 
-#' @describeIn bru_input Extract the input definitions associated with a
+#' @describeIn bru_input_text Extract the input definitions associated with a
 #'   `bru_mapper`.
 #' @seealso [ibm_input]
 #' @export
@@ -860,7 +873,7 @@ bru_input_text.bru_mapper <- function(x, ..., label = "<unknown>") {
   inp <- ibm_input_get(x)
   bru_input_text(inp, ..., label = label)
 }
-#' @rdname bru_input
+#' @rdname bru_input_text
 #' @export
 bru_input_text.bm_pipe <- function(x, ..., label = "<unknown>") {
   bru_log_message(
@@ -881,7 +894,7 @@ bru_input_text.bm_pipe <- function(x, ..., label = "<unknown>") {
     bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @rdname bru_input
+#' @rdname bru_input_text
 #' @export
 bru_input_text.bm_multi <- function(x, ..., label = "<unknown>") {
   bru_log_message(
@@ -902,7 +915,7 @@ bru_input_text.bm_multi <- function(x, ..., label = "<unknown>") {
     bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @rdname bru_input
+#' @rdname bru_input_text
 #' @export
 bru_input_text.bm_collect <- function(x, ..., label = "<unknown>") {
   bru_log_message(
@@ -923,7 +936,7 @@ bru_input_text.bm_collect <- function(x, ..., label = "<unknown>") {
     bru_input_text(x$mappers[[idx]], ..., label = glue("{label}:{idx}"))
   })
 }
-#' @rdname bru_input
+#' @rdname bru_input_text
 #' @export
 bru_input_text.bm_repeat <- function(x, ..., label = "<unknown>") {
   bru_log_message(
@@ -936,7 +949,7 @@ bru_input_text.bm_repeat <- function(x, ..., label = "<unknown>") {
   }
   bru_input_text(x[["mapper"]], ..., label = label)
 }
-#' @rdname bru_input
+#' @rdname bru_input_text
 #' @export
 bru_input_text.bm_sum <- function(x, ..., label = "<unknown>") {
   bru_log_message(
