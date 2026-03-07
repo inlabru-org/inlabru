@@ -311,22 +311,6 @@ bru_comp.character <- function(object,
     }
   }
 
-  if ("map" %in% names(sys.call())) {
-    lifecycle::deprecate_stop(
-      "2.3.0",
-      "bru_component(map)",
-      "bru_comp(main)"
-    )
-  }
-
-  if ("mesh" %in% names(sys.call())) {
-    lifecycle::deprecate_stop(
-      "2.3.0",
-      "bru_component(mesh)",
-      "bru_comp(mapper)"
-    )
-  }
-
   if (is.null(envir_extra)) {
     envir_extra <- new.env(parent = .envir)
   }

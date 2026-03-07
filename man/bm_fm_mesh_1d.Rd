@@ -42,6 +42,7 @@ m <- bru_mapper(
 ibm_values(m)
 ibm_eval(m, 1:7, 1:6)
 
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -69,11 +70,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_fm_mesh_1d} method implementations: 
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_fm_mesh_1d} method implementations}

@@ -1815,13 +1815,11 @@ bru_obs_check_used_deprecation <- function(
   if (lifecycle::is_present(include) ||
     lifecycle::is_present(exclude) ||
     lifecycle::is_present(include_latent)) {
-    if (!lifecycle::is_present(include)) {
-      include <- NULL
-    } else {
+    if (lifecycle::is_present(include)) {
       bru_log_message(
         paste0(
           "The `include` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "since inlabru 2.11.0 and will be ignored.\n\t",
           "If auto-detection doesn't work, use ",
           "`used = bru_used(effect = include)` instead."
         ),
@@ -1832,16 +1830,14 @@ bru_obs_check_used_deprecation <- function(
         "bru_obs(include)",
         "bru_obs(used)",
         c(
-          "The provided `include` value may be ignored.",
+          "The provided `include` value will be ignored.",
           "If auto-detection doesn't work, use `bru_used(effect = include)`"
         ),
         env = env,
         user_env = user_env
       )
     }
-    if (!lifecycle::is_present(exclude)) {
-      exclude <- NULL
-    } else {
+    if (lifecycle::is_present(exclude)) {
       bru_log_message(
         paste0(
           "The `exclude` argument of `bru_obs()` is deprecated ",
@@ -1856,7 +1852,7 @@ bru_obs_check_used_deprecation <- function(
         "bru_obs(exclude)",
         "bru_obs(used)",
         c(
-          "The provided `exclude` value may be ignored.",
+          "The provided `exclude` value will be ignored.",
           paste0(
             "If auto-detection doesn't work, ",
             "use `bru_used(effect_exclude = exclude)`"
@@ -1866,13 +1862,11 @@ bru_obs_check_used_deprecation <- function(
         user_env = user_env
       )
     }
-    if (!lifecycle::is_present(include_latent)) {
-      include_latent <- NULL
-    } else {
+    if (lifecycle::is_present(include_latent)) {
       bru_log_message(
         paste0(
           "The `include_latent` argument of `bru_obs()` is deprecated ",
-          "since inlabru 2.11.0 and may be ignored.\n\t",
+          "since inlabru 2.11.0 and will be ignored.\n\t",
           "If auto-detection doesn't work, use ",
           "`used = bru_used(latent = include_latent)` instead."
         ),
@@ -1883,7 +1877,7 @@ bru_obs_check_used_deprecation <- function(
         "bru_obs(include_latent)",
         "bru_obs(used)",
         c(
-          "The provided `include_latent` value may be ignored.",
+          "The provided `include_latent` value will be ignored.",
           paste0(
             "If auto-detection doesn't work, ",
             "use `bru_used(latent = include_latent)`"
@@ -1894,12 +1888,7 @@ bru_obs_check_used_deprecation <- function(
       )
     }
     if (is.null(used)) {
-      used <- bru_used(
-        expr_text,
-        effect = include,
-        effect_exclude = exclude,
-        latent = include_latent
-      )
+      used <- bru_used(expr_text)
     }
   }
   used
@@ -2267,7 +2256,7 @@ like <- function(...,
     ),
     verbosity = 1L
   )
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.12.0",
     "like()",
     "bru_obs()"
@@ -2582,7 +2571,7 @@ summary.bru_obs <- function(object, verbose = TRUE, ...) {
 #' `as_bru_obs_list()`, `bru_obs_list()`, or `c()`.
 #' @export
 like_list <- function(...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.12.0",
     "like_list()",
     "bru_obs_list()",
@@ -2599,7 +2588,7 @@ like_list <- function(...) {
 #' use `as_bru_obs_list()`, `bru_obs_list()` or `c()`.
 #' @export
 bru_like_list <- function(...) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.12.0.9017",
     "bru_like_list()",
     "bru_obs_list()",
@@ -3113,7 +3102,6 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   the prediction summary has the same number of rows as `newdata`, then the
 #'   output is a joined object. Default `FALSE`.
 #' @param \dots Additional arguments passed on to `inla.posterior.sample()`
-#' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
 #' of used variables fails, use `used` instead.
 #' @details
@@ -3144,42 +3132,14 @@ predict.bru <- function(object,
                         used = NULL,
                         drop = FALSE,
                         ...,
-                        data = deprecated(),
                         include = deprecated(),
                         exclude = deprecated()) {
   object <- bru_check_object_bru(object)
-  if (lifecycle::is_present(data)) {
-    if (is.null(newdata)) {
-      lifecycle::deprecate_stop(
-        "2.8.0",
-        "predict(data)",
-        "predict(newdata)",
-        details =
-          "Only `data` provided and not `newdata`. Use `newdata` only."
-      )
-    } else {
-      lifecycle::deprecate_stop(
-        "2.8.0",
-        "predict(data)",
-        "predict(newdata)",
-        details = "Both `newdata` and `data` provided. Use `newdata` only."
-      )
-    }
-  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as
   # such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_stop(
-      "2.8.0",
-      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
-      details = paste0(
-        "Use 'newdata = fm_vertices(mesh, format = ...)' ",
-        "instead of 'newdata = mesh'"
-      )
-    )
   } else if (inherits(newdata, "formula")) {
     stop(paste0(
       "Formula supplied as data to predict.bru(). ",
@@ -3302,7 +3262,7 @@ bru_generate_check_used_deprecation <- function(
       ),
       verbosity = 1L
     )
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "2.12.0.9003",
       "generate(include)",
       "generate(used)",
@@ -3322,7 +3282,7 @@ bru_generate_check_used_deprecation <- function(
       ),
       verbosity = 1L
     )
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       "2.12.0.9003",
       "generate(exclude)",
       "generate(used)",
@@ -3368,7 +3328,6 @@ bru_generate_check_used_deprecation <- function(
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param \dots additional, unused arguments.
-#' @param data `r lifecycle::badge("deprecated")` Use `newdata` instead.
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
 #' of used variables fails, use `used` instead.
 #' @details
@@ -3396,49 +3355,20 @@ generate.bru <- function(object,
                          num.threads = NULL,
                          used = NULL,
                          ...,
-                         data = deprecated(),
                          include = deprecated(),
                          exclude = deprecated()) {
   object <- bru_check_object_bru(object)
-  if (lifecycle::is_present(data)) {
-    if (is.null(newdata)) {
-      lifecycle::deprecate_stop(
-        "2.8.0",
-        "generate(data)",
-        "generate(newdata)",
-        details =
-          "Only `data` provided and not `newdata`. Use `newdata` only."
-      )
-    } else {
-      lifecycle::deprecate_stop(
-        "2.8.0",
-        "generate(data)",
-        "generate(newdata)",
-        details = "Both `newdata` and `data` provided. Use `newdata` only."
-      )
-    }
-  }
 
   # Convert data into list, data.frame or a Spatial object if not provided as
   # such
   if (is.character(newdata)) {
     newdata <- as.list(setNames(newdata, newdata))
-  } else if (inherits(newdata, c("fm_mesh_2d", "inla.mesh"))) {
-    lifecycle::deprecate_stop(
-      "2.8.0",
-      "predict(newdata = 'should not be an `fm_mesh_2d`/`inla.mesh` object')",
-      details = paste0(
-        "Use 'newdata = fm_vertices(mesh, format = ...)' ",
-        "instead of 'newdata = mesh'"
-      )
-    )
   } else if (inherits(newdata, "formula")) {
     stop(paste0(
       "Formula supplied as data to generate.bru(). ",
       "Please check your argument order/names."
     ))
   }
-
 
   state <- evaluate_state(
     object$bru_info$model,

@@ -50,5 +50,3 @@ observation model) of \link{bm_list} objects, each with one \link{bru_mapper}
 entry for each included component.
 
 }}
-\concept{specific \link{bm_list} mapper method implementations}
-\concept{specific \link{bru_comp_list} mapper method implementations}

@@ -126,10 +126,7 @@ Gaussian Cox Process (LGCP) and predicts its intensity:
 # Load libraries
 library(INLA)
 #> Loading required package: Matrix
-#> This is INLA_25.06.22-1 built 2025-06-22 16:17:48 UTC.
-#>  - See www.r-inla.org/contact-us for how to get help.
-#>  - List available models/likelihoods/etc with inla.list.models()
-#>  - Use inla.doc(<NAME>) to access documentation
+#> 
 library(inlabru)
 #> Loading required package: fmesher
 library(fmesher)
@@ -179,7 +176,6 @@ ggplot() +
 
 <img src="man/figures/README-plot-1.png" alt="Nest intensity per km squared" width="100%" />
 <p class="caption">
-
 Nest intensity per km squared
 </p>
 

@@ -49,6 +49,7 @@ m <- bm_logsumexp()
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -76,10 +77,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_logsumexp} method implementations: 
-\code{\link{ibm_eval}()},
-\code{\link{ibm_jacobian}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_logsumexp} method implementations}

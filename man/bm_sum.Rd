@@ -60,6 +60,7 @@ ibm_eval(
   seq_len(ibm_n(m))
 )
 
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -87,17 +88,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_sum} method implementations: 
-\code{\link{ibm_eval}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_sum} method implementations}

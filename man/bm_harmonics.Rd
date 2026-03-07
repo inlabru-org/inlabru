@@ -86,10 +86,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_harmonics} method implementations: 
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_harmonics} method implementations}

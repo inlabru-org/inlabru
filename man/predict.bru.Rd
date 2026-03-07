@@ -15,7 +15,6 @@
   used = NULL,
   drop = FALSE,
   ...,
-  data = deprecated(),
   include = deprecated(),
   exclude = deprecated()
 )
@@ -52,8 +51,6 @@ the prediction summary has the same number of rows as \code{newdata}, then the
 output is a joined object. Default \code{FALSE}.}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
-
-\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 
 \item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
 of used variables fails, use \code{used} instead.}

@@ -47,10 +47,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_index} method implementations: 
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_jacobian}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_index} method implementations}

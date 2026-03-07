@@ -28,6 +28,7 @@ m <- bm_pipe(list(
 ))
 ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
 
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -55,15 +56,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_pipe} method implementations: 
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_pipe} method implementations}

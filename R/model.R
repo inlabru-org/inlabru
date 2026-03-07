@@ -857,7 +857,7 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
 
 #' @rdname ibm_linear
 #' @export
-#' @family specific [bru_comp] mapper method implementations
+#'
 ibm_linear.bru_comp <- function(mapper,
                                 input,
                                 state = NULL,
@@ -917,7 +917,7 @@ ibm_simplify.bru_comp <- function(mapper,
 
 #' @rdname bru_model_mapper_methods
 #' @export
-#' @family specific [bru_comp_list] mapper method implementations
+#'
 ibm_simplify.bru_comp_list <- function(mapper,
                                        input = NULL,
                                        state = NULL,
@@ -944,7 +944,7 @@ ibm_simplify.bru_comp_list <- function(mapper,
 #' @export
 #' @rdname bru_model_mapper_methods
 #' @export
-#' @family specific [bm_list] mapper method implementations
+#'
 ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
