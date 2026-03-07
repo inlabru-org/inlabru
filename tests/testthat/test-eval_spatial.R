@@ -1,5 +1,5 @@
 test_that("eval_spatial.SpatRaster", {
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
 
   # Load the Gorilla data
   data(gorillas_sf, package = "inlabru", envir = environment())
@@ -67,7 +67,7 @@ test_that("eval_spatial.Spatial*", {
   skip_if_not(bru_safe_sp())
 
   # Load the Gorilla data
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
   gorillas <- gorillas_sp()
 
@@ -126,9 +126,6 @@ test_that("eval_spatial.Spatial*", {
 })
 
 
-
-
-
 test_that("eval_spatial.sf", {
   # Load the Gorilla data
   data(gorillas_sf, package = "inlabru", envir = environment())
@@ -151,9 +148,8 @@ test_that("eval_spatial.sf", {
 })
 
 
-
 test_that("eval_spatial.stars", {
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("stars")
 
   # Load the Gorilla data

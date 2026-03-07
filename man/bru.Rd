@@ -13,16 +13,20 @@ bru_rerun(result, options = list())
 \method{print}{bru}(x, ...)
 }
 \arguments{
-\item{components}{A \code{formula}-like specification of latent components.
+\item{components}{Latent component definitions, either as a \code{\link[=bru_comp_list]{bru_comp_list()}}
+object, or a \code{formula}-like specification.
 Also used to define a default linear additive predictor.  See
 \code{\link[=bru_comp]{bru_comp()}} for details.}
 
-\item{...}{Obervation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}}, or
-named parameters that can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. Note that
-all the arguments will be evaluated before calling \code{\link[=bru_obs]{bru_obs()}} in order to
-detect if they are \code{like} objects. This means that special arguments that
-need to be evaluated in the context of \code{response_data} or \code{data} (such as
-\code{Ntrials}) may will only work that way in direct calls to \code{\link[=bru_obs]{bru_obs()}}.}
+\item{\dots}{Observation models, each constructed by a calling \code{\link[=bru_obs]{bru_obs()}},
+or \code{\link[=bru_obs_list]{bru_obs_list()}}.
+
+Alternatively, for backwards compatibility, may be named parameters that
+can be passed to a single \code{\link[=bru_obs]{bru_obs()}} call. These arguments will be
+evaluated before calling \code{\link[=bru_obs]{bru_obs()}}, in order to detect if they already
+are \code{bru_obs} objects. This means that special arguments that are only
+available in the context of \code{data} or \code{response_data} (such as \code{Ntrials})
+will only work properly in direct calls to \code{\link[=bru_obs]{bru_obs()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
@@ -49,17 +53,17 @@ Easy usage of spatial covariates and automatic construction of inla
 projection matrices for (spatial) SPDE models. This feature is
 accessible via the \code{components} parameter. Practical examples on how to
 use spatial data by means of the components parameter can also be found
-by looking at the \link{lgcp} function's documentation.
+by looking at the \code{\link[=lgcp]{lgcp()}} function's documentation.
 \item
-Constructing multiple likelihoods is straight forward. See \link{like} for
-more information on how to provide additional likelihoods to \code{bru}
-using the \code{...} parameter list.
+Constructing multiple observation models is straightforward. See
+\code{\link[=bru_obs]{bru_obs()}} for more information on how to provide additional
+models to \code{bru} using the \code{...} parameter list.
 \item
 Support for non-linear predictors. See example below.
 \item
 Log Gaussian Cox process (LGCP) inference is
-available by using the \code{cp} family or (even easier) by using the
-\link{lgcp} function.
+available by using the \code{"cp"} family or (even easier) by using the
+\code{\link[=lgcp]{lgcp()}} function.
 }
 }
 \section{Methods (by generic)}{
@@ -95,7 +99,8 @@ if (bru_safe_inla()) {
 
 
 if (bru_safe_inla()) {
-  # Alternatively, we can use the bru_obs() function to construct the likelihood:
+  # Alternatively, we can use the bru_obs() function to construct the
+  # likelihood:
 
   lik <- bru_obs(family = "gaussian",
               formula = y ~ x + Intercept,

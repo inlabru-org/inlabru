@@ -109,7 +109,7 @@ test_that("Complex list data handling", {
       state = x1
     ) + x2,
     data = data,
-    allow_combine = TRUE,
+    is_rowwise = FALSE,
     response_data = resp_data
   )
 

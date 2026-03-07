@@ -15,7 +15,8 @@ if (bru_safe_inla()) {
 
 
 if (bru_safe_inla()) {
-  # Alternatively, we can use the bru_obs() function to construct the likelihood:
+  # Alternatively, we can use the bru_obs() function to construct the
+  # likelihood:
 
   lik <- bru_obs(family = "gaussian",
               formula = y ~ x + Intercept,

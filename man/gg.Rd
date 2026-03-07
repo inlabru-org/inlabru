@@ -9,7 +9,7 @@ gg(data, ...)
 \arguments{
 \item{data}{an object for which to generate a geom.}
 
-\item{...}{Arguments passed on to the geom method.}
+\item{\dots}{Arguments passed on to the geom method.}
 }
 \value{
 The form of the value returned by gg depends on the class of its
@@ -38,7 +38,6 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 \seealso{
 Other geomes for inla and inlabru predictions: 
-\code{\link{gg.bru_prediction}()},
 \code{\link{gg.data.frame}()},
 \code{\link{gg.matrix}()}
 

@@ -53,7 +53,8 @@ bru_component(...)
 \item{main}{\code{main} takes an R expression that evaluates to where the latent variables
 should be evaluated (coordinates, indices, continuous scalar (for rw2 etc)).
 Arguments starting with weights, group, replicate behave similarly to main,
-but for the corresponding features of \code{INLA::f()}.}
+but for the corresponding features of \code{INLA::f()}. \code{main} supports \code{tidy}
+evaluation expressions, with \code{.data} and \code{.env} pronouns.}
 
 \item{weights, weights_layer, weights_selector}{Optional specification of effect scaling weights.
 Same syntax as for \code{main}.}
@@ -115,9 +116,12 @@ that is applied before scaling by \code{weights}.}
 
 \item{A.msk}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} and has no effect.}
 
-\item{.envir}{Evaluation environment}
+\item{.envir}{Evaluation environment. Can later be accessed via
+\code{\link[=bru_comp_env]{bru_comp_env()}}. Default: \code{parent.frame()}}
 
-\item{envir_extra}{TODO: check/fix this parameter.}
+\item{envir_extra}{Environment for storing \code{INLA::f()} argument values.
+If NULL, an new environment is created. Can be accessed via
+\code{\link[=bru_comp_env_extra]{bru_comp_env_extra()}}}
 }
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed
@@ -167,11 +171,8 @@ or the effect of the covariate.
 The \code{bru_comp.character} method is inlabru's equivalent to
 \code{INLA}'s \code{f()} function but adds functionality that is unique to inlabru.
 
-Deprecated parameters:
-\itemize{
-\item map: Use \code{main} instead.
-\item mesh: Use \code{mapper} instead.
-}
+The \code{main}, \code{weights}, \code{group}, \code{replicate}, and \verb{*_layer} arguments
+support \code{tidy} evaluation expressions, with \code{.data} and \code{.env} pronouns.
 }
 \section{Functions}{
 \itemize{

@@ -15,7 +15,7 @@ mapping.}
 \item{crs}{A \code{CRS} object defining the coordinate system to project the data
 to before plotting.}
 
-\item{...}{Arguments passed on to \code{geom_sf}.
+\item{\dots}{Arguments passed on to \code{geom_sf}.
 Unless specified by the user,
 the argument \code{alpha = 0.2} (alpha level for polygon filling) is added.}
 }
@@ -38,7 +38,7 @@ for \code{SpatialPolygons/DataFrame} objects.
 \examples{
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      requireNamespace("terra", quietly = TRUE) &&
+      bru_safe_terra(quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data
@@ -79,9 +79,9 @@ for \code{SpatialPolygons/DataFrame} objects.
     # Change color
 
     ggplot() +
-      gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
-      gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-      gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
+      gg(mexdolphin$ppoly, color = "green") + # survey boundary; SpatialPolygon
+      gg(mexdolphin$samplers, color = "red") + # ship transects; SpatialLines
+      gg(mexdolphin$points, color = "blue") # dolphin sightings; SpatialPoints
 
 
     # Visualize data annotations: line width by segment number

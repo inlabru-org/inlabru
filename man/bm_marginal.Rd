@@ -3,64 +3,36 @@
 \name{bm_marginal}
 \alias{bm_marginal}
 \alias{bru_mapper_marginal}
-\alias{ibm_n.bm_marginal}
-\alias{ibm_n_output.bm_marginal}
-\alias{ibm_values.bm_marginal}
-\alias{ibm_jacobian.bm_marginal}
-\alias{ibm_eval.bm_marginal}
 \title{Mapper for marginal distribution transformation}
 \usage{
 bm_marginal(qfun, pfun = NULL, dfun = NULL, dqfun = NULL, ..., inverse = FALSE)
 
 bru_mapper_marginal(...)
-
-\method{ibm_n}{bm_marginal}(mapper, ..., state = NULL, n_state = NULL)
-
-\method{ibm_n_output}{bm_marginal}(mapper, input, state = NULL, ..., n_state = NULL)
-
-\method{ibm_values}{bm_marginal}(mapper, ..., state = NULL, n_state = NULL)
-
-\method{ibm_jacobian}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
-
-\method{ibm_eval}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 }
 \arguments{
-\item{qfun}{A quantile function, supporting \code{lower.tail} and \code{log.p}
-arguments, like \code{\link[stats:Normal]{stats::qnorm()}}.}
+\item{qfun}{A quantile function, supporting arguments \code{p}, \code{lower.tail}, and
+\code{log.p}, like \code{\link[stats:Normal]{stats::qnorm()}}.}
 
-\item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
+\item{pfun}{A CDF, supporting arguments \code{q}, \code{lower.tail}, and \code{log.p},
 like \code{\link[stats:Normal]{stats::pnorm()}}.  Only needed and used when
 \code{xor(mapper[["inverse"]], reverse)} is \code{TRUE} in a method call.
 Default \code{NULL}}
 
-\item{dfun}{A pdf, supporting \code{log} argument,
+\item{dfun}{A pdf, supporting arguments \code{x} and \code{log},
 like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
 differences on \code{qfun} or \code{pfun} instead.}
 
 \item{dqfun}{A function evaluating the reciprocal of the derivative of
-\code{qfun}. If \code{NULL} (default), uses \code{dfun(qfun(...),...)} or finite
-differences on \code{qfun} or \code{pfun} instead.}
+\code{qfun}, i.e. the density at a given CDF value. If \code{NULL} (default), uses
+\code{dfun(qfun(...),...)} or finite differences on \code{qfun} or \code{pfun} instead.
+Must support the same arguments as \code{qfun}.}
 
-\item{...}{Arguments passed on to other methods}
+\item{\dots}{Arguments passed on to \code{\link[=bm_marginal]{bm_marginal()}}}
 
 \item{inverse}{logical; If \code{FALSE} (default), \code{\link[=bm_marginal]{bm_marginal()}}
 defines a mapping from standard Normal to a specified distribution.
 If \code{TRUE}, it defines a mapping from the specified distribution to a standard
 Normal.}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{n_state}{integer giving the length of the state vector for mappers
-that have state dependent output size.}
-
-\item{input}{Data input for the mapper.}
-
-\item{reverse}{logical; control \code{bm_marginal} evaluation. Default
-\code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
-for \code{marginal} mappers.}
 }
 \description{
 Constructs a mapper that transforms the marginal distribution \code{state} from
@@ -68,17 +40,6 @@ Constructs a mapper that transforms the marginal distribution \code{state} from
 quantile function. The \code{...} arguments are used as parameter arguments to
 \code{qfun}, \code{pfun}, \code{dfun}, and \code{dqfun}.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_marginal)}: Non-NULL \code{input} values are interpreted
-as a parameter list for \code{qfun}, overriding that of the mapper itself.
-
-\item \code{ibm_eval(bm_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
-\code{FALSE}, \code{ibm_eval()}
-for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numerically
-stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
-
-}}
 \examples{
 m <- bm_marginal(qexp, pexp, rate = 1 / 8)
 (val <- ibm_eval(m, state = -5:5))
@@ -95,24 +56,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

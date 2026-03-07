@@ -97,23 +97,18 @@ bru_model <- function(components,
   # Back up environment
   env <- environment(components)
 
-  # Create joint formula that will be used by inla
-  formula <- BRU_response ~ -1
+  # Complete the used component definitions based on data
   included <- bru_used(lhoods)
   included <- union(included[["effect"]], included[["latent"]])
-
-  # Complete the used component definitions based on data
   components <- bru_comp_list(
     components[included],
     lhoods = lhoods,
     inputs = inputs
   )
 
-  for (cmp in included) {
-    if (!(components[[cmp]][["main"]][["type"]] %in% c("offset", "const"))) {
-      formula <- update.formula(formula, components[[cmp]]$inla.formula)
-    }
-  }
+  # Create joint formula that will be used by inla
+  formula <- bru_inla_formula(components)
+  formula <- update.formula(formula, BRU_response ~ .)
 
   # Restore environment
   environment(components) <- env
@@ -121,14 +116,15 @@ bru_model <- function(components,
 
   # Check linearity
   for (lh in seq_along(lhoods)) {
-    if (lhoods[[lh]][["linear"]]) {
+    if (bru_is_linear(lhoods[[lh]])) {
       used_lh <- bru_used(lhoods[[lh]])
-      used_lh <- unique(c(used_lh$effect, used_lh$latent))
-      lhoods[[lh]][["linear"]] <-
-        all(vapply(components[used_lh], function(cmp) {
-          ibm_is_linear(cmp$mapper)
-        }, TRUE))
+      lhoods[[lh]][["pred_expr"]][["is_linear"]] <-
+        (length(used_lh$latent) == 0) &&
+          all(vapply(components[used_lh$effect], function(cmp) {
+            ibm_is_linear(cmp$mapper)
+          }, TRUE))
     }
+    lhoods[[lh]] <- bru_compat_pre_2_14_bru_obs(lhoods[[lh]])
   }
 
   # Make model
@@ -155,7 +151,17 @@ summary.bru_model <- function(object, ...) {
   result <- structure(
     list(
       components =
-        summary(object[["effects"]], ...)
+        summary(as_bru_comp_list(object), ...),
+      lhoods = {
+        # Once lhoods is moved into bru_model, the NULL part will no longer be
+        # needed, and as_bru_obs_list() can be used instead.
+        bru_obs_lst <- object[["lhoods"]]
+        if (is.null(bru_obs_lst)) {
+          NULL
+        } else {
+          summary(bru_obs_lst, ...)
+        }
+      }
     ),
     class = "summary_bru_model"
   )
@@ -166,7 +172,12 @@ summary.bru_model <- function(object, ...) {
 #' @param x An object to be printed
 #' @rdname bru_model
 print.summary_bru_model <- function(x, ...) {
+  cat("Latent components:\n")
   print(x[["components"]])
+  if (!is.null(x[["lhoods"]])) {
+    cat("Observation models:\n")
+    print(x[["lhoods"]])
+  }
   invisible(x)
 }
 
@@ -176,8 +187,6 @@ print.bru_model <- function(x, ...) {
   print(summary(x))
   invisible(x)
 }
-
-
 
 
 #' Evaluate or sample from a posterior result given a model and locations
@@ -191,10 +200,10 @@ print.bru_model <- function(x, ...) {
 #' @param input Precomputed inputs list for the components
 #' @param comp_simple Precomputed [bm_list] of simplified mappers for the
 #' components
-#' @param predictor A formula or an expression to be evaluated given the
-#' posterior or for each sample thereof. The default (`NULL`) returns a
-#' `data.frame` containing the sampled effects. In case of a formula the right
-#' hand side is used for evaluation.
+#' @param predictor A formula or a [bru_pred_expr] expression to be evaluated
+#'   given the posterior or for each sample thereof. The default (`NULL`)
+#'   returns a `data.frame` containing the sampled effects. In case of a formula
+#'   the right hand side is used for evaluation.
 #' @param format character; determines the storage format of predictor output.
 #' Available options:
 #' * `"auto"` If the first evaluated result is a vector or single-column matrix,
@@ -228,20 +237,34 @@ evaluate_model <- function(model,
                            used = NULL,
                            n_pred = NULL,
                            ...) {
-  used <- bru_used(used, labels = names(model$effects))
+  comp_lst <- as_bru_comp_list(model)
+  if (inherits(predictor, "bru_pred_expr")) {
+    if (!is.null(used)) {
+      warning(
+        paste0(
+          "Overriding `used` argument to `evaluate_model()` ",
+          "in favour of `bru_used(predictor)`."
+        )
+      )
+    }
+    used <- bru_used(predictor, labels = names(comp_lst))
+    predictor <- bru_pred_expr(predictor, format = "formula")
+  } else {
+    used <- bru_used(used, labels = names(comp_lst))
+  }
 
   if (is.null(state)) {
     stop("Not enough information to evaluate model states.")
   }
   if (is.null(input)) {
     input <- bru_input(
-      components = model$effects[used$effect],
+      comp_lst[used$effect],
       data = data
     )
   }
   if (is.null(comp_simple) && !is.null(input)) {
     comp_simple <- ibm_simplify(
-      model$effects[used$effect],
+      comp_lst[used$effect],
       input = input,
       inla_f = TRUE
     )
@@ -312,7 +335,7 @@ evaluate_state <- function(model,
     )
   } else if (is.null(result)) {
     state <- list(lapply(
-      model[["effects"]],
+      as_bru_comp_list(model),
       function(x) {
         rep(0.0, ibm_n(x[["mapper"]]))
       }
@@ -327,8 +350,6 @@ evaluate_state <- function(model,
 
   state
 }
-
-
 
 
 #' @export
@@ -351,7 +372,7 @@ evaluate_effect_single_state <- function(...) {
 #' * `evaluate_effect_single_state.bru_mapper`:
 #'   A vector of the latent component state.
 #' * `evaluate_effect_single_state.*_list`: list of named state vectors.
-#' @param ... Optional additional parameters, e.g. `inla_f`. Normally unused.
+#' @param \dots Optional additional parameters, e.g. `inla_f`. Normally unused.
 #' @param label Option label used for any warning messages, specifying the
 #' affected component.
 #' @author Fabian E. Bachl \email{bachlfab@@gmail.com} and
@@ -418,8 +439,6 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 }
 
 
-
-
 #' Evaluate component effects or expressions
 #'
 #' Evaluate component effects or expressions, based on a bru model and one or
@@ -429,12 +448,13 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' and covariates needed to evaluate the model.
 #' @param data_extra Additional data for the predictor evaluation. Variables
 #' with the same name as in `data` will be ignored, unless accessed via
-#' `.data_extra.[["name"]]` or `.data_extra.$name`.
+#' `.data_extra.[["name"]]` or `.data_extra.$name`, or via pronouns;
+#'  see Details.
 #' @param state A list where each element is a list of named latent state
 #' information, as produced by [evaluate_state()]
 #' @param effects A list where each element is list of named evaluated effects,
 #' each computed by [evaluate_effect_single_state.bru_comp_list()]
-#' @param predictor Either a formula or expression
+#' @param predictor Either a formula or [bru_pred_expr] expression
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param format character; determines the storage format of the output.
 #' Available options:
@@ -448,9 +468,21 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' Default: "auto"
 #' @param n_pred integer. If provided, scalar predictor results are expanded to
 #' vectors of length `n_pred`.
-#' @details For each component, e.g. "name", the state values are available as
-#'   `name_latent`, and arbitrary evaluation can be done with `name_eval(...)`,
-#'   see [bru_comp_eval()].
+#' @details For each component, e.g. "name", the latent state values are
+#'   available as `name_latent`, and arbitrary evaluation can be done with
+#'   `name_eval(...)`, see [bru_comp_eval()].
+#'
+#'   The evaluation supports several [rlang::as_data_pronoun()] data masking
+#'   pronouns, to access variables from different data sources, and some of
+#'   these also have corresponding full objects, with an appended `.` in the
+#'   name. The full objects can be passed as arguments to functions.
+#'   \describe{
+#'   \item{.effect/.effect.}{refers to the `effects` vectors}
+#'   \item{.latent/.latent.}{refers to the latent state vectors}
+#'   \item{.data/.data.}{refers to the main `data` argument}
+#'   \item{.data_extra/.data_extra.}{refers to the `data_extra` argument}
+#'   \item{.env}{refers to the evaluation environment of the predictor}
+#'   }
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
@@ -465,11 +497,24 @@ evaluate_predictor <- function(model,
                                n_pred = NULL) {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
+  comp_lst <- as_bru_comp_list(model)
+  if (inherits(predictor, "bru_pred_expr")) {
+    if (!is.null(used)) {
+      warning(
+        paste0(
+          "Overriding `used` argument to `evaluate_predictor()` ",
+          "in favour of `bru_used(predictor)`."
+        )
+      )
+    }
+    used <- bru_used(predictor, labels = names(comp_lst))
+    predictor <- bru_pred_expr(predictor, format = "formula")
+  }
   pred.envir <- environment(predictor)
   if (inherits(predictor, "formula")) {
-    predictor <- parse(
-      text = as.character(predictor)[length(as.character(predictor))]
-    )
+    pred_text <- as.character(predictor)
+    pred_text <- pred_text[length(pred_text)]
+    predictor <- rlang::parse_expr(pred_text)
   }
   formula.envir <- environment(model$formula)
   enclos <-
@@ -481,7 +526,7 @@ evaluate_predictor <- function(model,
       parent.frame()
     }
 
-  used <- bru_used(used, labels = names(model$effects))
+  used <- bru_used(used, labels = names(comp_lst))
 
   # General evaluation environment
   envir <- new.env(parent = enclos)
@@ -495,44 +540,22 @@ evaluate_predictor <- function(model,
   #
   # Note: Since 2.7.0.9019, no longer converts Spatial*DataFrame to data frame
   # here; coordinates must be accessed via sp::coordinates() if needed.
-  if (!is.null(data)) {
-    if (inherits(data, "Spatial")) {
-      for (nm in names(data)) {
-        assign(nm, data[[nm]], envir = envir)
-      }
-    } else {
-      list2env(data, envir = envir)
-    }
-  }
-  assign(".data.", data, envir = envir)
-
-  nms <- setdiff(names(data_extra), names(data))
-  if (!is.null(data_extra[nms])) {
-    if (inherits(data_extra, "Spatial")) {
-      for (nm in nms) {
-        assign(nm, data_extra[[nm]], envir = envir)
-      }
-    } else {
-      list2env(data_extra[nms], envir = envir)
-    }
-  }
-  assign(".data_extra.", data_extra, envir = envir)
 
   # Rename component states from label to label_latent
   state_names <- as.list(expand_labels(
     names(state[[1]]),
-    names(model$effects),
+    names(comp_lst),
     suffix = "_latent"
   ))
   names(state_names) <- names(state[[1]])
 
   # Construct _eval function names
   eval_names <- as.list(expand_labels(
-    intersect(names(state[[1]]), names(model$effects)),
-    intersect(names(state[[1]]), names(model$effects)),
+    intersect(names(state[[1]]), names(comp_lst)),
+    intersect(names(state[[1]]), names(comp_lst)),
     suffix = "_eval"
   ))
-  names(eval_names) <- intersect(names(state[[1]]), names(model$effects))
+  names(eval_names) <- intersect(names(state[[1]]), names(comp_lst))
 
   eval_fun_factory <-
     function(.comp, .envir, .enclos) {
@@ -548,7 +571,7 @@ evaluate_predictor <- function(model,
                            weights = NULL,
                            .state = NULL) {
         n_input <- ibm_n_output(
-          .mapper[["mappers"]][["mapper"]][["mappers"]][["main"]],
+          .mapper[["mappers"]][["core"]][["mappers"]][["main"]],
           input = main
         )
         if (is.null(group)) {
@@ -558,14 +581,14 @@ evaluate_predictor <- function(model,
           replicate <- rep(1, n_input)
         }
         if (!.is_offset && is.null(.state)) {
-          .state <- eval(
-            parse(text = .label),
-            envir = .envir,
-            enclos = .enclos
+          .state <- rlang::eval_tidy(
+            rlang::parse_expr(.label),
+            data = data_mask,
+            env = .envir
           )
         }
         .input <- list(
-          mapper = list(
+          core = list(
             main = main,
             group = group,
             replicate = replicate
@@ -601,10 +624,10 @@ evaluate_predictor <- function(model,
             state = .state
           )
           if (any(not_ok)) {
-            .cache_state_index <- eval(
-              parse(text = ".cache_state_index"),
-              envir = .envir,
-              enclos = .enclos
+            .cache_state_index <- rlang::eval_tidy(
+              rlang::parse_expr(".cache_state_index"),
+              data = data_mask,
+              env = .envir
             )
             if (!identical(.cache_state_index, .iid_cache_index)) {
               .iid_cache_index <<- .cache_state_index
@@ -613,10 +636,10 @@ evaluate_predictor <- function(model,
             key <- as.character(main[not_ok])
             not_cached <- !(key %in% names(.iid_cache))
             if (any(not_cached)) {
-              .prec <- eval(
-                parse(text = .iid_precision),
-                envir = .envir,
-                enclos = .enclos
+              .prec <- rlang::eval_tidy(
+                rlang::parse_expr(.iid_precision),
+                data = data_mask,
+                env = .envir
               )
               for (k in unique(key[not_cached])) {
                 .iid_cache[k] <<- rnorm(1, mean = 0, sd = .prec^-0.5)
@@ -634,16 +657,14 @@ evaluate_predictor <- function(model,
       }
       eval_fun
     }
+  eval_list <- list()
   for (nm in names(eval_names)) {
-    assign(
-      eval_names[[nm]],
+    eval_list[[eval_names[[nm]]]] <-
       eval_fun_factory(
-        model$effects[[nm]],
+        comp_lst[[nm]],
         .envir = envir,
         .enclos = enclos
-      ),
-      envir = envir
-    )
+      )
   }
 
   # Remove problematic objects:
@@ -652,17 +673,26 @@ evaluate_predictor <- function(model,
 
   n <- length(state)
   for (k in seq_len(n)) {
-    # Keep track of the iteration index so the iid cache can be invalidated
-    assign(".cache_state_index", k, envir = envir)
+    state_df <- state[[k]]
+    names(state_df) <- state_names[names(state_df)]
+    data_mask <- bru_data_mask(
+      list(
+        effect = effects[[k]],
+        state_df,
+        latent = state[[k]],
+        data = data,
+        data_extra = data_extra,
+        eval_list,
+        # Keep track of the iteration index so the iid cache can be
+        # invalidated
+        list(.cache_state_index = k)
+      )
+    )
 
-    for (nm in names(state[[k]])) {
-      assign(state_names[[nm]], state[[k]][[nm]], envir = envir)
-    }
-    for (nm in names(effects[[k]])) {
-      assign(nm, effects[[k]][[nm]], envir = envir)
-    }
-
-    result_ <- eval(predictor, envir = envir, enclos = enclos)
+    result_ <- rlang::eval_tidy(predictor,
+      data = data_mask,
+      env = envir
+    )
     if (!is.null(n_pred) && is.numeric(result_) && length(result_) == 1) {
       result_ <- rep(result_, n_pred)
     }
@@ -691,7 +721,6 @@ evaluate_predictor <- function(model,
 
   result
 }
-
 
 
 #' Evaluate component values in predictor expressions
@@ -764,11 +793,6 @@ bru_comp_eval <- function(main,
 }
 
 
-
-
-
-
-
 #' @include mappers.R
 
 #' @title Mapper methods for model objects
@@ -777,6 +801,8 @@ bru_comp_eval <- function(main,
 #' [bru] model objects and related classes.
 #'
 #' @inheritParams bru_mapper_generics
+#' @inheritParams ibm_linear
+#' @inheritParams ibm_simplify
 #'
 #' @name bru_model_mapper_methods
 #' @rdname bru_model_mapper_methods
@@ -798,7 +824,7 @@ ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
       input,
       function(inp) {
         ibm_linear(
-          model[["effects"]],
+          as_bru_comp_list(model),
           input = inp,
           state = state,
           ...
@@ -829,8 +855,9 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
   mappers
 }
 
-#' @rdname bru_model_mapper_methods
+#' @rdname ibm_linear
 #' @export
+#'
 ibm_linear.bru_comp <- function(mapper,
                                 input,
                                 state = NULL,
@@ -860,7 +887,7 @@ ibm_simplify.bru_model <- function(mapper, input = NULL, state = NULL, ...) {
       input,
       function(inp) {
         ibm_simplify(
-          model[["effects"]],
+          as_bru_comp_list(model),
           input = inp,
           state = state,
           ...
@@ -890,6 +917,7 @@ ibm_simplify.bru_comp <- function(mapper,
 
 #' @rdname bru_model_mapper_methods
 #' @export
+#'
 ibm_simplify.bru_comp_list <- function(mapper,
                                        input = NULL,
                                        state = NULL,
@@ -913,11 +941,10 @@ ibm_simplify.bru_comp_list <- function(mapper,
 # Methods for the `ibm_linear()` and `ibm_simplify()` methods for
 # [bru] model objects and related classes.
 #
-#' @inheritParams bru_mapper_generics
+#' @export
+#' @rdname bru_model_mapper_methods
+#' @export
 #'
-#' @export
-#' @rdname bm_list
-#' @export
 ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
@@ -942,7 +969,7 @@ ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
   as_bm_list(mappers)
 }
 
-#' @rdname bm_list
+#' @rdname bru_model_mapper_methods
 #' @export
 ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
   label <- names(mapper)

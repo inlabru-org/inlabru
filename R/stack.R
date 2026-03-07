@@ -35,10 +35,10 @@ bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
     INLA::inla.stack(
       list(
         BRU.response = BRU.response,
-        BRU.E = lhood[["E"]],
-        BRU.Ntrials = lhood[["Ntrials"]],
-        BRU.weights = lhood[["weights"]],
-        BRU.scale = lhood[["scale"]],
+        BRU.E = lhood[["response_data"]][["BRU_E"]],
+        BRU.Ntrials = lhood[["response_data"]][["BRU_Ntrials"]],
+        BRU.weights = lhood[["response_data"]][["BRU_weights"]],
+        BRU.scale = lhood[["response_data"]][["BRU_scale"]],
         BRU.offset = as.vector(lin$offset),
         BRU.link = family_index
       ),
@@ -51,10 +51,10 @@ bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
   } else {
     INLA::inla.stack(
       list(
-        BRU.E = lhood[["E"]],
-        BRU.Ntrials = lhood[["Ntrials"]],
-        BRU.weights = lhood[["weights"]],
-        BRU.scale = lhood[["scale"]],
+        BRU.E = lhood[["response_data"]][["BRU_E"]],
+        BRU.Ntrials = lhood[["response_data"]][["BRU_Ntrials"]],
+        BRU.weights = lhood[["response_data"]][["BRU_weights"]],
+        BRU.scale = lhood[["response_data"]][["BRU_scale"]],
         BRU.offset = as.vector(lin$offset),
         BRU.link = family_index
       ),
@@ -67,8 +67,6 @@ bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
     )
   }
 }
-
-
 
 
 #' @param lhoods A `bru_obs_list` object

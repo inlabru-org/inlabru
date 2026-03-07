@@ -3,29 +3,16 @@
 \name{bm_index}
 \alias{bm_index}
 \alias{bru_mapper_index}
-\alias{ibm_invalid_output.bm_index}
-\alias{ibm_jacobian.bm_index}
 \title{Mapper for indexed variables}
 \usage{
-bm_index(n = 1L, ...)
+bm_index(n = 1L)
 
 bru_mapper_index(...)
-
-\method{ibm_invalid_output}{bm_index}(mapper, input, state, ...)
-
-\method{ibm_jacobian}{bm_index}(mapper, input, state, ...)
 }
 \arguments{
 \item{n}{Size of a model for \code{bm_index}}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
+\item{\dots}{Arguments passed on to \code{\link[=bm_index]{bm_index()}}}
 }
 \description{
 Create a an indexing mapper
@@ -42,24 +29,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

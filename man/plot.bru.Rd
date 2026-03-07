@@ -23,7 +23,7 @@ plotmarginal.inla(
 \arguments{
 \item{x}{a fitted \code{\link[=bru]{bru()}} model.}
 
-\item{...}{Options passed on to other methods.}
+\item{\dots}{Options passed on to other methods.}
 
 \item{result}{an \code{inla} or \code{bru} result object}
 

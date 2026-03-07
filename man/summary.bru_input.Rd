@@ -19,7 +19,7 @@
 component definitions. When \code{FALSE}, only show basic component
 definition information.  Default \code{TRUE}.}
 
-\item{...}{Passed on to other summary methods.}
+\item{\dots}{Passed on to other summary methods.}
 
 \item{label.override}{character; If not \code{NULL}, use this label instead of
 the object's label.}
@@ -39,4 +39,3 @@ Fabian E. Bachl \email{bachlfab@gmail.com}
 
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
-\keyword{internal}

@@ -41,17 +41,21 @@ Computes nearest-available-value imputation for missing values in space
 }
 \examples{
 \dontrun{
-if (bru_safe_inla()) {
+if (require("sf", quietly = TRUE)) {
   points <-
-    sp::SpatialPointsDataFrame(
-      matrix(1:6, 3, 2),
-      data = data.frame(val = c(NA, NA, NA))
+    sf::st_as_sf(
+      data.frame(
+        x = 1:3,
+        y = 4:6,
+        val = c(NA, NA, NA)
+      ),
+      coords = c("x", "y")
     )
   input_coord <- expand.grid(x = 0:7, y = 0:7)
   input <-
-    sp::SpatialPixelsDataFrame(
-      input_coord,
-      data = data.frame(val = as.vector(input_coord$y))
+    sf::st_as_sf(
+      cbind(input_coord, val = as.vector(input_coord$y)),
+      coords = c("x", "y")
     )
   points$val <- bru_fill_missing(input, points, points$val)
   print(points)

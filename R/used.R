@@ -1,36 +1,3 @@
-# Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
-bru_used_upgrade <- function(lhoods, labels) {
-  for (k in seq_along(lhoods)) {
-    if (is.null(lhoods[[k]][["used"]]) &&
-      is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["include_components"]],
-        latent = lhoods[[k]][["include_latent"]],
-        effect_exclude = lhoods[[k]][["exclude_components"]],
-      )
-
-      lhoods[[k]][["include_components"]] <- NULL
-      lhoods[[k]][["exclude_components"]] <- NULL
-      lhoods[[k]][["include_latent"]] <- NULL
-    } else if (!is.null(lhoods[[k]][["used_components"]])) {
-      used <- bru_used(
-        NULL,
-        effect = lhoods[[k]][["effect"]],
-        latent = lhoods[[k]][["latent"]]
-      )
-      lhoods[[k]][["used_components"]] <- NULL
-    } else {
-      used <- bru_used(lhoods[[k]])
-    }
-
-    used <- bru_used_update(used, labels = labels)
-    lhoods[[k]][["used"]] <- used
-  }
-  lhoods
-}
-
-
 #' Update used_component information objects
 #'
 #' Merge available component labels information with used components
@@ -38,7 +5,7 @@ bru_used_upgrade <- function(lhoods, labels) {
 #'
 #' @param x Object to be updated
 #' @param labels character vector of component labels
-#' @param ... Unused
+#' @param \dots Unused
 #' @returns An updated version of `x`
 #' @keywords internal
 #' @export
@@ -59,29 +26,43 @@ bru_used_update.bru_obs_list <- function(x, labels, ...) {
 #' @rdname bru_used_update
 #' @export
 bru_used_update.bru_obs <- function(x, labels, ...) {
+  x[["pred_expr"]] <- bru_used_update(
+    x[["pred_expr"]],
+    labels = labels,
+    ...
+  )
+  x <- bru_compat_pre_2_14_bru_obs(x)
+  x
+}
+
+#' @rdname bru_used_update
+#' @export
+bru_used_update.bru_pred_expr <- function(x, labels, ...) {
   pre_used <- bru_used(x)
   used <- bru_used_update(pre_used, labels = labels, ...)
   if (isTRUE(x[["is_additive"]])) {
     if ((length(used$latent) > 0) ||
       (length(setdiff(pre_used$effect, used$effect)) > 0)) {
       x[["is_additive"]] <- FALSE
-      x[["linear"]] <- FALSE
+      x[["is_linear"]] <- FALSE
 
-      if (is.null(x[["expr"]])) {
-        expr_text <- paste0(pre_used$effect, collapse = " + ")
+      if (is.null(x[["pred_expr"]])) {
+        pred_text <- paste0(pre_used$effect, collapse = " + ")
         if (length(pre_used$latent) > 0) {
-          expr_text <- paste(
-            expr_text,
+          x[["is_rowwise"]] <- FALSE
+          pred_text <- paste(
+            pred_text,
             paste0(pre_used$latent, "_latent", collapse = " + "),
             sep = " + "
           )
         }
-        x[["expr"]] <- parse(text = expr_text)
+        x[["pred_text"]] <- pred_text
+        x[["pred_expr"]] <- rlang::parse_expr(x[["pred_text"]])
       }
     } else {
-      if (is.null(x[["expr"]])) {
-        expr_text <- paste0(used$effect, collapse = " + ")
-        x[["expr"]] <- parse(text = expr_text)
+      if (is.null(x[["pred_expr"]])) {
+        x[["pred_text"]] <- paste0(used$effect, collapse = " + ")
+        x[["pred_expr"]] <- rlang::parse_expr(x[["pred_text"]])
       }
     }
   }
@@ -120,6 +101,41 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' supplied, also calls [bru_used_update()] on the `bru_used` objects.
 #'
 #' @param x An object that contains information about used components
+#' @param labels character; component labels passed on to
+#' [bru_used_update()]
+
+#' @param join Whether to join list output into a single object; Default
+#' may depend on the input object class
+#' @param \dots Parameters passed on to the other methods
+#' @returns A `bru_used` object (a list with elements `effect`
+#' and `latent`), or a list of such objects
+#' (for methods with `join = FALSE`)
+#'
+#' @examples
+#' (used <- new_bru_used(~.))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- new_bru_used(~ a + b + c_latent + d_latent))
+#' bru_used(used, labels = c("a", "c"))
+#' (used <- new_bru_used(expression(a + b + c_latent + d_latent)))
+#' bru_used(used, labels = c("a", "c"))
+#'
+#' @export
+#' @keywords internal
+#' @family bru_used
+bru_used <- function(x = NULL, ...) {
+  # Need to specify the dispatch object explicitly to handle the NULL case:
+  UseMethod("bru_used", x)
+}
+
+#' @title Store information about used components
+#'
+#' @description Create a `bru_used` object from effect name character
+#'   vectors.
+#' Create information about which components are used by a model, or
+#' its individual observation models. If a non-NULL `labels` argument is
+#' supplied, also calls [bru_used_update()] on the `bru_used` object.
+#'
+#' @param x `NULL`, or an object representing an expression
 #' @param effect character; components used as effects. When `NULL`, auto-detect
 #' components to include all components in a predictor expression.
 #' @param effect_exclude character; components to specifically exclude from
@@ -129,12 +145,9 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' @param labels character; component labels passed on to
 #' [bru_used_update()]
 
-#' @param join Whether to join list output into a single object; Default
-#' may depend on the input object class
-#' @param ... Parameters passed on to the other methods
+#' @param \dots Parameters passed on to the other methods
 #' @returns A `bru_used` object (a list with elements `effect`
-#' and `latent`), or a list of such objects
-#' (for methods with `join = FALSE`)
+#' and `latent`)
 #'
 #' @details
 #' The arguments `effect`, `effect_exclude`, and `latent` control what
@@ -162,29 +175,36 @@ bru_used_update.bru_used <- function(x, labels, ...) {
 #' }
 #'
 #' @examples
-#' (used <- bru_used(~.))
+#' (used <- new_bru_used(~.))
 #' bru_used(used, labels = c("a", "c"))
-#' (used <- bru_used(~ a + b + c_latent + d_latent))
+#' (used <- new_bru_used(~ a + b + c_latent + d_latent))
 #' bru_used(used, labels = c("a", "c"))
-#' (used <- bru_used(expression(a + b + c_latent + d_latent)))
+#' (used <- new_bru_used(expression(a + b + c_latent + d_latent)))
 #' bru_used(used, labels = c("a", "c"))
 #'
 #' @export
 #' @keywords internal
 #' @family bru_used
-bru_used <- function(x = NULL, ...) {
+#' @export
+new_bru_used <- function(x = NULL,
+                         ...,
+                         effect = NULL,
+                         effect_exclude = NULL,
+                         latent = NULL,
+                         labels = NULL) {
   # Need to specify the dispatch object explicitly to handle the NULL case:
-  UseMethod("bru_used", x)
+  UseMethod("new_bru_used", x)
 }
 
-#' @describeIn bru_used Create a `bru_used` object from effect name character
-#'   vectors.
+#' @describeIn new_bru_used Create a `bru_used` object from effect name
+#'   character vectors.
 #' @export
-bru_used.NULL <- function(x = NULL, ...,
-                          effect = NULL,
-                          effect_exclude = NULL,
-                          latent = NULL,
-                          labels = NULL) {
+new_bru_used.NULL <- function(x = NULL,
+                              ...,
+                              effect = NULL,
+                              effect_exclude = NULL,
+                              latent = NULL,
+                              labels = NULL) {
   used <- structure(
     list(
       effect = effect,
@@ -199,6 +219,12 @@ bru_used.NULL <- function(x = NULL, ...,
   }
 
   used
+}
+
+#' @describeIn bru_used Create a `bru_used` object by calling [new_bru_used()].
+#' @export
+bru_used.NULL <- function(x = NULL, ...) {
+  new_bru_used(x = x, ...)
 }
 
 
@@ -280,6 +306,13 @@ bru_used_vars.expression <- function(x, functions = FALSE) {
   bru_used_vars(ex, functions = functions)
 }
 
+#' @rdname bru_used_vars
+#' @export
+bru_used_vars.quosure <- function(x, functions = FALSE) {
+  ex <- deparse1(rlang::quo_get_expr(x), collapse = "\n")
+  bru_used_vars(ex, functions = functions)
+}
+
 #' @describeIn bru_used_vars Only the right-hand side is used.
 #' @export
 bru_used_vars.formula <- function(x, functions = FALSE) {
@@ -289,15 +322,20 @@ bru_used_vars.formula <- function(x, functions = FALSE) {
 }
 
 
+#' @describeIn bru_used Create a `bru_used` object by calling [new_bru_used()]
+#' @export
+bru_used.default <- function(x, ...) {
+  new_bru_used(x = x, ...)
+}
 
-#' @describeIn bru_used Create a `bru_used` object from a `character`
+#' @describeIn new_bru_used Create a `bru_used` object from a `character`
 #' representation of an expression.
 #' @export
-bru_used.character <- function(x, ...,
-                               effect = NULL,
-                               effect_exclude = NULL,
-                               latent = NULL,
-                               labels = NULL) {
+new_bru_used.character <- function(x, ...,
+                                   effect = NULL,
+                                   effect_exclude = NULL,
+                                   latent = NULL,
+                                   labels = NULL) {
   form <- x
   if (is.null(effect)) {
     effect <- bru_used_vars(form, functions = FALSE)
@@ -319,7 +357,7 @@ bru_used.character <- function(x, ...,
     }
   }
 
-  bru_used(
+  new_bru_used(
     x = NULL,
     ...,
     effect = effect,
@@ -330,16 +368,37 @@ bru_used.character <- function(x, ...,
 }
 
 
-#' @describeIn bru_used Create a `bru_used` object from an expression object.
+#' @describeIn new_bru_used Create a `bru_used` object from an expression
+#'   object.
 #' @export
-bru_used.expression <- function(x, ...,
-                                effect = NULL,
-                                effect_exclude = NULL,
-                                latent = NULL,
-                                labels = NULL) {
+new_bru_used.expression <- function(x, ...,
+                                    effect = NULL,
+                                    effect_exclude = NULL,
+                                    latent = NULL,
+                                    labels = NULL) {
   attributes(x) <- NULL
   y <- deparse1(x, collapse = "\n")
-  bru_used(
+  new_bru_used(
+    x = y,
+    ...,
+    effect = effect,
+    effect_exclude = effect_exclude,
+    latent = latent,
+    labels = labels
+  )
+}
+
+#' @describeIn new_bru_used Create a `bru_used` object from an `rlang` `expr`
+#'   object.
+#' @export
+new_bru_used.quosure <- function(x, ...,
+                                 effect = NULL,
+                                 effect_exclude = NULL,
+                                 latent = NULL,
+                                 labels = NULL) {
+  y <- deparse1(rlang::quo_get_expr(x), collapse = "\n")
+  attributes(y) <- NULL
+  new_bru_used(
     x = y,
     ...,
     effect = effect,
@@ -350,17 +409,17 @@ bru_used.expression <- function(x, ...,
 }
 
 
-#' @describeIn bru_used Create a `bru_used` object from a formula (only the
+#' @describeIn new_bru_used Create a `bru_used` object from a formula (only the
 #' right-hand side is used).
 #' @export
-bru_used.formula <- function(x, ...,
-                             effect = NULL,
-                             effect_exclude = NULL,
-                             latent = NULL,
-                             labels = NULL) {
+new_bru_used.formula <- function(x, ...,
+                                 effect = NULL,
+                                 effect_exclude = NULL,
+                                 latent = NULL,
+                                 labels = NULL) {
   form <- x[[length(x)]]
   ex <- deparse1(form, collapse = "\n")
-  bru_used(
+  new_bru_used(
     x = ex,
     ...,
     effect = effect,
@@ -374,7 +433,14 @@ bru_used.formula <- function(x, ...,
 #' of observation models used in a `bru` object.
 #' @export
 bru_used.bru <- function(x, ..., join = TRUE) {
-  bru_used(x[["bru_info"]][["lhoods"]], ..., join = join)
+  bru_used(x[["bru_info"]], ..., join = join)
+}
+
+#' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru_info` object.
+#' @export
+bru_used.bru_info <- function(x, ..., join = TRUE) {
+  bru_used(x[["lhoods"]], ..., join = join)
 }
 
 #' @describeIn bru_used Extract the `bru_used` information for each element
@@ -401,10 +467,17 @@ bru_used.list <- function(x, ..., join = TRUE) {
   used
 }
 
-#' @describeIn bru_used Extract the `bru_used` information for the collection
-#' of observation models used in a `bru` observation model `bru_obs` object.
+#' @describeIn bru_used Extract the `bru_used` information for the observation
+#'   model predictor used in a `bru` observation model `bru_obs` object.
 #' @export
 bru_used.bru_obs <- function(x, ...) {
+  bru_used(x[["pred_expr"]], ...)
+}
+
+#' @describeIn bru_used Extract the `bru_used` information for an observation
+#'   model predictor `bru_pred_expr` object.
+#' @export
+bru_used.bru_pred_expr <- function(x, ...) {
   bru_used(x[["used"]], ...)
 }
 
@@ -424,9 +497,9 @@ bru_used.bru_used <- function(x, labels = NULL, ...) {
 #' @export
 format.bru_used <- function(x, ...) {
   if (is.null(x[["effect"]])) {
-    s <- paste0("effects[<not yet initialised>]")
+    s <- paste0("effect[<not yet initialised>]")
   } else {
-    s <- paste0("effects[", paste0(x$effect, collapse = ", "), "]")
+    s <- paste0("effect[", paste0(x$effect, collapse = ", "), "]")
   }
   if (is.null(x[["latent"]])) {
     s <- paste0(s, ", latent[<not yet initialised>]")

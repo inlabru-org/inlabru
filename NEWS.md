@@ -1,3 +1,79 @@
+# inlabru 2.14.0
+
+## New features
+
+* Add `bru_names()` method for extracting the inlabru standardised names of
+  fixed effects, latent components, and hyperparameters from a fitted `bru`
+  object. (version `2.13.0.9011`)
+* Add `bm_logitaverage()` mapper, for weighted logit-averages
+  (version `2.13.0.9010`)
+* Add `bm_reparam()` mapper, for fixed-matrix reparameterisations of existing
+  mappers (version `2.13.0.9019`)
+* Add `bru_comp_env_extra()` getter and setter methods for the `env_extra`
+  element of `bru_comp()` objects, to allow storing extra information for use in
+  component definitions. Mostly for internal use, but may be used by external
+  packages needing to store and access special data.
+  (version `2.13.0.9035`)
+* Add `bru_input_text()` methods for extracting the component input information
+  as text, e.g. for use in error messages (version `2.13.0.9036`)
+
+## Updated features
+
+* Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
+  the support for `inla.rgeneric`, to standardise where to store a
+  pre-constructed mapper, so that external packages will no longer need to
+  add their own `bru_get_mapper()` methods for their r/cgeneric sub-classes,
+  if the mapper is pre-computed.
+  (version `2.13.0.9005`)
+* Remove unused `group` and `replicate` parts of each latent component, speeding
+  up component evaluation and linearisation. (version `2.13.0.9006`)
+* Allow index extraction from duplicated tags in `bru_index()`, returning
+  all matching indices. (version `2.13.0.9014`)
+* Code refactor and storage updates for `bru_obs()` and `bru_comp()` objects
+  to prepare for future extensions. For 2.14, the compatibility option
+  `bru_compat_pre_2_14_enable` is set to `TRUE` (version `2.13.0.9015`,
+  `2.13.0.9017`, `2.13.0.9018`)
+* Add `block_response` element to `bru_obs(aggregate_input)` list input,
+  to allow specifying a block-wise response variable to match for aggregated
+  predictors. (version `2.13.0.9016`)
+* Deprecate the `bru_obs(allow_combine)` argument with its logical inverse,
+  `bru_obs(is_rowwise)`, to make the meaning clearer.
+  (version `2.13.0.9017`)
+* Speed up `control.gcpo` friends structure generation for `bru_obs()` with
+  large numbers of samplers or observations. (version `2.13.0.9028` with further
+  speedup in `2.13.0.9029`)
+* Only enable `control.gcpo` computation in the final `inla()` iteration
+  (version `2.13.0.9030`)
+* Only enable `control.gcpo` for "cp" models if `control.gcpo` list input
+  is supplied (version `2.13.0.9031`)
+* Set option `bru_compress_cp = FALSE` by default, to avoid dense precision
+  matrix blocks (version `2.13.0.9031`)
+* Convert `sample.lgcp()` to `sf` internals and output format
+  (version `2.13.0.9033`).
+
+## Bug fixes
+
+* Fix logic for `bru_set_missing<inla.surv>()` to correctly handle the
+  `inla.surv()` class variations (version `2.13.0.9002`)
+* Handle changing number of hyperparameters in inla tracing
+  (version `2.13.0.9004`)
+* Robustify internal `extended_bind_rows()` method for unifying XY/XYZ `sf`
+  coordinate columns (version `2.13.0.9009`)
+* Robustify sf coordinate handling in `generate()` and `predict()` 
+  (version `2.13.0.9027`)
+* Robustify sf coordinate handling in `bru_obs_family_cp()`  for unifying XY/XYZ
+  coordinate columns
+  (version `2.13.0.9033`)
+* Add logic for `bru_fill_missing()` to handle missing values in `sf` input
+  data, so that e.g. `bru_fill_missing(input, input, input$values)` works as
+  expected (version `2.13.0.9022`)
+* Handle `bru` object upgrades from 2.12.0; the 2.12.0.9014 upgrade step needed
+  to introduce the `"bru_obs"` class name earlier, and upgrades through
+  2.13.0.9017, that introduced a new predictor expression storage system
+  (version `2.13.0.9024`)
+* Fix bug in `bru_obs_control_gcpo()` for multi-observation models.
+  (version `2.13.0.9025`)
+
 # inlabru 2.13.0
 
 ## New features
@@ -52,9 +128,11 @@
 * Allow `n_block` in `input` argument to `bm_aggregate` and
   `bm_logsumexp` evaluation methods, overriding the optional mapper
   object setting (version `2.12.0.9005`)
-* Allow `character` block information in `bm_aggregate` and
+* (Note: due to the difficulty of ensuring correct output ordering,
+   and `fmesher` will refuse `character` block input from version `0.5.0`.
+   Was: Allow `character` block information in `bm_aggregate` and
   `bm_logsumexp` mappers, from `fmesher` version `0.2.0.9017`
-  (version `2.12.0.9013`)
+  (version `2.12.0.9013`))
 * Expanded auto-detection of component sizes by checking `Cmatrix` and `graph`
   arguments, if present and `n` is `NULL` (version `2.12.0.9012`)
 * Code refactor to expand `bm_list` mapper list handling, removing unnecessary

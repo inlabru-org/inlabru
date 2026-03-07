@@ -2,7 +2,7 @@ test_that("Missing data infilling", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
 
   points <-
     sp::SpatialPointsDataFrame(
@@ -39,7 +39,6 @@ test_that("Missing data infilling", {
 
   expect_equal(val2, val0)
 })
-
 
 
 test_that("Laplace distribution", {

@@ -102,7 +102,7 @@ bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
     return(mappers[[1]])
   }
   mapper_ <- bm_sum(mappers, single_input = TRUE)
-  return(mapper_)
+  mapper_
 }
 
 #' @export
@@ -112,22 +112,24 @@ bru_mapper_repeat <- function(...) {
 }
 
 #' @export
-#' @rdname bm_repeat
+#' @rdname ibm_n
+#'
 ibm_n.bm_repeat <- function(mapper, ...) {
   ibm_n(mapper[["mapper"]], ...) * mapper[["n_rep"]]
 }
 #' @export
-#' @rdname bm_repeat
+#' @rdname ibm_n_output
+#'
 ibm_n_output.bm_repeat <- function(mapper, ...) {
   ibm_n_output(mapper[["mapper"]], ...)
 }
 
 #' @export
-#' @rdname bm_repeat
+#' @rdname ibm_values
+#'
 ibm_values.bm_repeat <- function(mapper, ...) {
   seq_len(ibm_n(mapper, ...))
 }
-
 
 
 bm_repeat_sub_lin <- function(mapper, input, state,
@@ -154,10 +156,10 @@ bm_repeat_sub_lin <- function(mapper, input, state,
 }
 
 
-
-#' @describeIn bm_repeat The input should take the format of the
+#' @describeIn ibm_jacobian The input should take the format of the
 #'   repeated submapper.
 #' @export
+#'
 ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
                                    inla_f = FALSE,
                                    multi = FALSE,
@@ -180,12 +182,13 @@ ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
       n_rep = mapper[["n_rep"]]
     )
   }
-  return(A)
+  A
 }
 
 
 #' @export
-#' @rdname bm_repeat
+#' @rdname ibm_eval
+#'
 ibm_eval.bm_repeat <- function(mapper, input, state,
                                multi = FALSE,
                                ...,
@@ -205,7 +208,8 @@ ibm_eval.bm_repeat <- function(mapper, input, state,
 
 
 #' @export
-#' @rdname bm_repeat
+#' @rdname ibm_linear
+#'
 ibm_linear.bm_repeat <- function(mapper, input, state,
                                  ...) {
   sub_lin <-
@@ -230,11 +234,10 @@ ibm_linear.bm_repeat <- function(mapper, input, state,
 }
 
 
-
-
-#' @describeIn bm_repeat
+#' @describeIn ibm_invalid_output
 #' Passes on the input to the corresponding method.
 #' @export
+#'
 ibm_invalid_output.bm_repeat <- function(mapper, input, state,
                                          ...) {
   idx <- bm_repeat_indexing(

@@ -7,12 +7,12 @@ download_dat <- read.csv(paste0(
   "https://raw.github.com/tmeeha/inlaSVCBC/master/code/modeling_data.csv"
 ))
 
-robins_subset <- download_dat %>%
+robins_subset <- download_dat |>
   select(
     circle, bcr, state, year, std_yr, count, log_hrs,
     lon, lat, obs
-  ) %>%
-  mutate(year = year + 1899) %>%
+  ) |>
+  mutate(year = year + 1899) |>
   filter(
     state %in% c(
       "TEXAS", "OKLAHOMA", "KANSAS", "MISSOURI",

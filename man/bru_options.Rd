@@ -28,7 +28,7 @@ bru_options_reset()
 bru_options_set_local(..., .reset = FALSE, .envir = parent.frame())
 }
 \arguments{
-\item{...}{A collection of named options, optionally including one or more
+\item{\dots}{A collection of named options, optionally including one or more
 \code{\link{bru_options}} objects. Options specified later override the previous
 options.}
 
@@ -104,38 +104,44 @@ automatically reset using \code{withr::defer()}.
 
 For \code{bru_options} and \code{bru_options_set}, recognised options are:
 \describe{
-\item{bru_verbose}{logical or numeric; if \code{TRUE}, log messages of \code{verbosity}
-\eqn{\le 1} are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, log messages
-of
-verbosity \eqn{\le}\code{bru_verbose} are printed.
+\item{bru_verbose}{
+numeric or logical; if \code{TRUE}, log messages with \code{verbosity} \eqn{\le}
+1 are printed by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric, messages with
+\code{verbosity} \eqn{\le} \code{bru_verbose} are printed.
 For line search details, set \code{bru_verbose=2} or \code{3}.
-Default: 0, to not print any messages}
-\item{bru_verbose_store}{logical or numeric; if \code{TRUE}, log messages of
-\code{verbosity} \eqn{\le 1} are stored by \code{\link[=bru_log_message]{bru_log_message()}}. If numeric,
-log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all
-messages.}
-\item{bru_run}{If TRUE, run inference. Otherwise only return configuration
-needed to run inference.}
+Default: 0, to not print any messages.}
+\item{bru_verbose_store}{
+numeric or logical, as for \code{bru_verbose}, but controls what messages
+are stored in the global log object.
+Default: \code{Inf}, to store all messages.}
 \item{bru_max_iter}{maximum number of inla iterations, default 10.
-Also see the \code{bru_method$rel_tol} and related options below.}
-\item{bru_initial}{An \code{inla} object returned from previous calls of
-\code{INLA::inla}, \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting
-values for the latent variables. This will be used as a
-starting point for further improvement of the approximate posterior.}
-\item{bru_int_args}{List of arguments passed all the way to the
-integration method \code{ipoints} and \code{int.polygon} for 'cp' family models;
+Also see \code{bru_method$rel_tol} and related options below.}
+\item{bru_run}{
+If \code{TRUE}, run inference. Otherwise only return configuration needed to
+run inference.}
+\item{bru_initial}{
+An \code{inla} object returned from previous calls of \code{INLA::inla}, \code{\link[=bru]{bru()}}
+or \code{\link[=lgcp]{lgcp()}}, or a list of named vectors of starting values for the
+latent variables. This will be used as a starting point for further
+improvement of the approximate posterior.}
+\item{bru_int_args}{
+List of arguments passed all the way to the integration method
+\code{\link[fmesher:fm_int]{fmesher::fm_int()}} for 'cp' family models;
 \describe{
-\item{method}{"stable" or "direct". For "stable" (default) integration points
-are aggregated to mesh vertices.}
+\item{method}{
+"stable" or "direct". For "stable" (default) integration points are
+aggregated to mesh vertices.}
 \item{nsub1}{Number of integration points per knot interval in 1D.
 Default 30.}
 \item{nsub2}{Number of integration points along a triangle edge for 2D.
 Default 9.}
-\item{nsub}{Deprecated parameter that overrides \code{nsub1} and \code{nsub2} if set.
-Default \code{NULL}.}
+\item{nsub}{
+Deprecated parameter that overrides \code{nsub1} and \code{nsub2} if set.
+Default \verb{<not set>}.}
 }
 }
-\item{bru_method}{List of arguments controlling the iterative inlabru method:
+\item{bru_method}{
+List of arguments controlling the iterative inlabru method:
 \describe{
 \item{taylor}{'pandemic'
 (default, from version 2.1.15).}
@@ -149,38 +155,59 @@ methods, or one or more of
 }
 To disable line search, set to an empty vector. Line search is not
 available for \code{taylor="legacy"}.}
-\item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
-multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
-\item{rel_tol}{Stop the iterations when the largest change in linearisation
-point
-(the conditional latent state mode) in relation to the estimated posterior
+\item{factor}{
+Numeric, \eqn{> 1} determining the line search step scaling multiplier.
+Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+\item{rel_tol}{
+Stop the iterations when the largest change in linearisation point (the
+conditional latent state mode) in relation to the estimated posterior
 standard deviation is less than \code{rel_tol}. Default 0.1 (ten percent).}
-\item{max_step}{The largest allowed line search step factor. Factor 1 is the
-full INLA step. Default is 2.}
-\item{line_opt_method}{Which method to use for the line search optimisation
-step.
-Default "onestep", using a quadratic approximation based on the value and
+\item{max_step}{
+The largest allowed line search step factor. Factor 1 is the full INLA
+step. Default is 2.}
+\item{line_opt_method}{
+Which method to use for the line search optimisation step. Default
+"onestep", using a quadratic approximation based on the value and
 gradient at zero, and the value at the current best step length guess.
-The method "full" does line optimisation on the full nonlinear predictor;
-this is slow and intended for debugging purposes only.}
+The method "full" does line optimisation on the full nonlinear
+predictor; this is slow and intended for debugging purposes only.}
 }
 }
 \item{bru_compress_cp}{logical; when \code{TRUE}, compress the
 \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
-part of the Poisson process likelihood (\code{family="cp"}) into a single term,
-with \eqn{y=n}{y=n}, and predictor \code{mean(eta)}. Default: \code{TRUE}}
-\item{bru_debug}{logical; when \code{TRUE}, activate temporary debug features for
-package development. Default: \code{FALSE}}
+part of the Poisson process likelihood (\code{family = "cp"}) into
+either a single term,
+with \eqn{y=n}{y=n}, and predictor \code{mean(eta)}, or a blockwise version of
+this. Default: \code{FALSE} (was \code{TRUE} prior to version \verb{2.13.0.9031}.)}
+\item{bru_debug}{
+logical; when \code{TRUE}, activate temporary debug features for package
+development. Default: \code{FALSE}}
+\item{bru_compat_pre_2_14_enable}{
+logical; when \code{TRUE}, enable compatibility features for inlabru versions
+prior to 2.14. Set to \code{FALSE} to test external package compatibility
+updates. Default: \code{TRUE} before version 2.14, and will be set to \code{FALSE}
+by default in a later version.}
 \item{\code{inla()} options}{
 All options not starting with \code{bru_} are passed on to \code{inla()}, sometimes
 after altering according to the needs of the inlabru method.
+
 Warning:
 Due to how inlabru currently constructs the \code{inla()} call, the \code{mean},
 \code{prec}, \code{mean.intercept}, and \code{prec.intercept} settings in
-\code{control.fixed} will have no
-effect. Until a more elegant alternative has been implemented, use explicit
-\code{mean.linear} and \code{prec.linear} specifications in each
-\code{model="linear"} component instead.
+\code{control.fixed} will have no effect. Until a more elegant alternative
+has been implemented, use explicit \code{mean.linear} and \code{prec.linear}
+specifications in each \code{model="linear"} component instead.
+
+The following \code{inla()} options have inlabru specific defaults:
+\describe{
+\item{\code{E}}{Default \code{1}.}
+\item{\code{Ntrials}}{Default \code{1L}.}
+\item{\code{control.compute}}{
+Default \code{list(config = TRUE, control.gcpo = list())}.}
+\item{\code{control.inla}}{Default \code{list(int.strategy = "auto")}.}
+\item{\code{control.fixed}}{
+Default \code{list(expand.factor.strategy = "inla")}.}
+}
 }
 }
 }

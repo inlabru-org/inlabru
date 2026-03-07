@@ -3,58 +3,17 @@
 \name{bm_sum}
 \alias{bm_sum}
 \alias{bru_mapper_sum}
-\alias{ibm_n.bm_sum}
-\alias{ibm_n_output.bm_sum}
-\alias{ibm_values.bm_sum}
-\alias{ibm_is_linear.bm_sum}
-\alias{ibm_jacobian.bm_sum}
-\alias{ibm_eval.bm_sum}
-\alias{ibm_linear.bm_sum}
-\alias{ibm_invalid_output.bm_sum}
 \alias{[.bm_sum}
 \alias{[.bru_mapper_sum}
-\alias{ibm_names.bm_sum}
-\alias{ibm_names<-.bm_sum}
-\alias{ibm_names<-.bru_mapper_sum}
 \title{Mapper for adding multiple mappers}
 \usage{
 bm_sum(mappers, single_input = FALSE)
 
 bru_mapper_sum(...)
 
-\method{ibm_n}{bm_sum}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_n_output}{bm_sum}(mapper, input, state = NULL, ...)
-
-\method{ibm_values}{bm_sum}(mapper, inla_f = FALSE, multi = FALSE, ...)
-
-\method{ibm_is_linear}{bm_sum}(mapper, multi = FALSE, ...)
-
-\method{ibm_jacobian}{bm_sum}(
-  mapper,
-  input,
-  state = NULL,
-  inla_f = FALSE,
-  multi = FALSE,
-  ...,
-  sub_lin = NULL
-)
-
-\method{ibm_eval}{bm_sum}(mapper, input, state, multi = FALSE, ..., sub_lin = NULL)
-
-\method{ibm_linear}{bm_sum}(mapper, input, state, ...)
-
-\method{ibm_invalid_output}{bm_sum}(mapper, input, state, multi = FALSE, ...)
-
 \method{[}{bm_sum}(x, i, drop = TRUE)
 
 \method{[}{bru_mapper_sum}(x, i, drop = TRUE)
-
-\method{ibm_names}{bm_sum}(mapper)
-
-\method{ibm_names}{bm_sum}(mapper) <- value
-
-\method{ibm_names}{bru_mapper_sum}(mapper) <- value
 }
 \arguments{
 \item{mappers}{A list of \code{bru_mapper} objects.}
@@ -64,27 +23,7 @@ sub-mappers. Otherwise, the input should be a list, data.frame, or matrix.
 If the \code{mappers} list has named entries, the \code{input} can reference their
 corresponding sub-mapper using its name.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{multi}{logical;
-If \code{TRUE} (or positive), recurse one level into sub-mappers}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+\item{\dots}{Arguments passed on to \code{\link[=bm_sum]{bm_sum()}}}
 
 \item{x}{object from which to extract element(s)}
 
@@ -95,9 +34,6 @@ For \verb{[.bm_sum}, whether to extract an individual mapper when
 \code{i} identifies a single element. If \code{FALSE}, a list of sub-mappers is
 returned (suitable e.g. for creating a new \code{bm_sum} object).
 Default: \code{TRUE}}
-
-\item{value}{a character vector of the same length as the number
-of sub-mappers in the mapper}
 }
 \value{
 A \code{bm_sum} object.
@@ -107,36 +43,12 @@ A \code{bm_sum} object.
 \code{bm_sum} object (for drop \code{FALSE}) or an individual sub-mapper
 (for drop \code{TRUE}, and \code{i} identifies a single element)
 }
-
-\itemize{
-\item The \code{names()} method for \code{bm_sum} returns the names from the
-sub-mappers list
-}
 }
 \description{
 Defines a mapper that adds the effects of each submapper.
 The \code{ibm_n()} method returns the sum of \code{ibm_n(mappers[[k]])}, and
 \code{ibm_values()} returns \code{seq_len(ibm_n(mapper))}.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_sum)}: Accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bm_sum]{ibm_names.bm_sum()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-
-\item \code{ibm_invalid_output(bm_sum)}: Accepts a list with
-named entries, or a list with unnamed but ordered elements.
-The names must match the sub-mappers, see \code{\link[=ibm_names.bm_sum]{ibm_names.bm_sum()}}.
-Each list element should take a format accepted by the corresponding
-sub-mapper. In case each element is a vector, the input can be given as a
-data.frame with named columns, a matrix with named columns, or a matrix
-with unnamed but ordered columns.
-
-}}
 \examples{
 (m <- bm_sum(list(a = bm_index(3), b = bm_index(2))))
 ibm_n(m)
@@ -147,6 +59,7 @@ ibm_eval(
   list(a = 1:3, b = c(1, 1, 2)),
   seq_len(ibm_n(m))
 )
+
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
@@ -156,24 +69,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

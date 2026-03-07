@@ -1,6 +1,7 @@
 \donttest{
 if (bru_safe_inla() &&
-    require(ggplot2, quietly = TRUE)) {
+    require(ggplot2, quietly = TRUE) &&
+    require(patchwork, quietly = TRUE)) {
 
   # The 'bru_obs()' (previously 'like()') function's main purpose is to set up
   # observation models, both for single- and multi-likelihood models.
@@ -73,6 +74,6 @@ if (bru_safe_inla() &&
     ylim(0, 4) +
     ggtitle("Joint model")
 
-  multiplot(p1, p2, pj)
+  (p1 / p2 / pj)
 }
 }

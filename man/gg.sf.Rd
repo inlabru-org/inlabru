@@ -13,7 +13,7 @@
 where the geometry name is obtained from \code{attr(data, "sf_column")}.
 This is merged with the user supplied mapping.}
 
-\item{...}{Arguments passed on to \code{geom_sf} or \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_sf} or \code{geom_tile}.}
 
 \item{geom}{Either "sf" (default) or "tile". For "tile", uses
 \code{geom_tile(..., stat = "sf_coordinates")}, intended for converting point data
@@ -30,7 +30,7 @@ Requires the \code{ggplot2} package.
 \examples{
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      requireNamespace("terra", quietly = TRUE) &&
+      bru_safe_terra(quietly = TRUE) &&
       require("tidyterra", quietly = TRUE)) {
     # Load Gorilla data
 

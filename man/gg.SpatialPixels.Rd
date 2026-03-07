@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{A \code{sp::SpatialPixels} object.}
 
-\item{...}{Arguments passed on to \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
 A \code{geom_tile} return value.
@@ -20,7 +20,7 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   bru_safe_sp()) {
   # Load Gorilla data
 

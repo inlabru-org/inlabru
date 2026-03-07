@@ -1,7 +1,7 @@
 test_that("2D LGCP fitting and prediction: Plot sampling", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
 
   options <- list(
@@ -62,7 +62,7 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   )
 
   expect_equal(
-    sum(fit$bru_info$lhoods[[1]]$E),
+    sum(as_bru_obs_list(fit)[[1]]$response_data$BRU_E),
     7.092,
     tolerance = lowtol
   )

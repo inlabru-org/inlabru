@@ -1,6 +1,7 @@
 test_that("mdata", {
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.02")
+  set.seed(12345L)
 
   sim.poisson <- function(prob, m) {
     stopifnot(length(prob) == length(m) && length(prob) > 0)
@@ -155,11 +156,11 @@ test_that("mdata", {
 })
 
 
-
 test_that("surv", {
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.26")
 
+  set.seed(12345L)
   df <- data.frame(
     time = 1:4,
     event = c(1, 1, 0, 1),

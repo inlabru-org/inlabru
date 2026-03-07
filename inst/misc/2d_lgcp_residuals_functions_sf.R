@@ -160,8 +160,8 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
 set_csc <- function(residuals, col_theme) {
   # Store data for the colour scale of the plots for each type of residual
   cscrange <- data.frame(
-    residuals %>%
-      group_by(Type) %>%
+    residuals |>
+      group_by(Type) |>
       summarise(maxabs = max(abs(mean)))
   )
 
@@ -221,8 +221,8 @@ set_csc <- function(residuals, col_theme) {
 
 residual_plot <- function(samplers, residuals, csc, model_name) {
   # Initialise the scaling residuals plot
-  samplers$Residual <- residuals %>%
-    filter(Type == "Scaling Residuals") %>%
+  samplers$Residual <- residuals |>
+    filter(Type == "Scaling Residuals") |>
     pull(mean)
   scaling <- ggplot() +
     gg(samplers, aes(fill = Residual), alpha = 1, colour = NA) +
@@ -231,8 +231,8 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
     labs(subtitle = paste(model_name, "Scaling"))
 
   # Initialise the inverse residuals plot
-  samplers$Residual <- residuals %>%
-    filter(Type == "Inverse Residuals") %>%
+  samplers$Residual <- residuals |>
+    filter(Type == "Inverse Residuals") |>
     pull(mean)
   inverse <- ggplot() +
     gg(samplers, aes(fill = Residual), alpha = 1, colour = NA) +
@@ -241,8 +241,8 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
     labs(subtitle = paste(model_name, "Inverse"))
 
   # Initialise the Pearson residuals plot
-  samplers$Residual <- residuals %>%
-    filter(Type == "Pearson Residuals") %>%
+  samplers$Residual <- residuals |>
+    filter(Type == "Pearson Residuals") |>
     pull(mean)
   pearson <- ggplot() +
     gg(samplers, aes(fill = Residual), alpha = 1, colour = NA) +

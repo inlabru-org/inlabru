@@ -14,8 +14,9 @@
 #'
 
 import.seals <- function(
-    sealfile = "WestIce2012.csv",
-    icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif") {
+  sealfile = "WestIce2012.csv",
+  icefile = "reflectance_0.0025deg_grid_modis_20120328_1310.tif"
+) {
   #' Load seal data
 
   seals <- utils::read.csv(sealfile)

@@ -9,8 +9,8 @@
 #' @keywords internal
 #'
 #' @param manifold Either "R1", "S1", "R2", or "S2", from
-#'     `fm_manifold(mesh)`, or a full `fm_mesh_2d` or
-#'     `fm_mesh_1d` object.
+#'     `fm_manifold(mesh)`, or an object supported by
+#'     [fmesher::fm_manifold()].
 #' @param dist A vector of distances at which to calculate the
 #'     covariances/correlations
 #' @param log.range A scalar or a list (mean, sd), such as produced by
@@ -82,18 +82,13 @@ materncov.bands <- function(manifold, dist, log.range,
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (inherits(
-      manifold,
-      c("fm_mesh_2d", "inla.mesh", "fm_mesh_1d", "inla.mesh.1d")
-    )) {
-      if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
-        S1.L <- diff(manifold$interval)
-      }
-      manifold <- fm_manifold(manifold)
+    if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
+      S1.L <- diff(manifold$interval)
     }
+    manifold <- fm_manifold(manifold)
   }
-  if (manifold == "R1") {
-    d <- 1
+  if (fm_manifold(manifold, "R")) {
+    d <- fm_manifold_dim(manifold)
     calc.corr <- calc.corr.R
     calc.cov <- calc.cov.R
   } else if (manifold == "S1") {
@@ -103,10 +98,6 @@ materncov.bands <- function(manifold, dist, log.range,
     d <- 1
     calc.corr <- calc.corr.S1
     calc.cov <- calc.cov.S1
-  } else if (manifold == "R2") {
-    d <- 2
-    calc.corr <- calc.corr.R
-    calc.cov <- calc.cov.R
   } else if (manifold == "S2") {
     d <- 2
     calc.corr <- calc.corr.S2
@@ -167,7 +158,6 @@ materncov.bands <- function(manifold, dist, log.range,
 }
 
 
-
 #' @title Posteriors of SPDE hyper parameters and Matern correlation or
 #'   covariance function.
 #'
@@ -193,7 +183,7 @@ spde.posterior <- function(result, name, what = "range",
                            quantile = 0.95) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
-  spdespec <- result$bru_info$model$effects[[name]]$main$model
+  spdespec <- as_bru_comp_list(result)[[name]]$main$model
   spderesult <- INLA::inla.spde.result(result, name, spdespec)
 
   if (what == "matern.correlation" || what == "matern.covariance") {
@@ -211,7 +201,7 @@ spde.posterior <- function(result, name, what = "range",
       corr <- TRUE
       ylab <- "Matern Correlation"
       out <- materncov.bands(
-        result$bru_info$model$effects[[name]]$main$mapper$mesh,
+        as_bru_comp_list(result)[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = NULL,
@@ -221,7 +211,7 @@ spde.posterior <- function(result, name, what = "range",
       corr <- FALSE
       ylab <- "Matern Covariance"
       out <- materncov.bands(
-        result$bru_info$model$effects[[name]]$main$mapper$mesh,
+        as_bru_comp_list(result)[[name]]$main$mapper$mesh,
         dist = x,
         log.range = log.range,
         log.variance = log.variance,
@@ -234,9 +224,9 @@ spde.posterior <- function(result, name, what = "range",
       x = x, q0.5 = out$median, lower = out$lower, upper = out$upper,
       median = out$median
     )
-    colnames(df)[3] <- paste0("q", paste0(round((1 - quantile) / 2, 5), "%"))
+    colnames(df)[3] <- paste0("q", paste0(round((1 - quantile) / 2, 5), ""))
     colnames(df)[4] <-
-      paste0("q", paste0(round(1 - (1 - quantile) / 2, 5), "%"))
+      paste0("q", paste0(round(1 - (1 - quantile) / 2, 5), ""))
     attr(df, "type") <- "1d"
     attr(df, "misc") <- list(dims = "x", predictor = c("distance", ylab))
     class(df) <- list("prediction", "data.frame")

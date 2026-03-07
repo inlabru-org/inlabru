@@ -25,12 +25,13 @@ and covariates needed to evaluate the model.}
 
 \item{data_extra}{Additional data for the predictor evaluation. Variables
 with the same name as in \code{data} will be ignored, unless accessed via
-\code{.data_extra.[["name"]]} or \code{.data_extra.$name}.}
+\code{.data_extra.[["name"]]} or \code{.data_extra.$name}, or via pronouns;
+see Details.}
 
 \item{effects}{A list where each element is list of named evaluated effects,
 each computed by \code{\link[=evaluate_effect_single_state.bru_comp_list]{evaluate_effect_single_state.bru_comp_list()}}}
 
-\item{predictor}{Either a formula or expression}
+\item{predictor}{Either a formula or \link{bru_pred_expr} expression}
 
 \item{used}{A \code{\link[=bru_used]{bru_used()}} object, or NULL (default)}
 
@@ -58,8 +59,20 @@ Evaluate component effects or expressions, based on a bru model and one or
 several states of the latent variables and hyperparameters.
 }
 \details{
-For each component, e.g. "name", the state values are available as
-\code{name_latent}, and arbitrary evaluation can be done with \code{name_eval(...)},
-see \code{\link[=bru_comp_eval]{bru_comp_eval()}}.
+For each component, e.g. "name", the latent state values are
+available as \code{name_latent}, and arbitrary evaluation can be done with
+\code{name_eval(...)}, see \code{\link[=bru_comp_eval]{bru_comp_eval()}}.
+
+The evaluation supports several \code{\link[rlang:as_data_mask]{rlang::as_data_pronoun()}} data masking
+pronouns, to access variables from different data sources, and some of
+these also have corresponding full objects, with an appended \code{.} in the
+name. The full objects can be passed as arguments to functions.
+\describe{
+\item{.effect/.effect.}{refers to the \code{effects} vectors}
+\item{.latent/.latent.}{refers to the latent state vectors}
+\item{.data/.data.}{refers to the main \code{data} argument}
+\item{.data_extra/.data_extra.}{refers to the \code{data_extra} argument}
+\item{.env}{refers to the evaluation environment of the predictor}
+}
 }
 \keyword{internal}

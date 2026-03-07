@@ -8,26 +8,36 @@
 \alias{as_bru_obs_list.list}
 \alias{as_bru_obs_list.bru_obs_list}
 \alias{as_bru_obs_list.bru}
+\alias{as_bru_obs_list.bru_info}
+\alias{as_bru_obs_list.bru_model}
 \title{Conversion methods for \code{bru_obs} and \code{bru_obs_list} objects}
 \usage{
 as_bru_obs(x, ...)
 
-as_bru_obs_list(x, ...)
+as_bru_obs_list(x, .tag = NULL)
 
 \method{as_bru_obs}{bru_obs}(x, ...)
 
-\method{as_bru_obs_list}{bru_obs}(x, ...)
+\method{as_bru_obs_list}{bru_obs}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{list}(x, ...)
+\method{as_bru_obs_list}{list}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{bru_obs_list}(x, ...)
+\method{as_bru_obs_list}{bru_obs_list}(x, .tag = NULL)
 
-\method{as_bru_obs_list}{bru}(x, ...)
+\method{as_bru_obs_list}{bru}(x, .tag = NULL)
+
+\method{as_bru_obs_list}{bru_info}(x, .tag = NULL)
+
+\method{as_bru_obs_list}{bru_model}(x, .tag = NULL)
 }
 \arguments{
 \item{x}{An object to convert to \link{bru_obs} or \link{bru_obs_list}}
 
 \item{\dots}{Additional arguments passed to sub-methods.}
+
+\item{.tag}{character; optional name for the single observation model in the
+returned \link{bru_obs_list} object. Default is \code{NULL}, which results in
+automatic naming based on the \code{tag} attribute of \code{x}, if present.}
 }
 \value{
 An object of class \link{bru_obs} or \link{bru_obs_list}.
@@ -39,4 +49,3 @@ objects.
 \seealso{
 \code{\link[=as_bru_comp_list]{as_bru_comp_list()}}
 }
-\keyword{internal}

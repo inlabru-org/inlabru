@@ -46,7 +46,7 @@ test_that("Latent models: RW2 mapping, data is list with different I/O sizes", {
   formula <- obs ~ rep(time, times = 4)
   fit1 <- bru(cmp1,
     formula = formula, data = data1, family = "gaussian",
-    allow_combine = TRUE
+    is_rowwise = FALSE
   )
 
   expect_equal(

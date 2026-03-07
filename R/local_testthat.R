@@ -37,7 +37,6 @@ local_bru_testthat_tolerances <- function(tolerances = c(1e-4, 1e-2, 1e-1),
 }
 
 
-
 #' @describeIn local_testthat Wrapper for [bru_options_set_local()],
 #' to locally override the global package options.
 #' @return `local_bru_options_set()` returns a copy of the global override
@@ -54,7 +53,6 @@ local_bru_options_set <- function(...,
                                   envir = parent.frame()) {
   bru_options_set_local(..., .reset = .reset, .envir = envir)
 }
-
 
 
 #' @export
@@ -81,7 +79,7 @@ local_basic_fixed_effect_testdata <- function() {
 # @returns logical; If the option setting was successful, `TRUE` is returned,
 # otherwise `FALSE`.
 local_inla_options_set <- function(...,
-                                   envir = parent.frame(),
+                                   .envir = parent.frame(),
                                    .save_only = FALSE) {
   # Set INLA options
   inla_options <- list(...)
@@ -113,7 +111,7 @@ local_inla_options_set <- function(...,
 
       withr::defer(
         INLA::inla.setOption(name, old_inla_options[[name]]),
-        envir
+        .envir
       )
     }
   }
@@ -143,24 +141,37 @@ local_bru_safe_inla <- function(multicore = FALSE,
     )
     if (inherits(inla.call, "simpleError")) {
       return(testthat::skip(
-        "inla.getOption('inla.call') failed, skip INLA tests."
+        "inla.getOption('inla.call') failed, skipping INLA tests."
       ))
     }
+
+    if (all(grepl("\\.run$", inla.call))) {
+      inla.binary <- gsub("\\.run$", "", inla.call)
+      if (!file.exists(inla.binary)) {
+        return(testthat::skip(
+          paste0(
+            "INLA binary '", inla.binary, "' not found. ",
+            "INLA not installed correctly, or with platform mismatch.\n",
+            "Skipping INLA tests."
+          )
+        ))
+      }
+    }
+
 
     # Save the num.threads option so it can be restored
     local_inla_options_set(
       num.threads = NULL,
-      envir = envir,
+      .envir = envir,
       .save_only = TRUE
     )
 
     local_inla_options_set(
       inla.timeout = 60,
-      fmesher.timeout = 30,
       fmesher.evolution = 2L,
       fmesher.evolution.warn = TRUE,
       fmesher.evolution.verbosity = "stop",
-      envir = envir,
+      .envir = envir,
       .save_only = FALSE
     )
 
@@ -193,6 +204,7 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
     # To specifically test pardiso, need to override locally
     control.compute = list(smtp = "taucs"),
     inla.mode = "compact",
+    bru_compat_pre_2_14_enable = FALSE,
     envir = envir
   )
   sp_version <- tryCatch(

@@ -112,7 +112,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   # ))) +
   #   geom_density(aes(distance, after_stat(count))) +
   #   geom_line(aes(distance, est, col = "Plugin"),
-  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) |>
   #               mutate(est = hr(
   #                 abs(distance),
   #                 sig(fit$summary.fixed["sig_theta", "mean"])
@@ -123,7 +123,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #             data = pred
   #   ) +
   #   geom_line(aes(distance, est, col = "1"),
-  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) %>%
+  #             data = data.frame(distance = seq(-8, 8, by = 0.001)) |>
   #               mutate(est = hr(
   #                 abs(distance),
   #                 1
@@ -144,14 +144,14 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #           sum(hr(distance, sig(fit$summary.fixed["sig_theta", "mean"]))),
   #         col = "Plugin"
   #     ),
-  #     data = data.frame(ips) %>% arrange(distance)
+  #     data = data.frame(ips) |> arrange(distance)
   #   ) +
   #   geom_line(
   #     aes(distance,
   #         cumsum(mean) / sum(mean),
   #         col = "Pred"
   #     ),
-  #     data = pred %>% arrange(distance)
+  #     data = pred |> arrange(distance)
   #   ) +
   #   geom_line(
   #     aes(distance,
@@ -159,7 +159,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
   #           sum(hr(distance, 1)),
   #         col = "1"
   #     ),
-  #     data = data.frame(ips) %>% arrange(distance)
+  #     data = data.frame(ips) |> arrange(distance)
   #   )
   ##########
 })

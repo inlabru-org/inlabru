@@ -3,31 +3,21 @@
 \name{bm_fmesher}
 \alias{bm_fmesher}
 \alias{bru_mapper_fmesher}
-\alias{ibm_n.bm_fmesher}
-\alias{ibm_values.bm_fmesher}
-\alias{ibm_jacobian.bm_fmesher}
+\alias{bru_mapper.fm_mesh_2d}
 \title{Mapper for general \code{fmesher} function space objects}
 \usage{
 bm_fmesher(mesh)
 
 bru_mapper_fmesher(...)
 
-\method{ibm_n}{bm_fmesher}(mapper, ...)
-
-\method{ibm_values}{bm_fmesher}(mapper, ...)
-
-\method{ibm_jacobian}{bm_fmesher}(mapper, input, ...)
+\method{bru_mapper}{fm_mesh_2d}(mesh, ...)
 }
 \arguments{
 \item{mesh}{An \code{fmesher} object to map, supported by
 \link[fmesher:fm_basis]{fmesher::fm_basis}\verb{(mesh, input)} and
 \link[fmesher:fm_dof]{fmesher::fm_dof}\code{(mesh)}.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{input}{Data input for the mapper.}
+\item{\dots}{Arguments passed on to \code{\link[=bm_fmesher]{bm_fmesher()}}}
 }
 \value{
 A \code{bm_fmesher} object.
@@ -41,6 +31,14 @@ Handles indexed mapping for all \code{fmesher} classes that support
 \code{fm_mesh_1d} objects, use \code{bru_mapper(mesh, indexed = FALSE)} which
 invokes the \code{\link[=bru_mapper.fm_mesh_1d]{bru_mapper.fm_mesh_1d()}} method.
 }
+\section{Functions}{
+\itemize{
+\item \code{bru_mapper(fm_mesh_2d)}: Equivalent to calling \code{\link[=bm_fmesher]{bm_fmesher()}}.
+Note: Prior to version \verb{2.12.0.9021},
+this returned a \code{bru_mapper_fm_mesh_2d} object. Also see the note for
+\code{\link[=bru_mapper.fm_mesh_1d]{bru_mapper.fm_mesh_1d()}}.
+
+}}
 \examples{
 m <- bm_fmesher(fmesher::fmexample$mesh)
 ibm_n(m)
@@ -55,24 +53,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

@@ -30,7 +30,8 @@
 #'
 #' @examples
 #' \donttest{
-#' if (require("ggplot2", quietly = TRUE)) {
+#' if (require("ggplot2", quietly = TRUE) &&
+#'   require("patchwork", quietly = TRUE)) {
 #'   data(Poisson2_1D)
 #'   p1 <- ggplot(countdata2) +
 #'     geom_point(data = countdata2, aes(x = x, y = count), col = "blue") +
@@ -56,7 +57,7 @@
 #'     geom_point(data = pts2, aes(x = x), y = 0.2, shape = "|", cex = 4) +
 #'     xlab(expression(bold(s))) +
 #'     ylab(expression(lambda(bold(s))))
-#'   multiplot(p1, p2, cols = 1)
+#'   (p1 / p2)
 #' }
 #' }
 NULL

@@ -2,272 +2,33 @@
 % Please edit documentation in R/mappers.R
 \name{bru_mapper_generics}
 \alias{bru_mapper_generics}
-\alias{ibm_n}
-\alias{ibm_n_output}
-\alias{ibm_values}
-\alias{ibm_is_linear}
-\alias{ibm_jacobian}
-\alias{ibm_linear}
-\alias{ibm_simplify}
-\alias{ibm_eval}
-\alias{ibm_eval2}
-\alias{ibm_names}
-\alias{ibm_names<-}
-\alias{ibm_inla_subset}
-\alias{ibm_invalid_output}
-\alias{ibm_n.default}
-\alias{ibm_n_output.default}
-\alias{ibm_values.default}
-\alias{ibm_is_linear.default}
-\alias{ibm_jacobian.default}
-\alias{ibm_linear.default}
-\alias{ibm_simplify.default}
-\alias{ibm_eval.default}
-\alias{ibm_eval2.default}
-\alias{ibm_names.default}
-\alias{ibm_inla_subset.default}
-\alias{ibm_invalid_output.default}
 \title{Generic methods for bru_mapper objects}
-\usage{
-ibm_n(mapper, inla_f = FALSE, ...)
-
-ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
-
-ibm_values(mapper, inla_f = FALSE, ...)
-
-ibm_is_linear(mapper, ...)
-
-ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
-
-ibm_linear(mapper, input, state = NULL, ...)
-
-ibm_simplify(mapper, input = NULL, state = NULL, ...)
-
-ibm_eval(mapper, input, state = NULL, ...)
-
-ibm_eval2(mapper, input, state = NULL, ...)
-
-ibm_names(mapper)
-
-ibm_names(mapper) <- value
-
-ibm_inla_subset(mapper, ...)
-
-ibm_invalid_output(mapper, input, state, ...)
-
-\method{ibm_n}{default}(mapper, inla_f = FALSE, ...)
-
-\method{ibm_n_output}{default}(mapper, input, state = NULL, inla_f = FALSE, ...)
-
-\method{ibm_values}{default}(mapper, inla_f = FALSE, ...)
-
-\method{ibm_is_linear}{default}(mapper, ...)
-
-\method{ibm_jacobian}{default}(mapper, input, state = NULL, ...)
-
-\method{ibm_linear}{default}(mapper, input, state, ...)
-
-\method{ibm_simplify}{default}(mapper, input = NULL, state = NULL, ...)
-
-\method{ibm_eval}{default}(mapper, input, state = NULL, ..., jacobian = NULL)
-
-\method{ibm_eval2}{default}(mapper, input, state, ...)
-
-\method{ibm_names}{default}(mapper, ...)
-
-\method{ibm_inla_subset}{default}(mapper, ...)
-
-\method{ibm_invalid_output}{default}(mapper, input, state, ...)
-}
-\arguments{
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{\dots}{Arguments passed on to other methods}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{value}{a character vector of the same length as the number
-of sub-mappers in the mapper}
-
-\item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
-supplied by internal methods that already have the Jacobian.}
-}
 \description{
 A \code{bru_mapper} sub-class implementation must provide an
-\code{ibm_jacobian()} method. If the model size 'n' and definition
-values 'values' are stored in the object itself, default methods are
-available (see Details). Otherwise the
-\code{ibm_n()} and \code{ibm_values()} methods also need to be provided.
-}
-\section{Functions}{
-\itemize{
-\item \code{ibm_n()}: Implementations must return the size of the latent vector
-being mapped to.
-
-\item \code{ibm_n_output()}: Implementations must return an integer denoting the
-mapper output length.
-The default implementation returns \code{NROW(input)}.
-Mappers such as \code{bm_multi} and \code{bm_collect},
-that can accept \code{list()} inputs require their own methods implementations.
-
-\item \code{ibm_values()}: When \code{inla_f=TRUE}, implementations must return a vector that
-would be interpretable by an \code{INLA::f(..., values = ...)} specification.
-The exception is the method for \code{bm_multi}, that returns a
-multi-column data frame if \code{multi=TRUE}.
-
-\item \code{ibm_is_linear()}: Implementations must return \code{TRUE} or \code{FALSE}.
-If \code{TRUE} (returned by the default method unless the mapper
-contains an \code{is_linear} variable), users of the mapper
-may assume the mapper is linear.
-
-\item \code{ibm_jacobian()}: Implementations must return a (sparse) matrix of size
-\code{ibm_n_output(mapper, input, inla_f)}
-by \code{ibm_n(mapper, inla_f = FALSE)}. The \code{inla_f=TRUE} argument should
-only affect the allowed type of input format.
-
-\item \code{ibm_linear()}: Implementations must return a \link{bm_taylor} object
-The linearisation information includes \code{offset}, \code{jacobian}, and \code{state0}.
-The state information indicates for which state the \code{offset} was evaluated,
-with \code{NULL} meaning all-zero.
-The linearised mapper output is defined as
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{effect(input, state) =
-  offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)
-}\if{html}{\out{</div>}}
-
-The default method calls \code{ibm_eval()} and \code{ibm_jacobian()} to generate
-the needed information.
-
-\item \code{ibm_simplify()}: Implementations must return a \link{bru_mapper} object.
-The default method returns \code{ibm_linear(...)} for linear mappers, and the
-original \code{mapper} for non-linear mappers.
-
-\item \code{ibm_eval()}: Implementations must return a vector of length \code{ibm_n_output(...)}.
-The \code{input} contents must
-be in a format accepted by \code{ibm_jacobian(...)}
-for the mapper.
-
-\item \code{ibm_eval2()}: Implementations must return a list with elements \code{offset} and \code{jacobian}.
-The \code{input} contents must
-be in a format accepted by \code{ibm_jacobian(...)}
-for the mapper.
-
-\item \code{ibm_names()}: Implementations must return a character vector of sub-mapper names, or
-\code{NULL}. Intended for providing information about multi-mappers and mapper
-collections.
-
-\item \code{ibm_names(mapper) <- value}: Set mapper names.
-
-\item \code{ibm_inla_subset()}: Implementations must return a logical vector of \code{TRUE/FALSE} for
-the subset such that, given the full A matrix and values output,
-\code{A[, subset, drop = FALSE]} and \code{values[subset]}
-(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
-to the \code{inla_f = TRUE} version of A and values. The default method uses
-the \code{ibm_values} output to construct the subset indexing.
-
-\item \code{ibm_invalid_output()}: Implementations should return a logical vector of length
-\code{ibm_n_output(mapper, input, state, ...)} indicating which, if any,
-output elements of \code{ibm_eval(mapper, input, state, ...)} are known to be
-invalid.
-For for multi/collect mappers, a list, when given a \code{multi=TRUE} argument.
-
-\item \code{ibm_n(default)}: Returns a non-null element 'n' from the
-mapper object, and gives an error if it doesn't exist. If \code{inla_f=TRUE},
-first checks for a 'n_inla' element.
-
-\item \code{ibm_n_output(default)}: Returns \code{NROW(input)}
-
-\item \code{ibm_values(default)}: Returns a non-null element
-'values' from the mapper object, and \code{seq_len(ibm_n(mapper))} if
-it doesn't exist.
-
-\item \code{ibm_is_linear(default)}: Returns logical
-\code{is_linear} from the mapper object if it exists, and otherwise \code{TRUE}.
-
-\item \code{ibm_jacobian(default)}: Mapper classes must implement their own \code{ibm_jacobian} method.
-
-\item \code{ibm_linear(default)}: Calls \code{ibm_eval()} and \code{ibm_jacobian()}
-and returns a \code{bm_taylor} object.
-The \code{state0} information in the affine mapper indicates for which state
-the \code{offset} was evaluated; The affine mapper output is defined as
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{effect(input, state) =
-  offset(input, state0) + jacobian(input, state0) \%*\% (state - state0)
-}\if{html}{\out{</div>}}
-
-\item \code{ibm_simplify(default)}: Calls \code{ibm_linear()} for linear mappers, and returns the original mapper
-for non-linear mappers.
-
-\item \code{ibm_eval(default)}: Verifies that the mapper is linear
-with \code{ibm_is_linear()}, and then computes a linear mapping
-as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
-a zero vector of length \code{ibm_n_output(...)} is returned.
-
-\item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and
-\code{offset <- ibm_eval(..., jacobian = jacobian)}
-and returns a list with elements \code{offset} and \code{jacobian}, as needed by
-\code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
-their own \code{ibm_eval2} method if joint construction of evaluation and Jacobian
-is more efficient than separate or sequential construction.
-
-\item \code{ibm_names(default)}: Returns \code{NULL}
-
-\item \code{ibm_inla_subset(default)}: Uses
-the \code{ibm_values} output to construct the inla subset indexing, passing
-extra arguments such as \code{multi} on to the methods (this means it supports
-both regular vector values and \code{multi=1} data.frame values).
-
-\item \code{ibm_invalid_output(default)}: Returns an all-\code{FALSE} logical vector.
-
-}}
-\examples{
-# ibm_names
-mapper <- bm_multi(list(A = bm_index(2), B = bm_index(2)))
-ibm_names(mapper)
-ibm_names(mapper) <- c("new", "names")
-ibm_names(mapper)
+\code{\link[=ibm_jacobian]{ibm_jacobian()}} method. If the model size 'n' and definition
+values 'values' are stored in the object itself, default methods \code{\link[=ibm_n]{ibm_n()}}
+and \code{\link[=ibm_values]{ibm_values()}} are
+available. Otherwise the
+\code{\link[=ibm_n]{ibm_n()}} and \code{\link[=ibm_values]{ibm_values()}} methods also need to be provided.
 }
 \seealso{
 \link{bru_mapper} for constructor methods, and
 \link{bru_get_mapper} for hooks to extract mappers from latent model object
 class objects.
 
-\link{bru_mapper}, \code{\link[=bru_get_mapper]{bru_get_mapper()}}
-
-Other mappers: 
-\code{\link{bm_aggregate}()},
-\code{\link{bm_collect}()},
-\code{\link{bm_const}()},
-\code{\link{bm_factor}()},
-\code{\link{bm_fmesher}()},
-\code{\link{bm_harmonics}()},
-\code{\link{bm_index}()},
-\code{\link{bm_linear}()},
-\code{\link{bm_logsumexp}()},
-\code{\link{bm_marginal}()},
-\code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
-\code{\link{bm_multi}()},
-\code{\link{bm_pipe}()},
-\code{\link{bm_repeat}()},
-\code{\link{bm_scale}()},
-\code{\link{bm_shift}()},
-\code{\link{bm_sum}()},
-\code{\link{bm_taylor}()},
-\code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()}
+Other mapper methods: 
+\code{\link{ibm_eval}()},
+\code{\link{ibm_eval2}()},
+\code{\link{ibm_inla_subset}()},
+\code{\link{ibm_invalid_output}()},
+\code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_linear}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_names}()},
+\code{\link{ibm_simplify}()},
+\code{\link{ibm_values}()}
 }
-\concept{mappers}
+\concept{mapper methods}

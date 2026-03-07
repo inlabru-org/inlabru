@@ -9,7 +9,7 @@
 \arguments{
 \item{data}{A SpatRaster object.}
 
-\item{...}{Arguments passed on to \code{geom_spatraster}.}
+\item{\dots}{Arguments passed on to \code{geom_spatraster}.}
 }
 \value{
 The output from `geom_spatraster.
@@ -20,7 +20,7 @@ Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
   # Load Gorilla covariates
 

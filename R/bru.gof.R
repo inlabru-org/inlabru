@@ -135,7 +135,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
     xx <- 0:(nobs + 1L)
     cdff <- function(p) pbinom(xx, size = nobs, prob = p)
     zz <- apply(qq[k, , drop = FALSE], MARGIN = 2, cdff)
-    zz <- apply(zz, MARGIN = 1, mean)
+    zz <- rowMeans(zz)
     pint[[k]] <- vapply(probs, function(pr) xx[sum(zz < pr) + 1L], 0.0)
   }
   pint <- data.frame(do.call(rbind, pint))
@@ -184,7 +184,7 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
       ),
       shape = 20, size = 2
     ) +
-    ggplot2::xlab(all.vars(update.formula(predictor, ~.0))) +
+    ggplot2::xlab(all.vars(update.formula(predictor, . ~ 0))) +
     ggplot2::ylab("count")
 
   attr(pint, "ggp") <- ggp
@@ -192,7 +192,6 @@ bincount <- function(result, predictor, observations, breaks, nint = 20,
   # Return
   pint
 }
-
 
 
 #' Variance and correlations measures for prediction components
@@ -260,5 +259,5 @@ devel.cvmeasure <- function(joint, prediction1, prediction2, samplers = NULL,
     attr(ret, "type") <- tmp[["type"]]
   }
 
-  return(ret)
+  ret
 }

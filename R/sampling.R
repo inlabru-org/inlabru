@@ -36,11 +36,14 @@
 #'   Default `FALSE`. This affects `R` and the permitted values for `strategy`.
 #'
 #' @return A `data.frame` (1D case),
-#'   SpatialPoints (2D flat and 3D spherical surface cases)
-#'   SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
+#'   or `sf` (2D flat and 3D spherical surface cases,
+#'   or 2D/2.5D surface cases with multiple samples).
 #'   For multiple samples, the `data.frame` output has a
 #'   column `'sample'` giving the index for each sample.
 #' object of point locations.
+#'
+#' For the old (pre version `2.13.0.9034`) `sp` output format, use `as(ret,
+#' "Spatial")` or `sf::as_Spatial(ret)`.
 #'
 #' @details
 #' * For crs-less meshes on R2: Lambda is interpreted in the raw coordinate
@@ -64,9 +67,7 @@
 #' @examples
 #' \donttest{
 #' # The INLA package is required
-#' if (bru_safe_inla() &&
-#'   bru_safe_sp() &&
-#'   require("sp")) {
+#' if (bru_safe_inla()) {
 #'   vertices <- seq(0, 3, by = 0.1)
 #'   mesh <- fm_mesh_1d(vertices)
 #'   loglambda <- 5 - 0.5 * vertices
@@ -81,11 +82,9 @@
 #' # The INLA package is required
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   bru_safe_sp() &&
-#'   require("sp") &&
-#'   require("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("sf", quietly = TRUE)) {
-#'   gorillas <- gorillas_sp()
+#'   gorillas <- gorillas_sf
 #'   pts <- sample.lgcp(gorillas$mesh,
 #'     loglambda = 1.5,
 #'     samplers = gorillas$boundary
@@ -93,6 +92,16 @@
 #'   ggplot() +
 #'     gg(gorillas$mesh) +
 #'     gg(pts)
+#'
+#'   pts <- sample.lgcp(gorillas$mesh,
+#'     loglambda = base::scale(gorillas$mesh$loc) * 2,
+#'     samplers = gorillas$boundary,
+#'     ignore.CRS = TRUE
+#'   )
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(pts, aes(color = as.factor(sample))) +
+#'     labs(color = "Sample")
 #' }
 #' }
 #'
@@ -185,7 +194,7 @@ sample.lgcp <- function(mesh,
     }
     input.crs <- fm_crs(mesh)
     use.crs <- !is.na(input.crs) && !ignore.CRS
-    is.geocent <- (mesh$manifold == "S2")
+    is.geocent <- fmesher::fm_crs_is_geocent(mesh)
 
     if (is.geocent || use.crs) {
       strategies <- c("triangulated", "sliced-spherical", "spherical")
@@ -208,14 +217,14 @@ sample.lgcp <- function(mesh,
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
+      internal.crs <- fm_crs("sphere")
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
     } else {
       if (use.crs) {
-        internal.crs <- fm_CRS("sphere", args = list(a = 1, b = 1, units = "m"))
+        internal.crs <- fm_crs("sphere")
       } else {
-        internal.crs <- fm_CRS(NA_character_)
+        internal.crs <- fm_crs(NA_character_)
         mesh$crs <- NULL
       }
     }
@@ -293,23 +302,29 @@ sample.lgcp <- function(mesh,
         if (is.geocent) {
           target.crs <- internal.crs
         } else if (use.crs) {
-          target.crs <- fm_CRS(input.crs)
+          target.crs <- fm_crs(input.crs)
         } else {
-          target.crs <- fm_CRS(NA_character_)
+          target.crs <- fm_crs(NA_character_)
         }
         if (sum(Npoints) > 0) {
-          points <- sp::SpatialPoints(points, proj4string = target.crs)
+          points <- sf::st_as_sf(
+            as.data.frame(points),
+            coords = seq_len(ncol(points)),
+            crs = target.crs
+          )
 
           A <- fm_basis(mesh, points)
           lambda_ratio <- exp(as.vector(A %*% loglambda) -
             loglambda_max[triangle])
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
-          ret <- points[keep]
+          ret <- points[keep, , drop = FALSE]
           waste_ratio <- sum(keep) / length(keep)
         } else {
-          points <- sp::SpatialPoints(matrix(0, 1, 3),
-            proj4string = target.crs
-          )[-1]
+          points <- sf::st_as_sf(
+            as.data.frame(matrix(0, 1, 3)),
+            coords = seq_len(3),
+            crs = target.crs
+          )[-1, , drop = FALSE]
           ret <- points
           waste_ratio <- 0
         }
@@ -327,25 +342,28 @@ sample.lgcp <- function(mesh,
         Npoints <- rpois(1, lambda = area * exp(lambda_max))
 
         if (Npoints == 0) {
-          ret <- sp::SpatialPoints(matrix(0, 1, 2),
-            proj4string = internal.crs
-          )[-1]
+          ret <- sf::st_as_sf(
+            as.data.frame(matrix(0, 1, 2)),
+            coords = seq_len(2),
+            crs = internal.crs
+          )[-1, , drop = FALSE]
           waste_ratio <- 0
         } else {
           # Simulate uniform points on the bounding rectangle
-          points <- sp::SpatialPoints(
-            cbind(
+          points <- sf::st_as_sf(
+            data.frame(
               x = runif(n = Npoints, min = xmin, max = xmax),
               y = runif(n = Npoints, min = ymin, max = ymax)
             ),
-            proj4string = internal.crs
+            coords = seq_len(2),
+            crs = internal.crs
           )
 
           # Do some thinning
           proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
-          ret <- points[keep]
+          ret <- points[keep, , drop = FALSE]
           waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "spherical") {
@@ -358,9 +376,11 @@ sample.lgcp <- function(mesh,
         }
 
         if (Npoints == 0) {
-          ret <- sp::SpatialPoints(matrix(0, 1, 3),
-            proj4string = internal.crs
-          )[-1]
+          ret <- sf::st_as_sf(
+            as.data.frame(matrix(0, 1, 3)),
+            coords = seq_len(3),
+            crs = internal.crs
+          )[-1, , drop = FALSE]
           waste_ratio <- 0
         } else {
           # Choose z uniformly distributed in [-1,1].
@@ -371,14 +391,16 @@ sample.lgcp <- function(mesh,
           x <- r * cos(t)
           y <- r * sin(t)
 
-          points <- data.frame(x, y, z)
-          sp::coordinates(points) <- c("x", "y", "z")
-          sp::proj4string(points) <- internal.crs
+          points <- sf::st_as_sf(
+            as.data.frame(x, y, z),
+            coords = seq_len(3),
+            crs = internal.crs
+          )
 
           proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
-          ret <- points[keep]
+          ret <- points[keep, , drop = FALSE]
           waste_ratio <- sum(keep) / length(keep)
         }
       } else if (strategy == "sliced-spherical") {
@@ -411,7 +433,11 @@ sample.lgcp <- function(mesh,
           n.points <- sp[k + 1] - sp[k]
           if (n.points == 0) {
             sampled.points[[k]] <-
-              sp::SpatialPoints(matrix(0, 1, 3), proj4string = internal.crs)[-1]
+              sf::st_as_sf(
+                as.data.frame(matrix(0, 1, 3)),
+                coords = seq_len(3),
+                crs = internal.crs
+              )[-1, , drop = FALSE]
             break
           }
 
@@ -428,21 +454,23 @@ sample.lgcp <- function(mesh,
           x <- r * cos(angle)
           y <- r * sin(angle)
 
-          points <- data.frame(x, y, z)
-          sp::coordinates(points) <- c("x", "y", "z")
-          sp::proj4string(points) <- internal.crs
+          points <- sf::st_as_sf(
+            as.data.frame(x, y, z),
+            coords = seq_len(3),
+            crs = internal.crs
+          )
 
           proj <- fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
-          sampled.points[[k]] <- points[keep]
+          sampled.points[[k]] <- points[keep, , drop = FALSE]
 
           n.keep <- n.keep + sum(keep)
           n.sampled <- n.sampled + length(keep)
         }
 
         # What to return
-        if (sum(vapply(sampled.points, length, 1L)) > 0) {
+        if (sum(lengths(sampled.points)) > 0) {
           ret <- do.call(rbind, sampled.points)
         } else {
           ret <- sampled.points[[1]]
@@ -451,65 +479,82 @@ sample.lgcp <- function(mesh,
       }
 
       if (multi.samples) {
-        result[[sample]] <-
-          sp::SpatialPointsDataFrame(
-            ret,
-            data = data.frame(sample = rep(sample, length(ret)))
-          )
+        result[[sample]] <- cbind(ret, sample = rep(sample, NROW(ret)))
       }
     }
     if (multi.samples) {
-      ret <- do.call(rbind, result[vapply(result, length, 1L) > 0])
+      ret <- do.call(rbind, result)
     }
 
     if (is.geocent) {
-      if (length(ret) > 0) {
-        ret <- fm_transform(ret, crs = fm_CRS("sphere", args = list(
-          a = space.R, b = space.R, units = "m"
-        )))
+      if (NROW(ret) > 0) {
+        ret <- fm_transform(ret, crs = fm_crs("globe"))
       } else if (multi.samples) {
-        ret <- sp::SpatialPointsDataFrame(
-          matrix(0, 1, 3),
-          data = data.frame(sample = 1)
-        )[-1]
+        if (use.crs) {
+          ret_crs <- fm_crs(input.crs)
+        } else {
+          ret_crs <- fm_crs(NA_character_)
+        }
+        ret <- sf::st_as_sf(
+          cbind(as.data.frame(matrix(0, 1, 3)), sample = 1),
+          coords = seq_len(3),
+          crs = ret_crs
+        )[-1, , drop = FALSE]
       } else {
-        ret <- sp::SpatialPoints(matrix(0, 1, 3))[-1]
-      }
-      if (use.crs) {
-        sp::proj4string(ret) <- fm_CRS(input.crs)
-      } else {
-        sp::proj4string(ret) <- fm_CRS(NA_character_)
+        ret <- sf::st_as_sf(
+          as.data.frame(matrix(0, 1, 3)),
+          coords = seq_len(3),
+          crs = ret_crs
+        )[-1, , drop = FALSE]
       }
     } else {
       if (use.crs) {
-        if (length(ret) > 0) {
+        if (NROW(ret) > 0) {
           ret <- fm_transform(ret, input.crs)
         } else if (multi.samples) {
-          ret <- sp::SpatialPointsDataFrame(
-            matrix(0, 1, 2),
-            data = data.frame(sample = 1)
-          )[-1]
-          sp::proj4string(ret) <- fm_CRS(input.crs)
+          ret <- sf::st_as_sf(
+            cbind(as.data.frame(matrix(0, 1, 2)), sample = 1),
+            coords = seq_len(2),
+            crs = fm_crs(input.crs)
+          )[-1, , drop = FALSE]
         } else {
-          ret <- sp::SpatialPoints(matrix(0, 1, 2))[-1]
-          sp::proj4string(ret) <- fm_CRS(input.crs)
+          ret <- sf::st_as_sf(
+            as.data.frame(matrix(0, 1, 2)),
+            coords = seq_len(2),
+            crs = fm_crs(input.crs)
+          )[-1, , drop = FALSE]
         }
       } else {
-        sp::proj4string(ret) <- fm_CRS(NA_character_)
+        sf::st_crs(ret) <- fm_crs(NA_character_)
       }
     }
 
     # Only retain points within the samplers
-    if (!is.null(samplers) && (length(ret) > 0)) {
+    if (!is.null(samplers) && (NROW(ret) > 0)) {
       if (inherits(samplers, "fm_mesh_2d")) {
         proj <- fm_basis(samplers, ret, full = TRUE)
-        ret <- ret[proj$ok]
+        ret <- ret[proj$ok, , drop = FALSE]
       } else if (inherits(samplers, "Spatial")) {
-        ret <- ret[!is.na(sp::over(ret, samplers))]
+        ret_ <- sf::as_Spatial(ret)
+        if (use.crs) {
+          ret_ <- fm_transform(ret_, fm_crs(samplers))
+        } else {
+          fm_crs(ret_) <- fm_crs(NA_character_)
+          fm_crs(samplers) <- fm_crs(NA_character_)
+        }
+        ok <- !is.na(sp::over(ret_, samplers))
+        ret <- ret[ok, , drop = FALSE]
       } else {
-        idx <- sf::st_within(sf::st_as_sf(ret), samplers)
+        ret_ <- sf::st_as_sf(ret)
+        if (use.crs) {
+          ret_ <- fm_transform(ret_, fm_crs(samplers))
+        } else {
+          fm_crs(ret_) <- fm_crs(NA_character_)
+          fm_crs(samplers) <- fm_crs(NA_character_)
+        }
+        idx <- sf::st_within(ret_, samplers)
         ok <- vapply(idx, function(x) length(x) > 0, TRUE)
-        ret <- ret[ok]
+        ret <- ret[ok, , drop = FALSE]
       }
     }
   } else {

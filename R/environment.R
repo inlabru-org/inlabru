@@ -34,9 +34,6 @@ bru_env_get <- function() {
 }
 
 
-
-
-
 # inlabru log methods ----
 
 #' @title Clear log contents
@@ -88,7 +85,7 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   }
   index <- offset + seq_len(log_length - offset)
   x <- x[index]
-  return(invisible(x))
+  invisible(x)
 }
 
 
@@ -231,16 +228,12 @@ bru_log_offset <- function(x = NULL,
     which_found <- max(which(found))
     found <- marks[[which_found]]
   } else {
-    warning(paste0(
-      "Log bookmark '",
-      bookmark,
-      "' not found; assuming start of log."
-    ))
+    warning(glue("Log bookmark '{bookmark}' not found; assuming start of log."))
     marks <- c(0L, log_length)
     which_found <- 1L
   }
   which_found <- max(1L, min(length(marks), which_found + offset))
-  return(marks[[which_found]])
+  marks[[which_found]]
 }
 
 #' @export
@@ -359,7 +352,7 @@ bru_log.bru <- function(x, verbosity = NULL) {
 
 #' @describeIn bru_log Format a `bru_log` object for printing.
 #' If `verbosity` is `TRUE`, include the verbosity level of each message.
-#' @param ... further arguments passed to or from other methods.
+#' @param \dots further arguments passed to or from other methods.
 #' @param timestamp If `TRUE`, include the timestamp of each message. Default
 #'   `TRUE`.
 #' @export
@@ -370,14 +363,10 @@ bru_log.bru <- function(x, verbosity = NULL) {
 format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   msg <- x[["log"]][["message"]]
   if (timestamp) {
-    msg <- paste0(
-      x[["log"]][["timestamp"]], ": ", msg
-    )
+    msg <- glue("{x[['log']][['timestamp']]}: {msg}")
   }
   if (verbosity) {
-    msg <- paste0(
-      msg, " (level ", x[["log"]][["verbosity"]], ")"
-    )
+    msg <- glue("{msg} (level {x[['log']][['verbosity']]})")
   }
   msg
 }
@@ -570,16 +559,17 @@ bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
 #' @param .frame The throwing context, for when `.internal` is `TRUE`
 #' @export
 bru_log_abort <- function(
-    msg,
-    ...,
-    domain = NULL,
-    appendLF = TRUE,
-    verbosity = 1L,
-    allow_verbose = TRUE,
-    verbose = FALSE,
-    verbose_store = NULL,
-    call = rlang::caller_env(),
-    .frame = rlang::caller_env()) {
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+) {
   bru_log_message(
     msg,
     domain = domain,
@@ -595,16 +585,17 @@ bru_log_abort <- function(
 #' @describeIn bru_log_message Store a log message and throw a warning.
 #' @export
 bru_log_warn <- function(
-    msg,
-    ...,
-    domain = NULL,
-    appendLF = TRUE,
-    verbosity = 1L,
-    allow_verbose = TRUE,
-    verbose = FALSE,
-    verbose_store = NULL,
-    call = rlang::caller_env(),
-    .frame = rlang::caller_env()) {
+  msg,
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = FALSE,
+  verbose_store = NULL,
+  call = rlang::caller_env(),
+  .frame = rlang::caller_env()
+) {
   bru_log_message(
     msg,
     domain = domain,
@@ -629,93 +620,10 @@ bru_log_warn <- function(
 #'   The `_get`, `_set`, and `_reset` functions operate on a global
 #'   package options override object. In many cases, setting options in
 #'   specific calls to [bru()] is recommended instead.
-#' @param ... A collection of named options, optionally including one or more
+#' @param \dots A collection of named options, optionally including one or more
 #'   [`bru_options`] objects. Options specified later override the previous
 #'   options.
 #' @return `bru_options()` returns a `bru_options` object.
-#' @section Valid options:
-#' For `bru_options` and `bru_options_set`, recognised options are:
-#' \describe{
-#' \item{bru_verbose}{logical or numeric; if `TRUE`, log messages of `verbosity`
-#' \eqn{\le 1} are printed by [bru_log_message()]. If numeric, log messages
-#' of
-#' verbosity \eqn{\le}`bru_verbose` are printed.
-#' For line search details, set `bru_verbose=2` or `3`.
-#' Default: 0, to not print any messages}
-#' \item{bru_verbose_store}{logical or numeric; if `TRUE`, log messages of
-#' `verbosity` \eqn{\le 1} are stored by [bru_log_message()]. If numeric,
-#' log messages of verbosity \eqn{\le} are stored. Default: Inf, to store all
-#' messages.}
-#' \item{bru_run}{If TRUE, run inference. Otherwise only return configuration
-#' needed to run inference.}
-#' \item{bru_max_iter}{maximum number of inla iterations, default 10.
-#'  Also see the `bru_method$rel_tol` and related options below.}
-#' \item{bru_initial}{An `inla` object returned from previous calls of
-#'   `INLA::inla`, [bru()] or [lgcp()], or a list of named vectors of starting
-#'   values for the latent variables. This will be used as a
-#'   starting point for further improvement of the approximate posterior.}
-#' \item{bru_int_args}{List of arguments passed all the way to the
-#' integration method `ipoints` and `int.polygon` for 'cp' family models;
-#' \describe{
-#' \item{method}{"stable" or "direct". For "stable" (default) integration points
-#' are aggregated to mesh vertices.}
-#' \item{nsub1}{Number of integration points per knot interval in 1D.
-#'   Default 30.}
-#' \item{nsub2}{Number of integration points along a triangle edge for 2D.
-#'   Default 9.}
-#' \item{nsub}{Deprecated parameter that overrides `nsub1` and `nsub2` if set.
-#'   Default `NULL`.}
-#' }
-#' }
-#' \item{bru_method}{List of arguments controlling the iterative inlabru method:
-#' \describe{
-#' \item{taylor}{'pandemic'
-#' (default, from version 2.1.15).}
-#' \item{search}{Either 'all' (default), to use all available line search
-#' methods, or one or more of
-#' \describe{
-#' \item{'finite'}{(reduce step size until predictor is finite)}
-#' \item{'contract'}{(decrease step size until trust hypersphere reached)}
-#' \item{'expand'}{(increase step size until no improvement)}
-#' \item{'optimise'}{(fast approximate error norm minimisation)}
-#' }
-#' To disable line search, set to an empty vector. Line search is not
-#' available for `taylor="legacy"`.}
-#' \item{factor}{Numeric, \eqn{> 1} determining the line search step scaling
-#' multiplier. Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
-#' \item{rel_tol}{Stop the iterations when the largest change in linearisation
-#' point
-#' (the conditional latent state mode) in relation to the estimated posterior
-#' standard deviation is less than `rel_tol`. Default 0.1 (ten percent).}
-#' \item{max_step}{The largest allowed line search step factor. Factor 1 is the
-#' full INLA step. Default is 2.}
-#' \item{line_opt_method}{Which method to use for the line search optimisation
-#' step.
-#' Default "onestep", using a quadratic approximation based on the value and
-#' gradient at zero, and the value at the current best step length guess.
-#' The method "full" does line optimisation on the full nonlinear predictor;
-#' this is slow and intended for debugging purposes only.}
-#' }
-#' }
-#' \item{bru_compress_cp}{logical; when `TRUE`, compress the
-#' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
-#' part of the Poisson process likelihood (`family="cp"`) into a single term,
-#' with \eqn{y=n}{y=n}, and predictor `mean(eta)`. Default: `TRUE`}
-#' \item{bru_debug}{logical; when `TRUE`, activate temporary debug features for
-#' package development. Default: `FALSE`}
-#' \item{`inla()` options}{
-#' All options not starting with `bru_` are passed on to `inla()`, sometimes
-#' after altering according to the needs of the inlabru method.
-
-#' Warning:
-#'   Due to how inlabru currently constructs the `inla()` call, the `mean`,
-#'   `prec`, `mean.intercept`, and `prec.intercept` settings in
-#'   `control.fixed` will have no
-#'   effect. Until a more elegant alternative has been implemented, use explicit
-#'   `mean.linear` and `prec.linear` specifications in each
-#'   `model="linear"` component instead.
-#' }
-#' }
 #'
 #' @examples
 #' \dontrun{
@@ -778,32 +686,148 @@ as.bru_options <- function(x = NULL) {
 #' @return `bru_options_default()` returns an `bru_options` object containing
 #'   default options.
 #' @export
+#' @section Valid options:
 
 bru_options_default <- function() {
   bru_options(
     # inlabru options
+    #' For `bru_options` and `bru_options_set`, recognised options are:
+    #' \describe{
+    #' \item{bru_verbose}{
+    #' numeric or logical; if `TRUE`, log messages with `verbosity` \eqn{\le}
+    #' 1 are printed by [bru_log_message()]. If numeric, messages with
+    #' `verbosity` \eqn{\le} `bru_verbose` are printed.
+    #' For line search details, set `bru_verbose=2` or `3`.
+    #' Default: 0, to not print any messages.}
     bru_verbose = 0,
+    #' \item{bru_verbose_store}{
+    #' numeric or logical, as for `bru_verbose`, but controls what messages
+    #' are stored in the global log object.
+    #' Default: `Inf`, to store all messages.}
     bru_verbose_store = Inf,
+    #' \item{bru_max_iter}{maximum number of inla iterations, default 10.
+    #'  Also see `bru_method$rel_tol` and related options below.}
     bru_max_iter = 10,
+    #' \item{bru_run}{
+    #'   If `TRUE`, run inference. Otherwise only return configuration needed to
+    #'   run inference.}
     bru_run = TRUE,
-    bru_int_args = list(method = "stable", nsub1 = 30, nsub2 = 9),
-    bru_method = list(
-      taylor = "pandemic",
-      search = "all",
-      factor = (1 + sqrt(5)) / 2,
-      rel_tol = 0.1,
-      max_step = 2,
-      line_opt_method = "onestep"
+    #' \item{bru_initial}{
+    #'   An `inla` object returned from previous calls of `INLA::inla`, [bru()]
+    #'   or [lgcp()], or a list of named vectors of starting values for the
+    #'   latent variables. This will be used as a starting point for further
+    #'   improvement of the approximate posterior.}
+    #' \item{bru_int_args}{
+    #' List of arguments passed all the way to the integration method
+    #' [fmesher::fm_int()] for 'cp' family models;
+    #' \describe{
+    bru_int_args = list(
+      #' \item{method}{
+      #' "stable" or "direct". For "stable" (default) integration points are
+      #' aggregated to mesh vertices.}
+      method = "stable",
+      #' \item{nsub1}{Number of integration points per knot interval in 1D.
+      #'   Default 30.}
+      nsub1 = 30,
+      #' \item{nsub2}{Number of integration points along a triangle edge for 2D.
+      #'   Default 9.}
+      nsub2 = 9
+      #' \item{nsub}{
+      #'   Deprecated parameter that overrides `nsub1` and `nsub2` if set.
+      #'   Default `<not set>`.}
+      #' }
+      #' }
     ),
-    bru_compress_cp = TRUE,
+    #' \item{bru_method}{
+    #' List of arguments controlling the iterative inlabru method:
+    #' \describe{
+    bru_method = list(
+      #' \item{taylor}{'pandemic'
+      #' (default, from version 2.1.15).}
+      taylor = "pandemic",
+      #' \item{search}{Either 'all' (default), to use all available line search
+      #' methods, or one or more of
+      #' \describe{
+      #' \item{'finite'}{(reduce step size until predictor is finite)}
+      #' \item{'contract'}{(decrease step size until trust hypersphere reached)}
+      #' \item{'expand'}{(increase step size until no improvement)}
+      #' \item{'optimise'}{(fast approximate error norm minimisation)}
+      #' }
+      #' To disable line search, set to an empty vector. Line search is not
+      #' available for `taylor="legacy"`.}
+      search = "all",
+      #' \item{factor}{
+      #' Numeric, \eqn{> 1} determining the line search step scaling multiplier.
+      #' Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}
+      factor = (1 + sqrt(5)) / 2,
+      #' \item{rel_tol}{
+      #' Stop the iterations when the largest change in linearisation point (the
+      #' conditional latent state mode) in relation to the estimated posterior
+      #' standard deviation is less than `rel_tol`. Default 0.1 (ten percent).}
+      rel_tol = 0.1,
+      #' \item{max_step}{
+      #' The largest allowed line search step factor. Factor 1 is the full INLA
+      #' step. Default is 2.}
+      max_step = 2,
+      #' \item{line_opt_method}{
+      #' Which method to use for the line search optimisation step. Default
+      #' "onestep", using a quadratic approximation based on the value and
+      #' gradient at zero, and the value at the current best step length guess.
+      #' The method "full" does line optimisation on the full nonlinear
+      #' predictor; this is slow and intended for debugging purposes only.}
+      line_opt_method = "onestep"
+      #' }
+      #' }
+    ),
+    #' \item{bru_compress_cp}{logical; when `TRUE`, compress the
+    #' \eqn{\sum_{i=1}^n \eta_i}{sum_i=1^n eta_i}
+    #' part of the Poisson process likelihood (`family = "cp"`) into
+    #' either a single term,
+    #' with \eqn{y=n}{y=n}, and predictor `mean(eta)`, or a blockwise version of
+    #' this. Default: `FALSE` (was `TRUE` prior to version `2.13.0.9031`.)}
+    bru_compress_cp = FALSE,
+    #' \item{bru_debug}{
+    #' logical; when `TRUE`, activate temporary debug features for package
+    #' development. Default: `FALSE`}
     bru_debug = FALSE,
-    # bru_initial: NULL
+    #' \item{bru_compat_pre_2_14_enable}{
+    #' logical; when `TRUE`, enable compatibility features for inlabru versions
+    #' prior to 2.14. Set to `FALSE` to test external package compatibility
+    #' updates. Default: `TRUE` before version 2.14, and will be set to `FALSE`
+    #' by default in a later version.}
+    bru_compat_pre_2_14_enable = TRUE,
     # inla options
+    #' \item{`inla()` options}{
+    #' All options not starting with `bru_` are passed on to `inla()`, sometimes
+    #' after altering according to the needs of the inlabru method.
+    #'
+    #' Warning:
+    #'   Due to how inlabru currently constructs the `inla()` call, the `mean`,
+    #'   `prec`, `mean.intercept`, and `prec.intercept` settings in
+    #'   `control.fixed` will have no effect. Until a more elegant alternative
+    #'   has been implemented, use explicit `mean.linear` and `prec.linear`
+    #'   specifications in each `model="linear"` component instead.
+    #'
+    #'   The following `inla()` options have inlabru specific defaults:
+    #'   \describe{
+    #'     \item{`E`}{Default `1`.}
     E = 1,
-    Ntrials = 1,
-    control.compute = list(config = TRUE),
+    #'     \item{`Ntrials`}{Default `1L`.}
+    Ntrials = 1L,
+    #'     \item{`control.compute`}{
+    #'       Default `list(config = TRUE, control.gcpo = list())`.}
+    control.compute = list(
+      config = TRUE,
+      control.gcpo = list()
+    ),
+    #'     \item{`control.inla`}{Default `list(int.strategy = "auto")`.}
     control.inla = list(int.strategy = "auto"),
+    #'     \item{`control.fixed`}{
+    #'       Default `list(expand.factor.strategy = "inla")`.}
     control.fixed = list(expand.factor.strategy = "inla")
+    #'   }
+    #' }
+    #' }
   )
 }
 
@@ -821,12 +845,16 @@ bru_options_deprecated <- function(args) {
     }
     deprecated_args <- deprecated_args[!depr_list]
     if (any(nzchar(names(deprecated_args)) == 0)) {
-      warning(paste0(
-        "Ignoring deprecated global options '",
-        paste0(names(deprecated_args)[nzchar(names(deprecated_args)) == 0],
-          collapse = "', '"
+      warning(glue(
+        "Ignoring deprecated global options ",
+        glue_collapse(
+          glue("'{depr}'",
+            depr =
+              names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+          ),
+          sep = ", "
         ),
-        "'."
+        ".",
       ))
       names_args <- setdiff(
         names_args,
@@ -837,11 +865,11 @@ bru_options_deprecated <- function(args) {
     }
     if (length(deprecated_args) > 0) {
       warning(paste0(
-        "Converting deprecated global option(s) '",
-        paste0(names(deprecated_args), collapse = "', '"),
-        "' to new option(s) '",
-        paste0(deprecated_args, collapse = "', '"),
-        "'."
+        "Converting deprecated global option(s) ",
+        glue_collapse(glue("'{names(deprecated_args)}'"), sep = ", "),
+        " to new option(s) ",
+        glue_collapse(glue("'{deprecated_args}'"), sep = ", "),
+        "."
       ))
       names_args <- names(args)
       names_args[names_args %in% names(deprecated_args)] <-
@@ -866,7 +894,6 @@ bru_options_deprecated <- function(args) {
   class(args) <- cl
   args
 }
-
 
 
 #' Additional bru options
@@ -919,7 +946,6 @@ bru_options_inla <- function(options) {
 }
 
 
-
 #' @describeIn bru_options Checks for valid contents of a `bru_options`
 #' object, and produces warnings for invalid options.
 #' @param options An `bru_options` object to be checked
@@ -947,7 +973,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     disallowed_null <- disallowed_null[are_null[disallowed_null]]
     if (length(disallowed_null) > 0) {
       warning(paste0(
-        paste0("'", disallowed_null, "'", collapse = ", "),
+        glue_collapse(glue("'{disallowed_null}'"), sep = ", "),
         " should not be set to NULL."
       ))
     }
@@ -956,7 +982,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     # Check valid max_iter
     opt <- options[[name]]
     if (name == "bru_max_iter") {
-      if (!is.numeric(opt) || !(opt > 0)) {
+      if (!is.numeric(opt) || opt <= 0) {
         ok <- FALSE
         warning("'bru_max_iter' should be a positive integer.")
       }
@@ -965,7 +991,6 @@ bru_options_check <- function(options, ignore_null = TRUE) {
 
   ok
 }
-
 
 
 #' @param name Either `NULL`, or single option name string, or character vector
@@ -1065,14 +1090,13 @@ bru_options_set_local <- function(...,
 }
 
 
-
 #' @title Print inlabru options
 #' @param object A [bru_options] object to be summarised
 #' @param x A `summary_bru_options` object to be printed
 #' @param legend logical; If `TRUE`, include explanatory text, Default: `TRUE`
 #' @param include_global logical; If `TRUE`, include global override options
 #' @param include_default logical; If `TRUE`, include default options
-#' @param ... Further parameters, currently ignored
+#' @param \dots Further parameters, currently ignored
 #'
 #' @examples
 #' if (interactive()) {
@@ -1172,27 +1196,24 @@ print.summary_bru_options <- function(x, ...) {
   traverse <- function(tree, prefix = "") {
     for (name in sort(names(tree))) {
       if (tree[[name]]$is_list) {
-        cat(paste0(prefix, name, " =\n"))
+        cat(glue("{prefix}{name} ="), "\n")
         traverse(
           tree[[name]]$value,
-          prefix = paste0(prefix, "\t")
+          prefix = glue("{prefix}\t")
         )
       } else {
-        cat(paste0(
-          prefix,
-          name, " =\t",
-          tree[[name]]$value,
-          "\t(",
-          tree[[name]]$origin,
-          ")\n"
-        ))
+        cat(glue(
+          "{prefix}{name} =",
+          "\t{tree[[name]]$value}",
+          "\t({tree[[name]]$origin})"
+        ), "\n")
       }
     }
   }
 
   if (!is.null(x[["legend"]])) {
     cat("Legend:\n")
-    cat(paste0("  ", x[["legend"]], collapse = "\n"))
+    cat(glue_collapse("  {x[['legend']]}", sep = "\n"))
   }
   cat("Options for inlabru:\n")
   traverse(x[["value"]], prefix = "  ")

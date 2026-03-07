@@ -23,19 +23,18 @@ definition}
 class definition before adding the \code{new_class} names. Default is \code{"list"}.}
 }
 \value{
-\itemize{
-\item \code{bru_mapper()} returns a \code{bru_mapper} object
-}
+A \code{bru_mapper} object.
 }
 \description{
 Constructors for \code{bru_mapper} objects
 }
 \section{Functions}{
 \itemize{
-\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing
-mappers for special objects. See below for details of the
-default constructor \code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define
-new mappers in user code.
+\item \code{bru_mapper()}: Generic mapper S3 constructor, used for constructing mappers for special
+objects. See below for details of the default constructor
+\code{\link[=bru_mapper_define]{bru_mapper_define()}} that can be used to define new mapper clesses in user
+code. To extracting mappers for latent component models, see
+\code{\link[=bru_get_mapper]{bru_get_mapper()}}.
 
 \item \code{bru_mapper_define()}: Adds the \code{new_class} and \code{"bru_mapper"} class names to
 the inheritance list for the input \code{mapper} object, unless the object
@@ -77,24 +76,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
-\code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_get_mapper}()}
 }
 \concept{mappers}

@@ -28,7 +28,7 @@ bru_compute_linearisation <- function(...) {
 #' expression
 #' @param pred0 Precomputed predictor for the given state
 #' @param used A [bru_used()] object for the predictor expression
-#' @param allow_combine logical; If `TRUE`, the predictor expression may
+#' @param is_rowwise logical; If `FALSE`, the predictor expression may
 #' involve several rows of the input data to influence the same row.
 #' @param eps The finite difference step size
 #' @param n_pred The length of the predictor expression. If not `NULL`, scalar
@@ -47,7 +47,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
                                                effects,
                                                pred0,
                                                used,
-                                               allow_combine,
+                                               is_rowwise,
                                                eps,
                                                n_pred = NULL,
                                                ...) {
@@ -79,7 +79,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
       state = state[[label]]
     )
 
-    assume_rowwise <- !allow_latent && !allow_combine && is.data.frame(data)
+    assume_rowwise <- !allow_latent && is_rowwise && is.data.frame(data)
 
     if (assume_rowwise) {
       if (!is.null(n_pred) && (NROW(pred0) != n_pred)) {
@@ -105,7 +105,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     x = numeric(0)
   )
 
-  if (any(!is.finite(pred0))) {
+  if (!all(is.finite(pred0))) {
     warning(
       "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
       immediate. = TRUE
@@ -131,7 +131,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
       }
       # TODO:
       # Option: filter out the data and effect rows for which
-      # the rows of A have some non-zeros, or all if allow_combine
+      # the rows of A have some non-zeros, or all if !is_rowwise
       # Option: compute predictor for multiple different states. This requires
       # constructing multiple states and corresponding effects before calling
       # evaluate_predictor
@@ -221,7 +221,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
         }
       } else {
-        if (any(!is.finite(pred_eps))) {
+        if (!all(is.finite(pred_eps))) {
           warning(
             "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
             label,
@@ -236,7 +236,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
         }
       }
       nonzero <- is.finite(values)
-      if (any(!nonzero)) {
+      if (!all(nonzero)) {
         warning(
           "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
           "derivatives for '",
@@ -288,14 +288,15 @@ bru_compute_linearisation.bru_obs <- function(lhood,
                                               eps,
                                               ...) {
   used <- bru_used(lhood)
-  allow_combine <- lhood[["allow_combine"]]
+  pred_expr <- bru_pred_expr(lhood)
+  is_rowwise <- bru_is_rowwise(pred_expr)
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
     input = input[used[["effect"]]],
     state = state[used[["effect"]]]
   )
 
-  lhood_expr <- bru_obs_expr(lhood, model[["effects"]])
+  lhood_expr <- bru_pred_expr(pred_expr, format = "expr")
   n_pred <- bru_response_size(lhood)
 
   pred0 <- evaluate_predictor(
@@ -315,9 +316,11 @@ bru_compute_linearisation.bru_obs <- function(lhood,
   offset <- pred0
   # Either this loop or the internal bru_comp specific loop
   # can in principle be parallelised.
+  comp_lst <- as_bru_comp_list(model)
+  additive_and_rowwise <- bru_is_additive(lhood) && is_rowwise
   for (label in union(used[["effect"]], used[["latent"]])) {
-    if (ibm_n(model[["effects"]][[label]][["mapper"]]) > 0) {
-      if (lhood[["is_additive"]] && !lhood[["allow_combine"]]) {
+    if (ibm_n(comp_lst[[label]][["mapper"]]) > 0) {
+      if (additive_and_rowwise) {
         # If additive and no combinations allowed, just need to copy the
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
@@ -337,7 +340,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
       } else {
         B[[label]] <-
           bru_compute_linearisation(
-            model[["effects"]][[label]],
+            comp_lst[[label]],
             model = model,
             lhood_expr = lhood_expr,
             data = data,
@@ -348,7 +351,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
             effects = effects,
             pred0 = pred0,
             used = used,
-            allow_combine = lhood[["allow_combine"]],
+            is_rowwise = is_rowwise,
             eps = eps,
             n_pred = n_pred,
             ...

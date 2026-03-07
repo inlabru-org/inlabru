@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.13.0
+Version: 2.14.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -21,8 +21,9 @@ Authors@R: c(
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
   person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
-  person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"),
-         comment = "Man Ho Suen contributed features for aggregated responses and vignette updates"),
+  person("Suen", "Man Ho", email = "m.suen19@imperial.ac.uk", role = c("ctb", "cph"),
+         comment = c(ORCID = "0009-0003-2281-0776",
+                     "Man Ho Suen contributed features for aggregated responses and vignette updates")),
   person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
          comment = "Pierre Roudier contributed general quantile summaries"),
   person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
@@ -49,17 +50,17 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.4.0),
+    fmesher (>= 0.7.0),
     methods,
-    R (>= 3.6),
+    R (>= 4.1.0),
     stats
 Imports:
     dplyr,
+    glue,
     lifecycle,
-    magrittr,
     MatrixModels,
     Matrix,
     plyr,
@@ -67,7 +68,8 @@ Imports:
     sf,
     tibble,
     utils,
-    withr
+    withr,
+    Rcpp
 Suggests:
     covr,
     ggplot2,
@@ -90,7 +92,7 @@ Suggests:
     spatstat.data,
     sphereplot,
     splancs,
-    terra,
+    terra (>= 1.7-66),
     tidyterra,
     testthat (>= 3.2.0),
     tidyr,
@@ -102,11 +104,16 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     '0_inlabru_envir.R'
+    'RcppExports.R'
+    'access_trace.R'
+    'access_trace_methods.R'
     'bru.gof.R'
     'bru.inference.R'
     'bru_conversion.R'
     'bru_index.R'
+    'deprecated.R'
     'bru_input.R'
+    'bru_is.R'
     'bru_sp.R'
     'data.Poisson1_1D.R'
     'data.Poisson2_1D.R'
@@ -119,21 +126,24 @@ Collate:
     'data.toygroups.R'
     'data.toypoints.R'
     'deltaIC.R'
-    'deprecated.R'
     'effect.R'
     'environment.R'
     'fmesher.R'
     'ggplot.R'
+    'hexagon_tiling.R'
+    'mappers.R'
+    'hierarchical_basis.R'
     'inla.R'
     'inlabru-package.R'
     'local_testthat.R'
-    'mappers.R'
     'mapper_collect.R'
     'mapper_repeat.R'
     'mapper_sum.R'
     'model.R'
     'nlinla.R'
+    'object_upgrade.R'
     'plotsample.R'
+    'pred_expr.R'
     'rgl.R'
     'sampling.R'
     'spatstat.R'
@@ -147,3 +157,5 @@ VignetteBuilder: knitr
 BuildVignettes: true
 LazyData: true
 LazyDataCompression: xz
+LinkingTo: 
+    Rcpp

@@ -3,62 +3,25 @@
 \name{bm_mesh_B}
 \alias{bm_mesh_B}
 \alias{bru_mapper_mesh_B}
-\alias{ibm_n.bm_mesh_B}
-\alias{ibm_values.bm_mesh_B}
-\alias{ibm_jacobian.bm_mesh_B}
-\title{Mapper for basis conversion}
+\title{Deprecated basis conversion mapper}
 \usage{
 bm_mesh_B(mesh, B)
 
 bru_mapper_mesh_B(...)
-
-\method{ibm_n}{bm_mesh_B}(mapper, ...)
-
-\method{ibm_values}{bm_mesh_B}(mapper, ...)
-
-\method{ibm_jacobian}{bm_mesh_B}(mapper, input, ...)
 }
 \arguments{
-\item{mesh}{object supported by \code{bru_mapper}, typically \code{fm_mesh_2d} or
-\code{fm_mesh_1d}}
+\item{mesh}{Object supported by a \code{\link[=bru_mapper]{bru_mapper()}} method.}
 
 \item{B}{a square or tall basis conversion matrix}
-
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{input}{The values for which to produce a mapping matrix}
 }
 \description{
-Creates a mapper for handling basis conversions
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Old deprecated name for \code{\link[=bm_reparam]{bm_reparam()}}
 }
-\seealso{
-\link{bru_mapper}, \link{bru_mapper_generics}
+\section{Functions}{
+\itemize{
+\item \code{bru_mapper_mesh_B()}: \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Deprecated name for \code{bm_mesh_B}
 
-Other mappers: 
-\code{\link{bm_aggregate}()},
-\code{\link{bm_collect}()},
-\code{\link{bm_const}()},
-\code{\link{bm_factor}()},
-\code{\link{bm_fmesher}()},
-\code{\link{bm_harmonics}()},
-\code{\link{bm_index}()},
-\code{\link{bm_linear}()},
-\code{\link{bm_logsumexp}()},
-\code{\link{bm_marginal}()},
-\code{\link{bm_matrix}()},
-\code{\link{bm_multi}()},
-\code{\link{bm_pipe}()},
-\code{\link{bm_repeat}()},
-\code{\link{bm_scale}()},
-\code{\link{bm_shift}()},
-\code{\link{bm_sum}()},
-\code{\link{bm_taylor}()},
-\code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
-}
-\concept{mappers}
+}}
+\keyword{internal}

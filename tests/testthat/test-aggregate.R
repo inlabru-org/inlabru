@@ -36,7 +36,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
           )
         )
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -69,7 +69,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
       control.family = list(
         hyper = list(prec = list(initial = 6, fixed = TRUE))
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -81,20 +81,21 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
 })
 
 
-
 test_that("Aggregated Gaussian observations, using aggregate feature", {
   local_bru_safe_inla()
 
   obs <- data.frame(
     x = c(10, 20, 30),
     y = c(1000, 2000, 3000),
-    z = c(10, 20, 30)
+    z = c(10, 20, 30),
+    the_group_char = c("a", "b", "c")
   )
   pred <- data.frame(
     x = c(1, 2, 3, 4, 5, 6),
     y = c(1, 20, 3, 40, 5, 60),
     weights = c(1, 1, 1, 1, 1, 1),
-    grp = c(1, 1, 2, 2, 2, 3)
+    grp = c(1, 1, 2, 2, 2, 3),
+    grp_char = c("a", "a", "b", "b", "b", "c")
   )
   domain <- list()
 
@@ -152,13 +153,14 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     )
   })
 
+  # Missing block information
   expect_error(
     {
       bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
-        data = pred,
+        data = c(as.list(pred), list(.block = NULL)),
         aggregate = "average",
         aggregate_input = list(
           weights = weights,
@@ -180,6 +182,61 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     ),
     fixed = TRUE
   )
+
+  # Character block information without matching response block information
+  expect_error(
+    {
+      bru_obs(
+        z ~ Intercept + x + y,
+        family = "normal",
+        response_data = obs,
+        data = pred,
+        aggregate = "average",
+        aggregate_input = list(
+          weights = weights,
+          block = grp_char,
+          n_block = bru_response_size(.response_data.)
+        ),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = 6,
+              fixed = TRUE
+            )
+          )
+        )
+      )
+    },
+    paste0(
+      "'character' aggregation block information detected."
+    ),
+    fixed = TRUE
+  )
+
+  # Character block information without match response block information
+  expect_no_error({
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      aggregate_input = list(
+        weights = weights,
+        block = grp_char,
+        n_block = bru_response_size(.response_data.),
+        block_response = "the_group_char"
+      ),
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    )
+  })
 })
 
 
@@ -252,41 +309,12 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
       )
     },
     paste0(
-      "The input evaluation 'y' for 'y' failed. ",
+      "The input evaluation 'y' for 'y' failed.\n",
       "Perhaps the data object doesn't contain the needed variables?"
     ),
     fixed = TRUE
   )
-
-  skip_if(utils::packageVersion("fmesher") >= "0.4.0.9006")
-  # For fmesher < 0.4.0.9006, detect character .block info
-  domain <- list(x = 1:6, y = 2:4)
-  samplers <- list(x = list(1:2, 3:5, 6))
-  expect_error(
-    {
-      bru_obs(
-        z ~ Intercept + x + y,
-        family = "normal",
-        response_data = obs,
-        data = NULL,
-        aggregate = "average",
-        domain = domain,
-        samplers = samplers,
-        control.family = list(
-          hyper = list(
-            prec = list(
-              initial = 6,
-              fixed = TRUE
-            )
-          )
-        )
-      )
-    },
-    "'character' aggregation block information detected.",
-    fixed = TRUE
-  )
 })
-
 
 
 test_that("Aggregated Poisson observations, using mapper", {
@@ -316,7 +344,7 @@ test_that("Aggregated Poisson observations, using mapper", {
       family = "poisson",
       response_data = obs,
       data = pred,
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -345,7 +373,7 @@ test_that("Aggregated Poisson observations, using mapper", {
       E = E,
       response_data = obs,
       data = pred,
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -395,7 +423,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
           )
         )
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -426,7 +454,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
       control.family = list(
         hyper = list(prec = list(initial = 6, fixed = TRUE))
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 

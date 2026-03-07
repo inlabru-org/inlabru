@@ -9,7 +9,13 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Take a look at the point (and frequency) data
 
   ggplot(pts2) +
-    geom_histogram(aes(x = x), binwidth = 55 / 20, boundary = 0, fill = NA, color = "black") +
+    geom_histogram(
+      aes(x = x),
+      binwidth = 55 / 20,
+      boundary = 0,
+      fill = NA,
+      color = "black"
+    ) +
     geom_point(aes(x), y = 0, pch = "|", cex = 4) +
     coord_fixed(ratio = 1)
 
@@ -17,7 +23,8 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
 
   x <- seq(0, 55, length.out = 20)
   mesh1D <- fm_mesh_1d(x, boundary = "free")
-  mdl <- x ~ spde1D(x, model = INLA::inla.spde2.matern(mesh1D, constr = TRUE)) + Intercept(1)
+  constrained_matern <- INLA::inla.spde2.matern(mesh1D, constr = TRUE)
+  mdl <- x ~ spde1D(x, model = constrained_matern) + Intercept(1)
   fit <- lgcp(mdl, data = pts2, domain = list(x = mesh1D))
 
   # Calculate and plot the posterior range

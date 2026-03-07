@@ -9,7 +9,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
     formula = y ~ .,
     data = list(x = c(1, 1.5, 2, NA, 3, 4), y = 11:15),
     used = bru_used(effect = "effect"),
-    allow_combine = TRUE
+    is_rowwise = FALSE
   )
 
   cmp1 <- bru_comp_list(~ effect(c(1, 1.5, 2, 3, 4), model = "iid") - 1)
@@ -62,14 +62,13 @@ test_that("Component construction: default mesh/mapping, data is list", {
 })
 
 
-
 test_that("Component construction: unsafe intercepts, data is list", {
   local_bru_safe_inla()
 
   cmp <- bru_comp_list(~ something_unknown - 1)
   lik <- bru_obs(
     formula = response ~ ., data = list(response = 1:5),
-    allow_combine = TRUE
+    is_rowwise = FALSE
   )
   lik <- bru_used_update(lik, labels = names(cmp))
   expect_error(
@@ -78,11 +77,10 @@ test_that("Component construction: unsafe intercepts, data is list", {
     },
     paste0(
       "The input evaluation 'something_unknown' for 'something_unknown' ",
-      "failed. Perhaps the data object doesn't contain the needed variables?"
+      "failed.\nPerhaps the data object doesn't contain the needed variables?"
     )
   )
 })
-
 
 
 test_that("Component construction: separate response_data input", {
@@ -93,14 +91,14 @@ test_that("Component construction: separate response_data input", {
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = list(x = c(1, 1.5, 2, 3, 4)),
     response_data = data.frame(y = c(11, 12)),
-    allow_combine = TRUE
+    is_rowwise = FALSE
   )
 
   lik2 <- bru_obs("gaussian",
     formula = y ~ c(sum(effect), sum(effect^2)),
     data = data.frame(x = c(1, 1.5, 2, 3, 4)),
     response_data = data.frame(y = c(11, 12)),
-    allow_combine = TRUE
+    is_rowwise = FALSE
   )
 
 

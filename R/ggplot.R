@@ -50,7 +50,7 @@ gmap <- function(...) {
 #' @name gg
 #' @export
 #' @param data an object for which to generate a geom.
-#' @param ... Arguments passed on to the geom method.
+#' @param \dots Arguments passed on to the geom method.
 #' @return The form of the value returned by gg depends on the class of its
 #'   argument. See the documentation of the particular methods for details of
 #'   what is produced by that method.
@@ -112,7 +112,7 @@ gm <- function(...) {
 #' @param data A `matrix` object.
 #' @param mapping a set of aesthetic mappings created by `aes`. These are passed
 #'   on to `geom_tile`.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` with reversed y scale.
 #' @family geomes for inla and inlabru predictions
 #'
@@ -142,20 +142,12 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 }
 
 
-#' Geom for data.frame
-#'
+#' @describeIn gg.bru_prediction
 #' This geom constructor will simply call [gg.bru_prediction()] for the data
 #' provided.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name gg.data.frame
 #' @export
-#' @param ... Arguments passed on to [gg.bru_prediction()].
-#' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon`
-#'   value.
-#' @family geomes for inla and inlabru predictions
-#' @example inst/examples/gg.prediction.R
+#' @param \dots Arguments passed on to [gg.bru_prediction()].
 
 gg.data.frame <- function(...) {
   gg.bru_prediction(...)
@@ -219,7 +211,7 @@ gg.bru_prediction <- function(data,
       if (NROW(data[[x]]) == 1) {
         rownames(data[[x]]) <- x
       } else {
-        rownames(data[[x]]) <- paste0(x, ".", seq_len(NROW(data[[x]])))
+        rownames(data[[x]]) <- glue("{x}.{seq_len(NROW(data[[x]]))}")
       }
       data[[x]]
     })
@@ -242,11 +234,15 @@ gg.bru_prediction <- function(data,
     names(data)[names(data) == new_quant_names[[quant_name]]] <- quant_name
   }
   # Find quantile levels
-  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*$", names(data))]
+  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*%?$", names(data))]
   if (length(quant_names) > 0) {
-    quant_probs <- as.numeric(sub("^q", "", quant_names))
+    perc <- grepl("%$", quant_names)
+    quant_probs <- as.numeric(
+      sub("%$", "", sub("^q", "", quant_names))
+    )
+    quant_probs[perc] <- quant_probs[perc] / 100
     quant_names <- quant_names[order(quant_probs)]
-    quant_probs <- quant_probs[order(quant_probs)]
+    quant_probs <- sort(quant_probs)
     lqname <- quant_names[1]
     uqname <- quant_names[length(quant_names)]
   }
@@ -396,7 +392,7 @@ gg.prediction <- function(data, ...) {
 #'   ```
 #' @param crs A `sp::CRS` object defining the coordinate system to project the
 #'   data to before plotting.
-#' @param ... Arguments passed on to `geom_point`.
+#' @param \dots Arguments passed on to `geom_point`.
 #' @return A `geom_point` return value
 #' @family geomes for spatial data
 #'
@@ -442,7 +438,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' `geom_tile(..., stat = "sf_coordinates")`, intended for converting point data
 #' to grid tiles with the `fill` aesthetic, which is by default set to the first
 #' data column.
-#' @param ... Arguments passed on to `geom_sf` or `geom_tile`.
+#' @param \dots Arguments passed on to `geom_sf` or `geom_tile`.
 #' @return A ggplot return value
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sf.R
@@ -516,7 +512,7 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
 #'   ```
 #' @param crs A `CRS` object defining the coordinate system to project the data
 #'   to before plotting.
-#' @param ... Arguments passed on to `ggplot2::geom_segment`.
+#' @param \dots Arguments passed on to `ggplot2::geom_segment`.
 #' @return A `geom_segment`` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -542,7 +538,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
     function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
   ))
   colnames(sp) <- cnames
-  colnames(ep) <- paste0("end.", cnames)
+  colnames(ep) <- glue("end.{cnames}")
   if (!inherits(data, "SpatialLinesDataFrame")) {
     df <- data.frame(cbind(sp, ep))
   } else {
@@ -566,8 +562,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   dmap <- ggplot2::aes(
     x = .data[[cnames[1]]],
     y = .data[[cnames[2]]],
-    xend = .data[[paste0("end.", cnames[1])]],
-    yend = .data[[paste0("end.", cnames[2])]]
+    xend = .data[[glue("end.{cnames[1]}")]],
+    yend = .data[[glue("end.{cnames[2]}")]]
   )
 
   if (!is.null(mapping)) {
@@ -589,7 +585,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
 #'   mapping.
 #' @param crs A `CRS` object defining the coordinate system to project the data
 #'   to before plotting.
-#' @param ... Arguments passed on to `geom_sf`.
+#' @param \dots Arguments passed on to `geom_sf`.
 #' Unless specified by the user,
 #' the argument `alpha = 0.2` (alpha level for polygon filling) is added.
 #' @return A `geom_sf` object.
@@ -624,7 +620,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
 #'
 #' @export
 #' @param data A SpatialGridDataFrame object.
-#' @param ... Arguments passed on to [gg.SpatialPixelsDataFrame()].
+#' @param \dots Arguments passed on to [gg.SpatialPixelsDataFrame()].
 #' @return A `geom_tile` value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -656,7 +652,7 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #'   data to before plotting.
 #' @param mask A `sp::SpatialPolygons` object defining the region that is
 #'   plotted.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @example inst/examples/gg.sp.R
@@ -703,12 +699,12 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'
 #' @export
 #' @param data A `sp::SpatialPixels` object.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` return value.
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
@@ -736,12 +732,12 @@ gg.SpatialPixels <- function(data, ...) {
 #'
 #' @export
 #' @param data A SpatRaster object.
-#' @param ... Arguments passed on to `geom_spatraster`.
+#' @param \dots Arguments passed on to `geom_spatraster`.
 #' @return The output from `geom_spatraster.
 #' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("tidyterra", quietly = TRUE)) {
 #'   # Load Gorilla covariates
 #'
@@ -771,9 +767,6 @@ gg.SpatRaster <- function(data, ...) {
   }
   tidyterra::geom_spatraster(data = data, ...)
 }
-
-
-
 
 
 #' Geom for fm_mesh_2d objects
@@ -813,7 +806,7 @@ gg.SpatRaster <- function(data, ...) {
 #'   parameter).
 #' @param mask A `SpatialPolygon` or `sf` polygon defining the region that is
 #'   plotted.
-#' @param ... ignored arguments (S3 generic compatibility).
+#' @param \dots ignored arguments (S3 generic compatibility).
 #' @return `geom_line` return values or, if the color argument is used, the
 #'   values of [gg.SpatialPixelsDataFrame()].
 #' @family geomes for meshes
@@ -969,7 +962,7 @@ gg.fm_mesh_2d <- function(data,
 #' @param y Single or vector numeric defining the y-coordinates of the mesh
 #'   knots to plot.
 #' @param shape Shape of the knot markers.
-#' @param ... parameters passed on to `geom_point`.
+#' @param \dots parameters passed on to `geom_point`.
 #' @return An object generated by `geom_point`.
 #' @family geomes for meshes
 #'
@@ -1012,7 +1005,7 @@ gg.fm_mesh_1d <- function(data,
 #' @param data A RasterLayer object.
 #' @param mapping aesthetic mappings created by `aes`. These are passed on to
 #'   `geom_tile`.
-#' @param ... Arguments passed on to `geom_tile`.
+#' @param \dots Arguments passed on to `geom_tile`.
 #' @return An object returned by `geom_tile`
 #' @family geomes for Raster data
 #'
@@ -1067,7 +1060,7 @@ gg.RasterLayer <- function(data,
 #' @method plot bru
 #' @export
 #' @param x a fitted [bru()] model.
-#' @param ... Options passed on to other methods.
+#' @param \dots Options passed on to other methods.
 #'
 #' @examples
 #' \dontrun{
@@ -1097,20 +1090,12 @@ plot.bru <- function(x, ...) {
   }
 }
 
-#' @title Plot prediction using ggplot2
-#'
-#' @description
+#' @describeIn gg.bru_prediction
 #' Generates a base ggplot2 using `ggplot()` and adds a geom for input `x` using
-#' [gg].
+#' [gg.bru_prediction()]. Returns a ggplot object.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name plot.bru_prediction
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
-#' @param ... Arguments passed on to [gg.prediction()].
-#' @return an object of class `gg`
-#' @example inst/examples/gg.prediction.R
 #' @export
 #' @method plot bru_prediction
 
@@ -1120,7 +1105,7 @@ plot.bru_prediction <- function(x, y = NULL, ...) {
     gg(x, ...)
 }
 
-#' @rdname plot.bru_prediction
+#' @describeIn gg.bru_prediction Identical to [gg.bru_prediction()].
 #' @export
 #' @method plot prediction
 plot.prediction <- function(x, y = NULL, ...) {
@@ -1128,7 +1113,6 @@ plot.prediction <- function(x, y = NULL, ...) {
   ggplot2::ggplot() +
     gg(x, ...)
 }
-
 
 
 #' @title Multiple ggplots on a page.
@@ -1139,7 +1123,7 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'
 #' Renders multiple ggplots on a single page.
 #'
-#' @param ... Comma-separated `ggplot` objects.
+#' @param \dots Comma-separated `ggplot` objects.
 #' @param plotlist A list of `ggplot` objects - an alternative to the
 #'   comma-separated argument above.
 #' @param cols Number of columns of plots on the page.
@@ -1162,18 +1146,26 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'     geom_line(mapping = aes(x, z), color = "blue")
 #'   pl3 <- ggplot(data = df) +
 #'     geom_path(mapping = aes(y, z), color = "magenta")
+#'
 #'   multiplot(
 #'     pl1, pl2, pl3,
 #'     layout = rbind(c(1, 2), c(3, 3))
 #'   )
 #'
+#'   # Recommended alternative using the patchwork package:
 #'   if (require("patchwork")) {
-#'     (pl1 + pl2) / pl3
+#'     (pl1 | pl2) / pl3
 #'   }
 #' }
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
+  lifecycle::deprecate_soft(
+    "2.13.0.9026",
+    "multiplot()",
+    details = "Please use the 'patchwork' package for combining ggplots."
+  )
+
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 
@@ -1210,7 +1202,6 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
     }
   }
 }
-
 
 
 # Default color palette for plots using \link{gg}

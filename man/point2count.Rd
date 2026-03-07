@@ -28,8 +28,9 @@ if (bru_safe_sp() &&
   require("sp") &&
   require("raster", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE) &&
-  require("terra", quietly = TRUE) &&
-  require("sf", quietly = TRUE)) {
+  bru_safe_terra(quietly = TRUE) &&
+  require("sf", quietly = TRUE) &&
+  require("patchwork", quietly = TRUE)) {
   gorillas <- gorillas_sp()
   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
@@ -46,7 +47,7 @@ if (bru_safe_sp() &&
     gg(gorillas$boundary) +
     gg(plotpts$plots) +
     geom_text(aes(label = count, x = x, y = y))
-  multiplot(p1, p2, cols = 2)
+  (p1 | p2)
 }
 }
 

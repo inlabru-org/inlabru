@@ -11,13 +11,16 @@ lgcp(
   samplers = NULL,
   ips = NULL,
   formula = . ~ .,
+  E = NULL,
+  weights = NULL,
   ...,
   options = list(),
   .envir = parent.frame()
 )
 }
 \arguments{
-\item{components}{A \code{formula}-like specification of latent components.
+\item{components}{Latent component definitions, either as a \code{\link[=bru_comp_list]{bru_comp_list()}}
+object, or a \code{formula}-like specification.
 Also used to define a default linear additive predictor.  See
 \code{\link[=bru_comp]{bru_comp()}} for details.}
 
@@ -31,16 +34,33 @@ or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
 \item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}.}
+to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}. \code{fmesher::new_fm_int()} (from fmesher
+\verb{0.5.0.9013}) can be used for manually constructed integration schemes.}
 }}
 
 \item{formula}{a \code{formula} where the right hand side is a general R
 expression defines the predictor used in the model.}
 
-\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}. In particular,
-optional \code{E}, a single numeric used rescale all integration weights by a
-fixed factor.}
+\item{E}{Exposure/effort parameter for family = 'poisson' passed on to
+\code{INLA::inla}. Special case if family is 'cp': rescale all integration
+weights by a scalar \code{E}. For sampler specific reweighting/effort, use a
+\code{weight} column in the \code{samplers} object instead, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.
+Default taken from \code{options$E}, normally \code{1}.}
+
+\item{weights}{Fixed (optional) weights parameters of the likelihood, so the
+log-likelihood\verb{[i]} is changed into \code{weights[i] * log_likelihood[i]}.
+Default value is \code{1}. WARNING: The normalizing constant for the likelihood
+is NOT recomputed, so ALL marginals (and the marginal likelihood) must be
+interpreted with great care.
+
+For \code{family = "cp"}, the weights are applied as \code{sum(weights * eta)} in
+the point location contribution part of the log-likelihood, where \code{eta} is
+the linear predictor, and do not affect the integration part of the
+likelihood. This can be used to implement approximative methods for point
+location uncertainty.}
+
+\item{\dots}{Further arguments passed on to \code{\link[=bru_obs]{bru_obs()}}.}
 
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
@@ -70,6 +90,10 @@ example, spatial point realizations may only be known in sub-areas of the
 modelled space. These observed subsets of the LGCP domain are called samplers
 and can be provided via the respective parameter. If samplers is NULL it is
 assumed that all of the LGCP's dimensions have been observed completely.
+}
+\details{
+The \code{E} and \code{weights} arguments are evaluated in the data context, like for
+\code{\link[=bru_obs]{bru_obs()}}.
 }
 \examples{
 \donttest{
@@ -114,7 +138,6 @@ if (bru_safe_inla() &&
   # Plot the intensity
   ggplot() +
     gg(lambda, geom = "tile") +
-    geom_fm(data = data$mesh, alpha = 0, linewidth = 0.05) +
     gg(data$nests, col = "red", alpha = 0.2)
 }
 }

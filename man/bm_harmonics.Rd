@@ -3,17 +3,11 @@
 \name{bm_harmonics}
 \alias{bm_harmonics}
 \alias{bru_mapper_harmonics}
-\alias{ibm_n.bm_harmonics}
-\alias{ibm_jacobian.bm_harmonics}
 \title{Mapper for cos/sin functions}
 \usage{
 bm_harmonics(order = 1, scaling = 1, intercept = TRUE, interval = c(0, 1))
 
 bru_mapper_harmonics(...)
-
-\method{ibm_n}{bm_harmonics}(mapper, inla_f = FALSE, ...)
-
-\method{ibm_jacobian}{bm_harmonics}(mapper, input, state = NULL, inla_f = FALSE, ...)
 }
 \arguments{
 \item{order}{For \code{bm_harmonics}, specifies the maximum \code{cos}/\code{sin}
@@ -28,22 +22,7 @@ basis function is a constant. (Default \code{TRUE})}
 \item{interval}{numeric length-2 vector specifying a domain interval.
 Default \code{c(0, 1)}.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
+\item{\dots}{Arguments passed on to \code{\link[=bm_harmonics]{bm_harmonics()}}}
 }
 \description{
 Constructs a mapper for \code{cos}/\code{sin} functions of orders 1 (if
@@ -89,24 +68,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

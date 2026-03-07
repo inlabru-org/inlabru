@@ -3,17 +3,11 @@
 \name{bm_logsumexp}
 \alias{bm_logsumexp}
 \alias{bru_mapper_logsumexp}
-\alias{ibm_jacobian.bm_logsumexp}
-\alias{ibm_eval.bm_logsumexp}
 \title{Mapper for log-sum-exp aggregation}
 \usage{
 bm_logsumexp(rescale = FALSE, n_block = NULL)
 
 bru_mapper_logsumexp(...)
-
-\method{ibm_jacobian}{bm_logsumexp}(mapper, input, state = NULL, ...)
-
-\method{ibm_eval}{bm_logsumexp}(mapper, input, state = NULL, log = TRUE, ..., sub_lin = NULL)
 }
 \arguments{
 \item{rescale}{logical; For \code{bm_aggregate} and \code{bm_logsumexp},
@@ -31,19 +25,7 @@ the same as dividing by the number of entries in each block.
 the maximum block index in the inputs. The priority order is \code{input$n_block},
 the mapper definition \code{n_block}, then \code{max(input$block)}.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{log}{logical; control \code{log} output. Default \code{TRUE}, see the
-\code{ibm_eval()} details for \code{logsumexp} mappers.}
-
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+\item{\dots}{Arguments passed on to \code{\link[=bm_logsumexp]{bm_logsumexp()}}}
 }
 \description{
 Constructs a mapper
@@ -62,18 +44,6 @@ common method of internally shifting the state blockwise;
 where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the
 shift for block \eqn{k}{k}.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_logsumexp)}: \code{input} should be a list with elements
-\code{block} and \code{weights}. \code{block} should be a vector of the same length as the
-\code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
-If \code{weights} is \code{NULL}, it's interpreted as all-1.
-
-\item \code{ibm_eval(bm_logsumexp)}: When \code{log} is \code{TRUE} (default), \code{ibm_eval()}
-for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
-\code{sum-weight-exp} value is returned.
-
-}}
 \examples{
 m <- bm_logsumexp()
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
@@ -88,24 +58,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

@@ -3,20 +3,11 @@
 \name{bm_factor}
 \alias{bm_factor}
 \alias{bru_mapper_factor}
-\alias{ibm_n.bm_factor}
-\alias{ibm_values.bm_factor}
-\alias{ibm_jacobian.bm_factor}
 \title{Mapper for factor variables}
 \usage{
 bm_factor(values, factor_mapping, indexed = FALSE)
 
 bru_mapper_factor(...)
-
-\method{ibm_n}{bm_factor}(mapper, ...)
-
-\method{ibm_values}{bm_factor}(mapper, ...)
-
-\method{ibm_jacobian}{bm_factor}(mapper, input, ...)
 }
 \arguments{
 \item{values}{Input values calculated by \code{\link[=bru_input.bru_input]{bru_input.bru_input()}}}
@@ -34,11 +25,7 @@ This is needed e.g. for \code{group} and \code{replicate} mappers, since
 works for the main input mappers. The default mapper constructions
 will set it the required setting.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
-
-\item{input}{Data input for the mapper.}
+\item{\dots}{Arguments passed on to \code{\link[=bm_factor]{bm_factor()}}}
 }
 \description{
 Create a factor mapper
@@ -58,25 +45,24 @@ Other mappers:
 \code{\link{bm_aggregate}()},
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

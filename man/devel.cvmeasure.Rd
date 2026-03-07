@@ -32,11 +32,10 @@ if (bru_safe_inla() &&
   require("ggplot2", quietly = TRUE) &&
   require("patchwork", quietly = TRUE) &&
   require("sn", quietly = TRUE) &&
-  require("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
-  require("dplyr", quietly = TRUE) &&
-  require("magrittr", quietly = TRUE)) {
+  require("dplyr", quietly = TRUE)) {
   # Load Gorilla data
 
   gorillas <- gorillas_sf
@@ -56,7 +55,7 @@ if (bru_safe_inla() &&
 
   cmp <- geometry ~ 0 +
     vegetation(gorillas$gcov$vegetation, model = "factor_contrast") +
-    spde(geometry, model = pcmatern) -
+    spde(geometry, model = pcmatern) +
     Intercept(1)
 
   fit <- lgcp(
@@ -86,10 +85,10 @@ if (bru_safe_inla() &&
 
   pred_collect <-
     rbind(
-      pred$joint \%>\% dplyr::mutate(component = "joint"),
-      pred$field \%>\% dplyr::mutate(component = "field"),
-      pred$veg \%>\% dplyr::mutate(component = "veg")
-    ) \%>\%
+      pred$joint |> dplyr::mutate(component = "joint"),
+      pred$field |> dplyr::mutate(component = "field"),
+      pred$veg |> dplyr::mutate(component = "veg")
+    ) |>
     dplyr::mutate(var = sd^2)
 
   # Plot component mean

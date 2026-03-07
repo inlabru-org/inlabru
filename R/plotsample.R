@@ -66,7 +66,7 @@ makepoly <- function(start, width, height) {
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
-#'   require("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("sf", quietly = TRUE)) {
 #'   gorillas <- gorillas_sp()
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
@@ -140,9 +140,8 @@ plotsample <- function(spdf,
   # extract only those nests inside the polygons (neat!)
   dets <- spdf[plots, ]
 
-  return(list(plots = plots, dets = dets))
+  list(plots = plots, dets = dets)
 }
-
 
 
 #' @title Convert a plot sample of points into one of counts.
@@ -166,8 +165,9 @@ plotsample <- function(spdf,
 #'   require("sp") &&
 #'   require("raster", quietly = TRUE) &&
 #'   require("ggplot2", quietly = TRUE) &&
-#'   require("terra", quietly = TRUE) &&
-#'   require("sf", quietly = TRUE)) {
+#'   bru_safe_terra(quietly = TRUE) &&
+#'   require("sf", quietly = TRUE) &&
+#'   require("patchwork", quietly = TRUE)) {
 #'   gorillas <- gorillas_sp()
 #'   plotpts <- plotsample(gorillas$nests, gorillas$boundary,
 #'     x.ppn = 0.4, y.ppn = 0.4, nx = 5, ny = 5
@@ -184,7 +184,7 @@ plotsample <- function(spdf,
 #'     gg(gorillas$boundary) +
 #'     gg(plotpts$plots) +
 #'     geom_text(aes(label = count, x = x, y = y))
-#'   multiplot(p1, p2, cols = 2)
+#'   (p1 | p2)
 #' }
 #' }
 #'

@@ -1,6 +1,6 @@
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      requireNamespace("terra", quietly = TRUE) &&
+      bru_safe_terra(quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data
@@ -41,9 +41,9 @@
     # Change color
 
     ggplot() +
-      gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
-      gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-      gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
+      gg(mexdolphin$ppoly, color = "green") + # survey boundary; SpatialPolygon
+      gg(mexdolphin$samplers, color = "red") + # ship transects; SpatialLines
+      gg(mexdolphin$points, color = "blue") # dolphin sightings; SpatialPoints
 
 
     # Visualize data annotations: line width by segment number

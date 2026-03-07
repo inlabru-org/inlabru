@@ -1,4 +1,3 @@
-#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom rlang .env
 
@@ -30,7 +29,7 @@
 #' minimum values are shown.
 #' @seealso [bru()]
 #'
-#' @details Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
+#' @details Requires the "dplyr", "ggplot2", and "patchwork"
 #' packages to be installed.
 #' @export
 #' @examples
@@ -52,7 +51,7 @@ bru_convergence_plot <- function(x, from = 1, to = NULL, type = NULL) {
 
 
 make_bru_track_plots <- function(fit, from = 1, to = NULL) {
-  needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
+  needed <- c("dplyr", "ggplot2", "patchwork")
   are_installed <-
     vapply(
       needed,
@@ -61,7 +60,7 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",
@@ -85,9 +84,9 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
     to <- max(track_data$iteration)
   }
 
-  track_data <- track_data %>%
-    dplyr::group_by(.data$effect, .data$iteration) %>%
-    dplyr::mutate(alpha_value = 1 / sqrt(max(.data$index))) %>%
+  track_data <- track_data |>
+    dplyr::group_by(.data$effect, .data$iteration) |>
+    dplyr::mutate(alpha_value = 1 / sqrt(max(.data$index))) |>
     dplyr::ungroup()
 
   alpha_value_lin_scale <- 0.8
@@ -152,12 +151,12 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_tracks <-
     ggplot2::ggplot(
-      track_data %>%
-        dplyr::filter(.data$iteration >= from, .data$iteration <= to) %>%
+      track_data |>
+        dplyr::filter(.data$iteration >= from, .data$iteration <= to) |>
         dplyr::group_by(
           .data$effect,
           .data$iteration
-        ) %>%
+        ) |>
         dplyr::summarise(
           MaxMode = max(.data$mode),
           MeanMode = mean(.data$mode),
@@ -228,19 +227,19 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_mode_lin <-
     ggplot2::ggplot(
-      track_data %>%
+      track_data |>
         dplyr::filter(
           .data$iteration >= max(1, from),
           .data$iteration <= to
-        ) %>%
+        ) |>
         dplyr::filter(
           is.finite(.data$sd),
           is.finite(.data$new_linearisation)
-        ) %>%
+        ) |>
         dplyr::group_by(
           .data$effect,
           .data$iteration
-        ) %>%
+        ) |>
         dplyr::summarise(
           MaxSD = max(.data$sd),
           MeanSD = mean(.data$sd),
@@ -375,18 +374,18 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_relative_change <-
     ggplot2::ggplot(
-      track_data %>%
+      track_data |>
         dplyr::filter(
           .data$iteration >= max(1, from),
           .data$iteration <= to
-        ) %>%
+        ) |>
         dplyr::group_by(
           .data$effect,
           .data$iteration
-        ) %>%
+        ) |>
         dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd),
           .data$sd, 1.0
-        )) %>%
+        )) |>
         dplyr::summarise(
           MaxMode = max(abs(.data$mode - .data$mode.prev) / .data$sd),
           MeanMode = mean(abs(.data$mode - .data$mode.prev) / .data$sd),
@@ -398,7 +397,7 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
           RMSLin = mean((.data$new_linearisation -
             .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
           .groups = "drop"
-        ) %>%
+        ) |>
         dplyr::mutate(
           MaxMode = dplyr::if_else(.data$MaxMode > 0, .data$MaxMode, NA),
           MeanMode = dplyr::if_else(.data$MeanMode > 0, .data$MeanMode, NA),
@@ -451,16 +450,16 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_change <-
     ggplot2::ggplot(
-      track_data %>%
+      track_data |>
         dplyr::filter(
           .data$iteration >= max(1, from),
           .data$iteration <= to
-        ) %>%
-        dplyr::filter(is.finite(.data$sd)) %>%
+        ) |>
+        dplyr::filter(is.finite(.data$sd)) |>
         dplyr::group_by(
           .data$effect,
           .data$iteration
-        ) %>%
+        ) |>
         dplyr::summarise(
           MaxSD = max(.data$sd),
           MeanSD = mean(.data$sd),
@@ -650,7 +649,7 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 }
 
 make_inla_track_plots <- function(fit, from = 1, to = NULL) {
-  needed <- c("dplyr", "ggplot2", "magrittr", "patchwork")
+  needed <- c("dplyr", "ggplot2", "patchwork")
   are_installed <-
     vapply(
       needed,
@@ -659,7 +658,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",
@@ -690,7 +689,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_trace1a <-
     ggplot2::ggplot(
-      track_data %>%
+      track_data |>
         dplyr::filter(.data$iteration >= from, .data$iteration <= to),
       ggplot2::aes(
         .data$nfunc_total,
@@ -703,11 +702,11 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
     ggplot2::ggtitle("target function value")
 
   tracks <- cbind(
-    track_data %>%
+    track_data |>
       dplyr::select(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
     tibble::as_tibble(track_data$theta)
   )
-  tracks <- tracks %>%
+  tracks <- tracks |>
     tidyr::pivot_longer(
       cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
       names_to = "theta",
@@ -715,7 +714,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
     )
   pl_trace1b <-
     ggplot2::ggplot(
-      tracks %>% dplyr::filter(.data$iteration >= from, .data$iteration <= to),
+      tracks |> dplyr::filter(.data$iteration >= from, .data$iteration <= to),
       ggplot2::aes(
         .data$nfunc_total,
         .data$value,
@@ -750,18 +749,18 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
       ggplot2::theme(legend.position = "bottom")
 
 
-  tr <- track_data %>%
+  tr <- track_data |>
     dplyr::select(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total)
   th <- tibble::as_tibble(track_data$theta)
   tr1 <- cbind(tr[-nrow(tr), ], theta = th[-nrow(tr), ])
   tr2 <- cbind(tr[-nrow(tr), ], theta = th[-1, ])
 
-  track1 <- tr1 %>% tidyr::pivot_longer(
+  track1 <- tr1 |> tidyr::pivot_longer(
     cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
     names_to = "theta",
     values_to = "value"
   )
-  track2 <- tr2 %>% tidyr::pivot_longer(
+  track2 <- tr2 |> tidyr::pivot_longer(
     cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
     names_to = "theta",
     values_to = "value"
@@ -770,7 +769,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 
   pl_trace2 <-
     ggplot2::ggplot(
-      track1 %>% dplyr::filter(.data$iteration >= from, .data$iteration <= to)
+      track1 |> dplyr::filter(.data$iteration >= from, .data$iteration <= to)
     ) +
     ggplot2::geom_path(ggplot2::aes(.data$value, .data$value_next)) +
     ggplot2::facet_wrap(~ .data$theta) +
@@ -783,7 +782,6 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
     default = pl_trace_combined
   )
 }
-
 
 
 #' @title Plot inlabru iteration timings
@@ -813,7 +811,7 @@ bru_timings_plot <- function(x) {
       },
       TRUE
     )
-  if (any(!are_installed)) {
+  if (!all(are_installed)) {
     stop(
       paste0(
         "Needed package(s) ",

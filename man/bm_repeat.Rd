@@ -3,40 +3,11 @@
 \name{bm_repeat}
 \alias{bm_repeat}
 \alias{bru_mapper_repeat}
-\alias{ibm_n.bm_repeat}
-\alias{ibm_n_output.bm_repeat}
-\alias{ibm_values.bm_repeat}
-\alias{ibm_jacobian.bm_repeat}
-\alias{ibm_eval.bm_repeat}
-\alias{ibm_linear.bm_repeat}
-\alias{ibm_invalid_output.bm_repeat}
 \title{Mapper for repeating a mapper}
 \usage{
 bm_repeat(mapper, n_rep, interleaved = FALSE)
 
 bru_mapper_repeat(...)
-
-\method{ibm_n}{bm_repeat}(mapper, ...)
-
-\method{ibm_n_output}{bm_repeat}(mapper, ...)
-
-\method{ibm_values}{bm_repeat}(mapper, ...)
-
-\method{ibm_jacobian}{bm_repeat}(
-  mapper,
-  input,
-  state = NULL,
-  inla_f = FALSE,
-  multi = FALSE,
-  ...,
-  sub_lin = NULL
-)
-
-\method{ibm_eval}{bm_repeat}(mapper, input, state, multi = FALSE, ..., sub_lin = NULL)
-
-\method{ibm_linear}{bm_repeat}(mapper, input, state, ...)
-
-\method{ibm_invalid_output}{bm_repeat}(mapper, input, state, ...)
 }
 \arguments{
 \item{mapper}{The mapper to be repeated.}
@@ -55,25 +26,7 @@ If \code{n_rep} is a vector, \code{interleaved} should either be a single logica
 or a vector of the same length. Each element applies to the corresponding
 \code{n_rep} repetition specification.}
 
-\item{...}{Arguments passed on to other methods}
-
-\item{input}{Data input for the mapper.}
-
-\item{state}{A vector of latent state values for the mapping,
-of length \code{ibm_n(mapper, inla_f = FALSE)}}
-
-\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
-result must be compatible with the \code{INLA::f(...)} and corresponding
-\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
-the \code{input} interpretation may be different.
-Implementations do not normally need to do anything different, except
-for mappers of the type needed for hidden multicomponent models such
-as "bym2", which can be handled by \code{bm_collect}.}
-
-\item{multi}{logical;
-If \code{TRUE} (or positive), recurse one level into sub-mappers}
-
-\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+\item{...}{Arguments passed on to \code{\link[=bm_scale]{bm_scale()}}}
 }
 \value{
 A \code{bm_repeat} or \code{bm_sum} object, or the original
@@ -84,14 +37,6 @@ Defines a repeated-space mapper that sums the contributions for
 each copy. The \code{ibm_n()} method returns \code{ibm_n(mapper) * n_rep}, and
 \code{ibm_values()} returns \code{seq_len(ibm_n(mapper))}.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{ibm_jacobian(bm_repeat)}: The input should take the format of the
-repeated submapper.
-
-\item \code{ibm_invalid_output(bm_repeat)}: Passes on the input to the corresponding method.
-
-}}
 \examples{
 (m0 <- bm_index(3))
 (m <- bm_repeat(m0, 5))
@@ -116,24 +61,23 @@ Other mappers:
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
 \code{\link{bm_factor}()},
+\code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},
 \code{\link{bm_index}()},
 \code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
 \code{\link{bm_sum}()},
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()},
-\code{\link{bru_mapper.fm_mesh_1d}()},
-\code{\link{bru_mapper.fm_mesh_2d}()},
-\code{\link{bru_mapper_generics}}
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}

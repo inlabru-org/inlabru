@@ -16,7 +16,7 @@ evaluate_effect_single_state(...)
 \method{evaluate_effect_single_state}{bru_comp_list}(components, input, state, ...)
 }
 \arguments{
-\item{...}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
+\item{\dots}{Optional additional parameters, e.g. \code{inla_f}. Normally unused.}
 
 \item{component}{A \link{bru_mapper}, \link{bru_comp}, or
 \link{bm_list}.}

@@ -4,7 +4,10 @@ if (bru_safe_inla() &&
 
   # Generate some data
   input.df <- data.frame(x = cos(1:10))
-  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+  input.df <- within(
+    input.df,
+    y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+  )
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
@@ -18,14 +21,14 @@ if (bru_safe_inla() &&
 
   class(xpost)
 
-  # The statistics include mean, standard deviation, the 2.5% quantile, the median,
-  # the 97.5% quantile, minimum and maximum sample drawn from the posterior as well as
-  # the coefficient of variation and the variance.
+  # The statistics include mean, standard deviation, the 2.5% quantile, the
+  # median, the 97.5% quantile, minimum and maximum sample drawn from the
+  # posterior as well as the coefficient of variation and the variance.
 
   xpost
 
-  # For a single variable like 'x' the default plotting method invoked by gg() will
-  # show these statistics in a fashion similar to a box plot:
+  # For a single variable like 'x' the default plotting method invoked by gg()
+  # will show these statistics in a fashion similar to a box plot:
 
   ggplot() +
     gg(xpost)
@@ -37,7 +40,8 @@ if (bru_safe_inla() &&
   xipost <- predict(fit, formula = ~ data.frame(post = c(x, Intercept)))
   xipost
 
-  # If we still want a plot in the previous style we have to set the 'bar' parameter to TRUE:
+  # If we still want a plot in the previous style we have to set the 'bar'
+  # parameter to TRUE:
 
   rownames(xipost) <- c("x", "Intercept")
   ggplot() +

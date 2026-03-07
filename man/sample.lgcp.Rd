@@ -44,11 +44,13 @@ Default \code{FALSE}. This affects \code{R} and the permitted values for \code{s
 }
 \value{
 A \code{data.frame} (1D case),
-SpatialPoints (2D flat and 3D spherical surface cases)
-SpatialPointsDataFrame (2D/3D surface cases with multiple samples).
+or \code{sf} (2D flat and 3D spherical surface cases,
+or 2D/2.5D surface cases with multiple samples).
 For multiple samples, the \code{data.frame} output has a
 column \code{'sample'} giving the index for each sample.
 object of point locations.
+
+For the old (pre version \verb{2.13.0.9034}) \code{sp} output format, use \code{as(ret, "Spatial")} or \code{sf::as_Spatial(ret)}.
 }
 \description{
 This function provides point samples from one- and two-dimensional
@@ -78,9 +80,7 @@ the same CRS as the mesh.
 \examples{
 \donttest{
 # The INLA package is required
-if (bru_safe_inla() &&
-  bru_safe_sp() &&
-  require("sp")) {
+if (bru_safe_inla()) {
   vertices <- seq(0, 3, by = 0.1)
   mesh <- fm_mesh_1d(vertices)
   loglambda <- 5 - 0.5 * vertices
@@ -95,11 +95,9 @@ if (bru_safe_inla() &&
 # The INLA package is required
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
-  bru_safe_sp() &&
-  require("sp") &&
-  require("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE)) {
-  gorillas <- gorillas_sp()
+  gorillas <- gorillas_sf
   pts <- sample.lgcp(gorillas$mesh,
     loglambda = 1.5,
     samplers = gorillas$boundary
@@ -107,6 +105,16 @@ if (bru_safe_inla() &&
   ggplot() +
     gg(gorillas$mesh) +
     gg(pts)
+
+  pts <- sample.lgcp(gorillas$mesh,
+    loglambda = base::scale(gorillas$mesh$loc) * 2,
+    samplers = gorillas$boundary,
+    ignore.CRS = TRUE
+  )
+  ggplot() +
+    gg(gorillas$mesh) +
+    gg(pts, aes(color = as.factor(sample))) +
+    labs(color = "Sample")
 }
 }
 

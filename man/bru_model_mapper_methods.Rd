@@ -4,23 +4,26 @@
 \alias{bru_model_mapper_methods}
 \alias{ibm_linear.bru_model}
 \alias{ibm_linear.bru_comp_list}
-\alias{ibm_linear.bru_comp}
 \alias{ibm_simplify.bru_model}
 \alias{ibm_simplify.bru_comp}
 \alias{ibm_simplify.bru_comp_list}
+\alias{ibm_linear.bm_list}
+\alias{ibm_simplify.bm_list}
 \title{Mapper methods for model objects}
 \usage{
 \method{ibm_linear}{bru_model}(mapper, input, state = NULL, ...)
 
 \method{ibm_linear}{bru_comp_list}(mapper, input, state = NULL, ...)
 
-\method{ibm_linear}{bru_comp}(mapper, input, state = NULL, ...)
-
 \method{ibm_simplify}{bru_model}(mapper, input = NULL, state = NULL, ...)
 
 \method{ibm_simplify}{bru_comp}(mapper, input = NULL, state = NULL, ...)
 
 \method{ibm_simplify}{bru_comp_list}(mapper, input = NULL, state = NULL, ...)
+
+\method{ibm_linear}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_simplify}{bm_list}(mapper, input = NULL, state = NULL, ...)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}

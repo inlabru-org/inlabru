@@ -1,7 +1,7 @@
 test_that("Component construction: linear model", {
   local_bru_safe_inla()
 
-  df <- data.frame(x = 1:10, response = 1:10)
+  df <- data.frame(x = 1:10, W = rep(1, 10), response = 1:10)
 
   llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = df)))
 
@@ -13,7 +13,7 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp0$main$mapper)$input), "x")
 
   # Using label as input:
   cmp0 <- bru_comp_list(
@@ -23,37 +23,37 @@ test_that("Component construction: linear model", {
 
   expect_equal(cmp0$label, "x")
   expect_equal(cmp0$main$model, "linear")
-  expect_equal(as.character(cmp0$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp0$main$mapper)$input), "x")
 
   cmp <- bru_comp_list(
-    ~ beta(main = x, model = "linear", values = 1),
+    ~ beta(main = x, weights = W, model = "linear", values = 1),
     lhoods = llik
   )[["beta"]]
 
   expect_equal(cmp$label, "beta")
   expect_equal(cmp$main$model, "linear")
-  expect_equal(as.character(cmp$main$input$input), "x")
+  expect_equal(rlang::as_label(ibm_input_get(cmp$main$mapper)$input), "x")
 
   # Covariate mapping
-  df <- data.frame(x = 1:10)
+  df <- data.frame(x = 1:10, W = 1)
   inp <- bru_input(cmp, data = df)
   expect_equal(
     inp,
     list(
-      mapper = list(
-        main = 1:10,
-        group = 1,
-        replicate = 1
+      core = list(
+        main = 1:10 # ,
+        #        group = 1,
+        #        replicate = 1
       ),
-      scale = NULL
+      scale = rep_len(1, 10)
     )
   )
 
   idx <- bru_index(cmp, inla_f = FALSE)
   expect_type(idx, "list")
   expect_equal(names(idx)[1], "beta")
-  expect_equal(names(idx)[2], "beta.group")
-  expect_equal(names(idx)[3], "beta.repl")
+  #  expect_equal(names(idx)[2], "beta.group")
+  #  expect_equal(names(idx)[3], "beta.repl")
   expect_equal(idx$beta, 1)
 
   # A-matrix
@@ -82,7 +82,6 @@ test_that("Component construction: linear model", {
 })
 
 
-
 test_that("Component construction: duplicate detection", {
   expect_error(
     bru_comp_list(
@@ -93,7 +92,6 @@ test_that("Component construction: duplicate detection", {
     regexp = "Duplicated component labels detected: 'beta'"
   )
 })
-
 
 
 test_that("Component construction: offset", {
@@ -111,10 +109,9 @@ test_that("Component construction: offset", {
 })
 
 
-
 test_that("Component construction: terra", {
   skip_if_not_installed("sf")
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
 
   f <- system.file("ex/elev.tif", package = "terra")
   r <- terra::rast(f)
@@ -225,8 +222,6 @@ test_that("Component construction: terra", {
 })
 
 
-
-
 test_that("Component construction: default index/mesh/mapping construction", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -245,8 +240,8 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
-      input = c(1, NA, 4),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(main = c(1, NA, 4))),
       state = c(11, 12, 13, 14)
     ),
     c(11, 0, 14)
@@ -295,7 +290,6 @@ test_that("Component construction: default index/mesh/mapping construction", {
 })
 
 
-
 test_that("Component construction: main iid factor construction", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -316,8 +310,8 @@ test_that("Component construction: main iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$main,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(main = as.factor(c(1, NA, 4)))),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)
@@ -349,8 +343,11 @@ test_that("Component construction: group iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$group,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(
+        main = rep(1, 3),
+        group = as.factor(c(1, NA, 4))
+      )),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)
@@ -384,8 +381,11 @@ test_that("Component construction: replicate iid factor construction", {
   )
 
   expect_equal(
-    ibm_eval(cmp2$effect$mapper$mappers$mapper$mappers$replicate,
-      input = as.factor(c(1, NA, 4)),
+    ibm_eval(cmp2$effect$mapper,
+      input = list(core = list(
+        main = rep(1, 3),
+        replicate = as.factor(c(1, NA, 4))
+      )),
       state = c(11, 12, 13, 14, 15)
     ),
     c(11, 0, 15)
@@ -394,7 +394,6 @@ test_that("Component construction: replicate iid factor construction", {
   local_bru_safe_inla()
   expect_no_error(bru(cmp2, lik))
 })
-
 
 
 test_that("Component construction: unsafe intercepts", {
@@ -409,7 +408,7 @@ test_that("Component construction: unsafe intercepts", {
     },
     paste0(
       "The input evaluation 'something_unknown' for 'something_unknown' ",
-      "failed. Perhaps the data object doesn't contain the needed variables?"
+      "failed.\nPerhaps the data object doesn't contain the needed variables?"
     )
   )
 })
@@ -451,11 +450,11 @@ test_that("Component inputs: non-numeric input detection", {
   lk <- bru_obs(formula = obs ~ ., data = df, family = "gaussian")
   lk <- bru_used_update(lk, labels = names(cmp))
   model <- bru_model(cmp, c(lk))
-  input <- bru_input(model$effects$field, data = df)
+  input <- bru_input(as_bru_comp_list(model)$field, data = df)
 
   expect_error(
     ibm_eval(
-      model$effects$field$mapper,
+      as_bru_comp_list(model)$field$mapper,
       input = input,
       state = rep(1, fm_dof(mesh))
     ),

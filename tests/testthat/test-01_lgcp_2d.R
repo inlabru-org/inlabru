@@ -1,7 +1,7 @@
 test_that("2D LGCP fitting (sf)", {
   skip_on_cran()
   local_bru_safe_inla()
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
 
   withr::local_seed(123L)
@@ -35,12 +35,12 @@ test_that("2D LGCP fitting (sf)", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.1109,
+    0.6882955,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.579,
+    0.5167925,
     tolerance = midtol
   )
 
@@ -58,12 +58,12 @@ test_that("2D LGCP fitting (sf)", {
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
-    2.1137,
+    2.137037,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    1.1049,
+    1.133754,
     tolerance = midtol
   )
 
@@ -140,7 +140,7 @@ test_that("2D LGCP fitting (sp)", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not(bru_safe_sp())
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
   withr::local_options(lifecycle_verbosity = "quiet")
 
@@ -175,12 +175,12 @@ test_that("2D LGCP fitting (sp)", {
   # test_that("2D LGCP fitting: INLA intercept", {
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
-    1.1109,
+    0.6882955,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.fixed["Intercept", "sd"],
-    0.579,
+    0.516925,
     tolerance = midtol
   )
 
@@ -198,12 +198,12 @@ test_that("2D LGCP fitting (sp)", {
   )
   expect_equal(
     fit$summary.hyperpar["Range for mySmooth", "mean"],
-    2.1137,
+    2.137037,
     tolerance = midtol
   )
   expect_equal(
     fit$summary.hyperpar["Stdev for mySmooth", "mean"],
-    1.1049,
+    1.133754,
     tolerance = midtol
   )
 

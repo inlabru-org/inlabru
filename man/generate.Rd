@@ -16,7 +16,6 @@ generate(object, ...)
   num.threads = NULL,
   used = NULL,
   ...,
-  data = deprecated(),
   include = deprecated(),
   exclude = deprecated()
 )
@@ -24,7 +23,7 @@ generate(object, ...)
 \arguments{
 \item{object}{A \code{bru} object obtained by calling \code{\link[=bru]{bru()}}.}
 
-\item{...}{additional, unused arguments.}
+\item{\dots}{additional, unused arguments.}
 
 \item{newdata}{A \code{data.frame} or \code{SpatialPointsDataFrame} of covariates
 needed for sampling.}
@@ -47,8 +46,6 @@ When seed != 0, overridden to "1:1"}
 
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
-
-\item{data}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{newdata} instead.}
 
 \item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
 of used variables fails, use \code{used} instead.}
@@ -80,7 +77,8 @@ expressions defined in the component definition itself, e.g.
 \code{field(coordinates, ...)} (see also \code{\link[=bru_comp_eval]{bru_comp_eval()}}).
 
 For "iid" models with \code{mapper = bm_index(n)}, \code{rnorm()} is used to
-generate new realisations for indices greater than \code{n}.
+generate new realisations for indices greater than \code{n}, if accessed
+via \verb{<name>_eval(...)}.
 }
 \examples{
 \donttest{
@@ -90,7 +88,10 @@ if (bru_safe_inla() &&
   # Generate data for a simple linear model
 
   input.df <- data.frame(x = cos(1:10))
-  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
+  input.df <- within(
+    input.df,
+    y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+  )
 
   # Fit the model
 

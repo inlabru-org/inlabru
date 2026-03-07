@@ -2,7 +2,7 @@
 if (bru_safe_inla() &&
     require("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE) &&
-    require("terra", quietly = TRUE) &&
+    bru_safe_terra(quietly = TRUE) &&
     require("sf", quietly = TRUE)) {
 
   # Load the Gorilla data
@@ -24,7 +24,8 @@ if (bru_safe_inla() &&
     prior.range = c(0.01, 0.01)
   )
 
-  # Define domain of the LGCP as well as the model components (spatial SPDE effect and Intercept)
+  # Define domain of the LGCP as well as the model components (spatial SPDE
+  # effect and Intercept)
 
   cmp <- geometry ~ field(geometry, model = matern) + Intercept(1)
 
@@ -37,15 +38,16 @@ if (bru_safe_inla() &&
     options = list(control.inla = list(int.strategy = "eb"))
   )
 
-  # Once we obtain a fitted model the predict function can serve various purposes.
+  # Once we obtain a fitted model the predict function can serve various
+  # purposes.
   # The most basic one is to determine posterior statistics of a univariate
   # random variable in the model, e.g. the intercept
 
   icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
   plot(icpt)
 
-  # The formula argument can take any expression that is valid within the model, for
-  # instance a non-linear transformation of a random variable
+  # The formula argument can take any expression that is valid within the model,
+  # for instance a non-linear transformation of a random variable
 
   exp.icpt <- predict(fit, NULL, ~ c(
     "Intercept" = Intercept_latent,
@@ -53,22 +55,24 @@ if (bru_safe_inla() &&
   ))
   plot(exp.icpt, bar = TRUE)
 
-  # The intercept is special in the sense that it does not depend on other variables
-  # or covariates. However, this is not true for the smooth spatial effects 'field'.
-  # In order to predict 'field' we have to define where (in space) to predict. For
-  # this purpose, the second argument of the predict function can take \code{data.frame}
-  # objects as well as Spatial objects. For instance, we might want to predict
-  # 'field' at the locations of the mesh vertices. Using
+  # The intercept is special in the sense that it does not depend on other
+  # variables or covariates. However, this is not true for the smooth spatial
+  # effects 'field'.
+  # In order to predict 'field' we have to define where (in space) to predict.
+  # For this purpose, the second argument of the predict function can take
+  # \code{data.frame} objects as well as sf (and legacy sp/Spatial) objects. For
+  # instance, we might want to predict 'field' at the locations of the mesh
+  # vertices. Using
 
   vrt <- fm_vertices(gorillas$mesh, format = "sf")
 
-  # we obtain these vertices as a SpatialPointsDataFrame
+  # we obtain these vertices as an sf object with POINT geometries
 
   ggplot() +
     gg(gorillas$mesh) +
     gg(vrt, color = "red")
 
-  # Predicting 'mySmooth' at these locations works as follows
+  # Predicting 'field' at these locations works as follows
 
   field <- predict(fit, vrt, ~field)
 
@@ -85,14 +89,14 @@ if (bru_safe_inla() &&
     gg(gorillas$mesh) +
     gg(field, aes(color = mean), size = 2)
 
-  # However, we are often interested in a spatial field and thus a linear interpolation,
-  # which can be achieved by using the gg mechanism for meshes
+  # However, we are often interested in a spatial field and thus a linear
+  # interpolation, which can be achieved by using the gg mechanism for meshes
 
   ggplot() +
     gg(gorillas$mesh, color = field$mean)
 
-  # Alternatively, we can predict the spatial field at a grid of locations, e.g. a
-  # sf object with a grid of points covering the relevant part of mesh
+  # Alternatively, we can predict the spatial field at a grid of locations, e.g.
+  # a sf object with a grid of points covering the relevant part of mesh
 
   pxl <- fm_pixels(gorillas$mesh, format = "sf", mask = gorillas$boundary)
   field2 <- predict(fit, pxl, ~field)

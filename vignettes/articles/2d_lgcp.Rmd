@@ -35,6 +35,7 @@ library(inlabru)
 library(INLA)
 library(mgcv)
 library(ggplot2)
+library(patchwork)
 ```
 
 Get the data
@@ -136,7 +137,7 @@ pl2 <- ggplot() +
   geom_sf(data = boundary, alpha = 0.1) +
   ggtitle("LGCP fit to Points", subtitle = "(Linear Predictor Scale)")
 
-multiplot(pl1, pl2, cols = 2)
+(pl1 | pl2)
 ```
 
 You can plot the median, lower 95% and upper 95% density surfaces as follows (assuming
@@ -168,7 +169,7 @@ spde.logvar <- spde.posterior(fit, "mySmooth", what = "log.variance")
 range.plot <- plot(spde.range)
 var.plot <- plot(spde.logvar)
 
-multiplot(range.plot, var.plot, int.plot)
+(range.plot / var.plot / int.plot)
 ```
 
 Look at the correlation function if you want to:
@@ -176,7 +177,7 @@ Look at the correlation function if you want to:
 ```{r eval=TRUE,warning=FALSE,message=FALSE}
 corplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.correlation"))
 covplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.covariance"))
-multiplot(covplot, corplot)
+(covplot / corplot)
 ```
 
 

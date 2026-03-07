@@ -25,7 +25,7 @@ data to before plotting.}
 \item{mask}{A \code{sp::SpatialPolygons} object defining the region that is
 plotted.}
 
-\item{...}{Arguments passed on to \code{geom_tile}.}
+\item{\dots}{Arguments passed on to \code{geom_tile}.}
 }
 \value{
 A \code{geom_tile} return value.
@@ -38,7 +38,7 @@ Requires the \code{ggplot2} package.
 \examples{
 \donttest{
   if (require("ggplot2", quietly = TRUE) &&
-      requireNamespace("terra", quietly = TRUE) &&
+      bru_safe_terra(quietly = TRUE) &&
       bru_safe_sp() &&
       require("sp")) {
     # Load Gorilla data
@@ -79,9 +79,9 @@ Requires the \code{ggplot2} package.
     # Change color
 
     ggplot() +
-      gg(mexdolphin$ppoly, color = "green") + # survey boundary as SpatialPolygon
-      gg(mexdolphin$samplers, color = "red") + # ship transects as SpatialLines
-      gg(mexdolphin$points, color = "blue") # dolphin sightings as SpatialPoints
+      gg(mexdolphin$ppoly, color = "green") + # survey boundary; SpatialPolygon
+      gg(mexdolphin$samplers, color = "red") + # ship transects; SpatialLines
+      gg(mexdolphin$points, color = "blue") # dolphin sightings; SpatialPoints
 
 
     # Visualize data annotations: line width by segment number

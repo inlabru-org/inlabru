@@ -1,16 +1,17 @@
-#' @title Summarise DIC and WAIC from `lgcp` objects.
+#' @title Summarise DIC from `lgcp` estimates.
 #'
 #' @description
-#' Calculates DIC and/or WAIC differences and produces an ordered summary.
+#' Calculates DIC differences and produces an ordered summary.
 #'
-#' @param ... Comma-separated objects inheriting from class `inla` and obtained
-#' from a run of `INLA::inla()`, [bru()] or [lgcp()]
+#' @param \dots Comma-separated objects inheriting from class `inla` and
+#'   obtained from a run of `INLA::inla()`, [bru()] or [lgcp()]
 #' @param criterion character vector.
 #' If it includes 'DIC', computes DIC differences;
-#' If it contains 'WAIC', computes WAIC differences. Default: 'DIC'
+#' 'WAIC' is also allowed, but note that plain WAIC values fomr inla are not
+#' well-defined for point process models. Default 'WAIC'
 #'
 #' @return A data frame with each row containing the Model name,
-#' DIC and Delta.DIC, and/or WAIC and Delta.WAIC.
+#' DIC and Delta.DIC.
 #'
 #' @export
 #'
@@ -45,6 +46,16 @@
 #' }
 deltaIC <- function(..., criterion = "DIC") {
   criterion <- match.arg(criterion, c("DIC", "WAIC"), several.ok = TRUE)
+
+  if ("WAIC" %in% criterion) {
+    warning(
+      paste0(
+        "WAIC values from INLA are not well-defined for point process models.",
+        " Use with caution, or better, not at all."
+      ),
+      .immediately = TRUE
+    )
+  }
 
   names <- as.character(substitute(list(...)))[-1L]
   model <- eval(list(...))
@@ -82,5 +93,5 @@ deltaIC <- function(..., criterion = "DIC") {
   if ("WAIC" %in% criterion) {
     result <- cbind(result, data.frame(WAIC = waic, Delta.WAIC = dwaic))
   }
-  return(result)
+  result
 }

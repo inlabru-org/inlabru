@@ -10,7 +10,7 @@
 multiplot(..., plotlist = NULL, cols = 1, layout = NULL)
 }
 \arguments{
-\item{...}{Comma-separated \code{ggplot} objects.}
+\item{\dots}{Comma-separated \code{ggplot} objects.}
 
 \item{plotlist}{A list of \code{ggplot} objects - an alternative to the
 comma-separated argument above.}
@@ -37,13 +37,15 @@ if (require("ggplot2", quietly = TRUE)) {
     geom_line(mapping = aes(x, z), color = "blue")
   pl3 <- ggplot(data = df) +
     geom_path(mapping = aes(y, z), color = "magenta")
+
   multiplot(
     pl1, pl2, pl3,
     layout = rbind(c(1, 2), c(3, 3))
   )
 
+  # Recommended alternative using the patchwork package:
   if (require("patchwork")) {
-    (pl1 + pl2) / pl3
+    (pl1 | pl2) / pl3
   }
 }
 }
