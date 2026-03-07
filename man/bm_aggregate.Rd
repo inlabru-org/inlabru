@@ -43,7 +43,6 @@ m <- bm_aggregate()
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

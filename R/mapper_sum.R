@@ -28,7 +28,6 @@
 #'   seq_len(ibm_n(m))
 #' )
 #'
-#'
 bm_sum <- function(mappers, single_input = FALSE) {
   mappers <- as_bm_list(mappers)
   if (is.null(names(mappers))) {

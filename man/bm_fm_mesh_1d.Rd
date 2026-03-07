@@ -42,7 +42,6 @@ m <- bru_mapper(
 ibm_values(m)
 ibm_eval(m, 1:7, 1:6)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

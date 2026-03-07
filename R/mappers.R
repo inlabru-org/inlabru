@@ -1350,7 +1350,6 @@ ibm_jacobian.bm_inla_mesh_2d <- function(mapper, input, ...) {
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:6)
 #'
-#'
 bru_mapper.fm_mesh_1d <- function(mesh, indexed = TRUE, ...) {
   if (indexed) {
     mapper <- bm_fmesher(mesh)
@@ -1748,7 +1747,6 @@ ibm_eval.bm_taylor <- function(mapper,
 #' m <- bm_linear()
 #' ibm_eval(m, input = 1:4, state = 2)
 #'
-#'
 bm_linear <- function() {
   bru_mapper_define(list(), new_class = "bm_linear")
 }
@@ -1919,7 +1917,6 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
 #' m <- bm_factor(factor(c("a", "b")), "contrast")
 #' ibm_eval2(m, input = factor(c("b", "a", "a", "b")), state = 2)
 #'
-#'
 bm_factor <- function(values, factor_mapping, indexed = FALSE) {
   factor_mapping <- match.arg(factor_mapping, c("full", "contrast"))
   if (is.factor(values)) {
@@ -2031,7 +2028,6 @@ ibm_jacobian.bm_factor <- function(mapper, input, ...) {
 #' m <- bm_const()
 #' ibm_eval2(m, input = 1:4)
 #'
-#'
 bm_const <- function() {
   bru_mapper_define(list(), new_class = "bm_const")
 }
@@ -2092,7 +2088,6 @@ ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
 #' @examples
 #' m <- bm_shift()
 #' ibm_eval2(m, c(1, 2, 1, 2), 1:4)
-#'
 #'
 bm_shift <- function(mapper = NULL) {
   m <- bru_mapper_define(
@@ -2196,7 +2191,6 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
 #' @examples
 #' m <- bm_scale()
 #' ibm_eval2(m, c(1, 2, 1, 2), 1:4)
-#'
 #'
 bm_scale <- function(mapper = NULL) {
   m <- bru_mapper_define(
@@ -2338,7 +2332,6 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
 #' m <- bm_aggregate()
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
-#'
 #'
 bm_aggregate <- function(rescale = FALSE,
                          n_block = NULL,
@@ -2532,7 +2525,6 @@ ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
-#'
 bm_logsumexp <- function(rescale = FALSE,
                          n_block = NULL) {
   # Arguments documented for bm_aggregate
@@ -2660,7 +2652,6 @@ ibm_eval.bm_logsumexp <- function(mapper, input, state = NULL,
 #' m <- bm_logitaverage()
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
-#'
 #'
 bm_logitaverage <- function(n_block = NULL) {
   # Arguments documented for bm_aggregate
@@ -2851,7 +2842,6 @@ require_args <- function(fun, req) {
 #' @examples
 #' m <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 #' ibm_eval2(m, state = -3:3)
-#'
 #'
 bm_marginal <- function(qfun,
                         pfun = NULL,
@@ -3068,7 +3058,6 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
 #'   shift = bm_shift()
 #' ))
 #' ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
-#'
 #'
 bm_pipe <- function(mappers) {
   mappers <- as_bm_list(mappers)
@@ -3312,7 +3301,6 @@ ibm_simplify.bm_pipe <- function(mapper,
 #' @examples
 #' (m <- bm_multi(list(a = bm_index(2), b = bm_index(3))))
 #' ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
-#'
 #'
 bm_multi <- function(mappers, simplify = FALSE) {
   if (!is.list(mappers)) {

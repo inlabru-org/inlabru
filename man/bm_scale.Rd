@@ -25,7 +25,6 @@ returns
 m <- bm_scale()
 ibm_eval2(m, c(1, 2, 1, 2), 1:4)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

@@ -60,7 +60,6 @@ ibm_eval(
   seq_len(ibm_n(m))
 )
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

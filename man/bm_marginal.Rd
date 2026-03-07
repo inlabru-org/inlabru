@@ -47,7 +47,6 @@ ibm_eval(m, state = val, reverse = TRUE)
 m <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ibm_eval2(m, state = -3:3)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

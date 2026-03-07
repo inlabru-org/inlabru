@@ -16,7 +16,6 @@ Create a mapper for linear effects
 m <- bm_linear()
 ibm_eval(m, input = 1:4, state = 2)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

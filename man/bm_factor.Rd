@@ -37,7 +37,6 @@ ibm_eval2(m, input = c("b", "a", "a", "b"), state = c(1, 3))
 m <- bm_factor(factor(c("a", "b")), "contrast")
 ibm_eval2(m, input = factor(c("b", "a", "a", "b")), state = 2)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

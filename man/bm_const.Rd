@@ -16,7 +16,6 @@ Create a constant mapper
 m <- bm_const()
 ibm_eval2(m, input = 1:4)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

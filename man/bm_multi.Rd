@@ -51,7 +51,6 @@ linear/affine sub-mappers are allowed.
 (m <- bm_multi(list(a = bm_index(2), b = bm_index(3))))
 ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

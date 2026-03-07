@@ -28,7 +28,6 @@ m <- bm_pipe(list(
 ))
 ibm_eval2(m, input = list(scale = 2, shift = 1:4), state = 1:4)
 
-
 }
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}

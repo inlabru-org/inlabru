@@ -44,7 +44,6 @@
 #' ibm_jacobian(m, 1:3)
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
-#'
 bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
   stopifnot((length(n_rep) > 0L) && sum(n_rep) > 0L)
   if ((length(n_rep) == 1L) || !any(interleaved)) {
