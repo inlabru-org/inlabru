@@ -21,6 +21,9 @@
 
 ## Updated features
 
+* Regenerated `gorillas_sf` data set, with new mesh better suited for modelling,
+  with a regular interior triangular mesh. (version `2.13.0.9034`)
+* Regenerated `mexdolphin_sf` data set, with new mesh. (version `2.13.0.9035`)
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
   the support for `inla.rgeneric`, to standardise where to store a
   pre-constructed mapper, so that external packages will no longer need to
