@@ -1,5 +1,10 @@
 # inlabru (development version)
 
+## Bug fixes
+* Fix issue #293, where automated mapper construction for `factor_contrast`
+  always used the alphabetically first level as contrast, instead of the
+  factor-defined first level (`2.14.0.9001`)
+
 # inlabru 2.14.0
 
 ## New features

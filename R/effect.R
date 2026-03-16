@@ -937,7 +937,7 @@ add_mappers.bru_comp <- function(component,
 
   component$main <- add_mapper(
     component$main,
-    label = component$label,
+    label = paste0(component$label, "(main)"),
     data = lh_data,
     inputs = lapply(
       inputs,
@@ -949,7 +949,7 @@ add_mappers.bru_comp <- function(component,
   if (!is.null(component[["group"]])) {
     component$group <- add_mapper(
       component$group,
-      label = component$label,
+      label = paste0(component$label, "(group)"),
       data = lh_data,
       inputs = lapply(
         inputs,
@@ -962,7 +962,7 @@ add_mappers.bru_comp <- function(component,
   if (!is.null(component[["replicate"]])) {
     component$replicate <- add_mapper(
       component$replicate,
-      label = component$label,
+      label = paste0(component$label, "(replicate)"),
       data = lh_data,
       inputs = lapply(
         inputs,
@@ -1164,7 +1164,13 @@ bru_subcomp <- function(input = NULL,
 }
 
 
-make_unique_inputs <- function(inp, allow_list = FALSE) {
+make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
+  local_stop <- function(msg) {
+    stop(paste0(
+      "Error in making unique inputs for component '", label, "':\n  ",
+      msg
+    ))
+  }
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
   is_sfc <- vapply(inp, function(x) inherits(x, "sfc"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
@@ -1176,7 +1182,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
   if (any(is_spatial)) {
     bru_safe_sp(force = TRUE)
     if (!all(is_spatial)) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial/non-spatial input. ",
         "Unable to infer mapper information."
       ))
@@ -1189,7 +1195,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(unlist(crs_info))) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial CRS information. ",
         "Unable to infer mapper information."
       ))
@@ -1204,7 +1210,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- nrow(inp_values)
   } else if (any(is_sfc)) {
     if (!all(is_sfc)) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial/non-spatial input. ",
         "Unable to infer mapper information."
       ))
@@ -1216,7 +1222,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(inp_crs)) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial crs information. ",
         "Unable to infer mapper information."
       ))
@@ -1227,7 +1233,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- NROW(inp_values)
   } else if (any(is_matrix | is_Matrix)) {
     if (!all(is_matrix | is_Matrix)) {
-      stop("Inconsistent input types; matrix and non-matrix")
+      local_stop("Inconsistent input types; matrix and non-matrix")
     }
     # Add extra column to work around bug in unique.matrix for single-column
     # Matrix and ModelMatrix matrices:
@@ -1236,24 +1242,26 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {
-      stop("Inconsistent input types; data.frame and non-data.frame")
+      local_stop("Inconsistent input types; data.frame and non-data.frame")
     }
     inp_values <- unique(do.call(rbind, inp))
     n_values <- nrow(inp_values)
   } else if (any(is_factor)) {
     if (!all(is_factor)) {
-      stop("Inconsistent input types; factor and non-factor")
+      local_stop("Inconsistent input types; factor and non-factor")
     }
-    inp_values <- sort(unique(do.call(c, lapply(inp, as.character))),
-      na.last = NA
-    )
+    inp_values <- unique(lapply(inp, levels))
+    if (length(inp_values) > 1) {
+      local_stop("Inconsistent factor levels. Unable to infer mapper information.")
+    }
+    inp_values <- inp_values[[1]]
     n_values <- length(inp_values)
   } else if (any(is_list)) {
     if (!all(is_list)) {
-      stop("Inconsistent input types; list and non-list")
+      local_stop("Inconsistent input types; list and non-list")
     }
     if (!allow_list) {
-      stop(paste0(
+      local_stop(paste0(
         "Unable to create automatic mapper. List data at this level requires ",
         "an explicit mapper definition."
       ))
@@ -1315,7 +1323,10 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
       ))
     }
   } else if (is.null(mapper_input)) {
-    stop("This code should be unused?")
+    stop(glue(
+      "This code should be unused for {label}: ",
+      "add_mapper() with isTRUE(is.null(mapper_input))"
+    ))
     # Used for automatic group and replicate mappers
     subcomp[["mapper"]] <- make_mapper(
       subcomp,
@@ -1386,7 +1397,11 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
           inp_ <- inputs
         }
 
-        unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
+        unique_inputs <- make_unique_inputs(
+          inp_,
+          allow_list = TRUE,
+          label = label
+        )
       }
       if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1

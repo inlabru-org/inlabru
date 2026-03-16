@@ -91,6 +91,83 @@ test_that("Factor mapper", {
 })
 
 
+test_that("Automated factor releveling", {
+  local_bru_safe_inla()
+  skip_if_not_installed("sf")
+
+  pts <- sf::st_as_sf(
+    data.frame(x = runif(20), y = runif(20), category = factor(
+      sample(c("Alpha", "Beta", "Gamma"), 20, TRUE),
+      levels = c("Alpha", "Beta", "Gamma"))
+    ),
+    coords = c("x", "y"),
+    crs = 5070
+  )
+
+  boundary <- sf::st_sf(
+    geometry =
+      sf::st_sfc(
+        sf::st_polygon(list(rbind(
+          c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)
+        ))),
+        crs = 5070
+      )
+  )
+
+  mesh <- fmesher::fm_mesh_2d(
+    boundary = boundary,
+    max.edge = 0.5,
+    cutoff = 0.1,
+    crs = sf::st_crs(boundary)
+  )
+
+  ips <- fmesher::fm_int(list(geometry = mesh), boundary)
+
+  ips$category <- factor(
+    sample(c("Alpha", "Beta", "Gamma"), nrow(ips), TRUE),
+    levels = c("Alpha", "Beta", "Gamma")
+  )
+
+  cmp <- geometry ~ Intercept(1) +
+    category(category, model = "factor_contrast")
+
+  # Relevel pts only, which is ok since dplyr::bind_rows() relevels the ips
+  # to the levels of pts.
+  pts$category  <- relevel(pts$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Also relevel ips:
+  ips$category  <- relevel(ips$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+})
+
+
 test_that("Pipe mapper", {
   mapper <-
     bm_pipe(
