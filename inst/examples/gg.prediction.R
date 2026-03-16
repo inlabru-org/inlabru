@@ -1,6 +1,6 @@
 \donttest{
 if (bru_safe_inla() &&
-    require("sn", quietly = TRUE) &&
+    requireNamespace("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE) &&
     require("patchwork", quietly = TRUE)) {
   # Generate some data

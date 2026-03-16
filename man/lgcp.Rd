@@ -100,7 +100,7 @@ The \code{E} and \code{weights} arguments are evaluated in the data context, lik
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   require(fmesher, quietly = TRUE) &&
-  require(sn, quietly = TRUE)) {
+  requireNamespace("sn", quietly = TRUE)) {
   # Load the Gorilla data
   data <- gorillas_sf
 

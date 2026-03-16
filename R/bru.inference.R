@@ -2951,7 +2951,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(fmesher, quietly = TRUE) &&
-#'   require(sn, quietly = TRUE)) {
+#'   requireNamespace("sn", quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data <- gorillas_sf
 #'

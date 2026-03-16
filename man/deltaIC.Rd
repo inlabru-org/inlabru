@@ -12,7 +12,7 @@ obtained from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\
 
 \item{criterion}{character vector.
 If it includes 'DIC', computes DIC differences;
-'WAIC' is also allowed, but note that plain WAIC values fomr inla are not
+'WAIC' is also allowed, but note that plain WAIC values from inla are not
 well-defined for point process models. Default 'WAIC'}
 }
 \value{

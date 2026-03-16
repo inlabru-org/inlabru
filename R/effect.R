@@ -1252,7 +1252,22 @@ make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
     }
     inp_values <- unique(lapply(inp, levels))
     if (length(inp_values) > 1) {
-      local_stop("Inconsistent factor levels. Unable to infer mapper information.")
+      local_stop(
+        paste0(
+          "Inconsistent factor levels. Unable to infer mapper information.\n",
+          "  Level combinations:\n    ",
+          paste0(
+            seq_along(inp_values),
+            ": ",
+            vapply(
+              inp_values,
+              function(x) paste0("'", x, "'", collapse = ", "),
+              ""
+            ),
+            collapse = "\n    "
+          )
+        )
+      )
     }
     inp_values <- inp_values[[1]]
     n_values <- length(inp_values)

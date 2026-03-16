@@ -1,6 +1,6 @@
 \donttest{
 if (bru_safe_inla() &&
-    require("sn", quietly = TRUE) &&
+    requireNamespace("sn", quietly = TRUE) &&
     require("ggplot2", quietly = TRUE) &&
     bru_safe_terra(quietly = TRUE) &&
     require("sf", quietly = TRUE)) {

@@ -96,9 +96,13 @@ test_that("Automated factor releveling", {
   skip_if_not_installed("sf")
 
   pts <- sf::st_as_sf(
-    data.frame(x = runif(20), y = runif(20), category = factor(
-      sample(c("Alpha", "Beta", "Gamma"), 20, TRUE),
-      levels = c("Alpha", "Beta", "Gamma"))
+    data.frame(
+      x = runif(20),
+      y = runif(20),
+      category = factor(
+        sample(c("Alpha", "Beta", "Gamma"), 20, TRUE),
+        levels = c("Alpha", "Beta", "Gamma")
+      )
     ),
     coords = c("x", "y"),
     crs = 5070
@@ -133,7 +137,7 @@ test_that("Automated factor releveling", {
 
   # Relevel pts only, which is ok since dplyr::bind_rows() relevels the ips
   # to the levels of pts.
-  pts$category  <- relevel(pts$category, ref = "Beta")
+  pts$category <- relevel(pts$category, ref = "Beta")
 
   fit <- bru(
     cmp,
@@ -150,7 +154,7 @@ test_that("Automated factor releveling", {
   expect_equal(lev, c("Beta", "Alpha", "Gamma"))
 
   # Also relevel ips:
-  ips$category  <- relevel(ips$category, ref = "Beta")
+  ips$category <- relevel(ips$category, ref = "Beta")
 
   fit <- bru(
     cmp,
@@ -165,6 +169,28 @@ test_that("Automated factor releveling", {
 
   lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
   expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Relevel again, to check inconsistent levels are noticed:
+  ips$category <- relevel(ips$category, ref = "Gamma")
+
+  pts$z <- rnorm(nrow(pts))
+  ips$z <- rnorm(nrow(ips))
+
+  expect_error(
+    bru(
+      cmp,
+      bru_obs(
+        z ~ .,
+        data = pts
+      ),
+      bru_obs(
+        z ~ .,
+        data = ips
+      ),
+      options = list(bru_run = FALSE)
+    ),
+    "Inconsistent factor levels. Unable to infer mapper information."
+  )
 })
 
 

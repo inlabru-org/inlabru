@@ -1,6 +1,6 @@
 \donttest{
 if (bru_safe_inla() &&
-    require("sn", quietly = TRUE)) {
+    requireNamespace("sn", quietly = TRUE)) {
 
   # Generate data for a simple linear model
 

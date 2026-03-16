@@ -31,7 +31,7 @@ introduced by Yuan et al. (2017).
 if (bru_safe_inla() &&
   require("ggplot2", quietly = TRUE) &&
   require("patchwork", quietly = TRUE) &&
-  require("sn", quietly = TRUE) &&
+  requireNamespace("sn", quietly = TRUE) &&
   bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
