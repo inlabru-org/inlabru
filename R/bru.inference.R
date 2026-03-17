@@ -2089,6 +2089,12 @@ bru_obs <- function(formula = . ~ .,
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
 
+  tag_text <- if (is.null(tag)) {
+    "<unknown>"
+  } else {
+    glue("'{tag}'")
+  }
+
   check_sp_data_deprecation(
     data = data,
     response_data = response_data,
@@ -2117,7 +2123,12 @@ bru_obs <- function(formula = . ~ .,
 
   # Set the response name
   if (is.null(pred_expr$resp_text)) {
-    stop("Missing response variable name or expression")
+    formula_text <- deparse1(formula, collapse = '    \n', width.cutoff = 80L)
+    stop(glue::glue(
+      "Missing response variable name or expression in formula for ",
+      "bru_obs(tag={tag_text}).\n",
+      "  Formula: {formula_text}"
+    ))
   }
   response_expr <- rlang::parse_expr(pred_expr$resp_text)
   data_list <- list(response_data = response_data, data = data)
@@ -2222,7 +2233,10 @@ bru_obs <- function(formula = . ~ .,
   }
 
   if (is.null(lh[["response_data"]][[lh[["response"]]]])) {
-    stop("Response variable missing or could not be evaluated")
+    stop(glue::glue(
+      "Response variable missing or could not be evaluated in ",
+      "bru_obs(tag={tag_text})"
+    ))
   }
 
   if (is.null(lh[["used"]])) {
