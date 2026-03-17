@@ -208,136 +208,14 @@ Lambda_veg
 #### Continuous limit of WAIC
 
 ```{r}
-int_points <- fm_int(domain = list(geometry = mesh_int), boundary)
-block_int_points <- fm_int(domain = list(geometry = mesh_int), cvpart)
-agg <- bm_aggregate(type = "sum", n_block = 1L)
-agg_block <- bm_aggregate(type = "sum", n_block = max(block_int_points$.block))
-pred <- predict(fit_veg,
-  newdata = cbind(
-    dplyr::bind_rows(nests, int_points, block_int_points),
-    part = c(
-      rep("Y", nrow(nests)),
-      rep("int", nrow(int_points)),
-      rep("block_int", nrow(block_int_points))
-    )
-  ),
-  formula = ~ {
-    eta <- {
-      vegetation
-    }
-    log_lambda_y <- eta[part == "Y"]
-    lambda_y <- exp(log_lambda_y)
-    # Full domain
-    lambda_int <- sum(weight[part == "int"] * (1 - exp(eta[part == "int"])))
-    log_lambda_int <- log(sum(weight[part == "int"] * exp(eta[part == "int"])))
-    area <- sum(weight[part == "int"])
-    log_like <- sum(log_lambda_y) + lambda_int
-    # Blockwise
-    lambda_block_int <- ibm_eval(agg_block,
-      input = list(
-        block = .block[part == "block_int"],
-        weights = weight[part == "block_int"]
-      ),
-      state = exp(eta[part == "block_int"])
-    )
-    block_area <- ibm_eval(agg_block,
-      input = list(
-        block = .block[part == "block_int"],
-        weights = weight[part == "block_int"]
-      ),
-      state = rep(1, sum(part == "block_int"))
-    )
-    blocksplit_log_like <- block_area - lambda_block_int +
-      ibm_eval(agg_block,
-        input = list(block = .block[part == "Y"]),
-        state = log_lambda_y
-      )
-    blocksplit_like <- exp(blocksplit_log_like)
-    block_log_like <- block_area - lambda_block_int +
-      ibm_eval(agg_block,
-        input = list(block = .block[part == "Y"]),
-        state = log(lambda_block_int / block_area)[.block[part == "Y"]]
-      )
-    block_like <- exp(block_log_like)
-    list(
-      log_lambda_y = log_lambda_y,
-      lambda_y = lambda_y,
-      lambda_int = lambda_int,
-      log_lambda_int = log_lambda_int,
-      area = area,
-      log_like = log_like,
-      blocksplit_log_like = blocksplit_log_like,
-      blocksplit_like = blocksplit_like,
-      block_log_like = block_log_like,
-      block_like = block_like
-    )
-  },
-  n.samples = 2000
+IC <- lgcp_IC(
+  fit_veg,
+  data = nests,
+  predictor = vegetation,
+  domain = list(geometry = mesh_int),
+  samplers = cvpart
 )
-# Limit:
-lppd_limit <- sum(log(pred$lambda_y$mean)) + pred$lambda_int$mean
-p_WAIC_limit <- sum(pred$log_lambda_y$sd^2)
-p_DIC <- 2 * pred$log_like$sd^2
-WAIC_limit <- -2 * (lppd_limit - p_WAIC_limit)
-DIC <- -2 * (lppd_limit - p_DIC)
-# Blockwise split:
-lppd_blocksplit <- sum(log(pred$blocksplit_like$mean))
-p_WAIC_blocksplit <- sum(pred$blocksplit_log_like$sd^2)
-WAIC_blocksplit <- -2 * (lppd_blocksplit - p_WAIC_blocksplit)
-# True Blockwise counts:
-lppd_blockwise <- sum(log(pred$block_like$mean))
-p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
-WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
-# INLA ICs:
-lppd_INLA_DIC <- fit_veg$dic$dic / (-2) + fit_veg$dic$p.eff
-lppd_INLA_WAIC <- fit_veg$waic$waic / (-2) + fit_veg$waic$p.eff
-lppd_INLA_DIC_adjusted <- lppd_INLA_DIC + sum(int_points$weight)
-lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
-# Collect
-IC_results <-
-  data.frame(
-    type = c(
-      "DIC",
-      "WAIC_limit",
-      "WAIC_blocksplit",
-      "WAIC_blockwise",
-      "DIC_INLA",
-      "DIC_INLA_adjusted",
-      "WAIC_INLA",
-      "WAIC_INLA_adjusted"
-    ),
-    lppd = c(
-      lppd_limit,
-      lppd_limit,
-      lppd_blocksplit,
-      lppd_blockwise,
-      lppd_INLA_DIC,
-      lppd_INLA_DIC_adjusted,
-      lppd_INLA_WAIC,
-      lppd_INLA_WAIC_adjusted
-    ),
-    p_eff = c(
-      p_DIC,
-      p_WAIC_limit,
-      p_WAIC_blocksplit,
-      p_WAIC_blockwise,
-      fit_veg$dic$p.eff,
-      fit_veg$dic$p.eff,
-      fit_veg$waic$p.eff,
-      fit_veg$waic$p.eff
-    ),
-    IC = c(
-      DIC,
-      WAIC_limit,
-      WAIC_blocksplit,
-      WAIC_blockwise,
-      fit_veg$dic$dic,
-      -2 * (lppd_INLA_DIC_adjusted - fit_veg$dic$p.eff),
-      fit_veg$waic$waic,
-      -2 * (lppd_INLA_WAIC_adjusted - fit_veg$waic$p.eff)
-    )
-  )
-knitr::kable(IC_results)
+knitr::kable(IC)
 ```
 
 #### Cross validation with NA setting
