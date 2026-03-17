@@ -135,49 +135,56 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   }
   pred_quo <- rlang::enquo(predictor)
   pred_text <- rlang::as_name(pred_quo)
-  form <- as.formula(glue::glue('~ {{
-                    eta <- {{
-                      {pred_text}
-                    }}
-                    log_lambda_y <- eta[part == "Y"]
-                    lambda_y <- exp(log_lambda_y)
-                    # Full domain
-                    lambda_int <- sum(weight[part == "int"] * exp(eta[part == "int"]))
-                    log_lambda_int <- log(lambda_int)
-                    area <- sum(weight[part == "int"])
-                    log_like <- sum(log_lambda_y) + area - lambda_int
-                    # Blockwise
-                    lambda_block_int <- ibm_eval(agg_block,
-                                                 input = list(
-                                                   block = .block[part == "int"],
-                                                   weights = weight[part == "int"]
-                                                 ),
-                                                 state = exp(eta[part == "int"])
-                    )
-                    block_area <- ibm_eval(agg_block,
-                                           input = list(
-                                             block = .block[part == "int"],
-                                             weights = weight[part == "int"]
-                                           ),
-                                           state = rep(1, sum(part == "int"))
-                    )
-                    block_log_lambda_y <-
-                      ibm_eval(agg_block,
-                               input = list(block = .block[part == "Y"]),
-                               state = log(lambda_block_int / block_area)[.block[part == "Y"]])
-                    block_log_like <- block_area - lambda_block_int + block_log_lambda_y
-                    block_like <- exp(block_log_like - block_area - lgamma(sum(part == "Y"))+1L)
-                    list(
-                      lambda_y = lambda_y,
-                      log_lambda_y = log_lambda_y,
-                      lambda_int = lambda_int,
-                      log_lambda_int = log_lambda_int,
-                      area = area,
-                      log_like = log_like,
-                      block_log_like = block_log_like,
-                      block_like = block_like
-                    )
-                  }}'))
+  form <- as.formula(
+    glue::glue('~ {{
+      eta <- {{
+               {pred_text}
+             }}
+      log_lambda_y <- eta[part == "Y"]
+      lambda_y <- exp(log_lambda_y)
+      # Full domain
+      lambda_int <- sum(weight[part == "int"] * exp(eta[part == "int"]))
+      log_lambda_int <- log(lambda_int)
+      area <- sum(weight[part == "int"])
+      log_like <- sum(log_lambda_y) + area - lambda_int
+      # Blockwise
+      lambda_block_int <-
+        ibm_eval(agg_block,
+                 input = list(
+                   block = .block[part == "int"],
+                   weights = weight[part == "int"]
+                 ),
+                 state = exp(eta[part == "int"])
+                )
+      block_area <-
+        ibm_eval(agg_block,
+                 input = list(
+                   block = .block[part == "int"],
+                   weights = weight[part == "int"]
+                 ),
+                 state = rep(1, sum(part == "int"))
+                )
+      block_log_lambda_y <-
+        ibm_eval(agg_block,
+                 input = list(block = .block[part == "Y"]),
+                 state = log(lambda_block_int / block_area)[.block[part == "Y"]]
+                )
+
+      block_log_like <- block_area - lambda_block_int + block_log_lambda_y
+      block_like <-
+        exp(block_log_like - block_area - lgamma(sum(part == "Y")) + 1L)
+      list(
+        lambda_y = lambda_y,
+        log_lambda_y = log_lambda_y,
+        lambda_int = lambda_int,
+        log_lambda_int = log_lambda_int,
+        area = area,
+        log_like = log_like,
+        block_log_like = block_log_like,
+        block_like = block_like
+      )
+    }}')
+  )
   newdata <- cbind(
     dplyr::bind_rows(data, int_points),
     part = c(
@@ -206,7 +213,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     state = rep(1, sum(newdata$part == "int"))
   )
   adj <- newdata$.block[newdata$part == "Y"]
-  lppd_blockwise <- sum(log(pred$block_like$mean) + block_area + lgamma(sum(newdata$part == "Y") + 1L))
+  lppd_blockwise <- sum(log(pred$block_like$mean) + block_area +
+                          lgamma(sum(newdata$part == "Y") + 1L))
   p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
   WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
 

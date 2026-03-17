@@ -2123,7 +2123,7 @@ bru_obs <- function(formula = . ~ .,
 
   # Set the response name
   if (is.null(pred_expr$resp_text)) {
-    formula_text <- deparse1(formula, collapse = '    \n', width.cutoff = 80L)
+    formula_text <- deparse1(formula, collapse = "    \n", width.cutoff = 80L)
     stop(glue::glue(
       "Missing response variable name or expression in formula for ",
       "bru_obs(tag={tag_text}).\n",
