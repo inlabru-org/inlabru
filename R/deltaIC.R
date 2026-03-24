@@ -178,7 +178,7 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
 
       block_log_like <- block_area - lambda_block_int + block_log_lambda_y
       block_like <-
-        exp(block_log_like - block_area - lgamma(block_n + 1L))
+        exp(block_log_like - block_area + block_n*log(block_area) - lgamma(block_n + 1L))
       list(
         lambda_y = lambda_y,
         log_lambda_y = log_lambda_y,
@@ -234,17 +234,21 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
              state = rep(1, sum(newdata$part == "Y"))
     )
   adj <- newdata$.block[newdata$part == "Y"]
-  lppd_blockwise <- sum(log(pred$block_like$mean) + block_area +
-                          lgamma(block_n + 1L))
-  p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
+
+  ok <- block_area > 0
+  lppd_blockwise <- sum((log(pred$block_like$mean) +
+                          block_area -
+                          block_n * log(block_area) +
+                          lgamma(block_n + 1L))[ok])
+  p_WAIC_blockwise <- sum(pred$block_log_like$sd[ok]^2)
   WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
 
   lppd_blockwise.se <-
     sqrt(
-      sum(pred$block_like$mean.mc_std_err^2 / pred$block_like$mean^2)
+      sum(pred$block_like$mean.mc_std_err[ok]^2 / pred$block_like$mean[ok]^2)
     )
-  p_WAIC_blockwise.se <- sqrt(sum((2 * pred$block_log_like$sd)^2 *
-                                pred$block_log_like$sd.mc_std_err^2))
+  p_WAIC_blockwise.se <- sqrt(sum((2 * pred$block_log_like$sd[ok])^2 *
+                                pred$block_log_like$sd.mc_std_err[ok]^2))
 
   # INLA ICs:
   lppd_INLA_DIC <- fit$dic$dic / (-2) + fit$dic$p.eff
