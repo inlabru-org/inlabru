@@ -134,7 +134,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     data$.block <- 1L
   }
   pred_quo <- rlang::enquo(predictor)
-  pred_text <- rlang::as_name(pred_quo)
+  pred_text <- as.character(as.formula(deparse1(pred_quo)))
+  pred_text <- pred_text[length(pred_text)]
   form <- as.formula(
     glue::glue('~ {{
       eta <- {{
@@ -169,10 +170,15 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
                  input = list(block = .block[part == "Y"]),
                  state = log(lambda_block_int / block_area)[.block[part == "Y"]]
                 )
+      block_n <-
+        ibm_eval(agg_block,
+                 input = list(block = .block[part == "Y"]),
+                 state = rep(1, sum(part == "Y"))
+                )
 
       block_log_like <- block_area - lambda_block_int + block_log_lambda_y
       block_like <-
-        exp(block_log_like - block_area - lgamma(sum(part == "Y")) + 1L)
+        exp(block_log_like - block_area - lgamma(block_n + 1L))
       list(
         lambda_y = lambda_y,
         log_lambda_y = log_lambda_y,
@@ -204,6 +210,16 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   p_DIC <- 2 * pred$log_like$sd^2
   WAIC_limit <- -2 * (lppd_limit - p_WAIC_limit)
   DIC <- -2 * (lppd_limit - p_DIC)
+
+  lppd_limit.se <-
+    sqrt(
+      sum(pred$lambda_y$mean.mc_std_err^2 / pred$lambda_y$mean^2) +
+        pred$lambda_int$mean.mc_std_err^2
+    )
+  p_DIC.se <- sqrt(4 * (2 * pred$log_like$sd)^2 * pred$log_like$sd.mc_std_err^2)
+  p_WAIC_limit.se <- sqrt(sum((2 * pred$log_lambda_y$sd)^2 *
+                                pred$log_lambda_y$sd.mc_std_err^2))
+
   # True Blockwise counts:
   block_area <- ibm_eval(agg_block,
     input = list(
@@ -212,11 +228,23 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     ),
     state = rep(1, sum(newdata$part == "int"))
   )
+  block_n <-
+    ibm_eval(agg_block,
+             input = list(block = newdata$.block[newdata$part == "Y"]),
+             state = rep(1, sum(newdata$part == "Y"))
+    )
   adj <- newdata$.block[newdata$part == "Y"]
   lppd_blockwise <- sum(log(pred$block_like$mean) + block_area +
-                          lgamma(sum(newdata$part == "Y") + 1L))
+                          lgamma(block_n + 1L))
   p_WAIC_blockwise <- sum(pred$block_log_like$sd^2)
   WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
+
+  lppd_blockwise.se <-
+    sqrt(
+      sum(pred$block_like$mean.mc_std_err^2 / pred$block_like$mean^2)
+    )
+  p_WAIC_blockwise.se <- sqrt(sum((2 * pred$block_log_like$sd)^2 *
+                                pred$block_log_like$sd.mc_std_err^2))
 
   # INLA ICs:
   lppd_INLA_DIC <- fit$dic$dic / (-2) + fit$dic$p.eff
@@ -225,15 +253,15 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
 
   tibble::tribble(
-    ~Criterion, ~Method, ~lppd, ~p_eff, ~IC,
-    "DIC", "Limit", lppd_limit, p_DIC, DIC,
-    "DIC", "INLA", lppd_INLA_DIC, fit$dic$p.eff, fit$dic$dic,
+    ~Criterion, ~Method, ~lppd, ~p_eff, ~IC, ~lppd.std_err, ~p_eff.std_err, ~IC.std_err,
+    "DIC", "Limit", lppd_limit, p_DIC, DIC, lppd_limit.se, p_DIC.se, NA,
+    "DIC", "INLA", lppd_INLA_DIC, fit$dic$p.eff, fit$dic$dic, NA, NA, NA,
     "DIC_adjusted", "INLA", lppd_INLA_DIC_adjusted, fit$dic$p.eff,
-    -2 * (lppd_INLA_DIC_adjusted - fit$dic$p.eff),
-    "WAIC", "Limit", lppd_limit, p_WAIC_limit, WAIC_limit,
-    "WAIC", "Blockwise", lppd_blockwise, p_WAIC_blockwise, WAIC_blockwise,
-    "WAIC", "INLA", lppd_INLA_WAIC, fit$waic$p.eff, fit$waic$waic,
+    -2 * (lppd_INLA_DIC_adjusted - fit$dic$p.eff), NA, NA, NA,
+    "WAIC", "Limit", lppd_limit, p_WAIC_limit, WAIC_limit, lppd_limit.se, p_WAIC_limit.se, NA,
+    "WAIC", "Blockwise", lppd_blockwise, p_WAIC_blockwise, WAIC_blockwise, lppd_blockwise.se, p_WAIC_blockwise.se, NA,
+    "WAIC", "INLA", lppd_INLA_WAIC, fit$waic$p.eff, fit$waic$waic, NA, NA, NA,
     "WAIC_adjusted", "INLA", lppd_INLA_WAIC_adjusted, fit$waic$p.eff,
-    -2 * (lppd_INLA_WAIC_adjusted - fit$waic$p.eff)
+    -2 * (lppd_INLA_WAIC_adjusted - fit$waic$p.eff), NA, NA, NA
   )
 }
