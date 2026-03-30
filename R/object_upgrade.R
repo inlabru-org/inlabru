@@ -489,8 +489,10 @@ bru_info_upgrade <- function(object,
 
       # Update bm_factor mappers to proper levels for cases where previously
       # incorrect data reading resulted in an incorrect (but matching) mapper
-      the_inputs <- bru_input(object[["lhoods"]],
-                              object[["model"]][["effects"]])
+      the_inputs <- bru_input(
+        object[["lhoods"]],
+        object[["model"]][["effects"]]
+      )
       if (!is.null(object[["model"]][["effects"]])) {
         object[["model"]][["effects"]] <-
           lapply(object[["model"]][["effects"]], function(x) {
@@ -519,7 +521,8 @@ bru_info_upgrade <- function(object,
                 if (length(inp_levels) != length(mapper$levels)) {
                   warning(glue::glue(
                     "Number of levels for {lab} in mapper ",
-                    "({length(mapper$levels)}) does not match number of levels ",
+                    "({length(mapper$levels)}) does ",
+                    "not match number of levels ",
                     "in input ({length(inp_levels)}). ",
                     "Using levels from input."
                   ))
