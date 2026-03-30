@@ -178,7 +178,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
 
       block_log_like <- block_area - lambda_block_int + block_log_lambda_y
       block_like <-
-        exp(block_log_like - block_area + block_n*log(block_area) - lgamma(block_n + 1L))
+        exp(block_log_like - block_area +
+              block_n * log(block_area) - lgamma(block_n + 1L))
       list(
         lambda_y = lambda_y,
         log_lambda_y = log_lambda_y,
@@ -218,7 +219,7 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     )
   p_DIC.se <- sqrt(4 * (2 * pred$log_like$sd)^2 * pred$log_like$sd.mc_std_err^2)
   p_WAIC_limit.se <- sqrt(sum((2 * pred$log_lambda_y$sd)^2 *
-                                pred$log_lambda_y$sd.mc_std_err^2))
+    pred$log_lambda_y$sd.mc_std_err^2))
 
   # True Blockwise counts:
   block_area <- ibm_eval(agg_block,
@@ -230,16 +231,16 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   )
   block_n <-
     ibm_eval(agg_block,
-             input = list(block = newdata$.block[newdata$part == "Y"]),
-             state = rep(1, sum(newdata$part == "Y"))
+      input = list(block = newdata$.block[newdata$part == "Y"]),
+      state = rep(1, sum(newdata$part == "Y"))
     )
   adj <- newdata$.block[newdata$part == "Y"]
 
   ok <- block_area > 0
   lppd_blockwise <- sum((log(pred$block_like$mean) +
-                          block_area -
-                          block_n * log(block_area) +
-                          lgamma(block_n + 1L))[ok])
+    block_area -
+    block_n * log(block_area) +
+    lgamma(block_n + 1L))[ok])
   p_WAIC_blockwise <- sum(pred$block_log_like$sd[ok]^2)
   WAIC_blockwise <- -2 * (lppd_blockwise - p_WAIC_blockwise)
 
@@ -248,7 +249,7 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
       sum(pred$block_like$mean.mc_std_err[ok]^2 / pred$block_like$mean[ok]^2)
     )
   p_WAIC_blockwise.se <- sqrt(sum((2 * pred$block_log_like$sd[ok])^2 *
-                                pred$block_log_like$sd.mc_std_err[ok]^2))
+    pred$block_log_like$sd.mc_std_err[ok]^2))
 
   # INLA ICs:
   lppd_INLA_DIC <- fit$dic$dic / (-2) + fit$dic$p.eff
@@ -257,15 +258,27 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
 
   tibble::tribble(
-    ~Criterion, ~Method, ~lppd, ~p_eff, ~IC, ~lppd.std_err, ~p_eff.std_err, ~IC.std_err,
+    ~Criterion, ~Method, ~lppd, ~p_eff, ~IC,
+    ~lppd.std_err, ~p_eff.std_err, ~IC.std_err,
     "DIC", "Limit", lppd_limit, p_DIC, DIC, lppd_limit.se, p_DIC.se, NA,
     "DIC", "INLA", lppd_INLA_DIC, fit$dic$p.eff, fit$dic$dic, NA, NA, NA,
     "DIC_adjusted", "INLA", lppd_INLA_DIC_adjusted, fit$dic$p.eff,
     -2 * (lppd_INLA_DIC_adjusted - fit$dic$p.eff), NA, NA, NA,
-    "WAIC", "Limit", lppd_limit, p_WAIC_limit, WAIC_limit, lppd_limit.se, p_WAIC_limit.se, NA,
-    "WAIC", "Blockwise", lppd_blockwise, p_WAIC_blockwise, WAIC_blockwise, lppd_blockwise.se, p_WAIC_blockwise.se, NA,
+    "WAIC", "Limit", lppd_limit, p_WAIC_limit, WAIC_limit,
+    lppd_limit.se, p_WAIC_limit.se, NA,
+    "WAIC", "Blockwise", lppd_blockwise, p_WAIC_blockwise, WAIC_blockwise,
+    lppd_blockwise.se, p_WAIC_blockwise.se, NA,
     "WAIC", "INLA", lppd_INLA_WAIC, fit$waic$p.eff, fit$waic$waic, NA, NA, NA,
     "WAIC_adjusted", "INLA", lppd_INLA_WAIC_adjusted, fit$waic$p.eff,
     -2 * (lppd_INLA_WAIC_adjusted - fit$waic$p.eff), NA, NA, NA
   )
+}
+
+delta_IC <- function(data) {
+  data <- data |>
+    dplyr::group_by(Criterion, Method) |>
+    dplyr::mutate(Delta_IC = IC - min(IC)) |>
+    dplyr::ungroup() |>
+    dplyr::arrange(Criterion, Method, IC)
+  data
 }

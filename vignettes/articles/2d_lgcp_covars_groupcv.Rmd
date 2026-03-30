@@ -396,6 +396,37 @@ Lambda_field
 knitr::kable(deltaIC(fit_veg, fit_veg_field, fit_field, criterion = c("DIC")))
 ```
 
+New experimental definitions:
+```{r}
+IC_veg <- lgcp_IC(
+  fit_veg,
+  data = nests,
+  predictor = vegetation,
+  domain = list(geometry = mesh_int),
+  samplers = cvpart
+)
+IC_veg_field <- lgcp_IC(
+  fit_veg_field,
+  data = nests,
+  predictor = vegetation + field,
+  domain = list(geometry = mesh_int),
+  samplers = cvpart
+)
+IC_field <- lgcp_IC(
+  fit_field,
+  data = nests,
+  predictor = field + Intercept,
+  domain = list(geometry = mesh_int),
+  samplers = cvpart
+)
+knitr::kable(rbind(
+  cbind(IC_veg, Model = "veg"),
+  cbind(IC_veg_field, Model = "veg + field"),
+  cbind(IC_field, Model = "field")
+) |>
+  dplyr::arrange(Criterion, Method, Model))
+```
+
 #### CV and SPDE parameters for Model 2
 
 We are going with Model `fit_veg_field`. Lets look at the spatial distribution of the 
@@ -543,6 +574,24 @@ Summary and model selection
 ```{r warning=FALSE,message=FALSE}
 summary(fit_elev_field)
 deltaIC(fit_veg, fit_veg_field, fit_field, fit_elev_field)
+```
+
+New definitions:
+```{r}
+IC_elev_field <- lgcp_IC(
+  fit_elev_field,
+  data = nests,
+  predictor = elev + field + Intercept,
+  domain = list(geometry = mesh_int),
+  samplers = cvpart
+)
+knitr::kable(rbind(
+  cbind(IC_veg, Model = "veg"),
+  cbind(IC_veg_field, Model = "veg + field"),
+  cbind(IC_field, Model = "field"),
+  cbind(IC_elev_field, Model = "elev + field")
+) |>
+  dplyr::arrange(Criterion, Method, Model))
 ```
 
 Predict and plot the density
