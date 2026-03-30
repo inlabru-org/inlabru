@@ -2,9 +2,12 @@
 % Please edit documentation in R/deltaIC.R
 \name{lgcp_IC}
 \alias{lgcp_IC}
+\alias{delta_IC}
 \title{Information criteria for point processes}
 \usage{
 lgcp_IC(fit, data, predictor, domain, samplers, n.samples = 2000L)
+
+delta_IC(data)
 }
 \arguments{
 \item{fit}{A fitted \code{bru} model object, from \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}.}
@@ -36,4 +39,14 @@ Calculate information criteria for point process models, using a fitted
 model and optionally new data. The interface is still under development
 and may change without warning in future versions.
 }
+\section{Functions}{
+\itemize{
+\item \code{delta_IC()}: Calculate IC differences based on joined output from
+several \code{lgcp_IC} calls;
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{delta_IC(rbind(cbind(lgcp_IC(...), Model = "A"),
+               cbind(lgcp_IC(...), Model = "B")))
+}\if{html}{\out{</div>}}
+
+}}
 \keyword{internal}

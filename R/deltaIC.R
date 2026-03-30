@@ -274,11 +274,18 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   )
 }
 
+#' @export
+#' @describeIn lgcp_IC Calculate IC differences based on joined output from
+#' several `lgcp_IC` calls;
+#' ```
+#' delta_IC(rbind(cbind(lgcp_IC(...), Model = "A"),
+#'                cbind(lgcp_IC(...), Model = "B")))
+#' ```
 delta_IC <- function(data) {
   data <- data |>
-    dplyr::group_by(Criterion, Method) |>
-    dplyr::mutate(Delta_IC = IC - min(IC)) |>
+    dplyr::group_by(.data$Criterion, .data$Method) |>
+    dplyr::mutate(Delta_IC = .data$IC - min(.data$IC)) |>
     dplyr::ungroup() |>
-    dplyr::arrange(Criterion, Method, IC)
+    dplyr::arrange(.data$Criterion, .data$Method, .data$IC)
   data
 }
