@@ -573,6 +573,35 @@ eval_spatial.SpatRaster <- function(data,
     layer = layer
   )
   val <- val[["value"]]
+  layer_set <- unique(layer)
+  is_factor <- vapply(layer_set, function(l) terra::is.factor(data[[l]]), logical(1))
+  if (any(is_factor)) {
+    if (!all(is_factor)) {
+      stop(
+        "Some layers are factors and some are not.",
+        immediate. = TRUE
+      )
+    }
+    factor_levels <- unique(lapply(layer_set, function(l) {
+      terra::levels(data[[l]])[[1]][, 2]
+    }))
+    if (length(factor_levels) > 1) {
+      warning(
+        "Factor levels differ between layers. Using levels from the first layer.",
+        immediate. = TRUE
+      )
+    }
+    factor_levels <- factor_levels[[1]]
+    if (is.factor(val)) {
+      val <- factor(as.character(val),
+                    levels = factor_levels,
+                    labels = factor_levels)
+    } else {
+      val <- factor(val,
+                    levels = seq_along(factor_levels),
+                    labels = factor_levels)
+    }
+  }
   val
 }
 
