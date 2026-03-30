@@ -419,11 +419,12 @@ IC_field <- lgcp_IC(
   domain = list(geometry = mesh_int),
   samplers = cvpart
 )
-knitr::kable(rbind(
+IC_data <- rbind(
   cbind(IC_veg, Model = "veg"),
   cbind(IC_veg_field, Model = "veg + field"),
   cbind(IC_field, Model = "field")
-) |>
+)
+knitr::kable(IC_data |>
   dplyr::arrange(Criterion, Method, Model))
 ```
 
@@ -585,13 +586,11 @@ IC_elev_field <- lgcp_IC(
   domain = list(geometry = mesh_int),
   samplers = cvpart
 )
-knitr::kable(rbind(
-  cbind(IC_veg, Model = "veg"),
-  cbind(IC_veg_field, Model = "veg + field"),
-  cbind(IC_field, Model = "field"),
-  cbind(IC_elev_field, Model = "elev + field")
-) |>
-  dplyr::arrange(Criterion, Method, Model))
+IC_data <- rbind(IC_data, cbind(IC_elev_field, Model = "elev + field"))
+knitr::kable(IC_data |> dplyr::arrange(Criterion, Method, Model))
+```
+```{r}
+knitr::kable(IC_data |> delta_IC)
 ```
 
 Predict and plot the density

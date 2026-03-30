@@ -484,6 +484,63 @@ bru_info_upgrade <- function(object,
       object[["inlabru_version"]] <- "2.13.0.9036"
     }
 
+    if (utils::compareVersion("2.14.0.9002", old_ver) > 0) {
+      message("Upgrading bru_info to 2.14.0.9002")
+
+      # Update bm_factor mappers to proper levels for cases where previously
+      # incorrect data reading resulted in an incorrect (but matching) mapper
+      the_inputs <- bru_input(object[["lhoods"]],
+                              object[["model"]][["effects"]])
+      if (!is.null(object[["model"]][["effects"]])) {
+        object[["model"]][["effects"]] <-
+          lapply(object[["model"]][["effects"]], function(x) {
+            lab <- x[["label"]]
+            mapper <- x[["main"]][["mapper"]]
+            if (inherits(mapper, "bm_factor")) {
+              inp_levels <- lapply(the_inputs, function(xx) {
+                if (is.factor(xx[[lab]][["core"]][["main"]])) {
+                  levels(xx[[lab]][["core"]][["main"]])
+                } else {
+                  NULL
+                }
+              })
+              inp_levels_non_null <-
+                vapply(inp_levels, function(x) !is.null(x), logical(1))
+              if (any(inp_levels_non_null)) {
+                inp_levels <- unique(inp_levels[inp_levels_non_null])
+                if (length(unique(inp_levels)) > 1) {
+                  warning(glue::glue(
+                    "Inconsistent input factor levels for {lab}.
+                   Levels found: {paste(unique(inp_levels), collapse = '; ')}.
+                   Using levels from first input with non-null levels."
+                  ))
+                }
+                inp_levels <- inp_levels[[1]]
+                if (length(inp_levels) != length(mapper$levels)) {
+                  warning(glue::glue(
+                    "Number of levels for {lab} in mapper ",
+                    "({length(mapper$levels)}) does not match number of levels ",
+                    "in input ({length(inp_levels)}). ",
+                    "Using levels from input."
+                  ))
+                }
+                mapper[["levels"]] <- inp_levels
+                mapper[["n"]] <- length(inp_levels)
+                if (identical(mapper[["factor_mapping"]], "contrast")) {
+                  mapper[["n"]] <- mapper[["n"]] - 1L
+                }
+                x[["main"]][["mapper"]] <- mapper
+              }
+            }
+            x <- bru_comp_update_mapper(x)
+            x
+          })
+        class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
+      }
+
+      object[["inlabru_version"]] <- "2.14.0.9002"
+    }
+
     object[["inlabru_version"]] <- new_version
     message(glue("Upgraded bru_info to {new_version}"))
 
