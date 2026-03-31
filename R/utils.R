@@ -540,6 +540,53 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 
+
+terra_factor_levels <- function(data) {
+  layers <- names(data)
+  is_factor <- terra::is.factor(data)
+  if (!any(is_factor)) {
+    return(NULL)
+  }
+  if (!all(is_factor)) {
+    stop(
+      glue::glue(
+        "Some layers are factors ",
+        "({paste(sort(layers[is_factor]), collapse = ', ')})",
+        " and some are not ",
+        "({paste(sort(layers[!is_factor]), collapse = ', ')})."
+      )
+    )
+  }
+  factor_levels <- lapply(
+    terra::levels(data),
+    function(l) {
+      if (is.data.frame(l)) {
+        l[, 2]
+      } else {
+        NULL
+      }
+    }
+  )
+  unique_levels_idx <- which(!duplicated(factor_levels))
+  factor_levels <- factor_levels[unique_levels_idx]
+  layers <- layers[unique_levels_idx]
+  if (length(unique_levels_idx) > 1) {
+    stop(
+      glue::glue(
+        "Factor levels differ between layers. ",
+        "Found factor levels:\n",
+        glue::glue_collapse(
+          glue::glue("{layers}: {factor_levels}", sep = ", "),
+          sep = "\n"
+        )
+      )
+    )
+  }
+
+  factor_levels[[1]]
+}
+
+
 #' @export
 #' @rdname eval_spatial
 eval_spatial.SpatRaster <- function(data,
@@ -573,45 +620,17 @@ eval_spatial.SpatRaster <- function(data,
     layer = layer
   )
   val <- val[["value"]]
-  layer_set <- unique(layer)
-  is_factor <- vapply(
-    layer_set,
-    function(l) {
-      terra::is.factor(data[[l]])
-    },
-    logical(1)
-  )
-  if (any(is_factor)) {
-    if (!all(is_factor)) {
-      stop(
-        "Some layers are factors and some are not.",
-        immediate. = TRUE
-      )
-    }
-    factor_levels <- unique(lapply(layer_set, function(l) {
-      terra::levels(data[[l]])[[1]][, 2]
-    }))
-    if (length(factor_levels) > 1) {
-      warning(
-        glue::glue(
-          "Factor levels differ between layers. ",
-          "Using levels from the first layer."
-        ),
-        immediate. = TRUE
-      )
-    }
-    factor_levels <- factor_levels[[1]]
+
+  layer_set <- sort(unique(layer))
+  factor_levels <- terra_factor_levels(data[[layer_set]])
+  if (!is.null(factor_levels)) {
     if (is.factor(val)) {
-      val <- factor(as.character(val),
-        levels = factor_levels,
-        labels = factor_levels
-      )
+      val <- as.character(val)
+      levs <- factor_levels
     } else {
-      val <- factor(val,
-        levels = seq_along(factor_levels),
-        labels = factor_levels
-      )
+      levs <- seq_along(factor_levels)
     }
+    val <- factor(val, levels = levs, labels = factor_levels)
   }
   val
 }
