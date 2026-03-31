@@ -590,7 +590,13 @@ IC_data <- rbind(IC_data, cbind(IC_elev_field, Model = "elev + field"))
 knitr::kable(IC_data |> dplyr::arrange(Criterion, Method, Model))
 ```
 ```{r}
-knitr::kable(IC_data |> delta_IC())
+knitr::kable(
+  IC_data |>
+    delta_IC() |>
+    dplyr::select(
+      Method, Criterion, lppd, p_eff, IC, Delta_IC, IC.std_err, Model
+    )
+)
 ```
 
 Predict and plot the density

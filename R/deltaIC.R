@@ -257,7 +257,7 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   lppd_INLA_DIC_adjusted <- lppd_INLA_DIC + sum(int_points$weight)
   lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
 
-  tibble::tribble(
+  df <- tibble::tribble(
     ~Criterion, ~Method, ~lppd, ~p_eff, ~IC,
     ~lppd.std_err, ~p_eff.std_err, ~IC.std_err,
     "DIC", "Limit", lppd_limit, p_DIC, DIC, lppd_limit.se, p_DIC.se, NA,
@@ -272,6 +272,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     "WAIC_adjusted", "INLA", lppd_INLA_WAIC_adjusted, fit$waic$p.eff,
     -2 * (lppd_INLA_WAIC_adjusted - fit$waic$p.eff), NA, NA, NA
   )
+  df$IC.std_err <- 2 * (df$lppd.std_err + df$p_eff.std_err)
+  df
 }
 
 #' @export
