@@ -3,8 +3,9 @@ test_that("Linear mapper", {
 
   input <- seq_len(4)
   state <- 10
+  input_length <- length(input)
   expect_equal(ibm_n(mapper), 1)
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), 1)
   expect_equal(ibm_values(mapper, inla_f = TRUE), 1)
   expect_equal(
@@ -28,8 +29,10 @@ test_that("Index mapper", {
   input <- c(2, 2, 1, 3)
   val <- state[input]
 
-  expect_equal(ibm_n(mapper), length(values))
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  values_length <- length(values)
+  input_length <- length(input)
+  expect_equal(ibm_n(mapper), values_length)
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), values)
   expect_equal(ibm_values(mapper, inla_f = TRUE), values)
   expect_equal(
@@ -72,8 +75,10 @@ test_that("Factor mapper", {
       val
     }
 
-    expect_equal(ibm_n(mapper), length(values))
-    expect_equal(ibm_n_output(mapper, input = input), length(input))
+    values_length <- length(values)
+    input_length <- length(input)
+    expect_equal(ibm_n(mapper), values_length)
+    expect_equal(ibm_n_output(mapper, input = input), input_length)
     expect_equal(ibm_values(mapper), values)
     expect_equal(ibm_values(mapper, inla_f = TRUE), values)
     expect_equal(

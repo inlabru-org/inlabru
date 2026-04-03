@@ -40,7 +40,7 @@ globe <- function(R = 1,
   requireNamespace("rgl")
   rgl::persp3d(x, y, z,
     col = "white",
-    texture = system.file("misc/Lambert_ocean.png", package = "inlabru"),
+    texture = system.file("misc", "Lambert_ocean.png", package = "inlabru"),
     specular = "black",
     axes = axes,
     box = box,

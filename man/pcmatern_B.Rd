@@ -69,14 +69,14 @@ B <- make_hierarchical_mesh_basis(m, method = "laplace2", alpha = 1.5)
 \donttest{
 m <- fmesher::fm_subdivide(fmesher::fmexample$mesh, 1)
 B <- list()
-for (method in c(
+for (methodB in c(
   "laplace", "laplace2",
   "graphdistance",
   "graphlaplace", "graphlaplace2"
 )) {
-  B[[method]] <- make_hierarchical_mesh_basis(
+  B[[methodB]] <- make_hierarchical_mesh_basis(
     m,
-    method = method, alpha = 1.5
+    method = methodB, alpha = 1.5
   )
 }
 if (require("ggplot2") && require("patchwork")) {
@@ -104,12 +104,12 @@ if (require("ggplot2") && require("patchwork")) {
 
   idx <- seq_len(fm_dof(m))
   idx <- seq_len(10)
-  method <- "laplace"
-  theta <- qr.solve(B[[method]][, idx, drop = FALSE], m$loc[, 1])
+  method0 <- "laplace"
+  theta <- qr.solve(B[[method0]][, idx, drop = FALSE], m$loc[, 1])
   print(
     ggplot() +
       gg(m,
-        col = B[[method]][, idx, drop = FALSE] \%*\% theta - m$loc[, 1],
+        col = B[[method0]][, idx, drop = FALSE] \%*\% theta - m$loc[, 1],
         nx = 60, ny = 60
       ) +
       geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +

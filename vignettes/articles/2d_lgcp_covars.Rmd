@@ -425,7 +425,7 @@ f.elev <- function(where) {
   v <- eval_spatial(elev, where, layer = "elevation")
   # Fill in missing values; this example would work for
   # SpatialPixelsDataFrame data
-  # if (any(is.na(v))) {
+  # if (anyNA(v)) {
   #   v <- bru_fill_missing(elev, where, v)
   # }
   v

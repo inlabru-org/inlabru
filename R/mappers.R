@@ -1626,8 +1626,6 @@ ibm_n.bm_taylor <- function(mapper,
                             ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_n.bm_taylor should not be used with inla_f = TRUE")
-
-    ibm_n(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
   } else if (multi) {
     mapper[["n_multi"]]
   } else {
@@ -1652,8 +1650,6 @@ ibm_values.bm_taylor <- function(mapper,
                                  ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_values.bm_taylor should not be used with inla_f = TRUE")
-
-    ibm_values(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
   } else if (multi) {
     lapply(mapper[["n_multi"]], function(k) seq_len(k))
   } else {

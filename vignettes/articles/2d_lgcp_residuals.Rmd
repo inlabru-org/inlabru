@@ -39,8 +39,7 @@ msg <- paste(msg, "\n", code_file, file.exists(code_file))
 if (file.exists(code_file)) {
   code_location <- code_file
 } else {
-  code_location <-
-    system.file(file.path("misc", code_file), package = "inlabru")
+  code_location <- system.file("misc", code_file, package = "inlabru")
   msg <- paste(msg, "\n", code_location, file.exists(code_location))
   if (!file.exists(code_location)) {
     code_location <- file.path("..", "..", "inst", "misc", code_file)
@@ -56,10 +55,11 @@ source(code_location)
 ```
 ```{r , eval=FALSE, echo=TRUE}
 # Load function definitions
-source(system.file(
-  file.path("misc", "2d_lgcp_residuals_functions.R"),
-  package = "inlabru"
-))
+source(
+  system.file("misc", "2d_lgcp_residuals_functions.R",
+    package = "inlabru"
+  )
+)
 ```
 
 # Introduction

@@ -26,11 +26,11 @@ Calculates DIC differences and produces an ordered summary.
 \donttest{
 if (bru_safe_inla()) {
   # Generate some data
-  input.df <- data.frame(idx = 1:10, x = cos(1:10))
-  input.df <- within(
-    input.df,
-    y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-  )
+  input.df <- data.frame(idx = 1:10) |>
+    dplyr::mutate(
+      x = cos(idx),
+      y = rpois(length(x), 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1))
+    )
 
   # Fit two models
   fit1 <- bru(

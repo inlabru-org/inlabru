@@ -307,7 +307,7 @@ bru_input.bru_input <- function(x,
   # as zero.  An option to turn on a warning could be useful for checking
   # models that aren't supposed to have NA inputs.
   #
-  #  if (any(is.na(unlist(as.vector(val))))) {
+  #  if (anyNA(unlist(as.vector(val)))) {
   #    # TODO: remove this check and make sure NAs are handled properly
   #    # elsewhere,
   #    # if possible. Problem: treating NA as "no effect" can have negative side

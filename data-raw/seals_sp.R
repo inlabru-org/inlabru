@@ -84,35 +84,35 @@ import.seals <- function(
   #' Interpolate ice covariate
 
   stop("Old internal methods needed by import.seals have been removed.")
-  # TODO: replace old code in misc/ with modern code
-  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
-  icecv <- NULL
-  #  plot(icecv)
-
-  #' Add band1 covariate to seals data frame
-
-  # TODO: replace old code in misc/ with modern code
-  # ice.band1 <- evaluator(icecv)
-  ice.band1 <- function(x, y) {
-    NULL
-  }
-  seals$ice <- ice.band1(
-    x = sp::coordinates(seals)[, 1],
-    y = sp::coordinates(seals)[, 2]
-  )
-
-  #' Plot seal count and ice together
+  #  # TODO: replace old code in misc/ with modern code
+  #  #  icecv <- covariate(ice, predictor = "band1", mesh = mesh)
+  #  icecv <- NULL
+  #  #  plot(icecv)
   #
-  #   plot.spatial(mesh = mesh,
-  #                col = data.frame(mode = icecv$values),
-  #                property = "mode", nx = 2000) +
-  #     scale_fill_gradientn(colours = topo.colors(100)) +
-  #     gg(seals, mapping = aes(x, y, color = log(all/area)), size = 3) +
-  #     scale_color_gradientn(colours = heat.colors(100))
-
-
-  #' Create a data set
-  seals <- list(mesh = mesh, points = seals, ice.data = ice, ice.cv = icecv)
+  #  # Add band1 covariate to seals data frame
+  #
+  #  # TODO: replace old code in misc/ with modern code
+  #  # ice.band1 <- evaluator(icecv)
+  #  ice.band1 <- function(x, y) {
+  #    NULL
+  #  }
+  #  seals$ice <- ice.band1(
+  #    x = sp::coordinates(seals)[, 1],
+  #    y = sp::coordinates(seals)[, 2]
+  #  )
+  #
+  #  # Plot seal count and ice together
+  #  #
+  #  #   plot.spatial(mesh = mesh,
+  #  #                col = data.frame(mode = icecv$values),
+  #  #                property = "mode", nx = 2000) +
+  #  #     scale_fill_gradientn(colours = topo.colors(100)) +
+  #  #     gg(seals, mapping = aes(x, y, color = log(all/area)), size = 3) +
+  #  #     scale_color_gradientn(colours = heat.colors(100))
+  #
+  #
+  #  # Create a data set
+  #  seals <- list(mesh = mesh, points = seals, ice.data = ice, ice.cv = icecv)
 }
 
 import.seals_sf <- function() {

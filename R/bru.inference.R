@@ -4283,6 +4283,8 @@ bru_line_search <- function(model,
         )
       )
 
+    # jarl-ignore browser: Special debug use
+    # jarl-ignore undesirable_function: Special debug use
     browser()
   }
 

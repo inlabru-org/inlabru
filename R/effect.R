@@ -1342,14 +1342,6 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
       "This code should be unused for {label}: ",
       "add_mapper() with isTRUE(is.null(mapper_input))"
     ))
-    # Used for automatic group and replicate mappers
-    subcomp[["mapper"]] <- make_mapper(
-      subcomp,
-      label,
-      input_values = 1,
-      strict = TRUE,
-      require_indexed = require_indexed
-    )
   } else {
     if (!is.null(data) || !is.null(inputs)) {
       if (is.null(inputs) || (length(inputs) == 0)) {
@@ -1769,7 +1761,7 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
   if (length(offset_idx) > 0) {
     isoff <- as.vector(unlist(lapply(
       rownames(attr(tms, "factors")),
-      function(s) substr(s, 1, 6) == "offset"
+      function(s) startsWith(s, "offset")
     )))
     if (!any(isoff)) {
       stop("Internal error: multiple offsets indicated but none extracted")

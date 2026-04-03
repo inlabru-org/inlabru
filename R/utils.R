@@ -260,7 +260,7 @@ bru_safe_terra <- function(quietly = FALSE,
   gcov <- gorillas_sf_gcov()
   where <- inlabru::gorillas_sf$nests[seq_len(5), , drop = FALSE]
   values <- eval_spatial(gcov, where = where)
-  if (any(is.na(values))) {
+  if (anyNA(values)) {
     if (!quietly) {
       message(
         paste0(

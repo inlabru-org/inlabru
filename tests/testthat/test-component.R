@@ -113,7 +113,7 @@ test_that("Component construction: terra", {
   skip_if_not_installed("sf")
   skip_if_not(bru_safe_terra())
 
-  f <- system.file("ex/elev.tif", package = "terra")
+  f <- system.file("ex", "elev.tif", package = "terra")
   r <- terra::rast(f)
 
   data <- sf::st_sf(
