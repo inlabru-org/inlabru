@@ -1,3 +1,4 @@
 [lint]
 extend-select = ["TESTTHAT"]
 ignore = ["unused_function"]
+exclude = ["inst/examples/", "misc/"]
