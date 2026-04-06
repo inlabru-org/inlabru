@@ -97,8 +97,6 @@ deltaIC <- function(..., criterion = "DIC") {
 }
 
 
-
-
 #' @title Information criteria for point processes
 #' @description `r lifecycle::badge("experimental")`
 #'   Calculate information criteria for point process models, using a fitted
@@ -124,8 +122,7 @@ deltaIC <- function(..., criterion = "DIC") {
 #' @keywords internal
 # lgcp_IC(fit_veg,nests,vegetation,list(geometry=mesh_int),boundary)
 # lgcp_IC(fit_veg,nests,vegetation,list(geometry=mesh_int),cvpart)
-lgcp_IC <- function(fit, data, predictor, domain, samplers,
-                    n.samples = 2000L) {
+lgcp_IC <- function(fit, data, predictor, domain, samplers, n.samples = 2000L) {
   int_points <- fm_int(domain = domain, samplers = samplers)
   agg <- bm_aggregate(type = "sum", n_block = 1L)
   agg_block <- bm_aggregate(type = "sum", n_block = max(int_points$.block))
@@ -137,7 +134,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   pred_text <- as.character(as.formula(deparse1(pred_quo)))
   pred_text <- pred_text[length(pred_text)]
   form <- as.formula(
-    glue::glue('~ {{
+    glue::glue(
+      '~ {{
       eta <- {{
                {pred_text}
              }}
@@ -190,7 +188,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
         block_log_like = block_log_like,
         block_like = block_like
       )
-    }}')
+    }}'
+    )
   )
   newdata <- cbind(
     dplyr::bind_rows(data, int_points),
@@ -199,14 +198,11 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
       rep("int", nrow(int_points))
     )
   )
-  pred <- predict(fit,
-    newdata = newdata,
-    formula = form,
-    n.samples = n.samples
-  )
+  pred <- predict(fit, newdata = newdata, formula = form, n.samples = n.samples)
   # Limit:
   lppd_limit <- sum(log(pred$lambda_y$mean)) +
-    pred$area$mean - pred$lambda_int$mean
+    pred$area$mean -
+    pred$lambda_int$mean
   p_WAIC_limit <- sum(pred$log_lambda_y$sd^2)
   p_DIC <- 2 * pred$log_like$sd^2
   WAIC_limit <- -2 * (lppd_limit - p_WAIC_limit)
@@ -218,11 +214,14 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
         pred$lambda_int$mean.mc_std_err^2
     )
   p_DIC.se <- sqrt(4 * (2 * pred$log_like$sd)^2 * pred$log_like$sd.mc_std_err^2)
-  p_WAIC_limit.se <- sqrt(sum((2 * pred$log_lambda_y$sd)^2 *
-    pred$log_lambda_y$sd.mc_std_err^2))
+  p_WAIC_limit.se <- sqrt(sum(
+    (2 * pred$log_lambda_y$sd)^2 *
+      pred$log_lambda_y$sd.mc_std_err^2
+  ))
 
   # True Blockwise counts:
-  block_area <- ibm_eval(agg_block,
+  block_area <- ibm_eval(
+    agg_block,
     input = list(
       block = newdata$.block[newdata$part == "int"],
       weights = newdata$weight[newdata$part == "int"]
@@ -230,7 +229,8 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     state = rep(1, sum(newdata$part == "int"))
   )
   block_n <-
-    ibm_eval(agg_block,
+    ibm_eval(
+      agg_block,
       input = list(block = newdata$.block[newdata$part == "Y"]),
       state = rep(1, sum(newdata$part == "Y"))
     )
@@ -248,8 +248,10 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
     sqrt(
       sum(pred$block_like$mean.mc_std_err[ok]^2 / pred$block_like$mean[ok]^2)
     )
-  p_WAIC_blockwise.se <- sqrt(sum((2 * pred$block_log_like$sd[ok])^2 *
-    pred$block_log_like$sd.mc_std_err[ok]^2))
+  p_WAIC_blockwise.se <- sqrt(sum(
+    (2 * pred$block_log_like$sd[ok])^2 *
+      pred$block_log_like$sd.mc_std_err[ok]^2
+  ))
 
   # INLA ICs:
   lppd_INLA_DIC <- fit$dic$dic / (-2) + fit$dic$p.eff
@@ -257,6 +259,7 @@ lgcp_IC <- function(fit, data, predictor, domain, samplers,
   lppd_INLA_DIC_adjusted <- lppd_INLA_DIC + sum(int_points$weight)
   lppd_INLA_WAIC_adjusted <- lppd_INLA_WAIC + sum(int_points$weight)
 
+  # fmt: skip
   df <- tibble::tribble(
     ~Criterion, ~Method, ~lppd, ~p_eff, ~IC,
     ~lppd.std_err, ~p_eff.std_err, ~IC.std_err,
