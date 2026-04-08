@@ -223,7 +223,7 @@ bru_component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- bru_comp("myEffectOfX",
 #'     main = x,
-#'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
+#'     model = INLA::inla.spde2.matern(fmesher::fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.

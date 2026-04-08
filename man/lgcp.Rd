@@ -106,7 +106,7 @@ if (bru_safe_inla() &&
 
   # Plot the Gorilla nests, the mesh and the survey boundary
   ggplot() +
-    geom_fm(data = data$mesh) +
+    fmesher::geom_fm(data = data$mesh) +
     gg(data$boundary, fill = "blue", alpha = 0.2) +
     gg(data$nests, col = "red", alpha = 0.2)
 
@@ -131,7 +131,7 @@ if (bru_safe_inla() &&
   # Predict the spatial intensity surface
   lambda <- predict(
     fit,
-    fm_pixels(data$mesh, mask = data$boundary),
+    fmesher::fm_pixels(data$mesh, mask = data$boundary),
     ~ exp(field + Intercept)
   )
 

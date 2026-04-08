@@ -67,7 +67,7 @@ if (bru_safe_inla() &&
   )
 
   # Predict SPDE and vegetation at a grid covering the domain of interest
-  pred_loc <- fm_pixels(
+  pred_loc <- fmesher::fm_pixels(
     gorillas$mesh,
     mask = gorillas$boundary,
     dims = c(200, 200),
@@ -189,7 +189,7 @@ if (bru_safe_inla() &&
 
   # Variance and correlation integrated over space
 
-  vrt <- fm_vertices(gorillas$mesh, format = "sf")
+  vrt <- fmesher::fm_vertices(gorillas$mesh, format = "sf")
   pred_vrt <- predict(
     fit,
     vrt,
@@ -204,7 +204,7 @@ if (bru_safe_inla() &&
     pred_vrt$joint,
     pred_vrt$field,
     pred_vrt$veg,
-    samplers = fm_int(gorillas$mesh, gorillas$boundary),
+    samplers = fmesher::fm_int(gorillas$mesh, gorillas$boundary),
     mesh = gorillas$mesh
   )
   vm.int

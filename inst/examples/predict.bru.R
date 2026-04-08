@@ -64,7 +64,7 @@ if (bru_safe_inla() &&
   # instance, we might want to predict 'field' at the locations of the mesh
   # vertices. Using
 
-  vrt <- fm_vertices(gorillas$mesh, format = "sf")
+  vrt <- fmesher::fm_vertices(gorillas$mesh, format = "sf")
 
   # we obtain these vertices as an sf object with POINT geometries
 
@@ -98,7 +98,9 @@ if (bru_safe_inla() &&
   # Alternatively, we can predict the spatial field at a grid of locations, e.g.
   # a sf object with a grid of points covering the relevant part of mesh
 
-  pxl <- fm_pixels(gorillas$mesh, format = "sf", mask = gorillas$boundary)
+  pxl <- fmesher::fm_pixels(gorillas$mesh,
+                            format = "sf",
+                            mask = gorillas$boundary)
   field2 <- predict(fit, pxl, ~field)
 
   # This will give us a sf with the columns we are looking for

@@ -27,7 +27,7 @@
 #' @examples
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   ggplot() +
-#'     geom_fm(data = mrsea$mesh) +
+#'     fmesher::geom_fm(data = mrsea$mesh) +
 #'     gg(mrsea$samplers) +
 #'     gg(mrsea$points) +
 #'     gg(mrsea$boundary)

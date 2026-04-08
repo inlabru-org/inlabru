@@ -85,7 +85,7 @@
 #'       scale_x_log10()
 #'   )
 #'
-#'   idx <- seq_len(fm_dof(m))
+#'   idx <- seq_len(fmesher::fm_dof(m))
 #'   idx <- seq_len(10)
 #'   method0 <- "laplace"
 #'   theta <- qr.solve(B[[method0]][, idx, drop = FALSE], m$loc[, 1])
@@ -95,11 +95,13 @@
 #'         col = B[[method0]][, idx, drop = FALSE] %*% theta - m$loc[, 1],
 #'         nx = 60, ny = 60
 #'       ) +
-#'       geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+#'       fmesher::geom_fm(data = m,
+#'         color = ggplot2::alpha("black", 0.1),
+#'         alpha = 0) +
 #'       scale_fill_distiller(palette = "RdBu")
 #'   )
 #'
-#'   ev <- fm_evaluator(m, dims = c(60, 60))
+#'   ev <- fmesher::fm_evaluator(m, dims = c(60, 60))
 #'   df <- NULL
 #'   for (method in c(
 #'     "laplace", "laplace2",
@@ -116,8 +118,8 @@
 #'         data.frame(
 #'           x = ev$lattice$loc[, 1],
 #'           y = ev$lattice$loc[, 2],
-#'           orig = as.vector(fm_evaluate(ev, fun_orig)),
-#'           norm = as.vector(fm_evaluate(ev, fun_norm)),
+#'           orig = as.vector(fmesher::fm_evaluate(ev, fun_orig)),
+#'           norm = as.vector(fmesher::fm_evaluate(ev, fun_norm)),
 #'           index = k,
 #'           fun = paste0(
 #'             "fun",
@@ -136,7 +138,9 @@
 #'       geom_tile(aes(x, y, fill = orig),
 #'         na.rm = TRUE
 #'       ) +
-#'       geom_fm(data = m, color = ggplot2::alpha("black", 0.1), alpha = 0) +
+#'       fmesher::geom_fm(data = m,
+#'         color = ggplot2::alpha("black", 0.1),
+#'         alpha = 0) +
 #'       geom_contour(aes(x, y, z = orig),
 #'         breaks = seq_len(29 - 15) / (30 - 15), #* 2-0.5,
 #'         na.rm = TRUE, col = "black", alpha = 0.5

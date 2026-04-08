@@ -27,16 +27,16 @@ objects.
 Create mapper for an \code{fm_mesh_1d} object
 }
 \examples{
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
+m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)))
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
 m <- bru_mapper(
-  fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
+  fmesher::fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
   indexed = FALSE
 )
 ibm_values(m)

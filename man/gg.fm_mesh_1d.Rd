@@ -39,7 +39,7 @@ if (require("fmesher", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   # Create a 1D mesh
 
-  mesh <- fm_mesh_1d(seq(0, 10, by = 0.5))
+  mesh <- fmesher::fm_mesh_1d(seq(0, 10, by = 0.5))
 
   # Plot it
 

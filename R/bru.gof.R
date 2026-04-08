@@ -45,7 +45,7 @@
 #'
 #'   # Fit an LGCP model
 #'   x <- seq(0, 55, length.out = 50)
-#'   mesh1D <- fm_mesh_1d(x, boundary = "free")
+#'   mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
 #'   matern <- INLA::inla.spde2.pcmatern(mesh1D,
 #'     prior.range = c(1, 0.01),
 #'     prior.sigma = c(1, 0.01),
