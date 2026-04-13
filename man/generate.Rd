@@ -129,6 +129,7 @@ if (
   }
 }
 }
+
 }
 \seealso{
 \link{predict.bru}

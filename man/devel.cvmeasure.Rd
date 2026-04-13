@@ -94,7 +94,9 @@ if (bru_safe_inla() &&
   # Plot component mean
 
   ggplot(pred_collect) +
-    geom_tile(aes(geometry = geometry, fill = mean), stat = "sf_coordinates") +
+    geom_tile(aes(geometry = geometry, fill = mean),
+      stat = "sf_coordinates"
+    ) +
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
@@ -102,7 +104,9 @@ if (bru_safe_inla() &&
   # Plot component variance
 
   ggplot(pred_collect) +
-    geom_tile(aes(geometry = geometry, fill = var), stat = "sf_coordinates") +
+    geom_tile(aes(geometry = geometry, fill = var),
+      stat = "sf_coordinates"
+    ) +
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
@@ -210,6 +214,7 @@ if (bru_safe_inla() &&
   vm.int
 }
 }
+
 }
 \references{
 Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T.

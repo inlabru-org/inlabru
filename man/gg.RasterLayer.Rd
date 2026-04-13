@@ -49,7 +49,14 @@ if (require("spatstat.data", quietly = TRUE) &&
 }
 }
 \seealso{
-Other geomes for Raster data: 
-\code{\link{gg}()}
+Other geomes: 
+\code{\link{gg}()},
+\code{\link{gg.SpatRaster}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for Raster data}
+\concept{geomes}

@@ -81,8 +81,7 @@ Also see the \code{\link[fmesher:geom_fm]{fmesher::geom_fm()}} method.
 \examples{
 \donttest{
 if (require(fmesher, quietly = TRUE) &&
-    require(ggplot2, quietly = TRUE)) {
-
+  require(ggplot2, quietly = TRUE)) {
   # Load Gorilla data
   gorillas <- inlabru::gorillas_sf
 
@@ -114,10 +113,17 @@ if (require(fmesher, quietly = TRUE) &&
     gg(gorillas$boundary, alpha = 0)
 }
 }
+
 }
 \seealso{
-Other geomes for meshes: 
+Other geomes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_1d}()}
+\code{\link{gg.RasterLayer}()},
+\code{\link{gg.SpatRaster}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for meshes}
+\concept{geomes}

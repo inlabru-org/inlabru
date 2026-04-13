@@ -29,7 +29,6 @@ correlation or covariance function. \code{inla.spde.result}.
 \examples{
 \donttest{
 if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
-
   # Load 1D Poisson process data
 
   data(Poisson2_1D, package = "inlabru")
@@ -87,6 +86,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   plot(matcov)
 }
 }
+
 }
 \author{
 Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}

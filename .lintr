@@ -7,17 +7,4 @@ linters: linters_with_defaults(
     indentation_linter = NULL
   )
 exclusions: list(
-  "inst/examples/bru.R",
-  "inst/examples/generate.bru.R",
-  "inst/examples/gg.prediction.R",
-  "inst/examples/gg.sp.R",
-  "inst/examples/predict.bru.R",
-  "inst/examples/prediction.bru.R",
-  "inst/examples/spde.posterior.R",
-  "inst/examples/bru_obs.R",
-  "inst/examples/data.toygroups.R",
-  "inst/examples/devel.cvmeasure.R",
-  "inst/examples/gg.fm_mesh_2d.R",
-  "inst/examples/gg.sf.R",
-  "inst/examples/rgl.R"
   )

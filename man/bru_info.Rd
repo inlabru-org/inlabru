@@ -7,7 +7,6 @@
 \alias{as_bru_info}
 \alias{as_bru_info.bru_info}
 \alias{as_bru_info.bru}
-\alias{summary.bru_info}
 \alias{print.summary_bru_info}
 \alias{print.bru_info}
 \title{Methods for bru_info objects}
@@ -24,14 +23,13 @@ as_bru_info(object, ...)
 
 \method{as_bru_info}{bru}(object, ...)
 
-\method{summary}{bru_info}(object, verbose = TRUE, ...)
-
 \method{print}{summary_bru_info}(x, ...)
 
 \method{print}{bru_info}(x, ...)
 }
 \arguments{
-\item{\dots}{Arguments passed on to other \code{summary} methods}
+\item{\dots}{Additional arguments to be stored in the \code{bru_info} object. For
+\code{summary} and \code{print} methods, arguments passed on to submethods.}
 
 \item{method}{character; The type of estimation method used}
 
@@ -40,12 +38,6 @@ automatically detecting the version}
 
 \item{INLA_version}{character; INLA package version. Default: NULL, for
 automatically detecting the version}
-
-\item{object}{Object to operate on}
-
-\item{verbose}{logical; If \code{TRUE}, include more details of the
-component definitions. If \code{FALSE}, only show basic component
-definition information. Default: \code{TRUE}}
 
 \item{x}{An  object to be printed}
 }
