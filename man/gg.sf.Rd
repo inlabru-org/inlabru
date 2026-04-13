@@ -53,7 +53,8 @@ if (require("ggplot2", quietly = TRUE) &&
 
   mexdolphin <- inlabru::mexdolphin_sf
 
-  # Plot the pantropical survey boundary, ship transects and dolphin sightings
+  # Plot the pantropical survey boundary, ship transects and dolphin
+  # sightings
 
   ggplot() +
     gg(mexdolphin$ppoly, alpha = 0.5) + # survey boundary

@@ -623,7 +623,8 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #'
 #'   mexdolphin <- inlabru::mexdolphin_sf
 #'
-#'   # Plot the pantropical survey boundary, ship transects and dolphin sightings
+#'   # Plot the pantropical survey boundary, ship transects and dolphin
+#'   # sightings
 #'
 #'   ggplot() +
 #'     gg(mexdolphin$ppoly, alpha = 0.5) + # survey boundary

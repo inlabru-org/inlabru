@@ -199,6 +199,10 @@ bru_inla_formula.bru_comp_list <- function(x, ...) {
 
 
 #' @rdname bru
+#' @param object A `bru_info` object
+#' @param verbose logical; If `TRUE`, include more details of the
+#' component definitions. If `FALSE`, only show basic component
+#' definition information. Default: `FALSE`
 #' @export
 #' @method summary bru_info
 summary.bru_info <- function(object, verbose = TRUE, ...) {
