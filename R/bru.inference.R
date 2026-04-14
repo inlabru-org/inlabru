@@ -1041,6 +1041,9 @@ bru_get_parse_data <- function(x) {
 # messages.
 check_sp_data_deprecation <- function(...) {
   .caller <- sys.call(-1)[[1]]
+  if (startsWith(deparse1(.caller)[1], "function")) {
+    .caller <- NULL
+  }
   obj <- list(...)
   nms <- names(obj)
   result <- vapply(
@@ -1051,7 +1054,7 @@ check_sp_data_deprecation <- function(...) {
           lifecycle::deprecate_warn(
             "2.12.0.9023",
             as.character(glue::glue(
-              "{deparse(.caller)}({nm} = ",
+              "{deparse1(.caller)}({nm} = ",
               "'has deprecated support for `Spatial` input')"
             )),
             I("`sf` input")
@@ -1060,7 +1063,7 @@ check_sp_data_deprecation <- function(...) {
           lifecycle::deprecate_warn(
             "2.12.0.9023",
             I(as.character(glue::glue(
-              "{nm} has deprecated support for `Spatial` input"
+              "`{nm}` argument has deprecated support for `Spatial` input;"
             ))),
             I("`sf` input")
           )
@@ -5006,6 +5009,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     )
     inputs <- bru_input(model, lhoods = lhoods)
   }
+
+  timings <- bru_timer_do(timings, "Linearise", 1L)
   bru_log_message(
     "iinla: Evaluate component linearisations",
     verbosity = 3
@@ -5355,7 +5360,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
-          timings <- bru_timer_do(timings, "Line search", k)
+          timings <- bru_timer_do(timings, "Line search", k + 1L)
           line_weights <-
             extract_property(
               result = result,
@@ -5378,7 +5383,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           )
           state <- line_search[["state"]]
         }
-        timings <- bru_timer_do(timings, "Linearise", k)
+        timings <- bru_timer_do(timings, "Linearise", k + 1L)
 
         bru_log_message(
           "iinla: Evaluate component linearisations",

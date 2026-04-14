@@ -301,7 +301,7 @@ bru_comp.character <- function(object,
     !missing(nrep) || !missing(replicate_mapper)
   if (include_group) {
     if (!is.null(substitute(group)) &&
-      !identical(deparse(substitute(group)), "1L")) {
+      !identical(deparse1(substitute(group)), "1L")) {
       if (is.null(control.group)) {
         control.group <- INLA::inla.set.control.group.default()
       }
