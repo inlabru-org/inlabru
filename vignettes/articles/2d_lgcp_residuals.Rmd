@@ -28,6 +28,7 @@ library("patchwork")
 library("terra")
 library("INLA")
 library("inlabru")
+library("fmesher")
 bru_safe_sp(force = TRUE)
 ```
 

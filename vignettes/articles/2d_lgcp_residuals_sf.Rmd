@@ -29,6 +29,7 @@ library("terra")
 library("sf")
 library("INLA")
 library("inlabru")
+library("fmesher")
 ```
 
 ```{r, eval=TRUE, echo=FALSE, cache=FALSE}
