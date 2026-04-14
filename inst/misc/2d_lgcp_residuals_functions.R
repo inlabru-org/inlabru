@@ -3,6 +3,7 @@
 
 suppressPackageStartupMessages(library("INLA"))
 suppressPackageStartupMessages(library("inlabru"))
+suppressPackageStartupMessages(library("fmesher"))
 suppressPackageStartupMessages(library("RColorBrewer"))
 suppressPackageStartupMessages(library("ggplot2"))
 suppressPackageStartupMessages(library("dplyr"))

@@ -11,6 +11,7 @@ suppressPackageStartupMessages(library("terra"))
 suppressPackageStartupMessages(library("sf"))
 suppressPackageStartupMessages(library("INLA"))
 suppressPackageStartupMessages(library("inlabru"))
+suppressPackageStartupMessages(library("fmesher"))
 theme_set(theme_bw())
 
 
