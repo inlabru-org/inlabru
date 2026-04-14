@@ -5,12 +5,16 @@ test_that("sp data detected", {
 
   local_bru_options_set(bru_run = FALSE)
   withr::local_options(lifecycle_verbosity = "error")
-  expect_error({
-    fit_sp <- bru(
-      as.integer(date) ~ field(sp::coordinates, model = "linear"),
-      data = gorillas_sp()$nests
+  expect_error(
+    {
+      fit_sp <- bru(
+        as.integer(date) ~ field(sp::coordinates, model = "linear"),
+        data = gorillas_sp()$nests
+      )
+    },
+    paste0(
+      "`data` argument has deprecated support for `Spatial` input; ",
+      "was deprecated in inlabru 2.12.0.9023."
     )
-  },
-  "`data` argument has deprecated support for `Spatial` input; was deprecated in inlabru 2.12.0.9023."
   )
 })
