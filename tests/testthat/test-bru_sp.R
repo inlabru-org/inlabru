@@ -2,6 +2,7 @@ test_that("sp data detected", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sp")
+  skip_if_not_installed("terra")
 
   local_bru_options_set(bru_run = FALSE)
   withr::local_options(lifecycle_verbosity = "error")
