@@ -53,10 +53,7 @@ bru_mapper_collect <- function(...) {
 #' @export
 #' @rdname ibm_n
 #'
-ibm_n.bm_collect <- function(mapper,
-                             inla_f = FALSE,
-                             multi = FALSE,
-                             ...) {
+ibm_n.bm_collect <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (multi) {
     mapper[["n_multi"]]
   } else if (mapper[["hidden"]] && inla_f) {
@@ -92,36 +89,36 @@ bm_collect_indexing <- function(mapper, input) {
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_collect <- function(mapper, input,
-                                    state = NULL,
-                                    inla_f = FALSE,
-                                    multi = FALSE, ...) {
+ibm_n_output.bm_collect <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...
+) {
   if (mapper[["hidden"]] && inla_f) {
     return(ibm_n_output(mapper[["mappers"]][[1]], input = input))
   }
 
   indexing <- bm_collect_indexing(mapper, input)
-  if (is.matrix(input)) {
-    n <- vapply(
-      indexing,
-      function(x) {
-        as.integer(
-          ibm_n_output(mapper[["mapper"]][[x]], input[, x], ...)
+  n <- vapply(
+    indexing,
+    function(x) {
+      as.integer(
+        ibm_n_output(
+          mapper[["mapper"]][[x]],
+          if (is.matrix(input)) {
+            input[, x]
+          } else {
+            input[[x]]
+          },
+          ...
         )
-      },
-      0L
-    )
-  } else {
-    n <- vapply(
-      indexing,
-      function(x) {
-        as.integer(
-          ibm_n_output(mapper[["mapper"]][[x]], input[[x]], ...)
-        )
-      },
-      0L
-    )
-  }
+      )
+    },
+    0L
+  )
 
   if (!multi) {
     n <- sum(n)
@@ -134,10 +131,7 @@ ibm_n_output.bm_collect <- function(mapper, input,
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_collect <- function(mapper,
-                                  inla_f = FALSE,
-                                  multi = FALSE,
-                                  ...) {
+ibm_values.bm_collect <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (multi) {
     mapper[["values_multi"]]
   } else if (mapper[["hidden"]] && inla_f) {
@@ -150,10 +144,12 @@ ibm_values.bm_collect <- function(mapper,
 #' @export
 #' @rdname ibm_is_linear
 #'
-ibm_is_linear.bm_collect <- function(mapper,
-                                     inla_f = FALSE,
-                                     multi = FALSE,
-                                     ...) {
+ibm_is_linear.bm_collect <- function(
+  mapper,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...
+) {
   if (mapper[["hidden"]] && inla_f && !multi) {
     ibm_is_linear(mapper[["mappers"]][[1]])
   } else if (multi) {
@@ -164,9 +160,7 @@ ibm_is_linear.bm_collect <- function(mapper,
 }
 
 
-bm_collect_sub_lin <- function(mapper, input, state,
-                               inla_f = FALSE,
-                               ...) {
+bm_collect_sub_lin <- function(mapper, input, state, inla_f = FALSE, ...) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)
   }
@@ -193,12 +187,11 @@ bm_collect_sub_lin <- function(mapper, input, state,
         state_subset <- state[n_offset[x] + seq_len(n_multi[x])]
         ibm_linear(
           mapper[["mappers"]][[x]],
-          input =
-            if (is.numeric(x) && (x > length(input))) {
-              NULL
-            } else {
-              input[[x]]
-            },
+          input = if (is.numeric(x) && (x > length(input))) {
+            NULL
+          } else {
+            input[[x]]
+          },
           state = state_subset
         )
       }
@@ -219,10 +212,15 @@ bm_collect_sub_lin <- function(mapper, input, state,
 #' the first, non-hidden, sub-mapper.
 #' @export
 #'
-ibm_jacobian.bm_collect <- function(mapper, input, state = NULL,
-                                    inla_f = FALSE, multi = FALSE,
-                                    ...,
-                                    sub_lin = NULL) {
+ibm_jacobian.bm_collect <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_collect_sub_lin(mapper, input, state, inla_f = inla_f)
   }
@@ -241,10 +239,15 @@ ibm_jacobian.bm_collect <- function(mapper, input, state = NULL,
 #' @export
 #' @rdname ibm_eval
 #'
-ibm_eval.bm_collect <- function(mapper, input, state,
-                                inla_f = FALSE, multi = FALSE,
-                                ...,
-                                sub_lin = NULL) {
+ibm_eval.bm_collect <- function(
+  mapper,
+  input,
+  state,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_collect_sub_lin(mapper, input, state, inla_f = inla_f)
   }
@@ -262,17 +265,12 @@ ibm_eval.bm_collect <- function(mapper, input, state,
 #' @export
 #' @rdname ibm_linear
 #'
-ibm_linear.bm_collect <- function(mapper, input, state,
-                                  inla_f = FALSE,
-                                  ...) {
+ibm_linear.bm_collect <- function(mapper, input, state, inla_f = FALSE, ...) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)
   }
   sub_lin <-
-    bm_collect_sub_lin(mapper, input, state,
-      inla_f = FALSE,
-      ...
-    )
+    bm_collect_sub_lin(mapper, input, state, inla_f = FALSE, ...)
   eval2 <- ibm_eval2(
     mapper,
     input = input,
@@ -301,9 +299,14 @@ ibm_linear.bm_collect <- function(mapper, input, state,
 #' with unnamed but ordered columns.
 #' @export
 #'
-ibm_invalid_output.bm_collect <- function(mapper, input, state,
-                                          inla_f = FALSE,
-                                          multi = FALSE, ...) {
+ibm_invalid_output.bm_collect <- function(
+  mapper,
+  input,
+  state,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...
+) {
   if (mapper[["hidden"]] && inla_f) {
     return(
       ibm_invalid_output(
@@ -315,26 +318,18 @@ ibm_invalid_output.bm_collect <- function(mapper, input, state,
   }
 
   indexing <- bm_collect_indexing(mapper, input)
-  if (is.matrix(input)) {
+  if (is.matrix(input) || is.list(input)) {
     invalid <-
       lapply(
         indexing,
         function(x) {
           ibm_invalid_output(
             mapper[["mappers"]][[x]],
-            input = input[, x],
-            multi = FALSE
-          )
-        }
-      )
-  } else if (is.list(input)) {
-    invalid <-
-      lapply(
-        indexing,
-        function(x) {
-          ibm_invalid_output(
-            mapper[["mappers"]][[x]],
-            input = input[[x]],
+            input = if (is.matrix(input)) {
+              input[, x]
+            } else {
+              input[[x]]
+            },
             multi = FALSE
           )
         }
