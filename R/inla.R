@@ -203,7 +203,7 @@ extract_property <- function(result, property,
 post.sample.structured <- function(result, n, seed = NULL,
                                    num.threads = NULL, ...) {
   if (!is.null(seed) && (seed != 0L)) {
-    num.threads <- "1:1"
+    num.threads <- "1:1:1"
   }
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {

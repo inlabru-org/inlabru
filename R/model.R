@@ -216,7 +216,7 @@ print.bru_model <- function(x, ...) {
 #' @param seed If seed != 0L, the random seed
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
-#' When seed != 0, overridden to "1:1"
+#' When seed != 0, overridden to "1:1:1"
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param n_pred integer. If provided, scalar predictor results are expanded to
 #' vectors of length `n_pred`.
