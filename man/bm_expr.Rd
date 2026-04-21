@@ -66,7 +66,7 @@ ibm_eval2(m, list(), list(x = 1:5))
 
 # Expression with data
 (m <- bm_expr(rlang::quo(cos(x) * .data$z)))
-ibm_eval(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
+ibm_eval(m, list(data = list(data = data.frame(z = 11:15))), list(x = 1:5))
 ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
 
 # Expression with data, root variables, and derived variables.
@@ -80,7 +80,7 @@ ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
 ibm_eval(
   m,
   list(
-    data = data.frame(z = 11:15),
+    data = list(data = data.frame(z = 11:15)),
     derived = list(y = 2:6), # y = x + 1
     jacobians = list(y = list(x = Matrix::Diagonal(1.0, 5)))
   ),
