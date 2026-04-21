@@ -69,7 +69,7 @@ interactively.
 \item \code{local_bru_options_set()}: Wrapper for \code{\link[=bru_options_set_local]{bru_options_set_local()}},
 to locally override the global package options.
 
-\item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1" to ensure
+\item \code{local_bru_safe_inla()}: Tests should set num.threads = "1:1:1" to ensure
 within-system repeatability by calling \code{local_bru_safe_inla()}; see also
 \code{\link[=bru_safe_inla]{bru_safe_inla()}}
 
