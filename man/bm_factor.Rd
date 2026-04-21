@@ -45,6 +45,7 @@ Other mappers:
 \code{\link{bm_aggregate}()},
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
+\code{\link{bm_expr}()},
 \code{\link{bm_fm_mesh_1d}},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},

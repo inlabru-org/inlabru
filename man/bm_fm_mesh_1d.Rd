@@ -50,6 +50,7 @@ Other mappers:
 \code{\link{bm_aggregate}()},
 \code{\link{bm_collect}()},
 \code{\link{bm_const}()},
+\code{\link{bm_expr}()},
 \code{\link{bm_factor}()},
 \code{\link{bm_fmesher}()},
 \code{\link{bm_harmonics}()},

@@ -673,8 +673,7 @@ evaluate_predictor <- function(model,
 
   n <- length(state)
   for (k in seq_len(n)) {
-    state_df <- state[[k]]
-    names(state_df) <- state_names[names(state_df)]
+    state_df <- stats::setNames(state[[k]], state_names[names(state[[k]])])
     data_mask <- bru_data_mask(
       list(
         effect = effects[[k]],
