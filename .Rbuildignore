@@ -32,3 +32,5 @@
 ^air\.toml$
 ^jarl\.toml$
 ^\.pre-commit-config\.yaml$
+^\.positai$
+^\.claude$
