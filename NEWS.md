@@ -9,6 +9,15 @@
   extraction. Layer-specific `terra::extract()` may return integer instead of
   factor data, as multi-layer extraction would otherwise need to mix data of
   different types (`2.14.0.9002`)
+* Check for "error" inheritance for input evaluation and other errors instead
+  of "simpleError", as R > 4.5 introduces more fine-grained error classes
+  (`2.14.0.9004`)
+
+## General updates
+
+* Move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary namespace
+  clashes and encourage explicit fmesher declarations in user code (version
+  `2.14.0.9003`)
 
 # inlabru 2.14.0
 
