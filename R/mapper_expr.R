@@ -157,9 +157,23 @@ ibm_is_linear.bm_expr <- function(mapper, ...) {
 }
 
 
+ibm_jacobian_bm_expr <- function(
+    mapper,
+    input,
+    state,
+    ...,
+    var,
+    offset,
+    env = rlang::caller_env()
+) {
+  # TODO: adapt code from bru_compute_linearisation.bru_comp
+  NULL
+}
+
 #' @describeIn ibm_jacobian
 #' Accepts a `state` list with named entries, one for each variable.
 #' The `input` format should match the description given for [bm_expr()].
+#' @param offset The offset value, pre-calculated by [ibm_eval.bm_expr()].
 #' @export
 #'
 ibm_jacobian.bm_expr <- function(
@@ -169,17 +183,38 @@ ibm_jacobian.bm_expr <- function(
   inla_f = FALSE,
   multi = FALSE,
   ...,
+  offset = NULL,
   env = rlang::caller_env()
 ) {
-
-
+  if (is.null(offset)) {
+    offset <- ibm_eval(
+      mapper,
+      input,
+      state,
+      env = env,
+      ...
+    )
+  }
+  A <- lapply(
+    setNames(nm = names(state)),
+    function(var) {
+      ibm_jacobian_bm_expr_var(
+        mapper,
+        input,
+        state,
+        var = var,
+        offset = offset,
+        env = env
+      )
+    }
+  )
 
   if (multi) {
     return(A)
   }
 
-  # Combine the matrices (A1, A2, A3, ...) -> rbind(A1, A2, A3, ...)
-  A <- do.call(rbind, A)
+  # Combine the matrices (A1, A2, A3, ...) -> cbind(A1, A2, A3, ...)
+  A <- do.call(cbind, A)
   A
 }
 
@@ -262,4 +297,19 @@ ibm_linear.bm_expr <- function(mapper, input, state, inla_f = FALSE, ...) {
     state0 = state,
     values_mapper = mapper
   )
+}
+
+
+#' @export
+#' @rdname ibm_eval2
+#'
+ibm_eval2.bm_expr <- function(mapper, input, state = NULL, ...) {
+  offset <- ibm_eval(
+    mapper,
+    input,
+    state,
+    ...
+  )
+  jacobian <- ibm_jacobian(mapper, input, state, ..., offset = offset)
+  list(offset = offset, jacobian = jacobian)
 }

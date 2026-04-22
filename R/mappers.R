@@ -1114,22 +1114,21 @@ ibm_eval.default <- function(mapper,
 #' their own `ibm_eval2` method if joint construction of evaluation and Jacobian
 #' is more efficient than separate or sequential construction.
 #' @export
-ibm_eval2.default <- function(mapper, input, state, ...) {
+ibm_eval2.default <- function(mapper, input, state = NULL, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
     return(ibm_eval2(mapper_new, input = input, state = state, ...))
   }
-  jacobian <- ibm_jacobian(mapper, input, state, ...)
+  jacobian <- ibm_jacobian(mapper = mapper, input = input, state = state, ...)
   offset <- ibm_eval(
-    mapper,
-    input,
-    state,
+    mapper = mapper,
+    input = input,
+    state = state,
     ...,
     jacobian = jacobian
   )
   list(offset = offset, jacobian = jacobian)
 }
-
 
 #' @export
 #' @describeIn ibm_names Returns `NULL`
@@ -3201,6 +3200,10 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
     state_k <- eval2_k$offset
     if (k == first) {
       A <- eval2_k$jacobian
+    } else if (is.list(A)) {
+      # Multi-root-state case, where A is a list of Jacobian matrices, one for
+      # each root state. Used when the first mapper is a bm_expr.
+      A <- lapply(A, function(A_mat) eval2_k$jacobian %*% A_mat)
     } else {
       A <- eval2_k$jacobian %*% A
     }

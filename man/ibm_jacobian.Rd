@@ -93,6 +93,7 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
   inla_f = FALSE,
   multi = FALSE,
   ...,
+  offset = NULL,
   env = rlang::caller_env()
 )
 
@@ -144,6 +145,8 @@ for \code{marginal} mappers.}
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+
+\item{offset}{The offset value, pre-calculated by \code{\link[=ibm_eval.bm_expr]{ibm_eval.bm_expr()}}.}
 }
 \description{
 Implementations must return a (sparse) matrix of size
