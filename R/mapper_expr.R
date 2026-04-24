@@ -130,16 +130,22 @@ ibm_n_output.bm_expr <- function(
   input,
   state = NULL,
   inla_f = FALSE,
-  ...
+  ...,
+  n_state = NULL
 ) {
-  if (
-    !mapper[["is_rowwise"]] ||
-      is.null(input[["data"]]) ||
-      is.null(input[["data"]][["data"]])
-  ) {
+  if (!mapper[["is_rowwise"]]) {
     return(NA_integer_)
   }
-  NROW(input[["data"]][["data"]][[1]])
+  if (!is.null(input[["data"]][["data"]])) {
+    return(NROW(input[["data"]][["data"]][[1]]))
+  }
+  if (!is.null(input[["derived"]][[1]])) {
+    return(length(input[["derived"]][[1]]))
+  }
+  if (!is.null(n_state)) {
+    return(n_state)
+  }
+  NA_integer_
 }
 
 #' @export
@@ -164,9 +170,228 @@ ibm_jacobian_bm_expr <- function(
     ...,
     var,
     offset,
+    n_output = NROW(offset),
+    eps = 1e-6,
     env = rlang::caller_env()
 ) {
-  # TODO: adapt code from bru_compute_linearisation.bru_comp
+  if (length(state[[var]]) == 0L) {
+    return(Matrix::sparseMatrix(
+      i = c(),
+      j = c(),
+      x = c(1),
+      dims = c(NROW(offset), 0)
+    ))
+  }
+
+  # TODO: Store and access adjusted bru_used info for the expression!
+  # Or is it enough to precompute "assume_rowwise"?
+  used <- NULL # TODO!
+  allow_root <- var %in% used[[mapper[["root_label"]]]]
+
+  if (is.null(comp_simple)) { # TODO: Should this be here or elsewhere?
+    A <- NULL
+    assume_rowwise <- FALSE
+  } else {
+    # Jacobian of each derived variable with respect to the root variable.
+    # Each missing entry implies an all-zero matrix.
+    A <- lapply(input[["jacobians"]], function(x) x[[var]])
+
+    assume_rowwise <- !allow_root &&
+      is_rowwise &&
+      is.data.frame(input[["data"]][["data"]])
+    if (assume_rowwise) {
+      if (!is.null(n_output) && (NROW(offset) != n_output)) {
+        stop(
+          "Number of rows (",
+          NROW(offset),
+          ") in the predictor for component '",
+          var,
+          "' does not match the length implied by the response data (",
+          n_output,
+          ")."
+        )
+      }
+      if (NROW(A) == 1L) {
+        A <- Matrix::kronecker(rep(1, NROW(offset)), A)
+      }
+    }
+  }
+
+  triplets <- list(
+    i = integer(0),
+    j = integer(0),
+    x = numeric(0)
+  )
+
+  if (!all(is.finite(offset))) {
+    warning(
+      "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
+      immediate. = TRUE
+    )
+  }
+
+  symmetric_diffs <- FALSE
+  for (k in seq_len(NROW(state[[var]]))) {
+    if (is.null(A)) {
+      row_subset <- seq_len(NROW(offset))
+    } else {
+      Ak <- lapply(A, function(x) x[, k, drop = TRUE])
+      row_subset <- which(Ak != 0.0)
+    }
+    if (length(row_subset) > 0) {
+      if (symmetric_diffs) {
+        state_eps <- list(state, state)
+        state_eps[[1]][[label]][k] <- state[[label]][k] - eps
+        state_eps[[2]][[label]][k] <- state[[label]][k] + eps
+      } else {
+        state_eps <- state
+        state_eps[[label]][k] <- state[[label]][k] + eps
+      }
+      # TODO:
+      # Option: filter out the data and effect rows for which
+      # the rows of A have some non-zeros, or all if !is_rowwise
+      # Option: compute predictor for multiple different states. This requires
+      # constructing multiple states and corresponding effects before calling
+      # evaluate_predictor
+
+      if (symmetric_diffs) {
+        effects_eps <- list(effects, effects)
+      } else {
+        effects_eps <- effects
+      }
+      if (!is.null(A)) {
+        if (assume_rowwise) {
+          if (symmetric_diffs) {
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[1]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+                effects_eps[[2]][[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[1]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
+                effects_eps[[2]][[label_loop]] <-
+                  effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[1]][[label]] <-
+              effects_eps[[1]][[label]] - Ak[row_subset] * eps
+            effects_eps[[2]][[label]] <-
+              effects_eps[[2]][[label]] + Ak[row_subset] * eps
+          } else {
+            for (label_loop in names(effects)) {
+              if (NROW(effects[[label_loop]]) == 1) {
+                effects_eps[[label_loop]] <-
+                  rep(effects[[label_loop]], length(row_subset))
+              } else {
+                effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+              }
+            }
+            effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
+          }
+        } else {
+          if (symmetric_diffs) {
+            effects_eps <- list(effects, effects)
+            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
+            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
+          } else {
+            effects_eps <- effects
+            effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
+          }
+        }
+      }
+      pred_eps <- evaluate_predictor(
+        model,
+        state = if (symmetric_diffs) {
+          state_eps
+        } else {
+          list(state_eps)
+        },
+        data =
+          if (assume_rowwise) {
+            data[row_subset, , drop = FALSE]
+          } else {
+            data
+          },
+        data_extra = data_extra,
+        effects =
+          if (symmetric_diffs) {
+            effects_eps
+          } else {
+            list(effects_eps)
+          },
+        predictor = lhood_expr,
+        used = used,
+        format = "matrix",
+        n_pred =
+          if (assume_rowwise) {
+            length(row_subset)
+          } else {
+            n_pred
+          }
+      )
+      # Store sparse triplet information
+      if (symmetric_diffs) {
+        if (assume_rowwise) {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        } else {
+          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+        }
+      } else {
+        if (!all(is.finite(pred_eps))) {
+          warning(
+            "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
+            label,
+            "' plus eps.\n",
+            immediate. = TRUE
+          )
+        }
+        if (assume_rowwise) {
+          values <- (pred_eps - pred0[row_subset])
+        } else {
+          values <- (pred_eps - pred0)
+        }
+      }
+      nonzero <- is.finite(values)
+      if (!all(nonzero)) {
+        warning(
+          "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
+          "derivatives for '",
+          label,
+          "'; treated as 0.0.\n",
+          immediate. = TRUE
+        )
+      }
+      nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
+      if (assume_rowwise) {
+        triplets$i <- c(triplets$i, row_subset[nonzero])
+      } else {
+        triplets$i <- c(triplets$i, which(nonzero))
+      }
+      triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
+      triplets$x <- c(triplets$x, values[nonzero] / eps)
+    }
+  }
+  B <- Matrix::sparseMatrix(
+    i = triplets$i,
+    j = triplets$j,
+    x = triplets$x,
+    dims = c(NROW(pred0), NROW(state[[label]]))
+  )
+  if (NROW(B) != NROW(pred0)) {
+    stop(
+      "Jacobian matrix for component '",
+      label,
+      "' has ",
+      NROW(B),
+      " rows, but expected ",
+      NROW(pred0),
+      " rows based on the predictor length."
+    )
+  }
+  B
+
   NULL
 }
 
