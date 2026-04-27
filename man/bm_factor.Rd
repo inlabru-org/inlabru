@@ -54,9 +54,9 @@ Other mappers:
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
@@ -64,11 +64,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_factor} method implementations: 
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_factor} method implementations}

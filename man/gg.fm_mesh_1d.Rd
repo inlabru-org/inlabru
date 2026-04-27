@@ -39,7 +39,7 @@ if (require("fmesher", quietly = TRUE) &&
   require("ggplot2", quietly = TRUE)) {
   # Create a 1D mesh
 
-  mesh <- fm_mesh_1d(seq(0, 10, by = 0.5))
+  mesh <- fmesher::fm_mesh_1d(seq(0, 10, by = 0.5))
 
   # Plot it
 
@@ -55,8 +55,14 @@ if (require("fmesher", quietly = TRUE) &&
 
 }
 \seealso{
-Other geomes for meshes: 
+Other geomes: 
 \code{\link{gg}()},
-\code{\link{gg.fm_mesh_2d}()}
+\code{\link{gg.RasterLayer}()},
+\code{\link{gg.SpatRaster}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for meshes}
+\concept{geomes}

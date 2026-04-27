@@ -27,16 +27,16 @@ objects.
 Create mapper for an \code{fm_mesh_1d} object
 }
 \examples{
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
+m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)))
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
-m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 ibm_values(m)
 ibm_eval(m, 1:7, 1:5)
 
 m <- bru_mapper(
-  fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
+  fmesher::fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
   indexed = FALSE
 )
 ibm_values(m)
@@ -59,9 +59,9 @@ Other mappers:
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_marginal}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
@@ -69,11 +69,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_fm_mesh_1d} method implementations: 
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_fm_mesh_1d} method implementations}

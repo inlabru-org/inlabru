@@ -2,7 +2,7 @@
 % Please edit documentation in R/deltaIC.R
 \name{deltaIC}
 \alias{deltaIC}
-\title{Summarise DIC and WAIC from \code{lgcp} objects.}
+\title{Summarise DIC from \code{lgcp} estimates.}
 \usage{
 deltaIC(..., criterion = "DIC")
 }
@@ -12,24 +12,25 @@ obtained from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\
 
 \item{criterion}{character vector.
 If it includes 'DIC', computes DIC differences;
-If it contains 'WAIC', computes WAIC differences. Default: 'DIC'}
+'WAIC' is also allowed, but note that plain WAIC values from inla are not
+well-defined for point process models. Default 'WAIC'}
 }
 \value{
 A data frame with each row containing the Model name,
-DIC and Delta.DIC, and/or WAIC and Delta.WAIC.
+DIC and Delta.DIC.
 }
 \description{
-Calculates DIC and/or WAIC differences and produces an ordered summary.
+Calculates DIC differences and produces an ordered summary.
 }
 \examples{
 \donttest{
 if (bru_safe_inla()) {
   # Generate some data
-  input.df <- data.frame(idx = 1:10, x = cos(1:10))
-  input.df <- within(
-    input.df,
-    y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-  )
+  input.df <- data.frame(idx = 1:10) |>
+    dplyr::mutate(
+      x = cos(idx),
+      y = rpois(length(x), 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1))
+    )
 
   # Fit two models
   fit1 <- bru(

@@ -75,14 +75,6 @@ bru_names.bru <- function(x) {
 }
 
 
-
-
-
-
-
-
-
-
 inla_result_latent_idx <- function(result) {
   do.call(
     c,
@@ -108,7 +100,7 @@ inla_result_latent_idx <- function(result) {
 
 #' Extract a summary property from all results of an inla result
 #'
-#' @param result an `inla` result object
+#' @param result an `inla` result object with a `bru_info` element
 #' @param property character; "mean", "sd", "mode", or some other column
 #' identifier for inla result `$summary.fixed`, `$summary.random$label`, and
 #' `$summary.hyperpar`, or "joint_mode". For "joint_mode", the joint latent mode
@@ -169,15 +161,17 @@ extract_property <- function(result, property,
     }
   }
 
-  fac.names <- names(result$model$effects)[
+  comp_lst <- as_bru_comp_list(result$bru_info)
+  fac.names <- names(comp_lst)[
     vapply(
-      result$model$effects,
+      comp_lst,
       function(e) {
         identical(e$type, "factor")
       },
       TRUE
     )
   ]
+
   # TODO: Consider whether to extract/convert effect$type == "factor" models
   # from random effects into fixed effects
   #
@@ -196,7 +190,6 @@ extract_property <- function(result, property,
 }
 
 
-
 ##
 ## A wrapper for inla.posterior.sample()
 ##
@@ -210,7 +203,7 @@ extract_property <- function(result, property,
 post.sample.structured <- function(result, n, seed = NULL,
                                    num.threads = NULL, ...) {
   if (!is.null(seed) && (seed != 0L)) {
-    num.threads <- "1:1"
+    num.threads <- "1:1:1"
   }
   # Workaround for older versions of INLA
   if ("hyper.user.scale" %in% formalArgs(INLA::inla.posterior.sample)) {
@@ -276,9 +269,10 @@ post.sample.structured <- function(result, n, seed = NULL,
 
     # For effects that were modeled via factors we attach an extra vector
     # holding the samples
-    fac.names <- names(result$bru_info$model$effects)[
+    comp_lst <- as_bru_comp_list(result)
+    fac.names <- names(comp_lst)[
       vapply(
-        result$bru_info$model$effects,
+        comp_lst,
         function(e) {
           identical(e$main$type, "factor")
         },
@@ -287,7 +281,7 @@ post.sample.structured <- function(result, n, seed = NULL,
     ]
     for (name in fac.names) {
       # TODO: figure out how to interact this with group and replicate info
-      names(vals[[name]]) <- result$bru_info$model$effects[[name]]$main$values
+      names(vals[[name]]) <- comp_lst[[name]]$main$values
     }
 
     if (length(smpl.hyperpar) > 0) {
@@ -302,7 +296,7 @@ post.sample.structured <- function(result, n, seed = NULL,
   #
   # Return
   #
-  return(ssmpl)
+  ssmpl
 }
 
 extract_entries <- function(name, smpl, .contents = NULL) {
@@ -321,7 +315,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
   }
   vals <- smpl[.contents[["start"]][idx] +
     seq_len(.contents[["length"]][idx]) - 1L]
-  return(vals)
+  vals
 }
 
 #' Backwards compatibility to handle mexpand for INLA <= 24.06.02
@@ -470,8 +464,6 @@ bru_inla.stack.mjoin <- function(...,
     ))
   }
 }
-
-
 
 
 #' @rdname plot.bru
@@ -690,5 +682,5 @@ variables.inla <- function(result, include.random = TRUE) {
   }
 
   variables <- do.call(rbind, c(list(fixed, hyperpar), random))
-  return(variables)
+  variables
 }

@@ -1,0 +1,212 @@
+---
+title: "Classes and methods"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Classes and methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+suppressPackageStartupMessages(library(inlabru))
+suppressPackageStartupMessages(library(fmesher))
+suppressPackageStartupMessages(library(tibble))
+
+convert_fun_link <- function(x, webref) {
+  pkg_name <- sub(
+    pattern = "^(([^:]*)::)?([^(]+)(\\(.*\\))(<-)?$",
+    replacement = "\\2",
+    x = x
+  )
+  if (identical(pkg_name, "")) {
+    pkg_name <- "inlabru"
+  }
+  nm <- sub(
+    pattern = "^(([^:]*)::)?([^(]+)(\\(.*\\))(<-)?$",
+    replacement = "\\3",
+    x = x
+  )
+  args <- sub(
+    pattern = "^(([^:]*)::)?([^(]+)(\\(.*\\))(<-)?$",
+    replacement = "\\4\\5",
+    x = x
+  )
+  help_name <- tryCatch(
+    {
+      basename(utils::help((nm), package = (pkg_name)))
+    },
+    error = function(e) {
+      nm
+    }
+  )
+  paste0(
+    '<a href="', webref[[pkg_name]], help_name, '.html">Y</a>',
+  )
+}
+
+convert_fun_links <- function(df) {
+  webref <- list(
+    inlabru = "https://inlabru-org.github.io/inlabru/reference/",
+    fmesher = "https://inlabru-org.github.io/fmesher/reference/"
+  )
+  df$Fun <- vapply(
+    df[["Fun"]],
+    function(x) convert_fun_link(x, webref),
+    ""
+  )
+  df
+}
+
+convert_NAs <- function(df) {
+  for (k in colnames(df)) {
+    df[[k]] <- vapply(
+      df[[k]],
+      function(x) if (is.na(x)) "" else paste0("`", x, "`"),
+      ""
+    )
+  }
+  df
+}
+```
+
+```{r, echo=FALSE}
+special_classes <- c(
+  "bru",
+  "bru_comp",
+  "bru_comp_list",
+  "bru_obs",
+  "bru_obs_list",
+  "bru_predictor",
+  "bru_model",
+  "bru_info",
+  "bru_mapper",
+  "bm_list"
+)
+
+bm_classes <- names(rlang::pkg_env("inlabru"))
+bm_classes <- bm_classes[grepl("^bm_", bm_classes)]
+all_classes <- unique(c(special_classes, bm_classes))
+# TODO: further filtering
+
+names(all_classes) <- all_classes
+methods_list <- c(
+  #  "predict",
+  #  "generate",
+  "gg"
+)
+names(methods_list) <- methods_list
+```
+
+```{r, echo=FALSE}
+class_methods <- lapply(all_classes, function(x) {
+  y <- unclass(methods(class = x))
+  if (NROW(y) == 0) {
+    NULL
+  } else {
+    y <- cbind(class = x, attr(y, "info"))
+    rownames(y) <- NULL
+    y
+  }
+})
+method_classes <- lapply(methods_list, function(x) {
+  y <- unclass(methods(generic.function = x))
+  if (NROW(y) == 0) {
+    NULL
+  } else {
+    y <- cbind(class = gsub(paste0("^", x, "\\."), "", y), attr(y, "info"))
+    rownames(y) <- NULL
+    y
+  }
+})
+```
+
+```{r, echo=FALSE}
+info <- dplyr::bind_rows(
+  dplyr::bind_rows(class_methods),
+  dplyr::bind_rows(method_classes)
+) |> # dplyr::filter(from == "inlabru") |>
+  dplyr::group_by(generic, class) |>
+  dplyr::summarise(generic = generic[1], class = class[1], .groups = "drop") |>
+  dplyr::select(Generic = generic, Class = class) |>
+  dplyr::mutate(Support = "Y") |>
+  dplyr::arrange(Class, Generic)
+
+info_sep <- list(
+  gg = info |>
+    dplyr::filter(Generic == "gg"),
+  bm = info |>
+    dplyr::filter(Class %in% bm_classes),
+  special = info |>
+    dplyr::filter(Class %in% special_classes)
+)
+
+info_sep_wide <- lapply(
+  info_sep,
+  function(x) {
+    x |>
+      tidyr::pivot_wider(names_from = Class, values_from = Support) |>
+      convert_NAs() |>
+      dplyr::arrange(Generic)
+  }
+)
+```
+
+```{css,echo=FALSE}
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform: 
+    /* Magic Numbers */
+    translate(-5px, 51px)
+    /* 60 is really 360 - 60 */
+    rotate(300deg);
+  width: 30px;
+}
+
+th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+}
+```
+
+### General classes
+```{r, echo = FALSE,results="asis"}
+x <- knitr::kable(
+  info_sep_wide$special,
+  caption = "General classes and methods in `inlabru`",
+  #  col.names = c("Method", "Class"),
+  row.names = FALSE,
+  format = "html"
+)
+
+gsub('<th style="text-align:(left|center|right);"> ([^(>| )]+) </th>',
+  '<th class="rotate"><div><span>\\2</span></div></th>',
+  x = x
+) |>
+  cat(sep = "\n")
+```
+
+### Bru mapper classes
+```{r, echo = FALSE,results="asis"}
+x <- knitr::kable(
+  info_sep_wide$bm,
+  caption = "`bru_mapper` classes and methods in `inlabru`",
+  #  col.names = c("Method", "Class"),
+  row.names = FALSE,
+  format = "html"
+)
+
+gsub('<th style="text-align:(left|center|right);"> ([^(>| )]+) </th>',
+  '<th class="rotate"><div><span>\\2</span></div></th>',
+  x = x
+) |>
+  cat(sep = "\n")
+```

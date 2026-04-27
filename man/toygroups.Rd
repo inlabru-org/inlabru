@@ -30,8 +30,9 @@ if (require(ggplot2, quietly = TRUE)) {
 
   data("toygroups", package = "inlabru")
 
-  # The data set is a simulation of animal groups residing in a 1D space. Their
-  # locations in x-space are sampled from a Cox process with intensity
+  # The data set is a simulation of animal groups residing in a 1D space.
+  # Their locations in x-space are sampled from a Cox process with
+  # intensity
 
   ggplot(toygroups$df.intensity) +
     geom_line(aes(x = x, y = g.lambda))
@@ -53,5 +54,6 @@ if (require(ggplot2, quietly = TRUE)) {
     geom_line(aes(x, rate))
 }
 }
+
 }
 \keyword{datasets}

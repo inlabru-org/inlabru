@@ -29,3 +29,8 @@
 ^man/chk_all$
 ^man/chk_found$
 ^cache$
+^air\.toml$
+^jarl\.toml$
+^\.pre-commit-config\.yaml$
+^\.positai$
+^\.claude$

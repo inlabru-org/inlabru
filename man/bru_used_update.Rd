@@ -4,6 +4,7 @@
 \alias{bru_used_update}
 \alias{bru_used_update.bru_obs_list}
 \alias{bru_used_update.bru_obs}
+\alias{bru_used_update.bru_pred_expr}
 \alias{bru_used_update.bru_used}
 \title{Update used_component information objects}
 \usage{
@@ -12,6 +13,8 @@ bru_used_update(x, labels, ...)
 \method{bru_used_update}{bru_obs_list}(x, labels, ...)
 
 \method{bru_used_update}{bru_obs}(x, labels, ...)
+
+\method{bru_used_update}{bru_pred_expr}(x, labels, ...)
 
 \method{bru_used_update}{bru_used}(x, labels, ...)
 }
@@ -32,7 +35,8 @@ information.
 \seealso{
 Other bru_used: 
 \code{\link{bru_used}()},
-\code{\link{bru_used_vars}()}
+\code{\link{bru_used_vars}()},
+\code{\link{new_bru_used}()}
 }
 \concept{bru_used}
 \keyword{internal}

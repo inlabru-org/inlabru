@@ -3,7 +3,7 @@ url: https://inlabru-org.github.io/inlabru/
 template:
   bootswatch: cosmo
   bootstrap: 5
-  math-rendering: "mathjax"
+  math-rendering: "katex"
 
 navbar:
   structure:
@@ -47,8 +47,6 @@ navbar:
         href: articles/2d_lgcp_sp.html
       - text: LGCPs - Spatial covariates
         href: articles/2d_lgcp_covars.html
-      - text: LGCPs - Spatial covariates and group CV
-        href: articles/2d_lgcp_covars.html
       - text: LGCPs - Distance sampling
         href: articles/2d_lgcp_distancesampling.html
       - text: LGCPs - Plot sampling
@@ -61,6 +59,8 @@ navbar:
         href: articles/2d_lgcp_residuals_sf.html
       - text: LGCPs - Residuals (sp version)
         href: articles/2d_lgcp_residuals.html
+      - text: LGCPs - Distance sampling and per-transect covariates (work in progress)
+        href: articles/2d_lgcp_per_transect_covars.html
     technical-articles:
       text: Technical articles
       menu:
@@ -79,6 +79,8 @@ navbar:
         href: articles/linearapprox.html
       - text: Code internal flow diagrams for model evaluation
         href: articles/devel_flow.html
+      - text: Class and method information tables
+        href: articles/classes.html
 
 redirects:
   - ["articles/web/Apptainer.html", "articles/Apptainer.html"]
@@ -111,6 +113,7 @@ reference:
   - matches("^bru_rerun$")
   - matches("^bru_options$")
   - starts_with("bru_comp")
+  - starts_with("bru_input")
   - starts_with("lgcp")
   - starts_with("bru_response_size")
   - starts_with("bru_set_missing")
@@ -131,13 +134,32 @@ reference:
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
   - starts_with("bru_timings")
+- title: "Object/property extraction/queries"
+  desc: "Functions for extracting or querying properties of objects."
+  contents:
+  - starts_with("as_bru_")
+  - starts_with("as_bru_obs")
+  - starts_with("as_bru_obs_list")
+  - starts_with("as_bru_comp_list")
+  - starts_with("bru_is_")
+  - starts_with("bru_is_linear")
+  - starts_with("bru_is_additive")
+  - starts_with("bru_is_rowwise")
 - title: "Mapper methods"
   desc: "Functions for `bru_mapper` handling."
+- subtitle: "Low level and wrapper methods"
   contents:
   - starts_with("bru_get_mapper")
-  - starts_with("bru_mapper")
-  - starts_with("ibm_")
+  - matches("^bru_mapper$")
+- subtitle: "Constructor methods"
+  contents:
   - starts_with("bm_")
+- subtitle: "Evaluator methods"
+  contents:
+  - matches("^bru_mapper_generics$")
+  - starts_with("ibm_")
+- subtitle: "Conversion and helper methods"
+  contents:
   - starts_with("as_bru_mapper")
   - starts_with("as_bm_list")
   - starts_with("bru_forward_transformation")

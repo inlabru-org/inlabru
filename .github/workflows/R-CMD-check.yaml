@@ -45,7 +45,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -64,23 +64,15 @@ jobs:
           brew install cairo
           brew install --cask xquartz
           brew install pkg-config
-          brew install proj@9
-          brew install gdal
-          brew install gsl
           brew install udunits
+          brew install gdal
+#          brew install proj@9
+#          brew install gsl
 
       - name: Install system dependencies on Linux (GL)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -y && sudo apt-get install -y libglu1-mesa-dev
-
-      # Enable tmate debugging of manually-triggered workflows if the input option was provided
-      # https://mxschmitt.github.io/action-tmate/
-      - name: Setup tmate debugging session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        with:
-          limit-access-to-actor: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -104,12 +96,29 @@ jobs:
           }
         shell: Rscript {0}
 
+# Terra check:
+# https://github.com/ncss-tech/soilDB/issues/375#issuecomment-3618556750
       - name: Session info
         run: |
           options(width = 100)
           pkgs <- installed.packages()[, "Package"]
-          sessioninfo::session_info(pkgs, include_base = TRUE)
+          print(sessioninfo::session_info(pkgs, include_base = TRUE))
+          print(sf::sf_proj_info("have_datum_files"))
+          print(sf::sf_proj_info("proj"))
+          print(sf::sf_proj_info("ellps"))
+          print(sf::sf_proj_info("datum"))
+          print(sf::sf_proj_info("units"))
+          print(sf::sf_proj_info("prime_meridians"))
+          print(sf::sf_proj_info("path"))
         shell: Rscript {0}
+
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      # https://mxschmitt.github.io/action-tmate/
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          limit-access-to-actor: true
 
       - uses: r-lib/actions/check-r-package@v2
         env:

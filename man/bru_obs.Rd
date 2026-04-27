@@ -28,7 +28,7 @@ bru_obs(
   samplers = NULL,
   ips = NULL,
   used = NULL,
-  allow_combine = NULL,
+  is_rowwise = NULL,
   aggregate = NULL,
   aggregate_input = NULL,
   control.family = NULL,
@@ -38,7 +38,8 @@ bru_obs(
   .envir = parent.frame(),
   include = deprecated(),
   exclude = deprecated(),
-  include_latent = deprecated()
+  include_latent = deprecated(),
+  allow_combine = deprecated()
 )
 
 like(
@@ -126,8 +127,9 @@ models, such as Gaussian and student-t response models.}
 \item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}.}
+to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}. \code{fmesher::new_fm_int()} (from fmesher
+\verb{0.5.0.9013}) can be used for manually constructed integration schemes.}
 }}
 
 \item{used}{Either \code{NULL} (default) or a \code{\link[=bru_used]{bru_used()}} object. When,
@@ -136,10 +138,12 @@ latent vectors are made available to the predictor evaluation is defined by
 \code{bru_used(formula)}, which will include all effects and latent vectors
 used by the predictor expression.}
 
-\item{allow_combine}{logical; If \code{TRUE}, the predictor expression may involve
-several rows of the input data to influence the same row. When \code{NULL},
-defaults to \code{FALSE}, unless \code{response_data} is non-\code{NULL}, or \code{data} is a
-\code{list}, or the likelihood construction requires it.}
+\item{is_rowwise, allow_combine}{logical; If \code{is_rowwise} is \code{FALSE}, the
+predictor expression may involve several rows of the input data to
+influence the same row. When \code{NULL}, it defaults to \code{TRUE}, unless
+\code{response_data} is non-\code{NULL}, or \code{data} is a \code{list}, or the likelihood
+construction requires it. The \code{allow_combine} argument is a deprecated and
+inverted version, such that \code{is_rowwise = !allow_combine}.}
 
 \item{aggregate}{character ("none" or a valid name for the \code{type} argument of
 \code{\link[=bm_aggregate]{bm_aggregate()}}) or an aggregation \code{bru_mapper} object (\code{\link[=bm_aggregate]{bm_aggregate()}},
@@ -247,10 +251,10 @@ use \code{as_bru_obs_list()}, \code{bru_obs_list()} or \code{c()}.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    require(ggplot2, quietly = TRUE)) {
-
-  # The 'bru_obs()' (previously 'like()') function's main purpose is to set up
-  # observation models, both for single- and multi-likelihood models.
+  require(ggplot2, quietly = TRUE) &&
+  require(patchwork, quietly = TRUE)) {
+  # The 'bru_obs()' (previously 'like()') function's main purpose is to set
+  # up observation models, both for single- and multi-likelihood models.
   # The following example generates some random covariates which are observed
   # through two different random effect models with different likelihoods
 
@@ -297,7 +301,8 @@ if (bru_safe_inla() &&
     tag = "pois"
   )
 
-  # The union of effects of both models gives the components needed to run bru
+  # The union of effects of both models gives the components needed to run
+  # bru
 
   jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
@@ -320,9 +325,10 @@ if (bru_safe_inla() &&
     ylim(0, 4) +
     ggtitle("Joint model")
 
-  multiplot(p1, p2, pj)
+  (p1 / p2 / pj)
 }
 }
+
 }
 \seealso{
 \code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_comp]{bru_comp()}},

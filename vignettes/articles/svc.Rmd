@@ -102,6 +102,7 @@ setting some options.
 # libraries
 library(maps)
 library(ggplot2)
+library(patchwork)
 library(sf)
 library(terra)
 library(tidyterra) # raster plotting
@@ -141,14 +142,14 @@ epsg6703km <- paste(
 )
 
 # make a base map
-states <- maps::map("state", plot = FALSE, fill = TRUE) %>%
-  sf::st_as_sf() %>%
+states <- maps::map("state", plot = FALSE, fill = TRUE) |>
+  sf::st_as_sf() |>
   filter(ID %in% c(
     "texas", "oklahoma", "kansas", "missouri",
     "arkansas", "louisiana"
-  )) %>%
-  sf::st_make_valid() %>%
-  sf::st_transform(epsg6703km) %>%
+  )) |>
+  sf::st_make_valid() |>
+  sf::st_transform(epsg6703km) |>
   sf::st_make_valid()
 ```
 
@@ -169,12 +170,12 @@ The following code was used to generate the subset:
 robins_subset <- read.csv(paste0(
   "https://raw.github.com/tmeeha/inlaSVCBC",
   "/master/code/modeling_data.csv"
-)) %>%
+)) |>
   select(
     circle, bcr, state, year, std_yr, count, log_hrs,
     lon, lat, obs
-  ) %>%
-  mutate(year = year + 1899) %>%
+  ) |>
+  mutate(year = year + 1899) |>
   filter(
     state %in% c(
       "TEXAS", "OKLAHOMA", "KANSAS", "MISSOURI",
@@ -189,25 +190,25 @@ index variables to uniquely index site and year information, and transform the
 coordinates to the `epsg6703km` CRS:
 ```{r data, eval=TRUE}
 data(robins_subset)
-count_dat <- robins_subset %>%
-  mutate(site_idx = as.numeric(factor(paste(circle, lon, lat)))) %>%
-  group_by(site_idx) %>%
-  mutate(n_years = n()) %>%
-  filter(n_years >= 20) %>%
-  ungroup() %>%
+count_dat <- robins_subset |>
+  mutate(site_idx = as.numeric(factor(paste(circle, lon, lat)))) |>
+  group_by(site_idx) |>
+  mutate(n_years = n()) |>
+  filter(n_years >= 20) |>
+  ungroup() |>
   mutate(
     std_yr = year - max(year),
-    obs = seq_len(nrow(.)),
+    obs = seq_len(n()),
     site_idx = as.numeric(factor(paste(circle, lon, lat))),
     year_idx = as.numeric(factor(year)),
     site_year_idx = as.numeric(factor(paste(circle, lon, lat, year)))
-  ) %>%
-  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) %>%
-  st_transform(epsg6703km) %>%
+  ) |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE) |>
+  st_transform(epsg6703km) |>
   mutate(
-    easting = st_coordinates(.)[, 1],
-    northing = st_coordinates(.)[, 2]
-  ) %>%
+    easting = st_coordinates(geometry)[, 1],
+    northing = st_coordinates(geometry)[, 2]
+  ) |>
   arrange(circle, year)
 ```
 
@@ -219,7 +220,7 @@ counts per site and year.
 # map it
 ggplot() +
   geom_sf(
-    data = count_dat %>% filter(year_idx %in% seq(1, 30, 3)),
+    data = count_dat |> filter(year_idx %in% seq(1, 30, 3)),
     aes(col = log(count + 1))
   ) +
   geom_sf(data = states, fill = NA) +
@@ -237,9 +238,9 @@ later spatial modeling and plotting.
 
 ```{r spat_dat}
 # make a set of distinct study sites for mapping
-site_map <- count_dat %>%
-  select(circle, easting, northing) %>%
-  distinct() %>%
+site_map <- count_dat |>
+  select(circle, easting, northing) |>
+  distinct() |>
   select(circle, easting, northing)
 ```
 
@@ -639,7 +640,7 @@ ps_range95 <- make_plot_site(
 ```
 ```{r svc_plots, warning=F, message=F, fig.width=8, fig.align='center'}
 # plot together
-multiplot(ps, pa, pe, pt, cols = 2)
+((ps | pa) / (pe | pt))
 ```
 The map for the posterior mean of $\tau_s$ shows that robins have 
 decreased in the southern part of the study area and increased in 
@@ -648,7 +649,7 @@ is shifting northward as winters become warmer due to climate change.
 
 ```{r svc_plots_range95, warning=F, message=F, fig.width=8, fig.align='center'}
 # plot together
-multiplot(ps_range95, pa_range95, pe_range95, pt_range95, cols = 2)
+((ps_range95 | pa_range95) / (pe_range95 | pt_range95))
 ```
 
 ## More information

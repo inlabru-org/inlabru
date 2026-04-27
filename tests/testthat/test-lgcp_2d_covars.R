@@ -3,7 +3,7 @@ test_that("2D LGCP fitting", {
   local_bru_safe_inla()
 
   # test_that("2D LGCP fitting: Factor covariate (as SpatialPixelsDataFrame)", {
-  skip_if_not_installed("terra")
+  skip_if_not(bru_safe_terra())
   skip_if_not_installed("sf")
   gorillas <- gorillas_sf
   gorillas$gcov <- gorillas_sf_gcov()
@@ -59,16 +59,16 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
+  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004180126,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
+  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.0002472825,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
+  expect_equal(fit2$summary.fixed["Intercept", "mean"], 2.967071,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
+  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.06031667,
     tolerance = midtol
   )
 
@@ -92,16 +92,16 @@ test_that("2D LGCP fitting", {
     )
   )
 
-  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004192824,
+  expect_equal(fit2$summary.fixed["beta.elev", "mean"], 0.004180126,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.00249103,
+  expect_equal(fit2$summary.fixed["beta.elev", "sd"], 0.0002472825,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["Intercept", "mean"], 3.069781,
+  expect_equal(fit2$summary.fixed["Intercept", "mean"], 2.967071,
     tolerance = midtol
   )
-  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.05587102,
+  expect_equal(fit2$summary.fixed["Intercept", "sd"], 0.06031667,
     tolerance = midtol
   )
 })

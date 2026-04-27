@@ -9,6 +9,7 @@
 \alias{format.bm_collect}
 \alias{format.bm_sum}
 \alias{format.bm_repeat}
+\alias{format.bm_reparam}
 \alias{print.summary_bru_mapper}
 \alias{print.bru_mapper}
 \alias{print.bm_list}
@@ -37,6 +38,8 @@
 \method{format}{bm_sum}(x, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{format}{bm_repeat}(x, ..., prefix = "", initial = prefix, depth = 1)
+
+\method{format}{bm_reparam}(x, ..., prefix = "", initial = prefix, depth = 1)
 
 \method{print}{summary_bru_mapper}(x, ..., sep = "\\n")
 
@@ -98,6 +101,18 @@ mapper <-
       )
     ),
     3
+  )
+summary(mapper)
+summary(mapper, depth = 0)
+mapper <-
+  bm_reparam(
+    bm_multi(
+      list(
+        A = bm_index(2),
+        B = bm_index(3)
+      )
+    ),
+    matrix(1:36, nrow = 6)
   )
 summary(mapper)
 summary(mapper, depth = 0)

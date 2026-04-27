@@ -20,7 +20,7 @@ Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
 \examples{
 if (require("ggplot2", quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
   # Load Gorilla covariates
 
@@ -32,14 +32,14 @@ if (require("ggplot2", quietly = TRUE) &&
 }
 }
 \seealso{
-Other geomes for spatial data: 
+Other geomes: 
 \code{\link{gg}()},
-\code{\link{gg.SpatialGridDataFrame}()},
-\code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixels}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
-\code{\link{gg.SpatialPoints}()},
-\code{\link{gg.SpatialPolygons}()},
+\code{\link{gg.RasterLayer}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()},
 \code{\link{gg.sf}()}
 }
-\concept{geomes for spatial data}
+\concept{geomes}

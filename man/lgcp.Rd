@@ -34,8 +34,9 @@ or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
 \item{\code{samplers}}{Integration domain for \code{family="cp"} or subdomains for
 \verb{aggregate=}, see \code{\link[fmesher:fm_int]{fmesher::fm_int()}}.}
 \item{\code{ips}}{Integration points. Defaults
-to \code{fmesher::fm_int(domain, samplers)}. If explicitly given,
-overrides \code{domain} and \code{samplers}.}
+to \link[fmesher:fm_int]{fmesher::fm_int}\verb{(domain, samplers)}. If explicitly given,
+overrides \code{domain} and \code{samplers}. \code{fmesher::new_fm_int()} (from fmesher
+\verb{0.5.0.9013}) can be used for manually constructed integration schemes.}
 }}
 
 \item{formula}{a \code{formula} where the right hand side is a general R
@@ -99,13 +100,13 @@ The \code{E} and \code{weights} arguments are evaluated in the data context, lik
 if (bru_safe_inla() &&
   require(ggplot2, quietly = TRUE) &&
   require(fmesher, quietly = TRUE) &&
-  require(sn, quietly = TRUE)) {
+  requireNamespace("sn", quietly = TRUE)) {
   # Load the Gorilla data
   data <- gorillas_sf
 
   # Plot the Gorilla nests, the mesh and the survey boundary
   ggplot() +
-    geom_fm(data = data$mesh) +
+    fmesher::geom_fm(data = data$mesh) +
     gg(data$boundary, fill = "blue", alpha = 0.2) +
     gg(data$nests, col = "red", alpha = 0.2)
 
@@ -130,14 +131,13 @@ if (bru_safe_inla() &&
   # Predict the spatial intensity surface
   lambda <- predict(
     fit,
-    fm_pixels(data$mesh, mask = data$boundary),
+    fmesher::fm_pixels(data$mesh, mask = data$boundary),
     ~ exp(field + Intercept)
   )
 
   # Plot the intensity
   ggplot() +
     gg(lambda, geom = "tile") +
-    geom_fm(data = data$mesh, alpha = 0, linewidth = 0.05) +
     gg(data$nests, col = "red", alpha = 0.2)
 }
 }

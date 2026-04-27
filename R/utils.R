@@ -8,12 +8,12 @@
 #'
 #' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
 #' INLA `num.threads` option is not checked or altered.
-#' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
+#' If `FALSE`, forces `num.threads="1:1:1"`. Default: NULL, checks
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `FALSE` and `multicore` is `FALSE`,
 #' prints a message if the `num.threads` option
-#' isn't already "1.1" to alert the user to the change.
+#' isn't already "1.1:1" to alert the user to the change.
 #' Default: FALSE.
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 23.1.31 (should always match the requirement in the package
@@ -48,13 +48,27 @@ bru_safe_inla <- function(multicore = NULL,
       e
     }
   )
-  if (inherits(inla.call, "simpleError")) {
+  if (inherits(inla.call, "error")) {
     if (!quietly) {
       message(
         "inla.getOption('inla.call') failed. INLA not installed correctly."
       )
     }
     return(FALSE)
+  }
+  if (all(grepl("\\.run$", inla.call))) {
+    inla.binary <- gsub("\\.run$", "", inla.call)
+    if (!file.exists(inla.binary)) {
+      if (!quietly) {
+        message(
+          paste0(
+            "INLA binary '", inla.binary, "' not found. ",
+            "INLA not installed correctly, or with platform mismatch."
+          )
+        )
+      }
+      return(FALSE)
+    }
   }
 
   if (is.null(multicore)) {
@@ -68,22 +82,22 @@ bru_safe_inla <- function(multicore = NULL,
         e
       }
     )
-    if (inherits(n.t, "simpleError")) {
+    if (inherits(n.t, "error")) {
       if (!quietly) {
         message("inla.getOption() failed. INLA not installed correctly.")
       }
       return(FALSE)
     }
-    if (!identical(n.t, "1:1")) {
+    if (!identical(n.t, "1:1:1")) {
       if (!quietly) {
         message(paste0(
-          "Changing INLA option num.threads from '", n.t, "' to '1:1'."
+          "Changing INLA option num.threads from '", n.t, "' to '1:1:1'."
         ))
       }
-      INLA::inla.setOption(num.threads = "1:1")
+      INLA::inla.setOption(num.threads = "1:1:1")
     }
   }
-  return(TRUE)
+  TRUE
 }
 
 
@@ -116,7 +130,7 @@ check_package_version_and_load <-
       }
       return(NA_character_)
     }
-    return(version)
+    version
   }
 
 
@@ -133,16 +147,15 @@ check_package_version_and_load <-
 #' If `force` is `TRUE`, return `TRUE` if the package configuration is safe,
 #' potentially after forcing the evolution status to `2L`.
 #' Default `FALSE`
-#' @param minimum_version character; the minimum required INLA version.
-#' Default 1.4-5 (should always match the requirement in the package
+#' @param minimum_version character; the minimum required version.
+#' Default 2.1 (should always match the requirement in the package
 #' DESCRIPTION)
 #' @return Returns (invisibly) `FALSE` if a potential issue is detected, and
 #'   give a message if `quietly` is `FALSE`. Otherwise returns `TRUE`
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_sp() &&
-#'   require("sp")) {
+#' if (bru_safe_sp()) {
 #'   # Run sp dependent calculations
 #' }
 #' }
@@ -150,7 +163,7 @@ check_package_version_and_load <-
 #' @keywords internal
 bru_safe_sp <- function(quietly = FALSE,
                         force = FALSE,
-                        minimum_version = "1.4-5") {
+                        minimum_version = "2.1") {
   sp_version <-
     check_package_version_and_load(
       pkg = "sp",
@@ -202,9 +215,65 @@ bru_safe_sp <- function(quietly = FALSE,
       }
     }
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }
 
+
+#' @title Check for potential `terra` installation issues
+#'
+#' @description
+#' Loads the terra package with `requireNamespace("terra", quietly = TRUE)`,
+#' and checks whether `eval_spatial()` successfully extracts non-NA values.
+#' NA values may appear when there is a GDAL/PROJ installation issue that causes
+#' it to not find the `proj.db` database file.
+#'
+#' For use in package tests and examples that depend on `terra`.
+#'
+#' @param quietly logical; if `TRUE`, prints diagnostic messages. Default
+#'   `FALSE`
+#' @param minimum_version character; the minimum required version.
+#' Default 1.7-66 (should always match the requirement in the package
+#' DESCRIPTION)
+#' @return Returns (invisibly) `FALSE` if a potential issue is detected, and
+#'   give a message if `quietly` is `FALSE`. Otherwise returns `TRUE`
+#' @export
+#' @examples
+#' \dontrun{
+#' if (bru_safe_terra()) {
+#'   # Run terra dependent calculations
+#' }
+#' }
+#'
+#' @keywords internal
+bru_safe_terra <- function(quietly = FALSE,
+                           minimum_version = "1.7-66") {
+  terra_version <-
+    check_package_version_and_load(
+      pkg = "terra",
+      minimum_version = minimum_version,
+      quietly = quietly
+    )
+  if (is.na(terra_version)) {
+    return(invisible(FALSE))
+  }
+
+  gcov <- gorillas_sf_gcov()
+  where <- inlabru::gorillas_sf$nests[seq_len(5), , drop = FALSE]
+  values <- eval_spatial(gcov, where = where)
+  if (anyNA(values)) {
+    if (!quietly) {
+      message(
+        paste0(
+          "Potential issue detected with 'terra' package spatial evaluation,\n",
+          "likely due to GDAL/PROJ installation issues."
+        )
+      )
+    }
+    return(invisible(FALSE))
+  }
+
+  invisible(TRUE)
+}
 
 
 #' Expand labels
@@ -240,17 +309,12 @@ extract_vectorlist_column <- function(thelist) {
 }
 
 
-
-
-
-
-
 check_layer <- function(data, where, layer) {
   # This works for both SpatialGrid/PixelDataFrame and SpatRaster
   names_data <- names(data)
   if (is.character(layer)) {
     unique_layer <- unique(layer)
-    if (any(!(unique_layer %in% names_data))) {
+    if (!all((unique_layer %in% names_data))) {
       stop(
         paste0(
           "Input layer name(s) '",
@@ -265,7 +329,7 @@ check_layer <- function(data, where, layer) {
     }
   } else if (is.numeric(layer)) {
     ok_layer <- (layer >= 1) & (layer <= length(names_data))
-    if (any(!ok_layer)) {
+    if (!all(ok_layer)) {
       stop(
         paste0(
           "Input layer(s) nr ",
@@ -326,8 +390,6 @@ extract_layer <- function(where, layer, selector) {
   }
   layer
 }
-
-
 
 
 #' Evaluate spatial covariates
@@ -478,6 +540,53 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 
+
+terra_factor_levels <- function(data) {
+  layers <- names(data)
+  is_factor <- terra::is.factor(data)
+  if (!any(is_factor)) {
+    return(NULL)
+  }
+  if (!all(is_factor)) {
+    stop(
+      glue::glue(
+        "Some layers are factors ",
+        "({paste(sort(layers[is_factor]), collapse = ', ')})",
+        " and some are not ",
+        "({paste(sort(layers[!is_factor]), collapse = ', ')})."
+      )
+    )
+  }
+  factor_levels <- lapply(
+    terra::levels(data),
+    function(l) {
+      if (is.data.frame(l)) {
+        l[, 2]
+      } else {
+        NULL
+      }
+    }
+  )
+  unique_levels_idx <- which(!duplicated(factor_levels))
+  factor_levels <- factor_levels[unique_levels_idx]
+  layers <- layers[unique_levels_idx]
+  if (length(unique_levels_idx) > 1) {
+    stop(
+      glue::glue(
+        "Factor levels differ between layers. ",
+        "Found factor levels:\n",
+        glue::glue_collapse(
+          glue::glue("{layers}: {factor_levels}", sep = ", "),
+          sep = "\n"
+        )
+      )
+    )
+  }
+
+  factor_levels[[1]]
+}
+
+
 #' @export
 #' @rdname eval_spatial
 eval_spatial.SpatRaster <- function(data,
@@ -488,48 +597,40 @@ eval_spatial.SpatRaster <- function(data,
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
+    handle_crs <- (!fm_crs_is_null(fm_crs(where)) &&
+      !fm_crs_is_null(fm_crs(data)))
+    if (handle_crs) {
+      where <- fmesher::fm_transform(where, fm_crs(data))
+    }
     where <- terra::vect(where)
-  }
-  if (!fm_crs_is_null(fm_crs(where)) &&
-    !fm_crs_is_null(fm_crs(data))) {
-    where <- terra::project(where, data)
-  }
-  if (getNamespaceVersion("terra") >= "1.7-66") {
-    val <- terra::extract(
-      data,
-      where,
-      ID = FALSE,
-      layer = layer
-    )
-    val <- val[["value"]]
+    if (handle_crs) {
+      # Terra's data crs might not be detected as the same as fm_crs(data)
+      where <- terra::project(where, data)
+    }
   } else {
-    # For terra pre-1.7-64:
-    if ((NROW(where) == 1) && (terra::nlyr(data) > 1)) {
-      # Work around issue in terra::extract() that assumes `layer` to point
-      # to a column of `where` (like `selector`) when
-      # length(layer)==1 (NROW(where)==1),
-      # but otherwise be used directly for indexing into data.
-      # When nlyr == 1, terra::extract ignores the layer input.
-      val <- terra::extract(
-        data,
-        rbind(where, where),
-        ID = FALSE,
-        layer = c(layer, layer)
-      )
-      val <- val[1, , drop = FALSE]
-    } else {
-      val <- terra::extract(
-        data,
-        where,
-        ID = FALSE,
-        layer = layer
-      )
+    if (!fm_crs_is_null(fm_crs(where)) &&
+      !fm_crs_is_null(fm_crs(data))) {
+      where <- terra::project(where, data)
     }
-    if (terra::nlyr(data) == 1) {
-      val <- val[[1]]
+  }
+  val <- terra::extract(
+    data,
+    where,
+    ID = FALSE,
+    layer = layer
+  )
+  val <- val[["value"]]
+
+  layer_set <- sort(unique(layer))
+  factor_levels <- terra_factor_levels(data[[layer_set]])
+  if (!is.null(factor_levels)) {
+    if (is.factor(val)) {
+      val <- as.character(val)
+      levs <- factor_levels
     } else {
-      val <- val[["value"]]
+      levs <- seq_along(factor_levels)
     }
+    val <- factor(val, levels = levs, labels = factor_levels)
   }
   val
 }
@@ -586,17 +687,21 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #' @export
 #' @examples
 #' \dontrun{
-#' if (bru_safe_inla()) {
+#' if (require("sf", quietly = TRUE)) {
 #'   points <-
-#'     sp::SpatialPointsDataFrame(
-#'       matrix(1:6, 3, 2),
-#'       data = data.frame(val = c(NA, NA, NA))
+#'     sf::st_as_sf(
+#'       data.frame(
+#'         x = 1:3,
+#'         y = 4:6,
+#'         val = c(NA, NA, NA)
+#'       ),
+#'       coords = c("x", "y")
 #'     )
 #'   input_coord <- expand.grid(x = 0:7, y = 0:7)
 #'   input <-
-#'     sp::SpatialPixelsDataFrame(
-#'       input_coord,
-#'       data = data.frame(val = as.vector(input_coord$y))
+#'     sf::st_as_sf(
+#'       cbind(input_coord, val = as.vector(input_coord$y)),
+#'       coords = c("x", "y")
 #'     )
 #'   points$val <- bru_fill_missing(input, points, points$val)
 #'   print(points)
@@ -639,7 +744,7 @@ bru_fill_missing <- function(data, where, values,
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
 
-  if (any(is.na(layer))) {
+  if (anyNA(layer)) {
     stop("NAs detected in the 'layer' information.")
   }
 
@@ -678,6 +783,16 @@ bru_fill_missing <- function(data, where, values,
     data_values <- data[[layer]]
     data_coord <- data
   }
+  data_notok <- is.na(data_values)
+  if (all(data_notok)) {
+    stop("All data values are NA; unable to fill missing values.")
+  }
+  data_values <- data_values[!data_notok]
+  if (inherits(data_coord, "sf")) {
+    data_coord <- data_coord[!data_notok, , drop = FALSE]
+  } else {
+    data_coord <- data_coord[!data_notok, , drop = FALSE]
+  }
 
   where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
 
@@ -692,7 +807,6 @@ bru_fill_missing <- function(data, where, values,
 
   values
 }
-
 
 
 # Resave data

@@ -91,7 +91,7 @@ objects. Requires the \code{sp}, \code{sf}, and \code{terra} packages to be inst
 \examples{
 if (interactive() &&
   require(ggplot2, quietly = TRUE) &&
-  requireNamespace("terra", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   requireNamespace("tidyterra", quietly = TRUE)) {
   # plot all the nests, mesh and boundary
   ggplot() +
@@ -113,7 +113,7 @@ if (interactive() &&
     geom_sf(data = gorillas_sf$plotsample$nests)
 }
 if (interactive() &&
-  requireNamespace("terra", quietly = TRUE)) {
+  bru_safe_terra(quietly = TRUE)) {
   gorillas_sf$gcov <- gorillas_sf_gcov()
 }
 }

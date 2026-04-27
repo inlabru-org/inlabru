@@ -39,7 +39,7 @@ Draws four panels of convergence diagnostics for an iterated INLA method
 estimation
 }
 \details{
-Requires the "dplyr", "ggplot2", "magrittr", and "patchwork"
+Requires the "dplyr", "ggplot2", and "patchwork"
 packages to be installed.
 }
 \examples{

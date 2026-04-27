@@ -77,7 +77,7 @@
 #' @examples
 #' if (interactive() &&
 #'   require(ggplot2, quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   requireNamespace("tidyterra", quietly = TRUE)) {
 #'   # plot all the nests, mesh and boundary
 #'   ggplot() +
@@ -106,10 +106,12 @@
 #' @export
 #' @examples
 #' if (interactive() &&
-#'   requireNamespace("terra", quietly = TRUE)) {
+#'   bru_safe_terra(quietly = TRUE)) {
 #'   gorillas_sf$gcov <- gorillas_sf_gcov()
 #' }
 gorillas_sf_gcov <- function() {
+  # Intentionally not calling bru_safe_terra() here, since this data is needed
+  # by bru_safe_terra() itself.
   requireNamespace("terra")
   terra::rast(system.file(inlabru::gorillas_sf$gcov_file, package = "inlabru"))
 }

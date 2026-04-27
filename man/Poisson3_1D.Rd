@@ -44,7 +44,8 @@ widths.
 }
 \examples{
 \donttest{
-if (require("ggplot2", quietly = TRUE)) {
+if (require("ggplot2", quietly = TRUE) &&
+  require("patchwork", quietly = TRUE)) {
   data(Poisson3_1D)
   # first the plots for the 10-bin case:
   p1a <- ggplot(countdata3a) +
@@ -71,7 +72,7 @@ if (require("ggplot2", quietly = TRUE)) {
     geom_point(data = pts3, aes(x = x), y = 0.2, shape = "|", cex = 4) +
     xlab(expression(bold(s))) +
     ylab(expression(lambda(bold(s))))
-  multiplot(p1a, p2a, cols = 1)
+  (p1a / p2a)
 
   # Then the plots for the 20-bin case:
   p1a <- ggplot(countdata3b) +
@@ -98,7 +99,7 @@ if (require("ggplot2", quietly = TRUE)) {
     geom_point(data = pts3, aes(x = x), y = 0.2, shape = "|", cex = 4) +
     xlab(expression(bold(s))) +
     ylab(expression(lambda(bold(s))))
-  multiplot(p1a, p2a, cols = 1)
+  (p1a / p2a)
 }
 }
 }

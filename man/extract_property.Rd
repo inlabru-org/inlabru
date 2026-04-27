@@ -7,7 +7,7 @@
 extract_property(result, property, internal_hyperpar = FALSE)
 }
 \arguments{
-\item{result}{an \code{inla} result object}
+\item{result}{an \code{inla} result object with a \code{bru_info} element}
 
 \item{property}{character; "mean", "sd", "mode", or some other column
 identifier for inla result \verb{$summary.fixed}, \verb{$summary.random$label}, and

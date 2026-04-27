@@ -26,6 +26,6 @@ profvis::profvis({
   bench::mark(
     old = do.call(a_old, L),
     new = do.call(a_new, L),
-    new = do.call(a_new2, L)
+    new2 = do.call(a_new2, L)
   )
 })

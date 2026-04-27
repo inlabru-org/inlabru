@@ -14,6 +14,7 @@
 \alias{ibm_eval.bm_marginal}
 \alias{ibm_eval.bm_pipe}
 \alias{ibm_eval.bm_multi}
+\alias{ibm_eval.bm_reparam}
 \alias{ibm_eval.bm_collect}
 \alias{ibm_eval.bm_repeat}
 \alias{ibm_eval.bm_sum}
@@ -50,6 +51,8 @@ ibm_eval(mapper, input, state = NULL, ...)
   jacobian = NULL,
   pre_A = deprecated()
 )
+
+\method{ibm_eval}{bm_reparam}(mapper, input, state = NULL, ..., jacobian = NULL)
 
 \method{ibm_eval}{bm_collect}(
   mapper,
@@ -147,125 +150,13 @@ Other mapper methods:
 \code{\link{ibm_inla_subset}()},
 \code{\link{ibm_invalid_output}()},
 \code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
 \code{\link{ibm_jacobian}()},
 \code{\link{ibm_linear}()},
 \code{\link{ibm_n}()},
 \code{\link{ibm_n_output}()},
 \code{\link{ibm_names}()},
 \code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_taylor} method implementations: 
-\code{\link{bm_taylor}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_const} method implementations: 
-\code{\link{bm_const}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_shift} method implementations: 
-\code{\link{bm_shift}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_scale} method implementations: 
-\code{\link{bm_scale}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_aggregate} method implementations: 
-\code{\link{bm_aggregate}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_logsumexp} method implementations: 
-\code{\link{bm_logsumexp}()},
-\code{\link{ibm_jacobian}()}
-
-Other specific \link{bm_logitaverage} method implementations: 
-\code{\link{bm_logitaverage}()},
-\code{\link{ibm_jacobian}()}
-
-Other specific \link{bm_marginal} method implementations: 
-\code{\link{bm_marginal}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_pipe} method implementations: 
-\code{\link{bm_pipe}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_multi} method implementations: 
-\code{\link{bm_multi}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_collect} method implementations: 
-\code{\link{bm_collect}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_repeat} method implementations: 
-\code{\link{bm_repeat}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
-
-Other specific \link{bm_sum} method implementations: 
-\code{\link{bm_sum}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
 \code{\link{ibm_values}()}
 }
 \concept{mapper methods}
-\concept{specific \link{bm_aggregate} method implementations}
-\concept{specific \link{bm_collect} method implementations}
-\concept{specific \link{bm_const} method implementations}
-\concept{specific \link{bm_logitaverage} method implementations}
-\concept{specific \link{bm_logsumexp} method implementations}
-\concept{specific \link{bm_marginal} method implementations}
-\concept{specific \link{bm_multi} method implementations}
-\concept{specific \link{bm_pipe} method implementations}
-\concept{specific \link{bm_repeat} method implementations}
-\concept{specific \link{bm_scale} method implementations}
-\concept{specific \link{bm_shift} method implementations}
-\concept{specific \link{bm_sum} method implementations}
-\concept{specific \link{bm_taylor} method implementations}

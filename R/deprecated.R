@@ -1,7 +1,7 @@
 #' Deprecated functions in inlabru
 #'
-#' Some of these functions may stil attempt to do their job, but will be removed
-#' in a future version.
+#' Some of these functions may still attempt to do their job, but will be
+#' removed in a future version.
 #'
 #' @param \dots Usually passed on to other methods
 #'

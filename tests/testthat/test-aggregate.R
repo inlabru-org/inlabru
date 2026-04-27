@@ -36,7 +36,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
           )
         )
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -69,7 +69,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
       control.family = list(
         hyper = list(prec = list(initial = 6, fixed = TRUE))
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -79,7 +79,6 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
     tolerance = midtol
   )
 })
-
 
 
 test_that("Aggregated Gaussian observations, using aggregate feature", {
@@ -318,7 +317,6 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
 })
 
 
-
 test_that("Aggregated Poisson observations, using mapper", {
   local_bru_safe_inla()
 
@@ -346,7 +344,7 @@ test_that("Aggregated Poisson observations, using mapper", {
       family = "poisson",
       response_data = obs,
       data = pred,
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -375,7 +373,7 @@ test_that("Aggregated Poisson observations, using mapper", {
       E = E,
       response_data = obs,
       data = pred,
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -425,7 +423,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
           )
         )
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 
@@ -456,7 +454,7 @@ test_that("Aggregated Gaussian observations, using mapper", {
       control.family = list(
         hyper = list(prec = list(initial = 6, fixed = TRUE))
       ),
-      allow_combine = TRUE
+      is_rowwise = FALSE
     )
   )
 

@@ -55,10 +55,7 @@ gmap <- function(...) {
 #'   argument. See the documentation of the particular methods for details of
 #'   what is produced by that method.
 #'
-#' @family geomes for inla and inlabru predictions
-#' @family geomes for spatial data
-#' @family geomes for meshes
-#' @family geomes for Raster data
+#' @family geomes
 #'
 #' @examples
 #' if (require("ggplot2", quietly = TRUE)) {
@@ -114,7 +111,7 @@ gm <- function(...) {
 #'   on to `geom_tile`.
 #' @param \dots Arguments passed on to `geom_tile`.
 #' @return A `geom_tile` with reversed y scale.
-#' @family geomes for inla and inlabru predictions
+#' @family geomes
 #'
 #' @importFrom rlang .data
 #' @examples
@@ -142,20 +139,12 @@ gg.matrix <- function(data, mapping = NULL, ...) {
 }
 
 
-#' Geom for data.frame
-#'
+#' @describeIn gg.bru_prediction
 #' This geom constructor will simply call [gg.bru_prediction()] for the data
 #' provided.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name gg.data.frame
 #' @export
 #' @param \dots Arguments passed on to [gg.bru_prediction()].
-#' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon`
-#'   value.
-#' @family geomes for inla and inlabru predictions
-#' @example inst/examples/gg.prediction.R
 
 gg.data.frame <- function(...) {
   gg.bru_prediction(...)
@@ -197,9 +186,97 @@ gg.data.frame <- function(...) {
 #' @param \dots Arguments passed on to `geom_line`.
 #' @return Concatenation of a `geom_line` value and optionally a `geom_ribbon`
 #'   value.
-#' @family geomes for inla and inlabru predictions
-#' @example inst/examples/gg.prediction.R
-
+#' @family geomes
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla() &&
+#'   requireNamespace("sn", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE) &&
+#'   require("patchwork", quietly = TRUE)) {
+#'   # Generate some data
+#'
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(
+#'     input.df,
+#'     {
+#'       y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+#'     }
+#'   )
+#'
+#'   # Fit a model with fixed effect 'x' and intercept 'Intercept'
+#'
+#'   fit <- bru(y ~ x, family = "gaussian", data = input.df)
+#'
+#'   # Predict posterior statistics of 'x'
+#'
+#'   xpost <- predict(fit, NULL, formula = ~x_latent)
+#'
+#'   # The statistics include mean, standard deviation, the 2.5% quantile, the
+#'   # median, the 97.5% quantile, minimum and maximum sample drawn from the
+#'   # posterior as well as the coefficient of variation and the variance.
+#'
+#'   xpost
+#'
+#'   # For a single variable like 'x' the default plotting method invoked by
+#'   # gg() will show these statistics in a fashion similar to a box plot:
+#'   ggplot() +
+#'     gg(xpost)
+#'
+#'
+#'   # The predict function can also be used to simultaneously estimate
+#'   # posteriors of multiple variables:
+#'
+#'   xipost <- predict(fit,
+#'     newdata = NULL,
+#'     formula = ~ c(
+#'       Intercept = Intercept_latent,
+#'       x = x_latent
+#'     )
+#'   )
+#'   xipost
+#'
+#'   # If we still want a plot in the previous style we have to set the bar
+#'   # parameter to TRUE
+#'
+#'   p1 <- ggplot() +
+#'     gg(xipost, bar = TRUE)
+#'   p1
+#'
+#'   # Note that gg also understands the posterior estimates generated while
+#'   # running INLA
+#'
+#'   p2 <- ggplot() +
+#'     gg(fit$summary.fixed, bar = TRUE)
+#'   (p1 / p2)
+#'
+#'   # By default, if the prediction has more than one row, gg will plot the
+#'   # column mean' against the row index. This is for instance useful for
+#'   # predicting and plotting function but not very meaningful given the above
+#'   # example:
+#'
+#'   ggplot() +
+#'     gg(xipost)
+#'
+#'   # For ease of use we can also type
+#'
+#'   plot(xipost)
+#'
+#'   # This type of plot will show a ribbon around the mean, which visualizes
+#'   # the upper and lower quantiles mentioned above (2.5% and 97.5%).
+#'   # Plotting the ribbon can be turned of using the \code{ribbon} parameter
+#'
+#'   ggplot() +
+#'     gg(xipost, ribbon = FALSE)
+#'
+#'   # Much like the other geomes produced by gg we can adjust the plot using
+#'   # ggplot2 style commands, for instance
+#'
+#'   ggplot() +
+#'     gg(xipost) +
+#'     gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
+#' }
+#' }
+#'
 gg.bru_prediction <- function(data,
                               mapping = NULL,
                               ribbon = TRUE,
@@ -242,11 +319,15 @@ gg.bru_prediction <- function(data,
     names(data)[names(data) == new_quant_names[[quant_name]]] <- quant_name
   }
   # Find quantile levels
-  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*$", names(data))]
+  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*%?$", names(data))]
   if (length(quant_names) > 0) {
-    quant_probs <- as.numeric(sub("^q", "", quant_names))
+    perc <- grepl("%$", quant_names)
+    quant_probs <- as.numeric(
+      sub("%$", "", sub("^q", "", quant_names))
+    )
+    quant_probs[perc] <- quant_probs[perc] / 100
     quant_names <- quant_names[order(quant_probs)]
-    quant_probs <- quant_probs[order(quant_probs)]
+    quant_probs <- sort(quant_probs)
     lqname <- quant_names[1]
     uqname <- quant_names[length(quant_names)]
   }
@@ -379,15 +460,23 @@ gg.prediction <- function(data, ...) {
   gg.bru_prediction(data = data, ...)
 }
 
-#' Geom for SpatialPoints objects
+#' @title Geoms for sp Spatial objects
 #'
+#' @description
+#' Methods for plotting sp spatial objects with `ggplot2`.
+#'
+#' @name gg.Spatial
+#' @rdname gg.Spatial
+NULL
+
+#' @describeIn gg.Spatial Geom for `SpatialPoints` objects.
 #' This function coerces the `SpatialPoints` into a `data.frame` and uses
 #' `geom_point` to plot the points. Requires the `ggplot2` package.
 #'
 #' @export
-#' @param data A SpatialPoints object.
+#' @param data A `Spatial*` object.
 #' @param mapping Aesthetic mappings created by `aes` used to update the default
-#'   mapping. The default mapping is
+#'   mapping. Uness specified otherwise below, the default mapping is
 #'   ```{r eval = FALSE}
 #'   ggplot2::aes(
 #'     x = .data[[sp::coordnames(data)[1]]],
@@ -396,12 +485,75 @@ gg.prediction <- function(data, ...) {
 #'   ```
 #' @param crs A `sp::CRS` object defining the coordinate system to project the
 #'   data to before plotting.
-#' @param \dots Arguments passed on to `geom_point`.
-#' @return A `geom_point` return value
-#' @family geomes for spatial data
+#' @param \dots Arguments passed on to `geom_*`.
+#' @return A `geom_point`, `geom_segment`, `geom_sf`, `geom_tile`,
+#' or a list of `ggplot` geomes
+#' @family geomes
 #'
-#' @example inst/examples/gg.sp.R
-
+#' @examples
+#' \donttest{
+#' if (require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
+#'   bru_safe_sp() &&
+#'   require("sp")) {
+#'   # Load Gorilla data
+#'
+#'   gorillas <- inlabru::gorillas_sf
+#'
+#'   gcov <- gorillas_sf_gcov()
+#'   elev <- terra::as.data.frame(gcov$elevation, xy = TRUE)
+#'   elev <- sf::as_Spatial(sf::st_as_sf(elev, coords = c("x", "y")))
+#'
+#'   # Turn elevation covariate into SpatialGridDataFrame
+#'   elev <- sp::SpatialPixelsDataFrame(elev, data = as.data.frame(elev))
+#'
+#'   # Plot Gorilla elevation covariate provided as SpatialPixelsDataFrame.
+#'   # The same syntax applies to SpatialGridDataFrame objects.
+#'
+#'   ggplot() +
+#'     gg(elev)
+#'
+#'   # Add Gorilla survey boundary and nest sightings
+#'
+#'   ggplot() +
+#'     gg(elev) +
+#'     gg(gorillas$boundary, alpha = 0.0, col = "red") +
+#'     gg(gorillas$nests)
+#'
+#'   # Load pantropical dolphin data
+#'
+#'   mexdolphin <- inlabru::mexdolphin_sp()
+#'
+#'   # Plot the pantropical survey boundary, ship transects, and dolphin
+#'   # sightings
+#'
+#'   ggplot() +
+#'     gg(mexdolphin$ppoly) + # survey boundary as SpatialPolygon
+#'     gg(mexdolphin$samplers) + # ship transects as SpatialLines
+#'     gg(mexdolphin$points) # dolphin sightings as SpatialPoints
+#'
+#'   # Change color
+#'
+#'   ggplot() +
+#'     gg(mexdolphin$ppoly, color = "green") + # survey boundary; SpatialPolygon
+#'     gg(mexdolphin$samplers, color = "red") + # ship transects; SpatialLines
+#'     gg(mexdolphin$points, color = "blue") # dolphin sightings; SpatialPoints
+#'
+#'
+#'   # Visualize data annotations: line width by segment number
+#'
+#'   names(mexdolphin$samplers) # 'seg' holds the segment number
+#'   ggplot() +
+#'     gg(mexdolphin$samplers, aes(color = seg))
+#'
+#'   # Visualize data annotations: point size by dolphin group size
+#'
+#'   names(mexdolphin$points) # 'size' holds the group size
+#'   ggplot() +
+#'     gg(mexdolphin$points, aes(size = size))
+#' }
+#' }
+#'
 gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
   requireNamespace("ggplot2")
@@ -444,9 +596,63 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
 #' data column.
 #' @param \dots Arguments passed on to `geom_sf` or `geom_tile`.
 #' @return A ggplot return value
-#' @family geomes for spatial data
-#' @example inst/examples/gg.sf.R
-
+#' @family geomes
+#' @examples
+#' \donttest{
+#' if (require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
+#'   require("tidyterra", quietly = TRUE)) {
+#'   # Load Gorilla data
+#'
+#'   gorillas <- inlabru::gorillas_sf
+#'   gorillas$gcov <- gorillas_sf_gcov()
+#'
+#'   # Plot Gorilla elevation covariate provided as terra::rast.
+#'
+#'   ggplot() +
+#'     gg(gorillas$gcov$elevation)
+#'
+#'   # Add Gorilla survey boundary and nest sightings
+#'
+#'   ggplot() +
+#'     gg(gorillas$gcov$elevation) +
+#'     gg(gorillas$boundary, alpha = 0) +
+#'     gg(gorillas$nests)
+#'
+#'   # Load pantropical dolphin data
+#'
+#'   mexdolphin <- inlabru::mexdolphin_sf
+#'
+#'   # Plot the pantropical survey boundary, ship transects and dolphin
+#'   # sightings
+#'
+#'   ggplot() +
+#'     gg(mexdolphin$ppoly, alpha = 0.5) + # survey boundary
+#'     gg(mexdolphin$samplers) + # ship transects
+#'     gg(mexdolphin$points) # dolphin sightings
+#'
+#'   # Change color
+#'
+#'   ggplot() +
+#'     gg(mexdolphin$ppoly, color = "green", alpha = 0.5) + # survey boundary
+#'     gg(mexdolphin$samplers, color = "red") + # ship transects
+#'     gg(mexdolphin$points, color = "blue") # dolphin sightings
+#'
+#'
+#'   # Visualize data annotations: line width by segment number
+#'
+#'   names(mexdolphin$samplers) # 'seg' holds the segment number
+#'   ggplot() +
+#'     gg(mexdolphin$samplers, aes(color = seg))
+#'
+#'   # Visualize data annotations: point size by dolphin group size
+#'
+#'   names(mexdolphin$points) # 'size' holds the group size
+#'   ggplot() +
+#'     gg(mexdolphin$points, aes(size = size))
+#' }
+#' }
+#'
 gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
   requireNamespace("ggplot2")
 
@@ -496,16 +702,12 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
   result
 }
 
-#' Geom for SpatialLines objects
-#'
-#' @description
+#' @describeIn gg.Spatial Geom for SpatialLines objects.
 #'
 #' Extracts start and end points of the lines and calls `geom_segment` to plot
-#' lines between them. Requires the `ggplot2` package.
+#' lines between them.
 #'
-#' @export
-#' @param data A `SpatialLines` or `SpatialLinesDataFrame` object.
-#' @param mapping Aesthetic mappings created by `ggplot2::aes` or
+#' `mapping`: Aesthetic mappings created by `ggplot2::aes` or
 #'   `ggplot2::aes_` used to update the default mapping. The default mapping is
 #'   ```{r eval = FALSE}
 #'   ggplot2::aes(
@@ -514,12 +716,7 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
 #'     xend = .data[[paste0("end.", sp::coordnames(data)[1])]],
 #'     yend = .data[[paste0("end.", sp::coordnames(data)[2])]])
 #'   ```
-#' @param crs A `CRS` object defining the coordinate system to project the data
-#'   to before plotting.
-#' @param \dots Arguments passed on to `ggplot2::geom_segment`.
-#' @return A `geom_segment`` return value.
-#' @family geomes for spatial data
-#' @example inst/examples/gg.sp.R
+#' @export
 
 gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
@@ -577,30 +774,20 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   ggplot2::geom_segment(data = df, mapping = dmap, ...)
 }
 
-#' Geom for SpatialPolygons objects
-#'
+#' @describeIn gg.Spatial Geom for SpatialPolygons objects.
 #' Uses the `ggplot2::fortify()` function to turn the `SpatialPolygons` objects
-#' into a `data.frame`. Then calls `geom_polygon` to plot the polygons. Requires
-#' the `ggplot2` package.
+#' into a `data.frame`. Then calls `geom_polygon` to plot the polygons.
 #'
-#' @export
-#' @param data A `SpatialPolygons` or `SpatialPolygonsDataFrame` object.
-#' @param mapping Aesthetic mappings created by `aes` used to update the default
-#'   mapping.
-#' @param crs A `CRS` object defining the coordinate system to project the data
-#'   to before plotting.
-#' @param \dots Arguments passed on to `geom_sf`.
 #' Unless specified by the user,
 #' the argument `alpha = 0.2` (alpha level for polygon filling) is added.
-#' @return A `geom_sf` object.
-#' @details Up to version `2.10.0`, the `ggpolypath` package was used to ensure
-#'   proper plotting, since the `ggplot2::geom_polygon` function doesn't always
-#'   handle geometries with holes properly. After `2.10.0`, the object is
-#'   converted to `sf` format and passed on to [gg.sf()] instead, as `ggplot2`
-#'   version `3.4.4` deprecated the intenrally used `ggplot2::fortify()` method
-#'   for `SpatialPolygons/DataFrame` objects.
-#' @family geomes for spatial data
-#' @example inst/examples/gg.sp.R
+#'
+#' Up to version `2.10.0`, the `ggpolypath` package was used to ensure proper
+#' plotting for polygons, since the `ggplot2::geom_polygon` function doesn't
+#' always handle geometries with holes properly. After `2.10.0`, the object is
+#' converted to `sf` format and passed on to [gg.sf()] instead, as `ggplot2`
+#' version `3.4.4` deprecated the internally used `ggplot2::fortify()` method
+#' for `SpatialPolygons/DataFrame` objects.
+#' @export
 
 gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
@@ -616,18 +803,12 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   }
 }
 
-#' Geom for SpatialGridDataFrame objects
+#' @describeIn gg.Spatial Geom for SpatialGridDataFrame objects
 #'
 #' Coerces input `SpatialGridDataFrame` to `SpatialPixelsDataFrame` and calls
 #' [gg.SpatialPixelsDataFrame()] to plot it.
-#' Requires the `ggplot2` package.
 #'
 #' @export
-#' @param data A SpatialGridDataFrame object.
-#' @param \dots Arguments passed on to [gg.SpatialPixelsDataFrame()].
-#' @return A `geom_tile` value.
-#' @family geomes for spatial data
-#' @example inst/examples/gg.sp.R
 
 gg.SpatialGridDataFrame <- function(data, ...) {
   bru_safe_sp(force = TRUE)
@@ -635,15 +816,12 @@ gg.SpatialGridDataFrame <- function(data, ...) {
   gg(data, ...)
 }
 
-#' Geom for SpatialPixelsDataFrame objects
+#' @describeIn gg.Spatial Geom for SpatialPixelsDataFrame objects.
 #'
-#' Coerces input SpatialPixelsDataFrame to data.frame and uses `geom_tile` to
-#' plot it.
-#' Requires the `ggplot2` package.
+#' Coerces `SpatialPixelsDataFrame` input to `data.frame` and uses
+#' `geom_tile` to plot it.
 #'
-#' @export
-#' @param data A SpatialPixelsDataFrame object.
-#' @param mapping Aesthetic mappings created by `aes` used to update the default
+#' `mapping`: Aesthetic mappings created by `aes` used to update the default
 #'   mapping. The default mapping is
 #'   ```{r eval=FALSE}
 #'   ggplot2::aes(
@@ -652,14 +830,10 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #'     fill = .data[[names(data)[[1]]]]
 #'   )
 #'   ```
-#' @param crs A `sp::CRS` object defining the coordinate system to project the
-#'   data to before plotting.
+#'
+#' @export
 #' @param mask A `sp::SpatialPolygons` object defining the region that is
 #'   plotted.
-#' @param \dots Arguments passed on to `geom_tile`.
-#' @return A `geom_tile` return value.
-#' @family geomes for spatial data
-#' @example inst/examples/gg.sp.R
 gg.SpatialPixelsDataFrame <- function(data,
                                       mapping = NULL,
                                       crs = NULL,
@@ -696,19 +870,15 @@ gg.SpatialPixelsDataFrame <- function(data,
 }
 
 
-#' Geom for SpatialPixels objects
+#' @describeIn gg.Spatial Geom for SpatialPixels objects
 #'
-#' Uses `geom_point` to plot the pixel centers.
-#' Requires the `ggplot2` package.
+#' Converts the input to `SpatialPoints` and calls
+#' [gg.SpatialPoints()` to plot it.
 #'
 #' @export
-#' @param data A `sp::SpatialPixels` object.
-#' @param \dots Arguments passed on to `geom_tile`.
-#' @return A `geom_tile` return value.
-#' @family geomes for spatial data
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   bru_safe_sp()) {
 #'   # Load Gorilla data
 #'
@@ -723,6 +893,7 @@ gg.SpatialPixelsDataFrame <- function(data,
 #'   ggplot() +
 #'     gg(pxl, size = 0.1)
 #' }
+#'
 gg.SpatialPixels <- function(data, ...) {
   bru_safe_sp(force = TRUE)
   gg(sp::SpatialPoints(data), ...)
@@ -738,10 +909,10 @@ gg.SpatialPixels <- function(data, ...) {
 #' @param data A SpatRaster object.
 #' @param \dots Arguments passed on to `geom_spatraster`.
 #' @return The output from `geom_spatraster.
-#' @family geomes for spatial data
+#' @family geomes
 #' @examples
 #' if (require("ggplot2", quietly = TRUE) &&
-#'   requireNamespace("terra", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
 #'   require("tidyterra", quietly = TRUE)) {
 #'   # Load Gorilla covariates
 #'
@@ -771,9 +942,6 @@ gg.SpatRaster <- function(data, ...) {
   }
   tidyterra::geom_spatraster(data = data, ...)
 }
-
-
-
 
 
 #' Geom for fm_mesh_2d objects
@@ -816,9 +984,43 @@ gg.SpatRaster <- function(data, ...) {
 #' @param \dots ignored arguments (S3 generic compatibility).
 #' @return `geom_line` return values or, if the color argument is used, the
 #'   values of [gg.SpatialPixelsDataFrame()].
-#' @family geomes for meshes
-#' @example inst/examples/gg.fm_mesh_2d.R
-
+#' @family geomes
+#' @examples
+#' \donttest{
+#' if (require(fmesher, quietly = TRUE) &&
+#'   require(ggplot2, quietly = TRUE)) {
+#'   # Load Gorilla data
+#'   gorillas <- inlabru::gorillas_sf
+#'
+#'   # Plot mesh using default edge colors
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh)
+#'
+#'   # Don't show interior and exterior boundaries
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh, interior = FALSE, exterior = FALSE)
+#'
+#'   # Change the edge colors
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh,
+#'       edge.color = "green",
+#'       int.color = "black",
+#'       ext.color = "blue"
+#'     )
+#'
+#'   # Use the x-coordinate of the vertices to colorize the triangles and
+#'   # mask the plotted area by the survey boundary, i.e. only plot the inside
+#'
+#'   xcoord <- gorillas$mesh$loc[, 1]
+#'   ggplot() +
+#'     gg(gorillas$mesh, color = (xcoord - 580), mask = gorillas$boundary) +
+#'     gg(gorillas$boundary, alpha = 0)
+#' }
+#' }
+#'
 gg.fm_mesh_2d <- function(data,
                           color = NULL,
                           alpha = NULL,
@@ -971,7 +1173,7 @@ gg.fm_mesh_2d <- function(data,
 #' @param shape Shape of the knot markers.
 #' @param \dots parameters passed on to `geom_point`.
 #' @return An object generated by `geom_point`.
-#' @family geomes for meshes
+#' @family geomes
 #'
 #' @examples
 #' \donttest{
@@ -979,7 +1181,7 @@ gg.fm_mesh_2d <- function(data,
 #'   require("ggplot2", quietly = TRUE)) {
 #'   # Create a 1D mesh
 #'
-#'   mesh <- fm_mesh_1d(seq(0, 10, by = 0.5))
+#'   mesh <- fmesher::fm_mesh_1d(seq(0, 10, by = 0.5))
 #'
 #'   # Plot it
 #'
@@ -1014,7 +1216,7 @@ gg.fm_mesh_1d <- function(data,
 #'   `geom_tile`.
 #' @param \dots Arguments passed on to `geom_tile`.
 #' @return An object returned by `geom_tile`
-#' @family geomes for Raster data
+#' @family geomes
 #'
 #' @examples
 #' \dontrun{
@@ -1073,11 +1275,10 @@ gg.RasterLayer <- function(data,
 #' \dontrun{
 #' if (require("ggplot2", quietly = TRUE)) {
 #'   # Generate some data and fit a simple model
-#'   input.df <- data.frame(x = cos(1:10))
-#'   input.df <- within(
-#'     input.df,
-#'     y <- 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1)
-#'   )
+#'   input.df <- data.frame(x = cos(1:10)) |>
+#'     dplyr::mutate(
+#'       y = 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1)
+#'     )
 #'   fit <- bru(y ~ x, family = "gaussian", data = input.df)
 #'   summary(fit)
 #'
@@ -1097,20 +1298,12 @@ plot.bru <- function(x, ...) {
   }
 }
 
-#' @title Plot prediction using ggplot2
-#'
-#' @description
+#' @describeIn gg.bru_prediction
 #' Generates a base ggplot2 using `ggplot()` and adds a geom for input `x` using
-#' [gg].
+#' [gg.bru_prediction()]. Returns a ggplot object.
 #'
-#' Requires the `ggplot2` package.
-#'
-#' @name plot.bru_prediction
 #' @param x a prediction object.
 #' @param y Ignored argument but required for S3 compatibility.
-#' @param \dots Arguments passed on to [gg.prediction()].
-#' @return an object of class `gg`
-#' @example inst/examples/gg.prediction.R
 #' @export
 #' @method plot bru_prediction
 
@@ -1120,7 +1313,7 @@ plot.bru_prediction <- function(x, y = NULL, ...) {
     gg(x, ...)
 }
 
-#' @rdname plot.bru_prediction
+#' @describeIn gg.bru_prediction Identical to [gg.bru_prediction()].
 #' @export
 #' @method plot prediction
 plot.prediction <- function(x, y = NULL, ...) {
@@ -1128,7 +1321,6 @@ plot.prediction <- function(x, y = NULL, ...) {
   ggplot2::ggplot() +
     gg(x, ...)
 }
-
 
 
 #' @title Multiple ggplots on a page.
@@ -1162,18 +1354,26 @@ plot.prediction <- function(x, y = NULL, ...) {
 #'     geom_line(mapping = aes(x, z), color = "blue")
 #'   pl3 <- ggplot(data = df) +
 #'     geom_path(mapping = aes(y, z), color = "magenta")
+#'
 #'   multiplot(
 #'     pl1, pl2, pl3,
 #'     layout = rbind(c(1, 2), c(3, 3))
 #'   )
 #'
+#'   # Recommended alternative using the patchwork package:
 #'   if (require("patchwork")) {
-#'     (pl1 + pl2) / pl3
+#'     (pl1 | pl2) / pl3
 #'   }
 #' }
 #' @export
 #
 multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
+  lifecycle::deprecate_soft(
+    "2.13.0.9026",
+    "multiplot()",
+    details = "Please use the 'patchwork' package for combining ggplots."
+  )
+
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 
@@ -1210,7 +1410,6 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
     }
   }
 }
-
 
 
 # Default color palette for plots using \link{gg}

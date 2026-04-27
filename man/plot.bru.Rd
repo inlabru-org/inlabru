@@ -51,11 +51,10 @@ Requires the \code{ggplot2} package.
 \dontrun{
 if (require("ggplot2", quietly = TRUE)) {
   # Generate some data and fit a simple model
-  input.df <- data.frame(x = cos(1:10))
-  input.df <- within(
-    input.df,
-    y <- 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1)
-  )
+  input.df <- data.frame(x = cos(1:10)) |>
+    dplyr::mutate(
+      y = 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1)
+    )
   fit <- bru(y ~ x, family = "gaussian", data = input.df)
   summary(fit)
 

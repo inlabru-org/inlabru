@@ -116,9 +116,12 @@ that is applied before scaling by \code{weights}.}
 
 \item{A.msk}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} and has no effect.}
 
-\item{.envir}{Evaluation environment}
+\item{.envir}{Evaluation environment. Can later be accessed via
+\code{\link[=bru_comp_env]{bru_comp_env()}}. Default: \code{parent.frame()}}
 
-\item{envir_extra}{TODO: check/fix this parameter.}
+\item{envir_extra}{Environment for storing \code{INLA::f()} argument values.
+If NULL, an new environment is created. Can be accessed via
+\code{\link[=bru_comp_env_extra]{bru_comp_env_extra()}}}
 }
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed
@@ -240,7 +243,7 @@ if (bru_safe_inla()) {
   # A more complicated component:
   cmp <- bru_comp("myEffectOfX",
     main = x,
-    model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
+    model = INLA::inla.spde2.matern(fmesher::fm_mesh_1d(1:10))
   )
 
   # Compound fixed effect component, where x and z are in the input data.

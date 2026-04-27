@@ -5,6 +5,7 @@
 \alias{bru_index.bru_obs}
 \alias{bru_index.bru_obs_list}
 \alias{bru_index.bru}
+\alias{bru_index.bru_info}
 \alias{bru_index.bru_comp}
 \alias{bru_index.bru_comp_list}
 \alias{bru_index.bru_model}
@@ -18,6 +19,8 @@ bru_index(object, ...)
 \method{bru_index}{bru_obs_list}(object, tag = NULL, what = NULL, ...)
 
 \method{bru_index}{bru}(object, tag = NULL, what = NULL, ...)
+
+\method{bru_index}{bru_info}(object, tag = NULL, what = NULL, ...)
 
 \method{bru_index}{bru_comp}(object, inla_f, ...)
 
@@ -63,6 +66,10 @@ an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
 }
 
 \itemize{
+\item \code{bru_index(bru_info)}: An \code{integer} vector.
+}
+
+\itemize{
 \item \code{bru_index(bru_comp)}:
 A list of indices into the latent variables compatible with the
 component mapper.
@@ -100,6 +107,10 @@ of \code{tag} and \code{what}.
 more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination
 of \code{tag} and \code{what}.
 
+\item \code{bru_index(bru_info)}: Extract the index vector for "APredictor" for one or
+more specified observation \code{\link[=bru_obs]{bru_obs()}} sub-models. Accepts any combination
+of \code{tag} and \code{what}.
+
 \item \code{bru_index(bru_model)}: Compute all index values for a \code{\link[=bru_model]{bru_model()}} object.
 Computes the index value matrices for included components according to the
 \code{used} argument.
@@ -124,7 +135,8 @@ fit <- bru(
     y ~ .,
     data = data.frame(x = 1:4, y = c(NA, NA, 3:4) + rnorm(4)),
     tag = "B"
-  )
+  ),
+  options = list(bru_run = FALSE) # We only need the model structure
 )
 bru_index(fit)
 bru_index(fit, "A")
@@ -137,4 +149,3 @@ bru_index(fit, what = "missing")
 Fabian E. Bachl \email{bachlfab@gmail.com},
 Finn Lindgren \email{finn.lindgren@gmail.com}
 }
-\keyword{internal}

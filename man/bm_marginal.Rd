@@ -10,21 +10,22 @@ bm_marginal(qfun, pfun = NULL, dfun = NULL, dqfun = NULL, ..., inverse = FALSE)
 bru_mapper_marginal(...)
 }
 \arguments{
-\item{qfun}{A quantile function, supporting \code{lower.tail} and \code{log.p}
-arguments, like \code{\link[stats:Normal]{stats::qnorm()}}.}
+\item{qfun}{A quantile function, supporting arguments \code{p}, \code{lower.tail}, and
+\code{log.p}, like \code{\link[stats:Normal]{stats::qnorm()}}.}
 
-\item{pfun}{A CDF, supporting \code{lower.tail} and \code{log.p} arguments,
+\item{pfun}{A CDF, supporting arguments \code{q}, \code{lower.tail}, and \code{log.p},
 like \code{\link[stats:Normal]{stats::pnorm()}}.  Only needed and used when
 \code{xor(mapper[["inverse"]], reverse)} is \code{TRUE} in a method call.
 Default \code{NULL}}
 
-\item{dfun}{A pdf, supporting \code{log} argument,
+\item{dfun}{A pdf, supporting arguments \code{x} and \code{log},
 like \code{\link[stats:Normal]{stats::dnorm()}}. If \code{NULL} (default), uses finite
 differences on \code{qfun} or \code{pfun} instead.}
 
 \item{dqfun}{A function evaluating the reciprocal of the derivative of
-\code{qfun}. If \code{NULL} (default), uses \code{dfun(qfun(...),...)} or finite
-differences on \code{qfun} or \code{pfun} instead.}
+\code{qfun}, i.e. the density at a given CDF value. If \code{NULL} (default), uses
+\code{dfun(qfun(...),...)} or finite differences on \code{qfun} or \code{pfun} instead.
+Must support the same arguments as \code{qfun}.}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_marginal]{bm_marginal()}}}
 
@@ -63,9 +64,9 @@ Other mappers:
 \code{\link{bm_logitaverage}()},
 \code{\link{bm_logsumexp}()},
 \code{\link{bm_matrix}()},
-\code{\link{bm_mesh_B}()},
 \code{\link{bm_multi}()},
 \code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
 \code{\link{bm_repeat}()},
 \code{\link{bm_scale}()},
 \code{\link{bm_shift}()},
@@ -73,13 +74,5 @@ Other mappers:
 \code{\link{bm_taylor}()},
 \code{\link{bru_get_mapper}()},
 \code{\link{bru_mapper}()}
-
-Other specific \link{bm_marginal} method implementations: 
-\code{\link{ibm_eval}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_values}()}
 }
 \concept{mappers}
-\concept{specific \link{bm_marginal} method implementations}

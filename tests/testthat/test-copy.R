@@ -7,9 +7,12 @@ test_that("bru: inla copy feature", {
 
   df1 <- data.frame(x = cos(1:100))
   df2 <- data.frame(x = sin(1:100))
-  df1 <- within(df1, y <- 1 + exp(2 * x) + rnorm(length(x), mean = 0, sd = 0.1))
-  df2 <- within(df2, y <- 1 + (6 * x) + rnorm(length(x), mean = 0, sd = 0.1))
-
+  df1 <- within(df1, {
+    y <- 1 + exp(2 * x) + rnorm(length(x), mean = 0, sd = 0.1)
+  })
+  df2 <- within(df2, {
+    y <- 1 + (6 * x) + rnorm(length(x), mean = 0, sd = 0.1)
+  })
   cmp <- ~
     +1 +
       myLin1(x,

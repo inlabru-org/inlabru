@@ -3,8 +3,9 @@ test_that("Linear mapper", {
 
   input <- seq_len(4)
   state <- 10
+  input_length <- length(input)
   expect_equal(ibm_n(mapper), 1)
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), 1)
   expect_equal(ibm_values(mapper, inla_f = TRUE), 1)
   expect_equal(
@@ -28,8 +29,10 @@ test_that("Index mapper", {
   input <- c(2, 2, 1, 3)
   val <- state[input]
 
-  expect_equal(ibm_n(mapper), length(values))
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  values_length <- length(values)
+  input_length <- length(input)
+  expect_equal(ibm_n(mapper), values_length)
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), values)
   expect_equal(ibm_values(mapper, inla_f = TRUE), values)
   expect_equal(
@@ -72,8 +75,10 @@ test_that("Factor mapper", {
       val
     }
 
-    expect_equal(ibm_n(mapper), length(values))
-    expect_equal(ibm_n_output(mapper, input = input), length(input))
+    values_length <- length(values)
+    input_length <- length(input)
+    expect_equal(ibm_n(mapper), values_length)
+    expect_equal(ibm_n_output(mapper, input = input), input_length)
     expect_equal(ibm_values(mapper), values)
     expect_equal(ibm_values(mapper, inla_f = TRUE), values)
     expect_equal(
@@ -88,6 +93,109 @@ test_that("Factor mapper", {
       val
     )
   }
+})
+
+
+test_that("Automated factor releveling", {
+  local_bru_safe_inla()
+  skip_if_not_installed("sf")
+
+  pts <- sf::st_as_sf(
+    data.frame(
+      x = runif(20),
+      y = runif(20),
+      category = factor(
+        sample(c("Alpha", "Beta", "Gamma"), 20, TRUE),
+        levels = c("Alpha", "Beta", "Gamma")
+      )
+    ),
+    coords = c("x", "y"),
+    crs = 5070
+  )
+
+  boundary <- sf::st_sf(
+    geometry =
+      sf::st_sfc(
+        sf::st_polygon(list(rbind(
+          c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)
+        ))),
+        crs = 5070
+      )
+  )
+
+  mesh <- fmesher::fm_mesh_2d(
+    boundary = boundary,
+    max.edge = 0.5,
+    cutoff = 0.1,
+    crs = sf::st_crs(boundary)
+  )
+
+  ips <- fmesher::fm_int(list(geometry = mesh), boundary)
+
+  ips$category <- factor(
+    sample(c("Alpha", "Beta", "Gamma"), nrow(ips), TRUE),
+    levels = c("Alpha", "Beta", "Gamma")
+  )
+
+  cmp <- geometry ~ Intercept(1) +
+    category(category, model = "factor_contrast")
+
+  # Relevel pts only, which is ok since dplyr::bind_rows() relevels the ips
+  # to the levels of pts.
+  pts$category <- relevel(pts$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Also relevel ips:
+  ips$category <- relevel(ips$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Relevel again, to check inconsistent levels are noticed:
+  ips$category <- relevel(ips$category, ref = "Gamma")
+
+  pts$z <- rnorm(nrow(pts))
+  ips$z <- rnorm(nrow(ips))
+
+  expect_error(
+    bru(
+      cmp,
+      bru_obs(
+        z ~ .,
+        data = pts
+      ),
+      bru_obs(
+        z ~ .,
+        data = ips
+      ),
+      options = list(bru_run = FALSE)
+    ),
+    "Inconsistent factor levels. Unable to infer mapper information."
+  )
 })
 
 
@@ -397,7 +505,6 @@ test_that("Multi-mapper bru input with offset", {
 })
 
 
-
 test_that("User defined mappers", {
   # .S3method was unavailable in R 3.6!
   skip_if_not(utils::compareVersion("4", R.Version()$major) <= 0)
@@ -444,7 +551,6 @@ test_that("User defined mappers", {
     label = "Non-interactive bru() call"
   )
 })
-
 
 
 test_that("Collect mapper, direct construction", {
@@ -572,13 +678,13 @@ test_that("Collect mapper, automatic construction", {
     )
 
     if (inla_f) {
-      input <- list(mapper = list(
+      input <- list(core = list(
         main = data$val,
         group = rep(1, 3),
         replicate = rep(1, 3)
       ))
     } else {
-      input <- list(mapper = list(
+      input <- list(core = list(
         main = list(u = data$val),
         group = rep(1, 3),
         replicate = rep(1, 3)
@@ -607,7 +713,6 @@ test_that("Collect mapper, automatic construction", {
     )
   }
 })
-
 
 
 test_that("Collect mapper works", {
@@ -641,7 +746,6 @@ test_that("Collect mapper works", {
       )
   })
 })
-
 
 
 test_that("Marginal mapper", {
@@ -680,7 +784,7 @@ test_that("Marginal mapper", {
     if (log) {
       return(val)
     }
-    return(exp(val))
+    exp(val)
   }
   m1_d <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
   m1_dq <- bm_marginal(qexp, pexp, NULL, dqexp, rate = 1 / 8)
@@ -730,7 +834,6 @@ test_that("Mesh 2d mapper", {
 })
 
 
-
 test_that("Repeat mapper, direct construction", {
   withr::local_seed(1234L)
 
@@ -752,8 +855,6 @@ test_that("Repeat mapper, direct construction", {
   A <- as(as(as(A, "dMatrix"), "generalMatrix"), "CsparseMatrix")
   expect_equal(ibm_jacobian(mapper, data), A)
 })
-
-
 
 
 test_that("Repeat mapper works", {
@@ -782,4 +883,85 @@ test_that("Repeat mapper works", {
         options = list(bru_initial = list(field = rep(10, 8)))
       )
   })
+})
+
+test_that("Reparam mapper works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  withr::local_seed(12345L)
+  u <- rnorm(8)
+  data <- data.frame(
+    x = rep_len(c(1, 2, 3, 2, 3, 4, 5, 6, 7, 8), 10 * 2)
+  )
+  data$y <- c(
+    u[1L:4L] + cumsum(u[5L:8L]),
+    cumsum(u[5L:8L])
+  )[data$x]
+
+  B <- rbind(
+    c(1, 0, 0, 0, 1, 0, 0, 0),
+    c(0, 1, 0, 0, 1, 1, 0, 0),
+    c(0, 0, 1, 0, 1, 1, 1, 0),
+    c(0, 0, 0, 1, 1, 1, 1, 1),
+    c(0, 0, 0, 0, 1, 0, 0, 0),
+    c(0, 0, 0, 0, 1, 1, 0, 0),
+    c(0, 0, 0, 0, 1, 1, 1, 0),
+    c(0, 0, 0, 0, 1, 1, 1, 1)
+  )
+
+  expect_no_error({
+    fit_bru_pipe <-
+      bru(
+        ~ 0 + field(
+          list(AA = B, BB = x),
+          model = "iid",
+          mapper = bm_pipe(list(AA = bm_matrix(ncol(B)), BB = bm_index(8))),
+          constr = FALSE
+        ),
+        bru_obs(
+          formula = y ~ .,
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          )))
+        ),
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  expect_no_error({
+    fit_bru_reparam <-
+      bru(
+        ~ 0 + field(
+          x,
+          model = "iid",
+          mapper = bm_reparam(bm_index(8), B = B)
+        ),
+        bru_obs(
+          formula = y ~ .,
+          data = data,
+          control.family = list(hyper = list(prec = list(
+            initial = log(1e8), fixed = TRUE
+          )))
+        ),
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  expect_equal(
+    fit_bru_pipe$summary.fixed,
+    fit_bru_reparam$summary.fixed,
+    tolerance = midtol
+  )
+
+  expect_equal(
+    fit_bru_pipe$summary.random$field,
+    fit_bru_reparam$summary.random$field,
+    tolerance = midtol
+  )
+
+  expect_equal(
+    fit_bru_pipe$summary.hyperpar,
+    fit_bru_reparam$summary.hyperpar,
+    tolerance = midtol
+  )
 })

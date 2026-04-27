@@ -60,7 +60,7 @@ ggplot() +
     fill = "red",
     alpha = 0.1
   ) +
-  geom_fm(data = mesh, alpha = 0)
+  fmesher::geom_fm(data = mesh, alpha = 0)
 
 # Simulate point data
 set.seed(13927)
@@ -77,7 +77,7 @@ ggplot() +
     fill = "red",
     alpha = 0.1
   ) +
-  geom_fm(data = mesh, alpha = 0) +
+  fmesher::geom_fm(data = mesh, alpha = 0) +
   geom_sf(data = locs, colour = "green")
 
 rho <- 3
@@ -85,8 +85,8 @@ sigma_matern <- 2
 beta_0 <- 3
 sigma_noise <- 0.2
 set.seed(1320)
-samp <- fm_matern_sample(mesh, rho = rho, sigma = sigma_matern)[, 1]
-locs$z <- beta_0 + fm_evaluate(mesh, loc = locs, field = samp) +
+samp <- fmesher::fm_matern_sample(mesh, rho = rho, sigma = sigma_matern)[, 1]
+locs$z <- beta_0 + fmesher::fm_evaluate(mesh, loc = locs, field = samp) +
   rnorm(
     n = nrow(locs),
     sd = sigma_noise

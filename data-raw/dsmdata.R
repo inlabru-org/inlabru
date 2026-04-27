@@ -78,7 +78,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # newdata[1:3, ]
 
 
-
   # Automated mesh construction
   loc <- rbind(
     as.matrix(segdata[, c("start.x", "start.y")]),
@@ -89,11 +88,11 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   ok <- rowSums(is.na(loc)) == 0
   loc <- loc[ok, , drop = FALSE]
-  inner <- fm_nonconvex_hull_inla(
+  inner <- fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
   )
-  outer <- fm_nonconvex_hull_inla(
+  outer <- fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
   )
@@ -106,7 +105,9 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
     cutoff = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20
   )
 
-  dset <- list(effort = newdata, mesh = mesh)
-  class(dset) <- c("dsdata", "list")
-  return(dset)
+  dset <- structure(
+    list(effort = newdata, mesh = mesh),
+    class = c("dsdata", "list")
+  )
+  dset
 }

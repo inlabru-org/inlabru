@@ -17,10 +17,35 @@ knitr::opts_chunk$set(
 ```{r setup, echo=FALSE,include=FALSE}
 ```
 
+## Package vignettes
+
+These package vignettes are available in the R package and on
+[`https://inlabru-org.github.io/inlabru/`](https://inlabru-org.github.io/inlabru/)
+
+```{r, echo=FALSE,results="asis"}
+files <- list.files(".", "\\.Rmd$")
+for (file in files) {
+  lines <- readLines(file, n = 10)
+  title_idx <- grep("^title: ", lines)
+  if (length(title_idx) > 0) {
+    title <- sub("^title: ", "", lines[title_idx[1]])
+    title <- sub('^"', "", title)
+    title <- sub('"$', "", title)
+    cat("* [",
+      title,
+      "](https://inlabru-org.github.io/inlabru/articles/",
+      sub("\\.Rmd", ".html", file),
+      ")\n",
+      sep = ""
+    )
+  }
+}
+```
+
 ## Package examples
 
 These potentially long running examples/tutorials are available on
-(https://inlabru-org.github.io/inlabru/)
+[`https://inlabru-org.github.io/inlabru/`](https://inlabru-org.github.io/inlabru/)
 
 ```{r, echo=FALSE,results="asis"}
 files <- list.files("articles", "\\.Rmd$")
@@ -42,27 +67,3 @@ for (file in file.path("articles", files)) {
 }
 ```
 
-## Package vignettes
-
-These package vignettes are also available on
-(https://inlabru-org.github.io/inlabru/)
-
-```{r, echo=FALSE,results="asis"}
-files <- list.files(".", "\\.Rmd$")
-for (file in files) {
-  lines <- readLines(file, n = 10)
-  title_idx <- grep("^title: ", lines)
-  if (length(title_idx) > 0) {
-    title <- sub("^title: ", "", lines[title_idx[1]])
-    title <- sub('^"', "", title)
-    title <- sub('"$', "", title)
-    cat("* [",
-      title,
-      "](https://inlabru-org.github.io/inlabru/articles/",
-      sub("\\.Rmd", ".html", file),
-      ")\n",
-      sep = ""
-    )
-  }
-}
-```

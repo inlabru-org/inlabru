@@ -43,7 +43,6 @@ gap.in.segments.f <- function(seg = NULL, geometry = "euc") {
 }
 
 
-
 define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN
@@ -93,7 +92,6 @@ define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
 
   seg
 }
-
 
 
 get.blocks.f <- function(seg = NULL, geometry = "euc") {
@@ -149,7 +147,6 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
 }
 
 
-
 add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN
@@ -182,7 +179,6 @@ add.labels.to.obs.f <- function(dists = NULL, obs = NULL, seg = NULL) {
 
   dists
 }
-
 
 
 combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
@@ -241,7 +237,6 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
 
   all
 }
-
 
 
 get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
@@ -306,7 +301,6 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
 
   unit
 }
-
 
 
 get.direction.segment.f <- function(data = NULL, geometry = "euc") {
@@ -425,8 +419,6 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 }
 
 
-
-
 start_end_points_segments_f <- function(seg = NULL,
                                         use.tran = FALSE,
                                         tran = NULL,
@@ -530,7 +522,6 @@ start_end_points_segments_f <- function(seg = NULL,
 } # End of function
 
 
-
 get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
   # Get the quadrant of the points
 
@@ -570,8 +561,6 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
 }
 
 
-
-
 euc.distance.f <- function(x1, y1, x2, y2) {
   # Calculate the Euclidean distance between two points, (x1,y1) and (x2,y2)
 
@@ -609,7 +598,6 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
 }
 
 
-
 get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
   # NOTE: old parameterization: seg.len=half.segment.length,angle=angle
 
@@ -625,7 +613,6 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 
   triangle
 }
-
 
 
 generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
@@ -780,7 +767,6 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 }
 
 
-
 get.coords.f <- function(quad = NULL,
                          alpha = NULL,
                          new.x = NULL,
@@ -874,14 +860,12 @@ get.coords.f <- function(quad = NULL,
 }
 
 
-
 get.hypot.f <- function(side1, side2) {
   # Get the length of the hypotenuse of triangle with sides of length side1 and
   # side2
   hyp <- sqrt(side1^2 + side2^2)
   hyp
 }
-
 
 
 # plot.segment.f <- function(x1,y1,x2,y2) {
@@ -897,7 +881,6 @@ get.hypot.f <- function(side1, side2) {
 #   segments(x1,y1,x2,y2)
 #
 # }
-
 
 
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {

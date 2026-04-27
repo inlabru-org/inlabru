@@ -31,12 +31,11 @@ introduced by Yuan et al. (2017).
 if (bru_safe_inla() &&
   require("ggplot2", quietly = TRUE) &&
   require("patchwork", quietly = TRUE) &&
-  require("sn", quietly = TRUE) &&
-  require("terra", quietly = TRUE) &&
+  requireNamespace("sn", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
-  require("dplyr", quietly = TRUE) &&
-  require("magrittr", quietly = TRUE)) {
+  require("dplyr", quietly = TRUE)) {
   # Load Gorilla data
 
   gorillas <- gorillas_sf
@@ -56,7 +55,7 @@ if (bru_safe_inla() &&
 
   cmp <- geometry ~ 0 +
     vegetation(gorillas$gcov$vegetation, model = "factor_contrast") +
-    spde(geometry, model = pcmatern) -
+    spde(geometry, model = pcmatern) +
     Intercept(1)
 
   fit <- lgcp(
@@ -68,7 +67,7 @@ if (bru_safe_inla() &&
   )
 
   # Predict SPDE and vegetation at a grid covering the domain of interest
-  pred_loc <- fm_pixels(
+  pred_loc <- fmesher::fm_pixels(
     gorillas$mesh,
     mask = gorillas$boundary,
     dims = c(200, 200),
@@ -86,16 +85,18 @@ if (bru_safe_inla() &&
 
   pred_collect <-
     rbind(
-      pred$joint \%>\% dplyr::mutate(component = "joint"),
-      pred$field \%>\% dplyr::mutate(component = "field"),
-      pred$veg \%>\% dplyr::mutate(component = "veg")
-    ) \%>\%
+      pred$joint |> dplyr::mutate(component = "joint"),
+      pred$field |> dplyr::mutate(component = "field"),
+      pred$veg |> dplyr::mutate(component = "veg")
+    ) |>
     dplyr::mutate(var = sd^2)
 
   # Plot component mean
 
   ggplot(pred_collect) +
-    geom_tile(aes(geometry = geometry, fill = mean), stat = "sf_coordinates") +
+    geom_tile(aes(geometry = geometry, fill = mean),
+      stat = "sf_coordinates"
+    ) +
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
@@ -103,7 +104,9 @@ if (bru_safe_inla() &&
   # Plot component variance
 
   ggplot(pred_collect) +
-    geom_tile(aes(geometry = geometry, fill = var), stat = "sf_coordinates") +
+    geom_tile(aes(geometry = geometry, fill = var),
+      stat = "sf_coordinates"
+    ) +
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
@@ -190,7 +193,7 @@ if (bru_safe_inla() &&
 
   # Variance and correlation integrated over space
 
-  vrt <- fm_vertices(gorillas$mesh, format = "sf")
+  vrt <- fmesher::fm_vertices(gorillas$mesh, format = "sf")
   pred_vrt <- predict(
     fit,
     vrt,
@@ -205,12 +208,13 @@ if (bru_safe_inla() &&
     pred_vrt$joint,
     pred_vrt$field,
     pred_vrt$veg,
-    samplers = fm_int(gorillas$mesh, gorillas$boundary),
+    samplers = fmesher::fm_int(gorillas$mesh, gorillas$boundary),
     mesh = gorillas$mesh
   )
   vm.int
 }
 }
+
 }
 \references{
 Y. Yuan, F. E. Bachl, F. Lindgren, D. L. Brochers, J. B. Illian, S. T.

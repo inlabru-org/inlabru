@@ -28,7 +28,6 @@
 #'   seq_len(ibm_n(m))
 #' )
 #'
-#' @family specific [bm_sum] method implementations
 bm_sum <- function(mappers, single_input = FALSE) {
   mappers <- as_bm_list(mappers)
   if (is.null(names(mappers))) {
@@ -39,11 +38,13 @@ bm_sum <- function(mappers, single_input = FALSE) {
     n_multi = lapply(mappers, ibm_n),
     values_multi = lapply(mappers, ibm_values),
     is_linear_multi = lapply(mappers, ibm_is_linear),
+    is_rowwise_multi = lapply(mappers, ibm_is_rowwise),
     single_input = single_input
   )
   mapper[["n"]] <- sum(unlist(mapper[["n_multi"]]))
   mapper[["values"]] <- seq_len(mapper[["n"]])
   mapper[["is_linear"]] <- all(unlist(mapper[["is_linear_multi"]]))
+  mapper[["is_rowwise"]] <- all(unlist(mapper[["is_rowwise_multi"]]))
   bru_mapper_define(mapper, new_class = "bm_sum")
 }
 
@@ -56,7 +57,7 @@ bru_mapper_sum <- function(...) {
 
 #' @export
 #' @rdname ibm_n
-#' @family specific [bm_sum] method implementations
+#'
 ibm_n.bm_sum <- function(mapper,
                          inla_f = FALSE,
                          multi = FALSE,
@@ -95,10 +96,9 @@ bm_sum_prepare_input <- function(mapper, input) {
 }
 
 
-
 #' @export
 #' @rdname ibm_n_output
-#' @family specific [bm_sum] method implementations
+#'
 ibm_n_output.bm_sum <- function(mapper, input, state = NULL, ...) {
   input <- bm_sum_prepare_input(mapper, input)
   # Assume that the first mapper fully handles the output size
@@ -117,7 +117,7 @@ ibm_n_output.bm_sum <- function(mapper, input, state = NULL, ...) {
 
 #' @export
 #' @rdname ibm_values
-#' @family specific [bm_sum] method implementations
+#'
 ibm_values.bm_sum <- function(mapper,
                               inla_f = FALSE,
                               multi = FALSE,
@@ -131,7 +131,7 @@ ibm_values.bm_sum <- function(mapper,
 
 #' @export
 #' @rdname ibm_is_linear
-#' @family specific [bm_sum] method implementations
+#'
 ibm_is_linear.bm_sum <- function(mapper,
                                  multi = FALSE,
                                  ...) {
@@ -171,7 +171,6 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
 }
 
 
-
 #' @describeIn ibm_jacobian
 #' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
@@ -181,7 +180,7 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
 #' @export
-#' @family specific [bm_sum] method implementations
+#'
 ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
                                 inla_f = FALSE,
                                 multi = FALSE,
@@ -198,13 +197,13 @@ ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
 
   # Combine the matrices (A1, A2, A3, ...) -> cbind(A1, A2, A3, ...)
   A <- do.call(cbind, A)
-  return(A)
+  A
 }
 
 
 #' @export
 #' @rdname ibm_eval
-#' @family specific [bm_sum] method implementations
+#'
 ibm_eval.bm_sum <- function(mapper, input, state,
                             multi = FALSE,
                             ...,
@@ -225,7 +224,7 @@ ibm_eval.bm_sum <- function(mapper, input, state,
 
 #' @export
 #' @rdname ibm_linear
-#' @family specific [bm_sum] method implementations
+#'
 ibm_linear.bm_sum <- function(mapper, input, state,
                               ...) {
   sub_lin <-
@@ -250,8 +249,6 @@ ibm_linear.bm_sum <- function(mapper, input, state,
 }
 
 
-
-
 #' @describeIn ibm_invalid_output
 #' Accepts a list with
 #' named entries, or a list with unnamed but ordered elements.
@@ -261,7 +258,7 @@ ibm_linear.bm_sum <- function(mapper, input, state,
 #' data.frame with named columns, a matrix with named columns, or a matrix
 #' with unnamed but ordered columns.
 #' @export
-#' @family specific [bm_sum] method implementations
+#'
 ibm_invalid_output.bm_sum <- function(mapper, input, state,
                                       multi = FALSE,
                                       ...) {
@@ -292,7 +289,7 @@ ibm_invalid_output.bm_sum <- function(mapper, input, state,
   for (k in seq_len(length(invalid) - 1L) + 1L) {
     invalid_ <- invalid_ | invalid[[k]]
   }
-  return(invalid_)
+  invalid_
 }
 
 #' @return
@@ -343,14 +340,14 @@ ibm_invalid_output.bm_sum <- function(mapper, input, state,
 #' @describeIn ibm_names
 #' Returns the names from the sub-mappers list
 #' @export
-#' @family specific [bm_sum] method implementations
+#'
 `ibm_names.bm_sum` <- function(mapper) {
   names(mapper[["mappers"]])
 }
 
 #' @export
 #' @rdname ibm_names
-#' @family specific [bm_collect] method implementations
+#'
 `ibm_names<-.bm_sum` <- function(mapper, value) {
   names(mapper[["mappers"]]) <- value
   names(mapper[["n_multi"]]) <- value
@@ -360,7 +357,7 @@ ibm_invalid_output.bm_sum <- function(mapper, input, state,
 
 #' @export
 #' @rdname ibm_names
-#' @family specific [bm_collect] method implementations
+#'
 `ibm_names<-.bru_mapper_sum` <- function(mapper, value) {
   names(mapper[["mappers"]]) <- value
   names(mapper[["n_multi"]]) <- value

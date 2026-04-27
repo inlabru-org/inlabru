@@ -32,6 +32,7 @@
 \method{ibm_jacobian}{bm_inla_mesh_1d}(mapper, input, ...)
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Deprecated methods only used for old stored
 \code{bru_mapper_fm_mesh_1d} and \code{bru_mapper_fm_mesh_2d} objects.
 }

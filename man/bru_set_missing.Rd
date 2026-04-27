@@ -2,7 +2,9 @@
 % Please edit documentation in R/bru.inference.R
 \name{bru_set_missing}
 \alias{bru_set_missing}
+\alias{bru_set_missing<-}
 \alias{bru_set_missing.bru}
+\alias{bru_set_missing.bru_info}
 \alias{bru_set_missing.bru_obs_list}
 \alias{bru_set_missing.bru_obs}
 \alias{bru_set_missing.default}
@@ -12,7 +14,11 @@
 \usage{
 bru_set_missing(object, keep = FALSE, ...)
 
+bru_set_missing(x, ...) <- value
+
 \method{bru_set_missing}{bru}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{bru_info}(object, keep = FALSE, ...)
 
 \method{bru_set_missing}{bru_obs_list}(object, keep = FALSE, ...)
 
@@ -37,6 +43,10 @@ Details.}
 
 \item{\dots}{Additional arguments passed on to the \code{bru_obs} and individual
 data class methods.  Currently unused.}
+
+\item{x}{Object on which to apply \code{bru_set_missing()}}
+
+\item{value}{Value to be passed as \code{keep} to \code{bru_set_missing()}}
 }
 \description{
 Set all or parts of the observation model response data
@@ -52,7 +62,7 @@ For \code{bru} and \code{bru_obs_list},
 \item{an unnamed list of the same length as the number of observation
 models, with elements compatible with the \code{bru_obs} method, or}
 \item{a named list with elements compatible with the \code{bru_obs} method,
-and only the named \code{bro_obs} models are acted upon, i.e. the elements
+and only the named \code{bru_obs} models are acted upon, i.e. the elements
 not present in the list are treated as \code{keep = TRUE}.}
 }
 
@@ -72,6 +82,11 @@ object supporting \code{\link[base:NA]{base::is.na<-()}} for positive and negati
 including \code{inla.mdata}.
 
 \item \code{bru_set_missing(inla.surv)}: From \verb{> 2.13.0}, handles \code{inla.surv}.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{bru_set_missing(x, ...) <- value}: Setter method for \code{bru_set_missing()}
 
 }}
 \section{Prior sampling caveats}{
@@ -121,6 +136,8 @@ lapply(
 \dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
 (obs <- INLA::inla.mdata(y = 1:4, X = matrix(1:8, 4, 2)))
 bru_set_missing(obs, keep = c(1, 4))
+bru_set_missing(obs) <- -(1:2)
+obs
 \dontshow{\}) # examplesIf}
 \dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
 (obs <- INLA::inla.surv(time = 1:4, event = c(1, 0, 1, 0)))

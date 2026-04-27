@@ -28,23 +28,31 @@ cv_partition <- function(samplers,
                          ncols = NULL,
                          chess = TRUE,
                          ...) {
+  requireNamespace("terra")
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- terra::rast(terra::ext(sf::st_as_sf(fmesher::fm_nonconvex_hull(samplers, ...))),
+    grid <- terra::rast(
+      terra::ext(sf::st_as_sf(
+        fmesher::fm_nonconvex_hull(samplers, ...)
+      )),
       crs = fmesher::fm_crs(samplers)$input,
-      nrows = nrows, ncols = ncols
+      nrows = nrows,
+      ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- terra::rast(terra::ext(sf::st_as_sf(fmesher::fm_nonconvex_hull(samplers, ...))),
+    grid <- terra::rast(
+      terra::ext(sf::st_as_sf(
+        fmesher::fm_nonconvex_hull(samplers, ...)
+      )),
       crs = fmesher::fm_crs(samplers)$input,
       resolution = resolution
     )
   }
 
   gridPolygon <- terra::as.polygons(grid)
-  if (chess == TRUE) {
+  if (isTRUE(chess)) {
     # no idea how it works
     # spatSample(x = gridPolygon, size = 0.5*nrow(gridPolygon),
     #            method="random", strata=NULL, chess="black")
@@ -55,7 +63,7 @@ cv_partition <- function(samplers,
     )
 
     # I am not sure which terra version changes how they name for init()
-    terra_version <- packageVersion("terra")
+    terra_version <- utils::packageVersion("terra")
     if (terra_version <= "1.8-42") {
       grid_chess_white_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 1, ]
       grid_chess_black_sf <- grid_chess_sf[grid_chess_sf$lyr.1 == 0, ]
@@ -70,10 +78,11 @@ cv_partition <- function(samplers,
     #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
   } else {
     # Extract the boundary with subpolygons only
-    sf::st_as_sf(
-      gridPolygon <- terra::intersect(gridPolygon, terra::vect(samplers))
+    gridPolygon <- sf::st_as_sf(
+      terra::intersect(gridPolygon, terra::vect(samplers))
     )
   }
+  gridPolygon
 }
 
 
@@ -89,10 +98,10 @@ cv_partition <- function(samplers,
 #' @param samplers A sf object containing region for which
 #' partitions to be created
 #' @param cellsize hexagon cellsize, see [sf::st_make_grid()] description
-#' @param n_group number of cv folds
+#' @param n_group number of cv folds.
 #' @param \dots Passed on to `fm_nonconvex_hull()`, e.g. `resolution`
-#' Output:
-#' @return a partitioned sf object as required
+#' @returns a hexagonal partition covering the `samplers` object, with a `group`
+#' integer variable indicating the fold assignment, 1, 2, ..., `n_group`.
 #'
 #' @keywords internal
 #' @export
@@ -106,7 +115,7 @@ cv_partition <- function(samplers,
 #'
 #'   chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
 #'   plot(chess$white)
-#'   }
+#' }
 #'
 cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
   bnd <- fmesher::fm_nonconvex_hull(samplers, convex = -0.01, ...)
@@ -127,18 +136,18 @@ cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {
   # map each hex to a column index
   col_index <- match(round(coords, 8), x_unique)
 
-  # assign groups by cycling 1 → 2 → 3
+  # assign groups by cycling 1 → 2 → 3 -> etc -> 1
   col_group <- ((col_index - 1) %% n_group) + 1
 
   # attach back
   hex_groups <-
     dplyr::mutate(
       hex_cell,
-      column = col_index,
-      group = as.factor(paste0("group", col_group))
+      group = col_group
     )
 
-  hex_cell_ <- sf::st_intersection(hex_groups, samplers)
+  sf::st_agr(hex_groups) <- "constant"
+  hex_cell_ <- sf::st_intersection(hex_groups, sf::st_geometry(samplers))
 
-  return(hex_cell_["group"])
+  hex_cell_["group"]
 }

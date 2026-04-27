@@ -9,6 +9,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 header-includes:
+  - \require{boldsymbol}
   - \newcommand{\bm}[1]{\boldsymbol{#1}}
   - \newcommand{\wt}[1]{\widetilde{#1}}
   - \newcommand{\ol}[1]{\overline{#1}}

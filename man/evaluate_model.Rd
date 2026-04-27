@@ -45,10 +45,10 @@ and covariates needed to evaluate the predictor.}
 \item{comp_simple}{Precomputed \link{bm_list} of simplified mappers for the
 components}
 
-\item{predictor}{A formula or an expression to be evaluated given the
-posterior or for each sample thereof. The default (\code{NULL}) returns a
-\code{data.frame} containing the sampled effects. In case of a formula the right
-hand side is used for evaluation.}
+\item{predictor}{A formula or a \link{bru_pred_expr} expression to be evaluated
+given the posterior or for each sample thereof. The default (\code{NULL})
+returns a \code{data.frame} containing the sampled effects. In case of a formula
+the right hand side is used for evaluation.}
 
 \item{format}{character; determines the storage format of predictor output.
 Available options:
@@ -82,7 +82,7 @@ returned for each component.}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
-When seed != 0, overridden to "1:1"}
+When seed != 0, overridden to "1:1:1"}
 
 \item{internal_hyperpar}{logical; If \code{TRUE}, return hyperparameter properties
 on the internal scale. Currently ignored when \code{property="sample"}.

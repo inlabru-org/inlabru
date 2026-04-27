@@ -37,7 +37,6 @@ inla_available <- inlabru::bru_safe_inla(
 
 
 ```{r setup, include=TRUE, eval=inla_available}
-library(magrittr)
 library(dplyr)
 library(scoringRules)
 ```
@@ -351,12 +350,12 @@ results <- data.frame(
 )
 # Check that the cutoff point K has nearly probability mass 1 below it,
 # for all i:
-min(results %>% dplyr::filter(k == max_K) %>% pull(Fpred))
+min(results |> dplyr::filter(k == max_K) |> pull(Fpred))
 
 crps_scores <-
-  (results %>%
-    group_by(i) %>%
-    summarise(crps = sum(residuals^2), .groups = "drop") %>%
+  (results |>
+    group_by(i) |>
+    summarise(crps = sum(residuals^2), .groups = "drop") |>
     pull(crps))
 summary(crps_scores)
 ```
@@ -582,10 +581,10 @@ pred_pois <- predict(fit_pois, newdata_pois,
 )
 crps_score <-
   pred_pois$crps$mean -
-  (pred_pois$F %>%
-    mutate(i = rep(seq_along(newdata_pois$y), each = max_K + 1)) %>%
-    group_by(i) %>%
-    summarise(F_var = sum(sd^2), .groups = "drop") %>%
+  (pred_pois$F |>
+    mutate(i = rep(seq_along(newdata_pois$y), each = max_K + 1)) |>
+    group_by(i) |>
+    summarise(F_var = sum(sd^2), .groups = "drop") |>
     pull(F_var))
 summary(crps_score)
 ```

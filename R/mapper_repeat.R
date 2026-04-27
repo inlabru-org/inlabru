@@ -44,7 +44,6 @@
 #' ibm_jacobian(m, 1:3)
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
-#' @family specific [bm_repeat] method implementations
 bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
   stopifnot((length(n_rep) > 0L) && sum(n_rep) > 0L)
   if ((length(n_rep) == 1L) || !any(interleaved)) {
@@ -103,7 +102,7 @@ bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
     return(mappers[[1]])
   }
   mapper_ <- bm_sum(mappers, single_input = TRUE)
-  return(mapper_)
+  mapper_
 }
 
 #' @export
@@ -114,24 +113,23 @@ bru_mapper_repeat <- function(...) {
 
 #' @export
 #' @rdname ibm_n
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_n.bm_repeat <- function(mapper, ...) {
   ibm_n(mapper[["mapper"]], ...) * mapper[["n_rep"]]
 }
 #' @export
 #' @rdname ibm_n_output
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_n_output.bm_repeat <- function(mapper, ...) {
   ibm_n_output(mapper[["mapper"]], ...)
 }
 
 #' @export
 #' @rdname ibm_values
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_values.bm_repeat <- function(mapper, ...) {
   seq_len(ibm_n(mapper, ...))
 }
-
 
 
 bm_repeat_sub_lin <- function(mapper, input, state,
@@ -158,11 +156,10 @@ bm_repeat_sub_lin <- function(mapper, input, state,
 }
 
 
-
 #' @describeIn ibm_jacobian The input should take the format of the
 #'   repeated submapper.
 #' @export
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
                                    inla_f = FALSE,
                                    multi = FALSE,
@@ -185,13 +182,13 @@ ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
       n_rep = mapper[["n_rep"]]
     )
   }
-  return(A)
+  A
 }
 
 
 #' @export
 #' @rdname ibm_eval
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_eval.bm_repeat <- function(mapper, input, state,
                                multi = FALSE,
                                ...,
@@ -212,7 +209,7 @@ ibm_eval.bm_repeat <- function(mapper, input, state,
 
 #' @export
 #' @rdname ibm_linear
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_linear.bm_repeat <- function(mapper, input, state,
                                  ...) {
   sub_lin <-
@@ -237,12 +234,10 @@ ibm_linear.bm_repeat <- function(mapper, input, state,
 }
 
 
-
-
 #' @describeIn ibm_invalid_output
 #' Passes on the input to the corresponding method.
 #' @export
-#' @family specific [bm_repeat] method implementations
+#'
 ibm_invalid_output.bm_repeat <- function(mapper, input, state,
                                          ...) {
   idx <- bm_repeat_indexing(
