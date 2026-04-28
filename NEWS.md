@@ -10,7 +10,7 @@
   factor data, as multi-layer extraction would otherwise need to mix data of
   different types (`2.14.0.9002`)
 * Check for "error" inheritance for input evaluation and other errors instead
-  of "simpleError", as R > 4.5 introduces more fine-grained error classes
+  of "simpleError", as R > 4.6 introduces more fine-grained error classes
   (`2.14.0.9004`)
 
 ## General updates
