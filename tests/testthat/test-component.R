@@ -1,4 +1,5 @@
 test_that("Component construction: linear model", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   df <- data.frame(x = 1:10, W = rep(1, 10), response = 1:10)
@@ -83,6 +84,7 @@ test_that("Component construction: linear model", {
 
 
 test_that("Component construction: duplicate detection", {
+  local_bru_safe_inla()
   expect_error(
     bru_comp_list(
       ~ -1 +
@@ -95,6 +97,7 @@ test_that("Component construction: duplicate detection", {
 
 
 test_that("Component construction: offset", {
+  local_bru_safe_inla()
   cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
   inp <- bru_input(cmp, data = data.frame(a = 11:15))
   val <- evaluate_effect_single_state(cmp,
@@ -110,6 +113,7 @@ test_that("Component construction: offset", {
 
 
 test_that("Component construction: terra", {
+  local_bru_safe_inla()
   skip_if_not_installed("sf")
   skip_if_not(bru_safe_terra())
 
@@ -397,6 +401,7 @@ test_that("Component construction: replicate iid factor construction", {
 
 
 test_that("Component construction: unsafe intercepts", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   cmp <- bru_comp_list(~ something_unknown - 1)
