@@ -41,7 +41,7 @@ passed to \code{stats::quantile}}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
-When seed != 0, overridden to "1:1"}
+When seed != 0, overridden to "1:1:1"}
 
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
