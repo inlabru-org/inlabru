@@ -1,10 +1,12 @@
 ## Submission notes
 
-* Feature and bugfix release 2.14.0
+* Bugfix release 2.14.1
 
 ## R CMD check results and comments
 
-* No change in RMD CMD check results
+* CRAN tests reporting
+  "Error in `sort.int(x, na.last = na.last, decreasing = decreasing, ...)`: 'x' must be atomic"
+  were due to overly narrow error detection, and have been fixed.
 * The non-CRAN Suggested package INLA has been extensively tested with inlabru
   locally and in github actions for both Linux, Windows, and macOS.
   The needed repository specification is included in the package DESCRIPTION:
