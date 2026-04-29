@@ -15,9 +15,9 @@
 
 ## General updates
 
-* Move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary namespace
-  clashes and encourage explicit fmesher declarations in user code (version
-  `2.14.0.9003`)
+* Prepare to move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary
+  namespace clashes and encourage explicit fmesher declarations in user code
+  (version `2.14.0.9003`). Temporarily paused for CRAN bugfix release `2.14.1`.
 
 # inlabru 2.14.0
 
