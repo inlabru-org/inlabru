@@ -75,5 +75,4 @@ test_that("fm_pixels sp vs sf", {
   # expect_equal(A1[[3]]$field, A2[[3]]$field)
   # expect_equal(A1[[4]]$field, A2[[4]]$field)
   # expect_equal(A1[[5]]$field, A2[[5]]$field)
-
 })
