@@ -97,6 +97,7 @@ test_that("Factor mapper", {
 
 
 test_that("Automated factor releveling", {
+  skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
 
@@ -532,24 +533,28 @@ test_that("User defined mappers", {
   m <- bm_test(n = 20)
   cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
-  expect_message(
-    object = {
-      ibm_jacobian(m, mydata$x)
-    },
-    "---- IBM_JACOBIAN from inner environment ----",
-    label = "ibm_jacobian generic call"
-  )
+  suppressMessages({
+    expect_message(
+      object = {
+        ibm_jacobian(m, mydata$x)
+      },
+      "---- IBM_JACOBIAN from inner environment ----",
+      label = "ibm_jacobian generic call"
+    )
+  })
 
   skip_on_cran()
   local_bru_safe_inla()
 
-  expect_message(
-    object = {
-      fit <- bru(cmp, data = mydata, family = "gaussian")
-    },
-    "---- IBM_JACOBIAN from inner environment ----",
-    label = "Non-interactive bru() call"
-  )
+  suppressMessages({
+    expect_message(
+      object = {
+        fit <- bru(cmp, data = mydata, family = "gaussian")
+      },
+      "---- IBM_JACOBIAN from inner environment ----",
+      label = "Non-interactive bru() call"
+    )
+  })
 })
 
 

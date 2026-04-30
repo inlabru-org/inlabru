@@ -1,4 +1,4 @@
-# inlabru (development version)
+# inlabru 2.14.1
 
 ## Bug fixes
 
@@ -15,9 +15,11 @@
 
 ## General updates
 
-* Move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary namespace
-  clashes and encourage explicit fmesher declarations in user code (version
-  `2.14.0.9003`)
+* Move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary
+  namespace clashes and encourage explicit fmesher declarations in user code
+  (version `2.14.0.9003`). Temporarily keep re-exporting `fm_int` and
+  `fm_pixels` to avoid breaking outdated packages, for CRAN bugfix release
+  `2.14.1`.
 
 # inlabru 2.14.0
 

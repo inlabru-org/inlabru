@@ -1,4 +1,5 @@
 test_that("mdata", {
+  skip_on_cran()
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.02")
   set.seed(12345L)
@@ -157,6 +158,7 @@ test_that("mdata", {
 
 
 test_that("surv", {
+  skip_on_cran()
   local_bru_safe_inla()
   skip_if(utils::packageVersion("INLA") <= "24.06.26")
 

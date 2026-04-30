@@ -1,6 +1,7 @@
 test_that("Joint gcpo", {
-  skip_if_not_installed("sf")
+  skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not_installed("sf")
 
   ## partition
   cvpart <- cv_hex(
