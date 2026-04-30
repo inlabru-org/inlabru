@@ -4,13 +4,14 @@
 
 ## R CMD check results and comments
 
-* CRAN tests reporting
+* R CMD check results for 2.14.1 are clean on all platforms, with no new
+  warnings or errors compared to 2.14.0.
+* CRAN tests for 2.14.0 reported for R-devel:
   "Error in `sort.int(x, na.last = na.last, decreasing = decreasing, ...)`: 'x' must be atomic"
-  were due to overly narrow error detection, and have been fixed.
-* CRAN errors for 2.14.0 for r-devel detecting possible > 2 thread requests are
-  likely false positives, or should disappear, as the affected tests may have run
-  with incorrect settings due to the error detection issue, that failed to terminate
-  after certain errors, and that has now been fixed.
+  which was due to overly narrow error detection, and have been fixed.
+* CRAN messages in the tests for 2.14.0 for r-devel detecting possible > 2
+  thread requests are due to an issue in the INLA package. The inlabru tests
+  have been adjusted to avoid triggering the extra threads:
 
   > test-aggregate.R: OMP: Warning #96: Cannot form a team with 3 threads, using 2 instead.
   > test-aggregate.R: OMP: Hint Consider unsetting KMP_DEVICE_THREAD_LIMIT (KMP_ALL_THREADS), KMP_TEAMS_THREAD_LIMIT, and OMP_THREAD_LIMIT (if any are set).

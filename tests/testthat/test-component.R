@@ -84,6 +84,7 @@ test_that("Component construction: linear model", {
 
 
 test_that("Component construction: duplicate detection", {
+  skip_on_cran()
   local_bru_safe_inla()
   expect_error(
     bru_comp_list(
@@ -97,6 +98,7 @@ test_that("Component construction: duplicate detection", {
 
 
 test_that("Component construction: offset", {
+  skip_on_cran()
   local_bru_safe_inla()
   cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
   inp <- bru_input(cmp, data = data.frame(a = 11:15))
@@ -113,6 +115,7 @@ test_that("Component construction: offset", {
 
 
 test_that("Component construction: terra", {
+  skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
   skip_if_not(bru_safe_terra())
@@ -134,6 +137,7 @@ test_that("Component construction: terra", {
 
   llik <- bru_obs_list(list(bru_obs(formula = response ~ ., data = data)))
 
+  skip_on_cran()
   local_bru_safe_inla()
   cmp <- bru_comp_list(
     ~ -1 + something(eval_spatial(r, geometry), model = "linear"),
@@ -357,6 +361,7 @@ test_that("Component construction: group iid factor construction", {
     c(11, 0, 15)
   )
 
+  skip_on_cran()
   local_bru_safe_inla()
   expect_no_error(bru(cmp2, lik))
 })
@@ -395,6 +400,7 @@ test_that("Component construction: replicate iid factor construction", {
     c(11, 0, 15)
   )
 
+  skip_on_cran()
   local_bru_safe_inla()
   expect_no_error(bru(cmp2, lik))
 })

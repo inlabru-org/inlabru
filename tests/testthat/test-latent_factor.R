@@ -1,7 +1,6 @@
 test_that("bru: factor component", {
   skip_on_cran()
   local_bru_safe_inla()
-  local_bru_testthat_tolerances()
 
   # Seed influences data as well as predict()!
   withr::local_seed(123L)
@@ -104,7 +103,6 @@ test_that("bru: factor component", {
 test_that("bru: indexed factor component", {
   skip_on_cran()
   local_bru_safe_inla()
-  local_bru_testthat_tolerances()
 
   # Seed influences data as well as predict()!
   withr::local_seed(123)
