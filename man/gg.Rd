@@ -37,28 +37,14 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-Other geomes for inla and inlabru predictions: 
-\code{\link{gg.data.frame}()},
-\code{\link{gg.matrix}()}
-
-Other geomes for spatial data: 
+Other geomes: 
+\code{\link{gg.RasterLayer}()},
 \code{\link{gg.SpatRaster}()},
-\code{\link{gg.SpatialGridDataFrame}()},
-\code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixels}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
-\code{\link{gg.SpatialPoints}()},
-\code{\link{gg.SpatialPolygons}()},
-\code{\link{gg.sf}()}
-
-Other geomes for meshes: 
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
 \code{\link{gg.fm_mesh_1d}()},
-\code{\link{gg.fm_mesh_2d}()}
-
-Other geomes for Raster data: 
-\code{\link{gg.RasterLayer}()}
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for Raster data}
-\concept{geomes for inla and inlabru predictions}
-\concept{geomes for meshes}
-\concept{geomes for spatial data}
+\concept{geomes}

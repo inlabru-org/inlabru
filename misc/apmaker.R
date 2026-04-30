@@ -24,7 +24,7 @@ bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_wit
         end_with,
         ".\n"
       ),
-      verbosity = 2, verbose_store = T
+      verbosity = 2, verbose_store = TRUE
     )
   }
 }

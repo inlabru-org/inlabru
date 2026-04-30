@@ -3,8 +3,6 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{fm_cprod}
-\alias{fm_crs}
 \alias{fm_int}
 \alias{fm_pixels}
 \title{Objects exported from other packages}
@@ -14,6 +12,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{fmesher}{\code{\link[fmesher]{fm_cprod}}, \code{\link[fmesher]{fm_crs}}, \code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_pixels}}}
+  \item{fmesher}{\code{\link[fmesher]{fm_int}}, \code{\link[fmesher]{fm_pixels}}}
 }}
 

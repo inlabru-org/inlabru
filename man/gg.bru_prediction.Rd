@@ -74,15 +74,17 @@ provided.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    require("sn", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE) &&
-    require("patchwork", quietly = TRUE)) {
+  requireNamespace("sn", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE) &&
+  require("patchwork", quietly = TRUE)) {
   # Generate some data
 
   input.df <- data.frame(x = cos(1:10))
   input.df <- within(
     input.df,
-    y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+    {
+      y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+    }
   )
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
@@ -99,14 +101,14 @@ if (bru_safe_inla() &&
 
   xpost
 
-  # For a single variable like 'x' the default plotting method invoked by gg()
-  # will show these statistics in a fashion similar to a box plot:
+  # For a single variable like 'x' the default plotting method invoked by
+  # gg() will show these statistics in a fashion similar to a box plot:
   ggplot() +
     gg(xpost)
 
 
-  # The predict function can also be used to simultaneously estimate posteriors
-  # of multiple variables:
+  # The predict function can also be used to simultaneously estimate
+  # posteriors of multiple variables:
 
   xipost <- predict(fit,
     newdata = NULL,
@@ -131,9 +133,10 @@ if (bru_safe_inla() &&
     gg(fit$summary.fixed, bar = TRUE)
   (p1 / p2)
 
-  # By default, if the prediction has more than one row, gg will plot the column
-  # 'mean' against the row index. This is for instance useful for predicting and
-  # plotting function but not very meaningful given the above example:
+  # By default, if the prediction has more than one row, gg will plot the
+  # column mean' against the row index. This is for instance useful for
+  # predicting and plotting function but not very meaningful given the above
+  # example:
 
   ggplot() +
     gg(xipost)
@@ -142,9 +145,9 @@ if (bru_safe_inla() &&
 
   plot(xipost)
 
-  # This type of plot will show a ribbon around the mean, which visualizes the
-  # upper and lower quantiles mentioned above (2.5\% and 97.5\%). Plotting the
-  # ribbon can be turned of using the \code{ribbon} parameter
+  # This type of plot will show a ribbon around the mean, which visualizes
+  # the upper and lower quantiles mentioned above (2.5\% and 97.5\%).
+  # Plotting the ribbon can be turned of using the \code{ribbon} parameter
 
   ggplot() +
     gg(xipost, ribbon = FALSE)
@@ -157,10 +160,17 @@ if (bru_safe_inla() &&
     gg(xipost, mapping = aes(y = median), ribbon = FALSE, color = "red")
 }
 }
+
 }
 \seealso{
-Other geomes for inla and inlabru predictions: 
+Other geomes: 
 \code{\link{gg}()},
-\code{\link{gg.matrix}()}
+\code{\link{gg.RasterLayer}()},
+\code{\link{gg.SpatRaster}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for inla and inlabru predictions}
+\concept{geomes}

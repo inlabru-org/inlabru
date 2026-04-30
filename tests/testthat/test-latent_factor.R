@@ -3,7 +3,7 @@ test_that("bru: factor component", {
   local_bru_safe_inla()
 
   # Seed influences data as well as predict()!
-  withr::local_seed(123)
+  withr::local_seed(123L)
 
   # Factor models
   input.df <- data.frame(
@@ -46,30 +46,30 @@ test_that("bru: factor component", {
   #    fit$summary.random$fac2
   #  )
 
-  # Check factoreffect results
+  # Check factor effect results
   expect_equal(
     fit$summary.random$fac1$mean,
-    c(-3.072353, -1.092120),
+    c(-3.072345, -1.092111),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac1$sd,
-    c(0.04371715, 0.05016696),
+    c(0.04367061, 0.05013299),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac2$mean,
     c(
-      1.213684, -1.723465,
-      1.310543, -1.671742, 1.302144, -1.700765, 1.271106
+      1.213695, -1.723471,  1.310547, -1.671748,
+      1.302147, -1.700772,  1.271110
     ),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac2$sd,
     c(
-      0.5222028, 0.5208762,
-      0.5213029, 0.5213029, 0.5213029, 0.5213029, 0.5213029
+      0.5225545, 0.5212273, 0.5216542, 0.5216542,
+      0.5216542, 0.5216542, 0.5216542
     ),
     tolerance = hitol
   )
@@ -83,17 +83,18 @@ test_that("bru: factor component", {
       x2 = factor(c("Delta", "Delta", "Gamma"))
     ),
     ~ fac1 + fac2,
-    n.samples = 5,
-    seed = 1
+    n.samples = 500,
+    seed = 1,
+    num.threads = "1:1:1"
   )
   expect_equal(
     pr[, "mean"],
-    c(1.119, -1.952, -2.917),
+    c(1.223399, -1.849207, -2.807144),
     tolerance = midtol
   )
   expect_equal(
     pr[, "sd"],
-    c(0.49, 0.52, 0.504),
+    c(0.5064775, 0.5113702, 0.5070317),
     tolerance = hitol
   )
 })

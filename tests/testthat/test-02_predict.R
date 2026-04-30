@@ -6,9 +6,11 @@ test_that("bru: factor component", {
   withr::local_seed(1234L)
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
-  input.df <- within(input.df, y <- 5 + 2 * cos(1:10) +
-    rnorm(10, mean = 0, sd = 1)[zz] +
-    rnorm(10, mean = 0, sd = 0.1))
+  input.df <- within(input.df, {
+    y <- 5 + 2 * cos(1:10) +
+      rnorm(10, mean = 0, sd = 1)[zz] +
+      rnorm(10, mean = 0, sd = 0.1)
+  })
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
@@ -57,10 +59,10 @@ test_that("bru: factor component", {
 
   # The default statistics include mean, standard deviation,
   # the 2.5% quantile, the median, the 97.5% quantile
-  expect_equal(is.data.frame(xpost), TRUE)
+  expect_true(is.data.frame(xpost))
   expect_equal(nrow(xpost), 1)
 
-  expect_equal(is.data.frame(xpost2), TRUE)
+  expect_true(is.data.frame(xpost2))
   expect_equal(nrow(xpost2), 4)
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
@@ -74,7 +76,7 @@ test_that("bru: factor component", {
     seed = 12345L
   )
 
-  expect_equal(is.matrix(xipost), TRUE)
+  expect_true(is.matrix(xipost))
   expect_equal(rownames(xipost), c("Intercept", "x"))
 
 

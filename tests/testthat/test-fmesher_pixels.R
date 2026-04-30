@@ -10,6 +10,7 @@ test_that("fm_pixels sp vs sf", {
     crs = fm_CRS("longlat_globe")
   )
 
+  withr::local_seed(12345L)
   mydata <- sp::SpatialPointsDataFrame(
     mesh$loc,
     data = data.frame(y = rnorm(mesh$n) + 10),
@@ -60,4 +61,18 @@ test_that("fm_pixels sp vs sf", {
     density1$mean,
     density2$mean
   )
+
+  # withr::local_seed(1234L)
+  # A1<-generate(fit,n.samples=10,seed=12345L,num.threads="1:1")
+  #
+  # withr::local_seed(1234L)
+  # A2<-generate(fit,n.samples=10,seed=12345L,num.threads="1:1:1")
+  #
+  # expect_equal(INLA::inla.getOption("num.threads"), "1:1:1")
+  #
+  # expect_equal(A1[[1]]$field, A2[[1]]$field)
+  # expect_equal(A1[[2]]$field, A2[[2]]$field)
+  # expect_equal(A1[[3]]$field, A2[[3]]$field)
+  # expect_equal(A1[[4]]$field, A2[[4]]$field)
+  # expect_equal(A1[[5]]$field, A2[[5]]$field)
 })

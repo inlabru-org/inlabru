@@ -1,3 +1,26 @@
+# inlabru 2.14.1
+
+## Bug fixes
+
+* Fix issue #293, where automated mapper construction for `factor_contrast`
+  always used the alphabetically first level as contrast, instead of the
+  factor-defined first level (`2.14.0.9001`)
+* Fix `eval_spatial<SpatRaster>` to return factor data for pure factor layer
+  extraction. Layer-specific `terra::extract()` may return integer instead of
+  factor data, as multi-layer extraction would otherwise need to mix data of
+  different types (`2.14.0.9002`)
+* Check for "error" inheritance for input evaluation and other errors instead
+  of "simpleError", as R > 4.6 uses more fine-grained error sub-classes in more
+  cases than before (`2.14.0.9004`)
+
+## General updates
+
+* Move `fmesher` from `Depends:` to `Imports:` to avoid unnecessary
+  namespace clashes and encourage explicit fmesher declarations in user code
+  (version `2.14.0.9003`). Temporarily keep re-exporting `fm_int` and
+  `fm_pixels` to avoid breaking outdated packages, for CRAN bugfix release
+  `2.14.1`.
+
 # inlabru 2.14.0
 
 ## New features
@@ -19,6 +42,9 @@
 
 ## Updated features
 
+* Regenerated `gorillas_sf` data set, with new mesh better suited for modelling,
+  with a regular interior triangular mesh. (version `2.13.0.9034`)
+* Regenerated `mexdolphin_sf` data set, with new mesh. (version `2.13.0.9035`)
 * Add `bru_get_mapper()` support for `inla.cgeneric` objects, and update
   the support for `inla.rgeneric`, to standardise where to store a
   pre-constructed mapper, so that external packages will no longer need to

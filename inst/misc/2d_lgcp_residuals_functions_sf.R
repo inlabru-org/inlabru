@@ -11,6 +11,7 @@ suppressPackageStartupMessages(library("terra"))
 suppressPackageStartupMessages(library("sf"))
 suppressPackageStartupMessages(library("INLA"))
 suppressPackageStartupMessages(library("inlabru"))
+suppressPackageStartupMessages(library("fmesher"))
 theme_set(theme_bw())
 
 
@@ -60,7 +61,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
     i = unlist(idx),
     j = rep(
       seq_len(nrow(observations)),
-      vapply(idx, length, 1L)
+      lengths(idx)
     ),
     x = rep(1, length(unlist(idx))),
     dims = c(nrow(samplers), nrow(observations))

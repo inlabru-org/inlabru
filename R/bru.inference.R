@@ -13,8 +13,56 @@
 #' @return The form of the value returned by `generate()` depends on the data
 #' class and prediction formula. Normally, a data.frame is returned, or a list
 #' of data.frames (if the prediction formula generates a list)
-#' @example inst/examples/generate.bru.R
-
+#' @examples
+#' \donttest{
+#' if (
+#'   bru_safe_inla() &&
+#'     requireNamespace("sn", quietly = TRUE)
+#' ) {
+#'   # Generate data for a simple linear model
+#'
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(
+#'     input.df,
+#'     {
+#'       y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+#'     }
+#'   )
+#'
+#'   # Fit the model
+#'
+#'   fit <- bru(
+#'     y ~ xeff(main = x, model = "linear"),
+#'     family = "gaussian",
+#'     data = input.df
+#'   )
+#'   summary(fit)
+#'
+#'   # Generate samples for some predefined x
+#'
+#'   df <- data.frame(x = seq(-4, 4, by = 0.1))
+#'   smp <- generate(fit, df, ~ xeff + Intercept, n.samples = 10)
+#'
+#'   # Plot the resulting realizations
+#'
+#'   plot(df$x, smp[, 1], type = "l")
+#'   for (k in 2:ncol(smp)) {
+#'     points(df$x, smp[, k], type = "l")
+#'   }
+#'
+#'   # We can also draw samples form the joint posterior
+#'
+#'   df <- data.frame(x = 1)
+#'   smp <- generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
+#'   smp[[1]]
+#'
+#'   # ... and plot them
+#'   if (require(ggplot2, quietly = TRUE)) {
+#'     plot(do.call(rbind, smp))
+#'   }
+#' }
+#' }
+#'
 generate <- function(object, ...) {
   UseMethod("generate")
 }
@@ -150,14 +198,13 @@ bru_inla_formula.bru_comp_list <- function(x, ...) {
 }
 
 
-#' @export
-#' @method summary bru_info
-#' @param object Object to operate on
+#' @rdname bru_info
+#' @param object A `bru_info` object
 #' @param verbose logical; If `TRUE`, include more details of the
 #' component definitions. If `FALSE`, only show basic component
-#' definition information. Default: `TRUE`
-#' @param \dots Arguments passed on to other `summary` methods
-#' @rdname bru_info
+#' definition information. Default: `FALSE`
+#' @export
+#' @method summary bru_info
 summary.bru_info <- function(object, verbose = TRUE, ...) {
   structure(
     list(
@@ -325,9 +372,58 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #'   from `INLA::inla` (see the inla documentation for its properties) and
 #'   adds additional information stored in the `bru_info` field.
 #'
-#' @example inst/examples/bru.R
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla()) {
+#'   # Simulate some covariates x and observations y
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(input.df, {
+#'     y <- 5 + 2 * x + rnorm(10, mean = 0, sd = 0.1)
+#'   })
 #'
-
+#'   # Fit a Gaussian likelihood model
+#'   fit <- bru(y ~ x + Intercept(1), family = "gaussian", data = input.df)
+#'
+#'   # Obtain summary
+#'   fit$summary.fixed
+#' }
+#'
+#'
+#' if (bru_safe_inla()) {
+#'   # Alternatively, we can use the bru_obs() function to construct the
+#'   # likelihood:
+#'
+#'   lik <- bru_obs(
+#'     family = "gaussian",
+#'     formula = y ~ x + Intercept,
+#'     data = input.df
+#'   )
+#'   fit <- bru(~ x + Intercept(1), lik)
+#'   fit$summary.fixed
+#' }
+#'
+#' # An important addition to the INLA methodology is bru's ability to use
+#' # non-linear predictors. Such a predictor can be formulated via bru_obs()'s
+#' # \code{formula} parameter. The z(1) notation is needed to ensure that
+#' # the z component should be interpreted as single latent variable and not
+#' # a covariate:
+#'
+#' if (bru_safe_inla()) {
+#'   z <- 2
+#'   input.df <- within(input.df, {
+#'     y <- 5 + exp(z) * x + rnorm(10, mean = 0, sd = 0.1)
+#'   })
+#'   lik <- bru_obs(
+#'     family = "gaussian", data = input.df,
+#'     formula = y ~ exp(z) * x + Intercept
+#'   )
+#'   fit <- bru(~ z(1) + Intercept(1), lik)
+#'
+#'   # Check the result (z posterior should be around 2)
+#'   fit$summary.fixed
+#' }
+#' }
+#'
 bru <- function(components = ~ Intercept(1),
                 ...,
                 options = list(),
@@ -945,6 +1041,9 @@ bru_get_parse_data <- function(x) {
 # messages.
 check_sp_data_deprecation <- function(...) {
   .caller <- sys.call(-1)[[1]]
+  if (startsWith(deparse1(.caller)[1], "function")) {
+    .caller <- NULL
+  }
   obj <- list(...)
   nms <- names(obj)
   result <- vapply(
@@ -955,7 +1054,7 @@ check_sp_data_deprecation <- function(...) {
           lifecycle::deprecate_warn(
             "2.12.0.9023",
             as.character(glue::glue(
-              "{deparse(.caller)}({nm} = ",
+              "{deparse1(.caller)}({nm} = ",
               "'has deprecated support for `Spatial` input')"
             )),
             I("`sf` input")
@@ -964,7 +1063,7 @@ check_sp_data_deprecation <- function(...) {
           lifecycle::deprecate_warn(
             "2.12.0.9023",
             I(as.character(glue::glue(
-              "{nm} has deprecated support for `Spatial` input"
+              "`{nm}` argument has deprecated support for `Spatial` input;"
             ))),
             I("`sf` input")
           )
@@ -2060,7 +2159,87 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #' @seealso [bru_response_size()], [bru_used()], [bru_comp()],
 #' [bru_comp_eval()]
 #'
-#' @example inst/examples/bru_obs.R
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla() &&
+#'   require(ggplot2, quietly = TRUE) &&
+#'   require(patchwork, quietly = TRUE)) {
+#'   # The 'bru_obs()' (previously 'like()') function's main purpose is to set
+#'   # up observation models, both for single- and multi-likelihood models.
+#'   # The following example generates some random covariates which are observed
+#'   # through two different random effect models with different likelihoods
+#'
+#'   # Generate the data
+#'
+#'   set.seed(123)
+#'
+#'   n1 <- 200
+#'   n2 <- 10
+#'
+#'   x1 <- runif(n1)
+#'   x2 <- runif(n2)
+#'   z2 <- runif(n2)
+#'
+#'   y1 <- rnorm(n1, mean = 2 * x1 + 3)
+#'   y2 <- rpois(n2, lambda = exp(2 * x2 + z2 + 3))
+#'
+#'   df1 <- data.frame(y = y1, x = x1)
+#'   df2 <- data.frame(y = y2, x = x2, z = z2)
+#'
+#'   # Single likelihood models and inference using bru are done via
+#'
+#'   cmp1 <- y ~ -1 + Intercept(1) + x
+#'   fit1 <- bru(cmp1, family = "gaussian", data = df1)
+#'   summary(fit1)
+#'
+#'   cmp2 <- y ~ -1 + Intercept(1) + x + z
+#'   fit2 <- bru(cmp2, family = "poisson", data = df2)
+#'   summary(fit2)
+#'
+#'   # A joint model has two likelihoods, which are set up using the bru_obs
+#'   # function
+#'
+#'   lik1 <- bru_obs(
+#'     "gaussian",
+#'     formula = y ~ x + Intercept,
+#'     data = df1,
+#'     tag = "norm"
+#'   )
+#'   lik2 <- bru_obs(
+#'     "poisson",
+#'     formula = y ~ x + z + Intercept,
+#'     data = df2,
+#'     tag = "pois"
+#'   )
+#'
+#'   # The union of effects of both models gives the components needed to run
+#'   # bru
+#'
+#'   jcmp <- ~ x + z + Intercept(1)
+#'   jfit <- bru(jcmp, lik1, lik2)
+#'
+#'   bru_index(jfit, "norm")
+#'   bru_index(jfit, "pois")
+#'
+#'   # Compare the estimates
+#'
+#'   p1 <- ggplot() +
+#'     gg(fit1$summary.fixed, bar = TRUE) +
+#'     ylim(0, 4) +
+#'     ggtitle("Model 1")
+#'   p2 <- ggplot() +
+#'     gg(fit2$summary.fixed, bar = TRUE) +
+#'     ylim(0, 4) +
+#'     ggtitle("Model 2")
+#'   pj <- ggplot() +
+#'     gg(jfit$summary.fixed, bar = TRUE) +
+#'     ylim(0, 4) +
+#'     ggtitle("Joint model")
+#'
+#'   (p1 / p2 / pj)
+#' }
+#' }
+#'
 bru_obs <- function(formula = . ~ .,
                     family = "gaussian",
                     data = NULL,
@@ -2088,6 +2267,12 @@ bru_obs <- function(formula = . ~ .,
                     allow_combine = deprecated()) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
+
+  tag_text <- if (is.null(tag)) {
+    "<unknown>"
+  } else {
+    glue("'{tag}'")
+  }
 
   check_sp_data_deprecation(
     data = data,
@@ -2117,7 +2302,12 @@ bru_obs <- function(formula = . ~ .,
 
   # Set the response name
   if (is.null(pred_expr$resp_text)) {
-    stop("Missing response variable name or expression")
+    formula_text <- deparse1(formula, collapse = "    \n", width.cutoff = 80L)
+    stop(glue::glue(
+      "Missing response variable name or expression in formula for ",
+      "bru_obs(tag={tag_text}).\n",
+      "  Formula: {formula_text}"
+    ))
   }
   response_expr <- rlang::parse_expr(pred_expr$resp_text)
   data_list <- list(response_data = response_data, data = data)
@@ -2222,7 +2412,10 @@ bru_obs <- function(formula = . ~ .,
   }
 
   if (is.null(lh[["response_data"]][[lh[["response"]]]])) {
-    stop("Response variable missing or could not be evaluated")
+    stop(glue::glue(
+      "Response variable missing or could not be evaluated in ",
+      "bru_obs(tag={tag_text})"
+    ))
   }
 
   if (is.null(lh[["used"]])) {
@@ -2951,13 +3144,13 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 #' if (bru_safe_inla() &&
 #'   require(ggplot2, quietly = TRUE) &&
 #'   require(fmesher, quietly = TRUE) &&
-#'   require(sn, quietly = TRUE)) {
+#'   requireNamespace("sn", quietly = TRUE)) {
 #'   # Load the Gorilla data
 #'   data <- gorillas_sf
 #'
 #'   # Plot the Gorilla nests, the mesh and the survey boundary
 #'   ggplot() +
-#'     geom_fm(data = data$mesh) +
+#'     fmesher::geom_fm(data = data$mesh) +
 #'     gg(data$boundary, fill = "blue", alpha = 0.2) +
 #'     gg(data$nests, col = "red", alpha = 0.2)
 #'
@@ -2982,7 +3175,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 #'   # Predict the spatial intensity surface
 #'   lambda <- predict(
 #'     fit,
-#'     fm_pixels(data$mesh, mask = data$boundary),
+#'     fmesher::fm_pixels(data$mesh, mask = data$boundary),
 #'     ~ exp(field + Intercept)
 #'   )
 #'
@@ -3095,7 +3288,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   passed to `stats::quantile`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
-#' When seed != 0, overridden to "1:1"
+#' When seed != 0, overridden to "1:1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param drop logical; If `drop=FALSE`, and
@@ -3120,8 +3313,122 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values
 #'   and other summary statistics attached. Non-S4 object outputs have the class
 #'   "bru_prediction" added at the front of the class list.
-#' @example inst/examples/predict.bru.R
-
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla() &&
+#'   requireNamespace("sn", quietly = TRUE) &&
+#'   require("ggplot2", quietly = TRUE) &&
+#'   bru_safe_terra(quietly = TRUE) &&
+#'   require("sf", quietly = TRUE)) {
+#'   # Load the Gorilla data
+#'
+#'   gorillas <- gorillas_sf
+#'
+#'   # Plot the Gorilla nests, the mesh and the survey boundary
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(gorillas$nests) +
+#'     gg(gorillas$boundary, alpha = 0.1)
+#'
+#'   # Define SPDE prior
+#'
+#'   matern <- INLA::inla.spde2.pcmatern(
+#'     gorillas$mesh,
+#'     prior.sigma = c(0.1, 0.01),
+#'     prior.range = c(0.01, 0.01)
+#'   )
+#'
+#'   # Define domain of the LGCP as well as the model components (spatial SPDE
+#'   # effect and Intercept)
+#'
+#'   cmp <- geometry ~ field(geometry, model = matern) + Intercept(1)
+#'
+#'   # Fit the model, with "eb" instead of full Bayes
+#'   fit <- lgcp(
+#'     cmp,
+#'     data = gorillas$nests,
+#'     samplers = gorillas$boundary,
+#'     domain = list(geometry = gorillas$mesh),
+#'     options = list(control.inla = list(int.strategy = "eb"))
+#'   )
+#'
+#'   # Once we obtain a fitted model the predict function can serve various
+#'   # purposes.
+#'   # The most basic one is to determine posterior statistics of a univariate
+#'   # random variable in the model, e.g. the intercept
+#'
+#'   icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
+#'   plot(icpt)
+#'
+#'   # The formula argument can take any expression that is valid within the
+#'   # model, for instance a non-linear transformation of a random variable
+#'
+#'   exp.icpt <- predict(fit, NULL, ~ c(
+#'     "Intercept" = Intercept_latent,
+#'     "exp(Intercept)" = exp(Intercept_latent)
+#'   ))
+#'   plot(exp.icpt, bar = TRUE)
+#'
+#'   # The intercept is special in the sense that it does not depend on other
+#'   # variables or covariates. However, this is not true for the smooth spatial
+#'   # effects 'field'.
+#'   # In order to predict 'field' we have to define where (in space) to
+#'   # predict.
+#'   # For this purpose, the second argument of the predict function can take
+#'   # \code{data.frame} objects as well as sf (and legacy sp/Spatial) objects.
+#'   # For instance, we might want to predict 'field' at the locations of the
+#'   # mesh vertices. Using
+#'
+#'   vrt <- fmesher::fm_vertices(gorillas$mesh, format = "sf")
+#'
+#'   # we obtain these vertices as an sf object with POINT geometries
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(vrt, color = "red")
+#'
+#'   # Predicting 'field' at these locations works as follows
+#'
+#'   field <- predict(fit, vrt, ~field)
+#'
+#'   # Note that just like the input also the output will be a sf object with
+#'   # points and that the predicted statistics are simply added as columns
+#'
+#'   class(field)
+#'   head(vrt)
+#'   head(field)
+#'
+#'   # Plotting the mean, for instance, at the mesh node is straight forward
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh) +
+#'     gg(field, aes(color = mean), size = 2)
+#'
+#'   # However, we are often interested in a spatial field and thus a linear
+#'   # interpolation, which can be achieved by using the gg mechanism for meshes
+#'
+#'   ggplot() +
+#'     gg(gorillas$mesh, color = field$mean)
+#'
+#'   # Alternatively, we can predict the spatial field at a grid of locations,
+#'   # e.g. a sf object with a grid of points covering the relevant part of mesh
+#'
+#'   pxl <- fmesher::fm_pixels(gorillas$mesh,
+#'     format = "sf",
+#'     mask = gorillas$boundary
+#'   )
+#'   field2 <- predict(fit, pxl, ~field)
+#'
+#'   # This will give us a sf with the columns we are looking for
+#'
+#'   head(field2)
+#'   ggplot() +
+#'     gg(gorillas$boundary) +
+#'     gg(data = field2, geom = "tile")
+#' }
+#' }
+#'
 predict.bru <- function(object,
                         newdata = NULL,
                         formula = NULL,
@@ -3324,7 +3631,7 @@ bru_generate_check_used_deprecation <- function(
 #'   `INLA::inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
-#' When seed != 0, overridden to "1:1"
+#' When seed != 0, overridden to "1:1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param \dots additional, unused arguments.
@@ -4269,6 +4576,8 @@ bru_line_search <- function(model,
         )
       )
 
+    # jarl-ignore browser: Special debug use
+    # jarl-ignore undesirable_function: Special debug use
     browser()
   }
 
@@ -4700,6 +5009,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     )
     inputs <- bru_input(model, lhoods = lhoods)
   }
+
+  timings <- bru_timer_do(timings, "Linearise", 1L)
   bru_log_message(
     "iinla: Evaluate component linearisations",
     verbosity = 3
@@ -5049,7 +5360,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       )[[1]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
-          timings <- bru_timer_do(timings, "Line search", k)
+          timings <- bru_timer_do(timings, "Line search", k + 1L)
           line_weights <-
             extract_property(
               result = result,
@@ -5072,7 +5383,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           )
           state <- line_search[["state"]]
         }
-        timings <- bru_timer_do(timings, "Linearise", k)
+        timings <- bru_timer_do(timings, "Linearise", k + 1L)
 
         bru_log_message(
           "iinla: Evaluate component linearisations",
@@ -5303,10 +5614,11 @@ list.data <- function(formula) {
 }
 
 
-#' Summary for an inlabru fit
-#'
-#' Takes a fitted `bru` object produced by [bru()] or [lgcp()] and creates
-#' various summaries from it.
+#' @describeIn bru Takes a fitted `bru` object produced by [bru()] or [lgcp()]
+#' and creates various summaries from it, including the summary output from
+#' the corresponding `INLA::sumary()` method.
+#' The \dots arguments are passed on to component summary functions, see
+#' [summary.bru_comp()].
 #'
 #' @export
 #' @method summary bru
@@ -5314,11 +5626,7 @@ list.data <- function(formula) {
 #' @param verbose logical; If `TRUE`, include more details of the
 #' component definitions. If `FALSE`, only show basic component
 #' definition information. Default: `FALSE`
-#' @param \dots arguments passed on to component summary functions, see
-#' [summary.bru_comp()].
-#' @example inst/examples/bru.R
 #'
-
 summary.bru <- function(object, verbose = FALSE, ...) {
   object <- bru_check_object_bru(object)
 
@@ -5338,7 +5646,7 @@ summary.bru <- function(object, verbose = FALSE, ...) {
 
 #' @export
 #' @param x An object to be printed
-#' @rdname summary.bru
+#' @rdname bru
 
 print.summary_bru <- function(x, ...) {
   print(x$bru_info, ...)
@@ -5347,7 +5655,6 @@ print.summary_bru <- function(x, ...) {
 }
 
 #' @export
-#' @param x A `bru` object to be printed
 #' @describeIn bru Print a summary of a `bru` object.
 
 print.bru <- function(x, ...) {

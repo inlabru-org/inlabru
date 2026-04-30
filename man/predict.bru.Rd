@@ -41,7 +41,7 @@ passed to \code{stats::quantile}}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
-When seed != 0, overridden to "1:1"}
+When seed != 0, overridden to "1:1:1"}
 
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
@@ -92,11 +92,10 @@ via \verb{<name>_eval(...)}.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    require("sn", quietly = TRUE) &&
-    require("ggplot2", quietly = TRUE) &&
-    bru_safe_terra(quietly = TRUE) &&
-    require("sf", quietly = TRUE)) {
-
+  requireNamespace("sn", quietly = TRUE) &&
+  require("ggplot2", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
+  require("sf", quietly = TRUE)) {
   # Load the Gorilla data
 
   gorillas <- gorillas_sf
@@ -138,8 +137,8 @@ if (bru_safe_inla() &&
   icpt <- predict(fit, NULL, ~ c(Intercept = Intercept_latent))
   plot(icpt)
 
-  # The formula argument can take any expression that is valid within the model,
-  # for instance a non-linear transformation of a random variable
+  # The formula argument can take any expression that is valid within the
+  # model, for instance a non-linear transformation of a random variable
 
   exp.icpt <- predict(fit, NULL, ~ c(
     "Intercept" = Intercept_latent,
@@ -150,13 +149,14 @@ if (bru_safe_inla() &&
   # The intercept is special in the sense that it does not depend on other
   # variables or covariates. However, this is not true for the smooth spatial
   # effects 'field'.
-  # In order to predict 'field' we have to define where (in space) to predict.
+  # In order to predict 'field' we have to define where (in space) to
+  # predict.
   # For this purpose, the second argument of the predict function can take
-  # \code{data.frame} objects as well as sf (and legacy sp/Spatial) objects. For
-  # instance, we might want to predict 'field' at the locations of the mesh
-  # vertices. Using
+  # \code{data.frame} objects as well as sf (and legacy sp/Spatial) objects.
+  # For instance, we might want to predict 'field' at the locations of the
+  # mesh vertices. Using
 
-  vrt <- fm_vertices(gorillas$mesh, format = "sf")
+  vrt <- fmesher::fm_vertices(gorillas$mesh, format = "sf")
 
   # we obtain these vertices as an sf object with POINT geometries
 
@@ -187,10 +187,13 @@ if (bru_safe_inla() &&
   ggplot() +
     gg(gorillas$mesh, color = field$mean)
 
-  # Alternatively, we can predict the spatial field at a grid of locations, e.g.
-  # a sf object with a grid of points covering the relevant part of mesh
+  # Alternatively, we can predict the spatial field at a grid of locations,
+  # e.g. a sf object with a grid of points covering the relevant part of mesh
 
-  pxl <- fm_pixels(gorillas$mesh, format = "sf", mask = gorillas$boundary)
+  pxl <- fmesher::fm_pixels(gorillas$mesh,
+    format = "sf",
+    mask = gorillas$boundary
+  )
   field2 <- predict(fit, pxl, ~field)
 
   # This will give us a sf with the columns we are looking for
@@ -201,4 +204,5 @@ if (bru_safe_inla() &&
     gg(data = field2, geom = "tile")
 }
 }
+
 }

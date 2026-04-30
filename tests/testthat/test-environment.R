@@ -6,13 +6,15 @@ test_that("bru_log", {
     bru_verbose_store = 3
   )
 
-  bru_log_bookmark("bookmark 1")
-  bru_log_message("Test message 1", verbosity = 1)
-  bru_log_message("Test message 2", verbosity = 2)
-  bru_log_bookmark("bookmark 2")
-  bru_log_message("Test message 3", verbosity = 3)
-  bru_log_message("Test message 4", verbosity = 4)
+  suppressMessages({
+    bru_log_bookmark("bookmark 1")
+    bru_log_message("Test message 1", verbosity = 1)
+    bru_log_message("Test message 2", verbosity = 2)
+    bru_log_bookmark("bookmark 2")
+    bru_log_message("Test message 3", verbosity = 3)
+    bru_log_message("Test message 4", verbosity = 4)
+  })
 
-  expect_equal(length(bru_log()["bookmark 1"]), 2L)
-  expect_equal(length(bru_log()["bookmark 2"]), 1L)
+  expect_length(bru_log()["bookmark 1"], 2L)
+  expect_length(bru_log()["bookmark 2"], 1L)
 })

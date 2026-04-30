@@ -223,7 +223,7 @@ bru_component <- function(...) {
 #'   # A more complicated component:
 #'   cmp <- bru_comp("myEffectOfX",
 #'     main = x,
-#'     model = INLA::inla.spde2.matern(fm_mesh_1d(1:10))
+#'     model = INLA::inla.spde2.matern(fmesher::fm_mesh_1d(1:10))
 #'   )
 #'
 #'   # Compound fixed effect component, where x and z are in the input data.
@@ -301,7 +301,7 @@ bru_comp.character <- function(object,
     !missing(nrep) || !missing(replicate_mapper)
   if (include_group) {
     if (!is.null(substitute(group)) &&
-      !identical(deparse(substitute(group)), "1L")) {
+      !identical(deparse1(substitute(group)), "1L")) {
       if (is.null(control.group)) {
         control.group <- INLA::inla.set.control.group.default()
       }
@@ -937,7 +937,7 @@ add_mappers.bru_comp <- function(component,
 
   component$main <- add_mapper(
     component$main,
-    label = component$label,
+    label = paste0(component$label, "(main)"),
     data = lh_data,
     inputs = lapply(
       inputs,
@@ -949,7 +949,7 @@ add_mappers.bru_comp <- function(component,
   if (!is.null(component[["group"]])) {
     component$group <- add_mapper(
       component$group,
-      label = component$label,
+      label = paste0(component$label, "(group)"),
       data = lh_data,
       inputs = lapply(
         inputs,
@@ -962,7 +962,7 @@ add_mappers.bru_comp <- function(component,
   if (!is.null(component[["replicate"]])) {
     component$replicate <- add_mapper(
       component$replicate,
-      label = component$label,
+      label = paste0(component$label, "(replicate)"),
       data = lh_data,
       inputs = lapply(
         inputs,
@@ -1164,7 +1164,13 @@ bru_subcomp <- function(input = NULL,
 }
 
 
-make_unique_inputs <- function(inp, allow_list = FALSE) {
+make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
+  local_stop <- function(msg) {
+    stop(paste0(
+      "Error in making unique inputs for component '", label, "':\n  ",
+      msg
+    ))
+  }
   is_spatial <- vapply(inp, function(x) inherits(x, "Spatial"), TRUE)
   is_sfc <- vapply(inp, function(x) inherits(x, "sfc"), TRUE)
   is_matrix <- vapply(inp, function(x) is.matrix(x), TRUE)
@@ -1176,7 +1182,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
   if (any(is_spatial)) {
     bru_safe_sp(force = TRUE)
     if (!all(is_spatial)) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial/non-spatial input. ",
         "Unable to infer mapper information."
       ))
@@ -1189,7 +1195,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(unlist(crs_info))) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial CRS information. ",
         "Unable to infer mapper information."
       ))
@@ -1204,7 +1210,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- nrow(inp_values)
   } else if (any(is_sfc)) {
     if (!all(is_sfc)) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial/non-spatial input. ",
         "Unable to infer mapper information."
       ))
@@ -1216,7 +1222,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
       (length(unique(inp_crs)) > 1) ||
         (any(null_crs) && !all(null_crs))
     if (inconsistent_crs) {
-      stop(paste0(
+      local_stop(paste0(
         "Inconsistent spatial crs information. ",
         "Unable to infer mapper information."
       ))
@@ -1227,7 +1233,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- NROW(inp_values)
   } else if (any(is_matrix | is_Matrix)) {
     if (!all(is_matrix | is_Matrix)) {
-      stop("Inconsistent input types; matrix and non-matrix")
+      local_stop("Inconsistent input types; matrix and non-matrix")
     }
     # Add extra column to work around bug in unique.matrix for single-column
     # Matrix and ModelMatrix matrices:
@@ -1236,24 +1242,41 @@ make_unique_inputs <- function(inp, allow_list = FALSE) {
     n_values <- nrow(inp_values)
   } else if (any(is_data_frame)) {
     if (!all(is_data_frame)) {
-      stop("Inconsistent input types; data.frame and non-data.frame")
+      local_stop("Inconsistent input types; data.frame and non-data.frame")
     }
     inp_values <- unique(do.call(rbind, inp))
     n_values <- nrow(inp_values)
   } else if (any(is_factor)) {
     if (!all(is_factor)) {
-      stop("Inconsistent input types; factor and non-factor")
+      local_stop("Inconsistent input types; factor and non-factor")
     }
-    inp_values <- sort(unique(do.call(c, lapply(inp, as.character))),
-      na.last = NA
-    )
+    inp_values <- unique(lapply(inp, levels))
+    if (length(inp_values) > 1) {
+      local_stop(
+        paste0(
+          "Inconsistent factor levels. Unable to infer mapper information.\n",
+          "  Level combinations:\n    ",
+          paste0(
+            seq_along(inp_values),
+            ": ",
+            vapply(
+              inp_values,
+              function(x) paste0("'", x, "'", collapse = ", "),
+              ""
+            ),
+            collapse = "\n    "
+          )
+        )
+      )
+    }
+    inp_values <- inp_values[[1]]
     n_values <- length(inp_values)
   } else if (any(is_list)) {
     if (!all(is_list)) {
-      stop("Inconsistent input types; list and non-list")
+      local_stop("Inconsistent input types; list and non-list")
     }
     if (!allow_list) {
-      stop(paste0(
+      local_stop(paste0(
         "Unable to create automatic mapper. List data at this level requires ",
         "an explicit mapper definition."
       ))
@@ -1315,15 +1338,10 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
       ))
     }
   } else if (is.null(mapper_input)) {
-    stop("This code should be unused?")
-    # Used for automatic group and replicate mappers
-    subcomp[["mapper"]] <- make_mapper(
-      subcomp,
-      label,
-      input_values = 1,
-      strict = TRUE,
-      require_indexed = require_indexed
-    )
+    stop(glue(
+      "This code should be unused for {label}: ",
+      "add_mapper() with isTRUE(is.null(mapper_input))"
+    ))
   } else {
     if (!is.null(data) || !is.null(inputs)) {
       if (is.null(inputs) || (length(inputs) == 0)) {
@@ -1386,7 +1404,11 @@ add_mapper <- function(subcomp, label, data = NULL, env = NULL,
           inp_ <- inputs
         }
 
-        unique_inputs <- make_unique_inputs(inp_, allow_list = TRUE)
+        unique_inputs <- make_unique_inputs(
+          inp_,
+          allow_list = TRUE,
+          label = label
+        )
       }
       if (sum(unlist(unique_inputs$n_values)) < 1) {
         subcomp$n <- 1
@@ -1739,7 +1761,7 @@ bru_formula_to_bru_obs_code <- function(components, add = "") {
   if (length(offset_idx) > 0) {
     isoff <- as.vector(unlist(lapply(
       rownames(attr(tms, "factors")),
-      function(s) substr(s, 1, 6) == "offset"
+      function(s) startsWith(s, "offset")
     )))
     if (!any(isoff)) {
       stop("Internal error: multiple offsets indicated but none extracted")

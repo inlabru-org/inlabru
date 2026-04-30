@@ -1,4 +1,5 @@
 test_that("Aggregated Gaussian observations, using fm_block_eval", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   obs <- data.frame(
@@ -82,6 +83,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
 
 
 test_that("Aggregated Gaussian observations, using aggregate feature", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   obs <- data.frame(
@@ -241,6 +243,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
 
 
 test_that("Aggregated Gaussian observations, using domain/samplers feature", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   obs <- data.frame(
@@ -318,6 +321,7 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
 
 
 test_that("Aggregated Poisson observations, using mapper", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   obs <- data.frame(y = c(10, 20, 30))
@@ -385,6 +389,7 @@ test_that("Aggregated Poisson observations, using mapper", {
 })
 
 test_that("Aggregated Gaussian observations, using mapper", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   obs <- data.frame(

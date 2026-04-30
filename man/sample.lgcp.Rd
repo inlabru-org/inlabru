@@ -82,7 +82,7 @@ the same CRS as the mesh.
 # The INLA package is required
 if (bru_safe_inla()) {
   vertices <- seq(0, 3, by = 0.1)
-  mesh <- fm_mesh_1d(vertices)
+  mesh <- fmesher::fm_mesh_1d(vertices)
   loglambda <- 5 - 0.5 * vertices
   pts <- sample.lgcp(mesh, loglambda)
   pts$y <- 0

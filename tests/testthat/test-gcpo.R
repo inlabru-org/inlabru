@@ -1,6 +1,7 @@
 test_that("Joint gcpo", {
-  skip_if_not_installed("sf")
+  skip_on_cran()
   local_bru_safe_inla()
+  skip_if_not_installed("sf")
 
   ## partition
   cvpart <- cv_hex(
@@ -76,8 +77,8 @@ test_that("Joint gcpo", {
     c(lik_major, lik_minor),
     control.gcpo = bru_options("control.gcpo")
   )
-  expect_equal(
-    length(c_g$friends),
+  expect_length(
+    c_g$friends,
     length(bru_index(lik_major)) + length(bru_index(lik_minor))
   )
 })

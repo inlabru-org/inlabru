@@ -8,12 +8,12 @@
 #'
 #' @param multicore logical; if `TRUE`, multiple cores are allowed, and the
 #' INLA `num.threads` option is not checked or altered.
-#' If `FALSE`, forces `num.threads="1:1"`. Default: NULL, checks
+#' If `FALSE`, forces `num.threads="1:1:1"`. Default: NULL, checks
 #' if running in testthat or non-interactively, in which case sets
 #' `multicore=FALSE`, otherwise `TRUE`.
 #' @param quietly logical; if `FALSE` and `multicore` is `FALSE`,
 #' prints a message if the `num.threads` option
-#' isn't already "1.1" to alert the user to the change.
+#' isn't already "1.1:1" to alert the user to the change.
 #' Default: FALSE.
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 23.1.31 (should always match the requirement in the package
@@ -48,7 +48,7 @@ bru_safe_inla <- function(multicore = NULL,
       e
     }
   )
-  if (inherits(inla.call, "simpleError")) {
+  if (inherits(inla.call, "error")) {
     if (!quietly) {
       message(
         "inla.getOption('inla.call') failed. INLA not installed correctly."
@@ -82,19 +82,19 @@ bru_safe_inla <- function(multicore = NULL,
         e
       }
     )
-    if (inherits(n.t, "simpleError")) {
+    if (inherits(n.t, "error")) {
       if (!quietly) {
         message("inla.getOption() failed. INLA not installed correctly.")
       }
       return(FALSE)
     }
-    if (!identical(n.t, "1:1")) {
+    if (!identical(n.t, "1:1:1")) {
       if (!quietly) {
         message(paste0(
-          "Changing INLA option num.threads from '", n.t, "' to '1:1'."
+          "Changing INLA option num.threads from '", n.t, "' to '1:1:1'."
         ))
       }
-      INLA::inla.setOption(num.threads = "1:1")
+      INLA::inla.setOption(num.threads = "1:1:1")
     }
   }
   TRUE
@@ -260,7 +260,7 @@ bru_safe_terra <- function(quietly = FALSE,
   gcov <- gorillas_sf_gcov()
   where <- inlabru::gorillas_sf$nests[seq_len(5), , drop = FALSE]
   values <- eval_spatial(gcov, where = where)
-  if (any(is.na(values))) {
+  if (anyNA(values)) {
     if (!quietly) {
       message(
         paste0(
@@ -540,6 +540,53 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
 }
 
 
+
+terra_factor_levels <- function(data) {
+  layers <- names(data)
+  is_factor <- terra::is.factor(data)
+  if (!any(is_factor)) {
+    return(NULL)
+  }
+  if (!all(is_factor)) {
+    stop(
+      glue::glue(
+        "Some layers are factors ",
+        "({paste(sort(layers[is_factor]), collapse = ', ')})",
+        " and some are not ",
+        "({paste(sort(layers[!is_factor]), collapse = ', ')})."
+      )
+    )
+  }
+  factor_levels <- lapply(
+    terra::levels(data),
+    function(l) {
+      if (is.data.frame(l)) {
+        l[, 2]
+      } else {
+        NULL
+      }
+    }
+  )
+  unique_levels_idx <- which(!duplicated(factor_levels))
+  factor_levels <- factor_levels[unique_levels_idx]
+  layers <- layers[unique_levels_idx]
+  if (length(unique_levels_idx) > 1) {
+    stop(
+      glue::glue(
+        "Factor levels differ between layers. ",
+        "Found factor levels:\n",
+        glue::glue_collapse(
+          glue::glue("{layers}: {factor_levels}", sep = ", "),
+          sep = "\n"
+        )
+      )
+    )
+  }
+
+  factor_levels[[1]]
+}
+
+
 #' @export
 #' @rdname eval_spatial
 eval_spatial.SpatRaster <- function(data,
@@ -573,6 +620,18 @@ eval_spatial.SpatRaster <- function(data,
     layer = layer
   )
   val <- val[["value"]]
+
+  layer_set <- sort(unique(layer))
+  factor_levels <- terra_factor_levels(data[[layer_set]])
+  if (!is.null(factor_levels)) {
+    if (is.factor(val)) {
+      val <- as.character(val)
+      levs <- factor_levels
+    } else {
+      levs <- seq_along(factor_levels)
+    }
+    val <- factor(val, levels = levs, labels = factor_levels)
+  }
   val
 }
 

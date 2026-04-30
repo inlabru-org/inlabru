@@ -12,7 +12,7 @@ obtained from a run of \code{INLA::inla()}, \code{\link[=bru]{bru()}} or \code{\
 
 \item{criterion}{character vector.
 If it includes 'DIC', computes DIC differences;
-'WAIC' is also allowed, but note that plain WAIC values fomr inla are not
+'WAIC' is also allowed, but note that plain WAIC values from inla are not
 well-defined for point process models. Default 'WAIC'}
 }
 \value{
@@ -26,11 +26,11 @@ Calculates DIC differences and produces an ordered summary.
 \donttest{
 if (bru_safe_inla()) {
   # Generate some data
-  input.df <- data.frame(idx = 1:10, x = cos(1:10))
-  input.df <- within(
-    input.df,
-    y <- rpois(10, 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1))
-  )
+  input.df <- data.frame(idx = 1:10) |>
+    dplyr::mutate(
+      x = cos(idx),
+      y = rpois(length(x), 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1))
+    )
 
   # Fit two models
   fit1 <- bru(

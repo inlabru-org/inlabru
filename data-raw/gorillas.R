@@ -6,6 +6,7 @@
 #' @return gorilla data
 
 import_gorillas_sp <- function() {
+  # jarl-ignore internal_function: We are running outside the package
   stopifnot(inlabru:::check_spatstat("spatstat.data"))
   gorillas <- spatstat.data::gorillas
   gorillas.extra <- spatstat.data::gorillas.extra
@@ -115,6 +116,7 @@ import_gorillas_sp <- function() {
 
 #' @describeIn import_gorillas_sp Import gorillas in `sf` and `terra` format
 import_gorillas_sf <- function(overwrite = FALSE) {
+  # jarl-ignore internal_function: We are running outside the package
   stopifnot(inlabru:::check_spatstat("spatstat.data"))
   gorillas <- spatstat.data::gorillas
   gorillas.extra <- spatstat.data::gorillas.extra

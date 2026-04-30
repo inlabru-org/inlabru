@@ -3,8 +3,9 @@ test_that("Linear mapper", {
 
   input <- seq_len(4)
   state <- 10
+  input_length <- length(input)
   expect_equal(ibm_n(mapper), 1)
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), 1)
   expect_equal(ibm_values(mapper, inla_f = TRUE), 1)
   expect_equal(
@@ -28,8 +29,10 @@ test_that("Index mapper", {
   input <- c(2, 2, 1, 3)
   val <- state[input]
 
-  expect_equal(ibm_n(mapper), length(values))
-  expect_equal(ibm_n_output(mapper, input = input), length(input))
+  values_length <- length(values)
+  input_length <- length(input)
+  expect_equal(ibm_n(mapper), values_length)
+  expect_equal(ibm_n_output(mapper, input = input), input_length)
   expect_equal(ibm_values(mapper), values)
   expect_equal(ibm_values(mapper, inla_f = TRUE), values)
   expect_equal(
@@ -72,8 +75,10 @@ test_that("Factor mapper", {
       val
     }
 
-    expect_equal(ibm_n(mapper), length(values))
-    expect_equal(ibm_n_output(mapper, input = input), length(input))
+    values_length <- length(values)
+    input_length <- length(input)
+    expect_equal(ibm_n(mapper), values_length)
+    expect_equal(ibm_n_output(mapper, input = input), input_length)
     expect_equal(ibm_values(mapper), values)
     expect_equal(ibm_values(mapper, inla_f = TRUE), values)
     expect_equal(
@@ -88,6 +93,110 @@ test_that("Factor mapper", {
       val
     )
   }
+})
+
+
+test_that("Automated factor releveling", {
+  skip_on_cran()
+  local_bru_safe_inla()
+  skip_if_not_installed("sf")
+
+  pts <- sf::st_as_sf(
+    data.frame(
+      x = runif(20),
+      y = runif(20),
+      category = factor(
+        sample(c("Alpha", "Beta", "Gamma"), 20, TRUE),
+        levels = c("Alpha", "Beta", "Gamma")
+      )
+    ),
+    coords = c("x", "y"),
+    crs = 5070
+  )
+
+  boundary <- sf::st_sf(
+    geometry =
+      sf::st_sfc(
+        sf::st_polygon(list(rbind(
+          c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)
+        ))),
+        crs = 5070
+      )
+  )
+
+  mesh <- fmesher::fm_mesh_2d(
+    boundary = boundary,
+    max.edge = 0.5,
+    cutoff = 0.1,
+    crs = sf::st_crs(boundary)
+  )
+
+  ips <- fmesher::fm_int(list(geometry = mesh), boundary)
+
+  ips$category <- factor(
+    sample(c("Alpha", "Beta", "Gamma"), nrow(ips), TRUE),
+    levels = c("Alpha", "Beta", "Gamma")
+  )
+
+  cmp <- geometry ~ Intercept(1) +
+    category(category, model = "factor_contrast")
+
+  # Relevel pts only, which is ok since dplyr::bind_rows() relevels the ips
+  # to the levels of pts.
+  pts$category <- relevel(pts$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Also relevel ips:
+  ips$category <- relevel(ips$category, ref = "Beta")
+
+  fit <- bru(
+    cmp,
+    bru_obs(
+      geometry ~ .,
+      data = pts,
+      family = "cp",
+      ips = ips
+    ),
+    options = list(bru_run = FALSE)
+  )
+
+  lev <- as_bru_comp_list(fit)$category$mapper$mappers$core$mappers$main$levels
+  expect_equal(lev, c("Beta", "Alpha", "Gamma"))
+
+  # Relevel again, to check inconsistent levels are noticed:
+  ips$category <- relevel(ips$category, ref = "Gamma")
+
+  pts$z <- rnorm(nrow(pts))
+  ips$z <- rnorm(nrow(ips))
+
+  expect_error(
+    bru(
+      cmp,
+      bru_obs(
+        z ~ .,
+        data = pts
+      ),
+      bru_obs(
+        z ~ .,
+        data = ips
+      ),
+      options = list(bru_run = FALSE)
+    ),
+    "Inconsistent factor levels. Unable to infer mapper information."
+  )
 })
 
 
@@ -424,24 +533,28 @@ test_that("User defined mappers", {
   m <- bm_test(n = 20)
   cmp <- y ~ -1 + indep(x, model = "iid", mapper = m)
   mydata <- data.frame(y = rnorm(15) + 2 * (1:15), x = 1:15)
-  expect_message(
-    object = {
-      ibm_jacobian(m, mydata$x)
-    },
-    "---- IBM_JACOBIAN from inner environment ----",
-    label = "ibm_jacobian generic call"
-  )
+  suppressMessages({
+    expect_message(
+      object = {
+        ibm_jacobian(m, mydata$x)
+      },
+      "---- IBM_JACOBIAN from inner environment ----",
+      label = "ibm_jacobian generic call"
+    )
+  })
 
   skip_on_cran()
   local_bru_safe_inla()
 
-  expect_message(
-    object = {
-      fit <- bru(cmp, data = mydata, family = "gaussian")
-    },
-    "---- IBM_JACOBIAN from inner environment ----",
-    label = "Non-interactive bru() call"
-  )
+  suppressMessages({
+    expect_message(
+      object = {
+        fit <- bru(cmp, data = mydata, family = "gaussian")
+      },
+      "---- IBM_JACOBIAN from inner environment ----",
+      label = "Non-interactive bru() call"
+    )
+  })
 })
 
 

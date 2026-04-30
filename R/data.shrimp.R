@@ -31,9 +31,9 @@
 #' if (require(ggplot2, quietly = TRUE)) {
 #'   data(shrimp, package = "inlabru", envir = environment())
 #'   ggplot() +
-#'     geom_fm(data = shrimp$mesh) +
+#'     fmesher::geom_fm(data = shrimp$mesh) +
 #'     gg(shrimp$hauls, aes(col = catch)) +
-#'     coord_sf(datum = fm_crs(shrimp$hauls))
+#'     coord_sf(datum = fmesher::fm_crs(shrimp$hauls))
 #' }
 #' }
 "shrimp"

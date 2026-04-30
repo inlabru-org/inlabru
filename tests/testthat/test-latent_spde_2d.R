@@ -153,9 +153,9 @@ test_that("Georeferenced data with sf, with groups", {
     tolerance = midtol
   )
 
-  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sf")
+  pred_df <- fmesher::fm_pixels(mesh, dims = c(8, 8), format = "sf")
   expect_s3_class(pred_df, "sf")
-  pred_df <- fm_cprod(pred_df, data.frame(season = seq_len(2)))
+  pred_df <- fmesher::fm_cprod(pred_df, data.frame(season = seq_len(2)))
 
   skip_if_not_installed("sn")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)

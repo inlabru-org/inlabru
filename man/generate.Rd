@@ -42,7 +42,7 @@ The default, 100, is rather low but provides a quick approximate result.}
 
 \item{num.threads}{Specification of desired number of threads for parallel
 computations. Default NULL, leaves it up to INLA.
-When seed != 0, overridden to "1:1"}
+When seed != 0, overridden to "1:1:1"}
 
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
@@ -82,21 +82,26 @@ via \verb{<name>_eval(...)}.
 }
 \examples{
 \donttest{
-if (bru_safe_inla() &&
-    require("sn", quietly = TRUE)) {
-
+if (
+  bru_safe_inla() &&
+    requireNamespace("sn", quietly = TRUE)
+) {
   # Generate data for a simple linear model
 
   input.df <- data.frame(x = cos(1:10))
   input.df <- within(
     input.df,
-    y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+    {
+      y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+    }
   )
 
   # Fit the model
 
-  fit <- bru(y ~ xeff(main = x, model = "linear"),
-    family = "gaussian", data = input.df
+  fit <- bru(
+    y ~ xeff(main = x, model = "linear"),
+    family = "gaussian",
+    data = input.df
   )
   summary(fit)
 
@@ -108,7 +113,9 @@ if (bru_safe_inla() &&
   # Plot the resulting realizations
 
   plot(df$x, smp[, 1], type = "l")
-  for (k in 2:ncol(smp)) points(df$x, smp[, k], type = "l")
+  for (k in 2:ncol(smp)) {
+    points(df$x, smp[, k], type = "l")
+  }
 
   # We can also draw samples form the joint posterior
 
@@ -122,6 +129,7 @@ if (bru_safe_inla() &&
   }
 }
 }
+
 }
 \seealso{
 \link{predict.bru}

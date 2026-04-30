@@ -29,7 +29,6 @@ correlation or covariance function. \code{inla.spde.result}.
 \examples{
 \donttest{
 if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
-
   # Load 1D Poisson process data
 
   data(Poisson2_1D, package = "inlabru")
@@ -51,7 +50,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   # Fit an LGCP model with  and SPDE component
 
   x <- seq(0, 55, length.out = 20)
-  mesh1D <- fm_mesh_1d(x, boundary = "free")
+  mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
   constrained_matern <- INLA::inla.spde2.matern(mesh1D, constr = TRUE)
   mdl <- x ~ spde1D(x, model = constrained_matern) + Intercept(1)
   fit <- lgcp(mdl, data = pts2, domain = list(x = mesh1D))
@@ -87,6 +86,7 @@ if (bru_safe_inla() && require(ggplot2, quietly = TRUE)) {
   plot(matcov)
 }
 }
+
 }
 \author{
 Finn Lindgren \email{Finn.Lindgren@ed.ac.uk}

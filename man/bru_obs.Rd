@@ -251,11 +251,10 @@ use \code{as_bru_obs_list()}, \code{bru_obs_list()} or \code{c()}.
 \examples{
 \donttest{
 if (bru_safe_inla() &&
-    require(ggplot2, quietly = TRUE) &&
-    require(patchwork, quietly = TRUE)) {
-
-  # The 'bru_obs()' (previously 'like()') function's main purpose is to set up
-  # observation models, both for single- and multi-likelihood models.
+  require(ggplot2, quietly = TRUE) &&
+  require(patchwork, quietly = TRUE)) {
+  # The 'bru_obs()' (previously 'like()') function's main purpose is to set
+  # up observation models, both for single- and multi-likelihood models.
   # The following example generates some random covariates which are observed
   # through two different random effect models with different likelihoods
 
@@ -302,7 +301,8 @@ if (bru_safe_inla() &&
     tag = "pois"
   )
 
-  # The union of effects of both models gives the components needed to run bru
+  # The union of effects of both models gives the components needed to run
+  # bru
 
   jcmp <- ~ x + z + Intercept(1)
   jfit <- bru(jcmp, lik1, lik2)
@@ -328,6 +328,7 @@ if (bru_safe_inla() &&
   (p1 / p2 / pj)
 }
 }
+
 }
 \seealso{
 \code{\link[=bru_response_size]{bru_response_size()}}, \code{\link[=bru_used]{bru_used()}}, \code{\link[=bru_comp]{bru_comp()}},

@@ -1335,16 +1335,16 @@ ibm_jacobian.bm_inla_mesh_2d <- function(mapper, input, ...) {
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @examples
-#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)))
+#' m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)))
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:5)
 #'
-#' m <- bru_mapper(fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
+#' m <- bru_mapper(fmesher::fm_mesh_1d(c(1:3, 5, 7)), indexed = FALSE)
 #' ibm_values(m)
 #' ibm_eval(m, 1:7, 1:5)
 #'
 #' m <- bru_mapper(
-#'   fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
+#'   fmesher::fm_mesh_1d(c(1:3, 5, 7), degree = 2, boundary = "free"),
 #'   indexed = FALSE
 #' )
 #' ibm_values(m)
@@ -1626,8 +1626,6 @@ ibm_n.bm_taylor <- function(mapper,
                             ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_n.bm_taylor should not be used with inla_f = TRUE")
-
-    ibm_n(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
   } else if (multi) {
     mapper[["n_multi"]]
   } else {
@@ -1652,8 +1650,6 @@ ibm_values.bm_taylor <- function(mapper,
                                  ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_values.bm_taylor should not be used with inla_f = TRUE")
-
-    ibm_values(mapper[["values_inla"]], inla_f = inla_f, multi = multi)
   } else if (multi) {
     lapply(mapper[["n_multi"]], function(k) seq_len(k))
   } else {

@@ -1,0 +1,7 @@
+repos:
+-   repo: https://github.com/etiennebacher/jarl-pre-commit
+    rev: 0.5.0
+    hooks:
+      - id: jarl-check
+        pass_filenames: false
+        args: ["."]

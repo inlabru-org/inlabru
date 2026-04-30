@@ -3,12 +3,18 @@
 \name{bru}
 \alias{bru}
 \alias{bru_rerun}
+\alias{summary.bru}
+\alias{print.summary_bru}
 \alias{print.bru}
 \title{Convenient model fitting using (iterated) INLA}
 \usage{
 bru(components = ~Intercept(1), ..., options = list(), .envir = parent.frame())
 
 bru_rerun(result, options = list())
+
+\method{summary}{bru}(object, verbose = FALSE, ...)
+
+\method{print}{summary_bru}(x, ...)
 
 \method{print}{bru}(x, ...)
 }
@@ -36,7 +42,13 @@ specification is used)}
 
 \item{result}{A previous estimation object of class \code{bru}}
 
-\item{x}{A \code{bru} object to be printed}
+\item{object}{An object obtained from a \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}} call}
+
+\item{verbose}{logical; If \code{TRUE}, include more details of the
+component definitions. If \code{FALSE}, only show basic component
+definition information. Default: \code{FALSE}}
+
+\item{x}{An object to be printed}
 }
 \value{
 bru returns an object of class "bru". A \code{bru} object inherits
@@ -68,6 +80,12 @@ available by using the \code{"cp"} family or (even easier) by using the
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{summary(bru)}: Takes a fitted \code{bru} object produced by \code{\link[=bru]{bru()}} or \code{\link[=lgcp]{lgcp()}}
+and creates various summaries from it, including the summary output from
+the corresponding \code{INLA::sumary()} method.
+The \dots arguments are passed on to component summary functions, see
+\code{\link[=summary.bru_comp]{summary.bru_comp()}}.
+
 \item \code{print(bru)}: Print a summary of a \code{bru} object.
 
 }}
@@ -102,9 +120,11 @@ if (bru_safe_inla()) {
   # Alternatively, we can use the bru_obs() function to construct the
   # likelihood:
 
-  lik <- bru_obs(family = "gaussian",
-              formula = y ~ x + Intercept,
-              data = input.df)
+  lik <- bru_obs(
+    family = "gaussian",
+    formula = y ~ x + Intercept,
+    data = input.df
+  )
   fit <- bru(~ x + Intercept(1), lik)
   fit$summary.fixed
 }
@@ -130,6 +150,7 @@ if (bru_safe_inla()) {
   fit$summary.fixed
 }
 }
+
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

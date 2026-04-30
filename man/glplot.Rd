@@ -5,6 +5,7 @@
 \alias{glplot.SpatialPoints}
 \alias{glplot.SpatialLines}
 \alias{glplot.fm_mesh_2d}
+\alias{globe}
 \title{Render objects using RGL}
 \usage{
 glplot(object, ...)
@@ -14,6 +15,17 @@ glplot(object, ...)
 \method{glplot}{SpatialLines}(object, add = TRUE, ...)
 
 \method{glplot}{fm_mesh_2d}(object, add = TRUE, col = NULL, ...)
+
+globe(
+  R = 1,
+  R.grid = 1.05,
+  specular = "black",
+  axes = FALSE,
+  box = FALSE,
+  xlab = "",
+  ylab = "",
+  zlab = ""
+)
 }
 \arguments{
 \item{object}{an object used to select a method.}
@@ -27,6 +39,18 @@ plot.}
 
 \item{col}{Color specification. A single named color, a vector of scalar
 values, or a matrix of RGB values.}
+
+\item{R}{Radius of the globe}
+
+\item{R.grid}{Radius of the annotation sphere.}
+
+\item{specular}{Light color of specular effect.}
+
+\item{axes}{If TRUE, plot x, y and z axes.}
+
+\item{box}{If TRUE, plot a box around the globe.}
+
+\item{xlab, ylab, zlab}{Axes labels}
 }
 \description{
 \code{glplot()} is a generic function for renders various kinds of spatial
@@ -45,14 +69,22 @@ the lines provided and use \code{lines3d()} in order to render them.
 coordinates and uses \code{\link[fmesher:plot_rgl]{fmesher::plot_rgl()}} to plot the result.
 
 }}
+\section{Functions}{
+\itemize{
+\item \code{globe()}: Visualize a globe using RGL
+
+Creates a textured sphere and lon/lat coordinate annotations.
+This function requires the \code{rgl} and \code{sphereplot} packages.
+
+}}
 \examples{
 \donttest{
 if (interactive() &&
-    require("rgl", quietly = TRUE) &&
-    require("sphereplot", quietly = TRUE) &&
-    bru_safe_sp() &&
-    require("sp")) {
-  # Show the globe
+  require("rgl", quietly = TRUE) &&
+  require("sphereplot", quietly = TRUE) &&
+  bru_safe_sp() &&
+  require("sp")) {
+  # Show the globe:
   globe()
 
   # Load pantropoical dolphin data
@@ -66,18 +98,5 @@ if (interactive() &&
   glplot(mexdolphin$points, size = 10)
 }
 }
+
 }
-\seealso{
-Other inlabru RGL tools: 
-\code{\link{globe}()}
-
-Other inlabru RGL tools: 
-\code{\link{globe}()}
-
-Other inlabru RGL tools: 
-\code{\link{globe}()}
-
-Other inlabru RGL tools: 
-\code{\link{globe}()}
-}
-\concept{inlabru RGL tools}

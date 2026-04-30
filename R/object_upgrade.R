@@ -41,34 +41,9 @@ bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
 }
 
 
-bru_info_upgrade <- function(object,
-                             new_version = getNamespaceVersion("inlabru")) {
-  object_full <- object
-  object <- object[["bru_info"]]
-  msg <- NULL
-  if (!is.list(object)) {
-    msg <- "Not a list"
-  } else if (!inherits(object, "bru_info")) {
-    msg <- "Not a bru_info object"
-  } else if (is.null(object[["inlabru_version"]])) {
-    msg <- "`inlabru_version` is missing"
-  }
-  if (!is.null(msg)) {
-    stop(glue(
-      "bru_info part of the object can't be converted to `bru_info`; {msg}"
-    ))
-  }
-
-  old_ver <- object[["inlabru_version"]]
-  if (utils::compareVersion(new_version, old_ver) > 0) {
-    warning(
-      glue("Old bru_info object version {old_ver} detected.
-            Attempting upgrade to version {new_version}.")
-    )
-
-    message("Detected bru_info version ", old_ver)
-    if (utils::compareVersion("2.1.14.901", old_ver) > 0) {
-      message("Upgrading bru_info to 2.1.14.901")
+bru_info_upgrade_functions <- function() {
+  list(
+    "2.1.14.901" = function(object) {
       # Ensure INLA_version stored
       if (is.null(object[["INLA_version"]])) {
         object[["INLA_version"]] <- "0.0.0"
@@ -87,10 +62,9 @@ bru_info_upgrade <- function(object,
           )
         object[["model"]][["effects"]][[k]] <- cmp
       }
-      object[["inlabru_version"]] <- "2.1.14.901"
-    }
-    if (utils::compareVersion("2.5.3.9003", old_ver) > 0) {
-      message("Upgrading bru_info to 2.5.3.9003")
+      object
+    },
+    "2.5.3.9003" = function(object) {
       # Check that likelihoods store 'weights'
       for (k in seq_along(object[["lhoods"]])) {
         lhood <- object[["lhoods"]][[k]]
@@ -99,11 +73,9 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]][[k]] <- lhood
         }
       }
-      object[["inlabru_version"]] <- "2.5.3.9003"
-    }
-
-    if (utils::compareVersion("2.5.3.9005", old_ver) > 0) {
-      message("Upgrading bru_info to 2.5.3.9005")
+      object
+    },
+    "2.5.3.9005" = function(object) {
       # Make sure component$mapper is a bm_pipe
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
@@ -127,11 +99,9 @@ bru_info_upgrade <- function(object,
           )
         object[["model"]][["effects"]][[k]] <- cmp
       }
-      object[["inlabru_version"]] <- "2.5.3.9005"
-    }
-
-    if (utils::compareVersion("2.6.0.9000", old_ver) > 0) {
-      message("Upgrading bru_info to 2.6.0.9000")
+      object
+    },
+    "2.6.0.9000" = function(object) {
       # Make sure component$mapper is a bm_pipe
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
@@ -151,30 +121,28 @@ bru_info_upgrade <- function(object,
           )
         object[["model"]][["effects"]][[k]] <- cmp
       }
-      object[["inlabru_version"]] <- "2.6.0.9000"
-    }
-
-    if (utils::compareVersion("2.7.0.9010", old_ver) > 0) {
-      message("Upgrading bru_info to 2.7.0.9010")
+      object
+    },
+    "2.7.0.9010" = function(object) {
       # Make sure component$group/replicate$input isn't NULL
       for (k in seq_along(object[["model"]][["effects"]])) {
         cmp <- object[["model"]][["effects"]][[k]]
         if (identical(deparse(cmp[["group"]][["input"]][["input"]]), "NULL")) {
           cmp[["group"]][["input"]][["input"]] <- expression(1L)
         }
-        if (identical(
-          deparse(cmp[["replicate"]][["input"]][["input"]]),
-          "NULL"
-        )) {
+        if (
+          identical(
+            deparse(cmp[["replicate"]][["input"]][["input"]]),
+            "NULL"
+          )
+        ) {
           cmp[["replicate"]][["input"]][["input"]] <- expression(1L)
         }
         object[["model"]][["effects"]][[k]] <- cmp
       }
-      object[["inlabru_version"]] <- "2.7.0.9010"
-    }
-
-    if (utils::compareVersion("2.7.0.9016", old_ver) > 0) {
-      message("Upgrading bru_info to 2.7.0.9016")
+      object
+    },
+    "2.7.0.9016" = function(object) {
       # Convert old style include_component/allow_latent to intermediate
       # include_component/include_latent format
 
@@ -194,11 +162,9 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
-      object[["inlabru_version"]] <- "2.7.0.9016"
-    }
-
-    if (utils::compareVersion("2.7.0.9017", old_ver) > 0) {
-      message("Upgrading bru_info to 2.7.0.9017")
+      object
+    },
+    "2.7.0.9017" = function(object) {
       # Convert old style include_component/allow_latent to new
       # bru_used format
 
@@ -220,11 +186,9 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
-      object[["inlabru_version"]] <- "2.7.0.9017"
-    }
-
-    if (utils::compareVersion("2.7.0.9021", old_ver) > 0) {
-      message("Upgrading bru_info to 2.7.0.9021")
+      object
+    },
+    "2.7.0.9021" = function(object) {
       # Make sure 'used' components format is properly stored
 
       if (is.null(object[["lhoods"]][["is_additive"]])) {
@@ -237,11 +201,9 @@ bru_info_upgrade <- function(object,
           object[["lhoods"]],
           labels = names(object[["model"]][["effects"]])
         )
-      object[["inlabru_version"]] <- "2.7.0.9021"
-    }
-
-    if (utils::compareVersion("2.10.1.9007", old_ver) > 0) {
-      message("Upgrading bru_info to 2.10.1.9007")
+      object
+    },
+    "2.10.1.9007" = function(object_full) {
       # Update timings info to difftime format
 
       warning(
@@ -263,11 +225,9 @@ bru_info_upgrade <- function(object,
         as.difftime(rep(0.0, length(conversion)), units = "secs")
       object_full[["bru_timings"]][["Elapsed"]] <- conversion
 
-      object[["inlabru_version"]] <- "2.10.1.9007"
-    }
-
-    if (utils::compareVersion("2.10.1.9012", old_ver) > 0) {
-      message("Upgrading bru_info to 2.10.1.9012")
+      object_full
+    },
+    "2.10.1.9012" = function(object_full) {
       # Update log format to new format
 
       object_full[["bru_iinla"]][["log"]] <-
@@ -276,12 +236,9 @@ bru_info_upgrade <- function(object,
           bookmarks = object_full[["bru_iinla"]][["log"]][["bookmarks"]]
         )
 
-      object[["inlabru_version"]] <- "2.10.1.9012"
-    }
-
-    if (utils::compareVersion("2.12.0.9014", old_ver) > 0) {
-      message("Upgrading bru_info to 2.12.0.9014")
-
+      object_full
+    },
+    "2.12.0.9014" = function(object) {
       # Add bru_obs class name, to support old bru_like objects.
       # Technically for 2.12.0.9017, but the upgrade code needs it for 2014
       if (!is.null(object[["lhoods"]])) {
@@ -304,12 +261,9 @@ bru_info_upgrade <- function(object,
       #     labels = names(object[["model"]][["effects"]])
       #   )
 
-      object[["inlabru_version"]] <- "2.12.0.9014"
-    }
-
-    if (utils::compareVersion("2.12.0.9017", old_ver) > 0) {
-      message("Upgrading bru_info to 2.12.0.9017")
-
+      object
+    },
+    "2.12.0.9017" = function(object) {
       # Update bru_like class names to bru_obs
       if (!is.null(object[["lhoods"]])) {
         object[["lhoods"]] <-
@@ -328,14 +282,11 @@ bru_info_upgrade <- function(object,
         class(eff[[k]]) <- "bru_comp"
       }
       class(eff) <- c("bru_comp_list", "list")
-      eff <- object[["model"]][["effects"]] <- eff
+      object[["model"]][["effects"]] <- eff
 
-      object[["inlabru_version"]] <- "2.12.0.9017"
-    }
-
-    if (utils::compareVersion("2.13.0.9012", old_ver) > 0) {
-      message("Upgrading bru_info to 2.13.0.9012")
-
+      object
+    },
+    "2.13.0.9012" = function(object) {
       # Update bru_input input&layer to quosures
       quosure_update <- function(x, env) {
         if (is.null(x)) {
@@ -367,14 +318,11 @@ bru_info_upgrade <- function(object,
           }
         }
       }
-      eff <- object[["model"]][["effects"]] <- eff
+      object[["model"]][["effects"]] <- eff
 
-      object[["inlabru_version"]] <- "2.13.0.9012"
-    }
-
-    if (utils::compareVersion("2.13.0.9015", old_ver) > 0) {
-      message("Upgrading bru_info to 2.13.0.9015")
-
+      object
+    },
+    "2.13.0.9015" = function(object) {
       # Update lhoods to streamlined storage format
       if (!is.null(object[["lhoods"]])) {
         object[["lhoods"]] <-
@@ -391,12 +339,9 @@ bru_info_upgrade <- function(object,
         class(object[["lhoods"]]) <- c("bru_obs_list", "list")
       }
 
-      object[["inlabru_version"]] <- "2.13.0.9015"
-    }
-
-    if (utils::compareVersion("2.13.0.9017", old_ver) > 0) {
-      message("Upgrading bru_info to 2.13.0.9017")
-
+      object
+    },
+    "2.13.0.9017" = function(object) {
       # Update lhoods to new bru_pred_expr object storage format
       if (!is.null(object[["lhoods"]])) {
         lhood_upgrader <- function(x) {
@@ -428,30 +373,33 @@ bru_info_upgrade <- function(object,
         class(object[["lhoods"]]) <- c("bru_obs_list", "list")
       }
 
-      object[["inlabru_version"]] <- "2.13.0.9017"
-    }
-
-    if (utils::compareVersion("2.13.0.9018", old_ver) > 0) {
-      message("Upgrading bru_info to 2.13.0.9018")
-
+      object
+    },
+    "2.13.0.9018" = function(object) {
       # Update component input storage to mapper-attached storage
       if (!is.null(object[["model"]][["effects"]])) {
         object[["model"]][["effects"]] <-
           lapply(object[["model"]][["effects"]], function(x) {
             for (subcomp in c("main", "group", "replicate")) {
-              if (!is.null(x[[subcomp]][["input"]]) &&
-                inherits(x[[subcomp]][["input"]], "bru_input") &&
-                is.null(x[[subcomp]][["mapper"]][[".input"]])) {
+              if (
+                !is.null(x[[subcomp]][["input"]]) &&
+                  inherits(x[[subcomp]][["input"]], "bru_input") &&
+                  is.null(x[[subcomp]][["mapper"]][[".input"]])
+              ) {
                 x[[subcomp]][["mapper"]][[".input"]] <- x[[subcomp]][["input"]]
                 x[[subcomp]][["input"]] <- NULL
               }
             }
-            if (!is.null(x[["marginal"]]) &&
-              is.null(x[["marginal"]][[".input"]])) {
+            if (
+              !is.null(x[["marginal"]]) &&
+                is.null(x[["marginal"]][[".input"]])
+            ) {
               x[["marginal"]][[".input"]] <- new_bru_input(NULL)
             }
-            if (!is.null(x[["weights"]]) &&
-              inherits(x[["weights"]], "bru_input")) {
+            if (
+              !is.null(x[["weights"]]) &&
+                inherits(x[["weights"]], "bru_input")
+            ) {
               weights_input <- x[["weights"]]
               x[["weights"]] <- bm_scale()
               x[["weights"]][[".input"]] <- weights_input
@@ -463,13 +411,9 @@ bru_info_upgrade <- function(object,
         class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
       }
 
-
-      object[["inlabru_version"]] <- "2.13.0.9018"
-    }
-
-    if (utils::compareVersion("2.13.0.9036", old_ver) > 0) {
-      message("Upgrading bru_info to 2.13.0.9036")
-
+      object
+    },
+    "2.13.0.9036" = function(object) {
       # Update component input storage to mapper-attached storage
       if (!is.null(object[["model"]][["effects"]])) {
         object[["model"]][["effects"]] <-
@@ -481,13 +425,111 @@ bru_info_upgrade <- function(object,
         class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
       }
 
-      object[["inlabru_version"]] <- "2.13.0.9036"
+      object
+    },
+    "2.14.0.9002" = function(object) {
+      # Update bm_factor mappers to proper levels for cases where previously
+      # incorrect data reading resulted in an incorrect (but matching) mapper
+      the_inputs <- bru_input(
+        object[["lhoods"]],
+        object[["model"]][["effects"]]
+      )
+      if (!is.null(object[["model"]][["effects"]])) {
+        object[["model"]][["effects"]] <-
+          lapply(object[["model"]][["effects"]], function(x) {
+            lab <- x[["label"]]
+            mapper <- x[["main"]][["mapper"]]
+            if (inherits(mapper, "bm_factor")) {
+              inp_levels <- lapply(the_inputs, function(xx) {
+                if (is.factor(xx[[lab]][["core"]][["main"]])) {
+                  levels(xx[[lab]][["core"]][["main"]])
+                } else {
+                  NULL
+                }
+              })
+              inp_levels_non_null <-
+                vapply(inp_levels, function(x) !is.null(x), logical(1))
+              if (any(inp_levels_non_null)) {
+                inp_levels <- unique(inp_levels[inp_levels_non_null])
+                if (length(unique(inp_levels)) > 1) {
+                  warning(glue::glue(
+                    "Inconsistent input factor levels for {lab}.
+                   Levels found: {paste(unique(inp_levels), collapse = '; ')}.
+                   Using levels from first input with non-null levels."
+                  ))
+                }
+                inp_levels <- inp_levels[[1]]
+                if (length(inp_levels) != length(mapper$levels)) {
+                  warning(glue::glue(
+                    "Number of levels for {lab} in mapper ",
+                    "({length(mapper$levels)}) does ",
+                    "not match number of levels ",
+                    "in input ({length(inp_levels)}). ",
+                    "Using levels from input."
+                  ))
+                }
+                mapper[["levels"]] <- inp_levels
+                mapper[["n"]] <- length(inp_levels)
+                if (identical(mapper[["factor_mapping"]], "contrast")) {
+                  mapper[["n"]] <- mapper[["n"]] - 1L
+                }
+                x[["main"]][["mapper"]] <- mapper
+              }
+            }
+            x <- bru_comp_update_mapper(x)
+            x
+          })
+        class(object[["model"]][["effects"]]) <- c("bru_comp_list", "list")
+      }
+
+      object
+    }
+  )
+}
+bru_info_upgrade <- function(object,
+                             new_version = getNamespaceVersion("inlabru")) {
+  object_full <- object
+  object <- object[["bru_info"]]
+  msg <- NULL
+  if (!is.list(object)) {
+    msg <- "Not a list"
+  } else if (!inherits(object, "bru_info")) {
+    msg <- "Not a bru_info object"
+  } else if (is.null(object[["inlabru_version"]])) {
+    msg <- "`inlabru_version` is missing"
+  }
+  if (!is.null(msg)) {
+    stop(glue(
+      "bru_info part of the object can't be converted to `bru_info`; {msg}"
+    ))
+  }
+
+  old_ver <- object[["inlabru_version"]]
+  if (utils::compareVersion(new_version, old_ver) > 0) {
+    warning(
+      glue("Old bru_info object version {old_ver} detected.
+            Attempting upgrade to version {new_version}.")
+    )
+
+    upgrade_functions <- bru_info_upgrade_functions()
+
+    message("Detected bru_info version ", old_ver)
+    for (ver in names(upgrade_functions)) {
+      if (utils::compareVersion(ver, old_ver) > 0) {
+        message("Upgrading bru_info to ", ver)
+        if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
+          object_full <- upgrade_functions[[ver]](object_full = object_full)
+        } else {
+          object <- upgrade_functions[[ver]](object)
+        }
+        object[["inlabru_version"]] <- ver
+        object_full[["bru_info"]] <- object
+      }
     }
 
     object[["inlabru_version"]] <- new_version
-    message(glue("Upgraded bru_info to {new_version}"))
-
     object_full[["bru_info"]] <- object
+    message(glue("Upgraded bru_info to {new_version}"))
   }
   object_full
 }

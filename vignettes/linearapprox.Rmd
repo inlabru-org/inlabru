@@ -243,8 +243,7 @@ ggplot() +
     lambda(mu_quad - 4 * sd_quad, gamma = g),
     lambda(mu_quad + 4 * sd_quad, gamma = g)
   ) +
-  xlab("lambda") +
-  ylab("Density") +
+  labs(x = "lambda", y = "Density") +
   geom_function(
     fun = function(x) {
       exp(log_p(lambda_inv(x, gamma = g), y = y, gamma = g)) /

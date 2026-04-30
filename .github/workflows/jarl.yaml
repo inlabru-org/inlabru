@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - devel
+      - release/*
+      - feature/*
+  pull_request:
+    branches:
+      - devel
+
+
+name: jarl-check
+
+permissions: read-all
+
+jobs:
+  jarl-check:
+    name: jarl-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install jarl without running check
+        uses: etiennebacher/setup-jarl@v0.1.1
+        with:
+          args: "--version"
+      - name: Run jarl check (verbose)
+        run: |
+          jarl --version
+          jarl check --output-format github .

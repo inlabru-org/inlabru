@@ -31,8 +31,14 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-Other geomes for inla and inlabru predictions: 
+Other geomes: 
 \code{\link{gg}()},
-\code{\link{gg.data.frame}()}
+\code{\link{gg.RasterLayer}()},
+\code{\link{gg.SpatRaster}()},
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.sf}()}
 }
-\concept{geomes for inla and inlabru predictions}
+\concept{geomes}

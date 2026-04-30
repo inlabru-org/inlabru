@@ -12,3 +12,4 @@ inla.model-*
 /doc/
 /Meta/
 *_cache
+.positai

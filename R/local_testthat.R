@@ -93,7 +93,7 @@ local_inla_options_set <- function(...,
         }
       )
 
-      if (inherits(old_inla_options[[name]], "simpleError")) {
+      if (inherits(old_inla_options[[name]], "error")) {
         return(FALSE)
       }
 
@@ -104,7 +104,7 @@ local_inla_options_set <- function(...,
             e
           }
         )
-        if (inherits(e, "simpleError")) {
+        if (inherits(e, "error")) {
           return(FALSE)
         }
       }
@@ -119,7 +119,7 @@ local_inla_options_set <- function(...,
 }
 
 
-#' @describeIn local_testthat Tests should set num.threads = "1:1" to ensure
+#' @describeIn local_testthat Tests should set num.threads = "1:1:1" to ensure
 #'   within-system repeatability by calling `local_bru_safe_inla()`; see also
 #'   [bru_safe_inla()]
 #' @param multicore logical; if `TRUE`, multiple cores are allowed, and the INLA
@@ -139,7 +139,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
         e
       }
     )
-    if (inherits(inla.call, "simpleError")) {
+    if (inherits(inla.call, "error")) {
       return(testthat::skip(
         "inla.getOption('inla.call') failed, skipping INLA tests."
       ))
@@ -179,7 +179,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
   }
 
   if (!multicore) {
-    local_bru_options_set(num.threads = "1:1", envir = envir)
+    local_bru_options_set(num.threads = "1:1:1", envir = envir)
   }
   testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
   # Ignore spurious warnings for INLA 23.12.17. Is fixed in later INLA versions:

@@ -29,68 +29,70 @@ Requires the \code{ggplot2} package.
 }
 \examples{
 \donttest{
-  if (require("ggplot2", quietly = TRUE) &&
-      bru_safe_terra(quietly = TRUE) &&
-      require("tidyterra", quietly = TRUE)) {
-    # Load Gorilla data
+if (require("ggplot2", quietly = TRUE) &&
+  bru_safe_terra(quietly = TRUE) &&
+  require("tidyterra", quietly = TRUE)) {
+  # Load Gorilla data
 
-    gorillas <- inlabru::gorillas_sf
-    gorillas$gcov <- gorillas_sf_gcov()
+  gorillas <- inlabru::gorillas_sf
+  gorillas$gcov <- gorillas_sf_gcov()
 
-    # Plot Gorilla elevation covariate provided as terra::rast.
+  # Plot Gorilla elevation covariate provided as terra::rast.
 
-    ggplot() +
-      gg(gorillas$gcov$elevation)
+  ggplot() +
+    gg(gorillas$gcov$elevation)
 
-    # Add Gorilla survey boundary and nest sightings
+  # Add Gorilla survey boundary and nest sightings
 
-    ggplot() +
-      gg(gorillas$gcov$elevation) +
-      gg(gorillas$boundary, alpha = 0) +
-      gg(gorillas$nests)
+  ggplot() +
+    gg(gorillas$gcov$elevation) +
+    gg(gorillas$boundary, alpha = 0) +
+    gg(gorillas$nests)
 
-    # Load pantropical dolphin data
+  # Load pantropical dolphin data
 
-    mexdolphin <- inlabru::mexdolphin_sf
+  mexdolphin <- inlabru::mexdolphin_sf
 
-    # Plot the pantropical survey boundary, ship transects and dolphin sightings
+  # Plot the pantropical survey boundary, ship transects and dolphin
+  # sightings
 
-    ggplot() +
-      gg(mexdolphin$ppoly, alpha = 0.5) + # survey boundary
-      gg(mexdolphin$samplers) + # ship transects
-      gg(mexdolphin$points) # dolphin sightings
+  ggplot() +
+    gg(mexdolphin$ppoly, alpha = 0.5) + # survey boundary
+    gg(mexdolphin$samplers) + # ship transects
+    gg(mexdolphin$points) # dolphin sightings
 
-    # Change color
+  # Change color
 
-    ggplot() +
-      gg(mexdolphin$ppoly, color = "green", alpha = 0.5) + # survey boundary
-      gg(mexdolphin$samplers, color = "red") + # ship transects
-      gg(mexdolphin$points, color = "blue") # dolphin sightings
+  ggplot() +
+    gg(mexdolphin$ppoly, color = "green", alpha = 0.5) + # survey boundary
+    gg(mexdolphin$samplers, color = "red") + # ship transects
+    gg(mexdolphin$points, color = "blue") # dolphin sightings
 
 
-    # Visualize data annotations: line width by segment number
+  # Visualize data annotations: line width by segment number
 
-    names(mexdolphin$samplers) # 'seg' holds the segment number
-    ggplot() +
-      gg(mexdolphin$samplers, aes(color = seg))
+  names(mexdolphin$samplers) # 'seg' holds the segment number
+  ggplot() +
+    gg(mexdolphin$samplers, aes(color = seg))
 
-    # Visualize data annotations: point size by dolphin group size
+  # Visualize data annotations: point size by dolphin group size
 
-    names(mexdolphin$points) # 'size' holds the group size
-    ggplot() +
-      gg(mexdolphin$points, aes(size = size))
-  }
+  names(mexdolphin$points) # 'size' holds the group size
+  ggplot() +
+    gg(mexdolphin$points, aes(size = size))
 }
+}
+
 }
 \seealso{
-Other geomes for spatial data: 
+Other geomes: 
 \code{\link{gg}()},
+\code{\link{gg.RasterLayer}()},
 \code{\link{gg.SpatRaster}()},
-\code{\link{gg.SpatialGridDataFrame}()},
-\code{\link{gg.SpatialLines}()},
-\code{\link{gg.SpatialPixels}()},
-\code{\link{gg.SpatialPixelsDataFrame}()},
-\code{\link{gg.SpatialPoints}()},
-\code{\link{gg.SpatialPolygons}()}
+\code{\link{gg.Spatial}},
+\code{\link{gg.data.frame}()},
+\code{\link{gg.fm_mesh_1d}()},
+\code{\link{gg.fm_mesh_2d}()},
+\code{\link{gg.matrix}()}
 }
-\concept{geomes for spatial data}
+\concept{geomes}

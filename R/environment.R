@@ -171,7 +171,6 @@ bru_log_bookmark <- function(bookmark = "", offset = NULL, x = NULL) {
     x[["bookmarks"]],
     structure(offset, names = bookmark)
   )
-  return(invisible(NULL))
   invisible(x)
 }
 

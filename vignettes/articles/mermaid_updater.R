@@ -12,9 +12,11 @@ updateMermaid <- function(version = "") {
   try(
     download.file(
       url,
-      system.file("htmlwidgets/lib/mermaid/dist/mermaid.slim.min.js",
+      system.file(
+        "htmlwidgets/lib/mermaid/dist/mermaid.slim.min.js",
         package = "DiagrammeR"
-      )
+      ),
+      mode = "wb"
     )
   )
 }
