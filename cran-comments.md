@@ -11,7 +11,7 @@
   which was due to overly narrow error detection, and have been fixed.
 * CRAN messages in the tests for 2.14.0 for r-devel detecting possible > 2
   thread requests are due to an issue in the INLA package. The inlabru tests
-  have been adjusted to avoid triggering the extra threads:
+  have been adjusted to avoid triggering the extra threads on CRAN:
 
   > test-aggregate.R: OMP: Warning #96: Cannot form a team with 3 threads, using 2 instead.
   > test-aggregate.R: OMP: Hint Consider unsetting KMP_DEVICE_THREAD_LIMIT (KMP_ALL_THREADS), KMP_TEAMS_THREAD_LIMIT, and OMP_THREAD_LIMIT (if any are set).
