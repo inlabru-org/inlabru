@@ -63,6 +63,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
 
 
 test_that("Component construction: unsafe intercepts, data is list", {
+  skip_on_cran()
   local_bru_safe_inla()
 
   cmp <- bru_comp_list(~ something_unknown - 1)

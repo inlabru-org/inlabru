@@ -3288,7 +3288,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #'   passed to `stats::quantile`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
-#' When seed != 0, overridden to "1:1"
+#' When seed != 0, overridden to "1:1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param drop logical; If `drop=FALSE`, and
@@ -3631,7 +3631,7 @@ bru_generate_check_used_deprecation <- function(
 #'   `INLA::inla.posterior.sample`
 #' @param num.threads Specification of desired number of threads for parallel
 #' computations. Default NULL, leaves it up to INLA.
-#' When seed != 0, overridden to "1:1"
+#' When seed != 0, overridden to "1:1:1"
 #' @param used Either `NULL` or a [bru_used()] object.
 #'   Default, `NULL`, uses auto-detection of used variables in the formula.
 #' @param \dots additional, unused arguments.

@@ -93,7 +93,7 @@ local_inla_options_set <- function(...,
         }
       )
 
-      if (inherits(old_inla_options[[name]], "simpleError")) {
+      if (inherits(old_inla_options[[name]], "error")) {
         return(FALSE)
       }
 
@@ -104,7 +104,7 @@ local_inla_options_set <- function(...,
             e
           }
         )
-        if (inherits(e, "simpleError")) {
+        if (inherits(e, "error")) {
           return(FALSE)
         }
       }
@@ -139,7 +139,7 @@ local_bru_safe_inla <- function(multicore = FALSE,
         e
       }
     )
-    if (inherits(inla.call, "simpleError")) {
+    if (inherits(inla.call, "error")) {
       return(testthat::skip(
         "inla.getOption('inla.call') failed, skipping INLA tests."
       ))

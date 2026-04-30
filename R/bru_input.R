@@ -140,7 +140,7 @@ bru_input.bru_input <- function(x,
     if (is.null(val)) {
       return(NULL)
     }
-    if (inherits(e_input, "simpleError")) {
+    if (inherits(e_input, "error")) {
       if (null.on.fail) {
         return(NULL)
       }

@@ -48,7 +48,7 @@ bru_safe_inla <- function(multicore = NULL,
       e
     }
   )
-  if (inherits(inla.call, "simpleError")) {
+  if (inherits(inla.call, "error")) {
     if (!quietly) {
       message(
         "inla.getOption('inla.call') failed. INLA not installed correctly."
@@ -82,7 +82,7 @@ bru_safe_inla <- function(multicore = NULL,
         e
       }
     )
-    if (inherits(n.t, "simpleError")) {
+    if (inherits(n.t, "error")) {
       if (!quietly) {
         message("inla.getOption() failed. INLA not installed correctly.")
       }

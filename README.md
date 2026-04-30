@@ -176,6 +176,7 @@ ggplot() +
 
 <img src="man/figures/README-plot-1.png" alt="Nest intensity per km squared" width="100%" />
 <p class="caption">
+
 Nest intensity per km squared
 </p>
 
