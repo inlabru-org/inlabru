@@ -53,12 +53,12 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 RoxygenNote: 7.3.3
 Encoding: UTF-8
 Depends:
-    fmesher (>= 0.7.0),
     methods,
     R (>= 4.1.0),
     stats
 Imports:
     dplyr,
+    fmesher (>= 0.7.0),
     glue,
     lifecycle,
     MatrixModels,
