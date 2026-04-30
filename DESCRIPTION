@@ -137,6 +137,7 @@ Collate:
     'inlabru-package.R'
     'local_testthat.R'
     'mapper_collect.R'
+    'mapper_expr.R'
     'mapper_repeat.R'
     'mapper_sum.R'
     'model.R'

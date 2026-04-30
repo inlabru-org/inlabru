@@ -9,7 +9,7 @@
 \usage{
 ibm_eval2(mapper, input, state = NULL, ...)
 
-\method{ibm_eval2}{default}(mapper, input, state, ...)
+\method{ibm_eval2}{default}(mapper, input, state = NULL, ...)
 
 \method{ibm_eval2}{bm_pipe}(mapper, input, state = NULL, ...)
 

@@ -40,7 +40,7 @@ ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
 
 \method{ibm_n_output}{bm_collect}(mapper, input, state = NULL, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_n_output}{bm_expr}(mapper, input, state = NULL, inla_f = FALSE, ...)
+\method{ibm_n_output}{bm_expr}(mapper, input, state = NULL, inla_f = FALSE, ..., n_state = NULL)
 
 \method{ibm_n_output}{bm_repeat}(mapper, ...)
 
