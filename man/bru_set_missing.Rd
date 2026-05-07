@@ -76,7 +76,7 @@ model \code{a}, marking the rest as missing, and sets observations \code{3:5} of
 \section{Methods (by class)}{
 \itemize{
 \item \code{bru_set_missing(default)}: From \verb{> 2.13.0}, set missing values in any
-object supporting \code{\link[base:NA]{base::is.na<-()}} for positive and negative indices.
+object supporting \code{\link[base:is.na<-]{base::is.na<-()}} for positive and negative indices.
 
 \item \code{bru_set_missing(data.frame)}: From \verb{> 2.13.0}, handles \code{data.frame}, tibbles,
 including \code{inla.mdata}.

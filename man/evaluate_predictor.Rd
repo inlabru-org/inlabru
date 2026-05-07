@@ -63,7 +63,7 @@ For each component, e.g. "name", the latent state values are
 available as \code{name_latent}, and arbitrary evaluation can be done with
 \code{name_eval(...)}, see \code{\link[=bru_comp_eval]{bru_comp_eval()}}.
 
-The evaluation supports several \code{\link[rlang:as_data_mask]{rlang::as_data_pronoun()}} data masking
+The evaluation supports several \code{\link[rlang:as_data_pronoun]{rlang::as_data_pronoun()}} data masking
 pronouns, to access variables from different data sources, and some of
 these also have corresponding full objects, with an appended \code{.} in the
 name. The full objects can be passed as arguments to functions.
