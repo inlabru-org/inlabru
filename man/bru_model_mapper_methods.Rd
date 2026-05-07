@@ -2,18 +2,18 @@
 % Please edit documentation in R/model.R
 \name{bru_model_mapper_methods}
 \alias{bru_model_mapper_methods}
-\alias{ibm_linear.bru_model}
-\alias{ibm_linear.bru_comp_list}
+\alias{ibm_as_taylor.bru_model}
+\alias{ibm_as_taylor.bru_comp_list}
 \alias{ibm_simplify.bru_model}
 \alias{ibm_simplify.bru_comp}
 \alias{ibm_simplify.bru_comp_list}
-\alias{ibm_linear.bm_list}
+\alias{ibm_as_taylor.bm_list}
 \alias{ibm_simplify.bm_list}
 \title{Mapper methods for model objects}
 \usage{
-\method{ibm_linear}{bru_model}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bru_model}(mapper, input, state = NULL, ...)
 
-\method{ibm_linear}{bru_comp_list}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bru_comp_list}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bru_model}(mapper, input = NULL, state = NULL, ...)
 
@@ -21,7 +21,7 @@
 
 \method{ibm_simplify}{bru_comp_list}(mapper, input = NULL, state = NULL, ...)
 
-\method{ibm_linear}{bm_list}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bm_list}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bm_list}(mapper, input = NULL, state = NULL, ...)
 }
@@ -36,12 +36,12 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \item{...}{Arguments passed on to other methods}
 }
 \description{
-Methods for the \code{ibm_linear()} and \code{ibm_simplify()} methods for
+Methods for the \code{ibm_as_taylor()} and \code{ibm_simplify()} methods for
 \link{bru} model objects and related classes.
 }
 \section{Functions}{
 \itemize{
-\item \code{ibm_linear(bru_model)}: Returns a list (one element per
+\item \code{ibm_as_taylor(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bm_taylor}
 entry for each included component.
 

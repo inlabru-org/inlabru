@@ -50,7 +50,6 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.3.3
 Encoding: UTF-8
 Depends:
     methods,
@@ -160,3 +159,4 @@ LazyData: true
 LazyDataCompression: xz
 LinkingTo: 
     Rcpp
+Config/roxygen2/version: 8.0.0

@@ -185,7 +185,7 @@ bm_collect_sub_lin <- function(mapper, input, state, inla_f = FALSE, ...) {
       indexing,
       function(x) {
         state_subset <- state[n_offset[x] + seq_len(n_multi[x])]
-        ibm_linear(
+        ibm_as_taylor(
           mapper[["mappers"]][[x]],
           input = if (is.numeric(x) && (x > length(input))) {
             NULL
@@ -263,9 +263,11 @@ ibm_eval.bm_collect <- function(
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_collect <- function(mapper, input, state, inla_f = FALSE, ...) {
+ibm_as_taylor.bm_collect <- function(
+  mapper, input, state, inla_f = FALSE, ...
+) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)
   }

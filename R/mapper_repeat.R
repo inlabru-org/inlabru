@@ -145,7 +145,7 @@ bm_repeat_sub_lin <- function(mapper, input, state,
       seq_len(mapper[["n_rep"]]),
       function(x) {
         state_subset <- state[idx$offsets[x] + idx$index]
-        ibm_linear(
+        ibm_as_taylor(
           mapper[["mapper"]],
           input = input,
           state = state_subset
@@ -208,10 +208,10 @@ ibm_eval.bm_repeat <- function(mapper, input, state,
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_repeat <- function(mapper, input, state,
-                                 ...) {
+ibm_as_taylor.bm_repeat <- function(mapper, input, state,
+                                    ...) {
   sub_lin <-
     bm_repeat_sub_lin(
       mapper, input, state,

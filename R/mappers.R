@@ -152,20 +152,31 @@ ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' effect(input, state) =
 #'   offset(input, state0) + jacobian(input, state0) %*% (state - state0)
 #' ```
-#' The default method calls [ibm_eval()] and [ibm_jacobian()] to generate
+#' The default method calls [ibm_eval2()] to generate
 #' the needed information.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
-ibm_linear <- function(mapper, input, state = NULL, ...) {
-  UseMethod("ibm_linear")
+ibm_as_taylor <- function(mapper, input, state = NULL, ...) {
+  UseMethod("ibm_as_taylor")
+}
+
+#' @describeIn inlabru-deprecated Deprecated alias for [ibm_as_taylor()].
+#' @export
+ibm_linear <- function(...) {
+  lifecycle::deprecate_warn(
+    "2.14.1.9000",
+    "ibm_linear()",
+    "ibm_as_taylor()"
+  )
+  ibm_as_taylor(...)
 }
 
 #' @title Simplify a mapper
 #' @description
 #' Implementations must return a [bru_mapper] object.
-#' The default method returns the result of [ibm_linear()] for linear/affine
+#' The default method returns the result of [ibm_as_taylor()] for linear/affine
 #' mappers, and the original `mapper` for non-linear mappers.
 #' @export
 #' @family mapper methods
@@ -1020,7 +1031,7 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
   ))
 }
 
-#' @describeIn ibm_linear
+#' @describeIn ibm_as_taylor
 #' Calls [ibm_eval2()] and returns a [bm_taylor] object.
 #' @returns A [bm_taylor] object.
 #' The `state0` information in the affine mapper indicates for which state
@@ -1030,10 +1041,10 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
 #'   offset(input, state0) + jacobian(input, state0) %*% (state - state0)
 #' ```
 #' @export
-ibm_linear.default <- function(mapper, input, state, ...) {
+ibm_as_taylor.default <- function(mapper, input, state, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
-    return(ibm_linear(mapper_new, input = input, state = state, ...))
+    return(ibm_as_taylor(mapper_new, input = input, state = state, ...))
   }
   eval2 <- ibm_eval2(mapper, input = input, state = state, ...)
   bm_taylor(
@@ -1045,10 +1056,10 @@ ibm_linear.default <- function(mapper, input, state, ...) {
 }
 
 #' @describeIn ibm_simplify
-#' Calls [ibm_linear()] for linear mappers, and returns the original mapper
+#' Calls [ibm_as_taylor()] for linear mappers, and returns the original mapper
 #' for non-linear mappers.
 #' @returns The original mapper is returned for non-linear mappers, and the
-#' output of [ibm_linear()] is returned for linear mappers.
+#' output of [ibm_as_taylor()] is returned for linear mappers.
 #' @export
 ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
@@ -1059,7 +1070,7 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
     if (is.null(state)) {
       state <- rep(0, ibm_n(mapper, input = input, state = NULL, ...))
     }
-    return(ibm_linear(mapper, input = input, state = state, ...))
+    return(ibm_as_taylor(mapper, input = input, state = state, ...))
   }
   mapper
 }
@@ -1110,7 +1121,7 @@ ibm_eval.default <- function(mapper,
 #' Calls `jacobian <- ibm_jacobian(...)` and
 #' `offset <- ibm_eval(..., jacobian = jacobian)`
 #' and returns a list with elements `offset` and `jacobian`, as needed by
-#' [ibm_linear.default()] and similar methods. Mapper classes can implement
+#' [ibm_as_taylor.default()] and similar methods. Mapper classes can implement
 #' their own `ibm_eval2` method if joint construction of evaluation and Jacobian
 #' is more efficient than separate or sequential construction.
 #' @export
@@ -3214,7 +3225,7 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
 
 #' @describeIn ibm_simplify
 #' Constructs a simplified `pipe` mapper. For fully linear pipes, calls
-#' [ibm_linear()].
+#' [ibm_as_taylor()].
 #' For partially non-linear pipes, replaces each sequence of linear mappers with
 #' a single [bm_taylor()] mapper, while keeping the full list of
 #' original mapper names, allowing the original `input` structure to be used
@@ -3244,7 +3255,7 @@ ibm_simplify.bm_pipe <- function(mapper,
       )
       state <- rep(0, n)
     }
-    return(ibm_linear(mapper,
+    return(ibm_as_taylor(mapper,
       input = input, state = state, ...,
       inla_f = inla_f, n_state = n_state
     ))
@@ -3508,11 +3519,11 @@ ibm_jacobian.bm_multi <- function(mapper,
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_multi <- function(mapper, input, state,
-                                inla_f = FALSE,
-                                ...) {
+ibm_as_taylor.bm_multi <- function(mapper, input, state,
+                                   inla_f = FALSE,
+                                   ...) {
   eval2 <- ibm_eval2(
     mapper, input,
     state = state,

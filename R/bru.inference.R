@@ -5015,7 +5015,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate component linearisations",
     verbosity = 3
   )
-  comp_lin <- ibm_linear(
+  comp_lin <- ibm_as_taylor(
     model,
     input = inputs,
     state = states[[length(states)]],
@@ -5389,7 +5389,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           "iinla: Evaluate component linearisations",
           verbosity = 3
         )
-        comp_lin <- ibm_linear(
+        comp_lin <- ibm_as_taylor(
           model,
           input = inputs,
           state = state,

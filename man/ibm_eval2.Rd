@@ -5,6 +5,7 @@
 \alias{ibm_eval2.default}
 \alias{ibm_eval2.bm_pipe}
 \alias{ibm_eval2.bm_expr}
+\alias{ibm_eval2.bru_obs}
 \title{Evaluate a mapper and its Jacobian}
 \usage{
 ibm_eval2(mapper, input, state = NULL, ...)
@@ -14,6 +15,8 @@ ibm_eval2(mapper, input, state = NULL, ...)
 \method{ibm_eval2}{bm_pipe}(mapper, input, state = NULL, ...)
 
 \method{ibm_eval2}{bm_expr}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -24,6 +27,9 @@ ibm_eval2(mapper, input, state = NULL, ...)
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
+
+\item{multi}{logical;
+If \code{TRUE} (or positive), recurse one level into sub-mappers}
 }
 \description{
 Implementations must return a list with elements \code{offset} and \code{jacobian}.
@@ -36,25 +42,25 @@ for the mapper.
 \item \code{ibm_eval2(default)}: Calls \code{jacobian <- ibm_jacobian(...)} and
 \code{offset <- ibm_eval(..., jacobian = jacobian)}
 and returns a list with elements \code{offset} and \code{jacobian}, as needed by
-\code{\link[=ibm_linear.default]{ibm_linear.default()}} and similar methods. Mapper classes can implement
+\code{\link[=ibm_as_taylor.default]{ibm_as_taylor.default()}} and similar methods. Mapper classes can implement
 their own \code{ibm_eval2} method if joint construction of evaluation and Jacobian
 is more efficient than separate or sequential construction.
 
 }}
 \seealso{
-Other mapper methods: 
+Other mapper methods:
 \code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_inla_subset}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
+\code{\link[=ibm_eval]{ibm_eval()}},
+\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
+\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
+\code{\link[=ibm_is_linear]{ibm_is_linear()}},
+\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
+\code{\link[=ibm_jacobian]{ibm_jacobian()}},
+\code{\link[=ibm_n]{ibm_n()}},
+\code{\link[=ibm_n_output]{ibm_n_output()}},
+\code{\link[=ibm_names]{ibm_names()}},
+\code{\link[=ibm_simplify]{ibm_simplify()}},
+\code{\link[=ibm_values]{ibm_values()}}
 }
 \concept{mapper methods}

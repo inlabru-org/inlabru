@@ -45,10 +45,10 @@ bru_log_warn(
 }
 \arguments{
 \item{\dots}{For \code{bru_log_message()}, zero or more objects passed on to
-\code{\link[base:message]{base::.makeMessage()}}. For \code{bru_log_abort()} and \code{bru_log_warn()},
+\code{\link[base:.makeMessage]{base::.makeMessage()}}. For \code{bru_log_abort()} and \code{bru_log_warn()},
 passed on to \code{rlang::abort()} and \code{rlang::warn()}.}
 
-\item{domain}{Domain for translations, passed on to \code{\link[base:message]{base::.makeMessage()}}}
+\item{domain}{Domain for translations, passed on to \code{\link[base:.makeMessage]{base::.makeMessage()}}}
 
 \item{appendLF}{logical; whether to add a newline to the message. Only
 used for verbose output.}
@@ -71,7 +71,7 @@ stored in the global log object. Can be controlled via the
 
 \item{x}{A \code{bru_log} object. If \code{NULL}, refers to the global \code{inlabru} log.}
 
-\item{msg}{character; passed to \code{\link[base:message]{base::.makeMessage()}}}
+\item{msg}{character; passed to \code{\link[base:.makeMessage]{base::.makeMessage()}}}
 
 \item{call}{The calling environment.}
 
@@ -119,11 +119,11 @@ if (interactive()) {
 }
 }
 \seealso{
-Other inlabru log methods: 
-\code{\link{bru_log}()},
-\code{\link{bru_log_bookmark}()},
-\code{\link{bru_log_new}()},
-\code{\link{bru_log_offset}()},
-\code{\link{bru_log_reset}()}
+Other inlabru log methods:
+\code{\link[=bru_log]{bru_log()}},
+\code{\link[=bru_log_bookmark]{bru_log_bookmark()}},
+\code{\link[=bru_log_new]{bru_log_new()}},
+\code{\link[=bru_log_offset]{bru_log_offset()}},
+\code{\link[=bru_log_reset]{bru_log_reset()}}
 }
 \concept{inlabru log methods}

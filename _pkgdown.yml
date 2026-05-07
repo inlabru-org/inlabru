@@ -222,6 +222,7 @@ reference:
   - matches("multiplot")
   - matches("spoly")
   - matches("sline")
+  - matches("ibm_linear")
 #- title: "Other functions"
 #  desc: "Other functions"
 #  contents:

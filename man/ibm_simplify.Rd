@@ -42,20 +42,20 @@ that have state dependent output size.}
 }
 \value{
 The original mapper is returned for non-linear mappers, and the
-output of \code{\link[=ibm_linear]{ibm_linear()}} is returned for linear mappers.
+output of \code{\link[=ibm_as_taylor]{ibm_as_taylor()}} is returned for linear mappers.
 }
 \description{
 Implementations must return a \link{bru_mapper} object.
-The default method returns the result of \code{\link[=ibm_linear]{ibm_linear()}} for linear/affine
+The default method returns the result of \code{\link[=ibm_as_taylor]{ibm_as_taylor()}} for linear/affine
 mappers, and the original \code{mapper} for non-linear mappers.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{ibm_simplify(default)}: Calls \code{\link[=ibm_linear]{ibm_linear()}} for linear mappers, and returns the original mapper
+\item \code{ibm_simplify(default)}: Calls \code{\link[=ibm_as_taylor]{ibm_as_taylor()}} for linear mappers, and returns the original mapper
 for non-linear mappers.
 
 \item \code{ibm_simplify(bm_pipe)}: Constructs a simplified \code{pipe} mapper. For fully linear pipes, calls
-\code{\link[=ibm_linear]{ibm_linear()}}.
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}}.
 For partially non-linear pipes, replaces each sequence of linear mappers with
 a single \code{\link[=bm_taylor]{bm_taylor()}} mapper, while keeping the full list of
 original mapper names, allowing the original \code{input} structure to be used
@@ -64,19 +64,19 @@ dependent on inputs.
 
 }}
 \seealso{
-Other mapper methods: 
+Other mapper methods:
 \code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_inla_subset}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_values}()}
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
+\code{\link[=ibm_eval]{ibm_eval()}},
+\code{\link[=ibm_eval2]{ibm_eval2()}},
+\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
+\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
+\code{\link[=ibm_is_linear]{ibm_is_linear()}},
+\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
+\code{\link[=ibm_jacobian]{ibm_jacobian()}},
+\code{\link[=ibm_n]{ibm_n()}},
+\code{\link[=ibm_n_output]{ibm_n_output()}},
+\code{\link[=ibm_names]{ibm_names()}},
+\code{\link[=ibm_values]{ibm_values()}}
 }
 \concept{mapper methods}

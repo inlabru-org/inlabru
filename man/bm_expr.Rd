@@ -7,9 +7,8 @@
 bm_expr(
   expr,
   ...,
-  root_label = "root",
-  derived_label = "derived",
-  root_suffix = NULL,
+  assume = character(0),
+  labels = NULL,
   .envir = parent.frame()
 )
 }
@@ -18,72 +17,68 @@ bm_expr(
 that can be evaluated in a data mask containing the root variables, derived
 variables, and data variables.}
 
-\item{root_label, derived_label}{Character strings specifying the pronoun
-labels for the data mask for root and derived variables. Default "root" and
-"derived", respectively. For example, if \code{root_label = "latent"}, then the
-root variables will be accessible in the expression as \code{.latent$varname}.}
+\item{assume}{character vector listing valid assumptions for the
+combination of the expression and input data, derived variables, and root
+variables. This can be used to specify assumptions that allow for more
+efficient Jacobian calculations. For example, if the expression
+is row-wise in the data and derived variables, then
+\code{assume = "rowwise"} can be used to indicate that the Jacobian with
+respect to derived variables can be calculated simultaneously for all
+rows. Supported assumptions are "rowwise", "linear", and "additive".}
 
-\item{root_suffix}{If non-NULL, aharacter string specifying a suffix to add
+\item{labels}{list of \code{root}, \code{derived}, and \code{suffix}.
+The \code{root} and \code{derived} elements specify the pronoun
+labels for the data mask for root and derived variables. Default "root" and
+"derived", respectively. For example, if \code{root = "latent"}, then the
+root variables will be accessible in the expression as \code{.latent$varname}.
+If \code{suffix} is non-NULL, a character string specifying a suffix to add
 to the root variable names when making them directly available to the
-expression. Default is \code{""}. For example, if \code{root_suffix = "_latent"},
+expression. Default is NULL, equivalent to \code{""}. For example, if
+\code{suffix = "_latent"},
 then a root variable named \code{"x"} will be available as \code{"x_latent"} in the
 expression, in addition to the data mask pronoun version.}
+
+\item{derived, jacobians}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.
+If \code{jacobians} is \code{NULL} or missing, defaults to an empty list.
+If not \code{NULL}, should be a list with named entries, one for variable derived
+from the root variables. Each list element should be a named list of Jacobian
+matrices, with names matching the root variables.
+Missing entries are treated as all-zero matrices.}
 }
 \description{
 Constructs an expression mapping
 }
 \details{
-The \code{input} should be a list with elements
-\describe{
-\item{data}{Defaults to \code{NULL}. If not \code{NULL}, should be a list of
-data.frame or similar objects, with \code{data$data} being the main data
-container.
-If \code{is_rowwise == TRUE}, the number of rows in the \code{data$data} data.frame
+The \code{input} should be a list with data objects, with the main object called
+\code{data}.
+If \code{is_rowwise == TRUE}, the number of rows in the \code{data} data.frame
 determines the number of rows in the output, and the columns can be used as
 constants in the expression, accessed via \code{.data$colname},
-\code{.data.$colname}, or \code{.data.[["colname"]]}.}
-\item{roots}{If \code{NULL} or missing, defaults to \code{names(state)}, and must
-otherwise be a subset of \code{names(state)}.
-If not \code{NULL}, should be a character vector of variable names.
-By definition, the pre-Jacobian for each root variable is an identity
-matrix.}
-\item{derived}{The state vectors of variables derived from the root
-variables. If \code{NULL} or missing, defaults to an empty list.}
-\item{jacobians}{If \code{NULL} or missing, defaults to an empty list.
-If not \code{NULL}, should be a list with named entries, one for variable derived
-from the root variables. Each list element should be a named list of Jacobian
-matrices, with names matching the root variables.
-Missing entries are treated as all-zero matrices.
-}
-}
+\code{.data.$colname}, or \code{.data.[["colname"]]}.
 }
 \examples{
-# Basic expression with only root variables ("x"). Implies
-# input$roots = names(state) = "x" and identity Jacobian for "x".
+# Basic expression with only root variables ("x").
 (m <- bm_expr(rlang::quo(cos(x))))
 ibm_eval(m, list(), list(x = 1:5))
 ibm_eval2(m, list(), list(x = 1:5))
 
 # Expression with data
 (m <- bm_expr(rlang::quo(cos(x) * .data$z)))
-ibm_eval(m, list(data = list(data = data.frame(z = 11:15))), list(x = 1:5))
+ibm_eval(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
 ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
 
 # Expression with data, root variables, and derived variables.
 (m <- bm_expr(
   rlang::quo(sin(x_latent) + cos(.effect$y) * .data$z),
-  root_label = "latent",
-  derived_label = "effect",
-  root_suffix = "_latent"
+  labels = list(root = "latent", derived = "effect", suffix = "_latent")
 )
 )
 ibm_eval(
   m,
-  list(
-    data = list(data = data.frame(z = 11:15)),
-    derived = list(y = 2:6), # y = x + 1
-    jacobians = list(y = list(x = Matrix::Diagonal(1.0, 5)))
-  ),
+  list(data = data.frame(z = 11:15)),
+  derived = list(y = 2:6), # y = x + 1
+  jacobians = list(y = list(x = Matrix::Diagonal(1.0, 5))),
   state = list(x = 1:5)
 )
 
@@ -91,29 +86,29 @@ ibm_eval(
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
-Other mappers: 
-\code{\link{bm_aggregate}()},
-\code{\link{bm_collect}()},
-\code{\link{bm_const}()},
-\code{\link{bm_factor}()},
+Other mappers:
+\code{\link[=bm_aggregate]{bm_aggregate()}},
+\code{\link[=bm_collect]{bm_collect()}},
+\code{\link[=bm_const]{bm_const()}},
+\code{\link[=bm_factor]{bm_factor()}},
 \code{\link{bm_fm_mesh_1d}},
-\code{\link{bm_fmesher}()},
-\code{\link{bm_harmonics}()},
-\code{\link{bm_index}()},
-\code{\link{bm_linear}()},
-\code{\link{bm_logitaverage}()},
-\code{\link{bm_logsumexp}()},
-\code{\link{bm_marginal}()},
-\code{\link{bm_matrix}()},
-\code{\link{bm_multi}()},
-\code{\link{bm_pipe}()},
-\code{\link{bm_reparam}()},
-\code{\link{bm_repeat}()},
-\code{\link{bm_scale}()},
-\code{\link{bm_shift}()},
-\code{\link{bm_sum}()},
-\code{\link{bm_taylor}()},
-\code{\link{bru_get_mapper}()},
-\code{\link{bru_mapper}()}
+\code{\link[=bm_fmesher]{bm_fmesher()}},
+\code{\link[=bm_harmonics]{bm_harmonics()}},
+\code{\link[=bm_index]{bm_index()}},
+\code{\link[=bm_linear]{bm_linear()}},
+\code{\link[=bm_logitaverage]{bm_logitaverage()}},
+\code{\link[=bm_logsumexp]{bm_logsumexp()}},
+\code{\link[=bm_marginal]{bm_marginal()}},
+\code{\link[=bm_matrix]{bm_matrix()}},
+\code{\link[=bm_multi]{bm_multi()}},
+\code{\link[=bm_pipe]{bm_pipe()}},
+\code{\link[=bm_reparam]{bm_reparam()}},
+\code{\link[=bm_repeat]{bm_repeat()}},
+\code{\link[=bm_scale]{bm_scale()}},
+\code{\link[=bm_shift]{bm_shift()}},
+\code{\link[=bm_sum]{bm_sum()}},
+\code{\link[=bm_taylor]{bm_taylor()}},
+\code{\link[=bru_get_mapper]{bru_get_mapper()}},
+\code{\link[=bru_mapper]{bru_mapper()}}
 }
 \concept{mappers}

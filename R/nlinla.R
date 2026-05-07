@@ -50,6 +50,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
                                                is_rowwise,
                                                eps,
                                                n_pred = NULL,
+                                               finite_diff = "forward",
                                                ...) {
   label <- cmp[["label"]]
   bru_log_message(
@@ -100,9 +101,9 @@ bru_compute_linearisation.bru_comp <- function(cmp,
   }
 
   triplets <- list(
-    i = integer(0),
-    j = integer(0),
-    x = numeric(0)
+    i = vector("list", NROW(state[[label]])),
+    j = vector("list", NROW(state[[label]])),
+    x = vector("list", NROW(state[[label]]))
   )
 
   if (!all(is.finite(pred0))) {
@@ -112,7 +113,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     )
   }
 
-  symmetric_diffs <- FALSE
+  symmetric_diffs <- identical(finite_diff, "central")
   for (k in seq_len(NROW(state[[label]]))) {
     if (is.null(A)) {
       row_subset <- seq_len(NROW(pred0))
@@ -247,18 +248,18 @@ bru_compute_linearisation.bru_comp <- function(cmp,
       }
       nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
       if (assume_rowwise) {
-        triplets$i <- c(triplets$i, row_subset[nonzero])
+        triplets$i[[k]] <- row_subset[nonzero]
       } else {
-        triplets$i <- c(triplets$i, which(nonzero))
+        triplets$i[[k]] <- which(nonzero)
       }
-      triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
-      triplets$x <- c(triplets$x, values[nonzero] / eps)
+      triplets$j[[k]] <- rep(k, sum(nonzero))
+      triplets$x[[k]] <- values[nonzero] / eps
     }
   }
   B <- Matrix::sparseMatrix(
-    i = triplets$i,
-    j = triplets$j,
-    x = triplets$x,
+    i = unlist(triplets$i),
+    j = unlist(triplets$j),
+    x = unlist(triplets$x),
     dims = c(NROW(pred0), NROW(state[[label]]))
   )
   if (NROW(B) != NROW(pred0)) {

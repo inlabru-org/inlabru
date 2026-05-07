@@ -224,7 +224,7 @@ bru_is_additive.bru_obs <- function(x, ...) {
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.bru_obs_list <- function(x, ...) {
-  vapply(x, function(lh) bru_is_linear(lh, ...), logical(1))
+  vapply(x, function(lh) bru_is_additive(lh, ...), logical(1))
 }
 
 

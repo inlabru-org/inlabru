@@ -796,11 +796,11 @@ bru_comp_eval <- function(main,
 
 #' @title Mapper methods for model objects
 #' @description
-#' Methods for the `ibm_linear()` and `ibm_simplify()` methods for
+#' Methods for the `ibm_as_taylor()` and `ibm_simplify()` methods for
 #' [bru] model objects and related classes.
 #'
 #' @inheritParams bru_mapper_generics
-#' @inheritParams ibm_linear
+#' @inheritParams ibm_as_taylor
 #' @inheritParams ibm_simplify
 #'
 #' @name bru_model_mapper_methods
@@ -811,7 +811,7 @@ NULL
 #'   observation model) of [bm_list] objects, each with one [bm_taylor]
 #'   entry for each included component.
 #' @export
-ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
+ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
   bru_log_message(
@@ -822,7 +822,7 @@ ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
     lapply(
       input,
       function(inp) {
-        ibm_linear(
+        ibm_as_taylor(
           as_bru_comp_list(model),
           input = inp,
           state = state,
@@ -836,7 +836,7 @@ ibm_linear.bru_model <- function(mapper, input, state = NULL, ...) {
 
 #' @rdname bru_model_mapper_methods
 #' @export
-ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
+ibm_as_taylor.bru_comp_list <- function(mapper, input, state = NULL, ...) {
   comp <- mapper
   included <- parse_inclusion(
     names(comp),
@@ -844,7 +844,7 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
     NULL
   )
 
-  mappers <- ibm_linear(
+  mappers <- ibm_as_taylor(
     as_bm_list(comp[included]),
     input = input[included],
     state = state[included],
@@ -854,13 +854,13 @@ ibm_linear.bru_comp_list <- function(mapper, input, state = NULL, ...) {
   mappers
 }
 
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #' @export
 #'
-ibm_linear.bru_comp <- function(mapper,
-                                input,
-                                state = NULL,
-                                ...) {
+ibm_as_taylor.bru_comp <- function(mapper,
+                                   input,
+                                   state = NULL,
+                                   ...) {
   bru_log_message(
     paste0("Linearise component '", mapper[["label"]], "'"),
     verbosity = 5
@@ -868,7 +868,7 @@ ibm_linear.bru_comp <- function(mapper,
   if (is.null(state)) {
     state <- rep(0, ibm_n(mapper[["mapper"]]))
   }
-  ibm_linear(mapper[["mapper"]], input = input, state = state, ...)
+  ibm_as_taylor(mapper[["mapper"]], input = input, state = state, ...)
 }
 
 #' @describeIn bru_model_mapper_methods Returns a list (one element per
@@ -937,14 +937,14 @@ ibm_simplify.bru_comp_list <- function(mapper,
 
 # @title Mapper methods for model objects
 # @description
-# Methods for the `ibm_linear()` and `ibm_simplify()` methods for
+# Methods for the `ibm_as_taylor()` and `ibm_simplify()` methods for
 # [bru] model objects and related classes.
 #
 #' @export
 #' @rdname bru_model_mapper_methods
 #' @export
 #'
-ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
+ibm_as_taylor.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
     label <- as.character(seq_along(mapper))
@@ -956,7 +956,7 @@ ibm_linear.bm_list <- function(mapper, input, state = NULL, ...) {
         paste0("Linearise component '", label[k], "'"),
         verbosity = 4
       )
-      ibm_linear(
+      ibm_as_taylor(
         mapper[[k]],
         input[[k]],
         state = NULL,
