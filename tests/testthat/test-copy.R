@@ -1,3 +1,69 @@
+test_that("bru: inla copy feature basics", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  # Seed influences data as well as predict()!
+  withr::local_seed(123L)
+
+  df <- data.frame(x = 1:10, y = 2:11, z = 3:12, w = 4:13)
+
+  obs <- bru_obs(y ~ ., family = "gaussian", data = df)
+
+  # Should pass:
+  cmp <- ~ 0 +
+    x(x, model = "iid") +
+    x_copy(y, copy = "x")
+  expect_no_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+
+  # Should fail as weights is missing from x, but present in x_copy_w:
+  cmp <- ~ 0 +
+    x(x, model = "iid") +
+    x_copy(y, copy = "x") +
+    x_copy_w(z, copy = "x", weights = w)
+  expect_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+
+  # Should pass:
+  cmp <- ~ 0 +
+    x(x, model = "iid", weights = 1) +
+    x_copy(y, copy = "x", weights = 1) +
+    x_copy_w(z, copy = "x", weights = w)
+  expect_no_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+
+  # Should fail, as group is missing in x_copy and x_copy_w:
+  cmp <- ~ 0 +
+    x(x, group = 1:3, model = "iid", weights = 1) +
+    x_copy(y, copy = "x", weights = 1) +
+    x_copy_w(z, copy = "x", weights = w)
+  expect_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+
+  # Should fail, as group is missing in x but present in x_copy:
+  cmp <- ~ 0 +
+    x(x, model = "iid", weights = 1) +
+    x_copy(y, copy = "x", group = 1, weights = 1) +
+    x_copy_w(z, copy = "x", weights = w)
+  expect_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+
+  # Should pass:
+  cmp <- ~ 0 +
+    x(x, model = "iid", group = 1:3, weights = 1) +
+    x_copy(y, copy = "x", group = 2, weights = 1) +
+    x_copy_w(z, copy = "x", group = 3, weights = w)
+  expect_no_error({
+    fit <- bru(cmp, obs, options = list(bru_run = FALSE))
+  })
+})
+
+
 test_that("bru: inla copy feature", {
   skip_on_cran()
   local_bru_safe_inla()

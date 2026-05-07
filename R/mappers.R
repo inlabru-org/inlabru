@@ -181,6 +181,8 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 #' The `input` contents must
 #' be in a format accepted by [ibm_jacobian()]
 #' for the mapper.
+#'
+#' Specific implementations for `r doclisting::methods_inline("ibm_jacobian")`.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n

@@ -1,5 +1,16 @@
 # inlabru (development version)
 
+## Bug fixes
+
+* Fix issue #298, where `weights` input to `copy = ...` components was not
+  consistently passed to the component mapper construction. This could be
+  partly worked around by specifying `weights = 1` in the source component, but
+  only for estimation, so post-estimation computations would still ignore the
+  weights.
+  Now enforces that the same inputs are present in both the source and copy
+  definitions, ensuring a consistent mapper construction, and post-estimation
+  consistency. (`2.14.1.9002`)
+
 # inlabru 2.14.1
 
 ## Bug fixes

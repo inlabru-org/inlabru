@@ -1017,6 +1017,61 @@ add_mappers.bru_comp <- function(component,
   component
 }
 
+# add_mappers.bru_comp for copy components
+add_mappers_copy <- function(component, root_comp) {
+  copy_with_input <- function(mapper, root, label) {
+    if (is.null(mapper) && is.null(root)) {
+      return(NULL)
+    }
+    if (is.null(mapper) && !is.null(root)) {
+      stop(glue(
+        "'{label}' mapper for copy component '{component$label}' is missing, ",
+        "but the source component '{root_comp$label}' has a non-null mapper."
+      ))
+    }
+    if (is.null(root)) {
+      stop(glue(
+        "'{label}' mapper for copy component '{component$label}' is present, ",
+        "but the source component '{root_comp$label}' has no mapper."
+      ))
+    }
+    input <- NULL
+    if (ibm_input_available(mapper)) {
+      input <- ibm_input_get(mapper)
+    }
+    mapper <- root
+    if (!is.null(input)) {
+      mapper <- ibm_input_set(mapper, input)
+    }
+    mapper
+  }
+
+  component$main$mapper <- copy_with_input(
+    component$main$mapper,
+    root_comp$main$mapper,
+    "main"
+  )
+  component$group$mapper <- copy_with_input(
+    component$group$mapper,
+    root_comp$group$mapper,
+    "group"
+  )
+  component$replicate$mapper <- copy_with_input(
+    component$replicate$mapper,
+    root_comp$replicate$mapper,
+    "replicate"
+  )
+  component$weights <- copy_with_input(
+    component$weights, root_comp$weights,
+    "weights"
+  )
+
+  component <- bru_comp_update_mapper(component)
+
+  component
+}
+
+
 #' @param components A `bru_comp_list` object
 #' @export
 #' @rdname add_mappers
@@ -1048,8 +1103,11 @@ add_mappers.bru_comp_list <- function(components,
         " to use as copy for component '{components[[k]][['label']]}'."
       ))
     }
-    components[[k]]$mapper <-
-      components[[components[[k]][["copy"]]]][["mapper"]]
+
+    components[[k]] <- add_mappers_copy(
+      components[[k]],
+      components[[components[[k]][["copy"]]]]
+    )
   }
   components
 }
