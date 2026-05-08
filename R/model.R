@@ -92,7 +92,13 @@ bru_model <- function(components,
     stop("No observation models provided.")
   }
 
-  inputs <- bru_input(lhoods, components = components, null.on.fail = FALSE)
+  # Evaluate inputs for non-copy components
+  is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
+  inputs <- bru_input(
+    lhoods,
+    components = components[!is_copy],
+    null.on.fail = FALSE
+  )
 
   # Back up environment
   env <- environment(components)
@@ -105,6 +111,25 @@ bru_model <- function(components,
     lhoods = lhoods,
     inputs = inputs
   )
+
+  # Evaluate inputs for non-copy components
+  is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
+  if (any(is_copy)) {
+    inputs_copy <- bru_input(
+      lhoods,
+      components = components[is_copy],
+      null.on.fail = FALSE
+    )
+    inputs <- lapply(
+      seq_along(inputs),
+      function(k) {
+        if (length(inputs_copy[[k]]) == 0) {
+          return(inputs[[k]])
+        }
+        modifyList(inputs[[k]], inputs_copy[[k]], keep.null = TRUE)
+      }
+    )
+  }
 
   # Create joint formula that will be used by inla
   formula <- bru_inla_formula(components)

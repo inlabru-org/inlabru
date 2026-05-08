@@ -104,9 +104,8 @@ of inputs for the components used by the corresponding observation model.
 }
 
 \itemize{
-\item \code{bru_input(bru_obs_list)}: A list of mapper input values,
-with one entry for each observation model, each containing a list
-of inputs for the components used by the corresponding observation model.
+\item \code{bru_input(bru_obs)}: A list of mapper input values,
+for each of the components used by the corresponding observation model.
 }
 
 \itemize{

@@ -499,12 +499,14 @@ bru_input.bru_model <- function(x, lhoods, ...) {
 #' @rdname bru_input
 #' @param components A `bru_comp_list` object containing all components
 #'   defined in the model.
-#' @return * `bru_input(bru_obs_list)`: A list of mapper input values,
-#'   with one entry for each observation model, each containing a list
-#'   of inputs for the components used by the corresponding observation model.
+#' @return * `bru_input(bru_obs)`: A list of mapper input values,
+#'   for each of the components used by the corresponding observation model.
 #' @export
 bru_input.bru_obs <- function(x, components, ...) {
-  included <- bru_used(x)[["effect"]]
+  included <- intersect(bru_used(x)[["effect"]], names(components))
+  if (length(included) == 0L) {
+    return(list())
+  }
 
   bru_input(
     components[included],
