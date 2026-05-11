@@ -10,6 +10,8 @@
   Now enforces that the same inputs are present in both the source and copy
   definitions, ensuring a consistent mapper construction, and post-estimation
   consistency. (`2.14.1.9002`)
+* (Re)enable non-integer point weights for `family = "cp"` models, by using
+  # `family = "xpoisson"` (version `2.14.1.9003`)
 
 # inlabru 2.14.1
 
