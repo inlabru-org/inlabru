@@ -24,6 +24,7 @@
 \alias{ibm_jacobian.bm_reparam}
 \alias{ibm_jacobian.bm_collect}
 \alias{ibm_jacobian.bm_expr}
+\alias{ibm_jacobian.bru_obs}
 \alias{ibm_jacobian.bm_repeat}
 \alias{ibm_jacobian.bm_sum}
 \title{Jacobian of a mapper}
@@ -90,14 +91,16 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
   mapper,
   input,
   state = NULL,
+  inla_f = FALSE,
+  ...,
   derived = NULL,
   jacobians = NULL,
-  inla_f = FALSE,
   multi = FALSE,
-  ...,
   offset = NULL,
   env = rlang::caller_env()
 )
+
+\method{ibm_jacobian}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
 
 \method{ibm_jacobian}{bm_repeat}(
   mapper,

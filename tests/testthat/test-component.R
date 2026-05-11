@@ -58,7 +58,7 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  comp_lin <- ibm_linear(cmp, input = inp, inla_f = FALSE)
+  comp_lin <- ibm_as_taylor(cmp, input = inp, inla_f = FALSE)
   A <- ibm_jacobian(comp_lin)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
@@ -144,7 +144,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(cmp,
+  comp_lin <- ibm_as_taylor(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -162,7 +162,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(cmp,
+  comp_lin <- ibm_as_taylor(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -181,7 +181,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(cmp,
+  comp_lin <- ibm_as_taylor(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
@@ -200,7 +200,7 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(cmp,
+  comp_lin <- ibm_as_taylor(cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE

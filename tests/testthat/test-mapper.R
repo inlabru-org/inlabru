@@ -14,7 +14,7 @@ test_that("Linear mapper", {
   )
   expect_equal(
     ibm_eval(
-      ibm_linear(mapper, input = input, state = state),
+      ibm_as_taylor(mapper, input = input, state = state),
       state = state
     ),
     input * state
@@ -41,7 +41,7 @@ test_that("Index mapper", {
   )
   expect_equal(
     ibm_eval(
-      ibm_linear(mapper, input = input, state = state),
+      ibm_as_taylor(mapper, input = input, state = state),
       state = state
     ),
     val
@@ -87,7 +87,7 @@ test_that("Factor mapper", {
     )
     expect_equal(
       ibm_eval(
-        ibm_linear(mapper, input = input, state = state),
+        ibm_as_taylor(mapper, input = input, state = state),
         state = state
       ),
       val

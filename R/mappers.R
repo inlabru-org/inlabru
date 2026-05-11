@@ -193,7 +193,7 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 #' be in a format accepted by [ibm_jacobian()]
 #' for the mapper.
 #'
-#' Specific implementations for `r doclisting::methods_inline("ibm_jacobian")`.
+#' Specific implementations for `r doclisting::methods_inline("ibm_eval")`.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
@@ -201,6 +201,14 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 ibm_eval <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval")
 }
+
+#' @title Specific `ibm_eval` method implementations
+#' @description Specific [ibm_eval()] method implementations.
+#' @inheritParams ibm_eval
+#' @rdname ibm_eval_methods
+#' @name ibm_eval_methods
+NULL
+
 
 #' @title Evaluate a mapper and its Jacobian
 #' @description
@@ -1686,7 +1694,7 @@ ibm_jacobian.bm_taylor <- function(mapper, ..., multi = FALSE) {
 }
 
 
-#' @describeIn ibm_eval
+#' @describeIn ibm_eval_methods
 #' Evaluates linearised
 #' mapper information at the given `state`. The `input` argument is ignored,
 #' so that the usual argument order
@@ -2067,7 +2075,7 @@ ibm_jacobian.bm_const <- function(mapper, input, ...) {
 }
 
 #' @export
-#' @describeIn ibm_eval Returns the input values, with NA replaced by 0.
+#' @describeIn ibm_eval_methods Returns the input values, with NA replaced by 0.
 #'
 ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
   if (is.null(input)) {
@@ -2168,8 +2176,7 @@ ibm_jacobian.bm_shift <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
-#' @inheritParams ibm_jacobian
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
   stopifnot(!is.null(state))
@@ -2286,7 +2293,7 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
   stopifnot(!is.null(state))
@@ -2487,7 +2494,7 @@ ibm_jacobian.bm_aggregate <- function(mapper,
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
@@ -2617,7 +2624,7 @@ ibm_jacobian.bm_logsumexp <- function(mapper,
 #' @export
 #' @param log logical; control `log` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logsumexp` mappers.
-#' @describeIn ibm_eval When `log` is `TRUE` (default), `ibm_eval()`
+#' @describeIn ibm_eval_methods When `log` is `TRUE` (default), `ibm_eval()`
 #'   for `logsumexp` returns the log-sum-weight-exp value. If `FALSE`, the
 #'   `sum-weight-exp` value is returned.
 #'
@@ -2757,7 +2764,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
 #' @export
 #' @param logit logical; control `logit` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logitaverage` mappers.
-#' @describeIn ibm_eval When `logit` is `TRUE` (default), `ibm_eval()`
+#' @describeIn ibm_eval_methods When `logit` is `TRUE` (default), `ibm_eval()`
 #'   for `logitaverage` returns the logit-sum-weight-inverse-logit value.
 #'   If `FALSE`, the `sum-weights=invere-logit` value is returned.
 #'
@@ -3007,7 +3014,7 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
 
 
 #' @export
-#' @describeIn ibm_eval When `xor(mapper[["inverse"]], reverse)` is
+#' @describeIn ibm_eval_methods When `xor(mapper[["inverse"]], reverse)` is
 #' `FALSE`, `ibm_eval()`
 #' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically
 #' stable way. Otherwise, evaluates the inverse `qnorm(pfun(x, param))` instead.
@@ -3169,7 +3176,7 @@ ibm_jacobian.bm_pipe <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_pipe <- function(mapper, input, state = NULL, ...) {
   if (is.null(mapper[["names"]])) {
@@ -3547,7 +3554,7 @@ ibm_as_taylor.bm_multi <- function(mapper, input, state,
 #' supplied by internal methods that already have the Jacobian.
 #' @param pre_A `r lifecycle::badge("deprecated")` in favour of `jacobian`.
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_multi <- function(mapper, input, state = NULL,
                               inla_f = FALSE, ...,
@@ -3944,7 +3951,7 @@ ibm_jacobian.bm_reparam <- function(mapper, input, state = NULL, ...) {
   A %*% mapper[["B"]]
 }
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 ibm_eval.bm_reparam <- function(mapper, input, state = NULL, ...,
                                 jacobian = NULL) {
   if (is.null(input)) {

@@ -6,6 +6,7 @@
 \alias{ibm_eval2.bm_pipe}
 \alias{ibm_eval2.bm_expr}
 \alias{ibm_eval2.bru_obs}
+\alias{ibm_eval2.bru_obs_list}
 \title{Evaluate a mapper and its Jacobian}
 \usage{
 ibm_eval2(mapper, input, state = NULL, ...)
@@ -17,6 +18,8 @@ ibm_eval2(mapper, input, state = NULL, ...)
 \method{ibm_eval2}{bm_expr}(mapper, input, state = NULL, ...)
 
 \method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
+
+\method{ibm_eval2}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_list)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}

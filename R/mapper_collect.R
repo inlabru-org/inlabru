@@ -237,7 +237,7 @@ ibm_jacobian.bm_collect <- function(
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_collect <- function(
   mapper,

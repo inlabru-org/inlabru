@@ -202,7 +202,7 @@ ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_sum <- function(mapper, input, state,
                             multi = FALSE,

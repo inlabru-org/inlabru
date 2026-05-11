@@ -44,9 +44,9 @@ ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
   mapper,
   input,
   state = NULL,
-  derived = NULL,
   inla_f = FALSE,
   ...,
+  derived = NULL,
   n_state = NULL
 )
 

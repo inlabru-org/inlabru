@@ -1557,6 +1557,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
         list(friends = group_cv_friends)
       )
     }
+    the_family <- "poisson"
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
@@ -1576,6 +1577,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       BRU_scale = response_data[["BRU_scale"]][1]
     )
     data <- extended_bind_rows(data, ips)
+    the_family <- "xpoisson"
   }
   if (ips_is_Spatial) {
     non_coordnames <- setdiff(names(data), data_coordnames)
@@ -1590,7 +1592,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   lh$data <- data
   lh$response_data <- new_response_data
   lh$response <- "BRU_response"
-  lh$inla.family <- "poisson"
+  lh$inla.family <- the_family
   lh$integration_info$ips <- NULL
 
   lh <- bru_compat_pre_2_14_bru_obs(lh)
@@ -1858,6 +1860,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         BRU_point_weights = 0.0
       )
     )
+    the_family <- "poisson"
   } else {
     new_response_data <- data.frame(
       BRU_E = c(
@@ -1877,6 +1880,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       BRU_scale = response_data[["BRU_scale"]][1]
     )
     data <- extended_bind_rows(data, ips)
+    the_family <- "xpoisson"
   }
   if (!is.null(lh$control.gcpo)) {
     group_cv_block <- new_response_data$BRU_block
@@ -1893,7 +1897,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   lh$data <- data
   lh$response_data <- new_response_data
   lh$response <- "BRU_response"
-  lh$inla.family <- "poisson"
+  lh$inla.family <- the_family
   lh$integration_info$ips <- NULL
 
   lh <- bru_compat_pre_2_14_bru_obs(lh)

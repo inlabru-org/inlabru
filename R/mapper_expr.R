@@ -138,9 +138,9 @@ ibm_n_output.bm_expr <- function(
   mapper,
   input,
   state = NULL,
-  derived = NULL,
   inla_f = FALSE,
   ...,
+  derived = NULL,
   n_state = NULL
 ) {
   if (!("rowwise" %in% mapper[["assume"]])) {
@@ -521,11 +521,11 @@ ibm_jacobian.bm_expr <- function(
   mapper,
   input,
   state = NULL,
+  inla_f = FALSE,
+  ...,
   derived = NULL,
   jacobians = NULL,
-  inla_f = FALSE,
   multi = FALSE,
-  ...,
   offset = NULL,
   env = rlang::caller_env()
 ) {
@@ -637,10 +637,16 @@ bm_expr_data_mask <- function(
 }
 
 #' @export
-#' @describeIn ibm_eval
+#' @describeIn ibm_eval_methods
 #' Accepts a `state` list with named entries, one for each variable.
 #' The `input` format should match the description given for [bm_expr()].
-#'
+#' @param data_mask A data mask object to use for evaluating the expression. If
+#'   `NULL` or missing, a data mask will be constructed from the `input`,
+#'   `state`, `derived`, and `env` arguments. This can be used to avoid
+#'   redundant construction of the data mask when evaluating different
+#'   expressions multiple times with the same input and state.
+#' @param env The environment in which to evaluate the expression. By default,
+#'   this is set to the caller environment.
 ibm_eval.bm_expr <- function(
   mapper,
   input,
@@ -736,18 +742,21 @@ format.bm_expr <- function(x, ...,
 }
 
 
+
+
+
 #' @rdname ibm_eval2
 #' @export
 ibm_eval2.bru_obs <- function(
-  mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_list
 ) {
   derived <- list()
   jacobians <- list()
   for (nm in names(comp_list)) {
     res <- ibm_eval2(
-      comp_list[[comp]],
-      input = input[["comp"]][[comp]],
-      state = state[[comp]],
+      comp_list[[nm]],
+      input = input[["comp"]][[nm]],
+      state = state[[nm]],
       ...
     )
     derived[[nm]] <- res$offset
@@ -766,27 +775,32 @@ ibm_eval2.bru_obs <- function(
 
   res2 <- ibm_eval2(
     expr_mapper,
-    input = list(data = mapper[["data"]], data_extra = mapper[["data_extra"]]),
+    input = list(
+      data = mapper[["data"]],
+      response_data = mapper[["response_data"]],
+      data_extra = mapper[["data_extra"]]
+    ),
     state = state,
     derived = derived,
     jacobians = jacobians,
+    multi = TRUE,
     ...
   )
 
   # Feed forward into optional transformation mapper.
   # TODO: work in progress...
-  post_mapper <- mapper[["aggregate_mapper"]]
-  post_input <- bru_input(ibm_input_get(post_mapper),
-    data = mapper[["data"]],
-    data_extra = mapper[["data_extra"]],
-    comp = input[["comp"]]
-  )
+  post_mapper <- mapper[["aggregate"]]
+
+  # This should be constructed as part of the overall bru_obs input evaluation,
+  # so that we have a this pre-computed (input for ibm_eval2.bru_obs_list):
+  # input = list(`obs1` = list(comp = input for components,
+  #                            post = post_mapper input), `obs2` = ...)
 
   res3 <- ibm_eval2(
     post_mapper,
-    input = post_input,
+    input = input[["post"]],
     state = res2$offset,
-    multi = TRUE,
+    multi = FALSE,
     ...
   )
 
@@ -805,4 +819,133 @@ ibm_eval2.bru_obs <- function(
   }
 
   list(offset = offset, jacobian = B)
+}
+
+
+#' @rdname ibm_eval2
+#' @export
+ibm_eval2.bru_obs_list <- function(
+    mapper, input, state, ..., multi = FALSE, comp_list
+) {
+  results <- lapply(
+    setNames(seq_along(mapper), names(mapper)),
+    function(m) ibm_eval2.bru_obs(mapper[[m]], input[[m]], state, ...,
+                                  multi = TRUE, comp_list = comp_list)
+  )
+
+  # Combine jacobians from the expression mapper and the aggregate mapper.
+  offset <- lapply(results, function(r) r[["offset"]])
+  jacobian <- lapply(results, function(r) r[["jacobian"]])
+
+  if (!multi) {
+    jac_names <- lapply(jacobian, function(r) names(r))
+    jac_names <- unique(unlist(jac_names))
+    names(jac_names) <- jac_names
+    jac_ncol <- vapply(jac_names, function(nm) {
+      max(vapply(jacobian, function(r) if (nm %in% names(r)) ncol(r[[nm]]) else 0L, 0L))
+    }, 0L)
+    jacobian <- lapply(
+      jac_names,
+      function(nm) {
+        do.call(
+          rbind,
+          lapply(seq_along(jacobian), function(k) {
+            if (nm %in% names(jacobian[[k]])) {
+              jacobian[[k]][[nm]]
+            } else {
+              Matrix::sparseMatrix(
+                i = c(),
+                j = c(),
+                x = c(1),
+                dims = c(length(offset[[k]]), jac_ncol[nm])
+              )
+            }
+          }
+          )
+        )
+      }
+    )
+
+    offset <- unlist(offset)
+  }
+
+  list(offset = offset, jacobian = jacobian)
+}
+
+#' @rdname ibm_jacobian
+#' @export
+ibm_jacobian.bru_obs <- function(
+    mapper, input, state, ..., multi = FALSE, comp_list
+) {
+  result <- ibm_eval2(
+    mapper,
+    input = input,
+    state = state,
+    ...,
+    multi = TRUE,
+    comp_list = comp_list
+  )
+
+  B <- result$jacobian
+
+  if (!multi) {
+    B <- do.call(cbind, B)
+  }
+
+  B
+}
+
+#' @rdname ibm_eval
+#' @export
+ibm_eval.bru_obs <- function(
+    mapper, input, state, ..., multi = FALSE, comp_list
+) {
+  derived <- list()
+  for (nm in names(comp_list)) {
+    res <- ibm_eval(
+      comp_list[[nm]],
+      input = input[["comp"]][[nm]],
+      state = state[[nm]],
+      ...
+    )
+    derived[[nm]] <- res
+  }
+
+  expr_mapper <- bm_expr(
+    bru_pred_expr(mapper, format = "quo"),
+    labels = list(
+      root = "latent",
+      derived = "effects",
+      suffix = "_latent"
+    ),
+    assume = c("rowwise", "additive")
+  )
+
+  res2 <- ibm_eval(
+    expr_mapper,
+    input = list(data = mapper[["data"]], data_extra = mapper[["data_extra"]]),
+    state = state,
+    derived = derived,
+    multi = FALSE,
+    ...
+  )
+
+  # Feed forward into optional transformation mapper.
+  # TODO: work in progress...
+  post_mapper <- mapper[["aggregate_mapper"]]
+  post_input <- bru_input(ibm_input_get(post_mapper),
+                          data = mapper[["data"]],
+                          data_extra = mapper[["data_extra"]],
+                          comp = input[["comp"]]
+  )
+
+  res3 <- ibm_eval(
+    post_mapper,
+    input = post_input,
+    state = res2$offset,
+    multi = FALSE,
+    ...
+  )
+
+  res3
 }
