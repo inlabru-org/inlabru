@@ -521,31 +521,44 @@ bru_info_upgrade <- function(object,
   }
 
   old_ver <- object[["inlabru_version"]]
-  if (utils::compareVersion(new_version, old_ver) > 0) {
-    warning(
-      glue("Old bru_info object version {old_ver} detected.
-            Attempting upgrade to version {new_version}.")
-    )
-
-    upgrade_functions <- bru_info_upgrade_functions()
-
-    message("Detected bru_info version ", old_ver)
-    for (ver in names(upgrade_functions)) {
-      if (utils::compareVersion(ver, old_ver) > 0) {
-        message("Upgrading bru_info to ", ver)
-        if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
-          object_full <- upgrade_functions[[ver]](object_full = object_full)
-        } else {
-          object <- upgrade_functions[[ver]](object)
-        }
-        object[["inlabru_version"]] <- ver
-        object_full[["bru_info"]] <- object
-      }
-    }
-
-    object[["inlabru_version"]] <- new_version
-    object_full[["bru_info"]] <- object
-    message(glue("Upgraded bru_info to {new_version}"))
+  compare_version <- utils::compareVersion(new_version, old_ver)
+  if (compare_version == 0) {
+    return(object_full)
   }
+
+  if (compare_version < 0) {
+    warning(
+      glue("Found bru_info object of version {old_ver}, ",
+           "which is newer than the running version {new_version}.")
+    )
+    return(object_full)
+  }
+
+  # compare_version > 0, so we need to upgrade
+  warning(
+    glue("Old bru_info object version {old_ver} detected.
+            Attempting upgrade to version {new_version}.")
+  )
+
+  upgrade_functions <- bru_info_upgrade_functions()
+
+  message("Detected bru_info version ", old_ver)
+  for (ver in names(upgrade_functions)) {
+    if (utils::compareVersion(ver, old_ver) > 0) {
+      message("Upgrading bru_info to ", ver)
+      if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
+        object_full <- upgrade_functions[[ver]](object_full = object_full)
+      } else {
+        object <- upgrade_functions[[ver]](object)
+      }
+      object[["inlabru_version"]] <- ver
+      object_full[["bru_info"]] <- object
+    }
+  }
+
+  object[["inlabru_version"]] <- new_version
+  object_full[["bru_info"]] <- object
+  message(glue("Upgraded bru_info to {new_version}"))
+
   object_full
 }
