@@ -31,6 +31,7 @@ bru_obs(
   is_rowwise = NULL,
   aggregate = NULL,
   aggregate_input = NULL,
+  response_block = NULL,
   control.family = NULL,
   control.gcpo = NULL,
   tag = NULL,

@@ -1152,7 +1152,7 @@ bru_agg_data <- function(
 }
 
 
-bru_agg_input_pandemic <- function(input, data_list, .envir) {
+bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NULL) {
   aggregate_input <- bru_eval_in_data_context(
     {{ input }},
     data = data_list,
@@ -1200,40 +1200,51 @@ bru_agg_input_pandemic <- function(input, data_list, .envir) {
     }
   })
 
-  if (!is.null(aggregate_input[["block_response"]])) {
-    blk_resp <- aggregate_input[["block_response"]]
-    if (is.null(data_list$response_data[[blk_resp]])) {
-      msg <- glue::glue(
-        '`block_response` variable "{blk_resp}" ',
-        "not found in `response_data`."
-      )
-
-      bru_log_abort(msg)
+  response_block_val <- NULL
+  if (is.null(response_block)) {
+    if (!is.null(aggregate_input[["block_response"]])) {
+      response_block <- aggregate_input[["block_response"]]
     }
-  } else {
-    aggregate_input[["block_response"]] <- ".block"
   }
-
-  # TODO: Since we will no longer pre-evaluate bru_agg_input, need to standardise
-  # the internal storage name of block_response; e.g. BRU_response_block, and
-  # then use that here instead of the user-supplied name, which may be different.
-  # The user supplied name is a new bru_obs argument, response_block, and
-  # block_response in aggregate_input will be overruled.
-
-  blk_resp <- aggregate_input[["block_response"]]
-  if (!is.null(data_list$response_data[[blk_resp]])) {
-    agg_block_resp_expr <- rlang::parse_expr(
-      glue::glue('.response_data[["{blk_resp}"]]')
+  if (is.null(response_block)) {
+    response_block <- ".block"
+  }
+  if (!is.null(response_block)) {
+    resp_block_expr <- rlang::parse_expr(
+      glue('.response_data.[["{ response_block }"]]')
     )
-    block_response <- bru_eval_in_data_context(
-      !!agg_block_resp_expr,
+    response_block_val <- bru_eval_in_data_context(
+      !!resp_block_expr,
       data = data_list,
       default = NULL,
       .envir = .envir
     )
-
+  }
+  if (!is.null(aggregate_input[["block_response"]])) {
+    lifecycle::deprecate_warn(
+      "2.14.1.9004",
+      I("Using `block_response` in `aggregate_input`"),
+      "bru_obs(response_block)",
+      details = glue(
+        "The `block_response` element is overruled by non-null ",
+        "`response_block`."
+      ))
+    if (is.null(response_block_val)) {
+      response_block <- aggregate_input[["block_response"]]
+      resp_block_expr <- rlang::parse_expr(
+        glue('.response_data.[["{ response_block }"]]')
+      )
+      response_block_val <- bru_eval_in_data_context(
+        !!resp_block_expr,
+        data = data_list,
+        default = NULL,
+        .envir = .envir
+      )
+    }
+  }
+  if (!is.null(response_block_val)) {
     aggregate_input[["block"]] <-
-      match(aggregate_input[["block"]], block_response)
+      match(aggregate_input[["block"]], response_block_val)
   }
 
   if (is.character(aggregate_input[["block"]])) {
@@ -1263,20 +1274,16 @@ bru_agg_input_pandemic <- function(input, data_list, .envir) {
 }
 
 
-bru_agg_input <- function(input, data_list, .envir) {
-  aggregate_input <- bru_eval_in_data_context(
-    {{ input }},
-    data = data_list,
-    default = NULL,
-    .envir = .envir
-  )
+bru_agg_input <- function(mapper, mask, .envir) {
+  aggregate_input <- bru_input(mapper, mask = mask, .envir = .envir)
+
   if (is.null(aggregate_input)) {
     aggregate_input <- list()
   }
   if (is.null(aggregate_input[["block"]])) {
     aggregate_input[["block"]] <- bru_eval_in_data_context(
       .data[[".block"]],
-      data = data_list,
+      data = mask,
       default = NULL,
       .envir = .envir
     )
@@ -1284,7 +1291,7 @@ bru_agg_input <- function(input, data_list, .envir) {
   if (is.null(aggregate_input[["weights"]])) {
     aggregate_input[["weights"]] <- bru_eval_in_data_context(
       .data[["weight"]],
-      data = data_list,
+      data = mask,
       default = NULL,
       .envir = .envir
     )
@@ -1295,7 +1302,7 @@ bru_agg_input <- function(input, data_list, .envir) {
     )
     aggregate_input[["n_block"]] <- bru_eval_in_data_context(
       !!agg_n_block_expr,
-      data = data_list,
+      data = mask,
       default = NULL,
       .envir = .envir
     )
@@ -1311,40 +1318,31 @@ bru_agg_input <- function(input, data_list, .envir) {
     }
   })
 
+  resp_block_expr <- rlang::parse_expr(
+    '.response_data.[["BRU_response_block"]]'
+  )
+  response_block <- bru_eval_in_data_context(
+    !!resp_block_expr,
+    data = mask,
+    default = NULL,
+    .envir = .envir
+  )
   if (!is.null(aggregate_input[["block_response"]])) {
-    blk_resp <- aggregate_input[["block_response"]]
-    if (is.null(data_list$response_data[[blk_resp]])) {
-      msg <- glue::glue(
-        '`block_response` variable "{blk_resp}" ',
-        "not found in `response_data`."
-      )
-
-      bru_log_abort(msg)
+    lifecycle::deprecate_warn(
+      "2.14.1.9004",
+      I("Using `block_response` in `aggregate_input`"),
+      "bru_obs(response_block)",
+      details = glue(
+        "The `block_response` element is overruled by non-null ",
+        "`response_block`."
+      ))
+    if (is.null(response_block)) {
+      response_block <- aggregate_input[["block_response"]]
     }
-  } else {
-    aggregate_input[["block_response"]] <- ".block"
   }
-
-  # TODO: Since we will no longer pre-evaluate bru_agg_input, need to standardise
-  # the internal storage name of block_response; e.g. BRU_response_block, and
-  # then use that here instead of the user-supplied name, which may be different.
-  # The user supplied name is a new bru_obs argument, response_block, and
-  # block_response in aggregate_input will be overruled.
-
-  blk_resp <- aggregate_input[["block_response"]]
-  if (!is.null(data_list$response_data[[blk_resp]])) {
-    agg_block_resp_expr <- rlang::parse_expr(
-      glue::glue('.response_data[["{blk_resp}"]]')
-    )
-    block_response <- bru_eval_in_data_context(
-      !!agg_block_resp_expr,
-      data = data_list,
-      default = NULL,
-      .envir = .envir
-    )
-
+  if (!is.null(response_block)) {
     aggregate_input[["block"]] <-
-      match(aggregate_input[["block"]], block_response)
+      match(aggregate_input[["block"]], response_block)
   }
 
   if (is.character(aggregate_input[["block"]])) {
@@ -1364,7 +1362,7 @@ bru_agg_input <- function(input, data_list, .envir) {
     msg <- paste0(
       "'NA' aggregation block information detected.",
       "Either the `block` information was out of range, or a match was not ",
-      "found when using `.response_data$block_response`."
+      "found when using `.response_data$BRU_response_block`."
     )
 
     bru_log_abort(msg)
@@ -1413,17 +1411,16 @@ bru_obs_agg <- function(lh,
         response_data = lh$BRU_original_response_data,
         extra_data = lh$data_extra
       ),
-      .envir = .envir
+      .envir = .envir,
+      response_block = response_block
     )
     if (is.null(response_block)) {
       response_block <- ".block"
       if (!is.null(aggregate_input[["block_response"]])) {
         lifecycle::deprecate_warn(
-          "2.14.1.9000",
-          I(glue(
-            "Using `block_response` in `aggregate_input` is deprecated; please",
-            " use the `response_block` argument to `bru_obs()` instead."
-          )),
+          "2.14.1.9004",
+          I("Using `block_response` in `aggregate_input`"),
+           "bru_obs(response_block)",
           details = glue(
             "The `block_response` element is overruled by non-null ",
             "`response_block`."
@@ -1463,54 +1460,20 @@ bru_obs_agg <- function(lh,
 
     inp <- new_bru_input({{ aggregate_input }}, label = "aggregate")
 
-    blk_resp <- response_block
-    if (!is.null(data_list$response_data[[blk_resp]])) {
-      agg_block_resp_expr <- rlang::parse_expr(
-        glue::glue('.response_data[["{blk_resp}"]]')
-      )
-      block_response <- bru_eval_in_data_context(
-        !!agg_block_resp_expr,
-        data = list(
-          data = lh$data,
-          response_data = lh$BRU_original_response_data,
-          extra_data = lh$data_extra
-        ),
-        default = NULL,
-        .envir = .envir
-      )
-      lh$response_data$BRU_response_block <- block_response
+    aggregate <- ibm_input_set(aggregate, input = inp)
 
-      aggregate_input[["block"]] <-
-        match(aggregate_input[["block"]], block_response)
+    if (is.null(response_block)) {
+      response_block <- ".block"
+    }
+    if (!is.null(lh$BRU_original_response_data[[response_block]])) {
+      lh$response_data$BRU_response_block <-
+        lh$BRU_original_response_data[[response_block]]
     }
 
-    aggregate_input <- bru_agg_input(
-      {{ aggregate_input }},
-      data_list = list(
-        data = lh$data,
-        response_data = lh$BRU_original_response_data,
-        extra_data = lh$data_extra
-      ),
-      .envir = .envir
-    )
+    lh$aggregate <- aggregate
 
-    pred_text <- bru_pred_expr(lh, format = "text_raw")
-    pred_text <- glue(
-      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-      " state = {{{pred_text}}})}}"
-    )
-    lh$pred_expr <- new_bru_pred_expr(
-      pred_text,
-      used = lh$pred_expr$used,
-      is_rowwise = FALSE,
-      .envir = lh$pred_expr$.envir
-    )
-    lh$pred_expr$is_additive <- FALSE
-    lh$pred_expr$is_linear <- FALSE
-    lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
-    lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
-
-    lh <- bru_compat_pre_2_14_bru_obs(lh)
+    # Note: No explicit pre-2.14 compatibility handling for fullchain, as
+    # fullchain is post-2.14.
   } else {
     stop(glue(
       "Unknown `bru_agg_method` option: {bru_agg_method}")
@@ -2494,6 +2457,7 @@ bru_obs <- function(formula = . ~ .,
                     is_rowwise = NULL,
                     aggregate = NULL,
                     aggregate_input = NULL,
+                    response_block = NULL,
                     control.family = NULL,
                     control.gcpo = NULL,
                     tag = NULL,
@@ -2639,6 +2603,7 @@ bru_obs <- function(formula = . ~ .,
     lh <- bru_obs_agg(lh,
       aggregate = aggregate,
       aggregate_input = {{ aggregate_input }},
+      response_block = response_block,
       options = options,
       .envir = .envir
     )

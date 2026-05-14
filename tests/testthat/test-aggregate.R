@@ -215,7 +215,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     fixed = TRUE
   )
 
-  # Character block information without match response block information
+  # Character block information with matching response block information
   expect_no_error({
     bru_obs(
       z ~ Intercept + x + y,
@@ -229,6 +229,30 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
         n_block = bru_response_size(.response_data.),
         block_response = "the_group_char"
       ),
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    )
+  })
+
+  expect_no_error({
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      aggregate_input = list(
+        weights = weights,
+        block = grp_char,
+        n_block = bru_response_size(.response_data.)
+      ),
+      response_block = "the_group_char",
       control.family = list(
         hyper = list(
           prec = list(

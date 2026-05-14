@@ -941,7 +941,7 @@ add_mappers.bru_comp <- function(component,
     data = lh_data,
     inputs = lapply(
       inputs,
-      function(x) x[[component$label]][["core"]][["main"]]
+      function(x) x[["comp"]][[component$label]][["core"]][["main"]]
     ),
     env = component$env,
     require_indexed = FALSE
@@ -953,7 +953,7 @@ add_mappers.bru_comp <- function(component,
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["core"]][["group"]]
+        function(x) x[["comp"]][[component$label]][["core"]][["group"]]
       ),
       env = component$env,
       require_indexed = TRUE
@@ -966,7 +966,7 @@ add_mappers.bru_comp <- function(component,
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["core"]][["replicate"]]
+        function(x) x[["comp"]][[component$label]][["core"]][["replicate"]]
       ),
       env = component$env,
       require_indexed = TRUE
