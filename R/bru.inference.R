@@ -801,6 +801,30 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
+#' @title Create inlabru data mask
+#' @description Create a data mask for inlabru, which allows for evaluating expressions in the
+#' context of the data objects, with support for tidy evaluation pronouns and
+#' direct access to the data objects as `.name.`. This is an internal inlabru method, not
+#' intended for general use.
+#' @keywords internal
+#' @param data list of data objects in priority order. Named elements will be
+#'  available as whole objects `.name.` as well as pronouns `.name` in
+#'  evaluation.
+#' @param pronouns,objects If `NULL` (default), all named elements of `data` are
+#' used as pronouns/objects. If character vector(s), only the matching named
+#' elements of `data` will be available as pronouns/objects.
+#' @examples
+#' m <- bru_data_mask(
+#'   data = list(
+#'     data = data.frame(z = 11:14),
+#'     extra_data = list(something = 1:2)
+#'   )
+#' )
+#' rlang::eval_tidy(
+#'   rlang::quo(z + rep(.extra_data$something, 2)),
+#'   data = m
+#' )
+#'
 bru_data_mask <- function(data,
                           pronouns = NULL,
                           objects = NULL) {
@@ -896,7 +920,6 @@ bru_eval_in_data_context <- function(input,
                                      default = NULL,
                                      .envir = parent.frame()) {
   input <- rlang::enquo(input)
-  deparse_input <- rlang::expr_text(input)
   if (inherits(data, "bru_data_mask")) {
     mask <- data
   } else {
@@ -910,6 +933,7 @@ bru_eval_in_data_context <- function(input,
   )
   success <- !inherits(result, "try-error")
   if (!success) {
+    deparse_input <- rlang::expr_text(input)
     stop(glue::glue(
       "Input '{glue::glue_collapse(deparse_input, sep = '\n')}' could ",
       "not be evaluated."
@@ -1128,6 +1152,117 @@ bru_agg_data <- function(
 }
 
 
+bru_agg_input_pandemic <- function(input, data_list, .envir) {
+  aggregate_input <- bru_eval_in_data_context(
+    {{ input }},
+    data = data_list,
+    default = NULL,
+    .envir = .envir
+  )
+  if (is.null(aggregate_input)) {
+    aggregate_input <- list()
+  }
+  if (is.null(aggregate_input[["block"]])) {
+    aggregate_input[["block"]] <- bru_eval_in_data_context(
+      .data[[".block"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["weights"]])) {
+    aggregate_input[["weights"]] <- bru_eval_in_data_context(
+      .data[["weight"]],
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  if (is.null(aggregate_input[["n_block"]])) {
+    agg_n_block_expr <- rlang::parse_expr(
+      "bru_response_size(.response_data.)"
+    )
+    aggregate_input[["n_block"]] <- bru_eval_in_data_context(
+      !!agg_n_block_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+  }
+  lapply(c("block", "weights", "n_block"), function(nm) {
+    if (is.null(aggregate_input[[nm]])) {
+      bru_log_abort(
+        glue::glue(
+          "Aggregation requested, but `aggregate_input[['{nm}']]` ",
+          "evaluates to NULL."
+        )
+      )
+    }
+  })
+
+  if (!is.null(aggregate_input[["block_response"]])) {
+    blk_resp <- aggregate_input[["block_response"]]
+    if (is.null(data_list$response_data[[blk_resp]])) {
+      msg <- glue::glue(
+        '`block_response` variable "{blk_resp}" ',
+        "not found in `response_data`."
+      )
+
+      bru_log_abort(msg)
+    }
+  } else {
+    aggregate_input[["block_response"]] <- ".block"
+  }
+
+  # TODO: Since we will no longer pre-evaluate bru_agg_input, need to standardise
+  # the internal storage name of block_response; e.g. BRU_response_block, and
+  # then use that here instead of the user-supplied name, which may be different.
+  # The user supplied name is a new bru_obs argument, response_block, and
+  # block_response in aggregate_input will be overruled.
+
+  blk_resp <- aggregate_input[["block_response"]]
+  if (!is.null(data_list$response_data[[blk_resp]])) {
+    agg_block_resp_expr <- rlang::parse_expr(
+      glue::glue('.response_data[["{blk_resp}"]]')
+    )
+    block_response <- bru_eval_in_data_context(
+      !!agg_block_resp_expr,
+      data = data_list,
+      default = NULL,
+      .envir = .envir
+    )
+
+    aggregate_input[["block"]] <-
+      match(aggregate_input[["block"]], block_response)
+  }
+
+  if (is.character(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'character' aggregation block information detected.\n",
+      "Please use a numeric or integer vector for the block information ",
+      "instead.\n",
+      "If you want to use a character vector, supply a `block_response`\n",
+      "argument with the name of a response variableto match the character ",
+      "vector to."
+    )
+
+    bru_log_abort(msg)
+  }
+
+  if (anyNA(aggregate_input[["block"]])) {
+    msg <- paste0(
+      "'NA' aggregation block information detected.",
+      "Either the `block` information was out of range, or a match was not ",
+      "found when using `.response_data$block_response`."
+    )
+
+    bru_log_abort(msg)
+  }
+
+  aggregate_input
+}
+
+
 bru_agg_input <- function(input, data_list, .envir) {
   aggregate_input <- bru_eval_in_data_context(
     {{ input }},
@@ -1189,6 +1324,13 @@ bru_agg_input <- function(input, data_list, .envir) {
   } else {
     aggregate_input[["block_response"]] <- ".block"
   }
+
+  # TODO: Since we will no longer pre-evaluate bru_agg_input, need to standardise
+  # the internal storage name of block_response; e.g. BRU_response_block, and
+  # then use that here instead of the user-supplied name, which may be different.
+  # The user supplied name is a new bru_obs argument, response_block, and
+  # block_response in aggregate_input will be overruled.
+
   blk_resp <- aggregate_input[["block_response"]]
   if (!is.null(data_list$response_data[[blk_resp]])) {
     agg_block_resp_expr <- rlang::parse_expr(
@@ -1235,6 +1377,7 @@ bru_agg_input <- function(input, data_list, .envir) {
 bru_obs_agg <- function(lh,
                         aggregate = NULL,
                         aggregate_input = NULL,
+                        response_block = NULL,
                         options = list(),
                         .envir = parent.frame()) {
   if (!is.null(aggregate) && is.character(aggregate)) {
@@ -1243,7 +1386,16 @@ bru_obs_agg <- function(lh,
       bm_aggregate(type = aggregate)
     )
   }
-  if (!is.null(aggregate)) {
+  if (is.null(aggregate)) {
+    return(lh)
+  }
+
+  bru_agg_method <- bru_options_get("bru_method")$autodiff
+  if (is.null(bru_agg_method)) {
+    bru_agg_method <- "pandemic"
+  }
+
+  if (identical(bru_agg_method, "pandemic")) {
     lh$data <- bru_agg_data(
       data = lh$data,
       ips = lh$integration_info$ips,
@@ -1253,6 +1405,84 @@ bru_obs_agg <- function(lh,
       .envir = .envir
     )
     lh$integration_info$ips <- NULL
+
+    aggregate_input <- bru_agg_input_pandemic(
+      {{ aggregate_input }},
+      data_list = list(
+        data = lh$data,
+        response_data = lh$BRU_original_response_data,
+        extra_data = lh$data_extra
+      ),
+      .envir = .envir
+    )
+    if (is.null(response_block)) {
+      response_block <- ".block"
+      if (!is.null(aggregate_input[["block_response"]])) {
+        lifecycle::deprecate_warn(
+          "2.14.1.9000",
+          I(glue(
+            "Using `block_response` in `aggregate_input` is deprecated; please",
+            " use the `response_block` argument to `bru_obs()` instead."
+          )),
+          details = glue(
+            "The `block_response` element is overruled by non-null ",
+            "`response_block`."
+          )
+        )
+        response_block <- aggregate_input[["block_response"]]
+      }
+    }
+
+    pred_text <- bru_pred_expr(lh, format = "text_raw")
+    pred_text <- glue(
+      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
+      " state = {{{pred_text}}})}}"
+    )
+    lh$pred_expr <- new_bru_pred_expr(
+      pred_text,
+      used = lh$pred_expr$used,
+      is_rowwise = FALSE,
+      .envir = lh$pred_expr$.envir
+    )
+    lh$pred_expr$is_additive <- FALSE
+    lh$pred_expr$is_linear <- FALSE
+    lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
+    lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
+
+    lh <- bru_compat_pre_2_14_bru_obs(lh)
+  } else if (identical(bru_agg_method, "fullchain")) {
+    lh$data <- bru_agg_data(
+      data = lh$data,
+      ips = lh$integration_info$ips,
+      domain = lh$integration_info$domain,
+      samplers = lh$integration_info$samplers,
+      options = options,
+      .envir = .envir
+    )
+    lh$integration_info$ips <- NULL
+
+    inp <- new_bru_input({{ aggregate_input }}, label = "aggregate")
+
+    blk_resp <- response_block
+    if (!is.null(data_list$response_data[[blk_resp]])) {
+      agg_block_resp_expr <- rlang::parse_expr(
+        glue::glue('.response_data[["{blk_resp}"]]')
+      )
+      block_response <- bru_eval_in_data_context(
+        !!agg_block_resp_expr,
+        data = list(
+          data = lh$data,
+          response_data = lh$BRU_original_response_data,
+          extra_data = lh$data_extra
+        ),
+        default = NULL,
+        .envir = .envir
+      )
+      lh$response_data$BRU_response_block <- block_response
+
+      aggregate_input[["block"]] <-
+        match(aggregate_input[["block"]], block_response)
+    }
 
     aggregate_input <- bru_agg_input(
       {{ aggregate_input }},
@@ -1281,6 +1511,10 @@ bru_obs_agg <- function(lh,
     lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
 
     lh <- bru_compat_pre_2_14_bru_obs(lh)
+  } else {
+    stop(glue(
+      "Unknown `bru_agg_method` option: {bru_agg_method}")
+    )
   }
 
   lh
@@ -4072,12 +4306,16 @@ bru_line_search <- function(model,
 
   fact <- options$bru_method$factor
 
-  nonlin_param <- list(
-    model = model,
-    lhoods = lhoods,
-    input = input,
-    comp_simple = comp_simple
-  )
+  if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+    stop("TODO: implement fullchain linearisation")
+  } else {
+    nonlin_param <- list(
+      model = model,
+      lhoods = lhoods,
+      input = input,
+      comp_simple = comp_simple
+    )
+  }
 
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
@@ -5029,6 +5267,9 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate component simplifications",
     verbosity = 3
   )
+  if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+    stop("TODO: implement fullchain linearisation")
+  }
   comp_simple <- ibm_simplify(
     model,
     input = inputs,
@@ -5373,18 +5614,22 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             )^{
               -2
             }
-          line_search <- bru_line_search(
-            model = model,
-            lhoods = lhoods,
-            lin = lin,
-            state0 = state0,
-            state = state,
-            input = inputs,
-            comp_lin = comp_lin,
-            comp_simple = comp_simple,
-            weights = line_weights,
-            options = options
-          )
+          if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+            stop("TODO: implement fullchain linearisation")
+          } else {
+            line_search <- bru_line_search(
+              model = model,
+              lhoods = lhoods,
+              lin = lin,
+              state0 = state0,
+              state = state,
+              input = inputs,
+              comp_lin = comp_lin,
+              comp_simple = comp_simple,
+              weights = line_weights,
+              options = options
+            )
+          }
           state <- line_search[["state"]]
         }
         timings <- bru_timer_do(timings, "Linearise", k + 1L)
@@ -5393,24 +5638,32 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           "iinla: Evaluate component linearisations",
           verbosity = 3
         )
-        comp_lin <- ibm_as_taylor(
-          model,
-          input = inputs,
-          state = state,
-          inla_f = TRUE
-        )
+        if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+          stop("TODO: implement fullchain linearisation")
+        } else {
+          comp_lin <- ibm_as_taylor(
+            model,
+            input = inputs,
+            state = state,
+            inla_f = TRUE
+          )
+        }
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
           verbosity = 3
         )
-        lin <- bru_compute_linearisation(
-          model,
-          lhoods = lhoods,
-          input = inputs,
-          state = state,
-          comp_simple = comp_simple,
-          options = options
-        )
+        if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+          stop("TODO: implement fullchain linearisation")
+        } else {
+          lin <- bru_compute_linearisation(
+            model,
+            lhoods = lhoods,
+            input = inputs,
+            state = state,
+            comp_simple = comp_simple,
+            options = options
+          )
+        }
 
         stk <- bru_make_stack(lhoods, lin, idx)
 

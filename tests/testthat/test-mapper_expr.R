@@ -17,21 +17,19 @@ test_that("Expr mapper", {
 
   dat <- data.frame(z = 11:13)
 
-  val <- ibm_eval(mapper, input = list(data = dat), state = state)
-  expect_equal(
-    val,
-    c(15.5403023058681403322, 15.583853163452858, 17.0100075033995571)
+  val <- ibm_eval(mapper, input = list(), state = state, data = list(data = dat))
+  val_reference <- cos(state$x) + state$y[c(1, 1, 2)] + dat$z
+  expect_equal(val, val_reference)
+
+  A <- ibm_jacobian(mapper,
+                    input = list(),
+                    state = state,
+                    data = list(data = dat))
+  A_reference <- Matrix::sparseMatrix(
+    i = c(1:3, 1:3),
+    j = c(1:3, 4, 4, 5),
+    x = c(-sin(state$x), rep(1, 3)),
+    dims = c(3, 5)
   )
-
-  A <- ibm_jacobian(mapper, input = list(data = dat), state = state)
-
-  A <- ibm_jacobian(mapper, input = list(data = as.list(dat)), state = state)
-
-  A <- Matrix::sparseMatrix(
-    i = 1:3,
-    j = c(2, 7, 12),
-    x = 1 * 2,
-    dims = c(3, 12)
-  )
-  expect_equal(ibm_jacobian(mapper, olist_data), A)
+  expect_equal(A, A_reference, tolerance = lowtol)
 })

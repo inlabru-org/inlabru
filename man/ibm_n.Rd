@@ -61,7 +61,7 @@ ibm_n(mapper, inla_f = FALSE, ...)
 
 \method{ibm_n}{bm_collect}(mapper, inla_f = FALSE, multi = FALSE, ...)
 
-\method{ibm_n}{bm_expr}(mapper, ..., input = NULL, state = NULL, multi = FALSE)
+\method{ibm_n}{bm_expr}(mapper, ..., input = NULL, state = NULL, multi = FALSE, data = NULL)
 
 \method{ibm_n}{bm_repeat}(mapper, ...)
 
@@ -90,6 +90,9 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 that have state dependent output size.}
 
 \item{input}{Data input for the mapper.}
+
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }
 \description{
 Implementations must return the size of the latent vector

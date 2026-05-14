@@ -508,14 +508,30 @@ bru_input.bru_obs <- function(x, components, ...) {
     return(list())
   }
 
-  bru_input(
+  mask = bru_data_mask(
+    list(
+      data = x[["data"]],
+      response_data = x[["response_data"]],
+      data_extra = x[["data_extra"]]
+    )
+  )
+
+  input <- list()
+  input$comp <- bru_input(
     components[included],
     data = x[["data"]],
-    mask = bru_data_mask(
-      list(data = x[["data"]], data_extra = x[["data_extra"]])
-    ),
+    mask = mask,
     ...
   )
+  if (!is.null(x[["aggregate"]])) {
+    input$post <- bru_agg_input(
+      x[["aggregate_input"]],
+      data_list = mask,
+      .envir = x[["env"]]
+    )
+  }
+
+  input
 }
 
 #' @rdname bru_input

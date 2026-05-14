@@ -25,6 +25,7 @@
 \alias{ibm_jacobian.bm_collect}
 \alias{ibm_jacobian.bm_expr}
 \alias{ibm_jacobian.bru_obs}
+\alias{ibm_jacobian.bru_obs_list}
 \alias{ibm_jacobian.bm_repeat}
 \alias{ibm_jacobian.bm_sum}
 \title{Jacobian of a mapper}
@@ -95,12 +96,16 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
   ...,
   derived = NULL,
   jacobians = NULL,
+  data = NULL,
   multi = FALSE,
   offset = NULL,
+  eps = 1e-06,
   env = rlang::caller_env()
 )
 
 \method{ibm_jacobian}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
+
+\method{ibm_jacobian}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_list)
 
 \method{ibm_jacobian}{bm_repeat}(
   mapper,
@@ -150,6 +155,9 @@ for \code{marginal} mappers.}
 \item{sub_A}{Internal; precomputed Jacobian matrices.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 
 \item{offset}{The offset value, pre-calculated by \code{\link[=ibm_eval.bm_expr]{ibm_eval.bm_expr()}}.}
 }

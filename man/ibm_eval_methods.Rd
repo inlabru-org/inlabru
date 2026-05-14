@@ -64,8 +64,9 @@
   mapper,
   input,
   state = NULL,
-  derived = NULL,
   ...,
+  derived = NULL,
+  data = NULL,
   data_mask = NULL,
   env = rlang::caller_env()
 )
@@ -99,9 +100,9 @@ supplied by internal methods that already have the Jacobian.}
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
 \item{data_mask}{A data mask object to use for evaluating the expression. If
-\code{NULL} or missing, a data mask will be constructed from the \code{input},
-\code{state}, \code{derived}, and \code{env} arguments. This can be used to avoid
-redundant construction of the data mask when evaluating different
+\code{NULL} or missing, a data mask will be constructed with \code{\link[=bru_data_mask]{bru_data_mask()}}
+from the \code{data}, \code{state}, \code{derived}, and \code{env} arguments. This can be used
+to avoid redundant construction of the data mask when evaluating different
 expressions multiple times with the same input and state.}
 
 \item{env}{The environment in which to evaluate the expression. By default,
@@ -136,6 +137,7 @@ for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numeric
 stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
 
 \item \code{ibm_eval(bm_expr)}: Accepts a \code{state} list with named entries, one for each variable.
-The \code{input} format should match the description given for \code{\link[=bm_expr]{bm_expr()}}.
+The \code{input} and \code{data} formats should match the description given for
+\code{\link[=bm_expr]{bm_expr()}}.
 
 }}

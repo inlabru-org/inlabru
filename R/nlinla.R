@@ -288,12 +288,13 @@ bru_compute_linearisation.bru_obs <- function(lhood,
                                               comp_simple,
                                               eps,
                                               ...) {
+  comp_input <- input[["comp"]]
   used <- bru_used(lhood)
   pred_expr <- bru_pred_expr(lhood)
   is_rowwise <- bru_is_rowwise(pred_expr)
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
-    input = input[used[["effect"]]],
+    input = comp_input[used[["effect"]]],
     state = state[used[["effect"]]]
   )
 
@@ -326,7 +327,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
           comp_simple[[label]],
-          input[[label]],
+          comp_input[[label]],
           state[[label]]
         )
         if (NROW(A) == 1) {
@@ -346,7 +347,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
             lhood_expr = lhood_expr,
             data = data,
             data_extra = lhood[["data_extra"]],
-            input = input,
+            input = comp_input,
             state = state,
             comp_simple = comp_simple[[label]],
             effects = effects,

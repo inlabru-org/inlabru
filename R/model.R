@@ -849,7 +849,7 @@ ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...) {
       function(inp) {
         ibm_as_taylor(
           as_bru_comp_list(model),
-          input = inp,
+          input = inp[["comp"]],
           state = state,
           ...
         )
@@ -912,7 +912,7 @@ ibm_simplify.bru_model <- function(mapper, input = NULL, state = NULL, ...) {
       function(inp) {
         ibm_simplify(
           as_bru_comp_list(model),
-          input = inp,
+          input = inp[["comp"]],
           state = state,
           ...
         )

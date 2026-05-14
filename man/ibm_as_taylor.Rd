@@ -24,10 +24,11 @@ ibm_as_taylor(mapper, input, state = NULL, ...)
   mapper,
   input,
   state,
+  ...,
   derived = NULL,
   jacobians = NULL,
-  inla_f = FALSE,
-  ...
+  data = data,
+  inla_f = FALSE
 )
 
 \method{ibm_as_taylor}{bm_repeat}(mapper, input, state, ...)
@@ -53,6 +54,9 @@ the \code{input} interpretation may be different.
 Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bm_collect}.}
+
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }
 \value{
 A \link{bm_taylor} object.

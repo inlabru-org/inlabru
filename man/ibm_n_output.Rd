@@ -47,7 +47,8 @@ ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, ...)
   inla_f = FALSE,
   ...,
   derived = NULL,
-  n_state = NULL
+  n_state = NULL,
+  data = NULL
 )
 
 \method{ibm_n_output}{bm_repeat}(mapper, ...)
@@ -77,6 +78,9 @@ that have state dependent output size.}
 
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }
 \description{
 Implementations must return an integer denoting the

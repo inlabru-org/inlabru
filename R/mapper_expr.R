@@ -23,7 +23,9 @@
 #'   expression, in addition to the data mask pronoun version.
 #' @inheritParams bru_mapper_generics
 #' @details
-#' The `input` should be a list with data objects, with the main object called
+#' The `input` is currently ignored.
+#'
+#' `data` should be a list with data objects, with the main object called
 #' `data`.
 #' If `is_rowwise == TRUE`, the number of rows in the `data` data.frame
 #' determines the number of rows in the output, and the columns can be used as
@@ -48,8 +50,9 @@
 #'
 #' # Expression with data
 #' (m <- bm_expr(rlang::quo(cos(x) * .data$z)))
-#' ibm_eval(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
-#' ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
+#' the_data <- list(data = data.frame(z = 11:15))
+#' ibm_eval(m, list(), list(x = 1:5), data = the_data)
+#' ibm_eval2(m, list(), list(x = 1:5), data = the_data)
 #'
 #' # Expression with data, root variables, and derived variables.
 #' (m <- bm_expr(
@@ -59,9 +62,10 @@
 #' )
 #' ibm_eval(
 #'   m,
-#'   list(data = data.frame(z = 11:15)),
+#'   list(),
 #'   derived = list(y = 2:6), # y = x + 1
 #'   jacobians = list(y = list(x = Matrix::Diagonal(1.0, 5))),
+#'   data = the_data,
 #'   state = list(x = 1:5)
 #' )
 #'
@@ -71,7 +75,7 @@ bm_expr <- function(
   expr,
   ...,
   #' @param assume character vector listing valid assumptions for the
-  #'   combination of the expression and input data, derived variables, and root
+  #'   combination of the expression and data, derived variables, and root
   #'   variables. This can be used to specify assumptions that allow for more
   #'   efficient Jacobian calculations. For example, if the expression
   #'   is row-wise in the data and derived variables, then
@@ -110,13 +114,16 @@ bm_expr <- function(
 
 #' @export
 #' @rdname ibm_n
+#' @param data should be a list with data objects, with the main object called
+#' `data`; see [bm_expr()] for details.
 #'
 ibm_n.bm_expr <- function(
   mapper,
   ...,
   input = NULL,
   state = NULL,
-  multi = FALSE
+  multi = FALSE,
+  data = NULL
 ) {
   if (is.null(state)) {
     return(NA_integer_)
@@ -141,13 +148,14 @@ ibm_n_output.bm_expr <- function(
   inla_f = FALSE,
   ...,
   derived = NULL,
-  n_state = NULL
+  n_state = NULL,
+  data = NULL
 ) {
   if (!("rowwise" %in% mapper[["assume"]])) {
     return(NA_integer_)
   }
-  if (!is.null(input[["data"]])) {
-    return(NROW(input[["data"]][[1]]))
+  if (!is.null(data[["data"]])) {
+    return(NROW(data[["data"]][[1]]))
   }
   if (!is.null(derived[[1]])) {
     return(NROW(derived[[1]]))
@@ -179,6 +187,7 @@ ibm_jacobian_bm_expr <- function(
   state,
   derived = NULL,
   jacobians = NULL,
+  data = NULL,
   ...,
   var,
   offset,
@@ -206,11 +215,11 @@ ibm_jacobian_bm_expr <- function(
   } else {
     # Jacobian of each derived variable with respect to the root variable.
     # Each missing entry implies an all-zero matrix.
-    A <- lapply(input[["jacobians"]], function(x) x[[var]])
+    A <- lapply(jacobians, function(x) x[[var]])
 
     assume_rowwise <- !allow_root &&
       is_rowwise &&
-      is.data.frame(input[["data"]])
+      is.data.frame(data[["data"]])
     if (assume_rowwise) {
       if (!is.null(n_output) && (NROW(offset) != n_output)) {
         stop(
@@ -414,6 +423,7 @@ ibm_jacobian_bm_expr_var <- function(
   state,
   derived = NULL,
   jacobians = NULL,
+  data = NULL,
   var,
   offset,
   n_output = NROW(offset),
@@ -434,7 +444,6 @@ ibm_jacobian_bm_expr_var <- function(
     ))
   }
 
-  eps <- 1e-6
   affected_nms <- names(jacobians)[
     vapply(
       jacobians,
@@ -443,7 +452,7 @@ ibm_jacobian_bm_expr_var <- function(
     )
   ]
   affected_nms <- intersect(affected_nms, names(derived))
-  A_affected <- lapply(input[["jacobians"]][affected_nms], function(x) x[[var]])
+  A_affected <- lapply(jacobians[affected_nms], function(x) x[[var]])
 
   N <- length(state[[var]])
 
@@ -459,6 +468,7 @@ ibm_jacobian_bm_expr_var <- function(
         input,
         state,
         derived = derived_eps,
+        data = data,
         env = env,
         ...
       )
@@ -492,6 +502,7 @@ ibm_jacobian_bm_expr_var <- function(
       input,
       state_eps,
       derived = derived_eps,
+      data = data,
       env = env,
       ...
     )
@@ -525,8 +536,10 @@ ibm_jacobian.bm_expr <- function(
   ...,
   derived = NULL,
   jacobians = NULL,
+  data = NULL,
   multi = FALSE,
   offset = NULL,
+  eps = 1e-6,
   env = rlang::caller_env()
 ) {
   if (is.null(offset)) {
@@ -535,14 +548,15 @@ ibm_jacobian.bm_expr <- function(
       input,
       state,
       derived = derived,
+      data = data,
       env = env,
       ...
     )
   }
   n_offset <- NROW(offset)
   # !allow_latent && is_rowwise && is.data.frame(data)
-  assume_rowwise <- ("rowwise" %in% mapper[["labels"]]) &&
-    is.data.frame(input[["data"]])
+  assume_rowwise <- ("rowwise" %in% mapper[["assume"]]) &&
+    is.data.frame(data[["data"]])
   if (assume_rowwise) {
     if (!is.null(n_offset) && (NROW(offset) != n_offset)) {
       stop(
@@ -581,10 +595,12 @@ ibm_jacobian.bm_expr <- function(
         state,
         derived = derived,
         jacobians = jacobians,
+        data = data,
         var = var,
         offset = offset,
         assume_rowwise = assume_rowwise,
         allow_root = FALSE,
+        eps = eps,
         env = env
       )
     }
@@ -604,6 +620,7 @@ bm_expr_data_mask <- function(
   input,
   state = NULL,
   derived = NULL,
+  data = data,
   env = rlang::caller_env()
 ) {
   suffix <- mapper[["labels"]][["suffix"]]
@@ -624,13 +641,13 @@ bm_expr_data_mask <- function(
           state_with_suffix,
           root = state
         ),
-        input
+        data
       ),
       c(
         mapper[["labels"]][["derived"]],
         "",
         mapper[["labels"]][["root"]],
-        names(input)
+        names(data)
       )
     )
   )
@@ -639,11 +656,12 @@ bm_expr_data_mask <- function(
 #' @export
 #' @describeIn ibm_eval_methods
 #' Accepts a `state` list with named entries, one for each variable.
-#' The `input` format should match the description given for [bm_expr()].
+#' The `input` and `data` formats should match the description given for
+#' [bm_expr()].
 #' @param data_mask A data mask object to use for evaluating the expression. If
-#'   `NULL` or missing, a data mask will be constructed from the `input`,
-#'   `state`, `derived`, and `env` arguments. This can be used to avoid
-#'   redundant construction of the data mask when evaluating different
+#'   `NULL` or missing, a data mask will be constructed with [bru_data_mask()]
+#'   from the `data`, `state`, `derived`, and `env` arguments. This can be used
+#'   to avoid redundant construction of the data mask when evaluating different
 #'   expressions multiple times with the same input and state.
 #' @param env The environment in which to evaluate the expression. By default,
 #'   this is set to the caller environment.
@@ -651,15 +669,19 @@ ibm_eval.bm_expr <- function(
   mapper,
   input,
   state = NULL,
-  derived = NULL,
   ...,
+  derived = NULL,
+  data = NULL,
   data_mask = NULL,
   env = rlang::caller_env()
 ) {
   if (is.null(data_mask)) {
     data_mask <- bm_expr_data_mask(
       mapper, input,
-      state = state, derived = derived, env = env
+      state = state,
+      derived = derived,
+      data = data,
+      env = env
     )
   }
   val <- rlang::eval_tidy(
@@ -677,10 +699,11 @@ ibm_as_taylor.bm_expr <- function(
   mapper,
   input,
   state,
+  ...,
   derived = NULL,
   jacobians = NULL,
-  inla_f = FALSE,
-  ...
+  data = data,
+  inla_f = FALSE
 ) {
   eval2 <- ibm_eval2(
     mapper,
@@ -708,9 +731,17 @@ ibm_eval2.bm_expr <- function(mapper, input, state = NULL, ...) {
     mapper,
     input,
     state,
-    ...
+    ...,
+    data = NULL
   )
-  jacobian <- ibm_jacobian(mapper, input, state, ..., offset = offset)
+  jacobian <- ibm_jacobian(
+    mapper,
+    input,
+    state,
+    ...,
+    offset = offset,
+    data = data
+  )
   list(offset = offset, jacobian = jacobian)
 }
 
@@ -745,14 +776,25 @@ format.bm_expr <- function(x, ...,
 
 
 
+# bru_obs ####
+
 #' @rdname ibm_eval2
 #' @export
 ibm_eval2.bru_obs <- function(
     mapper, input, state, ..., multi = FALSE, comp_list
 ) {
+  used <- bru_used(mapper)
+  nms <- unique(c(used$effects, used$latent))
+  param_nms <- setdiff(names(state), nms)
+  state_nms <- setdiff(names(state), param_nms)
+  param <- state[param_nms]
+
+  # TODO: check consistency; nms should be equal to names(state) or a subset of
+  # it, and should include nothing from param_nms.
+
   derived <- list()
   jacobians <- list()
-  for (nm in names(comp_list)) {
+  for (nm in nms) {
     res <- ibm_eval2(
       comp_list[[nm]],
       input = input[["comp"]][[nm]],
@@ -775,20 +817,22 @@ ibm_eval2.bru_obs <- function(
 
   res2 <- ibm_eval2(
     expr_mapper,
-    input = list(
+    input = list(),
+    state = state[state_nms],
+    derived = derived,
+    jacobians = jacobians,
+    multi = TRUE,
+    data = list(
+      param = param,
       data = mapper[["data"]],
       response_data = mapper[["response_data"]],
       data_extra = mapper[["data_extra"]]
     ),
-    state = state,
-    derived = derived,
-    jacobians = jacobians,
-    multi = TRUE,
     ...
   )
 
   # Feed forward into optional transformation mapper.
-  # TODO: work in progress...
+  # TODO: work in progress... Should be part of the pred_expr object
   post_mapper <- mapper[["aggregate"]]
 
   # This should be constructed as part of the overall bru_obs input evaluation,
@@ -821,6 +865,99 @@ ibm_eval2.bru_obs <- function(
   list(offset = offset, jacobian = B)
 }
 
+
+#' @rdname ibm_eval
+#' @export
+ibm_eval.bru_obs <- function(
+    mapper, input, state, ..., multi = FALSE, comp_list
+) {
+  used <- bru_used(mapper)
+  nms <- unique(c(used$effects, used$latent))
+  param_nms <- setdiff(names(state), nms)
+  state_nms <- setdiff(names(state), param_nms)
+  param <- state[param_nms]
+
+  # TODO: check consistency; nms should be equal to names(state) or a subset of
+  # it, and should include nothing from param_nms.
+
+  derived <- list()
+  jacobians <- list()
+  for (nm in nms) {
+    res <- ibm_eval(
+      comp_list[[nm]],
+      input = input[["comp"]][[nm]],
+      state = state[[nm]],
+      ...
+    )
+    derived[[nm]] <- res
+  }
+
+  expr_mapper <- bm_expr(
+    bru_pred_expr(mapper, format = "quo"),
+    labels = list(
+      root = "latent",
+      derived = "effects",
+      suffix = "_latent"
+    ),
+    assume = c("rowwise", "additive")
+  )
+
+  res2 <- ibm_eval(
+    expr_mapper,
+    input = list(),
+    state = state[state_nms],
+    derived = derived,
+    multi = TRUE,
+    data = list(
+      param = param,
+      data = mapper[["data"]],
+      response_data = mapper[["response_data"]],
+      data_extra = mapper[["data_extra"]]
+    ),
+    ...
+  )
+
+  # Feed forward into optional transformation mapper.
+  # TODO: work in progress... Should be part of the pred_expr object
+  post_mapper <- mapper[["aggregate"]]
+
+  # This should be constructed as part of the overall bru_obs input evaluation,
+  # so that we have a this pre-computed (input for ibm_eval2.bru_obs_list):
+  # input = list(`obs1` = list(comp = input for components,
+  #                            post = post_mapper input), `obs2` = ...)
+
+  res3 <- ibm_eval(
+    post_mapper,
+    input = input[["post"]],
+    state = res2,
+    multi = FALSE,
+    ...
+  )
+
+  res3
+}
+
+#' @rdname ibm_jacobian
+#' @export
+ibm_jacobian.bru_obs <- function(
+    mapper, input, state, ..., multi = FALSE, comp_list
+) {
+  result <- ibm_eval2(
+    mapper,
+    input = input,
+    state = state,
+    ...,
+    multi = multi,
+    comp_list = comp_list
+  )
+
+  B <- result$jacobian
+
+  B
+}
+
+
+# bru_obs_list ####
 
 #' @rdname ibm_eval2
 #' @export
@@ -874,7 +1011,7 @@ ibm_eval2.bru_obs_list <- function(
 
 #' @rdname ibm_jacobian
 #' @export
-ibm_jacobian.bru_obs <- function(
+ibm_jacobian.bru_obs_list <- function(
     mapper, input, state, ..., multi = FALSE, comp_list
 ) {
   result <- ibm_eval2(
@@ -882,70 +1019,12 @@ ibm_jacobian.bru_obs <- function(
     input = input,
     state = state,
     ...,
-    multi = TRUE,
+    multi = multi,
     comp_list = comp_list
   )
 
   B <- result$jacobian
 
-  if (!multi) {
-    B <- do.call(cbind, B)
-  }
-
   B
 }
 
-#' @rdname ibm_eval
-#' @export
-ibm_eval.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
-) {
-  derived <- list()
-  for (nm in names(comp_list)) {
-    res <- ibm_eval(
-      comp_list[[nm]],
-      input = input[["comp"]][[nm]],
-      state = state[[nm]],
-      ...
-    )
-    derived[[nm]] <- res
-  }
-
-  expr_mapper <- bm_expr(
-    bru_pred_expr(mapper, format = "quo"),
-    labels = list(
-      root = "latent",
-      derived = "effects",
-      suffix = "_latent"
-    ),
-    assume = c("rowwise", "additive")
-  )
-
-  res2 <- ibm_eval(
-    expr_mapper,
-    input = list(data = mapper[["data"]], data_extra = mapper[["data_extra"]]),
-    state = state,
-    derived = derived,
-    multi = FALSE,
-    ...
-  )
-
-  # Feed forward into optional transformation mapper.
-  # TODO: work in progress...
-  post_mapper <- mapper[["aggregate_mapper"]]
-  post_input <- bru_input(ibm_input_get(post_mapper),
-                          data = mapper[["data"]],
-                          data_extra = mapper[["data_extra"]],
-                          comp = input[["comp"]]
-  )
-
-  res3 <- ibm_eval(
-    post_mapper,
-    input = post_input,
-    state = res2$offset,
-    multi = FALSE,
-    ...
-  )
-
-  res3
-}

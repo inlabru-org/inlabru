@@ -18,7 +18,7 @@ that can be evaluated in a data mask containing the root variables, derived
 variables, and data variables.}
 
 \item{assume}{character vector listing valid assumptions for the
-combination of the expression and input data, derived variables, and root
+combination of the expression and data, derived variables, and root
 variables. This can be used to specify assumptions that allow for more
 efficient Jacobian calculations. For example, if the expression
 is row-wise in the data and derived variables, then
@@ -50,7 +50,9 @@ Missing entries are treated as all-zero matrices.}
 Constructs an expression mapping
 }
 \details{
-The \code{input} should be a list with data objects, with the main object called
+The \code{input} is currently ignored.
+
+\code{data} should be a list with data objects, with the main object called
 \code{data}.
 If \code{is_rowwise == TRUE}, the number of rows in the \code{data} data.frame
 determines the number of rows in the output, and the columns can be used as
@@ -65,8 +67,9 @@ ibm_eval2(m, list(), list(x = 1:5))
 
 # Expression with data
 (m <- bm_expr(rlang::quo(cos(x) * .data$z)))
-ibm_eval(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
-ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
+the_data <- list(data = data.frame(z = 11:15))
+ibm_eval(m, list(), list(x = 1:5), data = the_data)
+ibm_eval2(m, list(), list(x = 1:5), data = the_data)
 
 # Expression with data, root variables, and derived variables.
 (m <- bm_expr(
@@ -76,9 +79,10 @@ ibm_eval2(m, list(data = data.frame(z = 11:15)), list(x = 1:5))
 )
 ibm_eval(
   m,
-  list(data = data.frame(z = 11:15)),
+  list(),
   derived = list(y = 2:6), # y = x + 1
   jacobians = list(y = list(x = Matrix::Diagonal(1.0, 5))),
+  data = the_data,
   state = list(x = 1:5)
 )
 
