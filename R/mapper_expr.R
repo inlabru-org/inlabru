@@ -21,7 +21,8 @@
 #'   `suffix = "_latent"`,
 #'   then a root variable named `"x"` will be available as `"x_latent"` in the
 #'   expression, in addition to the data mask pronoun version.
-#' @inheritParams bru_mapper_generics
+#' @param .envir The environment for the expression evaluation. By default, this
+#'   is set to the caller environment.
 #' @details
 #' The `input` is currently ignored.
 #'
@@ -31,14 +32,6 @@
 #' determines the number of rows in the output, and the columns can be used as
 #' constants in the expression, accessed via `.data$colname`,
 #' `.data.$colname`, or `.data.[["colname"]]`.
-#'
-#' @param derived,jacobians The state vectors of variables derived from the root
-#'   variables. If `NULL` or missing, defaults to an empty list.
-#' If `jacobians` is `NULL` or missing, defaults to an empty list.
-#' If not `NULL`, should be a list with named entries, one for variable derived
-#' from the root variables. Each list element should be a named list of Jacobian
-#' matrices, with names matching the root variables.
-#' Missing entries are treated as all-zero matrices.
 #'
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -73,7 +66,6 @@
 #'
 bm_expr <- function(
   expr,
-  ...,
   #' @param assume character vector listing valid assumptions for the
   #'   combination of the expression and data, derived variables, and root
   #'   variables. This can be used to specify assumptions that allow for more
@@ -84,7 +76,7 @@ bm_expr <- function(
   #'   rows. Supported assumptions are "rowwise", "linear", and "additive".
   assume = character(0),
   labels = NULL,
-  .envir = parent.frame()
+  .envir = rlang::caller_env()
 ) {
   if (is.null(labels)) {
     labels <- list()
@@ -140,7 +132,7 @@ ibm_n.bm_expr <- function(
 
 #' @export
 #' @rdname ibm_n_output
-#'
+#' @inheritParams ibm_jacobian
 ibm_n_output.bm_expr <- function(
   mapper,
   input,
@@ -181,240 +173,240 @@ ibm_is_linear.bm_expr <- function(mapper, ...) {
 }
 
 
-ibm_jacobian_bm_expr <- function(
-  mapper,
-  input,
-  state,
-  derived = NULL,
-  jacobians = NULL,
-  data = NULL,
-  ...,
-  var,
-  offset,
-  n_output = NROW(offset),
-  eps = 1e-6,
-  env = rlang::caller_env()
-) {
-  if (length(state[[var]]) == 0L) {
-    return(Matrix::sparseMatrix(
-      i = c(),
-      j = c(),
-      x = c(1),
-      dims = c(NROW(offset), 0)
-    ))
-  }
-
-  # TODO: Store and access adjusted bru_used info for the expression!
-  # Or is it enough to precompute "assume_rowwise"?
-  used <- NULL # TODO!
-  allow_root <- var %in% used[[mapper[["labels"]][["root"]]]]
-
-  if (is.null(comp_simple)) { # TODO: Should this be here or elsewhere?
-    A <- NULL
-    assume_rowwise <- FALSE
-  } else {
-    # Jacobian of each derived variable with respect to the root variable.
-    # Each missing entry implies an all-zero matrix.
-    A <- lapply(jacobians, function(x) x[[var]])
-
-    assume_rowwise <- !allow_root &&
-      is_rowwise &&
-      is.data.frame(data[["data"]])
-    if (assume_rowwise) {
-      if (!is.null(n_output) && (NROW(offset) != n_output)) {
-        stop(
-          "Number of rows (",
-          NROW(offset),
-          ") in the predictor for component '",
-          var,
-          "' does not match the length implied by the response data (",
-          n_output,
-          ")."
-        )
-      }
-      if (NROW(A) == 1L) {
-        A <- Matrix::kronecker(rep(1, NROW(offset)), A)
-      }
-    }
-  }
-
-  triplets <- list(
-    i = integer(0),
-    j = integer(0),
-    x = numeric(0)
-  )
-
-  if (!all(is.finite(offset))) {
-    warning(
-      "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
-      immediate. = TRUE
-    )
-  }
-
-  symmetric_diffs <- FALSE
-  for (k in seq_len(NROW(state[[var]]))) {
-    if (is.null(A)) {
-      row_subset <- seq_len(NROW(offset))
-    } else {
-      Ak <- lapply(A, function(x) x[, k, drop = TRUE])
-      row_subset <- which(Ak != 0.0)
-    }
-    if (length(row_subset) > 0) {
-      if (symmetric_diffs) {
-        state_eps <- list(state, state)
-        state_eps[[1]][[label]][k] <- state[[label]][k] - eps
-        state_eps[[2]][[label]][k] <- state[[label]][k] + eps
-      } else {
-        state_eps <- state
-        state_eps[[label]][k] <- state[[label]][k] + eps
-      }
-      # TODO:
-      # Option: filter out the data and effect rows for which
-      # the rows of A have some non-zeros, or all if !is_rowwise
-      # Option: compute predictor for multiple different states. This requires
-      # constructing multiple states and corresponding effects before calling
-      # evaluate_predictor
-
-      if (symmetric_diffs) {
-        effects_eps <- list(effects, effects)
-      } else {
-        effects_eps <- effects
-      }
-      if (!is.null(A)) {
-        if (assume_rowwise) {
-          if (symmetric_diffs) {
-            for (label_loop in names(effects)) {
-              if (NROW(effects[[label_loop]]) == 1) {
-                effects_eps[[1]][[label_loop]] <-
-                  rep(effects[[label_loop]], length(row_subset))
-                effects_eps[[2]][[label_loop]] <-
-                  rep(effects[[label_loop]], length(row_subset))
-              } else {
-                effects_eps[[1]][[label_loop]] <-
-                  effects[[label_loop]][row_subset]
-                effects_eps[[2]][[label_loop]] <-
-                  effects[[label_loop]][row_subset]
-              }
-            }
-            effects_eps[[1]][[label]] <-
-              effects_eps[[1]][[label]] - Ak[row_subset] * eps
-            effects_eps[[2]][[label]] <-
-              effects_eps[[2]][[label]] + Ak[row_subset] * eps
-          } else {
-            for (label_loop in names(effects)) {
-              if (NROW(effects[[label_loop]]) == 1) {
-                effects_eps[[label_loop]] <-
-                  rep(effects[[label_loop]], length(row_subset))
-              } else {
-                effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
-              }
-            }
-            effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
-          }
-        } else {
-          if (symmetric_diffs) {
-            effects_eps <- list(effects, effects)
-            effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
-            effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
-          } else {
-            effects_eps <- effects
-            effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
-          }
-        }
-      }
-      pred_eps <- evaluate_predictor(
-        model,
-        state = if (symmetric_diffs) {
-          state_eps
-        } else {
-          list(state_eps)
-        },
-        data =
-          if (assume_rowwise) {
-            data[row_subset, , drop = FALSE]
-          } else {
-            data
-          },
-        data_extra = data_extra,
-        effects =
-          if (symmetric_diffs) {
-            effects_eps
-          } else {
-            list(effects_eps)
-          },
-        predictor = lhood_expr,
-        used = used,
-        format = "matrix",
-        n_pred =
-          if (assume_rowwise) {
-            length(row_subset)
-          } else {
-            n_pred
-          }
-      )
-      # Store sparse triplet information
-      if (symmetric_diffs) {
-        if (assume_rowwise) {
-          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
-        } else {
-          values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
-        }
-      } else {
-        if (!all(is.finite(pred_eps))) {
-          warning(
-            "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
-            label,
-            "' plus eps.\n",
-            immediate. = TRUE
-          )
-        }
-        if (assume_rowwise) {
-          values <- (pred_eps - pred0[row_subset])
-        } else {
-          values <- (pred_eps - pred0)
-        }
-      }
-      nonzero <- is.finite(values)
-      if (!all(nonzero)) {
-        warning(
-          "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
-          "derivatives for '",
-          label,
-          "'; treated as 0.0.\n",
-          immediate. = TRUE
-        )
-      }
-      nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
-      if (assume_rowwise) {
-        triplets$i <- c(triplets$i, row_subset[nonzero])
-      } else {
-        triplets$i <- c(triplets$i, which(nonzero))
-      }
-      triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
-      triplets$x <- c(triplets$x, values[nonzero] / eps)
-    }
-  }
-  B <- Matrix::sparseMatrix(
-    i = triplets$i,
-    j = triplets$j,
-    x = triplets$x,
-    dims = c(NROW(pred0), NROW(state[[label]]))
-  )
-  if (NROW(B) != NROW(pred0)) {
-    stop(
-      "Jacobian matrix for component '",
-      label,
-      "' has ",
-      NROW(B),
-      " rows, but expected ",
-      NROW(pred0),
-      " rows based on the predictor length."
-    )
-  }
-  B
-
-  NULL
-}
+# ibm_jacobian_bm_expr <- function(
+#   mapper,
+#   input,
+#   state,
+#   derived = NULL,
+#   jacobians = NULL,
+#   data = NULL,
+#   ...,
+#   var,
+#   offset,
+#   n_output = NROW(offset),
+#   eps = 1e-6,
+#   env = rlang::caller_env()
+# ) {
+#   if (length(state[[var]]) == 0L) {
+#     return(Matrix::sparseMatrix(
+#       i = c(),
+#       j = c(),
+#       x = c(1),
+#       dims = c(NROW(offset), 0)
+#     ))
+#   }
+#
+#   # TODO: Store and access adjusted bru_used info for the expression!
+#   # Or is it enough to precompute "assume_rowwise"?
+#   used <- NULL # TODO!
+#   allow_root <- var %in% used[[mapper[["labels"]][["root"]]]]
+#
+#   if (is.null(comp_simple)) { # TODO: Should this be here or elsewhere?
+#     A <- NULL
+#     assume_rowwise <- FALSE
+#   } else {
+#     # Jacobian of each derived variable with respect to the root variable.
+#     # Each missing entry implies an all-zero matrix.
+#     A <- lapply(jacobians, function(x) x[[var]])
+#
+#     assume_rowwise <- !allow_root &&
+#       is_rowwise &&
+#       is.data.frame(data[["data"]])
+#     if (assume_rowwise) {
+#       if (!is.null(n_output) && (NROW(offset) != n_output)) {
+#         stop(
+#           "Number of rows (",
+#           NROW(offset),
+#           ") in the predictor for component '",
+#           var,
+#           "' does not match the length implied by the response data (",
+#           n_output,
+#           ")."
+#         )
+#       }
+#       if (NROW(A) == 1L) {
+#         A <- Matrix::kronecker(rep(1, NROW(offset)), A)
+#       }
+#     }
+#   }
+#
+#   triplets <- list(
+#     i = integer(0),
+#     j = integer(0),
+#     x = numeric(0)
+#   )
+#
+#   if (!all(is.finite(offset))) {
+#     warning(
+#       "Non-finite (-Inf/Inf/NaN) entries detected in predictor.\n",
+#       immediate. = TRUE
+#     )
+#   }
+#
+#   symmetric_diffs <- FALSE
+#   for (k in seq_len(NROW(state[[var]]))) {
+#     if (is.null(A)) {
+#       row_subset <- seq_len(NROW(offset))
+#     } else {
+#       Ak <- lapply(A, function(x) x[, k, drop = TRUE])
+#       row_subset <- which(Ak != 0.0)
+#     }
+#     if (length(row_subset) > 0) {
+#       if (symmetric_diffs) {
+#         state_eps <- list(state, state)
+#         state_eps[[1]][[label]][k] <- state[[label]][k] - eps
+#         state_eps[[2]][[label]][k] <- state[[label]][k] + eps
+#       } else {
+#         state_eps <- state
+#         state_eps[[label]][k] <- state[[label]][k] + eps
+#       }
+#       # TODO:
+#       # Option: filter out the data and effect rows for which
+#       # the rows of A have some non-zeros, or all if !is_rowwise
+#       # Option: compute predictor for multiple different states. This requires
+#       # constructing multiple states and corresponding effects before calling
+#       # evaluate_predictor
+#
+#       if (symmetric_diffs) {
+#         effects_eps <- list(effects, effects)
+#       } else {
+#         effects_eps <- effects
+#       }
+#       if (!is.null(A)) {
+#         if (assume_rowwise) {
+#           if (symmetric_diffs) {
+#             for (label_loop in names(effects)) {
+#               if (NROW(effects[[label_loop]]) == 1) {
+#                 effects_eps[[1]][[label_loop]] <-
+#                   rep(effects[[label_loop]], length(row_subset))
+#                 effects_eps[[2]][[label_loop]] <-
+#                   rep(effects[[label_loop]], length(row_subset))
+#               } else {
+#                 effects_eps[[1]][[label_loop]] <-
+#                   effects[[label_loop]][row_subset]
+#                 effects_eps[[2]][[label_loop]] <-
+#                   effects[[label_loop]][row_subset]
+#               }
+#             }
+#             effects_eps[[1]][[label]] <-
+#               effects_eps[[1]][[label]] - Ak[row_subset] * eps
+#             effects_eps[[2]][[label]] <-
+#               effects_eps[[2]][[label]] + Ak[row_subset] * eps
+#           } else {
+#             for (label_loop in names(effects)) {
+#               if (NROW(effects[[label_loop]]) == 1) {
+#                 effects_eps[[label_loop]] <-
+#                   rep(effects[[label_loop]], length(row_subset))
+#               } else {
+#                 effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
+#               }
+#             }
+#             effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
+#           }
+#         } else {
+#           if (symmetric_diffs) {
+#             effects_eps <- list(effects, effects)
+#             effects_eps[[1]][[label]] <- effects_eps[[1]][[label]] - Ak * eps
+#             effects_eps[[2]][[label]] <- effects_eps[[2]][[label]] + Ak * eps
+#           } else {
+#             effects_eps <- effects
+#             effects_eps[[label]] <- effects_eps[[label]] + Ak * eps
+#           }
+#         }
+#       }
+#       pred_eps <- evaluate_predictor(
+#         model,
+#         state = if (symmetric_diffs) {
+#           state_eps
+#         } else {
+#           list(state_eps)
+#         },
+#         data =
+#           if (assume_rowwise) {
+#             data[row_subset, , drop = FALSE]
+#           } else {
+#             data
+#           },
+#         data_extra = data_extra,
+#         effects =
+#           if (symmetric_diffs) {
+#             effects_eps
+#           } else {
+#             list(effects_eps)
+#           },
+#         predictor = lhood_expr,
+#         used = used,
+#         format = "matrix",
+#         n_pred =
+#           if (assume_rowwise) {
+#             length(row_subset)
+#           } else {
+#             n_pred
+#           }
+#       )
+#       # Store sparse triplet information
+#       if (symmetric_diffs) {
+#         if (assume_rowwise) {
+#           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+#         } else {
+#           values <- (pred_eps[, 2] - pred_eps[, 1]) / 2
+#         }
+#       } else {
+#         if (!all(is.finite(pred_eps))) {
+#           warning(
+#             "Non-finite (-Inf/Inf/NaN) entries detected in predictor '",
+#             label,
+#             "' plus eps.\n",
+#             immediate. = TRUE
+#           )
+#         }
+#         if (assume_rowwise) {
+#           values <- (pred_eps - pred0[row_subset])
+#         } else {
+#           values <- (pred_eps - pred0)
+#         }
+#       }
+#       nonzero <- is.finite(values)
+#       if (!all(nonzero)) {
+#         warning(
+#           "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
+#           "derivatives for '",
+#           label,
+#           "'; treated as 0.0.\n",
+#           immediate. = TRUE
+#         )
+#       }
+#       nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
+#       if (assume_rowwise) {
+#         triplets$i <- c(triplets$i, row_subset[nonzero])
+#       } else {
+#         triplets$i <- c(triplets$i, which(nonzero))
+#       }
+#       triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
+#       triplets$x <- c(triplets$x, values[nonzero] / eps)
+#     }
+#   }
+#   B <- Matrix::sparseMatrix(
+#     i = triplets$i,
+#     j = triplets$j,
+#     x = triplets$x,
+#     dims = c(NROW(pred0), NROW(state[[label]]))
+#   )
+#   if (NROW(B) != NROW(pred0)) {
+#     stop(
+#       "Jacobian matrix for component '",
+#       label,
+#       "' has ",
+#       NROW(B),
+#       " rows, but expected ",
+#       NROW(pred0),
+#       " rows based on the predictor length."
+#     )
+#   }
+#   B
+#
+#   NULL
+# }
 
 
 ibm_jacobian_bm_expr_var <- function(
@@ -430,7 +422,7 @@ ibm_jacobian_bm_expr_var <- function(
   eps = 1e-6,
   assume_rowwise,
   allow_root,
-  env = rlang::caller_env(),
+  .envir = rlang::caller_env(),
   ...
 ) {
   n_offset <- NROW(offset)
@@ -469,7 +461,7 @@ ibm_jacobian_bm_expr_var <- function(
         state,
         derived = derived_eps,
         data = data,
-        env = env,
+        .envir = .envir,
         ...
       )
       the_diff <- (offset_eps - offset) / eps
@@ -503,7 +495,7 @@ ibm_jacobian_bm_expr_var <- function(
       state_eps,
       derived = derived_eps,
       data = data,
-      env = env,
+      .envir = .envir,
       ...
     )
 
@@ -526,6 +518,19 @@ ibm_jacobian_bm_expr_var <- function(
 #' Accepts a `state` list with named entries, one for each variable.
 #' The `input` format should match the description given for [bm_expr()].
 #' @param offset The offset value, pre-calculated by [ibm_eval.bm_expr()].
+#' @param derived The state vectors of variables derived from the root
+#'   variables. If `NULL` or missing, defaults to an empty list.
+#' @param jacobians The state vectors of variables derived from the root
+#' If `jacobians` is `NULL` or missing, defaults to an empty list.
+#' If not `NULL`, should be a list with named entries, one for variable derived
+#' from the root variables. Each list element should be a named list of Jacobian
+#' matrices, with names matching the root variables.
+#' Missing entries are treated as all-zero matrices.
+#' @param data A list with data objects, with the main object called `data`;
+#' see [bm_expr()]
+#' @param eps The finite difference step size to use for numerical
+#' differentiation. Default is `1e-6`.
+#' @inheritParams bm_expr .envir
 #' @export
 #'
 ibm_jacobian.bm_expr <- function(
@@ -540,7 +545,7 @@ ibm_jacobian.bm_expr <- function(
   multi = FALSE,
   offset = NULL,
   eps = 1e-6,
-  env = rlang::caller_env()
+  .envir = rlang::caller_env()
 ) {
   if (is.null(offset)) {
     offset <- ibm_eval(
@@ -549,7 +554,7 @@ ibm_jacobian.bm_expr <- function(
       state,
       derived = derived,
       data = data,
-      env = env,
+      .envir = .envir,
       ...
     )
   }
@@ -601,7 +606,7 @@ ibm_jacobian.bm_expr <- function(
         assume_rowwise = assume_rowwise,
         allow_root = FALSE,
         eps = eps,
-        env = env
+        .envir = .envir
       )
     }
   )
@@ -621,7 +626,7 @@ bm_expr_data_mask <- function(
   state = NULL,
   derived = NULL,
   data = data,
-  env = rlang::caller_env()
+  .envir = rlang::caller_env()
 ) {
   suffix <- mapper[["labels"]][["suffix"]]
   if (
@@ -660,11 +665,13 @@ bm_expr_data_mask <- function(
 #' [bm_expr()].
 #' @param data_mask A data mask object to use for evaluating the expression. If
 #'   `NULL` or missing, a data mask will be constructed with [bru_data_mask()]
-#'   from the `data`, `state`, `derived`, and `env` arguments. This can be used
-#'   to avoid redundant construction of the data mask when evaluating different
-#'   expressions multiple times with the same input and state.
-#' @param env The environment in which to evaluate the expression. By default,
-#'   this is set to the caller environment.
+#'   from the `data`, `state`, `derived`, and `.envir` arguments. This can be
+#'   used to avoid redundant construction of the data mask when evaluating
+#'   different expressions multiple times with the same input and state.
+#' @param .envir The environment in which to evaluate the expression. By
+#'   default, this is set to the caller environment.
+#' @param derived The state vectors of variables derived from the root
+#'   variables. If `NULL` or missing, defaults to an empty list.
 ibm_eval.bm_expr <- function(
   mapper,
   input,
@@ -673,7 +680,7 @@ ibm_eval.bm_expr <- function(
   derived = NULL,
   data = NULL,
   data_mask = NULL,
-  env = rlang::caller_env()
+  .envir = rlang::caller_env()
 ) {
   if (is.null(data_mask)) {
     data_mask <- bm_expr_data_mask(
@@ -681,19 +688,20 @@ ibm_eval.bm_expr <- function(
       state = state,
       derived = derived,
       data = data,
-      env = env
+      .envir = .envir
     )
   }
   val <- rlang::eval_tidy(
     mapper[["expr"]],
     data = data_mask,
-    env = env
+    env = .envir
   )
   val
 }
 
 #' @export
 #' @rdname ibm_as_taylor
+#' @inheritParams ibm_jacobian
 #'
 ibm_as_taylor.bm_expr <- function(
   mapper,
@@ -726,13 +734,13 @@ ibm_as_taylor.bm_expr <- function(
 #' @export
 #' @rdname ibm_eval2
 #'
-ibm_eval2.bm_expr <- function(mapper, input, state = NULL, ...) {
+ibm_eval2.bm_expr <- function(mapper, input, state = NULL, ..., data = NULL) {
   offset <- ibm_eval(
     mapper,
     input,
     state,
     ...,
-    data = NULL
+    data = data
   )
   jacobian <- ibm_jacobian(
     mapper,
@@ -780,8 +788,10 @@ format.bm_expr <- function(x, ...,
 
 #' @rdname ibm_eval2
 #' @export
+#' @param comp_mappers A list of mappers, typically from
+#'   `as_bm_list<bru_comp_list>`.
 ibm_eval2.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   used <- bru_used(mapper)
   nms <- unique(c(used$effects, used$latent))
@@ -796,7 +806,7 @@ ibm_eval2.bru_obs <- function(
   jacobians <- list()
   for (nm in nms) {
     res <- ibm_eval2(
-      comp_list[[nm]],
+      comp_mappers[[nm]],
       input = input[["comp"]][[nm]],
       state = state[[nm]],
       ...
@@ -867,9 +877,10 @@ ibm_eval2.bru_obs <- function(
 
 
 #' @rdname ibm_eval
+#' @inheritParams ibm_eval2
 #' @export
 ibm_eval.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   used <- bru_used(mapper)
   nms <- unique(c(used$effects, used$latent))
@@ -884,7 +895,7 @@ ibm_eval.bru_obs <- function(
   jacobians <- list()
   for (nm in nms) {
     res <- ibm_eval(
-      comp_list[[nm]],
+      comp_mappers[[nm]],
       input = input[["comp"]][[nm]],
       state = state[[nm]],
       ...
@@ -938,9 +949,10 @@ ibm_eval.bru_obs <- function(
 }
 
 #' @rdname ibm_jacobian
+#' @inheritParams ibm_eval2
 #' @export
 ibm_jacobian.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   result <- ibm_eval2(
     mapper,
@@ -948,7 +960,7 @@ ibm_jacobian.bru_obs <- function(
     state = state,
     ...,
     multi = multi,
-    comp_list = comp_list
+    comp_mappers = comp_mappers
   )
 
   B <- result$jacobian
@@ -962,12 +974,12 @@ ibm_jacobian.bru_obs <- function(
 #' @rdname ibm_eval2
 #' @export
 ibm_eval2.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   results <- lapply(
     setNames(seq_along(mapper), names(mapper)),
     function(m) ibm_eval2.bru_obs(mapper[[m]], input[[m]], state, ...,
-                                  multi = TRUE, comp_list = comp_list)
+                                  multi = TRUE, comp_mappers = comp_mappers)
   )
 
   # Combine jacobians from the expression mapper and the aggregate mapper.
@@ -1009,10 +1021,28 @@ ibm_eval2.bru_obs_list <- function(
   list(offset = offset, jacobian = jacobian)
 }
 
+#' @rdname ibm_eval2
+#' @export
+ibm_eval.bru_obs_list <- function(
+    mapper, input, state, ..., multi = FALSE, comp_mappers
+) {
+  offset <- lapply(
+    setNames(seq_along(mapper), names(mapper)),
+    function(m) ibm_eval.bru_obs(mapper[[m]], input[[m]], state, ...,
+                                 multi = TRUE, comp_mappers = comp_mappers)
+  )
+
+  if (!multi) {
+    offset <- unlist(offset)
+  }
+
+  offset
+}
+
 #' @rdname ibm_jacobian
 #' @export
 ibm_jacobian.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_list
+    mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   result <- ibm_eval2(
     mapper,
@@ -1020,7 +1050,7 @@ ibm_jacobian.bru_obs_list <- function(
     state = state,
     ...,
     multi = multi,
-    comp_list = comp_list
+    comp_mappers = comp_mappers
   )
 
   B <- result$jacobian

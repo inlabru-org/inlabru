@@ -526,7 +526,7 @@ bru_input.bru_obs <- function(x, components, ...) {
   if (!is.null(x[["aggregate"]])) {
     input$post <- bru_agg_input(
       x[["aggregate"]],
-      data_list = mask,
+      mask = mask,
       .envir = x[["env"]]
     )
   }

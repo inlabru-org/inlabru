@@ -210,6 +210,7 @@ bm_collect_sub_lin <- function(mapper, input, state, inla_f = FALSE, ...) {
 #' with unnamed but ordered columns. When `inla_f=TRUE` and `hidden=TRUE` in
 #' the mapper definition, the input format should instead match that of
 #' the first, non-hidden, sub-mapper.
+#' @param sub_lin Internal, optional pre-computed sub-mapper information
 #' @export
 #'
 ibm_jacobian.bm_collect <- function(
@@ -237,6 +238,7 @@ ibm_jacobian.bm_collect <- function(
 
 
 #' @export
+#' @param sub_lin Internal, optional pre-computed sub-mapper information
 #' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_collect <- function(

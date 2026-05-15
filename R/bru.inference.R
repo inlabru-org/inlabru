@@ -802,10 +802,10 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 }
 
 #' @title Create inlabru data mask
-#' @description Create a data mask for inlabru, which allows for evaluating expressions in the
-#' context of the data objects, with support for tidy evaluation pronouns and
-#' direct access to the data objects as `.name.`. This is an internal inlabru method, not
-#' intended for general use.
+#' @description Create a data mask for inlabru, which allows for evaluating
+#'   expressions in the context of the data objects, with support for tidy
+#'   evaluation pronouns and direct access to the data objects as `.name.`. This
+#'   is an internal inlabru method, not intended for general use.
 #' @keywords internal
 #' @param data list of data objects in priority order. Named elements will be
 #'  available as whole objects `.name.` as well as pronouns `.name` in
@@ -825,6 +825,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #'   data = m
 #' )
 #'
+#' @export
 bru_data_mask <- function(data,
                           pronouns = NULL,
                           objects = NULL) {
@@ -1200,26 +1201,34 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
     }
   })
 
-  response_block_val <- NULL
-  if (is.null(response_block)) {
+  response_block_val <- bru_eval_in_data_context(
+    {{ response_block }},
+    data = data_list,
+    default = NULL,
+    .envir = .envir
+  )
+
+  if (is.null(response_block_val)) {
     if (!is.null(aggregate_input[["block_response"]])) {
-      response_block <- aggregate_input[["block_response"]]
+      response_block <- rlang::parse_expr(
+        glue('.response_data.[["',
+             "{ aggregate_input[['block_response']] }",
+             '"]]')
+      )
+    } else {
+      response_block <- rlang::parse_expr(
+          glue('.response_data.[[".block"]]')
+      )
     }
-  }
-  if (is.null(response_block)) {
-    response_block <- ".block"
-  }
-  if (!is.null(response_block)) {
-    resp_block_expr <- rlang::parse_expr(
-      glue('.response_data.[["{ response_block }"]]')
-    )
+
     response_block_val <- bru_eval_in_data_context(
-      !!resp_block_expr,
+      !!response_block,
       data = data_list,
       default = NULL,
       .envir = .envir
     )
   }
+
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
       "2.14.1.9004",
@@ -1229,18 +1238,6 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
         "The `block_response` element is overruled by non-null ",
         "`response_block`."
       ))
-    if (is.null(response_block_val)) {
-      response_block <- aggregate_input[["block_response"]]
-      resp_block_expr <- rlang::parse_expr(
-        glue('.response_data.[["{ response_block }"]]')
-      )
-      response_block_val <- bru_eval_in_data_context(
-        !!resp_block_expr,
-        data = data_list,
-        default = NULL,
-        .envir = .envir
-      )
-    }
   }
   if (!is.null(response_block_val)) {
     aggregate_input[["block"]] <-
@@ -1321,7 +1318,7 @@ bru_agg_input <- function(mapper, mask, .envir) {
   resp_block_expr <- rlang::parse_expr(
     '.response_data.[["BRU_response_block"]]'
   )
-  response_block <- bru_eval_in_data_context(
+  response_block_val <- bru_eval_in_data_context(
     !!resp_block_expr,
     data = mask,
     default = NULL,
@@ -1333,16 +1330,12 @@ bru_agg_input <- function(mapper, mask, .envir) {
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
-        "The `block_response` element is overruled by non-null ",
-        "`response_block`."
+        "The `block_response` element is ignored."
       ))
-    if (is.null(response_block)) {
-      response_block <- aggregate_input[["block_response"]]
-    }
   }
-  if (!is.null(response_block)) {
+  if (!is.null(response_block_val)) {
     aggregate_input[["block"]] <-
-      match(aggregate_input[["block"]], response_block)
+      match(aggregate_input[["block"]], response_block_val)
   }
 
   if (is.character(aggregate_input[["block"]])) {
@@ -1412,23 +1405,8 @@ bru_obs_agg <- function(lh,
         extra_data = lh$data_extra
       ),
       .envir = .envir,
-      response_block = response_block
+      response_block = {{ response_block }}
     )
-    if (is.null(response_block)) {
-      response_block <- ".block"
-      if (!is.null(aggregate_input[["block_response"]])) {
-        lifecycle::deprecate_warn(
-          "2.14.1.9004",
-          I("Using `block_response` in `aggregate_input`"),
-           "bru_obs(response_block)",
-          details = glue(
-            "The `block_response` element is overruled by non-null ",
-            "`response_block`."
-          )
-        )
-        response_block <- aggregate_input[["block_response"]]
-      }
-    }
 
     pred_text <- bru_pred_expr(lh, format = "text_raw")
     pred_text <- glue(
@@ -1462,12 +1440,24 @@ bru_obs_agg <- function(lh,
 
     aggregate <- ibm_input_set(aggregate, input = inp)
 
-    if (is.null(response_block)) {
-      response_block <- ".block"
-    }
-    if (!is.null(lh$BRU_original_response_data[[response_block]])) {
-      lh$response_data$BRU_response_block <-
-        lh$BRU_original_response_data[[response_block]]
+    response_block_val <- bru_eval_in_data_context(
+      {{ response_block }},
+      data = list(
+        response_data = lh$BRU_original_response_data,
+        data = lh$data,
+        extra_data = lh$data_extra
+      ),
+      default = NULL,
+      .envir = .envir
+    )
+    if (!is.null(response_block_val)) {
+      lh$response_data$BRU_response_block <- response_block_val
+    } else {
+      response_block_var <- ".block"
+      if (!is.null(lh$BRU_original_response_data[[response_block_var]])) {
+        lh$response_data$BRU_response_block <-
+          lh$BRU_original_response_data[[response_block_var]]
+      }
     }
 
     lh$aggregate <- aggregate
@@ -2320,25 +2310,31 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`, interpreted as
 #'   "none". `r lifecycle::badge("experimental")`, available from version
 #'   `2.12.0.9013`.
-#' @param aggregate_input `NULL` or an optional input list to the mapper
+#' @param aggregate_input,response_block `NULL` or an optional input list to the mapper
 #'   defined by non-NULL `aggregate`, overriding the default,
 #'   ```
-#'   list(block = .data.[[".block"]],
-#'        weights = .data.[["weight"]],
-#'        n_block = bru_response_size(.response_data.),
-#'        block_response = ".block")
+#'   aggregate_input = list(
+#'     block = .data.[[".block"]],
+#'     weights = .data.[["weight"]],
+#'     n_block = bru_response_size(.response_data.)
+#'   ),
+#'   response_block = .response_data.[[".block"]]
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #'
-#'   From `2.13.0.9016`, it will look for a `block_response` element in the
-#'   list, which should be the name of a response variable in `response_data` to
-#'   match the `block` information against, allowing character or factor
+#'   From `2.13.0.9016` to `2.14.1.9003`, it would look for a `block_response`
+#'   character element in the list, but from `2.14.1.9004`, the separate
+#'   argument `reponse_block` should be used instead, with an expression to be
+#'   evaluated in the input data context. `response_block` should evaluate to a
+#'   vector of the same length as the response data, with values that can be
+#'   used to index into the rows of the response variable to determine which
+#'   rows of the predictor expression to aggregate, allowing character or factor
 #'   aggregation block information to be used by replacing `block` with
-#'   `match(block, block_response)`. If not supplied, the name
-#'   `".block"` is tried. If that isn't available, the `block` information must
-#'   be supplied directly as a numeric or integer vector, indexing into the rows
-#'   of the response variable. Having no `block_response` variable is equivalent
-#'   to having
+#'   `match(block, response_block)`. If not supplied, the variable `.block` in
+#'   the `response_data` is tried. If that isn't available, the `block`
+#'   information must be supplied directly as a numeric or integer vector,
+#'   indexing into the rows of the response variable. Having no `response_block`
+#'   variable is equivalent to having
 #'   `response_data$.block = seq_len(bru_response_size(response_data))`.
 #' @param control.family A optional `list` of `INLA::control.family` options
 #' @param control.gcpo A optional `list` of `INLA::control.gcpo` options
@@ -2603,7 +2599,7 @@ bru_obs <- function(formula = . ~ .,
     lh <- bru_obs_agg(lh,
       aggregate = aggregate,
       aggregate_input = {{ aggregate_input }},
-      response_block = response_block,
+      response_block = {{ response_block }},
       options = options,
       .envir = .envir
     )

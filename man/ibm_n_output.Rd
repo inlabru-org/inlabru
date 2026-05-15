@@ -79,6 +79,9 @@ that have state dependent output size.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
+\item{derived}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.}
+
 \item{data}{should be a list with data objects, with the main object called
 \code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }

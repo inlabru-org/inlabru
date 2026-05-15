@@ -68,7 +68,7 @@
   derived = NULL,
   data = NULL,
   data_mask = NULL,
-  env = rlang::caller_env()
+  .envir = rlang::caller_env()
 )
 
 \method{ibm_eval}{bm_repeat}(mapper, input, state, multi = FALSE, ..., sub_lin = NULL)
@@ -91,6 +91,18 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \item{logit}{logical; control \code{logit} output. Default \code{TRUE}, see the
 \code{ibm_eval()} details for \code{logitaverage} mappers.}
 
+\item{reverse}{logical; control \code{bm_marginal} evaluation. Default
+\code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
+for \code{marginal} mappers.}
+
+\item{inla_f}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
+result must be compatible with the \code{INLA::f(...)} and corresponding
+\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
+the \code{input} interpretation may be different.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bm_collect}.}
+
 \item{jacobian}{For \code{ibm_eval()} methods, an optional pre-computed Jacobian, typically
 supplied by internal methods that already have the Jacobian.}
 
@@ -99,14 +111,22 @@ supplied by internal methods that already have the Jacobian.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
+\item{sub_lin}{Internal, optional pre-computed sub-mapper information}
+
+\item{derived}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.}
+
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
+
 \item{data_mask}{A data mask object to use for evaluating the expression. If
 \code{NULL} or missing, a data mask will be constructed with \code{\link[=bru_data_mask]{bru_data_mask()}}
-from the \code{data}, \code{state}, \code{derived}, and \code{env} arguments. This can be used
-to avoid redundant construction of the data mask when evaluating different
-expressions multiple times with the same input and state.}
+from the \code{data}, \code{state}, \code{derived}, and \code{.envir} arguments. This can be
+used to avoid redundant construction of the data mask when evaluating
+different expressions multiple times with the same input and state.}
 
-\item{env}{The environment in which to evaluate the expression. By default,
-this is set to the caller environment.}
+\item{.envir}{The environment in which to evaluate the expression. By
+default, this is set to the caller environment.}
 }
 \description{
 Specific \code{\link[=ibm_eval]{ibm_eval()}} method implementations.

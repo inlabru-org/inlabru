@@ -16,10 +16,10 @@ used as pronouns/objects. If character vector(s), only the matching named
 elements of \code{data} will be available as pronouns/objects.}
 }
 \description{
-Create a data mask for inlabru, which allows for evaluating expressions in the
-context of the data objects, with support for tidy evaluation pronouns and
-direct access to the data objects as \code{.name.}. This is an internal inlabru method, not
-intended for general use.
+Create a data mask for inlabru, which allows for evaluating
+expressions in the context of the data objects, with support for tidy
+evaluation pronouns and direct access to the data objects as \code{.name.}. This
+is an internal inlabru method, not intended for general use.
 }
 \examples{
 m <- bru_data_mask(

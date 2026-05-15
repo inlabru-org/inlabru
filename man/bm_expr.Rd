@@ -6,10 +6,9 @@
 \usage{
 bm_expr(
   expr,
-  ...,
   assume = character(0),
   labels = NULL,
-  .envir = parent.frame()
+  .envir = rlang::caller_env()
 )
 }
 \arguments{
@@ -38,13 +37,8 @@ expression. Default is NULL, equivalent to \code{""}. For example, if
 then a root variable named \code{"x"} will be available as \code{"x_latent"} in the
 expression, in addition to the data mask pronoun version.}
 
-\item{derived, jacobians}{The state vectors of variables derived from the root
-variables. If \code{NULL} or missing, defaults to an empty list.
-If \code{jacobians} is \code{NULL} or missing, defaults to an empty list.
-If not \code{NULL}, should be a list with named entries, one for variable derived
-from the root variables. Each list element should be a named list of Jacobian
-matrices, with names matching the root variables.
-Missing entries are treated as all-zero matrices.}
+\item{.envir}{The environment for the expression evaluation. By default, this
+is set to the caller environment.}
 }
 \description{
 Constructs an expression mapping

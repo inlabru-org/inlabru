@@ -133,7 +133,6 @@ ibm_is_rowwise <- function(mapper, ...) {
 #' only affect the allowed type of input format.
 #' @export
 #' @family mapper methods
-#' @param sub_lin Internal, optional pre-computed sub-mapper information
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
 ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
@@ -196,6 +195,7 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 #' Specific implementations for `r doclisting::methods_inline("ibm_eval")`.
 #' @export
 #' @family mapper methods
+#' @inheritDotParams ibm_eval_methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
 ibm_eval <- function(mapper, input, state = NULL, ...) {
@@ -205,6 +205,7 @@ ibm_eval <- function(mapper, input, state = NULL, ...) {
 #' @title Specific `ibm_eval` method implementations
 #' @description Specific [ibm_eval()] method implementations.
 #' @inheritParams ibm_eval
+#' @inheritParams ibm_n
 #' @rdname ibm_eval_methods
 #' @name ibm_eval_methods
 NULL
@@ -3019,6 +3020,9 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
 #' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically
 #' stable way. Otherwise, evaluates the inverse `qnorm(pfun(x, param))` instead.
 #'
+#' @param reverse logical; control `bm_marginal` evaluation. Default
+#'   `FALSE`. When `TRUE`, reverses the direction of the mapping, see details
+#'   for `marginal` mappers.
 ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
                                  ...,
                                  reverse = FALSE) {

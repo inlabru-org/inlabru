@@ -10,7 +10,7 @@ ibm_eval(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{default}(mapper, input, state = NULL, ..., jacobian = NULL)
 
-\method{ibm_eval}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
+\method{ibm_eval}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -20,13 +20,46 @@ ibm_eval(mapper, input, state = NULL, ...)
 \item{state}{A vector of latent state values for the mapping,
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
-\item{...}{Arguments passed on to other methods}
+\item{...}{
+  Arguments passed on to \code{\link{ibm_eval_methods}}
+  \describe{
+    \item{\code{log}}{logical; control \code{log} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logsumexp} mappers.}
+    \item{\code{logit}}{logical; control \code{logit} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logitaverage} mappers.}
+    \item{\code{reverse}}{logical; control \code{bm_marginal} evaluation. Default
+\code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
+for \code{marginal} mappers.}
+    \item{\code{pre_A}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} in favour of \code{jacobian}.}
+    \item{\code{sub_lin}}{Internal, optional pre-computed sub-mapper information}
+    \item{\code{data_mask}}{A data mask object to use for evaluating the expression. If
+\code{NULL} or missing, a data mask will be constructed with \code{\link[=bru_data_mask]{bru_data_mask()}}
+from the \code{data}, \code{state}, \code{derived}, and \code{.envir} arguments. This can be
+used to avoid redundant construction of the data mask when evaluating
+different expressions multiple times with the same input and state.}
+    \item{\code{.envir}}{The environment in which to evaluate the expression. By
+default, this is set to the caller environment.}
+    \item{\code{derived}}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.}
+    \item{\code{inla_f}}{logical; when \code{TRUE} for \code{ibm_n()} and \code{ibm_values()}, the
+result must be compatible with the \code{INLA::f(...)} and corresponding
+\code{INLA::inla.stack(...)} constructions.  For \verb{ibm_\{eval,jacobian,linear\}},
+the \code{input} interpretation may be different.
+Implementations do not normally need to do anything different, except
+for mappers of the type needed for hidden multicomponent models such
+as "bym2", which can be handled by \code{bm_collect}.}
+    \item{\code{data}}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
+  }}
 
 \item{jacobian}{For \code{\link[=ibm_eval]{ibm_eval()}} methods, an optional pre-computed Jacobian, typically
 supplied by internal methods that already have the Jacobian.}
 
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{comp_mappers}{A list of mappers, typically from
+\verb{as_bm_list<bru_comp_list>}.}
 }
 \description{
 Implementations must return a vector of length \code{\link[=ibm_n_output]{ibm_n_output()}}.
@@ -48,7 +81,8 @@ Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_scale}},
 \code{\link[=ibm_eval_methods]{bm_shift}},
 \code{\link[=ibm_eval_methods]{bm_sum}},
-\code{\link[=ibm_eval_methods]{bm_taylor}}, \code{bru_obs}, \code{default}.
+\code{\link[=ibm_eval_methods]{bm_taylor}}, \code{bru_obs},
+\code{\link[=ibm_eval2]{bru_obs_list}}, \code{default}.
 }
 \section{Methods (by class)}{
 \itemize{

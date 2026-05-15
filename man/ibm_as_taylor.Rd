@@ -55,6 +55,16 @@ Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bm_collect}.}
 
+\item{derived}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.}
+
+\item{jacobians}{The state vectors of variables derived from the root
+If \code{jacobians} is \code{NULL} or missing, defaults to an empty list.
+If not \code{NULL}, should be a list with named entries, one for variable derived
+from the root variables. Each list element should be a named list of Jacobian
+matrices, with names matching the root variables.
+Missing entries are treated as all-zero matrices.}
+
 \item{data}{should be a list with data objects, with the main object called
 \code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }

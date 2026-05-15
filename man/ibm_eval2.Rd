@@ -7,6 +7,7 @@
 \alias{ibm_eval2.bm_expr}
 \alias{ibm_eval2.bru_obs}
 \alias{ibm_eval2.bru_obs_list}
+\alias{ibm_eval.bru_obs_list}
 \title{Evaluate a mapper and its Jacobian}
 \usage{
 ibm_eval2(mapper, input, state = NULL, ...)
@@ -15,11 +16,13 @@ ibm_eval2(mapper, input, state = NULL, ...)
 
 \method{ibm_eval2}{bm_pipe}(mapper, input, state = NULL, ...)
 
-\method{ibm_eval2}{bm_expr}(mapper, input, state = NULL, ...)
+\method{ibm_eval2}{bm_expr}(mapper, input, state = NULL, ..., data = NULL)
 
-\method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
+\method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
-\method{ibm_eval2}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_list)
+\method{ibm_eval2}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+
+\method{ibm_eval}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -31,8 +34,14 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
 
+\item{data}{should be a list with data objects, with the main object called
+\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
+
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{comp_mappers}{A list of mappers, typically from
+\verb{as_bm_list<bru_comp_list>}.}
 }
 \description{
 Implementations must return a list with elements \code{offset} and \code{jacobian}.

@@ -100,12 +100,12 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
   multi = FALSE,
   offset = NULL,
   eps = 1e-06,
-  env = rlang::caller_env()
+  .envir = rlang::caller_env()
 )
 
-\method{ibm_jacobian}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_list)
+\method{ibm_jacobian}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
-\method{ibm_jacobian}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_list)
+\method{ibm_jacobian}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
 \method{ibm_jacobian}{bm_repeat}(
   mapper,
@@ -156,10 +156,29 @@ for \code{marginal} mappers.}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 
-\item{data}{should be a list with data objects, with the main object called
-\code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
+\item{derived}{The state vectors of variables derived from the root
+variables. If \code{NULL} or missing, defaults to an empty list.}
+
+\item{jacobians}{The state vectors of variables derived from the root
+If \code{jacobians} is \code{NULL} or missing, defaults to an empty list.
+If not \code{NULL}, should be a list with named entries, one for variable derived
+from the root variables. Each list element should be a named list of Jacobian
+matrices, with names matching the root variables.
+Missing entries are treated as all-zero matrices.}
+
+\item{data}{A list with data objects, with the main object called \code{data};
+see \code{\link[=bm_expr]{bm_expr()}}}
 
 \item{offset}{The offset value, pre-calculated by \code{\link[=ibm_eval.bm_expr]{ibm_eval.bm_expr()}}.}
+
+\item{eps}{The finite difference step size to use for numerical
+differentiation. Default is \code{1e-6}.}
+
+\item{.envir}{The environment for the expression evaluation. By default, this
+is set to the caller environment.}
+
+\item{comp_mappers}{A list of mappers, typically from
+\verb{as_bm_list<bru_comp_list>}.}
 }
 \description{
 Implementations must return a (sparse) matrix of size
