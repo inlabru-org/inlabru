@@ -837,15 +837,21 @@ ibm_eval2.bru_obs <- function(
       data = mapper[["data"]],
       response_data = mapper[["response_data"]],
       data_extra = mapper[["data_extra"]]
-    ),
-    ...
+    )
   )
 
   # Feed forward into optional transformation mapper.
   # TODO: work in progress... Should be part of the pred_expr object
   post_mapper <- mapper[["aggregate"]]
+  if (is.null(post_mapper)) {
+    B <- res2$jacobian
+    if (!multi) {
+      B <- do.call(cbind, B)
+    }
+    return(list(offset = res2$offset, jacobian = B))
+  }
 
-  # This should be constructed as part of the overall bru_obs input evaluation,
+  # The input is constructed as part of the overall bru_obs input evaluation,
   # so that we have a this pre-computed (input for ibm_eval2.bru_obs_list):
   # input = list(`obs1` = list(comp = input for components,
   #                            post = post_mapper input), `obs2` = ...)
@@ -924,15 +930,18 @@ ibm_eval.bru_obs <- function(
       data = mapper[["data"]],
       response_data = mapper[["response_data"]],
       data_extra = mapper[["data_extra"]]
-    ),
-    ...
+    )
   )
 
   # Feed forward into optional transformation mapper.
   # TODO: work in progress... Should be part of the pred_expr object
   post_mapper <- mapper[["aggregate"]]
+  # If there is no post_mapper, we can return the expression result directly.
+  if (is.null(post_mapper)) {
+    return(res2)
+  }
 
-  # This should be constructed as part of the overall bru_obs input evaluation,
+  # The input is constructed as part of the overall bru_obs input evaluation,
   # so that we have a this pre-computed (input for ibm_eval2.bru_obs_list):
   # input = list(`obs1` = list(comp = input for components,
   #                            post = post_mapper input), `obs2` = ...)
