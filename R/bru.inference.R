@@ -1600,51 +1600,6 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   lh
 }
 
-#
-# > x<-sample(1:1000,size=1000000,replace=TRUE)
-# > bench::mark(R = convert_group_cv_blocks_to_friends_list(x, method = "R"),
-#               C = convert_group_cv_blocks_to_friends_list(x, method = "C"))
-# # A tibble: 2 × 13
-# expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc
-# total_time result memory time           gc
-# <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>
-# <bch:tm> <list> <list> <list>         <list>
-# 1 R             4.23s    4.23s     0.236        NA    27.6      1   117
-# 4.23s <list> <NULL> <bench_tm [1]> <tibble>
-# 2 C            97.1ms  97.97ms    10.1          NA     1.68     6     1
-# 595.38ms <list> <NULL> <bench_tm [6]> <tibble>
-#
-convert_group_cv_blocks_to_friends_list <- function(group_cv_block,
-                                                    method = "C") {
-  # Would like:
-  # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
-  #   which(group_cv_block == i)
-  # })
-  # Current inla.group.cv interface (2025-08-28)
-  # Inefficient implementation:
-  # group_cv_friends <- lapply(seq_along(group_cv_block), function(i) {
-  #   which(group_cv_block == group_cv_block[i])
-  # })
-  # Faster version:
-  if (method == "R") {
-    grp_index <- seq_len(max(group_cv_block))
-    group_cv_friends_groups <- lapply(grp_index, function(i) {
-      which(group_cv_block == i)
-    })
-    group_cv_friends <- lapply(group_cv_block, function(i) {
-      group_cv_friends_groups[[i]]
-    })
-  } else if (method == "C") {
-    group_cv_friends <-
-      inlabru_group_cv_block_conversion(as.integer(group_cv_block),
-        as.integer(max(group_cv_block)),
-        per_node = as.logical(TRUE)
-      )
-  }
-  group_cv_friends
-}
-
-
 bru_obs_family_cp <- function(lh, options, .envir) {
   if (inherits(lh[["data"]], "Spatial") ||
     inherits(lh[["BRU_original_response_data"]], "Spatial") ||
@@ -3112,7 +3067,6 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 
   c.gcpo.combined
 }
-
 
 #' @title Log Gaussian Cox process (LGCP) inference using INLA
 #'
