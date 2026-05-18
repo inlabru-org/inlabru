@@ -129,6 +129,7 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher.R'
+    'gcpo.R'
     'ggplot.R'
     'hexagon_tiling.R'
     'mappers.R'
@@ -160,3 +161,4 @@ LazyDataCompression: xz
 LinkingTo: 
     Rcpp
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.2

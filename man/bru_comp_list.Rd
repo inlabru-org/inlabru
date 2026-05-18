@@ -99,8 +99,11 @@ eff <- bru_comp_list(~ myLinearEffectOfX(x))
 eff <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 }
 \seealso{
-Other component constructors:
-\code{\link[=bru_comp]{bru_comp()}}
+Other component constructors: 
+\code{\link{bru_comp}()}
+
+Other component constructors: 
+\code{\link{bru_comp}()}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and

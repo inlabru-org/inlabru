@@ -219,43 +219,8 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
   c.gcpo.combined
 }
 
-
-#' Extract block-averaged GCPO scores from a fitted bru model
-#'
-#' @description
-#' Reads `fit$gcpo$gcpo` (the raw per-observation GCPO vector produced by
-#' INLA) and averages within each block defined by the `BRU_block` column in
-#' each likelihood's `response_data`, returning one score per block.
-#'
-#' Within each block, INLA repeats the same GCPO value for every observation
-#' belonging to that leave-out group. Taking the mean collapses the repeated
-#' values to one representative score per block, consistent with how
-#' `fit$cpo$cpo` is reported on the probability scale.
-#'
-#' For multi-likelihood models the raw GCPO vector is the concatenation of all
-#' likelihoods in order, so cumulative row offsets are computed automatically
-#' from `nrow(lh$response_data)` for each likelihood.
-#'
-#' @param fit A fitted object of class `bru`, with `fit$gcpo$gcpo` non-NULL
-#'   (i.e. fitted with
-#'   `options = list(control.compute = list(control.gcpo = list(enable = TRUE)))`)
-#'   and a `BRU_block` column present in `response_data` of each likelihood.
-#'
-#' @return A list with two elements:
-#' \describe{
-#'   \item{`blocks`}{Named list, one element per likelihood, each a vector of
-#'     the unique block labels found in that likelihood's
-#'     `response_data$BRU_block`.}
-#'   \item{`gcpo`}{For a single-likelihood model, a numeric vector of
-#'     block-averaged GCPO scores on the probability scale (one per unique
-#'     block, in the order they appear in `blocks[[1]]`). For a
-#'     multi-likelihood model, a named list of such vectors, one per
-#'     likelihood.}
-#' }
-#'
-#' @seealso [bru_obs()], [bru()]
-#' @export
-bru_block_gcpo <- function(fit) {
+# Internal workhorse for a single bru fit
+bru_block_gcpo_single <- function(fit) {
   fit <- bru_check_object_bru(fit)
   
   gcpo_vec <- fit[["gcpo"]][["gcpo"]]
@@ -269,7 +234,6 @@ bru_block_gcpo <- function(fit) {
   lhoods  <- as_bru_obs_list(fit)
   nlhoods <- length(lhoods)
   
-  # Unique block labels per likelihood
   block_per_lhood <- lapply(lhoods, function(lh) {
     blk <- lh[["response_data"]][["BRU_block"]]
     if (is.null(blk)) {
@@ -283,11 +247,9 @@ bru_block_gcpo <- function(fit) {
   })
   names(block_per_lhood) <- names(lhoods)
   
-  # Cumulative row offsets into the stacked GCPO vector
   n_per_lhood  <- vapply(lhoods, function(lh) nrow(lh[["response_data"]]), 0L)
   index_offset <- c(0L, cumsum(n_per_lhood))
   
-  # Average gcpo_vec over rows belonging to each block in one likelihood.
   # Within a block all values are identical (INLA repeats the group score);
   # mean() is used for robustness against floating point noise.
   average_blocks <- function(lhood_idx) {
@@ -312,4 +274,131 @@ bru_block_gcpo <- function(fit) {
   names(gcpo) <- names(lhoods)
   
   list(blocks = block_per_lhood, gcpo = gcpo)
+}
+
+
+#' Extract block-averaged GCPO scores from one or more fitted bru models
+#'
+#' @description
+#' After fitting a model with
+#' `options = list(control.compute = list(control.gcpo = list(enable = TRUE)))`,
+#' this function reads the raw per-observation GCPO vector from
+#' `fit$gcpo$gcpo` and averages within each block defined by the `BRU_block`
+#' column in each likelihood's `response_data`, returning one score per block.
+#'
+#' Within each block, INLA repeats the same GCPO value for every observation
+#' belonging to that leave-out group. Taking the mean collapses the repeated
+#' values to one representative score per block. Scores are returned on the
+#' probability scale, consistent with `fit$cpo$cpo`.
+#'
+#' For multi-likelihood models, the raw GCPO vector is the concatenation of
+#' all likelihoods in order; cumulative row offsets are computed automatically
+#' from `nrow(lh$response_data)` for each likelihood.
+#'
+#' @param fit A fitted object of class `bru`, or a named list of such objects,
+#'   or several such objects passed via `\dots`. Each must have been fitted with
+#'   `options = list(control.compute = list(control.gcpo = list(enable = TRUE)))`
+#'   so that `fit$gcpo$gcpo` is non-NULL. Each likelihood's `response_data`
+#'   must contain a `BRU_block` column identifying block membership of each
+#'   observation.
+#' @param \dots Additional fitted `bru` objects.
+#'
+#' @return
+#' For a single fit, a list with two elements:
+#' \describe{
+#'   \item{`blocks`}{Named list with one element per likelihood, each a vector
+#'     of unique block labels from `response_data$BRU_block`, in the order
+#'     they are encountered.}
+#'   \item{`gcpo`}{Block-averaged GCPO scores on the probability scale
+#'     (consistent with `fit$cpo$cpo`). A numeric vector for single-likelihood
+#'     models; a named list of numeric vectors for multi-likelihood models.}
+#' }
+#' For multiple fits, a named list of such objects, one per fit.
+#'
+#' @seealso [bru()], [bru_obs()], [bru_obs_control_gcpo()]
+#' @export
+bru_block_gcpo <- function(fit, ...) {
+  fits <- if (is.list(fit) && !inherits(fit, "bru")) {
+    fit
+  } else {
+    c(list(fit), list(...))
+  }
+  fits <- Filter(Negate(is.null), fits)
+  
+  if (length(fits) == 1L) {
+    return(bru_block_gcpo_single(fits[[1]]))
+  }
+  
+  results <- lapply(fits, bru_block_gcpo_single)
+  if (!is.null(names(fits))) {
+    names(results) <- names(fits)
+  }
+  results
+}
+
+
+#' Compare block-averaged GCPO scores across multiple fitted bru models
+#'
+#' @description
+#' Calls [bru_block_gcpo()] on each fit and combines the results into a
+#' `data.frame` with one row per block and one column per model, making it
+#' straightforward to compare GCPO scores across models block by block.
+#'
+#' @param fits A named list of fitted `bru` objects, or `NULL` if models are
+#'   passed via `\dots`.
+#' @param \dots Named fitted `bru` objects, used when `fits` is not a list.
+#'
+#' @return
+#' For a single-likelihood model, a `data.frame` with columns:
+#' \describe{
+#'   \item{`block`}{Block labels from `response_data$BRU_block`.}
+#'   \item{one column per model}{Block-averaged GCPO scores on the probability
+#'     scale, named after the elements of `fits` or `\dots`.}
+#' }
+#' For multi-likelihood models, a named list of such `data.frame`s, one per
+#' likelihood.
+#'
+#' @seealso [bru_block_gcpo()]
+#' @export
+bru_gcpo_table <- function(fits = NULL, ...) {
+  # Accept named list or named dots or both
+  dots <- list(...)
+  if (is.null(fits)) {
+    fits <- dots
+  } else if (length(dots) > 0) {
+    fits <- c(fits, dots)
+  }
+  
+  if (length(fits) == 0L) {
+    stop("No fitted bru objects supplied.")
+  }
+  if (is.null(names(fits)) || any(names(fits) == "")) {
+    stop("All fitted bru objects must be named.")
+  }
+  
+  results <- bru_block_gcpo(fits)
+  
+  # Detect single vs multi-likelihood from first result
+  first <- results[[1]]
+  nlhoods <- length(first$blocks)
+  
+  build_df <- function(lhood_idx) {
+    lhood_nm <- names(first$blocks)[lhood_idx]
+    blocks <- first$blocks[[lhood_nm]]
+    df <- data.frame(block = blocks)
+    for (nm in names(results)) {
+      gcpo <- results[[nm]]$gcpo
+      # single-likelihood: gcpo is a vector; multi: gcpo is a named list
+      df[[nm]] <- if (nlhoods == 1L) gcpo else gcpo[[lhood_nm]]
+    }
+    df
+  }
+  
+  if (nlhoods == 1L) {
+    return(build_df(1L))
+  }
+  
+  out <- lapply(seq_len(nlhoods), build_df)
+  names(out) <- names(first$blocks)
+  out
 }

@@ -112,15 +112,7 @@ The \code{input} contents must
 be in a format accepted by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 for the mapper.
 
-Specific implementations for \code{bm_aggregate}, \code{bm_collect}, \code{bm_const}, \code{bm_factor},
-\code{bm_fm_mesh_1d}, \code{\link[=bm_fm_mesh_old]{bm_fm_mesh_2d}},
-\code{bm_fmesher}, \code{bm_harmonics}, \code{bm_index},
-\code{\link[=bm_fm_mesh_old]{bm_inla_mesh_1d}},
-\code{\link[=bm_fm_mesh_old]{bm_inla_mesh_2d}}, \code{bm_linear},
-\code{bm_logitaverage}, \code{bm_logsumexp}, \code{bm_marginal},
-\code{bm_matrix}, \code{bm_multi}, \code{bm_pipe}, \code{bm_reparam},
-\code{bm_repeat}, \code{bm_scale}, \code{bm_shift}, \code{bm_sum},
-\code{bm_taylor}, \code{default}.
+Specific implementations for \verb{r doclisting::methods_inline("ibm_jacobian")}.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -154,19 +146,19 @@ stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instea
 
 }}
 \seealso{
-Other mapper methods:
+Other mapper methods: 
 \code{\link{bru_mapper_generics}},
-\code{\link[=ibm_eval2]{ibm_eval2()}},
-\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
-\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
-\code{\link[=ibm_is_linear]{ibm_is_linear()}},
-\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
-\code{\link[=ibm_jacobian]{ibm_jacobian()}},
-\code{\link[=ibm_linear]{ibm_linear()}},
-\code{\link[=ibm_n]{ibm_n()}},
-\code{\link[=ibm_n_output]{ibm_n_output()}},
-\code{\link[=ibm_names]{ibm_names()}},
-\code{\link[=ibm_simplify]{ibm_simplify()}},
-\code{\link[=ibm_values]{ibm_values()}}
+\code{\link{ibm_eval2}()},
+\code{\link{ibm_inla_subset}()},
+\code{\link{ibm_invalid_output}()},
+\code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_linear}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_names}()},
+\code{\link{ibm_simplify}()},
+\code{\link{ibm_values}()}
 }
 \concept{mapper methods}

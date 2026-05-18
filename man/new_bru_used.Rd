@@ -144,10 +144,10 @@ bru_used(used, labels = c("a", "c"))
 
 }
 \seealso{
-Other bru_used:
-\code{\link[=bru_used]{bru_used()}},
-\code{\link[=bru_used_update]{bru_used_update()}},
-\code{\link[=bru_used_vars]{bru_used_vars()}}
+Other bru_used: 
+\code{\link{bru_used}()},
+\code{\link{bru_used_update}()},
+\code{\link{bru_used_vars}()}
 }
 \concept{bru_used}
 \keyword{internal}

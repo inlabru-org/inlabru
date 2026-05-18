@@ -51,10 +51,10 @@ bru_used_vars(expression(a ~ b))
 
 }
 \seealso{
-Other bru_used:
-\code{\link[=bru_used]{bru_used()}},
-\code{\link[=bru_used_update]{bru_used_update()}},
-\code{\link[=new_bru_used]{new_bru_used()}}
+Other bru_used: 
+\code{\link{bru_used}()},
+\code{\link{bru_used_update}()},
+\code{\link{new_bru_used}()}
 }
 \concept{bru_used}
 \keyword{internal}

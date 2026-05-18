@@ -112,19 +112,19 @@ For character labels, the labels as a factor variable.
 
 }}
 \seealso{
-Other mapper methods:
+Other mapper methods: 
 \code{\link{bru_mapper_generics}},
-\code{\link[=ibm_eval]{ibm_eval()}},
-\code{\link[=ibm_eval2]{ibm_eval2()}},
-\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
-\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
-\code{\link[=ibm_is_linear]{ibm_is_linear()}},
-\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
-\code{\link[=ibm_jacobian]{ibm_jacobian()}},
-\code{\link[=ibm_linear]{ibm_linear()}},
-\code{\link[=ibm_n]{ibm_n()}},
-\code{\link[=ibm_n_output]{ibm_n_output()}},
-\code{\link[=ibm_names]{ibm_names()}},
-\code{\link[=ibm_simplify]{ibm_simplify()}}
+\code{\link{ibm_eval}()},
+\code{\link{ibm_eval2}()},
+\code{\link{ibm_inla_subset}()},
+\code{\link{ibm_invalid_output}()},
+\code{\link{ibm_is_linear}()},
+\code{\link{ibm_is_rowwise}()},
+\code{\link{ibm_jacobian}()},
+\code{\link{ibm_linear}()},
+\code{\link{ibm_n}()},
+\code{\link{ibm_n_output}()},
+\code{\link{ibm_names}()},
+\code{\link{ibm_simplify}()}
 }
 \concept{mapper methods}

@@ -55,28 +55,28 @@ ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
 \seealso{
 \link{bru_mapper}, \link{bru_mapper_generics}
 
-Other mappers:
-\code{\link[=bm_aggregate]{bm_aggregate()}},
-\code{\link[=bm_collect]{bm_collect()}},
-\code{\link[=bm_const]{bm_const()}},
-\code{\link[=bm_factor]{bm_factor()}},
+Other mappers: 
+\code{\link{bm_aggregate}()},
+\code{\link{bm_collect}()},
+\code{\link{bm_const}()},
+\code{\link{bm_factor}()},
 \code{\link{bm_fm_mesh_1d}},
-\code{\link[=bm_fmesher]{bm_fmesher()}},
-\code{\link[=bm_harmonics]{bm_harmonics()}},
-\code{\link[=bm_index]{bm_index()}},
-\code{\link[=bm_linear]{bm_linear()}},
-\code{\link[=bm_logitaverage]{bm_logitaverage()}},
-\code{\link[=bm_logsumexp]{bm_logsumexp()}},
-\code{\link[=bm_marginal]{bm_marginal()}},
-\code{\link[=bm_matrix]{bm_matrix()}},
-\code{\link[=bm_pipe]{bm_pipe()}},
-\code{\link[=bm_reparam]{bm_reparam()}},
-\code{\link[=bm_repeat]{bm_repeat()}},
-\code{\link[=bm_scale]{bm_scale()}},
-\code{\link[=bm_shift]{bm_shift()}},
-\code{\link[=bm_sum]{bm_sum()}},
-\code{\link[=bm_taylor]{bm_taylor()}},
-\code{\link[=bru_get_mapper]{bru_get_mapper()}},
-\code{\link[=bru_mapper]{bru_mapper()}}
+\code{\link{bm_fmesher}()},
+\code{\link{bm_harmonics}()},
+\code{\link{bm_index}()},
+\code{\link{bm_linear}()},
+\code{\link{bm_logitaverage}()},
+\code{\link{bm_logsumexp}()},
+\code{\link{bm_marginal}()},
+\code{\link{bm_matrix}()},
+\code{\link{bm_pipe}()},
+\code{\link{bm_reparam}()},
+\code{\link{bm_repeat}()},
+\code{\link{bm_scale}()},
+\code{\link{bm_shift}()},
+\code{\link{bm_sum}()},
+\code{\link{bm_taylor}()},
+\code{\link{bru_get_mapper}()},
+\code{\link{bru_mapper}()}
 }
 \concept{mappers}
