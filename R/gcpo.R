@@ -281,7 +281,7 @@ bru_block_gcpo_single <- function(fit) {
 #'
 #' @description
 #' After fitting a model with
-#' `options = list(control.compute = list(control.gcpo = list(enable = TRUE)))`,
+#' `control.gcpo = list(enable = TRUE)`,
 #' this function reads the raw per-observation GCPO vector from
 #' `fit$gcpo$gcpo` and averages within each block defined by the `BRU_block`
 #' column in each likelihood's `response_data`, returning one score per block.
@@ -297,7 +297,7 @@ bru_block_gcpo_single <- function(fit) {
 #'
 #' @param fit A fitted object of class `bru`, or a named list of such objects,
 #'   or several such objects passed via `\dots`. Each must have been fitted with
-#'   `options = list(control.compute = list(control.gcpo = list(enable = TRUE)))`
+#'   `control.gcpo = list(enable = TRUE)`
 #'   so that `fit$gcpo$gcpo` is non-NULL. Each likelihood's `response_data`
 #'   must contain a `BRU_block` column identifying block membership of each
 #'   observation.
@@ -314,8 +314,65 @@ bru_block_gcpo_single <- function(fit) {
 #'     models; a named list of numeric vectors for multi-likelihood models.}
 #' }
 #' For multiple fits, a named list of such objects, one per fit.
+#' 
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla()) {
+#'   # Simple  model for the Gorillas nests
+#'   cvpart <- cv_hex(
+#'     gorillas_sf$boundary,
+#'     cellsize = 0.5,
+#'     n_group = 3,
+#'     resolution = c(95, 80)
+#'   )
+#'   cvpart$block_ID <- seq_len(nrow(cvpart))
+#'   cvpart$group <- NULL
+#'   nblock <- nrow(cvpart)
+#' 
+#'   nests <- gorillas_sf$nests
+#'   a <- sf::st_intersects(nests, cvpart)
+#'   if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
+#'     stop("Point in none or multiple polygons")
+#'   }
+#'   nests$.block <- unlist(a)
+#' 
+#'   fit1 <- lgcp(
+#'     components = geometry ~ Intercept(1),
+#'     data = nests,
+#'     samplers = cvpart,
+#'     domain = list(geometry = gorillas_sf$mesh),
+#'     control.gcpo = list(enable = TRUE, 
+#'                       type.cv = "joint")
+#'   )
 #'
-#' @seealso [bru()], [bru_obs()], [bru_obs_control_gcpo()]
+#'   result <- bru_block_gcpo(fit1)
+#'
+#'   #block labels and one GCPO score per block
+#'   result$blocks
+#'   result$gcpo
+#'   sum(log(result$gcpo))
+#'   
+#'   #For multiple models
+#'   pcmatern <- inla.spde2.pcmatern(mesh,
+#'   prior.sigma = c(1, 0.01),
+#'   prior.range = c(0.1, 0.01)
+#'   )
+
+#'   fit2 <- lgcp(
+#'     components = geometry ~ Intercept(1) + 
+#'     field(geometry, model = pcmatern),
+#'     data = nests,
+#'     samplers = cvpart,
+#'     domain = list(geometry = gorillas_sf$mesh),
+#'     control.gcpo = list(enable = TRUE, 
+#'                       type.cv = "joint")
+#'   )
+#'   result <- bru_block_gcpo(list(Model1= fit1, Model2=fit2))
+#'   str(result)
+#'   
+#' }
+#' }
+#' @seealso [bru()], [bru_obs()], [bru_obs_control_gcpo()], [bru_gcpo_table()]
 #' @export
 bru_block_gcpo <- function(fit, ...) {
   fits <- if (is.list(fit) && !inherits(fit, "bru")) {
@@ -358,14 +415,66 @@ bru_block_gcpo <- function(fit, ...) {
 #' For multi-likelihood models, a named list of such `data.frame`s, one per
 #' likelihood.
 #'
+#' @examples
+#' \donttest{
+#' if (bru_safe_inla()) {
+#'   # Comparing two models for the Gorillas nests
+#'   cvpart <- cv_hex(
+#'     gorillas_sf$boundary,
+#'     cellsize = 0.5,
+#'     n_group = 3,
+#'     resolution = c(95, 80)
+#'   )
+#'   cvpart$block_ID <- seq_len(nrow(cvpart))
+#'   cvpart$group <- NULL
+#'   nblock <- nrow(cvpart)
+#' 
+#'   nests <- gorillas_sf$nests
+#'   a <- sf::st_intersects(nests, cvpart)
+#'   if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
+#'     stop("Point in none or multiple polygons")
+#'   }
+#'   nests$.block <- unlist(a)
+#' 
+#'   fit1 <- lgcp(
+#'     components = geometry ~ Intercept(1),
+#'     data = nests,
+#'     samplers = cvpart,
+#'     domain = list(geometry = gorillas_sf$mesh),
+#'     control.gcpo = list(enable = TRUE, 
+#'                       type.cv = "joint")
+#'   )
+#'   pcmatern <- inla.spde2.pcmatern(mesh,
+#'   prior.sigma = c(1, 0.01),
+#'   prior.range = c(0.1, 0.01)
+#'   )
+
+#'   fit2 <- lgcp(
+#'     components = geometry ~ Intercept(1) + 
+#'     field(geometry, model = pcmatern),
+#'     data = nests,
+#'     samplers = cvpart,
+#'     domain = list(geometry = gorillas_sf$mesh),
+#'     control.gcpo = list(enable = TRUE, 
+#'                       type.cv = "joint")
+#'   )
+#'   gcpo_df <- bru_gcpo_table(Model1= fit1, Model2=fit2)
+#'   names(gcpo_df) 
+#'   colSums(log(gcpo_df[,-1]))      
+#'   
+#' }
+#' }
 #' @seealso [bru_block_gcpo()]
 #' @export
 bru_gcpo_table <- function(fits = NULL, ...) {
-  # Accept named list or named dots or both
   dots <- list(...)
+  
   if (is.null(fits)) {
     fits <- dots
-  } else if (length(dots) > 0) {
+  } else if (inherits(fits, "bru")) {
+    # single bru passed as first argument, treat as one of the dots
+    fits <- c(list(fits), dots)
+  } else {
     fits <- c(fits, dots)
   }
   
@@ -375,6 +484,9 @@ bru_gcpo_table <- function(fits = NULL, ...) {
   if (is.null(names(fits)) || any(names(fits) == "")) {
     stop("All fitted bru objects must be named.")
   }
+  if (length(fits) == 1L) {
+    stop("bru_gcpo_table() requires at least two named models for comparison. Use bru_block_gcpo() for a single fit.")
+  }
   
   results <- bru_block_gcpo(fits)
   
@@ -383,13 +495,13 @@ bru_gcpo_table <- function(fits = NULL, ...) {
   nlhoods <- length(first$blocks)
   
   build_df <- function(lhood_idx) {
+    blocks <- first$blocks[[lhood_idx]]   # index by position, not name
     lhood_nm <- names(first$blocks)[lhood_idx]
-    blocks <- first$blocks[[lhood_nm]]
     df <- data.frame(block = blocks)
     for (nm in names(results)) {
       gcpo <- results[[nm]]$gcpo
       # single-likelihood: gcpo is a vector; multi: gcpo is a named list
-      df[[nm]] <- if (nlhoods == 1L) gcpo else gcpo[[lhood_nm]]
+      df[[nm]] <- if (nlhoods == 1L) gcpo else gcpo[[lhood_idx]]
     }
     df
   }

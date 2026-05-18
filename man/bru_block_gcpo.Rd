@@ -9,7 +9,7 @@ bru_block_gcpo(fit, ...)
 \arguments{
 \item{fit}{A fitted object of class \code{bru}, or a named list of such objects,
 or several such objects passed via \verb{\\dots}. Each must have been fitted with
-\code{options = list(control.compute = list(control.gcpo = list(enable = TRUE)))}
+\code{control.gcpo = list(enable = TRUE)}
 so that \code{fit$gcpo$gcpo} is non-NULL. Each likelihood's \code{response_data}
 must contain a \code{BRU_block} column identifying block membership of each
 observation.}
@@ -30,7 +30,7 @@ For multiple fits, a named list of such objects, one per fit.
 }
 \description{
 After fitting a model with
-\code{options = list(control.compute = list(control.gcpo = list(enable = TRUE)))},
+\code{control.gcpo = list(enable = TRUE)},
 this function reads the raw per-observation GCPO vector from
 \code{fit$gcpo$gcpo} and averages within each block defined by the \code{BRU_block}
 column in each likelihood's \code{response_data}, returning one score per block.
@@ -44,6 +44,63 @@ For multi-likelihood models, the raw GCPO vector is the concatenation of
 all likelihoods in order; cumulative row offsets are computed automatically
 from \code{nrow(lh$response_data)} for each likelihood.
 }
+\examples{
+\donttest{
+if (bru_safe_inla()) {
+  # Simple  model for the Gorillas nests
+  cvpart <- cv_hex(
+    gorillas_sf$boundary,
+    cellsize = 0.5,
+    n_group = 3,
+    resolution = c(95, 80)
+  )
+  cvpart$block_ID <- seq_len(nrow(cvpart))
+  cvpart$group <- NULL
+  nblock <- nrow(cvpart)
+
+  nests <- gorillas_sf$nests
+  a <- sf::st_intersects(nests, cvpart)
+  if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
+    stop("Point in none or multiple polygons")
+  }
+  nests$.block <- unlist(a)
+
+  fit1 <- lgcp(
+    components = geometry ~ Intercept(1),
+    data = nests,
+    samplers = cvpart,
+    domain = list(geometry = gorillas_sf$mesh),
+    control.gcpo = list(enable = TRUE, 
+                      type.cv = "joint")
+  )
+
+  result <- bru_block_gcpo(fit1)
+
+  #block labels and one GCPO score per block
+  result$blocks
+  result$gcpo
+  sum(log(result$gcpo))
+  
+  #For multiple models
+  pcmatern <- inla.spde2.pcmatern(mesh,
+  prior.sigma = c(1, 0.01),
+  prior.range = c(0.1, 0.01)
+  )
+  fit2 <- lgcp(
+    components = geometry ~ Intercept(1) + 
+    field(geometry, model = pcmatern),
+    data = nests,
+    samplers = cvpart,
+    domain = list(geometry = gorillas_sf$mesh),
+    control.gcpo = list(enable = TRUE, 
+                      type.cv = "joint")
+  )
+  result <- bru_block_gcpo(list(Model1= fit1, Model2=fit2))
+  str(result)
+  
+}
+}
+}
 \seealso{
-\code{\link[=bru]{bru()}}, \code{\link[=bru_obs]{bru_obs()}}, \code{\link[=bru_obs_control_gcpo]{bru_obs_control_gcpo()}}
+\code{\link[=bru]{bru()}}, \code{\link[=bru_obs]{bru_obs()}}, \code{\link[=bru_obs_control_gcpo]{bru_obs_control_gcpo()}}, \code{\link[=bru_gcpo_table]{bru_gcpo_table()}}
 }
