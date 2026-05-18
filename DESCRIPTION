@@ -161,4 +161,3 @@ LazyDataCompression: xz
 LinkingTo: 
     Rcpp
 Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.2

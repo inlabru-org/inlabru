@@ -123,7 +123,7 @@ Use \code{bru_index()} instead.
 
 }}
 \examples{
-\dontshow{if (bru_safe_inla()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (bru_safe_inla()) withAutoprint(\{ # examplesIf}
 fit <- bru(
   ~ 0 + x,
   bru_obs(
