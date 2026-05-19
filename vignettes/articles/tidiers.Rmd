@@ -1,0 +1,201 @@
+---
+title: "Tidy model output with broom-style tidiers"
+author: "inlabru authors"
+date: "Generated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tidy model output with broom-style tidiers}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.width = 7,
+  fig.height = 5
+)
+library(inlabru)
+inla_available <- inlabru::bru_safe_inla(
+  multicore = interactive(),
+  quietly = TRUE
+)
+```
+
+inlabru provides [broom](https://broom.tidymodels.org/)-style tidiers for `bru` model
+objects through three generics from the
+[generics](https://cran.r-project.org/package=generics) package:
+
+- `tidy()` — one row per model term (fixed effects or hyperparameters)
+- `glance()` — one row of model-level fit summaries
+- `augment()` — original data extended with posterior fitted values
+
+These make it straightforward to work with inlabru results inside tidy
+workflows (dplyr, ggplot2, etc.) without manually unpacking the `bru` object.
+
+## Set up
+
+```{r libraries, eval=inla_available, message=FALSE, warning=FALSE}
+library(INLA)
+library(inlabru)
+library(ggplot2)
+bru_options_set(control.compute = list(dic = TRUE, waic = TRUE))
+```
+
+We use a simple simulated Gaussian dataset throughout.
+
+```{r simulate, eval=inla_available}
+set.seed(42L)
+n <- 100
+x <- runif(n, 0, 5)
+y <- 2 + 1.5 * x + rnorm(n, sd = 0.8)
+dat <- data.frame(x = x, y = y)
+```
+
+## Fit a model
+
+```{r fit, eval=inla_available, results="hide"}
+fit <- bru(
+  y ~ Intercept(1) + slope(x, model = "linear"),
+  family = "gaussian",
+  data = dat
+)
+```
+
+## `tidy()` — fixed effects
+
+`tidy()` returns a tibble with one row per fixed-effect term, including the
+posterior mean, standard deviation, and 95 % credible interval.
+
+```{r tidy-fixed, eval=inla_available}
+library(generics)
+tidy(fit)
+```
+
+The column names follow the broom convention so the output integrates with
+standard tidy tools.  For example, a quick coefficient plot:
+
+```{r coef-plot, eval=inla_available}
+tidy(fit) |>
+  ggplot(aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() +
+  labs(title = "Fixed-effect posterior summaries", x = NULL, y = "Estimate")
+```
+
+## `tidy()` — hyperparameters
+
+Pass `effects = "hyperpar"` to extract the precision (or other hyperparameters)
+instead.
+
+```{r tidy-hyperpar, eval=inla_available}
+tidy(fit, effects = "hyperpar")
+```
+
+The Gaussian family has one hyperparameter — the precision of the likelihood.
+More complex models (e.g. with SPDE random fields) will have additional rows.
+
+## `glance()` — model-level summaries
+
+`glance()` returns a single-row tibble with the DIC, WAIC, marginal log-likelihood,
+the number of observations, and total wall-clock time.
+
+```{r glance, eval=inla_available}
+glance(fit)
+```
+
+This is useful when comparing competing models:
+
+```{r compare, eval=inla_available, results="hide"}
+fit_null <- bru(
+  y ~ Intercept(1),
+  family = "gaussian",
+  data = dat
+)
+```
+
+```{r compare-show, eval=inla_available}
+library(dplyr)
+bind_rows(
+  glance(fit_null) |> mutate(model = "intercept only"),
+  glance(fit)      |> mutate(model = "intercept + slope")
+) |>
+  select(model, dic, waic, marginal_loglik, nobs)
+```
+
+The model with `slope` should have a substantially lower DIC and WAIC.
+
+## `augment()` — fitted values on new data
+
+`augment()` adds posterior summaries of the linear predictor to a data frame.
+Because inlabru prediction expressions are arbitrary R code, you must supply a
+`pred_formula` that names what to predict.
+
+```{r augment, eval=inla_available, results="hide"}
+grid <- data.frame(x = seq(0, 5, length.out = 50))
+
+augmented <- augment(
+  fit,
+  data = grid,
+  pred_formula = ~ Intercept_latent + slope_latent,
+  n_samples = 500L,
+  seed = 1L
+)
+```
+
+```{r augment-show, eval=inla_available}
+head(augmented)
+```
+
+The four added columns are `.fitted` (posterior mean), `.fitted_low` and
+`.fitted_high` (2.5 % and 97.5 % quantiles), and `.fitted_sd` (posterior
+standard deviation).
+
+Plot the fitted line with a credible band on top of the raw data:
+
+```{r augment-plot, eval=inla_available}
+ggplot() +
+  geom_point(data = dat, aes(x, y), alpha = 0.4, size = 0.8) +
+  geom_ribbon(
+    data = augmented,
+    aes(x, ymin = .fitted_low, ymax = .fitted_high),
+    fill = "steelblue", alpha = 0.3
+  ) +
+  geom_line(data = augmented, aes(x, .fitted), colour = "steelblue", linewidth = 1) +
+  labs(
+    title = "Posterior fitted line with 95 % credible band",
+    x = "x", y = "y"
+  )
+```
+
+## Naming convention for `pred_formula`
+
+The latent variables in `pred_formula` follow inlabru's naming rule: a
+component named `foo` is available as `foo_latent` inside prediction
+expressions.  Components with `model = "linear"` (including the implicit
+intercept) appear in `summary.fixed`; components with a random-effect model
+(iid, rw1, SPDE, …) appear in `summary.random`.
+
+```{r names, eval=inla_available}
+# fixed-effect component names → use <name>_latent in pred_formula
+names(fit$summary.fixed)
+
+# random-effect component names (none in this model)
+names(fit$summary.random)
+```
+
+## Calling tidiers with the `broom` package
+
+The tidiers are registered as S3 methods on `bru` objects through the
+[generics](https://cran.r-project.org/package=generics) package, so they work
+automatically when you load either `generics` or `broom`.
+
+```{r broom, eval=inla_available && requireNamespace("broom", quietly = TRUE)}
+library(broom)
+tidy(fit)
+glance(fit)
+```
