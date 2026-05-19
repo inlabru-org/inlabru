@@ -1211,13 +1211,15 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
   if (is.null(response_block_val)) {
     if (!is.null(aggregate_input[["block_response"]])) {
       response_block <- rlang::parse_expr(
-        glue('.response_data.[["',
-             "{ aggregate_input[['block_response']] }",
-             '"]]')
+        glue(
+          '.response_data.[["',
+          "{ aggregate_input[['block_response']] }",
+          '"]]'
+        )
       )
     } else {
       response_block <- rlang::parse_expr(
-          glue('.response_data.[[".block"]]')
+        glue('.response_data.[[".block"]]')
       )
     }
 
@@ -1237,7 +1239,8 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
       details = glue(
         "The `block_response` element is overruled by non-null ",
         "`response_block`."
-      ))
+      )
+    )
   }
   if (!is.null(response_block_val)) {
     aggregate_input[["block"]] <-
@@ -1331,7 +1334,8 @@ bru_agg_input <- function(mapper, mask, .envir) {
       "bru_obs(response_block)",
       details = glue(
         "The `block_response` element is ignored."
-      ))
+      )
+    )
   }
   if (!is.null(response_block_val)) {
     aggregate_input[["block"]] <-
@@ -1381,7 +1385,7 @@ bru_obs_agg <- function(lh,
     return(lh)
   }
 
-  bru_agg_method <- bru_options_get("bru_method")$autodiff
+  bru_agg_method <- bru_options_get("bru_method")$agg
   if (is.null(bru_agg_method)) {
     bru_agg_method <- "pandemic"
   }
@@ -1426,6 +1430,16 @@ bru_obs_agg <- function(lh,
 
     lh <- bru_compat_pre_2_14_bru_obs(lh)
   } else if (identical(bru_agg_method, "fullchain")) {
+    autodiff_method <- bru_options_get("bru_method")$autodiff
+    if (is.null(autodiff_method)) {
+      autodiff_method <- "pandemic"
+    }
+    if (!identical(autodiff_method, "fullchain")) {
+      stop(glue(
+        "The 'fullchain' aggregation method requires the 'fullchain' autodiff ",
+        "method.\nPlease use option `bru_method = list(autodiff = 'fullchain')`."
+      ))
+    }
     lh$data <- bru_agg_data(
       data = lh$data,
       ips = lh$integration_info$ips,
@@ -1466,8 +1480,8 @@ bru_obs_agg <- function(lh,
     # fullchain is post-2.14.
   } else {
     stop(glue(
-      "Unknown `bru_agg_method` option: {bru_agg_method}")
-    )
+      "Unknown `bru_agg_method` option: {bru_agg_method}"
+    ))
   }
 
   lh
@@ -5228,9 +5242,6 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate component simplifications",
     verbosity = 3
   )
-  if (identical(options[["bru_method"]][["search"]], "fullchain")) {
-    stop("TODO: implement fullchain linearisation")
-  }
   comp_simple <- ibm_simplify(
     model,
     input = inputs,
@@ -5240,14 +5251,23 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     "iinla: Evaluate predictor linearisation",
     verbosity = 3
   )
-  lin <- bru_compute_linearisation(
-    model,
-    lhoods = lhoods,
-    input = inputs,
-    state = states[[length(states)]],
-    comp_simple = comp_simple,
-    options = options
-  )
+  if (identical(options[["bru_method"]][["autodiff"]], "pandemic")) {
+    lin <- bru_compute_linearisation(
+      model,
+      lhoods = lhoods,
+      input = inputs,
+      state = states[[length(states)]],
+      comp_simple = comp_simple,
+      options = options
+    )
+  } else {
+    lin <- ibm_as_taylor(
+      model,
+      input = inputs,
+      state = states[[length(states)]],
+      options = options
+    )
+  }
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {

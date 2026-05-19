@@ -474,13 +474,14 @@ format.bm_list <- function(x, ...,
           }
           paste0(
             nm,
-            " = ",
+            " = {",
             format(
               x[[k]],
               prefix = prefix,
               initial = initial,
               depth = depth
-            )
+            ),
+            "}"
           )
         },
         ""

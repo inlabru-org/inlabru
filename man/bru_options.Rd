@@ -152,6 +152,15 @@ components, predictor, and post-predictor transformations
 (new from \verb{2.14.1.9000}).}
 }
 }
+\item{agg}{Controls the aggregation implementation. One of
+\describe{
+\item{'pandemic'}{Treats all post-component transformations as a single
+calculation (the default from version \verb{2.1.15}).}
+\item{'fullchain'}{Uses the chain rule for the composition of
+components, predictor, and post-predictor transformations
+(new from \verb{2.14.1.9000}).}
+}
+}
 \item{finite_diff}{One of
 \describe{
 \item{'forward'}{Use onesided finite differences.}

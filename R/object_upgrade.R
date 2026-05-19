@@ -528,8 +528,10 @@ bru_info_upgrade <- function(object,
 
   if (compare_version < 0) {
     warning(
-      glue("Found bru_info object of version {old_ver}, ",
-           "which is newer than the running version {new_version}.")
+      glue(
+        "Found bru_info object of version {old_ver}, ",
+        "which is newer than the running version {new_version}."
+      )
     )
     return(object_full)
   }

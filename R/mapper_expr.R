@@ -791,10 +791,10 @@ format.bm_expr <- function(x, ...,
 #' @param comp_mappers A list of mappers, typically from
 #'   `as_bm_list<bru_comp_list>`.
 ibm_eval2.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   used <- bru_used(mapper)
-  nms <- unique(c(used$effects, used$latent))
+  nms <- unique(c(used$effect, used$latent))
   param_nms <- setdiff(names(state), nms)
   state_nms <- setdiff(names(state), param_nms)
   param <- state[param_nms]
@@ -886,10 +886,10 @@ ibm_eval2.bru_obs <- function(
 #' @inheritParams ibm_eval2
 #' @export
 ibm_eval.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   used <- bru_used(mapper)
-  nms <- unique(c(used$effects, used$latent))
+  nms <- unique(c(used$effect, used$latent))
   param_nms <- setdiff(names(state), nms)
   state_nms <- setdiff(names(state), param_nms)
   param <- state[param_nms]
@@ -961,7 +961,7 @@ ibm_eval.bru_obs <- function(
 #' @inheritParams ibm_eval2
 #' @export
 ibm_jacobian.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   result <- ibm_eval2(
     mapper,
@@ -983,12 +983,15 @@ ibm_jacobian.bru_obs <- function(
 #' @rdname ibm_eval2
 #' @export
 ibm_eval2.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   results <- lapply(
     setNames(seq_along(mapper), names(mapper)),
-    function(m) ibm_eval2.bru_obs(mapper[[m]], input[[m]], state, ...,
-                                  multi = TRUE, comp_mappers = comp_mappers)
+    function(m) {
+      ibm_eval2.bru_obs(mapper[[m]], input[[m]], state, ...,
+        multi = TRUE, comp_mappers = comp_mappers
+      )
+    }
   )
 
   # Combine jacobians from the expression mapper and the aggregate mapper.
@@ -1018,8 +1021,7 @@ ibm_eval2.bru_obs_list <- function(
                 dims = c(length(offset[[k]]), jac_ncol[nm])
               )
             }
-          }
-          )
+          })
         )
       }
     )
@@ -1030,15 +1032,18 @@ ibm_eval2.bru_obs_list <- function(
   list(offset = offset, jacobian = jacobian)
 }
 
-#' @rdname ibm_eval2
+#' @rdname ibm_eval
 #' @export
 ibm_eval.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   offset <- lapply(
     setNames(seq_along(mapper), names(mapper)),
-    function(m) ibm_eval.bru_obs(mapper[[m]], input[[m]], state, ...,
-                                 multi = TRUE, comp_mappers = comp_mappers)
+    function(m) {
+      ibm_eval.bru_obs(mapper[[m]], input[[m]], state, ...,
+        multi = TRUE, comp_mappers = comp_mappers
+      )
+    }
   )
 
   if (!multi) {
@@ -1051,7 +1056,7 @@ ibm_eval.bru_obs_list <- function(
 #' @rdname ibm_jacobian
 #' @export
 ibm_jacobian.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   result <- ibm_eval2(
     mapper,
@@ -1067,3 +1072,49 @@ ibm_jacobian.bru_obs_list <- function(
   B
 }
 
+#' @rdname ibm_as_taylor
+#' @export
+ibm_as_taylor.bru_obs <- function(
+    mapper, input, state, ..., multi = FALSE, comp_mappers
+) {
+  stopifnot(isTRUE(multi))
+  eval2 <- ibm_eval2(
+    mapper,
+    input = input,
+    state = state,
+    multi = TRUE,
+    comp_mappers = comp_mappers
+  )
+
+  for (nm in names(state)) {
+    if (nm %in% names(eval2$jacobian)) {
+      eval2$offset <- eval2$offset - eval2$jacobian[[nm]] %*% state[[nm]]
+    }
+  }
+
+  mappers <- bm_taylor(
+    offset = eval2$offset,
+    jacobian = eval2$jacobian,
+    state0 = NULL
+  )
+
+  mappers
+}
+#' @rdname ibm_as_taylor
+#' @export
+ibm_as_taylor.bru_obs_list <- function(
+    mapper, input, state, ..., multi = FALSE, comp_mappers
+) {
+  stopifnot(isTRUE(multi))
+
+  lapply(
+    setNames(seq_along(mapper), names(mapper)),
+    function(k) ibm_as_taylor(
+      mapper[[k]],
+      input[[k]],
+      state = state,
+      multi = TRUE,
+      comp_mappers = comp_mappers
+    )
+  )
+}

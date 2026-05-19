@@ -22,9 +22,10 @@ test_that("Expr mapper", {
   expect_equal(val, val_reference)
 
   A <- ibm_jacobian(mapper,
-                    input = list(),
-                    state = state,
-                    data = list(data = dat))
+    input = list(),
+    state = state,
+    data = list(data = dat)
+  )
   A_reference <- Matrix::sparseMatrix(
     i = c(1:3, 1:3),
     j = c(1:3, 4, 4, 5),

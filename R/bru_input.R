@@ -508,7 +508,7 @@ bru_input.bru_obs <- function(x, components, ...) {
     return(list())
   }
 
-  mask = bru_data_mask(
+  mask <- bru_data_mask(
     list(
       data = x[["data"]],
       response_data = x[["response_data"]],

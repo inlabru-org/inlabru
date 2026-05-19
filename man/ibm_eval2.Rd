@@ -7,7 +7,6 @@
 \alias{ibm_eval2.bm_expr}
 \alias{ibm_eval2.bru_obs}
 \alias{ibm_eval2.bru_obs_list}
-\alias{ibm_eval.bru_obs_list}
 \title{Evaluate a mapper and its Jacobian}
 \usage{
 ibm_eval2(mapper, input, state = NULL, ...)
@@ -21,8 +20,6 @@ ibm_eval2(mapper, input, state = NULL, ...)
 \method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
 \method{ibm_eval2}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
-
-\method{ibm_eval}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}

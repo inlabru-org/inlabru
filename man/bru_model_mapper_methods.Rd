@@ -11,7 +11,14 @@
 \alias{ibm_simplify.bm_list}
 \title{Mapper methods for model objects}
 \usage{
-\method{ibm_as_taylor}{bru_model}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL
+)
 
 \method{ibm_as_taylor}{bru_comp_list}(mapper, input, state = NULL, ...)
 
@@ -34,6 +41,9 @@
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
+
+\item{comp_mappers}{A list of mappers, typically from
+\verb{as_bm_list<bru_comp_list>}.}
 }
 \description{
 Methods for the \code{ibm_as_taylor()} and \code{ibm_simplify()} methods for
@@ -43,7 +53,14 @@ Methods for the \code{ibm_as_taylor()} and \code{ibm_simplify()} methods for
 \itemize{
 \item \code{ibm_as_taylor(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bm_taylor}
-entry for each included component.
+entry for each included component. (autodiff == "pandemic")
+
+If \code{autodiff} is not "pandemic", returns a list of \link{bm_taylor} objects, one
+for each observation model, with the offset and jacobians evaluated for the
+predictor of the observation model, and the component mappers passed on as
+\code{comp_mappers} for the evaluation of the jacobians.
+@param comp_mappers A \code{\link[=bm_list]{bm_list()}} of mappers, either the original component
+mappers, or simplified mappers.
 
 \item \code{ibm_simplify(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bru_mapper}

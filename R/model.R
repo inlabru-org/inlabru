@@ -834,28 +834,55 @@ NULL
 
 #' @describeIn bru_model_mapper_methods Returns a list (one element per
 #'   observation model) of [bm_list] objects, each with one [bm_taylor]
-#'   entry for each included component.
+#'   entry for each included component. (autodiff == "pandemic")
+#'
+#'   If `autodiff` is not "pandemic", returns a list of [bm_taylor] objects, one
+#'   for each observation model, with the offset and jacobians evaluated for the
+#'   predictor of the observation model, and the component mappers passed on as
+#'   `comp_mappers` for the evaluation of the jacobians.
+#'   @param comp_mappers A [bm_list()] of mappers, either the original component
+#'   mappers, or simplified mappers.
+#'
 #' @export
-ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...) {
+ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...,
+                                    options = NULL, comp_mappers = NULL) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
-  bru_log_message(
-    paste0("Linearise components for each observation model"),
-    verbosity = 3
-  )
-  mappers <-
-    lapply(
-      input,
-      function(inp) {
-        ibm_as_taylor(
-          as_bru_comp_list(model),
-          input = inp[["comp"]],
-          state = state,
-          ...
-        )
-      }
+  options <- options %||% bru_options_get()
+  if (identical(options[["bru_method"]][["autodiff"]], "pandemic")) {
+    bru_log_message(
+      paste0("Linearise components for each observation model"),
+      verbosity = 3
     )
-
+    mappers <-
+      lapply(
+        input,
+        function(inp) {
+          ibm_as_taylor(
+            as_bru_comp_list(model),
+            input = inp[["comp"]],
+            state = state,
+            ...
+          )
+        }
+      )
+  } else {
+    bru_log_message(
+      paste0("Linearise predictor for each observation model"),
+      verbosity = 3
+    )
+    if (is.null(comp_mappers)) {
+      comp_mappers <- as_bm_list(as_bru_comp_list(model))
+    }
+    mappers <- ibm_as_taylor(
+      as_bru_obs_list(model),
+      input = input,
+      state = state,
+      multi = TRUE,
+      ...,
+      comp_mappers = comp_mappers
+    )
+  }
   mappers
 }
 
@@ -972,10 +999,13 @@ ibm_simplify.bru_comp_list <- function(mapper,
 ibm_as_taylor.bm_list <- function(mapper, input, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
+    idx <- seq_along(mapper)
     label <- as.character(seq_along(mapper))
+  } else {
+    idx <- setNames(names(mapper), names(mapper))
   }
   mappers <- lapply(
-    seq_along(mapper),
+    idx,
     function(k) {
       bru_log_message(
         paste0("Linearise component '", label[k], "'"),
@@ -984,7 +1014,7 @@ ibm_as_taylor.bm_list <- function(mapper, input, state = NULL, ...) {
       ibm_as_taylor(
         mapper[[k]],
         input[[k]],
-        state = NULL,
+        state = state[[k]],
         ...
       )
     }
@@ -998,10 +1028,13 @@ ibm_as_taylor.bm_list <- function(mapper, input, state = NULL, ...) {
 ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
   label <- names(mapper)
   if (is.null(label)) {
+    idx <- seq_along(mapper)
     label <- as.character(seq_along(mapper))
+  } else {
+    idx <- setNames(names(mapper), names(mapper))
   }
   mappers <- lapply(
-    seq_along(mapper),
+    idx,
     function(k) {
       bru_log_message(
         paste0("Simplify component '", label[k], "'"),
@@ -1010,7 +1043,7 @@ ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
       ibm_simplify(
         mapper[[k]],
         input[[k]],
-        state = NULL,
+        state = state[[k]],
         ...
       )
     }

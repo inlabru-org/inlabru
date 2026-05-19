@@ -7,6 +7,8 @@
 \alias{ibm_as_taylor.bm_multi}
 \alias{ibm_as_taylor.bm_collect}
 \alias{ibm_as_taylor.bm_expr}
+\alias{ibm_as_taylor.bru_obs}
+\alias{ibm_as_taylor.bru_obs_list}
 \alias{ibm_as_taylor.bm_repeat}
 \alias{ibm_as_taylor.bm_sum}
 \alias{ibm_as_taylor.bru_comp}
@@ -30,6 +32,10 @@ ibm_as_taylor(mapper, input, state = NULL, ...)
   data = data,
   inla_f = FALSE
 )
+
+\method{ibm_as_taylor}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+
+\method{ibm_as_taylor}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
 \method{ibm_as_taylor}{bm_repeat}(mapper, input, state, ...)
 
@@ -67,6 +73,12 @@ Missing entries are treated as all-zero matrices.}
 
 \item{data}{should be a list with data objects, with the main object called
 \code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
+
+\item{multi}{logical;
+If \code{TRUE} (or positive), recurse one level into sub-mappers}
+
+\item{comp_mappers}{A list of mappers, typically from
+\verb{as_bm_list<bru_comp_list>}.}
 }
 \value{
 A \link{bm_taylor} object.
