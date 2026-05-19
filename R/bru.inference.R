@@ -4238,7 +4238,7 @@ bru_line_search <- function(model,
                             state0,
                             state,
                             input,
-                            comp_lin,
+#                            comp_lin,
                             comp_simple,
                             weights = 1,
                             options) {
@@ -5228,16 +5228,16 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   }
 
   timings <- bru_timer_do(timings, "Linearise", 1L)
-  bru_log_message(
-    "iinla: Evaluate component linearisations",
-    verbosity = 3
-  )
-  comp_lin <- ibm_as_taylor(
-    model,
-    input = inputs,
-    state = states[[length(states)]],
-    inla_f = TRUE
-  )
+  # bru_log_message(
+  #   "iinla: Evaluate component linearisations",
+  #   verbosity = 3
+  # )
+  # comp_lin <- ibm_as_taylor(
+  #   model,
+  #   input = inputs,
+  #   state = states[[length(states)]],
+  #   inla_f = TRUE
+  # )
   bru_log_message(
     "iinla: Evaluate component simplifications",
     verbosity = 3
@@ -5605,7 +5605,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
               state0 = state0,
               state = state,
               input = inputs,
-              comp_lin = comp_lin,
+#              comp_lin = comp_lin,
               comp_simple = comp_simple,
               weights = line_weights,
               options = options
@@ -5615,20 +5615,20 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         }
         timings <- bru_timer_do(timings, "Linearise", k + 1L)
 
-        bru_log_message(
-          "iinla: Evaluate component linearisations",
-          verbosity = 3
-        )
-        if (identical(options[["bru_method"]][["search"]], "fullchain")) {
-          stop("TODO: implement fullchain linearisation")
-        } else {
-          comp_lin <- ibm_as_taylor(
-            model,
-            input = inputs,
-            state = state,
-            inla_f = TRUE
-          )
-        }
+        # bru_log_message(
+        #   "iinla: Evaluate component linearisations",
+        #   verbosity = 3
+        # )
+        # if (identical(options[["bru_method"]][["search"]], "fullchain")) {
+        #   stop("TODO: implement fullchain linearisation")
+        # } else {
+        #   comp_lin <- ibm_as_taylor(
+        #     model,
+        #     input = inputs,
+        #     state = state,
+        #     inla_f = TRUE
+        #   )
+        # }
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
           verbosity = 3
