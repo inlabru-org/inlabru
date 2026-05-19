@@ -225,7 +225,8 @@ bru_block_gcpo_single <- function(fit) {
   if (is.null(gcpo_vec)) {
     stop(
       "fit$gcpo$gcpo is NULL. Refit with ",
-      "options = list(control.compute = list(control.gcpo = list(enable = TRUE)))."
+      "options = list(control.compute = ",
+      "list(control.gcpo = list(enable = TRUE)))."
     )
   }
 
@@ -489,7 +490,8 @@ bru_gcpo_table <- function(fits = NULL, ...) {
     stop("All fitted bru objects must be named.")
   }
   if (length(fits) == 1L) {
-    stop("bru_gcpo_table() requires at least two named models for comparison. Use bru_block_gcpo() for a single fit.")
+    stop("bru_gcpo_table() requires at least two named models for comparison. ",
+         "Use bru_block_gcpo() for a single fit.")
   }
 
   results <- bru_block_gcpo(fits)

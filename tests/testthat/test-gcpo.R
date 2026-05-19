@@ -134,6 +134,7 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
+  skip_if_not_installed("terra")
 
   cvpart <- cv_hex(
     gorillas_sf$boundary,
@@ -219,6 +220,7 @@ test_that("bru_gcpo_table returns correct structure for multiple fits", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
+  skip_if_not_installed("terra")
 
   cvpart <- cv_hex(
     gorillas_sf$boundary,
