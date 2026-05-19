@@ -166,7 +166,7 @@ ggplot() +
     fill = "steelblue", alpha = 0.3
   ) +
   geom_line(data = augmented,
-            aes(x, .fitted), 
+            aes(x, .fitted),
             colour = "steelblue", linewidth = 1) +
   labs(
     title = "Posterior fitted line with 95 % credible band",
