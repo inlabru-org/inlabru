@@ -53,26 +53,30 @@ if (bru_safe_inla()) {
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(enable = TRUE, 
-                      type.cv = "joint")
+    control.gcpo = list(
+      enable = TRUE,
+      type.cv = "joint"
+    )
   )
-  pcmatern <- inla.spde2.pcmatern(mesh,
-  prior.sigma = c(1, 0.01),
-  prior.range = c(0.1, 0.01)
+  pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+    prior.sigma = c(1, 0.01),
+    prior.range = c(0.1, 0.01)
   )
+
   fit2 <- lgcp(
-    components = geometry ~ Intercept(1) + 
-    field(geometry, model = pcmatern),
+    components = geometry ~ Intercept(1) +
+      field(geometry, model = pcmatern),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(enable = TRUE, 
-                      type.cv = "joint")
+    control.gcpo = list(
+      enable = TRUE,
+      type.cv = "joint"
+    )
   )
-  gcpo_df <- bru_gcpo_table(Model1= fit1, Model2=fit2)
-  names(gcpo_df) 
-  colSums(log(gcpo_df[,-1]))      
-  
+  gcpo_df <- bru_gcpo_table(Model1 = fit1, Model2 = fit2)
+  names(gcpo_df)
+  colSums(log(gcpo_df[, -1]))
 }
 }
 }

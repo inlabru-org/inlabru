@@ -52,7 +52,7 @@ convert_group_cv_blocks_to_friends_list <- function(group_cv_block,
 }
 
 
-#' Utility functions for bru observation model GCPO
+#' @title Utility functions for bru observation model GCPO
 #'
 #' @description
 #' Extract and combine `INLA::control.gcpo` options from `bru_obs` and
@@ -61,13 +61,11 @@ convert_group_cv_blocks_to_friends_list <- function(group_cv_block,
 #'
 #' @param x A `bru_obs` or `bru_obs_list` object.
 #' @param \dots Further arguments passed to submethods.
-#'
-#' @return
-#' * `bru_obs_control_gcpo()` returns a list with `INLA::control.gcpo` options,
-#'   with predictor/response variable indices unified for multi-observation
-#'   models. If a `bru_obs` model has a `NULL` `control.gcpo` argument, an
-#'   empty list is returned for that model.
-#'
+#' @returns
+#'   * `bru_obs_control_gcpo()` returns a list with `INLA::control.gcpo`
+#'   options, with predictor/response variable indices unified for
+#'   multi-observation models. If a `bru_obs` model has a `control.gcpo = NULL`
+#'   argument, an empty list is returned for that model.
 #' @seealso [bru_obs()], [bru_block_gcpo()]
 #' @export
 #' @keywords internal
@@ -134,7 +132,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
                                               control.gcpo = NULL,
                                               ...) {
   response_sizes <- bru_response_size(x)
-  
+
   any_element <- vapply(
     c("groups", "selection", "group.selection", "friends", "weights"),
     function(nm) {
@@ -149,19 +147,19 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     },
     TRUE
   )
-  
+
   c.gcpo <- lapply(
     seq_along(x),
     function(k) {
       bru_obs_control_gcpo(
         x[[k]],
         index_offset = sum(response_sizes[seq_len(k - 1)]),
-        index_length  = response_sizes[k],
+        index_length = response_sizes[k],
         force_weights = any_element["weights"]
       )
     }
   )
-  
+
   # If given in one model, must be given in all models
   c.gcpo.combined <- list()
   for (nm in c("groups", "selection", "group.selection")) {
@@ -175,7 +173,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
         do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
     }
   }
-  
+
   # Combine friends and weights across likelihoods
   c.gcpo.combined[["friends"]] <-
     do.call("c", lapply(c.gcpo, function(lh) lh[["friends"]]))
@@ -183,7 +181,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     c.gcpo.combined[["weights"]] <-
       unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
   }
-  
+
   merge_list_check <- function(a, b, exclude = character(0)) {
     for (nm in setdiff(names(b), exclude)) {
       if (nm %in% names(a)) {
@@ -199,7 +197,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     }
     a
   }
-  
+
   exc <- names(c.gcpo.combined)
   if (!is.null(control.gcpo)) {
     c.gcpo.combined <- merge_list_check(
@@ -215,14 +213,14 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
       exclude = exc
     )
   }
-  
+
   c.gcpo.combined
 }
 
 # Internal workhorse for a single bru fit
 bru_block_gcpo_single <- function(fit) {
   fit <- bru_check_object_bru(fit)
-  
+
   gcpo_vec <- fit[["gcpo"]][["gcpo"]]
   if (is.null(gcpo_vec)) {
     stop(
@@ -230,10 +228,10 @@ bru_block_gcpo_single <- function(fit) {
       "options = list(control.compute = list(control.gcpo = list(enable = TRUE)))."
     )
   }
-  
-  lhoods  <- as_bru_obs_list(fit)
+
+  lhoods <- as_bru_obs_list(fit)
   nlhoods <- length(lhoods)
-  
+
   block_per_lhood <- lapply(lhoods, function(lh) {
     blk <- lh[["response_data"]][["BRU_block"]]
     if (is.null(blk)) {
@@ -246,33 +244,33 @@ bru_block_gcpo_single <- function(fit) {
     unique(blk)
   })
   names(block_per_lhood) <- names(lhoods)
-  
-  n_per_lhood  <- vapply(lhoods, function(lh) nrow(lh[["response_data"]]), 0L)
+
+  n_per_lhood <- vapply(lhoods, function(lh) nrow(lh[["response_data"]]), 0L)
   index_offset <- c(0L, cumsum(n_per_lhood))
-  
+
   # Within a block all values are identical (INLA repeats the group score);
   # mean() is used for robustness against floating point noise.
   average_blocks <- function(lhood_idx) {
-    lh      <- lhoods[[lhood_idx]]
+    lh <- lhoods[[lhood_idx]]
     blk_var <- lh[["response_data"]][["BRU_block"]]
-    offset  <- index_offset[lhood_idx]
+    offset <- index_offset[lhood_idx]
     vapply(
       block_per_lhood[[lhood_idx]],
       function(b) mean(gcpo_vec[which(blk_var == b) + offset]),
       numeric(1)
     )
   }
-  
+
   if (nlhoods == 1L) {
     return(list(
       blocks = block_per_lhood,
       gcpo   = average_blocks(1L)
     ))
   }
-  
+
   gcpo <- lapply(seq_len(nlhoods), average_blocks)
   names(gcpo) <- names(lhoods)
-  
+
   list(blocks = block_per_lhood, gcpo = gcpo)
 }
 
@@ -314,7 +312,7 @@ bru_block_gcpo_single <- function(fit) {
 #'     models; a named list of numeric vectors for multi-likelihood models.}
 #' }
 #' For multiple fits, a named list of such objects, one per fit.
-#' 
+#'
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla()) {
@@ -328,48 +326,51 @@ bru_block_gcpo_single <- function(fit) {
 #'   cvpart$block_ID <- seq_len(nrow(cvpart))
 #'   cvpart$group <- NULL
 #'   nblock <- nrow(cvpart)
-#' 
+#'
 #'   nests <- gorillas_sf$nests
 #'   a <- sf::st_intersects(nests, cvpart)
 #'   if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
 #'     stop("Point in none or multiple polygons")
 #'   }
 #'   nests$.block <- unlist(a)
-#' 
+#'
 #'   fit1 <- lgcp(
 #'     components = geometry ~ Intercept(1),
 #'     data = nests,
 #'     samplers = cvpart,
 #'     domain = list(geometry = gorillas_sf$mesh),
-#'     control.gcpo = list(enable = TRUE, 
-#'                       type.cv = "joint")
+#'     control.gcpo = list(
+#'       enable = TRUE,
+#'       type.cv = "joint"
+#'     )
 #'   )
 #'
 #'   result <- bru_block_gcpo(fit1)
 #'
-#'   #block labels and one GCPO score per block
+#'   # block labels and one GCPO score per block
 #'   result$blocks
 #'   result$gcpo
 #'   sum(log(result$gcpo))
-#'   
-#'   #For multiple models
-#'   pcmatern <- inla.spde2.pcmatern(mesh,
-#'   prior.sigma = c(1, 0.01),
-#'   prior.range = c(0.1, 0.01)
+#'
+#'   # For multiple models
+#'   pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+#'     prior.sigma = c(1, 0.01),
+#'     prior.range = c(0.1, 0.01)
 #'   )
-
+#'
 #'   fit2 <- lgcp(
-#'     components = geometry ~ Intercept(1) + 
-#'     field(geometry, model = pcmatern),
+#'     components = geometry ~ Intercept(1) +
+#'       field(geometry, model = pcmatern),
 #'     data = nests,
 #'     samplers = cvpart,
 #'     domain = list(geometry = gorillas_sf$mesh),
-#'     control.gcpo = list(enable = TRUE, 
-#'                       type.cv = "joint")
+#'     control.gcpo = list(
+#'       enable = TRUE,
+#'       type.cv = "joint"
+#'     )
 #'   )
-#'   result <- bru_block_gcpo(list(Model1= fit1, Model2=fit2))
+#'   result <- bru_block_gcpo(list(Model1 = fit1, Model2 = fit2))
 #'   str(result)
-#'   
 #' }
 #' }
 #' @seealso [bru()], [bru_obs()], [bru_obs_control_gcpo()], [bru_gcpo_table()]
@@ -381,11 +382,11 @@ bru_block_gcpo <- function(fit, ...) {
     c(list(fit), list(...))
   }
   fits <- Filter(Negate(is.null), fits)
-  
+
   if (length(fits) == 1L) {
     return(bru_block_gcpo_single(fits[[1]]))
   }
-  
+
   results <- lapply(fits, bru_block_gcpo_single)
   if (!is.null(names(fits))) {
     names(results) <- names(fits)
@@ -428,47 +429,50 @@ bru_block_gcpo <- function(fit, ...) {
 #'   cvpart$block_ID <- seq_len(nrow(cvpart))
 #'   cvpart$group <- NULL
 #'   nblock <- nrow(cvpart)
-#' 
+#'
 #'   nests <- gorillas_sf$nests
 #'   a <- sf::st_intersects(nests, cvpart)
 #'   if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
 #'     stop("Point in none or multiple polygons")
 #'   }
 #'   nests$.block <- unlist(a)
-#' 
+#'
 #'   fit1 <- lgcp(
 #'     components = geometry ~ Intercept(1),
 #'     data = nests,
 #'     samplers = cvpart,
 #'     domain = list(geometry = gorillas_sf$mesh),
-#'     control.gcpo = list(enable = TRUE, 
-#'                       type.cv = "joint")
+#'     control.gcpo = list(
+#'       enable = TRUE,
+#'       type.cv = "joint"
+#'     )
 #'   )
-#'   pcmatern <- inla.spde2.pcmatern(mesh,
-#'   prior.sigma = c(1, 0.01),
-#'   prior.range = c(0.1, 0.01)
+#'   pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+#'     prior.sigma = c(1, 0.01),
+#'     prior.range = c(0.1, 0.01)
 #'   )
-
+#'
 #'   fit2 <- lgcp(
-#'     components = geometry ~ Intercept(1) + 
-#'     field(geometry, model = pcmatern),
+#'     components = geometry ~ Intercept(1) +
+#'       field(geometry, model = pcmatern),
 #'     data = nests,
 #'     samplers = cvpart,
 #'     domain = list(geometry = gorillas_sf$mesh),
-#'     control.gcpo = list(enable = TRUE, 
-#'                       type.cv = "joint")
+#'     control.gcpo = list(
+#'       enable = TRUE,
+#'       type.cv = "joint"
+#'     )
 #'   )
-#'   gcpo_df <- bru_gcpo_table(Model1= fit1, Model2=fit2)
-#'   names(gcpo_df) 
-#'   colSums(log(gcpo_df[,-1]))      
-#'   
+#'   gcpo_df <- bru_gcpo_table(Model1 = fit1, Model2 = fit2)
+#'   names(gcpo_df)
+#'   colSums(log(gcpo_df[, -1]))
 #' }
 #' }
 #' @seealso [bru_block_gcpo()]
 #' @export
 bru_gcpo_table <- function(fits = NULL, ...) {
   dots <- list(...)
-  
+
   if (is.null(fits)) {
     fits <- dots
   } else if (inherits(fits, "bru")) {
@@ -477,7 +481,7 @@ bru_gcpo_table <- function(fits = NULL, ...) {
   } else {
     fits <- c(fits, dots)
   }
-  
+
   if (length(fits) == 0L) {
     stop("No fitted bru objects supplied.")
   }
@@ -487,15 +491,15 @@ bru_gcpo_table <- function(fits = NULL, ...) {
   if (length(fits) == 1L) {
     stop("bru_gcpo_table() requires at least two named models for comparison. Use bru_block_gcpo() for a single fit.")
   }
-  
+
   results <- bru_block_gcpo(fits)
-  
+
   # Detect single vs multi-likelihood from first result
   first <- results[[1]]
   nlhoods <- length(first$blocks)
-  
+
   build_df <- function(lhood_idx) {
-    blocks <- first$blocks[[lhood_idx]]   # index by position, not name
+    blocks <- first$blocks[[lhood_idx]] # index by position, not name
     lhood_nm <- names(first$blocks)[lhood_idx]
     df <- data.frame(block = blocks)
     for (nm in names(results)) {
@@ -505,11 +509,11 @@ bru_gcpo_table <- function(fits = NULL, ...) {
     }
     df
   }
-  
+
   if (nlhoods == 1L) {
     return(build_df(1L))
   }
-  
+
   out <- lapply(seq_len(nlhoods), build_df)
   names(out) <- names(first$blocks)
   out

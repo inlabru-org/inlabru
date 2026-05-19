@@ -70,34 +70,38 @@ if (bru_safe_inla()) {
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(enable = TRUE, 
-                      type.cv = "joint")
+    control.gcpo = list(
+      enable = TRUE,
+      type.cv = "joint"
+    )
   )
 
   result <- bru_block_gcpo(fit1)
 
-  #block labels and one GCPO score per block
+  # block labels and one GCPO score per block
   result$blocks
   result$gcpo
   sum(log(result$gcpo))
-  
-  #For multiple models
-  pcmatern <- inla.spde2.pcmatern(mesh,
-  prior.sigma = c(1, 0.01),
-  prior.range = c(0.1, 0.01)
+
+  # For multiple models
+  pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+    prior.sigma = c(1, 0.01),
+    prior.range = c(0.1, 0.01)
   )
+
   fit2 <- lgcp(
-    components = geometry ~ Intercept(1) + 
-    field(geometry, model = pcmatern),
+    components = geometry ~ Intercept(1) +
+      field(geometry, model = pcmatern),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(enable = TRUE, 
-                      type.cv = "joint")
+    control.gcpo = list(
+      enable = TRUE,
+      type.cv = "joint"
+    )
   )
-  result <- bru_block_gcpo(list(Model1= fit1, Model2=fit2))
+  result <- bru_block_gcpo(list(Model1 = fit1, Model2 = fit2))
   str(result)
-  
 }
 }
 }

@@ -39,10 +39,10 @@ with per-likelihood settings.}
 }
 \value{
 \itemize{
-\item \code{bru_obs_control_gcpo()} returns a list with \code{INLA::control.gcpo} options,
-with predictor/response variable indices unified for multi-observation
-models. If a \code{bru_obs} model has a \code{NULL} \code{control.gcpo} argument, an
-empty list is returned for that model.
+\item \code{bru_obs_control_gcpo()} returns a list with \code{INLA::control.gcpo}
+options, with predictor/response variable indices unified for
+multi-observation models. If a \code{bru_obs} model has a \code{control.gcpo = NULL}
+argument, an empty list is returned for that model.
 }
 }
 \description{

@@ -112,7 +112,15 @@ The \code{input} contents must
 be in a format accepted by \code{\link[=ibm_jacobian]{ibm_jacobian()}}
 for the mapper.
 
-Specific implementations for \verb{r doclisting::methods_inline("ibm_jacobian")}.
+Specific implementations for \code{bm_aggregate}, \code{bm_collect}, \code{bm_const}, \code{bm_factor},
+\code{bm_fm_mesh_1d}, \code{\link[=bm_fm_mesh_old]{bm_fm_mesh_2d}},
+\code{bm_fmesher}, \code{bm_harmonics}, \code{bm_index},
+\code{\link[=bm_fm_mesh_old]{bm_inla_mesh_1d}},
+\code{\link[=bm_fm_mesh_old]{bm_inla_mesh_2d}}, \code{bm_linear},
+\code{bm_logitaverage}, \code{bm_logsumexp}, \code{bm_marginal},
+\code{bm_matrix}, \code{bm_multi}, \code{bm_pipe}, \code{bm_reparam},
+\code{bm_repeat}, \code{bm_scale}, \code{bm_shift}, \code{bm_sum},
+\code{bm_taylor}, \code{default}.
 }
 \section{Methods (by class)}{
 \itemize{
