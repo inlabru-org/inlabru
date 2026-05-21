@@ -36,10 +36,14 @@ test_that("glance.bru returns one-row tibble with expected columns", {
       bru_timings = data.frame(
         Elapsed = as.difftime(c(1.0, 2.0), units = "secs")
       ),
-      bru_info = list(
-        lhoods = list(
-          list(family = "gaussian", data = data.frame(x = 1:15))
-        )
+      bru_info = structure(
+        list(
+          inlabru_version = as.character(utils::packageVersion("inlabru")),
+          lhoods = list(
+            structure(list(data = data.frame(x = 1:15)), class = "bru_obs")
+          )
+        ),
+        class = "bru_info"
       )
     ),
     class = c("bru", "inla")
@@ -58,24 +62,33 @@ test_that("glance.bru returns NA nobs for any multi-likelihood fit", {
   # nobs is ill-defined for joint models regardless of whether families
   # match — possibly-shared observations and different supports across
   # likelihoods make the row sum meaningless.
+  bru_ver <- as.character(utils::packageVersion("inlabru"))
   mixed <- structure(
     list(
-      bru_info = list(
-        lhoods = list(
-          list(family = "gaussian", data = data.frame(x = 1:10)),
-          list(family = "poisson", data = data.frame(x = 1:5))
-        )
+      bru_info = structure(
+        list(
+          inlabru_version = bru_ver,
+          lhoods = list(
+            structure(list(data = data.frame(x = 1:10)), class = "bru_obs"),
+            structure(list(data = data.frame(x = 1:5)), class = "bru_obs")
+          )
+        ),
+        class = "bru_info"
       )
     ),
     class = c("bru", "inla")
   )
   same <- structure(
     list(
-      bru_info = list(
-        lhoods = list(
-          list(family = "gaussian", data = data.frame(x = 1:10)),
-          list(family = "gaussian", data = data.frame(x = 1:5))
-        )
+      bru_info = structure(
+        list(
+          inlabru_version = bru_ver,
+          lhoods = list(
+            structure(list(data = data.frame(x = 1:10)), class = "bru_obs"),
+            structure(list(data = data.frame(x = 1:5)), class = "bru_obs")
+          )
+        ),
+        class = "bru_info"
       )
     ),
     class = c("bru", "inla")
@@ -86,7 +99,15 @@ test_that("glance.bru returns NA nobs for any multi-likelihood fit", {
 
 test_that("glance.bru returns NA for missing fields gracefully", {
   fake_fit <- structure(
-    list(bru_info = list(lhoods = list())),
+    list(
+      bru_info = structure(
+        list(
+          inlabru_version = as.character(utils::packageVersion("inlabru")),
+          lhoods = list()
+        ),
+        class = "bru_info"
+      )
+    ),
     class = c("bru", "inla")
   )
   result <- glance(fake_fit)
