@@ -85,13 +85,11 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     if (assume_rowwise) {
       if (!is.null(n_pred) && (NROW(pred0) != n_pred)) {
         stop(
-          "Number of rows (",
-          NROW(pred0),
-          ") in the predictor for component '",
-          label,
-          "' does not match the length implied by the response data (",
-          n_pred,
-          ")."
+          glue(
+            "The number of values ({NROW(pred0)}) in the predictor for ",
+            "observation model ",
+          "<unknown> does not match the expected length ({n_pred})."
+          )
         )
       }
       if (NROW(A) == 1L) {

@@ -46,19 +46,27 @@ test_that("Response and predictor mismatch handling", {
       "<unknown> does not match the expected length \\(10\\)."
     )
   )
+
   expect_error(
     {
       fit3B <- bru(components = cmpB, lik3)
     },
-    paste0(
-      "The number of rows \\(10\\) in the Jacobian for derived variable ",
-      "'beta' with respect to\n",
-      "root variable 'beta' does not match the number of rows \\(20\\) in ",
-      "the expression result;\n",
-      "This indicates the expression was incorrectly inferred to be rowwise."
-    )
+    if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+      paste0(
+        "The number of values \\(20\\) in the predictor for",
+        " observation model <unknown> does not match the expected length",
+        " \\(10\\)"
+      )
+    } else {
+      paste0(
+        "The number of rows \\(10\\) in the Jacobian for derived variable ",
+        "'beta' with respect to\n",
+        "root variable 'beta' does not match the number of rows \\(20\\) in ",
+        "the expression result;\n",
+        "This indicates the expression was incorrectly inferred to be rowwise."
+      )
+    }
   )
-
 
   # INLA prior to mdata/surv stack support will give a different error message
   # than the one below, so we skip the test for old INLA versions.
@@ -67,15 +75,24 @@ test_that("Response and predictor mismatch handling", {
   expect_error(
     {
       fit4 <- bru(y ~ 0 + comp(1:3),
-        data = data.frame(y = rnorm(2)),
-        family = "gaussian"
+                  data = data.frame(y = rnorm(2)),
+                  family = "gaussian"
       )
     },
-    paste0(
-      "The number of values \\(3\\) in the predictor for ",
-      "observation model <unknown> ",
-      "does not match the expected length \\(2)\\."
-    )
+    if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+      paste0(
+        "The total number of response values \\(N=2\\) and predictor values",
+        " \\(N=3\\) do not match.\n",
+        "  This is likely due to a mistake in the component or predictor",
+        " constructions."
+      )
+    } else {
+      paste0(
+        "The number of values \\(3\\) in the predictor for ",
+        "observation model <unknown> ",
+        "does not match the expected length \\(2)\\."
+      )
+    }
   )
 })
 
