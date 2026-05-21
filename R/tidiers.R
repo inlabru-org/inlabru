@@ -65,7 +65,7 @@ glance.bru <- function(x, ...) {
 
   nobs_val <- tryCatch(
     {
-      lhoods <- x$bru_info$lhoods
+      lhoods <- as_bru_obs_list(x)
       # nobs is ill-defined for any multi-likelihood fit — even when families
       # match, summing rows across likelihoods that may share observations or
       # have different supports does not give a meaningful count.
@@ -80,7 +80,7 @@ glance.bru <- function(x, ...) {
 
   elapsed_val <- tryCatch(
     {
-      bt <- x$bru_timings
+      bt <- bru_timings(x)
       if (!is.null(bt) && "Elapsed" %in% names(bt)) {
         sum(as.numeric(bt$Elapsed), na.rm = TRUE)
       } else {
