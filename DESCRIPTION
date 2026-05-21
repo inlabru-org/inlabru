@@ -62,7 +62,6 @@ Imports:
     lifecycle,
     MatrixModels,
     Matrix,
-    plyr,
     rlang,
     sf,
     tibble,
