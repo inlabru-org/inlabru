@@ -456,8 +456,8 @@ bru <- function(components = ~ Intercept(1),
   # move lhoods and inputs out of bru.model:
   lhoods <- bru.model[["lhoods"]]
   inputs <- bru.model[["inputs"]]
-  bru.model[["lhoods"]] <- NULL
-  bru.model[["inputs"]] <- NULL
+#  bru.model[["lhoods"]] <- NULL
+#  bru.model[["inputs"]] <- NULL
 
   info <- bru_info(
     method = "bru",
@@ -1233,7 +1233,7 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
 
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9004",
+      "2.14.1.9005",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -1329,7 +1329,7 @@ bru_agg_input <- function(mapper, mask, .envir) {
   )
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9004",
+      "2.14.1.9005",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -2336,8 +2336,8 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #'
-#'   From `2.13.0.9016` to `2.14.1.9003`, it would look for a `block_response`
-#'   character element in the list, but from `2.14.1.9004`, the separate
+#'   From `2.13.0.9016` to `2.14.1.9004`, it would look for a `block_response`
+#'   character element in the list, but from `2.14.1.9005`, the separate
 #'   argument `reponse_block` should be used instead, with an expression to be
 #'   evaluated in the input data context. `response_block` should evaluate to a
 #'   vector of the same length as the response data, with values that can be
@@ -4162,29 +4162,39 @@ lin_predictor <- function(lin, state) {
   )
 }
 nonlin_predictor <- function(param, state) {
-  do.call(
-    c,
-    lapply(
-      seq_along(param[["lhoods"]]),
-      function(lh_idx) {
-        as.vector(
-          evaluate_model(
-            model = param[["model"]],
-            data = param[["lhoods"]][[lh_idx]][["data"]],
-            data_extra = param[["lhoods"]][[lh_idx]][["data_extra"]],
-            input = param[["input"]][[lh_idx]],
-            state = list(state),
-            comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
-              format = "expr"
-            ),
-            format = "matrix",
-            n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
+  if (identical(param$bru_method$autodiff, "pandemic")) {
+    res <- do.call(
+      c,
+      lapply(
+        seq_along(param[["lhoods"]]),
+        function(lh_idx) {
+          as.vector(
+            evaluate_model(
+              model = param[["model"]],
+              data = param[["lhoods"]][[lh_idx]][["data"]],
+              data_extra = param[["lhoods"]][[lh_idx]][["data_extra"]],
+              input = param[["input"]][[lh_idx]],
+              state = list(state),
+              comp_simple = param[["comp_simple"]][[lh_idx]],
+              predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
+                                        format = "expr"
+              ),
+              format = "matrix",
+              n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])
+            )
           )
-        )
-      }
+        }
+      )
     )
+    return(res)
+  }
+  res <- ibm_eval(
+    param[["lhoods"]],
+    input = param[["input"]],
+    state = state,
+    comp_mappers = param[["comp_simple"]]
   )
+  res
 }
 scale_state <- function(state0, state1, scaling_factor) {
   new_state <- lapply(
@@ -4238,7 +4248,6 @@ bru_line_search <- function(model,
                             state0,
                             state,
                             input,
-#                            comp_lin,
                             comp_simple,
                             weights = 1,
                             options) {
@@ -4281,16 +4290,13 @@ bru_line_search <- function(model,
 
   fact <- options$bru_method$factor
 
-  if (identical(options[["bru_method"]][["search"]], "fullchain")) {
-    stop("TODO: implement fullchain linearisation")
-  } else {
-    nonlin_param <- list(
-      model = model,
-      lhoods = lhoods,
-      input = input,
-      comp_simple = comp_simple
-    )
-  }
+  nonlin_param <- list(
+    bru_method = options[["bru_method"]],
+    model = model,
+    lhoods = lhoods,
+    input = input,
+    comp_simple = comp_simple
+  )
 
   state1 <- state
   lin_pred0 <- lin_predictor(lin, state0)
@@ -5228,16 +5234,6 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
   }
 
   timings <- bru_timer_do(timings, "Linearise", 1L)
-  # bru_log_message(
-  #   "iinla: Evaluate component linearisations",
-  #   verbosity = 3
-  # )
-  # comp_lin <- ibm_as_taylor(
-  #   model,
-  #   input = inputs,
-  #   state = states[[length(states)]],
-  #   inla_f = TRUE
-  # )
   bru_log_message(
     "iinla: Evaluate component simplifications",
     verbosity = 3
@@ -5265,6 +5261,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       model,
       input = inputs,
       state = states[[length(states)]],
+      comp_mappers = comp_simple,
       options = options
     )
   }
@@ -5605,7 +5602,6 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
               state0 = state0,
               state = state,
               input = inputs,
-#              comp_lin = comp_lin,
               comp_simple = comp_simple,
               weights = line_weights,
               options = options
@@ -5615,33 +5611,25 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         }
         timings <- bru_timer_do(timings, "Linearise", k + 1L)
 
-        # bru_log_message(
-        #   "iinla: Evaluate component linearisations",
-        #   verbosity = 3
-        # )
-        # if (identical(options[["bru_method"]][["search"]], "fullchain")) {
-        #   stop("TODO: implement fullchain linearisation")
-        # } else {
-        #   comp_lin <- ibm_as_taylor(
-        #     model,
-        #     input = inputs,
-        #     state = state,
-        #     inla_f = TRUE
-        #   )
-        # }
         bru_log_message(
           "iinla: Evaluate predictor linearisation",
           verbosity = 3
         )
-        if (identical(options[["bru_method"]][["search"]], "fullchain")) {
-          stop("TODO: implement fullchain linearisation")
-        } else {
+        if (identical(options[["bru_method"]][["autodiff"]], "pandemic")) {
           lin <- bru_compute_linearisation(
             model,
             lhoods = lhoods,
             input = inputs,
             state = state,
             comp_simple = comp_simple,
+            options = options
+          )
+        } else {
+          lin <- ibm_as_taylor(
+            model,
+            input = inputs,
+            state = state,
+            comp_mappers = comp_simple,
             options = options
           )
         }

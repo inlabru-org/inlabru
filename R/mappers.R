@@ -1566,13 +1566,13 @@ bm_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
       function(x) {
         ifelse(is.null(x),
           0L,
-          ncol(x)
+          NCOL(x)
         )
       },
       0L
     )
   } else {
-    n_jacobian <- ncol(jacobian)
+    n_jacobian <- NCOL(jacobian)
   }
 
   if (!is.null(state0)) {
@@ -1898,9 +1898,9 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
   } else {
     A <- as(input, "Matrix")
   }
-  if (ncol(A) != ibm_n(mapper)) {
+  if (NCOL(A) != ibm_n(mapper)) {
     stop(paste0(
-      "Input to matrix mapper has ", ncol(A),
+      "Input to matrix mapper has ", NCOL(A),
       " columns but should have ", ibm_n(mapper),
       " columns."
     ))

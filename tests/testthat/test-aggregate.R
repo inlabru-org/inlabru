@@ -102,6 +102,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   domain <- list()
 
   comp <- ~ Intercept(1) + x + y
+  comp_list <- bru_comp_list(comp)
 
   fit <- bru(
     comp,
@@ -158,7 +159,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   # Missing block information
   expect_error(
     {
-      bru_obs(
+      obs_ <- bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
@@ -177,6 +178,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
           )
         )
       )
+      inp <- bru_input(obs_, comp_list)
     },
     paste0(
       "Aggregation requested, but `aggregate_input[['block']]` ",
@@ -188,7 +190,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   # Character block information without matching response block information
   expect_error(
     {
-      bru_obs(
+      obs_ <- bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
@@ -208,6 +210,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
           )
         )
       )
+      inp <- bru_input(obs_, comp_list)
     },
     paste0(
       "'character' aggregation block information detected."
@@ -688,4 +691,95 @@ test_that("New method `fullchain` works", {
     state = list(Intercept = 1, x = 2, y = 3),
     comp_mappers = comp3_mappers
   )
+
+
+
+  # bench::mark(A={
+  # local_bru_options_set(bru_method = list(
+  #   agg = "pandemic",
+  #   autodiff = "pandemic"
+  # ))
+  #   fit <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # B={local_bru_options_set(bru_method = list(
+  #     agg = "pandemic",
+  #     autodiff = "fullchain"
+  #   ))
+  #   fit2 <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # C={
+  #   local_bru_options_set(bru_method = list(
+  #     agg = "fullchain",
+  #     autodiff = "fullchain"
+  #   ))
+  #   fit3 <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # check = FALSE
+  # )
 })

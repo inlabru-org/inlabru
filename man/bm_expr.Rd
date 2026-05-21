@@ -23,7 +23,8 @@ efficient Jacobian calculations. For example, if the expression
 is row-wise in the data and derived variables, then
 \code{assume = "rowwise"} can be used to indicate that the Jacobian with
 respect to derived variables can be calculated simultaneously for all
-rows. Supported assumptions are "rowwise", "linear", and "additive".}
+rows. Supported assumptions are "rowwise", "linear", "additive", and
+"no_root".}
 
 \item{labels}{list of \code{root}, \code{derived}, and \code{suffix}.
 The \code{root} and \code{derived} elements specify the pronoun

@@ -484,14 +484,20 @@ bru_info_upgrade_functions <- function() {
 
       object
     },
-    "2.14.1.9004" = function(object) {
-      # bru_model input changed from list of <component inputs>)
-      # list of list(comp = <component inputs>,
-      #              post = <postprocessing input>)
+    "2.14.1.9005" = function(object) {
 
-      if (!is.null(object[["inputs"]])) {
-        object[["inputs"]] <- lapply(
-          object[["inputs"]],
+      if (is.null(object[["model"]][["inputs"]])) {
+        object[["model"]][["inputs"]] <- object[["inputs"]]
+      }
+      if (is.null(object[["model"]][["lhoods"]])) {
+        object[["model"]][["lhoods"]] <- object[["lhoods"]]
+      }
+      if (!is.null(object[["model"]][["inputs"]])) {
+        # bru_model input changed from list of <component inputs>)
+        # list of list(comp = <component inputs>,
+        #              post = <postprocessing input>)
+        object[["model"]][["inputs"]] <- lapply(
+          object[["model"]][["inputs"]],
           function(x) {
             list(comp = x, post = NULL)
           }

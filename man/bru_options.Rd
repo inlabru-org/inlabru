@@ -149,7 +149,7 @@ List of arguments controlling the iterative inlabru method:
 calculation (the default from version \verb{2.1.15}).}
 \item{'fullchain'}{Uses the chain rule for the composition of
 components, predictor, and post-predictor transformations
-(new from \verb{2.14.1.9000}).}
+(new from \verb{2.14.1.9005}).}
 }
 }
 \item{agg}{Controls the aggregation implementation. One of
@@ -158,7 +158,7 @@ components, predictor, and post-predictor transformations
 calculation (the default from version \verb{2.1.15}).}
 \item{'fullchain'}{Uses the chain rule for the composition of
 components, predictor, and post-predictor transformations
-(new from \verb{2.14.1.9000}).}
+(new from \verb{2.14.1.9005}).}
 }
 }
 \item{finite_diff}{One of

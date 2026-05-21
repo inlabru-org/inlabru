@@ -126,7 +126,7 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @returns * `bru_index(bru_info)`: An `integer` vector.
 bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
-  bru_index(object[["lhoods"]], tag = tag, what = what, ...)
+  bru_index(as_bru_obs_list(object), tag = tag, what = what, ...)
 }
 
 #' @export

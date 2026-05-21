@@ -844,11 +844,13 @@ NULL
 #'   mappers, or simplified mappers.
 #'
 #' @export
+#' @param options A [bru_options] options object or a list of options passed
+#' on to [bru_options()]
 ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...,
                                     options = NULL, comp_mappers = NULL) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
-  options <- options %||% bru_options_get()
+  options <- bru_call_options(options)
   if (identical(options[["bru_method"]][["autodiff"]], "pandemic")) {
     bru_log_message(
       paste0("Linearise components for each observation model"),
@@ -862,6 +864,7 @@ ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...,
             as_bru_comp_list(model),
             input = inp[["comp"]],
             state = state,
+            inla_f = TRUE,
             ...
           )
         }
@@ -872,7 +875,11 @@ ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...,
       verbosity = 3
     )
     if (is.null(comp_mappers)) {
-      comp_mappers <- as_bm_list(as_bru_comp_list(model))
+      comp_mappers <- ibm_simplify(
+        model,
+        input = input,
+        inla_f = TRUE
+      )
     }
     mappers <- ibm_as_taylor(
       as_bru_obs_list(model),

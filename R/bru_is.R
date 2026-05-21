@@ -23,13 +23,13 @@ bru_is_linear.bru <- function(x, ...) {
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_info <- function(x, ...) {
-  all(bru_is_linear(x[["lhoods"]], ...)) &&
-    all(bru_is_linear(x[["model"]], ...))
+  all(bru_is_linear(as_bru_obs_list(x), ...)) &&
+    all(bru_is_linear(as_bru_comp_list(x), ...))
 }
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_model <- function(x, ...) {
-  bru_is_linear(x[["effects"]], ...)
+  bru_is_linear(as_bru_comp_list(x), ...)
 }
 #' @rdname bru_is_linear
 #' @export

@@ -742,12 +742,22 @@ test_that("Collect mapper works", {
     data = data
   )
 
+  local_bru_options_set(bru_method = list(autodiff = "pandemic"))
   expect_no_error({
     fit_bru <-
       bru(~ Intercept(1) + field(x, model = "bym", graph = graph),
-        formula = y ~ Intercept + field,
-        data = data,
-        options = list(bru_initial = list(field = rep(10, 8)))
+          formula = y ~ Intercept + field,
+          data = data,
+          options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  local_bru_options_set(bru_method=list(autodiff = "fullchain"))
+  expect_no_error({
+    fit_bru <-
+      bru(~ Intercept(1) + field(x, model = "bym", graph = graph),
+          formula = y ~ Intercept + field,
+          data = data,
+          options = list(bru_initial = list(field = rep(10, 8)))
       )
   })
 })

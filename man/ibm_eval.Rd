@@ -85,7 +85,7 @@ Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_shift}},
 \code{\link[=ibm_eval_methods]{bm_sum}},
 \code{\link[=ibm_eval_methods]{bm_taylor}}, \code{bru_obs},
-\code{\link[=ibm_eval2]{bru_obs_list}}, \code{default}.
+\code{bru_obs_list}, \code{default}.
 }
 \section{Methods (by class)}{
 \itemize{
