@@ -1161,13 +1161,13 @@ ibm_inla_subset.default <- function(mapper, ...) {
     subset <- logical(NROW(values_full))
     if (length(subset) > 0) {
       subset[
-        plyr::match_df(
+        dplyr::semi_join(
           cbind(
             .inla_subset = seq_len(NROW(values_full)),
             values_full
           ),
           values_inla,
-          on = names(values_full)
+          by = names(values_full)
         )[[".inla_subset"]]
       ] <- TRUE
     }
