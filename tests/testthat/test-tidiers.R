@@ -39,8 +39,13 @@ test_that("glance.bru returns one-row tibble with expected columns", {
       bru_info = structure(
         list(
           inlabru_version = as.character(utils::packageVersion("inlabru")),
-          lhoods = list(
-            structure(list(data = data.frame(x = 1:15)), class = "bru_obs")
+          lhoods = structure(list(
+            structure(list(response_data = data.frame(x = 1:15),
+                           response = "x",
+                           family = "normal"),
+                      class = "bru_obs")
+          ),
+          class = "bru_obs_list"
           )
         ),
         class = "bru_info"
@@ -58,43 +63,29 @@ test_that("glance.bru returns one-row tibble with expected columns", {
   expect_equal(result$elapsed, 3.0)
 })
 
-test_that("glance.bru returns NA nobs for any multi-likelihood fit", {
-  # nobs is ill-defined for joint models regardless of whether families
-  # match — possibly-shared observations and different supports across
-  # likelihoods make the row sum meaningless.
+test_that("glance.bru returns NA nobs for any point process fit", {
+  # nobs is ill-defined for "cp" likelihoods.
   bru_ver <- as.character(utils::packageVersion("inlabru"))
-  mixed <- structure(
+  fit <- structure(
     list(
-      bru_info = structure(
-        list(
-          inlabru_version = bru_ver,
-          lhoods = list(
-            structure(list(data = data.frame(x = 1:10)), class = "bru_obs"),
-            structure(list(data = data.frame(x = 1:5)), class = "bru_obs")
-          )
+      bru_info = structure(list(
+        inlabru_version = bru_ver,
+        lhoods = structure(list(
+          structure(list(response_data = data.frame(x = 1:10),
+                         response = "x",
+                         family = "cp",
+                         inla.family = "xpoisson"),
+                    class = "bru_obs")
         ),
-        class = "bru_info"
+        class = "bru_obs_list"
+        )
+      ),
+      class = "bru_info"
       )
     ),
     class = c("bru", "inla")
   )
-  same <- structure(
-    list(
-      bru_info = structure(
-        list(
-          inlabru_version = bru_ver,
-          lhoods = list(
-            structure(list(data = data.frame(x = 1:10)), class = "bru_obs"),
-            structure(list(data = data.frame(x = 1:5)), class = "bru_obs")
-          )
-        ),
-        class = "bru_info"
-      )
-    ),
-    class = c("bru", "inla")
-  )
-  expect_true(is.na(glance(mixed)$nobs))
-  expect_true(is.na(glance(same)$nobs))
+  expect_true(is.na(glance(fit)$nobs))
 })
 
 test_that("glance.bru returns NA for missing fields gracefully", {

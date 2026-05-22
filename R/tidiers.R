@@ -54,8 +54,8 @@ tidy.bru <- function(x, effects = "fixed", ...) {
 #' @return A one-row tibble of model-level summaries. `elapsed` is wall-clock
 #'   seconds summed across the phases in `fit$bru_timings`, not CPU time.
 #'   `nobs` is the total row count summed across all likelihoods, returned as
-#'   `NA` for joint models that combine likelihoods of different families
-#'   (where the sum is not statistically meaningful).
+#'   `NA` for models that involve `family = "cp"`, as "observation count" is
+#'   not meaningful for such models.
 #' @method glance bru
 #' @export
 glance.bru <- function(x, ...) {
