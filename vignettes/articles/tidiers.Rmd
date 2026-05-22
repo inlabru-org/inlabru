@@ -36,6 +36,8 @@ objects through three generics from the
 These make it straightforward to work with inlabru results inside tidy
 workflows (dplyr, ggplot2, etc.) without manually unpacking the `bru` object.
 
+Introduced in version `2.14.1.9005`.
+
 ## Set up
 
 ```{r libraries, eval=inla_available, message=FALSE, warning=FALSE}
@@ -141,7 +143,7 @@ grid <- data.frame(x = seq(0, 5, length.out = 50))
 augmented <- augment(
   fit,
   data = grid,
-  pred_formula = ~ Intercept_latent + slope_latent,
+  pred_formula = ~ Intercept + slope,
   n_samples = 500L,
   seed = 1L
 )
@@ -176,14 +178,25 @@ ggplot() +
 
 ## Naming convention for `pred_formula`
 
-The latent variables in `pred_formula` follow inlabru's naming rule: a
-component named `foo` is available as `foo_latent` inside prediction
-expressions.  Components with `model = "linear"` (including the implicit
+The latent variables in `pred_formula` follow inlabru's naming rule: the effect
+of a component named `foo` is available as `foo`, and the corresponding
+latent variables (model coefficients, spline coefficients, etc) can be
+accessed as `foo_latent` inside prediction
+expressions.  In classic frequentist terminology, these two distinct quantities
+are usually conflated, making it difficult to know whether one is talking about
+`beta_x` (the latent variable/coefficient), `x` (the covariate value), or
+`beta_x * x` (the effect of a model component that multiplies a latent variable
+with a covariate). In `inlabru` expressions, the covariate can be accessed as
+`.data$x`, the effect can be accessed as `x` or `.effect$x`, and the latent
+variable can be accessed as `x_latent` or `.latent$x`.
+
+Components with `model = "linear"` (including the implicit
 intercept) appear in `summary.fixed`; components with a random-effect model
 (iid, rw1, SPDE, …) appear in `summary.random`.
 
 ```{r names, eval=inla_available}
-# fixed-effect component names → use <name>_latent in pred_formula
+# fixed-effect component names → use <name>_latent in pred_formula to access
+# the coeficcients, and <name> to access the effect itself.
 names(fit$summary.fixed)
 
 # random-effect component names (none in this model)
