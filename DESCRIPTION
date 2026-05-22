@@ -56,6 +56,7 @@ Depends:
     R (>= 4.1.0),
     stats
 Imports:
+    generics,
     dplyr,
     fmesher (>= 0.7.0),
     glue,
@@ -148,6 +149,7 @@ Collate:
     'spatstat.R'
     'spde.R'
     'stack.R'
+    'tidiers.R'
     'track_plotting.R'
     'transformation.R'
     'used.R'
