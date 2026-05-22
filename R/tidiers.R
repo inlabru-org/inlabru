@@ -65,14 +65,10 @@ glance.bru <- function(x, ...) {
 
   nobs_val <- tryCatch(
     {
-      lhoods <- as_bru_obs_list(x)
-      # nobs is ill-defined for any multi-likelihood fit — even when families
-      # match, summing rows across likelihoods that may share observations or
-      # have different supports does not give a meaningful count.
-      if (length(lhoods) > 1L) {
+      if (any(bru_obs_family(x) %in% "cp")) {
         NA_integer_
       } else {
-        nrow(lhoods[[1L]]$data)
+        sum(bru_response_size(x))
       }
     },
     error = function(e) NA_integer_

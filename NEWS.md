@@ -1,5 +1,11 @@
 # inlabru (development version)
 
+## New features
+
+* Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
+  support the `broom` package tidying framework. Thanks to Novica Nakov
+  (`2.14.1.9005`)
+
 ## Bug fixes
 
 * Fix issue #298, where `weights` input to `copy = ...` components was not
@@ -13,7 +19,7 @@
 * (Re)enable non-integer point weights for `family = "cp"` models, by using
   # `family = "xpoisson"` (`2.14.1.9003`)
 
-# Other changes
+## Other changes
 
 * Remove dependency on `plyr`. Fixes #301 (`2.14.1.9004`)
 

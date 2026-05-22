@@ -18,6 +18,8 @@ navbar:
         href: articles/random_fields.html
       - text: Spatial random field models in 2D
         href: articles/random_fields_2d.html
+      - text: Postprocessing tidiers
+        href: articles/tidiers.html
       - text: Publications
         href: articles/publications.html
       - text: ---

@@ -36,6 +36,16 @@ objects through three generics from the
 These make it straightforward to work with inlabru results inside tidy
 workflows (dplyr, ggplot2, etc.) without manually unpacking the `bru` object.
 
+Note that the column names in the broom framework are standardised in a way that
+in most cases are inaccurate in the Bayesian context (e.g. `std.error` in the
+frequentist context is the standard error of an estimator, but to allow these
+methods to work in a Bayesian context, the value used is the posterior standard
+deviation of the estimated quantity). However, the tidy output is still useful
+for quick summaries and plotting, and the column names are chosen to integrate
+with tidy tools that expect them.  Only fixed effects and hyperparameters are
+initially supported `tidy()`, not random effects; those may be added in a
+future version.
+
 Introduced in version `2.14.1.9005`.
 
 ## Set up
@@ -196,8 +206,8 @@ intercept) appear in `summary.fixed`; components with a random-effect model
 
 ```{r names, eval=inla_available}
 # fixed-effect component names → use <name>_latent in pred_formula to access
-# the coeficcients, and <name> to access the effect itself.
-names(fit$summary.fixed)
+# the coefficients, and <name> to access the effect itself.
+rownames(fit$summary.fixed)
 
 # random-effect component names (none in this model)
 names(fit$summary.random)

@@ -2890,7 +2890,9 @@ print.bru_obs_list <- function(x, ...) {
 #' @param \dots Further arguments passed on to the submethods
 #' @export
 #' @keywords internal
-#' @returns * `bru_obs_inla_family()` returns a string or vector of strings
+#' @returns * `bru_obs_inla_family()` returns a string or vector of strings of
+#' the `family` name(s) used in the `INLA::inla()` call for the observation
+#' model(s) in `x`.
 #' @rdname bru_obs_methods
 #' @name bru_obs_methods
 #' @seealso [summary.bru_obs()]
@@ -2906,6 +2908,36 @@ bru_obs_inla_family.bru_obs <- function(x, ...) {
 #' @rdname bru_obs_methods
 bru_obs_inla_family.bru_obs_list <- function(x, ...) {
   vapply(x, bru_obs_inla_family, "")
+}
+
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_inla_family.bru <- function(x, ...) {
+  bru_obs_inla_family(as_bru_obs_list(x), ...)
+}
+
+#' @returns * `bru_obs_family()` returns a string or vector of strings of
+#' the `family` name(s) used to define each `bru_obs()`. This may be different
+#' the internal technical name(s) used in the `INLA::inla()` call.
+#' @rdname bru_obs_methods
+bru_obs_family <- function(x, ...) {
+  UseMethod("bru_obs_family")
+}
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_family.bru_obs <- function(x, ...) {
+  x[["family"]]
+}
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_family.bru_obs_list <- function(x, ...) {
+  vapply(x, bru_obs_family, "")
+}
+
+#' @export
+#' @rdname bru_obs_methods
+bru_obs_family.bru <- function(x, ...) {
+  bru_obs_family(as_bru_obs_list(x), ...)
 }
 
 #' @param control.family list of INLA `control.family` options to override
