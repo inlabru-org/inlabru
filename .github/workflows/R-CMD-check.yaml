@@ -7,9 +7,37 @@ on:
       - stable
       - release/*
       - feature/*
+    paths-ignore:
+      - "README.Rmd"
+      - "misc/**"
+      - "inst/**"
+      - "*.md"
+      - ".github/**"
+      - "*.json "
+      - "*.yaml"
+      - "*.yml"
+      - ".gitignore"
+      - "*.toml"
+      - "*.Rpoj"
+      - ".lintr"
+      - ".Rbuildignore"
   pull_request:
     branches:
       - devel
+    paths-ignore:
+      - "README.Rmd"
+      - "misc/**"
+      - "inst/**"
+      - "*.md"
+      - ".github/**"
+      - "*.json "
+      - "*.yaml"
+      - "*.yml"
+      - ".gitignore"
+      - "*.toml"
+      - "*.Rpoj"
+      - ".lintr"
+      - ".Rbuildignore"
   workflow_dispatch:
     inputs:
       debug_enabled:
