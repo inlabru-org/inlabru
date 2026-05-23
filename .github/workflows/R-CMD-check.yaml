@@ -10,7 +10,6 @@ on:
     paths-ignore:
       - "README.Rmd"
       - "misc/**"
-      - "inst/**"
       - "*.md"
       - ".github/**"
       - "*.json "
@@ -18,16 +17,14 @@ on:
       - "*.yml"
       - ".gitignore"
       - "*.toml"
-      - "*.Rpoj"
+      - "*.Rproj"
       - ".lintr"
-      - ".Rbuildignore"
   pull_request:
     branches:
       - devel
     paths-ignore:
       - "README.Rmd"
       - "misc/**"
-      - "inst/**"
       - "*.md"
       - ".github/**"
       - "*.json "
@@ -35,9 +32,8 @@ on:
       - "*.yml"
       - ".gitignore"
       - "*.toml"
-      - "*.Rpoj"
+      - "*.Rproj"
       - ".lintr"
-      - ".Rbuildignore"
   workflow_dispatch:
     inputs:
       debug_enabled:
