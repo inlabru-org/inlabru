@@ -14,6 +14,9 @@ bru_mapper_pipe(...)
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_pipe]{bm_pipe()}}}
 }
+\value{
+A \code{bm_pipe} mapper object.
+}
 \description{
 Create a pipe mapper, where \code{mappers} is a list of mappers,
 and the evaluated output of each mapper is handed as the state to the next

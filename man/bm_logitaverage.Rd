@@ -11,6 +11,9 @@ bm_logitaverage(n_block = NULL)
 the maximum block index in the inputs. The priority order is \code{input$n_block},
 the mapper definition \code{n_block}, then \code{max(input$block)}.}
 }
+\value{
+A \code{bm_logitaverage/bm_aggregate} mapper object.
+}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Constructs a mapper that averages elements of \code{plogis(state)}, with optional

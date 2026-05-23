@@ -15,8 +15,8 @@
 A one-row tibble of model-level summaries. \code{elapsed} is wall-clock
 seconds summed across the phases in \code{fit$bru_timings}, not CPU time.
 \code{nobs} is the total row count summed across all likelihoods, returned as
-\code{NA} for joint models that combine likelihoods of different families
-(where the sum is not statistically meaningful).
+\code{NA} for models that involve \code{family = "cp"}, as "observation count" is
+not meaningful for such models.
 }
 \description{
 Glance at a bru model fit

@@ -9,6 +9,9 @@ bm_linear()
 
 bru_mapper_linear()
 }
+\value{
+A \code{bm_linear} mapper object.
+}
 \description{
 Create a mapper for linear effects
 }
