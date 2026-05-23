@@ -7,33 +7,37 @@ on:
       - stable
       - release/*
       - feature/*
-    paths-ignore:
-      - "README.Rmd"
-      - "misc/**"
-      - "cran-comments.md"
-      - ".github/**"
-      - "*.json "
-      - "*.yaml"
-      - "*.yml"
-      - ".gitignore"
-      - "*.toml"
-      - "*.Rproj"
-      - ".lintr"
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/R-CMD-check.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   pull_request:
     branches:
       - devel
-    paths-ignore:
-      - "README.Rmd"
-      - "misc/**"
-      - "cran-comments.md"
-      - ".github/**"
-      - "*.json "
-      - "*.yaml"
-      - "*.yml"
-      - ".gitignore"
-      - "*.toml"
-      - "*.Rproj"
-      - ".lintr"
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/R-CMD-check.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   workflow_dispatch:
     inputs:
       debug_enabled:
