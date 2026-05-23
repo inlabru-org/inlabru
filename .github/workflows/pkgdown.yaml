@@ -24,7 +24,7 @@ jobs:
     # Per branch/PR concurrency restriction
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: ${{ (github.event_name == 'pull_request') || ((github.ref_name != 'devel') && (github.ref_name != 'stable')) }}
+      cancel-in-progress: true
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -96,6 +96,11 @@ jobs:
   deploy:
     if: ${{ github.event_name != 'pull_request' && github.ref_name == 'devel' }}
     runs-on: ubuntu-latest
+    # Prevent accidental deployment cancellation
+    # (may only be strictly needed for branch deployment)
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
     needs: pkgdown
     permissions:
       pages: write
