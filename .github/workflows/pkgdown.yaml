@@ -21,9 +21,10 @@ name: pkgdown
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs on devel
+    # Per branch/PR concurrency restriction
     concurrency:
-      group: pkgdown-${{ (github.event_name != 'pull_request' && github.ref_name == 'devel') || github.run_id }}
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ (github.event_name == 'pull_request') || ((github.ref_name != 'devel') && (github.ref_name != 'stable')) }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
