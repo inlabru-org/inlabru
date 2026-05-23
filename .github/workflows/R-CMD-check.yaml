@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.config.os }}
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.config.os }}-${{ matrix.config.r }}
       cancel-in-progress: true
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
