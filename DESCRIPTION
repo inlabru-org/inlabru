@@ -34,7 +34,7 @@ Authors@R: c(
          role = c("ctb", "cph"),
          comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette"),
   person("Novica", "Nakov", email = "nnovica@gmail.com", role = c("ctb"),
-         comment = c(ORCID = "0009-0005-7773-7718")))
+         comment = c(ORCID = "0009-0005-7773-7718"))
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
 BugReports: https://github.com/inlabru-org/inlabru/issues
