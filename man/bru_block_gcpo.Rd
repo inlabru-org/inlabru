@@ -8,46 +8,51 @@ bru_block_gcpo(fit, ...)
 }
 \arguments{
 \item{fit}{A fitted object of class \code{bru}, or a named list of such objects,
-or several such objects passed via \verb{\\dots}. Each must have been fitted with
-\code{control.gcpo = list(enable = TRUE)}
-so that \code{fit$gcpo$gcpo} is non-NULL. Each likelihood's \code{response_data}
-must contain a \code{BRU_block} column identifying block membership of each
-observation.}
+or several such objects passed via \verb{\\dots}. Each must have been fitted
+with \code{control.gcpo = list(enable = TRUE)} so that \code{fit$gcpo$gcpo} is
+non-NULL.}
 
-\item{\dots}{Additional fitted \code{bru} objects.}
+\item{\dots}{Additional named fitted \code{bru} objects.}
 }
 \value{
 For a single fit, a list with two elements:
 \describe{
-\item{\code{blocks}}{Named list with one element per likelihood, each a vector
-of unique block labels from \code{response_data$BRU_block}, in the order
-they are encountered.}
-\item{\code{gcpo}}{Block-averaged GCPO scores on the probability scale
-(consistent with \code{fit$cpo$cpo}). A numeric vector for single-likelihood
-models; a named list of numeric vectors for multi-likelihood models.}
+\item{\code{blocks}}{Named list with one element per likelihood, each a
+vector of block labels (for \code{"cp"} models: unique \code{BRU_block} values;
+for other models: observation indices).}
+\item{\code{gcpo}}{GCPO scores on the probability scale, consistent with
+\code{fit$cpo$cpo}. A numeric vector for single-likelihood models; a named
+list of numeric vectors for multi-likelihood models.}
 }
 For multiple fits, a named list of such objects, one per fit.
 }
 \description{
-After fitting a model with
-\code{control.gcpo = list(enable = TRUE)},
+After fitting a model with \code{control.gcpo = list(enable = TRUE)},
 this function reads the raw per-observation GCPO vector from
-\code{fit$gcpo$gcpo} and averages within each block defined by the \code{BRU_block}
-column in each likelihood's \code{response_data}, returning one score per block.
+\code{fit$gcpo$gcpo} and returns one score per block or observation group.
 
-Within each block, INLA repeats the same GCPO value for every observation
-belonging to that leave-out group. Taking the mean collapses the repeated
-values to one representative score per block. Scores are returned on the
-probability scale, consistent with \code{fit$cpo$cpo}.
+Two cases are handled automatically:
 
-For multi-likelihood models, the raw GCPO vector is the concatenation of
-all likelihoods in order; cumulative row offsets are computed automatically
-from \code{nrow(lh$response_data)} for each likelihood.
+\describe{
+\item{Block-based (lgcp / \code{"cp"} family)}{When \code{BRU_block} is present
+in \code{response_data} (populated automatically by the \code{"cp"} family
+machinery from the samplers structure), INLA repeats the same GCPO
+value for every observation in a leave-out block. The mean within
+each block collapses the repeated values to one score per block.}
+\item{Groups-based (all other families)}{When \code{BRU_block} is absent,
+INLA builds groups internally (via \code{num.level.sets} or \code{friends}) or
+from a user-supplied \code{groups} list. One score per observation is
+returned directly from \code{fit$gcpo$gcpo}.}
+}
+
+Scores are returned on the probability scale, consistent with
+\code{fit$cpo$cpo}. For multi-likelihood models, cumulative row offsets
+into the stacked INLA response vector are handled automatically.
 }
 \examples{
 \donttest{
 if (bru_safe_inla()) {
-  # Simple  model for the Gorillas nests
+  # Block-based example (lgcp)
   cvpart <- cv_hex(
     gorillas_sf$boundary,
     cellsize = 0.5,
@@ -56,49 +61,35 @@ if (bru_safe_inla()) {
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
-  nblock <- nrow(cvpart)
 
   nests <- gorillas_sf$nests
   a <- sf::st_intersects(nests, cvpart)
-  if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
-    stop("Point in none or multiple polygons")
-  }
   nests$.block <- unlist(a)
 
   fit1 <- lgcp(
-    components = geometry ~ Intercept(1),
+    geometry ~ Intercept(1),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(
-      enable = TRUE,
-      type.cv = "joint"
-    )
+    control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
-
   result <- bru_block_gcpo(fit1)
-
-  # block labels and one GCPO score per block
   result$blocks
   result$gcpo
   sum(log(result$gcpo))
 
-  # For multiple models
-  pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+  # Multiple models
+  pcmatern <- INLA::inla.spde2.pcmatern(
+    gorillas_sf$mesh,
     prior.sigma = c(1, 0.01),
     prior.range = c(0.1, 0.01)
   )
-
   fit2 <- lgcp(
-    components = geometry ~ Intercept(1) +
-      field(geometry, model = pcmatern),
+    geometry ~ Intercept(1) + field(geometry, model = pcmatern),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(
-      enable = TRUE,
-      type.cv = "joint"
-    )
+    control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
   result <- bru_block_gcpo(list(Model1 = fit1, Model2 = fit2))
   str(result)

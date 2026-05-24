@@ -15,9 +15,10 @@ passed via \verb{\\dots}.}
 \value{
 For a single-likelihood model, a \code{data.frame} with columns:
 \describe{
-\item{\code{block}}{Block labels from \code{response_data$BRU_block}.}
-\item{one column per model}{Block-averaged GCPO scores on the probability
-scale, named after the elements of \code{fits} or \verb{\\dots}.}
+\item{\code{block}}{Block labels from \code{response_data$BRU_block} (for \code{"cp"}
+models) or observation indices (for other models).}
+\item{one column per model}{GCPO scores on the probability scale, named
+after the elements of \code{fits} or \verb{\\dots}.}
 }
 For multi-likelihood models, a named list of such \code{data.frame}s, one per
 likelihood.
@@ -30,7 +31,6 @@ straightforward to compare GCPO scores across models block by block.
 \examples{
 \donttest{
 if (bru_safe_inla()) {
-  # Comparing two models for the Gorillas nests
   cvpart <- cv_hex(
     gorillas_sf$boundary,
     cellsize = 0.5,
@@ -39,40 +39,29 @@ if (bru_safe_inla()) {
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
-  nblock <- nrow(cvpart)
 
   nests <- gorillas_sf$nests
   a <- sf::st_intersects(nests, cvpart)
-  if (!all(vapply(a, function(x) (length(x) == 1), logical(1)))) {
-    stop("Point in none or multiple polygons")
-  }
   nests$.block <- unlist(a)
 
   fit1 <- lgcp(
-    components = geometry ~ Intercept(1),
+    geometry ~ Intercept(1),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(
-      enable = TRUE,
-      type.cv = "joint"
-    )
+    control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
-  pcmatern <- INLA::inla.spde2.pcmatern(gorillas_sf$mesh,
+  pcmatern <- INLA::inla.spde2.pcmatern(
+    gorillas_sf$mesh,
     prior.sigma = c(1, 0.01),
     prior.range = c(0.1, 0.01)
   )
-
   fit2 <- lgcp(
-    components = geometry ~ Intercept(1) +
-      field(geometry, model = pcmatern),
+    geometry ~ Intercept(1) + field(geometry, model = pcmatern),
     data = nests,
     samplers = cvpart,
     domain = list(geometry = gorillas_sf$mesh),
-    control.gcpo = list(
-      enable = TRUE,
-      type.cv = "joint"
-    )
+    control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
   gcpo_df <- bru_gcpo_table(Model1 = fit1, Model2 = fit2)
   names(gcpo_df)
