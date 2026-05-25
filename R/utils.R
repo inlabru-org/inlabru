@@ -101,9 +101,6 @@ bru_safe_inla <- function(multicore = NULL,
 }
 
 
-
-
-
 check_package_version_and_load <-
   function(pkg, minimum_version, quietly = FALSE) {
     version <- tryCatch(utils::packageVersion(pkg),
@@ -538,7 +535,6 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
   }
   val
 }
-
 
 
 terra_factor_levels <- function(data) {

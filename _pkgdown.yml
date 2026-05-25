@@ -130,6 +130,7 @@ reference:
   - starts_with("spde.posterior")
   - starts_with("deltaIC")
   - starts_with("devel.cvmeasure")
+  - matches("gcpo")
 - title: "Optimization log information"
   desc: "Accessing the optimization text log, and plotting the optimization convergence."
   contents:
