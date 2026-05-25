@@ -7,15 +7,54 @@ on:
       - stable
       - release/*
       - feature/*
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/R-CMD-check-no-suggests.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   pull_request:
     branches:
       - devel
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/R-CMD-check-no-suggests.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 name: R-CMD-check-no-suggests
 
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.config.os }}-${{ matrix.config.r }}
+      cancel-in-progress: true
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
@@ -34,7 +73,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
 

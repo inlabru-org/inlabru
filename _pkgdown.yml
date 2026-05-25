@@ -18,6 +18,8 @@ navbar:
         href: articles/random_fields.html
       - text: Spatial random field models in 2D
         href: articles/random_fields_2d.html
+      - text: Postprocessing tidiers
+        href: articles/tidiers.html
       - text: Publications
         href: articles/publications.html
       - text: ---
@@ -215,6 +217,12 @@ reference:
   - starts_with("bru_call_options", internal = TRUE)
   - starts_with("bru_compute_linearisation", internal = TRUE)
   - starts_with("bru_is_additive", internal = TRUE)
+- title: "Tidy postprocessing"
+  desc: "Helper functions for 'tidy' postprocessing."
+  contents:
+  - matches("^tidy.bru$")
+  - matches("^glance.bru$")
+  - matches("^augment.bru$")
 - title: "Deprecated methods"
   desc: "Deprecated methods"
   contents:

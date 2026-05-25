@@ -25,8 +25,11 @@ knitr::opts_chunk$set(
 
 Introduction
 ----------------
-We're going to estimate distribution and abundance from a line transect survey of dolphins in the Gulf of Mexico. These data are 
-also available in the `R` package `dsm` (where they go under the name `mexdolphins`). In `inlabru` the data are called `mexdolphin` for `sp` format, and `mexdolphin_sf` for `sf` format.
+We're going to estimate distribution and abundance from a line transect survey
+of dolphins in the Gulf of Mexico. These data are also available in the `R`
+package `dsm` (where they go under the name `mexdolphins`). In `inlabru` the
+data are called `mexdolphin_sf` for `sf` format, and `sp` an format can be
+obtained using the `mexdolphin_sp()` function.
 
 Setting things up
 ----------------

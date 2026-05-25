@@ -27,6 +27,9 @@ will set it the required setting.}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_factor]{bm_factor()}}}
 }
+\value{
+A \code{bm_factor} mapper object.
+}
 \description{
 Create a factor mapper
 }

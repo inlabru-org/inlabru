@@ -5,6 +5,11 @@
 \alias{bru_obs_inla_family}
 \alias{bru_obs_inla_family.bru_obs}
 \alias{bru_obs_inla_family.bru_obs_list}
+\alias{bru_obs_inla_family.bru}
+\alias{bru_obs_family}
+\alias{bru_obs_family.bru_obs}
+\alias{bru_obs_family.bru_obs_list}
+\alias{bru_obs_family.bru}
 \alias{bru_obs_control_family}
 \alias{bru_obs_control_family.bru_obs}
 \alias{bru_obs_control_family.bru_obs_list}
@@ -15,6 +20,16 @@ bru_obs_inla_family(x, ...)
 \method{bru_obs_inla_family}{bru_obs}(x, ...)
 
 \method{bru_obs_inla_family}{bru_obs_list}(x, ...)
+
+\method{bru_obs_inla_family}{bru}(x, ...)
+
+bru_obs_family(x, ...)
+
+\method{bru_obs_family}{bru_obs}(x, ...)
+
+\method{bru_obs_family}{bru_obs_list}(x, ...)
+
+\method{bru_obs_family}{bru}(x, ...)
 
 bru_obs_control_family(x, control.family = NULL, ...)
 
@@ -31,7 +46,15 @@ bru_obs_control_family(x, control.family = NULL, ...)
 }
 \value{
 \itemize{
-\item \code{bru_obs_inla_family()} returns a string or vector of strings
+\item \code{bru_obs_inla_family()} returns a string or vector of strings of
+the \code{family} name(s) used in the \code{INLA::inla()} call for the observation
+model(s) in \code{x}.
+}
+
+\itemize{
+\item \code{bru_obs_family()} returns a string or vector of strings of
+the \code{family} name(s) used to define each \code{bru_obs()}. This may be different
+the internal technical name(s) used in the \code{INLA::inla()} call.
 }
 
 \itemize{

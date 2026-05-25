@@ -14,8 +14,11 @@ bru_mapper_index(...)
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_index]{bm_index()}}}
 }
+\value{
+A \code{bm_index} mapper object.
+}
 \description{
-Create a an indexing mapper
+Create an indexing mapper
 }
 \examples{
 m <- bm_index(4)

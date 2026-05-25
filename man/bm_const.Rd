@@ -9,6 +9,9 @@ bm_const()
 
 bru_mapper_const()
 }
+\value{
+A \code{bm_const} mapper object.
+}
 \description{
 Create a constant mapper
 }

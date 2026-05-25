@@ -27,6 +27,9 @@ the mapper definition \code{n_block}, then \code{max(input$block)}.}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_logsumexp]{bm_logsumexp()}}}
 }
+\value{
+A \code{bm_logsumexp/bm_aggregate} mapper object.
+}
 \description{
 Constructs a mapper
 that aggregates elements of \code{exp(state)}, with optional non-negative

@@ -77,6 +77,11 @@ Default \code{TRUE}}
 
 \item{sep}{character; separator for printing the summary.}
 }
+\value{
+\itemize{
+\item \code{format} character.
+}
+}
 \description{
 mapper object summaries
 }

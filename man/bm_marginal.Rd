@@ -34,6 +34,9 @@ defines a mapping from standard Normal to a specified distribution.
 If \code{TRUE}, it defines a mapping from the specified distribution to a standard
 Normal.}
 }
+\value{
+A \code{bm_marginal} mapper object.
+}
 \description{
 Constructs a mapper that transforms the marginal distribution \code{state} from
 \eqn{\textrm{N}(0,1)}{N(0, 1)} to the distribution of a given (continuous)
