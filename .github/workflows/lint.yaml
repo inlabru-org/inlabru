@@ -3,8 +3,36 @@
 on:
   push:
     branches: [devel, release/*, feature/*]
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/lint.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - ".lintr"
   pull_request:
     branches: [devel]
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/lint.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - ".lintr"
 
 name: lint
 

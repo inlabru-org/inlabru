@@ -4,9 +4,40 @@ on:
   push:
     branches:
       - devel
+      - stable
+      - release/*
+      - feature/*
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/test-coverage.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   pull_request:
     branches:
       - devel
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/test-coverage.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
 
 name: test-coverage
 

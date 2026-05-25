@@ -5,9 +5,37 @@ on:
     branches:
       - devel
       - feature/*
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/pkgdown.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   pull_request:
     branches:
       - devel
+    paths:
+      - "**"
+      - "!README.Rmd"
+      - "!misc/**"
+      - "!cran-comments.md"
+      - "!.github/**"
+      - ".github/workflows/pkgdown.yaml"
+      - "!*.json "
+      - "!*.yaml"
+      - "!*.yml"
+      - "!.gitignore"
+      - "!*.toml"
+      - "!*.Rproj"
+      - "!.lintr"
   workflow_dispatch:
     inputs:
       debug_enabled:
