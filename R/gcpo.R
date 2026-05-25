@@ -132,7 +132,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
                                               control.gcpo = NULL,
                                               ...) {
   response_sizes <- bru_response_size(x)
-  
+
   any_element <- vapply(
     c("groups", "selection", "group.selection", "friends", "weights"),
     function(nm) {
@@ -147,7 +147,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     },
     TRUE
   )
-  
+
   c.gcpo <- lapply(
     seq_along(x),
     function(k) {
@@ -159,7 +159,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
       )
     }
   )
-  
+
   # If given in one model, must be given in all models
   c.gcpo.combined <- list()
   for (nm in c("groups", "selection", "group.selection")) {
@@ -173,7 +173,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
         do.call("c", lapply(c.gcpo, function(lh) lh[[nm]]))
     }
   }
-  
+
   # Combine friends only when present (not combined with groups)
   if (any(vapply(c.gcpo, function(lh) !is.null(lh[["friends"]]), TRUE))) {
     c.gcpo.combined[["friends"]] <-
@@ -183,7 +183,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     c.gcpo.combined[["weights"]] <-
       unlist(lapply(c.gcpo, function(lh) lh[["weights"]]))
   }
-  
+
   merge_list_check <- function(a, b, exclude = character(0)) {
     for (nm in setdiff(names(b), exclude)) {
       if (nm %in% names(a)) {
@@ -199,7 +199,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
     }
     a
   }
-  
+
   exc <- names(c.gcpo.combined)
   if (!is.null(control.gcpo)) {
     c.gcpo.combined <- merge_list_check(
@@ -215,7 +215,7 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
       exclude = exc
     )
   }
-  
+
   c.gcpo.combined
 }
 
@@ -223,8 +223,8 @@ bru_obs_control_gcpo.bru_obs_list <- function(x,
 # Path 1: BRU_block based extraction (lgcp / cp family)
 bru_block_gcpo_from_block <- function(lh, gcpo_vec, offset) {
   blk_var <- lh[["response_data"]][["BRU_block"]]
-  blocks  <- unique(blk_var)
-  gcpo    <- vapply(
+  blocks <- unique(blk_var)
+  gcpo <- vapply(
     blocks,
     function(b) mean(gcpo_vec[which(blk_var == b) + offset]),
     numeric(1)
@@ -235,7 +235,7 @@ bru_block_gcpo_from_block <- function(lh, gcpo_vec, offset) {
 
 # Path 2: groups based extraction (all other families)
 bru_block_gcpo_from_groups <- function(lh, gcpo_vec, offset) {
-  n   <- bru_response_size(lh)
+  n <- bru_response_size(lh)
   idx <- offset + seq_len(n)
   list(
     blocks = seq_len(n),
@@ -251,7 +251,7 @@ bru_block_gcpo_from_groups <- function(lh, gcpo_vec, offset) {
 # is a standard family.
 bru_block_gcpo_single <- function(fit) {
   fit <- bru_check_object_bru(fit)
-  
+
   gcpo_vec <- fit[["gcpo"]][["gcpo"]]
   if (is.null(gcpo_vec)) {
     stop(
@@ -259,23 +259,23 @@ bru_block_gcpo_single <- function(fit) {
       "control.gcpo = list(enable = TRUE)."
     )
   }
-  
-  lhoods  <- as_bru_obs_list(fit)
+
+  lhoods <- as_bru_obs_list(fit)
   nlhoods <- length(lhoods)
-  
+
   # Cumulative offsets into the stacked GCPO vector
-  n_per_lhood  <- vapply(lhoods, function(lh) bru_response_size(lh), integer(1))
+  n_per_lhood <- vapply(lhoods, function(lh) bru_response_size(lh), integer(1))
   index_offset <- c(0L, cumsum(n_per_lhood))
-  
+
   # Sanitise likelihood names
   lhood_names <- names(lhoods)
   if (is.null(lhood_names) || all(is.na(lhood_names))) {
     lhood_names <- paste0("lhood", seq_len(nlhoods))
   }
-  
+
   # Per-likelihood dispatch
   results <- lapply(seq_len(nlhoods), function(k) {
-    lh     <- lhoods[[k]]
+    lh <- lhoods[[k]]
     offset <- index_offset[k]
     if (!is.null(lh[["response_data"]][["BRU_block"]])) {
       bru_block_gcpo_from_block(lh, gcpo_vec, offset)
@@ -284,17 +284,17 @@ bru_block_gcpo_single <- function(fit) {
     }
   })
   names(results) <- lhood_names
-  
+
   if (nlhoods == 1L) {
     return(list(
       blocks = setNames(list(results[[1L]]$blocks), lhood_names[1L]),
       gcpo   = results[[1L]]$gcpo
     ))
   }
-  
+
   list(
     blocks = setNames(lapply(results, `[[`, "blocks"), lhood_names),
-    gcpo   = setNames(lapply(results, `[[`, "gcpo"),   lhood_names)
+    gcpo   = setNames(lapply(results, `[[`, "gcpo"), lhood_names)
   )
 }
 
@@ -396,11 +396,11 @@ bru_block_gcpo <- function(fit, ...) {
     c(list(fit), list(...))
   }
   fits <- Filter(Negate(is.null), fits)
-  
+
   if (length(fits) == 1L) {
     return(bru_block_gcpo_single(fits[[1]]))
   }
-  
+
   results <- lapply(fits, bru_block_gcpo_single)
   if (!is.null(names(fits))) {
     names(results) <- names(fits)
@@ -475,7 +475,7 @@ bru_block_gcpo <- function(fit, ...) {
 #' @export
 bru_gcpo_table <- function(fits = NULL, ...) {
   dots <- list(...)
-  
+
   if (is.null(fits)) {
     fits <- dots
   } else if (inherits(fits, "bru")) {
@@ -483,7 +483,7 @@ bru_gcpo_table <- function(fits = NULL, ...) {
   } else {
     fits <- c(fits, dots)
   }
-  
+
   if (length(fits) == 0L) {
     stop("No fitted bru objects supplied.")
   }
@@ -496,13 +496,13 @@ bru_gcpo_table <- function(fits = NULL, ...) {
       "Use bru_block_gcpo() for a single fit."
     )
   }
-  
+
   results <- bru_block_gcpo(fits)
-  
+
   # Detect single vs multi-likelihood from first result
-  first   <- results[[1]]
+  first <- results[[1]]
   nlhoods <- length(first$blocks)
-  
+
   build_df <- function(lhood_idx) {
     blocks <- first$blocks[[lhood_idx]]
     df <- data.frame(block = blocks)
@@ -512,11 +512,11 @@ bru_gcpo_table <- function(fits = NULL, ...) {
     }
     df
   }
-  
+
   if (nlhoods == 1L) {
     return(build_df(1L))
   }
-  
+
   out <- lapply(seq_len(nlhoods), build_df)
   names(out) <- names(first$blocks)
   out

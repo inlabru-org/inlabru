@@ -86,18 +86,18 @@ test_that("Joint gcpo", {
 test_that("bru_block_gcpo works for regular gaussian models", {
   skip_on_cran()
   local_bru_safe_inla()
-  
+
   set.seed(123)
   n <- 50
   df <- data.frame(x = runif(n))
-  df$y      <- 2 + 3 * df$x + rnorm(n, sd = 0.5)
-  
+  df$y <- 2 + 3 * df$x + rnorm(n, sd = 0.5)
+
   gcpo_opts <- list(
     enable         = TRUE,
     type.cv        = "joint",
     num.level.sets = 2
   )
-  
+
   # fit full model with auto-generated groups
   fit_full <- bru(
     y ~ Intercept(1) + x,
@@ -105,65 +105,66 @@ test_that("bru_block_gcpo works for regular gaussian models", {
     data         = df,
     control.gcpo = gcpo_opts
   )
-  
+
   # basic structure
   expect_false(is.null(fit_full$gcpo$gcpo))
   expect_length(fit_full$gcpo$gcpo, n)
-  
+
   # bru_block_gcpo_single and bru_block_gcpo give same result
   res_single <- bru_block_gcpo_single(fit_full)
-  res        <- bru_block_gcpo(fit_full)
+  res <- bru_block_gcpo(fit_full)
   expect_identical(res_single, res)
-  
+
   # correct structure
   expect_named(res, c("blocks", "gcpo"))
   expect_type(res$gcpo, "double")
   expect_length(res$gcpo, n)
-  
+
   # scores on probability scale
   expect_true(all(res$gcpo > 0))
-  
+
   # fit null model with fixed groups from full model
   fixed_groups <- fit_full$gcpo$groups
   fit_null <- bru(
     y ~ Intercept(1),
-    family       = "gaussian",
-    data         = df,
+    family = "gaussian",
+    data = df,
     control.gcpo = list(
       enable  = TRUE,
       type.cv = "joint",
       groups  = fixed_groups
     )
   )
-  
+
   res_null <- bru_block_gcpo(fit_null)
   expect_named(res_null, c("blocks", "gcpo"))
   expect_length(res_null$gcpo, n)
-  
+
   # bru_gcpo_table
   tbl <- bru_gcpo_table(full = fit_full, null = fit_null)
-  
+
   expect_s3_class(tbl, "data.frame")
   expect_named(tbl, c("block", "full", "null"))
   expect_equal(nrow(tbl), n)
-  
+
   # log scores and summary
   tbl[, -1] <- log(tbl[, -1])
   tbl$gcpo_summary <- rowSums(tbl[, -1])
   expect_equal(ncol(tbl), 4L)
-  
+
   gcpo_summary <- data.frame(
     gcpo      = colSums(tbl[, c("full", "null")]),
     row.names = c("full", "null")
   )
   expect_named(gcpo_summary, "gcpo")
   expect_equal(nrow(gcpo_summary), 2L)
-  
+
   # full model should have higher total log score
   expect_gt(gcpo_summary["full", "gcpo"], gcpo_summary["null", "gcpo"])
 })
 
-test_that("bru_block_gcpo returns correct structure for single likelihood with cp family", {
+test_that("bru_block_gcpo returns correct structure for single likelihood with
+          cp family", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
@@ -210,7 +211,8 @@ test_that("bru_block_gcpo returns correct structure for single likelihood with c
   expect_true(all(result$gcpo > 0))
 })
 
-test_that("bru_block_gcpo returns correct structure for multiple likelihoods with cp family", {
+test_that("bru_block_gcpo returns correct structure for multiple likelihoods
+          with cp family", {
   skip_on_cran()
   local_bru_safe_inla()
   skip_if_not_installed("sf")
@@ -375,30 +377,30 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   local_bru_safe_inla()
   skip_if_not_installed("sf")
   skip_if_not_installed("fmesher")
-  
+
   set.seed(123)
-  
+
   # unit square mesh
-  loc.domain <- matrix(c(0,0, 1,0, 1,1, 0,1), ncol = 2, byrow = TRUE)
+  loc.domain <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), ncol = 2, byrow = TRUE)
   mesh <- fmesher::fm_mesh_2d_inla(
     loc.domain = loc.domain,
     max.edge   = c(0.2, 0.3),
     offset     = c(0.1, 0.1)
   )
-  
+
   # unit square boundary
   boundary <- sf::st_as_sf(sf::st_sfc(
     sf::st_polygon(list(
-      matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol = 2, byrow = TRUE)
+      matrix(c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0), ncol = 2, byrow = TRUE)
     ))
   ))
-  
+
   # block grid
   cvpart <- cv_hex(boundary, cellsize = 0.1, n_group = 1)
   cvpart$block_ID <- seq_len(nrow(cvpart))
-  cvpart$group    <- NULL
+  cvpart$group <- NULL
   nblock <- nrow(cvpart)
-  
+
   # point pattern data
   n_cp <- 30
   pts <- sf::st_as_sf(
@@ -408,14 +410,14 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   a <- sf::st_intersects(pts, cvpart)
   if (any(lengths(a) != 1)) stop("Point in none or multiple polygons")
   pts$.block <- unlist(a)
-  
+
   # gaussian data
   n_g <- 20
   df_gauss <- data.frame(
     y = rnorm(n_g, mean = 2, sd = 0.5),
     x = runif(n_g)
   )
-  
+
   # likelihoods
   lik_gauss <- bru_obs(
     y ~ Intercept,
@@ -433,27 +435,26 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
     control.gcpo = list(enable = TRUE, type.cv = "joint"),
     tag          = "cp"
   )
-  
+
   fit <- bru(~ Intercept(1), lik_gauss, lik_cp)
-  
+
   # raw gcpo vector should exist
   expect_false(is.null(fit$gcpo$gcpo))
-  
+
   # test bru_block_gcpo
   result <- bru_block_gcpo(fit)
-  
+
   # correct top-level structure
   expect_named(result, c("blocks", "gcpo"))
-  
+
   # two likelihoods
   expect_length(result$blocks, 2L)
   expect_named(result$blocks, c("gauss", "cp"))
-  expect_named(result$gcpo,   c("gauss", "cp"))
-  
+  expect_named(result$gcpo, c("gauss", "cp"))
+
   # gauss: groups path - one score per observation
   expect_length(result$gcpo$gauss, n_g)
-  
+
   # cp: block path - one score per spatial block
   expect_length(result$gcpo$cp, nblock)
-  
 })
