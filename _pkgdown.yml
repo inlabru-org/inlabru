@@ -85,23 +85,6 @@ navbar:
         href: articles/classes.html
 
 redirects:
-  - ["articles/web/Apptainer.html", "articles/Apptainer.html"]
-  - ["articles/web/publications.html", "articles/publications.html"]
-  - ["articles/web/2d_lgcp_multilikelihood.html", "articles/2d_lgcp_multilikelihood.html"]
-  - ["articles/web/2d_lgcp_spatiotemporal.html", "articles/2d_lgcp_spatiotemporal.html"]
-  - ["articles/web/2d_lgcp.html", "articles/2d_lgcp.html"]
-  - ["articles/web/2d_lgcp_sf.html", "articles/2d_lgcp_sf.html"]
-  - ["articles/web/1d_lgcp.html", "articles/1d_lgcp_.html"]
-  - ["articles/web/2d_lgcp_plotsampling.html", "articles/2d_lgcp_plotsampling.html"]
-  - ["articles/web/2d_lgcp_distancesampling.html", "articles/2d_lgcp_distancesampling.html"]
-  - ["articles/web/2d_lgcp_covars.html", "articles/2d_lgcp_covars.html"]
-  - ["articles/web/2d_lgcp_residuals_sf.html", "articles/2d_lgcp_residuals_sf.html"]
-  - ["articles/web/2d_lgcp_residuals.html", "articles/2d_lgcp_residuals.html"]
-  - ["articles/web/random_fields.html", "articles/random_fields.html"]
-  - ["articles/web/mesh_mapping.html", "articles/mesh_mapping.html"]
-  - ["articles/web/devel_flow.html", "articles/devel_flow.html"]
-  - ["articles/web/svc.html", "articles/svc.html"]
-  - ["articles/web/random_fields_2d.html", "articles/random_fields_2d.html"]
   - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
   - ["articles/components_vignette.html", "articles/component.html"]
 
