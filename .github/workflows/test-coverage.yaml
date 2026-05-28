@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - devel
-      - stable
-      - release/*
-      - feature/*
     paths:
       - "**"
       - "!README.Rmd"

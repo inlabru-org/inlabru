@@ -3,22 +3,9 @@
 on:
   push:
     branches:
+      - stable
       - devel
       - feature/*
-    paths:
-      - "**"
-      - "!README.Rmd"
-      - "!misc/**"
-      - "!cran-comments.md"
-      - "!.github/**"
-      - ".github/workflows/pkgdown.yaml"
-      - "!*.json "
-      - "!*.yaml"
-      - "!*.yml"
-      - "!.gitignore"
-      - "!*.toml"
-      - "!*.Rproj"
-      - "!.lintr"
   pull_request:
     branches:
       - devel
@@ -47,7 +34,8 @@ on:
 name: pkgdown
 
 jobs:
-  pkgdown:
+  pkgdown-stable:
+    if: ${{ github.ref_name == 'stable' }}
     runs-on: ubuntu-latest
     # Per branch/PR concurrency restriction
     concurrency:
@@ -57,8 +45,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
-      pages: write
-      id-token: write
 
     steps:
       - uses: actions/checkout@v6
@@ -105,31 +91,108 @@ jobs:
           source("vignettes/articles/mermaid_updater.R")
         shell: Rscript {0}
 
-      - name: Fix temporary out-of-sync binary packages
+      - name: Build site
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
+        shell: Rscript {0}
+
+      - name: Deploy to documentation branch 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          clean: false
+          branch: gh-pages
+          folder: docs
+
+  pkgdown-devel:
+    if: ${{ github.ref_name != 'stable' }}
+    runs-on: ubuntu-latest
+    # Per branch/PR concurrency restriction
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: docs
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          r-version: "release"
+          extra-repositories: 'https://inla.r-inla-download.org/R/testing https://inlabru-org.r-universe.dev'
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgdown
+            local::.
+            any::RColorBrewer
+            any::ggplot2
+            any::dplyr
+            any::lwgeom
+            any::tmaptools
+            any::patchwork
+            any::raster
+          needs: website
+
+      - name: Session info
         run: |
-          install.packages("MatrixModels", repos = "https://cloud.r-project.org", type = "source")
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      # https://mxschmitt.github.io/action-tmate/
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          limit-access-to-actor: true
+
+      - name: Mermaid update
+        run: |
+          source("vignettes/articles/mermaid_updater.R")
         shell: Rscript {0}
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
         shell: Rscript {0}
 
-      - name: Upload website for deployment 🚀
-        if: ${{ github.event_name != 'pull_request' && github.ref_name == 'devel' }}
+      - name: Build multi-version menus
+        run: |
+          source("misc/pkgdown_menu_builder.R")
+          update_menus("docs")
+        shell: Rscript {0}
+
+      - name: Upload full website for deployment 🚀
+        if: ${{ github.ref_name == 'devel' && github.event_name != 'pull_request' }}
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs
           retention-days: 7
 
   deploy:
-    if: ${{ github.event_name != 'pull_request' && github.ref_name == 'devel' }}
+    if: ${{ github.ref_name == 'devel' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     # Prevent accidental deployment cancellation
     # (may only be strictly needed for branch deployment)
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: false
-    needs: pkgdown
+    needs: pkgdown-devel
     permissions:
       pages: write
       id-token: write
@@ -143,5 +206,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
-
-
