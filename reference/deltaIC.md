@@ -1,0 +1,64 @@
+# Summarise DIC from `lgcp` estimates.
+
+Calculates DIC differences and produces an ordered summary.
+
+## Usage
+
+``` r
+deltaIC(..., criterion = "DIC")
+```
+
+## Arguments
+
+- ...:
+
+  Comma-separated objects inheriting from class `inla` and obtained from
+  a run of [`INLA::inla()`](https://rdrr.io/pkg/INLA/man/inla.html),
+  [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md) or
+  [`lgcp()`](https://inlabru-org.github.io/inlabru/reference/lgcp.md)
+
+- criterion:
+
+  character vector. If it includes 'DIC', computes DIC differences;
+  'WAIC' is also allowed, but note that plain WAIC values from inla are
+  not well-defined for point process models. Default 'WAIC'
+
+## Value
+
+A data frame with each row containing the Model name, DIC and Delta.DIC.
+
+## Examples
+
+``` r
+# \donttest{
+if (bru_safe_inla()) {
+  # Generate some data
+  input.df <- data.frame(idx = 1:10) |>
+    dplyr::mutate(
+      x = cos(idx),
+      y = rpois(length(x), 5 + 2 * x + rnorm(length(x), mean = 0, sd = 0.1))
+    )
+
+  # Fit two models
+  fit1 <- bru(
+    y ~ x,
+    family = "poisson",
+    data = input.df,
+    options = list(control.compute = list(dic = TRUE))
+  )
+  fit2 <- bru(
+    y ~ x + rand(idx, model = "iid"),
+    family = "poisson",
+    data = input.df,
+    options = list(control.compute = list(dic = TRUE))
+  )
+
+  # Compare DIC
+
+  deltaIC(fit1, fit2)
+}
+#>   Model      DIC  Delta.DIC
+#> 1  fit2 45.13102 0.00000000
+#> 2  fit1 45.13967 0.00864789
+# }
+```

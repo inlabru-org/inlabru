@@ -1,0 +1,357 @@
+# Defining model components
+
+(Note: vignette under construction!)
+
+## Basic component features
+
+Model components are defined using a formula syntax that is similar to
+`R-INLA` but has some differences. The basic syntax is
+
+``` r
+~ my_component_name(
+  main = ...,
+  model = ...
+)
+```
+
+`my_component_name` is a user-chosen label for the model component. This
+label is used in model summaries, to label relevant parts of a fitted
+model object, and to access model components when sampling from a model
+using
+[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+and [`predict()`](https://rdrr.io/r/stats/predict.html).
+
+The `main` argument defines the input data for the component. For
+example, an intercept-like component has a vector of ones as an input.
+The linear effect of a covariate has the vector of covariate values as
+an input. A 2-dimensional SPDE effect takes a 2-column matrix of
+coordinate locations as an input. This argument can be a general `R`
+expression, more details on this are below. The `main` argument doesn’t
+not need to be named. Other arguments should normally be named, to avoid
+confusion.
+
+The type of model component is specified using the `model` component,
+(see
+[`?component`](https://inlabru-org.github.io/inlabru/reference/bru_comp.md),
+and `?INLA::inla.list.models()$latent`).
+
+Each component type has an associated `bru_mapper` method that takes
+`main` as an input and constructs the component design matrix. Users can
+also specify their own mapper methods (see
+[`?bru_mapper`](https://inlabru-org.github.io/inlabru/reference/bru_mapper.md)).
+
+This syntax replaces the
+[`INLA::f()`](https://rdrr.io/pkg/INLA/man/f.html) function that has the
+disadvantage that there is no clear separation between the name of the
+covariate and the label of the effect, and the user often has to do a
+substantial amount of pre-processing of data to construct relevant
+inputs. The documentation for defining model components can be viewed at
+[`?component`](https://inlabru-org.github.io/inlabru/reference/bru_comp.md).
+
+The rest of the vignette goes into more detail about defining model
+components and highlights some advantages of the syntax.
+
+## What is a component design matrix?
+
+A linear additive predictor of a latent Gaussian model can be written as
+\begin{equation} \eta(u)\_i = u_0 + \sum\_{k=1}^K a\_{ik} u\_{ik} ,
+\end{equation} where u is a multivariate Gaussian vector, a_k are input
+information such as covariates or weights for random effects and i = 1,
+\ldots, n. This can also be written as \eta(u) = Au, where A is the
+model design matrix with i-th row \left\[1, a\_{i1}, \ldots,
+a\_{iK}\right\].
+
+We can also conceptally think of the predictor as the sum of D model
+components, so that we partition A = \left\[A^{(1)} \cdots
+A^{(D)}\right\], and each component has an associated **component design
+matrix** A^{(d)}.
+
+For example, if the component is an intercept parameter, then A^{(d)} =
+\left\[1, \ldots, 1\right\]^\intercal. If the component is the linear
+effect of a covariate z then A^{(d)} = \left\[z_1, \ldots,
+z_n\right\]^\intercal. For more complicated effects, such as SPDE
+models, the component design matrix maps latent Gaussian parameters to
+the predictor (also known as the “projector” matrix in this context).
+The the construction of each A^{(d)} is handled automatically by
+`bru_mapper` methods, that define general (linear) **component effects**
+\eta^{(d)}(u^{(d)}) = A^{(d)} u^{(d)}.
+
+Each linear predictor is defined by \eta(u^{(1)},\dots,u^{(D)}) =
+\sum\_{d=1}^D \eta^{(d)}(u^{(d)}) = \sum\_{d=1}^D A^{(d)} u^{(d)} .
+Non-linear predictors are defined by R expressions where the component
+label denotes the corresponding component effect.
+
+### Mapper methods
+
+Each component type has an associated method for converting the
+information given in the component definition into a component design
+matrix. The full model design matrix is then used internally in a call
+[`INLA::inla()`](https://rdrr.io/pkg/INLA/man/inla.html) to fit the
+model.
+
+The advantage of specifying mapper methods is that it supports automatic
+‘stack building’. A key feature of `inlabru` is that the full model
+stack is constructed automatically from the component definitions. The
+building blocks of the stack are built using `bru_mapper` methods.
+
+#### Mapper example: 2D SPDE
+
+The mapper for the 2D SPDE effect takes as an input a 2-column matrix of
+coordinates that represent the locations are which to evaluate the
+effect. The parameters of the SPDE component are defined at mesh nodes
+that may not be the same as the locations at which the effect should be
+evaluated.
+
+The appropriate weights required to evaluate the effect at the
+observation locations can be constructed using
+[`fm_evaluator()`](https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html).
+The mapper for this model component takes the information in the
+component definition, in this case the minimum information required is
+an SPDE model object, and the 2-column matrix that `main` is evaluated
+to. The mapper then calls
+[`fm_evaluator()`](https://inlabru-org.github.io/fmesher/reference/fm_evaluate.html)
+with appropriate arguments extracted from this information.
+
+(NOTE: Deliberately not going into huge detail here; the
+[bru_mapper](https://inlabru-org.github.io/inlabru/articles/bru_mapper.md)
+vignette will have more details.)
+
+### Defining `main`, `group`, and `replicate`.
+
+The arguments `main`, `group`, and `replicate` can all take a general
+`R` expression as an input. This expression is then evaluated in an
+environment that consists of the named variables in the data (note: for
+`sp` objects this does *not* include the column names from the `@coords`
+slot, but does include the columns in `@data`).
+
+If the names are not found in the data then the global environment is
+searched for objects of that name.
+
+For example, suppose the data has columns named `x` and `y`, then a 2D
+SPDE model component could be specified as
+
+``` r
+~ my_spde_effect(
+  cbind(x, y),
+  model = spde_model
+)
+```
+
+The expression `cbind(x,y)` is internally evaluated in an environment
+that contains the columns of the data, which includes the variables `x`
+and `y`.
+
+The full data object can be accessed using the `.data.` key-word. An
+equivalent way to define the same component is
+
+``` r
+get_xy <- function(df) {
+  cbind(df$x, df$y)
+}
+~ my_spde_effect(
+  get_xy(.data.),
+  model = spde_model
+)
+```
+
+This keyword allows code to be written that works with arbitrarily named
+input data, rather than hardcoding with a specific name of a dataset
+that may change in future.
+
+If the objects required to evaluate the R expression cannot be found in
+the data, then the global environment is searched. This allows users to
+access objects in the global environment, such as other data-structures
+that may be of a different dimension to the response data. This avoids
+the need to pre-process everything into a single `data.frame`.
+
+The functionality of allowing general `R` expressions can be used to
+extend the types of data that can be passed to the
+[`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md),
+[`bru_obs()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
+and [`lgcp()`](https://inlabru-org.github.io/inlabru/reference/lgcp.md)
+functions. It is the basis for the support of spatial data structures
+such as `sp` objects, and there is also experimental support to allow
+users to pass data as a list. `inlabru` is thus readily extendible,
+given appropriate functions to extract the relevant information for each
+component, and associated mappers that convert this information into a
+component design matrix.
+
+In addition to the three main inputs, the optional `weights` argument
+also takes an R expression, and the result is used to scale the
+component. This can be used for spatially varying coefficient models,
+where the `weights` argument provides the covariate values.
+
+### `inlabru`-specific component types
+
+In addition to the majority of latent models that can be defined using
+[`INLA::f()`](https://rdrr.io/pkg/INLA/man/f.html) function (see
+`INLA::inla.list.models()$latent)`), `inlabru` also has the following
+models: `'linear'`, `'fixed'`, `'offset'`, `'factor_full'` and
+`'factor_contrast'`).
+
+## Shortcuts
+
+There are a few shortcuts to defining model components. They are for
+
+1.  Parameters that are the same for all predictor evaluations
+    (intercept-like parameters).
+2.  Using a covariate stored in an `sp` `Spatial*` or `terra`
+    `SpatRaster` object.
+3.  Defining linear effects using an `lm`-style syntax.
+4.  Behaviour for if `main`, `group` or `replicate` is a function given
+    with no arguments.
+
+### Intercept-like components
+
+The syntax
+
+``` r
+~ my_intercept(1)
+```
+
+can be used as a shortcut for
+
+``` r
+~ my_intercept(
+  main = rep(1, n),
+  model = "linear"
+)
+```
+
+where `n` is the length of the predictor vector. Note that this shortcut
+makes an assumption about the approriate length of the predictor. For
+many models this can be easily deduced by inspecting input data, but
+this is not always the case, for example if the response and covariate
+data are of different dimensions or for joint likelihood models with
+shared components.
+
+### Spatial covariates
+
+If `main`, `group`, or `replicate`, is the name of an `sf`,
+`SpatRaster`, or `Spatial*` object stored in the global `R` environment,
+then `inlabru` attempts to do something intelligent by extracting the
+covariate information at the locations of the data passed to
+[`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md) or
+[`bru_obs()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md).
+This **requires that this data is a `sf` or `SpatialPoints*` object**.
+`inlabru` does this by calling the
+[`inlabru::eval_spatial()`](https://inlabru-org.github.io/inlabru/reference/eval_spatial.md)
+method, which supports several covariate storage types.
+
+The shortcut
+
+``` r
+~ my_sp_effect(
+  main = a_spatial_object,
+  model = "linear"
+)
+```
+
+internally calls
+[`eval_spatial()`](https://inlabru-org.github.io/inlabru/reference/eval_spatial.md)
+which equivalent to
+
+``` r
+~ my_sp_effect(
+  main = eval_spatial(a_spatial_object, .data.),
+  model = "linear"
+)
+```
+
+Note that this requires `a_spatial_object` to be stored in the global
+`R` environment (or in the environment associated with the model
+definition code) so it is findable when the expression is internally
+evaluated by `inlabru`. Also note that the
+[`eval_spatial()`](https://inlabru-org.github.io/inlabru/reference/eval_spatial.md)
+function by default extracts the first column of the raster object. For
+more general situations, one can either specify the optional
+`main_layer` argument to extract another named or indexed column, or
+directly use
+`main = eval_spatial(a_spatial_object, .data., layer = some_layer)`.
+
+Note that this assumes that the data is either `sf`, so that
+`st_geometry(.data.)` retrieves point locations, or `sp` where
+`coordinates(.data.)` retrieves coordinates. This might not be a
+sensible thing for all models! For example, if the input data is a
+`SpatialPolygonsDataFrame` then `coordinates(.data.)` returns the
+centroid of each polygon. As more specific input type support is
+developed, and support for `sp` is gradually deprecated in favour of
+`sf` and `terra`, these special cases may be given more precise meaning.
+For example, the `a_spatial_object` above may be an `sf` or `sp` polygon
+object with data columns, which is interpreted as a spatially piecewise
+constant covariate.
+
+### `lm`-style fixed effect and interaction syntax
+
+Since `inlabru` version 2.5.0, a feature has been added to allow users
+to specify linear fixed effects using a formula as input. This uses the
+`model = 'fixed'` component type. The basic component input is a model
+matrix. Alternatively, one can supply a formula specification, which is
+then used to generate a model matrix automatically, with
+`MatrixModels::model.Matrix(formula, data = .data.)`. If you want a
+different kind of model matrix construction, replace `~ x1 + x2` by some
+other R code that generates the needed matrix, using the `.data.` object
+as input.
+
+Example syntax:
+
+``` r
+~ my_fixed_effects(
+  main = ~ x1:x2 + x3 * x4,
+  model = "fixed"
+)
+```
+
+which is equvalent to
+
+``` r
+~ my_fixed_effects(
+  main = MatrixModels::model.Matrix(~ x1:x2 + x3 * x4, .data.),
+  model = "fixed"
+)
+```
+
+where the data has columns named `x1`, `x2`, `x3`, and `x4`.
+
+This allows users to define interactions in a concise way, by utilising
+the functionality already supported by the `MatrixModels` package. The
+formula is interpreted in the conventional way, `x1:x2` is the
+interaction of covariates `x1` and `x2`, not including their individual
+fixed effects, and `x3 * x4` is the interaction of `x3` and `x4`
+inclusive of the individual fixed effects `x3` and `x4`. Note that for
+implementation technical reasons, the estimated parameters appear in
+`'summary.random'` instead of the normal `'summary.fixed'` part of the
+`inla`/`bru` output object.
+
+The alternative to using this shortcut would be for the user to define
+and name individual components for each term in the formula.
+
+### A function given with no arguments
+
+If `main`, `group`, or `replicate` are given as a function with no
+covariates, then this function is applied to the data. For example,
+
+``` r
+~ a_component(
+  main = a_function,
+  model = ...
+)
+```
+
+is equivalent to
+
+``` r
+~ a_component(
+  main = a_function(.data.),
+  model = ...
+)
+```
+
+### Non-linear predictors
+
+`inlabru` supports non-linear predictors, where \tilde{\eta}(u,v) is a
+non-linear function of \eta_u and \eta_v. It is important to note that
+the mapping each component effect vector \eta_u=A^{(u)} u happens
+**before** the non-linear function is applied. So, for example, if
+\tilde{\eta}(u,v) = \exp(\eta_u + \eta_v) then this is evaluated as
+\exp(A^{(u)} u + A^{(v)} v).

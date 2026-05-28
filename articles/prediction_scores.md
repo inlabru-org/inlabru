@@ -1,0 +1,603 @@
+# Prediction scores
+
+``` r
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+library(scoringRules)
+```
+
+## Proper posterior prediction scores
+
+A prediction **score** S(F,y) evaluates some measure of **closeness**
+between a prediction distribution identified by F, and an observed value
+y.
+
+### A basic score, and motivating remarks
+
+A common score is the **Squared Error**, S\_\text{SE}(F,y) = \[y -
+\mathbb{E}\_F(Y)\]^2, and we would like predictions to have low values
+for S\_\text{SE}(F,y), indicating a “good” prediction, in that specific
+sense that puts a penalty on the squared deviation of the prediction
+mean from the true observed value. We can imagine constructing other
+such scoring functions that penalise other aspects of the prediction.
+
+A score where “lower is better” is called negatively oriented, and a
+score where “higher is better” is called positively oriented. One can
+always turn one type of score into the other by changing the sign, so to
+simplify the presentation, we’ll make all scores be negatively oriented,
+like the squared error.
+
+We often care about the prediction uncertainty and not just the mean (or
+at least we *should* care!). Just adding a prediction variance penalty
+to the squared error wouldn’t be useful, as we could then construct a
+new, “better”, prediction by reducing the stated prediction variance to
+zero. This would understate the real prediction uncertainty, so wouldn’t
+be a fair scoring approach for comparing different prediction models. In
+the next section, we make this fairness idea more precise.
+
+### Proper and strictly proper scores
+
+The expected value under a distribution identified by G is denoted
+S(F,G):=\mathbb{E}\_{Y\sim F}\[S(F,Y)\]. For a negatively oriented
+score, we seek scoring functions that are **fair**, in the sense that
+one cannot, on average, make a better prediction that that which
+generated the data. This requires S(F,G)\geq S(G,G) for all predictive
+distributions F and any distribution G. Such scores are call **proper**.
+If in addition, equality of the score expectations only hold when F=G,
+the score is **strictly proper**.
+
+Non-strict proper scores ignore some aspect of the prediction, typically
+by only being sensitive to some summary information, such as the mean,
+median, and/or variance.
+
+It’s notable that proper scores retain their properness under affine
+transformations, with just potential changes in whether they are
+positively or negatively oriented. If S(F,y) is a proper score, then
+S'(F,y) = a + b S(F,y),\quad a,b\in\mathbb{R}, is also a proper score,
+with the same orientation if b\>0 and the opposite orientation if b\<0.
+The degenerate case b=0 gives the score a to all predictions, which is
+technically a proper score (you cannot to better than an ideal
+prediction), but a useless one (an ideal prediction is no better than
+any other prediction).
+
+### Examples
+
+- log-score: S\_\text{log}(F,y) = -\log\\p_F(y)\\, where p_F(y) is a
+  predictive pdf or pmf for y, is a strictly proper score.
+
+- Squared Error: S\_\text{SE}(F,y) = \[y - \mathbb{E}\_F(Y)\]^2 is a
+  proper score
+
+- Brier score:
+
+  - Binary events: S\_\text{Brier}(F,z) = \[z - \mathbb{P}\_F(Z =
+    1)\]^2, where Z\in\\0,1\\ is a binary event indicator, is a strictly
+    proper score for the event prediction, but non-strict with respect
+    to any underlying outcome y generating the event indicator, e.g. via
+    z=I(y=0).
+  - Class indicator events: if y\in\\1,\dots,K\\ is a class category
+    outcome, the Brier score can be generalised to
+    S\_\text{MultiBrier}(F,y) = \sum\_{k=1}^K \[I(y = k) -
+    \mathbb{P}\_F(Y=k)\]^2 which can be seen as the Squared Error for
+    the Multinomial prediction model for z_k=I(y=k), with
+    \\z_1,\dots,z_K\\\sim\text{Multinomial}(1,\\p_1,\dots,p_K\\), where
+    p_k=\mathbb{P}\_F(Y=k). Sometimes, the sum is normalised by 1/K.
+    This generalised Brier score is a proper score.
+
+- Dawid-Sebastiani: S\_\text{DS}(F,y)=\[y - \mathbb{E}\_F(Y)\]^2 /
+  \mathbb{V}\_F(Y) + \log\[\mathbb{V}\_F(Y)\] is a proper score. It’s
+  derived from the strictly proper log-score of a Gaussian prediction,
+  but it’s also a non-strict proper score for other distributions. It
+  has the advantage that it only involves the predictive mean and
+  variance, making it computable also in cases when log-densities are
+  hard to obtain. Since it’s based on the symmetric Gaussian
+  distribution, it tends to be affected by skewness, so should be
+  applied with care in such cases.
+
+- Absolute (Median) Error: S\_\text{AE}(F,y)=\|y - \text{median}\_F\| is
+  a proper score, with expectation minimised when the medians of F and G
+  match. Note that \|y-\mathbb{E}\_F(Y)\|, the absolute error with
+  respect to the *expectation*, is *not* a proper score! Another way of
+  expressing this is that if \|y-m_F\| is a proper score *with respect
+  to the median*, i.e. it is proper when m_F is taken to be the median
+  of F, and not some other point prediction. Unfortunately, the
+  predictive median is not readily available, and typically requires
+  sampling from the observation level predictive distribution, or
+  estimating the median of the a mixture distribution. In the applied
+  literature, this distinction is often overlooked, and the predictive
+  mean is inserted into both the SE and AE scores, making the resulting
+  AE score comparisons less clear than they could be.
+
+- CRPS (Continuous Ranked Probability Score):
+
+  S\_\text{CRPS}(F,y)= \int\_{-\infty}^\infty \[\mathbb{P}\_F(Y
+  \leq x) - I(y \leq x)\]^2 \\\mathrm{d}x This is a strictly proper
+  score, related to the absolute error of point predictions.
+
+Other scores include the Interval score that is minimised for short
+prediction intervals with the intended coverage probability, and the
+Quantile score, that generalises the Absolute Median Error to other
+quantiles than the median.
+
+### Improper scores
+
+We’ve seen that some scores are *strictly* proper, and others are only
+proper scores, sensitive to specific aspects of the predictive
+distribution, such as mean, median, and/or variance.
+
+In contrast, *improper* scores do not fulfil the fairness idea. Such
+scores include the the aforementioned penalised squared error,
+\[y-\mathbb{E}(Y)\]^2+\mathbb{V}\_F(Y), but also the probability/density
+function, p_F(y). The latter might come as a surprise, as the log-score
+*is* proper.
+
+### Mean error/score
+
+Up to this point, we only considered individual scores. When summarising
+predictions \\F_i\\ for a collection of observations \\y_i\\, we usually
+compute the mean score, S(\\F_i\\,\\y_i\\) = \frac{1}{N}\sum\_{i=1}^N
+S(F_i,y_i) .
+
+When comparing two different prediction models F and F', the scores are
+dependent with respect to the observations y_i. This means that in order
+to more easily handle the score variability in the comparison, we should
+treat it as a paired sample problem. The pairwise score differences are
+given by S(F_i,F'\_i,y_i) = S(F_i,y_i) - S(F'\_i,y_i) . It’s also much
+more reasonable to make conditional independence assumptions about these
+differences, than for the plain score values S(F_i,y_i);
+\mathbb{V}\_{\\y_i\\\sim G}\left\[\frac{1}{N}\sum\_{i=1}^N
+S(F_i,y_i)\right\] =
+\frac{1}{N^2}\sum\_{i=1}^N\sum\_{j=1}^N\mathbb{C}\_{\\y_i\\\sim
+G}\left\[S(F_i,y_i),S(F_j,y_j)\right\] but \mathbb{V}\_{\\y_i\\\sim
+G}\left\[\frac{1}{N}\sum\_{i=1}^N S(F_i,y_i) - S(F'\_i,y_i)\right\]
+\approx \frac{1}{N^2}\sum\_{i=1}^N\mathbb{V}\_{y_i\sim G_i}\left\[
+S(F_i,y_i) - S(F'\_i,y_i)\right\].
+
+Note that taking the average of prediction scores, or averages of
+prediction score differences, is quite different from assessing summary
+statistics of the collection of predictions, since the scores are
+individual for each observation; we’re not assessing the collective
+value distribution, as that might be misleading. For example, consider a
+spatial model where he estimated procession has an empirical
+distribution of the predictive means that matches that of the observed
+data. Scores based on the marginal empirical distribution would not be
+able to detect if the *location* of the values is maximally different to
+the actual locations, whereas averages of individual scores would be
+sensitive to this.
+
+## Poisson model example
+
+Consider a model with Poisson outcomes y, conditionally on a log-linear
+predictor \lambda=\exp(\eta), where \eta is some linear expression in
+latent variables.
+
+The posterior predictive distributions are Poisson mixture distributions
+across the posterior distribution of \lambda, p(\lambda\|\text{data}).
+
+For illustration purposes, consider a simple Poisson model with a single
+covariate x and a linear predictor \eta = \beta_0 + \beta_1 x.
+
+``` r
+df_pois <- tibble::tibble(
+  x = rnorm(50),
+  y = rpois(length(x), exp(2 + 1 * x))
+)
+fit_pois <- bru(
+  y ~ Intercept(1) + x,
+  family = "poisson",
+  data = df_pois
+)
+newdata_pois <- tibble::tibble(
+  x = rnorm(100),
+  y = rpois(100, exp(2 + 1 * x))
+)
+```
+
+### Moment scores
+
+For the Squared Error and Dawid-Sebastiani scores, we’ll need the
+posterior expectation and variance: \mathbb{E}(Y\|\text{data}) =
+\mathbb{E}\[\mathbb{E}(Y\|\lambda,\text{data}) \| \text{data}\] =
+\mathbb{E}(\lambda \| \text{data}) and \mathbb{V}(Y\|\text{data}) =
+\mathbb{E}\[\mathbb{V}(Y\|\lambda,\text{data}) \| \text{data}\] +
+\mathbb{V}\[\mathbb{E}(Y \| \lambda, \text{data}) \| \text{data}\] =
+\mathbb{E}\[\lambda \| \text{data}\] + \mathbb{V}\[\lambda \|
+\text{data}\] i.e. the sum of the posterior mean and variance for
+lambda.
+
+The SE and DS scores are therefore relatively easy to compute after
+estimating a model with `inlabru`. You just need to estimate the
+posterior mean and variance with
+[`predict()`](https://rdrr.io/r/stats/predict.html) for each test data
+point. If `Intercept+x` is the expression for the linear predictor, and
+`newdata` holds the covariate information for the prediction points, run
+
+``` r
+pred_pois <- predict(
+  fit_pois,
+  newdata_pois,
+  formula = ~ exp(Intercept + x),
+  n.samples = 2000
+)
+post_E <- pred_pois$mean
+post_Var <- pred_pois$mean + pred_pois$sd^2
+scores <- data.frame(
+  SE = (newdata_pois$y - post_E)^2,
+  DS = (newdata_pois$y - post_E)^2 / post_Var + log(post_Var)
+)
+summary(scores)
+#>        SE                  DS          
+#>  Min.   :5.200e-05   Min.   :0.006632  
+#>  1st Qu.:5.112e-01   1st Qu.:1.794468  
+#>  Median :4.897e+00   Median :3.086901  
+#>  Mean   :1.605e+01   Mean   :3.176005  
+#>  3rd Qu.:1.860e+01   3rd Qu.:4.219737  
+#>  Max.   :1.265e+02   Max.   :7.932984
+```
+
+### Log-Probability and log-density scores
+
+The full log-score can actually also be estimated/computed in a similar
+way. We seek, for a fixed observation y, \log\[\mathbb{P}(Y = y \|
+\text{data})\] The probability is \mathbb{P}(Y = y \| \text{data}) =
+\mathbb{E}\[\mathbb{P}(Y = y \| \lambda, \text{data}) \| \text{data}\],
+so we can estimate it using
+[`predict()`](https://rdrr.io/r/stats/predict.html):
+
+``` r
+pred_pois <- predict(fit_pois,
+  newdata_pois,
+  formula = ~ dpois(y, lambda = exp(Intercept + x)),
+  n.samples = 2000
+)
+log_score <- -log(pred_pois$mean)
+summary(log_score)
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#>  0.6746  1.8502  2.4290  2.4886  3.0308  5.1072
+```
+
+to estimate the log_score (increase `n.samples` if needed for
+sufficiently small Monte Carlo error). Approximate Monte Carlo
+confidence intervals for the scores can be obtained via the Monte Carlo
+standard errors:
+
+``` r
+head(
+  data.frame(
+    log_S = log_score,
+    lower = -log(pred_pois$mean + 2 * pred_pois$mean.mc_std_err),
+    upper = -log(pred_pois$mean - 2 * pred_pois$mean.mc_std_err)
+  )
+)
+#>      log_S    lower    upper
+#> 1 2.649383 2.645401 2.653381
+#> 2 3.256565 3.244013 3.269277
+#> 3 3.205647 3.194884 3.216526
+#> 4 2.677222 2.674192 2.680262
+#> 5 3.091761 3.081482 3.102147
+#> 6 2.044725 2.043634 2.045817
+```
+
+### CRPS
+
+Yet another option would be to use the CRPS, which for each prediction
+value y_i would be S\_\text{CRPS}(F_i,y_i) = \sum\_{k=0}^\infty
+\[\mathbb{P}(Y_i \leq k \|\text{data}) - I(y_i \leq k)\]^2 For this, one
+would first need to get \mathbb{P}(Y \leq k \| \text{data}) from a
+predict call with `ppois(k, lambda = exp(eta))`, for a vector
+k=0,1\dots,K, for each y_i, for some sufficiently large K\>\max_i{y_i}
+for the remainder to be negligible. However, to avoid repeated
+[`predict()`](https://rdrr.io/r/stats/predict.html) calls for each y_i,
+the storage requirements is of order (K+1) \times N\times
+N\_\text{samples}. To avoid that, one option would be to reformulate the
+estimator into a recursive estimator, so that batches of simulations
+could be used to iteratively compute the estimator.
+
+A basic estimator can proceed as follows:
+
+Define K\geq K_0=\max_i(y_i) sufficiently large for the posterior
+predictive probability above K to be negligible. Perhaps a value like
+K=K_0+4\sqrt{K_0} might be sufficient. You can check afterwards, and
+change if needed.
+
+1.  Simulate samples from \lambda^{(j)}\sim p(\lambda\|\text{data})
+    using
+    [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+    (size N\times N\_\text{samples}).
+2.  For each i=1,\dots,N, use the samples to estimate the residuals
+    r\_{ik}=\mathbb{P}(Y\leq k\|\text{data})-I(y_i\leq k), for k\in
+    0,1,2,\dots,K, with
+
+\widehat{r}\_{ik} = \frac{1}{N\_\text{samples}}
+\sum\_{j=1}^{N\_\text{samples}} \\ \mathbb{P}(Y\leq
+k\|\lambda^{(j)}\_i) - I(y_i\leq k) \\ . 3. Compute
+
+\widehat{S}\_\text{CRPS}(F_i,y_i) = \sum\_{k=0}^{K} \widehat{r}\_{ik}^2
+
+``` r
+# some large value, so that 1-F(K) is small
+max_K <- ceiling(max(newdata_pois$y) + 4 * sqrt(max(newdata_pois$y)))
+k <- seq(0, max_K)
+kk <- rep(k, times = length(newdata_pois$y))
+i <- seq_along(newdata_pois$y)
+pred_pois <- generate(fit_pois, newdata_pois,
+  formula = ~ {
+    lambda <- exp(Intercept + x)
+    ppois(kk, lambda = rep(lambda, each = length(k)))
+  },
+  n.samples = 2000
+)
+results <- data.frame(
+  i = rep(i, each = length(k)),
+  k = kk,
+  Fpred = rowMeans(pred_pois),
+  residuals =
+    rowMeans(pred_pois) - (rep(newdata_pois$y, each = length(k)) <= kk)
+)
+# Check that the cutoff point K has nearly probability mass 1 below it,
+# for all i:
+min(results |> dplyr::filter(k == max_K) |> pull(Fpred))
+#> [1] 0.9995078
+
+crps_scores <-
+  (results |>
+    group_by(i) |>
+    summarise(crps = sum(residuals^2), .groups = "drop") |>
+    pull(crps))
+summary(crps_scores)
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#>  0.2146  0.6704  1.3904  1.9660  2.8459  7.8817
+```
+
+## Normal model example
+
+Consider a model with Normal outcomes y\sim N(\eta,\sigma^2_y),
+conditionally on a linear predictor \lambda=\eta, where \eta is some
+linear expression in latent variables.
+
+The posterior predictive distributions are Normal mixture distributions
+across the posterior distribution of \eta and \sigma^2_y,
+p(\lambda,\sigma^2_y\|\text{data}).
+
+For illustration purposes, consider a simple Poisson model with a single
+covariate x and a linear predictor \eta = \beta_0 + \beta_1 x.
+
+``` r
+true_sigma_y <- 0.1
+df_normal <- tibble::tibble(
+  x = rnorm(50),
+  y = rnorm(length(x), 2 + 1 * x, sd = true_sigma_y)
+)
+fit_normal <- bru(
+  y ~ Intercept(1) + x,
+  family = "normal",
+  data = df_normal
+)
+newdata_normal <- tibble::tibble(
+  x = rnorm(100),
+  y = rnorm(100, 2 + 1 * x, sd = true_sigma_y)
+)
+```
+
+### Moment scores and log-score
+
+For the Squared Error and Dawid-Sebastiani scores, we’ll need the
+posterior expectation and variance: \mathbb{E}(Y\|\text{data}) =
+\mathbb{E}\[\mathbb{E}(Y\|\eta, \sigma_y^2,\text{data}) \| \text{data}\]
+= \mathbb{E}(\eta \| \text{data}) and \mathbb{V}(Y\|\text{data}) =
+\mathbb{E}\[\mathbb{V}(Y\|\eta,\sigma_y^2,\text{data}) \|
+\text{data}\] + \mathbb{V}\[\mathbb{E}(Y \| \eta,\sigma_y^2,\text{data})
+\| \text{data}\] = \mathbb{E}\[\sigma_y^2 \| \text{data}\] +
+\mathbb{V}\[\eta \| \text{data}\] i.e. the sum of the posterior mean of
+\sigma_y^2 and the variance of \eta.
+
+The SE and DS scores are therefore relatively easy to compute after
+estimating a model with `inlabru`, as well as the log-score. You just
+need to estimate the posterior mean and variance with
+[`predict()`](https://rdrr.io/r/stats/predict.html) for each test data
+point. If `Intercept+x` is the expression for the linear predictor, and
+`newdata` holds the covariate information for the prediction points, run
+
+``` r
+pred_normal <- predict(fit_normal, newdata_normal,
+  formula = ~ {
+    E <- Intercept + x
+    V <- 1 / Precision_for_the_Gaussian_observations
+    list(
+      eta = E,
+      sigma_y_2 = V,
+      dens = dnorm(y, mean = E, sd = sqrt(V))
+    )
+  },
+  n.samples = 2000
+)
+post_E <- pred_normal$eta$mean
+post_Var <- pred_normal$sigma_y_2$mean + pred_normal$eta$sd^2
+scores_normal <- data.frame(
+  SE = (newdata_normal$y - post_E)^2,
+  DS = (newdata_normal$y - post_E)^2 / post_Var + log(post_Var),
+  LS = -log(pred_normal$dens$mean)
+)
+summary(scores_normal)
+#>        SE                  DS               LS         
+#>  Min.   :0.0000001   Min.   :-4.687   Min.   :-1.4402  
+#>  1st Qu.:0.0006669   1st Qu.:-4.607   1st Qu.:-1.3977  
+#>  Median :0.0039526   Median :-4.251   Median :-1.2089  
+#>  Mean   :0.0096242   Mean   :-3.643   Mean   :-0.9026  
+#>  3rd Qu.:0.0133511   3rd Qu.:-3.247   3rd Qu.:-0.6864  
+#>  Max.   :0.0633760   Max.   : 2.081   Max.   : 1.9175
+```
+
+Here, we’ve again used the negated log-score, so that small values are
+“better” for all three scores. Since the DS score is based on the
+log-score for Normal predictions, the *conditional* DS and LS scores
+differ only by a constant offset and scaling. However, since the full
+posterior predictions are Normal mixtures, the DS and LS scores for the
+full posterior predictive distribution are not equivalent.
+
+As for the Poisson case, we can estimate the log-score uncertainty:
+
+``` r
+head(
+  data.frame(
+    log_S = scores_normal$LS,
+    lower = -log(pred_normal$dens$mean + 2 * pred_normal$dens$mean.mc_std_err),
+    upper = -log(pred_normal$dens$mean - 2 * pred_normal$dens$mean.mc_std_err)
+  )
+)
+#>        log_S      lower      upper
+#> 1 -1.0762666 -1.0824172 -1.0700779
+#> 2 -1.3997066 -1.4043494 -1.3950421
+#> 3 -1.0983772 -1.1039149 -1.0928087
+#> 4 -1.3892141 -1.3941530 -1.3842508
+#> 5 -0.6752241 -0.6928083 -0.6573252
+#> 6 -0.2955040 -0.3067642 -0.2841156
+```
+
+## Posterior expectation of conditional scores
+
+In some cases, one might be tempted to consider posterior distribution
+properties of conditional predictive scores, e.g. the posterior
+expectation \mathbb{E}\_{\lambda\|\text{data}}\[S(F\_\lambda, y)\] for
+S(F\_\lambda, y) under the posterior distribution for \lambda in the
+Poisson model.
+
+For Squared Error, \begin{aligned}
+\mathbb{E}\_{\lambda\|\text{data}}\[(y - \lambda)^2\] &=
+\mathbb{E}\_{\lambda\|\text{data}}\[\\y -
+\mathbb{E}(\lambda\|\text{data}) + \mathbb{E}(\lambda\|\text{data}) -
+\lambda\\^2\] \\ &= \[y - \mathbb{E}(\lambda\|\text{data})\]^2 +
+\mathbb{E}\_{\lambda\|\text{data}}(\\\mathbb{E}(\lambda\|\text{data}) -
+\lambda\\^2\] \\ &= \[y - \mathbb{E}(\lambda\|\text{data})\]^2 +
+\mathbb{V}(\lambda\|\text{data}) . \end{aligned} It’s noteworthy that
+this is similar to the *improper* score \[y -
+\mathbb{E}(y\|\text{data})\]^2 + \mathbb{V}(y\|\text{data}), and also in
+this new case, one can have a model with artificially small posterior
+variance with a smaller expected score, making this type of construction
+problematic to interpret.
+
+However, in some cases it does provide alternative approaches for how to
+compute the proper scores for the full posterior predictive
+distributions. If \lambda\_{ij}, j=1,\dots,J are samples from the
+posterior distribution, one score estimator is \widehat{S}(F_i,y_i) =
+\left(y_i - \frac{1}{J}\sum\_{j=1}^J \lambda\_{ij}\right)^2 , with the
+averaging over the samples inside the quadratic expression, and we can
+use
+
+``` r
+pred_pois <- predict(fit_pois, newdata_pois, formula = ~ exp(Intercept + x))
+scores <- (newdata_pois$y - pred_pois$mean)^2
+```
+
+If we instead take advantage of the new expression above, we have \[y -
+\mathbb{E}(\lambda\|\text{data})\]^2 =
+\mathbb{E}\_{\lambda\|\text{data}}\[(y - \lambda)^2\] -
+\mathbb{V}(\lambda\|\text{data}) so the score can be estimated by
+
+``` r
+pred_pois <- predict(fit_pois, newdata_pois,
+  formula = ~ {
+    lambda <- exp(Intercept + x)
+    list(
+      cond_scores = (y - lambda)^2,
+      lambda = lambda
+    )
+  },
+  n.samples = 2000
+)
+scores <- pred_pois$cond_scores$mean - pred_pois$lambda$sd^2
+summary(scores)
+#>      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+#> 2.100e-05 5.129e-01 4.943e+00 1.603e+01 1.861e+01 1.315e+02
+```
+
+For this particular case, this approach is unlikely to be an improvement
+or more accurate than the basic estimator. Remarkably, this estimator of
+Squared Error isn’t even guaranteed to be positive! However, for other
+scores there may potentially be practical benefits.
+
+### An alternative estimator for CRPS
+
+For the CRPS score, there are closed form expressions available for some
+distributions, conditionally on their parameters, but not for the full
+predictive mixture distribution. We take a similar approach as for SE,
+and let F and F\_\lambda denote the unconditional and conditional
+cumulative distribution functions for the posterior predictive
+distribution. Then
+F(x)=\mathbb{E}\_{\lambda\|\text{data}}\[F\_\lambda(x)\] for all x, and
+\begin{aligned} S\_\text{CRPS}(F,y) &= \int\_{-\infty}^\infty \[F(x) -
+I(y\leq x)\]^2 \\\mathrm{d}x \\ &=
+\mathbb{E}\_{\lambda\|\text{data}}\left\[ \int\_{-\infty}^\infty
+\[F\_\lambda(x) - I(y\leq x)\]^2 \\\mathrm{d}x \right\] -
+\int\_{-\infty}^\infty
+\left\\\mathbb{E}\_{\lambda\|\text{data}}\left\[F\_\lambda(x)^2\right\] -
+\mathbb{E}\_{\lambda\|\text{data}}\[F\_\lambda(x)\]^2\right\\
+\\\mathrm{d}x \\ &= \mathbb{E}\_{\lambda\|\text{data}}\left\[
+S\_\text{CRPS}(F\_\lambda,y) \right\] - \int\_{-\infty}^\infty
+\mathbb{V}\_{\lambda\|\text{data}}\[F\_\lambda(x)\] \\\mathrm{d}x .
+\end{aligned} Note that we didn’t need to use any particular model
+properties here, so this holds for any predictive model with mixture
+structure, when \lambda is the collection of model parameters. We also
+note the resemblance to the alternative expression for the Squared
+Error; this is because CRPS can be seen as the integral over all Brier
+scores for predicting event indicators of the form z=I(y\leq x), with
+probability F(x).
+
+In the Poisson case, we can now estimate the CRPS scores like this, that
+makes the code a bit easier than the previous version that needed
+[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md).
+We can use the Poisson CRPS implementation
+[`crps_pois()`](https://rdrr.io/pkg/scoringRules/man/scores_pois.html)
+from the
+[`scoringRules`](https://cran.r-project.org/package=scoringRules)
+package.
+
+However, it can be shown that the two approaches have nearly identical
+Monte Carlo variance, so the previous version is likely preferable as it
+doesn’t require knowing a closed form CRPS expression.
+
+``` r
+max_K <- 100 # some large value, so that 1-F(K) is small
+pred_pois <- predict(fit_pois, newdata_pois,
+  formula = ~ {
+    lambda <- exp(Intercept + x)
+    list(
+      crps = scoringRules::crps_pois(y, lambda),
+      F = do.call(
+        c,
+        lapply(
+          seq_along(y),
+          function(i) {
+            ppois(seq(0, max_K), lambda = lambda[i])
+          }
+        )
+      )
+    )
+  },
+  n.samples = 2000
+)
+crps_score <-
+  pred_pois$crps$mean -
+  (pred_pois$F |>
+    mutate(i = rep(seq_along(newdata_pois$y), each = max_K + 1)) |>
+    group_by(i) |>
+    summarise(F_var = sum(sd^2), .groups = "drop") |>
+    pull(F_var))
+summary(crps_score)
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#>  0.2144  0.6679  1.3924  1.9806  2.8454  7.8456
+```
+
+Formulas and functions for Poisson CRPS, as well as for other
+distributions, can be found via the [“Evaluating Probabilistic Forecasts
+with
+scoringRules”](https://cran.r-project.org/package=scoringRules/vignettes/article.pdf)
+vignette of the `scoringRules` package, and the references in
+[`?scoringRules::crps.numeric`](https://rdrr.io/pkg/scoringRules/man/crps.numeric.html).

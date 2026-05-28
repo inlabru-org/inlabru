@@ -1,0 +1,35 @@
+pandoc: 3.1.6.1
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  articles/1d_lgcp: 1d_lgcp.html
+  articles/2d_lgcp_covars_groupcv: 2d_lgcp_covars_groupcv.html
+  articles/2d_lgcp_covars: 2d_lgcp_covars.html
+  articles/2d_lgcp_distancesampling: 2d_lgcp_distancesampling.html
+  articles/2d_lgcp_multilikelihood: 2d_lgcp_multilikelihood.html
+  articles/2d_lgcp_per_transect_covars: 2d_lgcp_per_transect_covars.html
+  articles/2d_lgcp_plotsampling: 2d_lgcp_plotsampling.html
+  articles/2d_lgcp_residuals_sf: 2d_lgcp_residuals_sf.html
+  articles/2d_lgcp_residuals: 2d_lgcp_residuals.html
+  articles/2d_lgcp_sp: 2d_lgcp_sp.html
+  articles/2d_lgcp_spatiotemporal: 2d_lgcp_spatiotemporal.html
+  articles/2d_lgcp: 2d_lgcp.html
+  articles/Apptainer: Apptainer.html
+  articles: articles.html
+  bru_mapper: bru_mapper.html
+  classes: classes.html
+  component: component.html
+  articles/devel_flow: devel_flow.html
+  linearapprox: linearapprox.html
+  articles/mesh_mapping: mesh_mapping.html
+  method: method.html
+  prediction_scores: prediction_scores.html
+  articles/publications: publications.html
+  articles/random_fields_2d: random_fields_2d.html
+  articles/random_fields: random_fields.html
+  articles/svc: svc.html
+  articles/zip_zap_models: zip_zap_models.html
+last_built: 2026-05-26T11:45Z
+urls:
+  reference: https://inlabru-org.github.io/inlabru/reference
+  article: https://inlabru-org.github.io/inlabru/articles
