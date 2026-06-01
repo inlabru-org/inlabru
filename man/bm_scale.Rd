@@ -14,6 +14,9 @@ bru_mapper_scale(...)
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_scale]{bm_scale()}}}
 }
+\value{
+A \code{bm_scale} mapper object.
+}
 \description{
 Create a standalone
 scaling mapper that can be used as part of a \code{bm_pipe}.

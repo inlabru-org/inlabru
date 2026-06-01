@@ -5,12 +5,14 @@
 \alias{bru_obs_inla_family}
 \alias{bru_obs_inla_family.bru_obs}
 \alias{bru_obs_inla_family.bru_obs_list}
+\alias{bru_obs_inla_family.bru}
+\alias{bru_obs_family}
+\alias{bru_obs_family.bru_obs}
+\alias{bru_obs_family.bru_obs_list}
+\alias{bru_obs_family.bru}
 \alias{bru_obs_control_family}
 \alias{bru_obs_control_family.bru_obs}
 \alias{bru_obs_control_family.bru_obs_list}
-\alias{bru_obs_control_gcpo}
-\alias{bru_obs_control_gcpo.bru_obs}
-\alias{bru_obs_control_gcpo.bru_obs_list}
 \title{Utility functions for bru observation model objects}
 \usage{
 bru_obs_inla_family(x, ...)
@@ -19,23 +21,21 @@ bru_obs_inla_family(x, ...)
 
 \method{bru_obs_inla_family}{bru_obs_list}(x, ...)
 
+\method{bru_obs_inla_family}{bru}(x, ...)
+
+bru_obs_family(x, ...)
+
+\method{bru_obs_family}{bru_obs}(x, ...)
+
+\method{bru_obs_family}{bru_obs_list}(x, ...)
+
+\method{bru_obs_family}{bru}(x, ...)
+
 bru_obs_control_family(x, control.family = NULL, ...)
 
 \method{bru_obs_control_family}{bru_obs}(x, control.family = NULL, ...)
 
 \method{bru_obs_control_family}{bru_obs_list}(x, control.family = NULL, ...)
-
-bru_obs_control_gcpo(x, ...)
-
-\method{bru_obs_control_gcpo}{bru_obs}(
-  x,
-  index_offset,
-  index_length = bru_response_size(x),
-  force_weights,
-  ...
-)
-
-\method{bru_obs_control_gcpo}{bru_obs_list}(x, control.gcpo = NULL, ...)
 }
 \arguments{
 \item{x}{Object of \code{bru_obs} or \code{bru_obs_list} type}
@@ -43,34 +43,24 @@ bru_obs_control_gcpo(x, ...)
 \item{\dots}{Further arguments passed on to the submethods}
 
 \item{control.family}{list of INLA \code{control.family} options to override}
-
-\item{index_offset}{integer; offset to add to indices in \code{control.gcpo}}
-
-\item{index_length}{integer; length of the response vector for the
-observation model. Defaults to \code{bru_response_size(x)}.}
-
-\item{force_weights}{logical; if \code{TRUE}, ensure that \code{control.gcpo$weights}
-is populated. This is needed if any of the observation models in a
-\code{bru_obs_list} has non-null \code{control.gcpo$weights}.}
-
-\item{control.gcpo}{list of INLA \code{control.gcpo} default options}
 }
 \value{
 \itemize{
-\item \code{bru_obs_inla_family()} returns a string or vector of strings
+\item \code{bru_obs_inla_family()} returns a string or vector of strings of
+the \code{family} name(s) used in the \code{INLA::inla()} call for the observation
+model(s) in \code{x}.
+}
+
+\itemize{
+\item \code{bru_obs_family()} returns a string or vector of strings of
+the \code{family} name(s) used to define each \code{bru_obs()}. This may be different
+the internal technical name(s) used in the \code{INLA::inla()} call.
 }
 
 \itemize{
 \item \code{bru_obs_control_family()} returns a list with
 \code{INLA::control.family} options, or a list of such lists, with one element
 per observation model
-}
-
-\itemize{
-\item \code{bru_obs_control_gcpo()} returns a list with
-\code{INLA::control.gcpo} options, with predictor/response variable indices
-unified for multi-observation models. If a \code{bru_obs} model has a NULL
-\code{control.gcpo} argument, an empty list is returned for that model.
 }
 }
 \description{

@@ -19,20 +19,26 @@ Authors@R: c(
   person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk",
          role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
-  person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
+  person("Andy", "Seaton", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
-  person("Suen", "Man Ho", email = "m.suen19@imperial.ac.uk", role = c("ctb", "cph"),
+  person("Man Ho", "Suen", email = "m.suen19@imperial.ac.uk", role = c("ctb", "cph"),
          comment = c(ORCID = "0009-0003-2281-0776",
                      "Man Ho Suen contributed features for aggregated responses and vignette updates")),
-  person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
+  person("Pierre", "Roudier", email = "", role = c("ctb", "cph"),
          comment = "Pierre Roudier contributed general quantile summaries"),
-  person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
+  person("Tim", "Meehan", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
          comment = "Tim Meehan contributed the SVC vignette and robins data"),
-  person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
+  person("Niharika", "Reddy Peddinenikalva", role = c("ctb", "cph"),
          comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette"),
-  person("Perepolkin", "Dmytro", email = "dperepolkin@gmail.com",
+  person("Dmytro", "Perepolkin", email = "dperepolkin@gmail.com",
          role = c("ctb", "cph"),
-         comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette")
+         comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette"),
+  person("Novica", "Nakov", email = "nnovica@gmail.com", role = c("ctb"),
+         comment = c(ORCID = "0009-0005-7773-7718")),
+  person("Hans", "Montcho", email = "hansmontcho@yahoo.fr",
+         role = c("ctb", "cph"),
+         comment = c(ORCID = "0000-0003-2510-2102",
+                     "Hans Montcho contributed features for joint cross validation"))       
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
 BugReports: https://github.com/inlabru-org/inlabru/issues
@@ -56,6 +62,7 @@ Depends:
     R (>= 4.1.0),
     stats
 Imports:
+    generics,
     dplyr,
     fmesher (>= 0.7.0),
     glue,
@@ -128,6 +135,7 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher.R'
+    'gcpo.R'
     'ggplot.R'
     'hexagon_tiling.R'
     'mappers.R'
@@ -149,6 +157,7 @@ Collate:
     'spatstat.R'
     'spde.R'
     'stack.R'
+    'tidiers.R'
     'track_plotting.R'
     'transformation.R'
     'used.R'

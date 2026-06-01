@@ -14,6 +14,9 @@ bru_mapper_shift(...)
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_shift]{bm_shift()}}}
 }
+\value{
+A \code{bm_shift} mapper object.
+}
 \description{
 Create a standalone
 shift mapper that can be used as part of a \code{bm_pipe}.

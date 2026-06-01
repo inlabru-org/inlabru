@@ -36,6 +36,8 @@ returned (suitable e.g. for creating a new \code{bm_multi} object).
 Default: \code{TRUE}}
 }
 \value{
+A \code{bm_multi} mapper object.
+
 \itemize{
 \item \code{[}-indexing a \code{bm_multi} extracts a subset
 \code{bm_multi} object (for drop \code{FALSE}) or an individual sub-mapper

@@ -16,6 +16,9 @@ indexing.}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_matrix]{bm_matrix()}}}
 }
+\value{
+A \code{bm_matrix} mapper object.
+}
 \description{
 Create a matrix mapper, for a given number of columns
 }

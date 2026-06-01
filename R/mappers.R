@@ -426,6 +426,7 @@ ibm_shortname <- function(mapper, ...) {
 #' @param depth The recursion depth for multi/collection/pipe mappers. Default
 #'   1, to only show the collection, and not the contents of the sub-mappers.
 #' @export
+#' @returns * `format` character.
 #' @method format bru_mapper
 #' @rdname bm_summary
 format.bru_mapper <- function(x, ...,
@@ -1447,7 +1448,8 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
 #' @title Mapper for indexed variables
 #' @param n Size of a model for `bm_index`
 #' @export
-#' @description Create a an indexing mapper
+#' @description Create an indexing mapper
+#' @returns A `bm_index` mapper object.
 #' @rdname bm_index
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1520,6 +1522,7 @@ ibm_jacobian.bm_index <- function(mapper, input, state, ...) {
 #' evaluated;
 #' The affine mapper output is defined as
 #' `effect(state) = offset + jacobian %*% (state - state0)`
+#' @returns A `bm_taylor` mapper object.
 #' @export
 #' @rdname bm_taylor
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -1758,6 +1761,7 @@ ibm_eval.bm_taylor <- function(mapper,
 #' @title Mapper for a linear effect
 #' @export
 #' @description Create a mapper for linear effects
+#' @returns A `bm_linear` mapper object.
 #' @rdname bm_linear
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1821,6 +1825,7 @@ ibm_jacobian.bm_linear <- function(mapper, input, ...) {
 #'   indexing.
 #' @export
 #' @description Create a matrix mapper, for a given number of columns
+#' @returns A `bm_matrix` mapper object.
 #' @rdname bm_matrix
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1925,6 +1930,7 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
 #' will set it the required setting.
 #' @export
 #' @description Create a factor mapper
+#' @returns A `bm_factor` mapper object.
 #' @rdname bm_factor
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2039,6 +2045,7 @@ ibm_jacobian.bm_factor <- function(mapper, input, ...) {
 #' @title Constant mapper
 #' @export
 #' @description Create a constant mapper
+#' @returns A `bm_const` mapper object.
 #' @rdname bm_const
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2100,6 +2107,7 @@ ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
 #' returns
 #' `bm_pipe(list(mapper = mapper, shift = bm_shift()))`
 #' @param mapper If non-NULL, a `bru_mapper` to be shifted.
+#' @returns A `bm_shift` mapper object.
 #' @rdname bm_shift
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2201,6 +2209,7 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
 #' If `mapper` is non-null, the `bm_scale()` constructor
 #' returns
 #' `bm_pipe(list(mapper = mapper, scale = bm_scale()))`
+#' @returns A `bm_scale` mapper object.
 #' @rdname bm_scale
 #' @param mapper An optional `bru_mapper` to be scaled.
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2342,6 +2351,7 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
 #' Constructs a mapper
 #' that aggregates elements of the input state, so it can be used e.g.
 #' for weighted summation or integration over blocks of values.
+#' @returns A `bm_aggregate` mapper object.
 #' @rdname bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2533,6 +2543,7 @@ ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
 #' }{log(blocksum(w*exp(state)))},
 #' where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the
 #' shift for block \eqn{k}{k}.
+#' @returns A `bm_logsumexp/bm_aggregate` mapper object.
 #' @rdname bm_logsumexp
 #' @inheritParams bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2661,6 +2672,7 @@ ibm_eval.bm_logsumexp <- function(mapper, input, state = NULL,
 #'
 #' \eqn{p_k=\sum_{i\in I_k} w_i / (1+e^{-\eta_i}) / \sum_{i\in I_k} w_i
 #' }{p[k]=sum(w[i] * plogis(eta[i])) / sum(w[i])}
+#' @returns A `bm_logitaverage/bm_aggregate` mapper object.
 #' @rdname bm_logitaverage
 #' @inheritParams bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2849,6 +2861,7 @@ require_args <- function(fun, req) {
 #' defines a mapping from standard Normal to a specified distribution.
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
 #' Normal.
+#' @returns A `bm_marginal` mapper object.
 #' @examples
 #' m <- bm_marginal(qexp, pexp, rate = 1 / 8)
 #' (val <- ibm_eval(m, state = -5:5))
@@ -3068,6 +3081,7 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
 #' mapper.
 #' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
 #' a list of inputs, one for each mapper.
+#' @returns A `bm_pipe` mapper object.
 #' @rdname bm_pipe
 #' @inheritParams bm_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -3318,6 +3332,7 @@ ibm_simplify.bm_pipe <- function(mapper,
 #' @description Constructs a row-wise Kronecker product mapping of linear/affine
 #'   mappers. Any offset in sub-mappers is added into a combined offset. Only
 #'   linear/affine sub-mappers are allowed.
+#' @returns A `bm_multi` mapper object.
 #' @rdname bm_multi
 #' @export
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -3800,6 +3815,7 @@ ibm_invalid_output.bm_multi <- function(mapper,
 #'
 #'   The period for the first order harmonics is shifted and scaled to match
 #'   `interval`.
+#' @returns A `bm_harmonics` mapper object.
 #' @export
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -3883,6 +3899,7 @@ ibm_jacobian.bm_harmonics <- function(mapper,
 #'   equivalent to `bm_pipe(list(bm_matrix(ncol(B)), mapper))`, but with an
 #'   internally stored matrix input `B` for efficiency, and allowing the mapper
 #'   `input` format to be identical to that of the original `mapper`.
+#' @returns A `bm_reparam` mapper object.
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @rdname bm_reparam
@@ -3909,8 +3926,7 @@ bm_reparam <- function(mapper, B) {
 }
 
 
-#' @title Deprecated basis conversion mapper
-#' @description `r lifecycle::badge("deprecated")`
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")`
 #'  Old deprecated name for [bm_reparam()]
 #' @param mesh Object supported by a [bru_mapper()] method.
 #' @param B a square or tall basis conversion matrix
@@ -3921,7 +3937,7 @@ bm_mesh_B <- function(mesh, B) {
 }
 
 #' @export
-#' @describeIn bm_mesh_B `r lifecycle::badge("deprecated")`
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")`
 #'   Deprecated name for `bm_mesh_B`
 bru_mapper_mesh_B <- function(...) {
   bm_mesh_B(...)

@@ -28,6 +28,9 @@ linearisation, or a list of such states matching the \code{jacobian} list.
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_taylor]{bm_taylor()}}}
 }
+\value{
+A \code{bm_taylor} mapper object.
+}
 \description{
 Provides a pre-computed affine mapping,
 internally used to represent and evaluate linearisation information.

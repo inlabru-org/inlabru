@@ -11,6 +11,9 @@ bm_reparam(mapper, B)
 
 \item{B}{a square or rectangular basis conversion matrix}
 }
+\value{
+A \code{bm_reparam} mapper object.
+}
 \description{
 Creates a mapper for handling basis conversions. Functionally
 equivalent to \code{bm_pipe(list(bm_matrix(ncol(B)), mapper))}, but with an

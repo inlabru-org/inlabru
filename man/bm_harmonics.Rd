@@ -24,6 +24,9 @@ Default \code{c(0, 1)}.}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_harmonics]{bm_harmonics()}}}
 }
+\value{
+A \code{bm_harmonics} mapper object.
+}
 \description{
 Constructs a mapper for \code{cos}/\code{sin} functions of orders 1 (if
 \code{intercept} is \code{TRUE}, otherwise 0) through \code{order}. The total number of

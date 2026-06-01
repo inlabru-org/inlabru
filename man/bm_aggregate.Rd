@@ -33,6 +33,9 @@ values are "sum", "average" (for regular \code{\link[=bm_aggregate]{bm_aggregate
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_aggregate]{bm_aggregate()}}}
 }
+\value{
+A \code{bm_aggregate} mapper object.
+}
 \description{
 Constructs a mapper
 that aggregates elements of the input state, so it can be used e.g.
