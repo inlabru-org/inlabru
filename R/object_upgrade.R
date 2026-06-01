@@ -484,7 +484,7 @@ bru_info_upgrade_functions <- function() {
 
       object
     },
-    "2.14.1.9005" = function(object) {
+    "2.14.1.9006" = function(object) {
 
       if (is.null(object[["model"]][["inputs"]])) {
         object[["model"]][["inputs"]] <- object[["inputs"]]

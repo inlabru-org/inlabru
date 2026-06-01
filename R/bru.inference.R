@@ -1233,7 +1233,7 @@ bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NU
 
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9005",
+      "2.14.1.9006",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -1329,7 +1329,7 @@ bru_agg_input <- function(mapper, mask, .envir) {
   )
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9005",
+      "2.14.1.9006",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -2337,7 +2337,7 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #'
 #'   From `2.13.0.9016` to `2.14.1.9004`, it would look for a `block_response`
-#'   character element in the list, but from `2.14.1.9005`, the separate
+#'   character element in the list, but from `2.14.1.9006`, the separate
 #'   argument `reponse_block` should be used instead, with an expression to be
 #'   evaluated in the input data context. `response_block` should evaluate to a
 #'   vector of the same length as the response data, with values that can be
