@@ -693,7 +693,6 @@ test_that("New method `fullchain` works", {
   )
 
 
-
   # bench::mark(A={
   # local_bru_options_set(bru_method = list(
   #   agg = "pandemic",

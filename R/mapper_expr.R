@@ -302,7 +302,8 @@ ibm_is_linear.bm_expr <- function(mapper, ...) {
 #                 effects_eps[[label_loop]] <- effects[[label_loop]][row_subset]
 #               }
 #             }
-#             effects_eps[[label]] <- effects_eps[[label]] + Ak[row_subset] * eps
+#             effects_eps[[label]] <- effects_eps[[label]] +
+#               Ak[row_subset] * eps
 #           }
 #         } else {
 #           if (symmetric_diffs) {
@@ -448,7 +449,7 @@ ibm_jacobian_bm_expr_var <- function(
   N <- length(state[[var]])
 
   if (("rowwise" %in% mapper$assume) &&
-      ("no_root" %in% mapper$assume)) {
+    ("no_root" %in% mapper$assume)) {
     # Sum of dE/dv * dv/du for all affected derived variables v and root
     # variable u, computed element-wise.
     B <- Matrix::Matrix(0.0, n_offset, N)
@@ -479,10 +480,12 @@ ibm_jacobian_bm_expr_var <- function(
           "' does not match the number of rows (",
           n_offset,
           ") in the expression result;\n",
-          "This indicates the expression was incorrectly inferred to be rowwise."
+          "This indicates the expression was incorrectly inferred",
+          " to be rowwise."
         )
       } else {
-        B <- B + Matrix::Diagonal(n = n_offset, x = the_diff) %*% A_affected[[nm]]
+        B <- B +
+          Matrix::Diagonal(n = n_offset, x = the_diff) %*% A_affected[[nm]]
       }
       # Restore the original derived variable values for the next iteration.
       derived_eps[[nm]] <- derived[[nm]]
@@ -578,8 +581,8 @@ ibm_jacobian.bm_expr <- function(
   n_offset <- NROW(offset)
   assume_rowwise <-
     ("no_root" %in% mapper[["assume"]]) &&
-    ("rowwise" %in% mapper[["assume"]]) &&
-    is.data.frame(data[["data"]])
+      ("rowwise" %in% mapper[["assume"]]) &&
+      is.data.frame(data[["data"]])
   if (assume_rowwise) {
     if (!is.null(n_offset) && (NROW(offset) != n_offset)) {
       stop(
@@ -847,10 +850,12 @@ ibm_eval2.bru_obs <- function(
       derived = "effects",
       suffix = "_latent"
     ),
-    assume = c(if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
-               if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
-               if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
-               if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL)
+    assume = c(
+      if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
+      if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
+      if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
+      if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL
+    )
   )
 
   res2 <- ibm_eval2(
@@ -904,7 +909,12 @@ ibm_eval2.bru_obs <- function(
   # input = list(`obs1` = list(comp = input for components,
   #                            post = post_mapper input), `obs2` = ...)
 
-  n_post <- ibm_n(post_mapper, input = input[["post"]], state = res2$offset, multi = FALSE)
+  n_post <- ibm_n(
+    post_mapper,
+    input = input[["post"]],
+    state = res2$offset,
+    multi = FALSE
+  )
   if ((length(res2$offset) == 1L) && is.finite(n_post) && (n_post > 1L)) {
     res2$offset <- rep(res2$offset, n_post)
     extended_scalar <- TRUE
@@ -930,7 +940,8 @@ ibm_eval2.bru_obs <- function(
       }
     } else {
       if (extended_scalar) {
-        B[[nm]] <- (res3$jacobian %*% Matrix::Matrix(1.0, n_post, 1L)) %*% B[[nm]]
+        B[[nm]] <-
+          (res3$jacobian %*% Matrix::Matrix(1.0, n_post, 1L)) %*% B[[nm]]
       } else {
         B[[nm]] <- res3$jacobian %*% B[[nm]]
       }
@@ -945,7 +956,8 @@ ibm_eval2.bru_obs <- function(
     stop(
       glue(
         "The number of values ({length(res3$offset)})",
-        " in the predictor for {na_or_value(mapper$tag, '<unknown>')} does not match",
+        " in the predictor for {na_or_value(mapper$tag, '<unknown>')}",
+        " does not match",
         " the expected length ({n_resp})."
       )
     )
@@ -1000,10 +1012,12 @@ ibm_eval.bru_obs <- function(
       derived = "effects",
       suffix = "_latent"
     ),
-    assume = c(if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
-               if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
-               if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
-               if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL)
+    assume = c(
+      if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
+      if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
+      if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
+      if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL
+    )
   )
 
   val <- ibm_eval(
@@ -1025,13 +1039,17 @@ ibm_eval.bru_obs <- function(
   post_mapper <- mapper[["aggregate"]]
   # If there is no post_mapper, we can return the expression result directly.
   if (!is.null(post_mapper)) {
-
     # The input is constructed as part of the overall bru_obs input evaluation,
     # so that we have a this pre-computed (input for ibm_eval2.bru_obs_list):
     # input = list(`obs1` = list(comp = input for components,
     #                            post = post_mapper input), `obs2` = ...)
 
-    n_post <- ibm_n(post_mapper, input = input[["post"]], state = val, multi = FALSE)
+    n_post <- ibm_n(
+      post_mapper,
+      input = input[["post"]],
+      state = val,
+      multi = FALSE
+    )
     if ((length(val) == 1L) && is.finite(n_post) && (n_post > 1L)) {
       val <- rep(val, n_post)
     }
@@ -1051,7 +1069,8 @@ ibm_eval.bru_obs <- function(
     stop(
       glue(
         "The number of values ({length(val)})",
-        " in the predictor for {na_or_value(mapper$tag, '<unknown>')} does not match",
+        " in the predictor for {na_or_value(mapper$tag, '<unknown>')}",
+        " does not match",
         " the expected length ({n_resp})."
       )
     )
@@ -1083,7 +1102,7 @@ ibm_jacobian.bru_obs <- function(
 #' @rdname ibm_as_taylor
 #' @export
 ibm_as_taylor.bru_obs <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   stopifnot(isTRUE(multi))
   eval2 <- ibm_eval2(
@@ -1137,9 +1156,23 @@ ibm_eval2.bru_obs_list <- function(
     jac_names <- lapply(jacobian, function(r) names(r))
     jac_names <- unique(unlist(jac_names))
     names(jac_names) <- jac_names
-    jac_ncol <- vapply(jac_names, function(nm) {
-      max(vapply(jacobian, function(r) if (nm %in% names(r)) ncol(r[[nm]]) else 0L, 0L))
-    }, 0L)
+    jac_ncol <- vapply(
+      jac_names,
+      function(nm) {
+        max(vapply(
+          jacobian,
+          function(r) {
+            if (nm %in% names(r)) {
+              ncol(r[[nm]])
+            } else {
+              0L
+            }
+          },
+          0L
+        ))
+      },
+      0L
+    )
     jacobian <- lapply(
       jac_names,
       function(nm) {
@@ -1214,22 +1247,24 @@ ibm_jacobian.bru_obs_list <- function(
 #' @rdname ibm_as_taylor
 #' @export
 ibm_as_taylor.bru_obs_list <- function(
-    mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper, input, state, ..., multi = FALSE, comp_mappers
 ) {
   stopifnot(isTRUE(multi))
 
   lapply(
     setNames(seq_along(mapper), names(mapper)),
-    function(k) ibm_as_taylor(
-      mapper[[k]],
-      input[[k]],
-      state = state,
-      multi = TRUE,
-      comp_mappers = if (inherits(comp_mappers, "bm_list")) {
-        comp_mappers
-      } else {
-        comp_mappers[[k]]
-      }
-    )
+    function(k) {
+      ibm_as_taylor(
+        mapper[[k]],
+        input[[k]],
+        state = state,
+        multi = TRUE,
+        comp_mappers = if (inherits(comp_mappers, "bm_list")) {
+          comp_mappers
+        } else {
+          comp_mappers[[k]]
+        }
+      )
+    }
   )
 }

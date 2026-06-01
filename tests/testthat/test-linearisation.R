@@ -43,10 +43,13 @@ test_that("Linearisation", {
   inp <- bru_input(model, lhoods, inla_f = TRUE)
 
   if (identical(bru_options_get("bru_method")$autodiff, "fullchain")) {
-    lin0 <- ibm_as_taylor(model, input = inp,
-                          state = list(Int_y = 0, Int_z = 0, x = 0))
-    lin <- ibm_as_taylor(model, input = inp,
-                         state = list(x = 1 / 5, Int_y = -4, Int_z = log(4))
+    lin0 <- ibm_as_taylor(model,
+      input = inp,
+      state = list(Int_y = 0, Int_z = 0, x = 0)
+    )
+    lin <- ibm_as_taylor(model,
+      input = inp,
+      state = list(x = 1 / 5, Int_y = -4, Int_z = log(4))
     )
   } else {
     comp_lin <- ibm_as_taylor(model, input = inp, state = NULL)

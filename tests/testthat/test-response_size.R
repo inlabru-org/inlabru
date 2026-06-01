@@ -75,8 +75,8 @@ test_that("Response and predictor mismatch handling", {
   expect_error(
     {
       fit4 <- bru(y ~ 0 + comp(1:3),
-                  data = data.frame(y = rnorm(2)),
-                  family = "gaussian"
+        data = data.frame(y = rnorm(2)),
+        family = "gaussian"
       )
     },
     if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {

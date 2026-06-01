@@ -456,8 +456,8 @@ bru <- function(components = ~ Intercept(1),
   # move lhoods and inputs out of bru.model:
   lhoods <- bru.model[["lhoods"]]
   inputs <- bru.model[["inputs"]]
-#  bru.model[["lhoods"]] <- NULL
-#  bru.model[["inputs"]] <- NULL
+  #  bru.model[["lhoods"]] <- NULL
+  #  bru.model[["inputs"]] <- NULL
 
   info <- bru_info(
     method = "bru",
@@ -1153,7 +1153,12 @@ bru_agg_data <- function(
 }
 
 
-bru_agg_input_pandemic <- function(input, data_list, .envir, response_block = NULL) {
+bru_agg_input_pandemic <- function(
+    input,
+    data_list,
+    .envir,
+    response_block = NULL
+) {
   aggregate_input <- bru_eval_in_data_context(
     {{ input }},
     data = data_list,
@@ -1436,8 +1441,10 @@ bru_obs_agg <- function(lh,
     }
     if (!identical(autodiff_method, "fullchain")) {
       stop(glue(
-        "The 'fullchain' aggregation method requires the 'fullchain' autodiff ",
-        "method.\nPlease use option `bru_method = list(autodiff = 'fullchain')`."
+        "The 'fullchain' aggregation method requires the 'fullchain'",
+        " autodiff ",
+        "method.\nPlease use option",
+        " `bru_method = list(autodiff = 'fullchain')`."
       ))
     }
     lh$data <- bru_agg_data(
@@ -2279,8 +2286,8 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   [bm_logsumexp()], or [bm_logitaverage()]). Default `NULL`, interpreted as
 #'   "none". `r lifecycle::badge("experimental")`, available from version
 #'   `2.12.0.9013`.
-#' @param aggregate_input,response_block `NULL` or an optional input list to the mapper
-#'   defined by non-NULL `aggregate`, overriding the default,
+#' @param aggregate_input,response_block `NULL` or an optional input list to the
+#'   mapper defined by non-NULL `aggregate`, overriding the default,
 #'   ```
 #'   aggregate_input = list(
 #'     block = .data.[[".block"]],
@@ -4015,7 +4022,7 @@ nonlin_predictor <- function(param, state) {
               state = list(state),
               comp_simple = param[["comp_simple"]][[lh_idx]],
               predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
-                                        format = "expr"
+                format = "expr"
               ),
               format = "matrix",
               n_pred = bru_response_size(param[["lhoods"]][[lh_idx]])

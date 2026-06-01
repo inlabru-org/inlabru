@@ -88,7 +88,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
           glue(
             "The number of values ({NROW(pred0)}) in the predictor for ",
             "observation model ",
-          "<unknown> does not match the expected length ({n_pred})."
+            "<unknown> does not match the expected length ({n_pred})."
           )
         )
       }
