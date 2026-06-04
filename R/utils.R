@@ -769,7 +769,7 @@ bru_fill_missing <- function(data, where, values,
       data[[layer]],
       dataframe = TRUE,
       na.rm = TRUE
-    )[[layer]]
+    )[[1]]
     data_coord <- as.data.frame(terra::crds(data[[layer]], na.rm = TRUE))
     data_coord <- sf::st_as_sf(data_coord,
       coords = seq_len(ncol(data_coord)),
