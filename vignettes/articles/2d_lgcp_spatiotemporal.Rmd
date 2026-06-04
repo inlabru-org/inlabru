@@ -141,7 +141,7 @@ Plot the integration points:
 ```{r results="hide",warning=FALSE,message=FALSE,echo=TRUE}
 ggplot() +
   geom_fm(data = mrsea$mesh) +
-  gg(ips, aes(size = weight)) +
-  scale_size_area(max_size = 1) +
+  gg(ips, aes(size = weight), stroke = 0) +
+  scale_size_area(max_size = 2) +
   facet_wrap(~season)
 ```
