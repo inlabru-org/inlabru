@@ -24,6 +24,15 @@ knitr::opts_chunk$set(
   fig.height = 5,
   eval = TRUE
 )
+library(INLA)
+library(inlabru)
+library(tibble)
+library(sf)
+library(fmesher)
+library(dplyr)
+library(ggplot2)
+library(fmesher)
+library(RColorBrewer)
 ```
 Set things up
 
@@ -129,8 +138,8 @@ obs_with_transect_info <- observations |>
 
 ggplot() +
   geom_fm(data = mesh) +
-  geom_sf(data = ips, aes(size = weight, color = visibility), alpha = 0.2) +
-  scale_size_area() +
+  geom_sf(data = ips, aes(size = weight, color = visibility), alpha = 0.2, stroke = 0) +
+  scale_size_area(max_size = 3) +
   geom_sf(data = samplers, color = "blue") +
   geom_sf(
     data = obs_with_transect_info, aes(shape = as.factor(transect)),
