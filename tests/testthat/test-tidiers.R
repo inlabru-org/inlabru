@@ -39,13 +39,18 @@ test_that("glance.bru returns one-row tibble with expected columns", {
       bru_info = structure(
         list(
           inlabru_version = as.character(utils::packageVersion("inlabru")),
-          lhoods = structure(list(
-            structure(list(response_data = data.frame(x = 1:15),
-                           response = "x",
-                           family = "normal"),
-                      class = "bru_obs")
-          ),
-          class = "bru_obs_list"
+          lhoods = structure(
+            list(
+              structure(
+                list(
+                  response_data = data.frame(x = 1:15),
+                  response = "x",
+                  family = "normal"
+                ),
+                class = "bru_obs"
+              )
+            ),
+            class = "bru_obs_list"
           )
         ),
         class = "bru_info"
@@ -68,19 +73,25 @@ test_that("glance.bru returns NA nobs for any point process fit", {
   bru_ver <- as.character(utils::packageVersion("inlabru"))
   fit <- structure(
     list(
-      bru_info = structure(list(
-        inlabru_version = bru_ver,
-        lhoods = structure(list(
-          structure(list(response_data = data.frame(x = 1:10),
-                         response = "x",
-                         family = "cp",
-                         inla.family = "xpoisson"),
-                    class = "bru_obs")
+      bru_info = structure(
+        list(
+          inlabru_version = bru_ver,
+          lhoods = structure(
+            list(
+              structure(
+                list(
+                  response_data = data.frame(x = 1:10),
+                  response = "x",
+                  family = "cp",
+                  inla.family = "xpoisson"
+                ),
+                class = "bru_obs"
+              )
+            ),
+            class = "bru_obs_list"
+          )
         ),
-        class = "bru_obs_list"
-        )
-      ),
-      class = "bru_info"
+        class = "bru_info"
       )
     ),
     class = c("bru", "inla")
