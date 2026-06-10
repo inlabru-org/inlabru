@@ -56,9 +56,11 @@ options(repos = c(
   getOption("repos")
 ))
 install.packages("inlabru")
+```
 
-# or
+or
 
+``` r
 # install.packages("pak")
 pak::pak("inlabru")
 ```

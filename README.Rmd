@@ -53,9 +53,9 @@ options(repos = c(
   getOption("repos")
 ))
 install.packages("inlabru")
-
-# or
-
+```
+or
+```{r cran-installation-pak, eval = FALSE}
 # install.packages("pak")
 pak::pak("inlabru")
 ```
@@ -78,6 +78,10 @@ Install the development version [GitHub](https://github.com/inlabru-org/inlabru)
 ```{r gh-installation-pak, eval = FALSE}
 pak::pak("inlabru-org/inlabru")
 ```
+
+## Online documentation
+
+[https://inlabru-org.github.io/inlabru/](https://inlabru-org.github.io/inlabru/)
 
 ## Example
 
