@@ -5,6 +5,11 @@
 * Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
   support the `broom` package tidying framework. Thanks to Novica Nakov
   (`2.14.1.9005`)
+* Add observation `family` options `nzbinomial`, `nznbinomial`, `nzcenpoisson`,
+  and `nzbetabinomial` for non-zero truncated models, acting like `nzpoisson`.
+  Will automatically switch to INLA implementations if available, otherwise
+  uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
+  (`2.14.1.9007`)
 
 ## Bug fixes
 

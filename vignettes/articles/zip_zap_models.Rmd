@@ -278,7 +278,9 @@ this could be done by fixing the hyperparameter to a small value.
 The [`nzpossion`
 model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf),
 available from INLA version `23.10.19-1` implements the $\text{Poisson}(y\vert
-y>0)$ model exactly.
+y>0)$ model exactly. `inlabru` added shortcuts for the hyperparameter approach
+for "nzbinomal", "nznbinomial", "nzcenpoisson", and "nzbetabinomial", in
+version `2.14.1.9007`.
 
 In the resulting model, the truncated Poisson distribution governs only the
 positive counts, while the absences are addressed by a separate binomial model
@@ -318,24 +320,12 @@ comps <- ~
 #  field_count(geometry, copy = "field_present", fixed = FALSE)
 
 truncated_poisson_obs <-
-  if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
-    bru_obs(
-      family = "zeroinflatedpoisson0",
-      data = counts_df[counts_df$present > 0, ],
-      formula = count ~ elevation + field_count + Intercept_count,
-      E = area,
-      control.family = list(hyper = list(theta = list(
-        initial = -20, fixed = TRUE
-      )))
-    )
-  } else {
-    bru_obs(
-      family = "nzpoisson",
-      data = counts_df[counts_df$present > 0, ],
-      formula = count ~ elevation + field_count + Intercept_count,
-      E = area
-    )
-  }
+  bru_obs(
+    family = "nzpoisson",
+    data = counts_df[counts_df$present > 0, ],
+    formula = count ~ elevation + field_count + Intercept_count,
+    E = area
+  )
 
 present_obs <- bru_obs(
   family = "binomial",
