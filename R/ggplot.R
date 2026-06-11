@@ -911,6 +911,7 @@ gg.SpatialPixels <- function(data, ...) {
 #' @return The output from `geom_spatraster.
 #' @family geomes
 #' @examples
+#' \donttest{
 #' if (require("ggplot2", quietly = TRUE) &&
 #'   bru_safe_terra(quietly = TRUE) &&
 #'   require("tidyterra", quietly = TRUE)) {
@@ -921,6 +922,7 @@ gg.SpatialPixels <- function(data, ...) {
 #'   # Plot the pixel centers
 #'   ggplot() +
 #'     gg(gcov$elevation)
+#' }
 #' }
 gg.SpatRaster <- function(data, ...) {
   if (!requireNamespace("tidyterra", quietly = TRUE)) {

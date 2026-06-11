@@ -19,6 +19,7 @@ Convenience wrapper function for \code{tidyterra::geom_spatraster()}.
 Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
 \examples{
+\donttest{
 if (require("ggplot2", quietly = TRUE) &&
   bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
@@ -29,6 +30,7 @@ if (require("ggplot2", quietly = TRUE) &&
   # Plot the pixel centers
   ggplot() +
     gg(gcov$elevation)
+}
 }
 }
 \seealso{
