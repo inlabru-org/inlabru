@@ -1169,18 +1169,24 @@ bru_agg_input_pandemic <- function(
     aggregate_input <- list()
   }
   if (is.null(aggregate_input[["block"]])) {
+    agg_block_expr <- rlang::parse_expr(
+      '.data.[[".block"]]'
+    )
     aggregate_input[["block"]] <- bru_eval_in_data_context(
-      .data[[".block"]],
+      !!agg_block_expr,
       data = data_list,
       default = NULL,
       .envir = .envir
     )
   }
   if (is.null(aggregate_input[["weights"]])) {
+    agg_weight_expr <- rlang::parse_expr(
+      '.data.[["weight"]]'
+    )
     aggregate_input[["weights"]] <- bru_eval_in_data_context(
-      .data[["weight"]],
+      !!agg_weight_expr,
       data = data_list,
-      default = NULL,
+      default = 1,
       .envir = .envir
     )
   }
@@ -1238,7 +1244,7 @@ bru_agg_input_pandemic <- function(
 
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9006",
+      "2.14.1.9008",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -1286,18 +1292,24 @@ bru_agg_input <- function(mapper, mask, .envir) {
     aggregate_input <- list()
   }
   if (is.null(aggregate_input[["block"]])) {
+    agg_block_expr <- rlang::parse_expr(
+      '.data.[[".block"]]'
+    )
     aggregate_input[["block"]] <- bru_eval_in_data_context(
-      .data[[".block"]],
+      !!agg_block_expr,
       data = mask,
       default = NULL,
       .envir = .envir
     )
   }
   if (is.null(aggregate_input[["weights"]])) {
+    agg_weight_expr <- rlang::parse_expr(
+      '.data.[["weight"]]'
+    )
     aggregate_input[["weights"]] <- bru_eval_in_data_context(
-      .data[["weight"]],
+      !!agg_weight_expr,
       data = mask,
-      default = NULL,
+      default = 1.0,
       .envir = .envir
     )
   }
@@ -1334,7 +1346,7 @@ bru_agg_input <- function(mapper, mask, .envir) {
   )
   if (!is.null(aggregate_input[["block_response"]])) {
     lifecycle::deprecate_warn(
-      "2.14.1.9006",
+      "2.14.1.9008",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
       details = glue(
@@ -2298,8 +2310,8 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'   ```
 #'   `r lifecycle::badge("experimental")`, available from version `2.12.0.9013`.
 #'
-#'   From `2.13.0.9016` to `2.14.1.9004`, it would look for a `block_response`
-#'   character element in the list, but from `2.14.1.9006`, the separate
+#'   From `2.13.0.9016` to `2.14.1.9007`, it would look for a `block_response`
+#'   character element in the list, but from `2.14.1.9008`, the separate
 #'   argument `reponse_block` should be used instead, with an expression to be
 #'   evaluated in the input data context. `response_block` should evaluate to a
 #'   vector of the same length as the response data, with values that can be
@@ -5078,7 +5090,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     inputs <- bru_input(model, lhoods = lhoods)
   }
 
-  timings <- bru_timer_do(timings, "Linearise", 1L)
+  timings <- bru_timer_do(timings, "Simplify", 1L)
   bru_log_message(
     "iinla: Evaluate component simplifications",
     verbosity = 3
@@ -5088,6 +5100,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     input = inputs,
     inla_f = TRUE
   )
+  timings <- bru_timer_do(timings, "Linearise", 1L)
   bru_log_message(
     "iinla: Evaluate predictor linearisation",
     verbosity = 3
@@ -5110,6 +5123,7 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       options = options
     )
   }
+  timings <- bru_timer_done(timings)
 
   do_line_search <- (length(options[["bru_method"]][["search"]]) > 0)
   if (do_line_search) {
@@ -5478,6 +5492,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             options = options
           )
         }
+
+        timings <- bru_timer_done(timings)
 
         stk <- bru_make_stack(lhoods, lin, idx)
 

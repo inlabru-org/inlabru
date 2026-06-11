@@ -747,7 +747,7 @@ bru_options_default <- function() {
       #'   calculation (the default from version `2.1.15`).}
       #' \item{'fullchain'}{Uses the chain rule for the composition of
       #'   components, predictor, and post-predictor transformations
-      #'   (new from `2.14.1.9006`).}
+      #'   (new from `2.14.1.9008`).}
       #' }
       #' }
       autodiff = "pandemic",
@@ -757,7 +757,7 @@ bru_options_default <- function() {
       #'   calculation (the default from version `2.1.15`).}
       #' \item{'fullchain'}{Uses the chain rule for the composition of
       #'   components, predictor, and post-predictor transformations
-      #'   (new from `2.14.1.9006`).}
+      #'   (new from `2.14.1.9008`).}
       #' }
       #' }
       agg = "pandemic",

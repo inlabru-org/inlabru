@@ -504,10 +504,12 @@ ibm_jacobian_bm_expr_var <- function(
     state_eps[[var]][k] <- state_eps[[var]][k] + eps
     derived_eps <- derived
     for (nm in affected_nms) {
-      row_subset <- (Ak[[nm]] != 0.0)
-      row_subset <- which(row_subset)
-      derived_eps[[nm]][row_subset] <-
-        derived_eps[[nm]][row_subset] + Ak[[nm]][row_subset] * eps
+      # row_subset <- (Ak[[nm]] != 0.0)
+      # row_subset <- which(row_subset)
+      # derived_eps[[nm]][row_subset] <-
+      #   derived_eps[[nm]][row_subset] + Ak[[nm]][row_subset] * eps
+      derived_eps[[nm]] <-
+        derived_eps[[nm]] + Ak[[nm]] * eps
     }
     offset_eps <- ibm_eval(
       mapper,
@@ -520,7 +522,18 @@ ibm_jacobian_bm_expr_var <- function(
     )
 
     the_diff <- (offset_eps - offset) / eps
-    nonzero <- the_diff != 0.0
+
+    nonzero <- is.finite(offset_eps)
+    if (!all(nonzero)) {
+      warning(
+        "Non-finite (-Inf/Inf/NaN) entries detected in predictor ",
+        "derivatives for '",
+        var,
+        "'; treated as 0.0.\n",
+        immediate. = TRUE
+      )
+    }
+    nonzero[nonzero] <- (the_diff[nonzero] != 0.0) # Detect exact (non)zeros
     ii[[k]] <- which(nonzero)
     jj[[k]] <- rep(k, sum(nonzero))
     xx[[k]] <- the_diff[ii[[k]]]

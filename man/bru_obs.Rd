@@ -152,8 +152,8 @@ inverted version, such that \code{is_rowwise = !allow_combine}.}
 "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version
 \verb{2.12.0.9013}.}
 
-\item{aggregate_input, response_block}{\code{NULL} or an optional input list to the mapper
-defined by non-NULL \code{aggregate}, overriding the default,
+\item{aggregate_input, response_block}{\code{NULL} or an optional input list to the
+mapper defined by non-NULL \code{aggregate}, overriding the default,
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{aggregate_input = list(
   block = .data.[[".block"]],
@@ -165,8 +165,8 @@ response_block = .response_data.[[".block"]]
 
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.
 
-From \verb{2.13.0.9016} to \verb{2.14.1.9004}, it would look for a \code{block_response}
-character element in the list, but from \verb{2.14.1.9006}, the separate
+From \verb{2.13.0.9016} to \verb{2.14.1.9007}, it would look for a \code{block_response}
+character element in the list, but from \verb{2.14.1.9008}, the separate
 argument \code{reponse_block} should be used instead, with an expression to be
 evaluated in the input data context. \code{response_block} should evaluate to a
 vector of the same length as the response data, with values that can be
