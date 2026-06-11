@@ -12,7 +12,7 @@
 \alias{[.bru_obs_list}
 \alias{like_list}
 \alias{bru_like_list}
-\title{Observation model construction for usage with \code{\link[=bru]{bru()}}}
+\title{Observation model construction for \code{\link[=bru]{bru()}}}
 \usage{
 bru_obs(
   formula = . ~ .,
@@ -76,13 +76,21 @@ bru_like_list(...)
 expression defines the predictor used in the model.}
 
 \item{family}{A string identifying a valid \code{INLA::inla} likelihood family.
-The default is
-\code{gaussian} with identity link. In addition to the likelihoods provided
-by inla (see \code{names(INLA::inla.models()$likelihood)})
-inlabru supports fitting latent Gaussian Cox
-processes via \code{family = "cp"}.
-As an alternative to \code{\link[=bru]{bru()}}, the \code{\link[=lgcp]{lgcp()}} function provides
-a convenient interface to fitting Cox processes.}
+The default is \code{gaussian} with identity link. Apart from the likelihoods
+provided by INLA (see \code{names(INLA::inla.models()$likelihood)}) inlabru
+supports
+\describe{
+\item{\code{cp}}{Cox process likelihood, for fitting point process models.
+The \code{\link[=lgcp]{lgcp()}} function is a shortcut to \code{bru(..., family = "cp")}.}
+\item{\code{nzbinomial},\code{nzbetabinomial},\code{nznbinomial},\code{nzcenpoisson}}{
+Non-zero versions of "binomial", "betabinomial", "nbinomial", and
+"cenpoisson", respectively, implemented by setting the zero probability
+parameter close to zero in the corresponding "zeroinflated*0" models.
+It will check if these models have native INLA implementations,
+and use those instead if available. In INLA \verb{26.06.07}, only
+"nzpoisson" has a native implementation.
+}
+}}
 
 \item{data}{Predictor expression-specific data, as a \code{data.frame}, \code{tibble},
 or \code{sf}.  Since \verb{2.12.0.9023}, deprecated support for
@@ -333,6 +341,24 @@ if (bru_safe_inla() &&
     ggtitle("Joint model")
 
   (p1 / p2 / pj)
+
+  # Non-zero binomial example:
+  nzdata <- data.frame(ntrials = rep(2:6, 10))
+  nzdata$x <- rnorm(nrow(nzdata))
+  nzdata$count <- rbinom(
+    nrow(nzdata),
+    size = nzdata$ntrials,
+    prob = plogis(nzdata$x)
+  )
+  nzdata <- nzdata[nzdata$count > 0, ]
+  truncated_binomial_obs <-
+    bru_obs(
+      formula = count ~ x,
+      family = "nzbinomial",
+      data = nzdata,
+      Ntrials = ntrials
+    )
+  fit <- bru(~ 0 + x, truncated_binomial_obs)
 }
 }
 

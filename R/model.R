@@ -757,7 +757,7 @@ evaluate_predictor <- function(model,
 #'   component. The four inputs are passed on to the joint `bru_mapper` for the
 #'   component, as
 #'  ```
-#'  list(mapper = list(
+#'  list(core = list(
 #'         main = main,
 #'         group = group,
 #'         replicate = replicate),
@@ -771,39 +771,31 @@ evaluate_predictor <- function(model,
 #' by the internal methods for evaluating inlabru predictor expressions.
 #' @return A vector of values for a component
 #' @examples
+#' \donttest{
 #' if (bru_safe_inla() &&
-#'   require("sf", quietly = TRUE) &&
 #'   requireNamespace("sn", quietly = TRUE)) {
-#'   mesh <- fmesher::fm_mesh_2d_inla(
-#'     cbind(0, 0),
-#'     offset = 2,
-#'     max.edge = 2.5
-#'   )
-#'   spde <- INLA::inla.spde2.pcmatern(
-#'     mesh,
-#'     prior.range = c(1, NA),
-#'     prior.sigma = c(0.2, NA)
-#'   )
 #'   set.seed(12345L)
-#'   data <- sf::st_as_sf(
+#'   data <-
 #'     data.frame(
-#'       x = runif(50),
-#'       y = runif(50),
-#'       z = rnorm(50)
-#'     ),
-#'     coords = c("x", "y")
-#'   )
+#'       x = runif(5),
+#'       idx = seq_len(5)
+#'     )
+#'   data$y <- data$x + rnorm(5, sd = 0.1)
 #'   fit <- bru(
-#'     z ~ -1 + field(geometry, model = spde),
+#'     y ~ 0 + x + field(idx, model = "iid", mapper = bm_index(5L)),
 #'     family = "gaussian", data = data,
+#'     control.family = list(
+#'       hyper = list(prec = list(initial = 9, fixed = TRUE))
+#'     ),
 #'     options = list(control.inla = list(int.strategy = "eb"))
 #'   )
 #'   pred <- generate(
 #'     fit,
-#'     newdata = data.frame(A = 0.5, B = 0.5),
-#'     formula = ~ field_eval(cbind(A, B)),
+#'     newdata = list(),
+#'     formula = ~ field_eval(c(seq_len(5), 6, 7, 6)),
 #'     n.samples = 1L
 #'   )
+#' }
 #' }
 bru_comp_eval <- function(main,
                           group = NULL,

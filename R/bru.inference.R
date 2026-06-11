@@ -2081,6 +2081,34 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 }
 
 
+bru_obs_family_nz <- function(lh, options, .envir) {
+  stopifnot(bru_safe_inla(multicore = TRUE))
+  if (lh$inla.family %in% names(INLA::inla.models()$likelihood)) {
+    return(lh)
+  }
+  family_conversion <-
+    list(
+      "nzpoisson" = "zeroinflatedpoisson0",
+      "nzbinomial" = "zeroinflatedbinomial0",
+      "nznbinomial" = "zeroinflatednbinomial0",
+      "nzbetabinomial" = "zeroinflatedbetabinomial0",
+      "nzcenpoisson" = "zeroinflatedcenpoisson0"
+    )
+  lh$inla.family <- family_conversion[[lh$inla.family]]
+  lh$control.family <- modifyList(
+    lh$control.family %||% list(),
+    list(
+      hyper = list(
+        prob = list(
+          initial = qlogis(2e-9),
+          fixed = TRUE
+        )
+      )
+    )
+  )
+  lh
+}
+
 bru_obs_check_used_deprecation <- function(
   used,
   include,
@@ -2215,7 +2243,7 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 }
 
 
-#' @title Observation model construction for usage with [bru()]
+#' @title Observation model construction for [bru()]
 #'
 #' @description Observation model construction for usage with [bru()].
 #'
@@ -2234,13 +2262,21 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #' @param formula a `formula` where the right hand side is a general R
 #'   expression defines the predictor used in the model.
 #' @param family A string identifying a valid `INLA::inla` likelihood family.
-#' The default is
-#'   `gaussian` with identity link. In addition to the likelihoods provided
-#'   by inla (see `names(INLA::inla.models()$likelihood)`)
-#'   inlabru supports fitting latent Gaussian Cox
-#'   processes via `family = "cp"`.
-#'   As an alternative to [bru()], the [lgcp()] function provides
-#'   a convenient interface to fitting Cox processes.
+#'   The default is `gaussian` with identity link. Apart from the likelihoods
+#'   provided by INLA (see `names(INLA::inla.models()$likelihood)`) inlabru
+#'   supports
+#'   \describe{
+#'     \item{`cp`}{Cox process likelihood, for fitting point process models.
+#'       The [lgcp()] function is a shortcut to `bru(..., family = "cp")`.}
+#'     \item{`nzbinomial`,`nzbetabinomial`,`nznbinomial`,`nzcenpoisson`}{
+#'       Non-zero versions of "binomial", "betabinomial", "nbinomial", and
+#'       "cenpoisson", respectively, implemented by setting the zero probability
+#'       parameter close to zero in the corresponding "zeroinflated*0" models.
+#'       It will check if these models have native INLA implementations,
+#'       and use those instead if available. In INLA `26.06.07`, only
+#'       "nzpoisson" has a native implementation.
+#'     }
+#'   }
 #' @param data Predictor expression-specific data, as a `data.frame`, `tibble`,
 #'  or `sf`.  Since `2.12.0.9023`, deprecated support for
 #' `SpatialPoints[DataFrame]` objects.
@@ -2422,6 +2458,24 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #'     ggtitle("Joint model")
 #'
 #'   (p1 / p2 / pj)
+#'
+#'   # Non-zero binomial example:
+#'   nzdata <- data.frame(ntrials = rep(2:6, 10))
+#'   nzdata$x <- rnorm(nrow(nzdata))
+#'   nzdata$count <- rbinom(
+#'     nrow(nzdata),
+#'     size = nzdata$ntrials,
+#'     prob = plogis(nzdata$x)
+#'   )
+#'   nzdata <- nzdata[nzdata$count > 0, ]
+#'   truncated_binomial_obs <-
+#'     bru_obs(
+#'       formula = count ~ x,
+#'       family = "nzbinomial",
+#'       data = nzdata,
+#'       Ntrials = ntrials
+#'     )
+#'   fit <- bru(~ 0 + x, truncated_binomial_obs)
 #' }
 #' }
 #'
@@ -2596,6 +2650,17 @@ bru_obs <- function(formula = . ~ .,
   # More on special bru likelihoods
   if (family == "cp") {
     lh <- bru_obs_family_cp(lh, options = options, .envir = .envir)
+  } else if (
+    family %in%
+      c(
+        "nzpoisson",
+        "nzbinomial",
+        "nzbetabinomial",
+        "nznbinomial",
+        "nzcenpoisson"
+      )
+  ) {
+    lh <- bru_obs_family_nz(lh, options = options, .envir = .envir)
   }
 
   if (is.null(lh[["response_data"]][[lh[["response"]]]])) {
