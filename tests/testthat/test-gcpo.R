@@ -396,7 +396,12 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   ))
 
   # block grid
-  cvpart <- cv_hex(boundary, cellsize = 0.1, n_group = 1)
+  cvpart <- cv_hex(
+    boundary,
+    cellsize = 0.1,
+    n_group = 1,
+    resolution = c(80, 80)
+  )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
