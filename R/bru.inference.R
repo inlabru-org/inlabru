@@ -826,6 +826,34 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' )
 #'
 #' @export
+#' @examples
+#' mask <- bru_data_mask(list(data = list(x = 1:4)))
+#' eval_tidy(quo(x), data = mask)
+#' eval_tidy(quo(.data$x), data = mask)
+#' eval_tidy(quo(.data.$x), data = mask)
+#'
+#' # Using functions that need to call eval_tidy using the data mask:
+#' fun_factory <- function() {
+#'   .get_mask <- function(frame = parent.frame(2L)) {
+#'     rlang::eval_tidy(rlang::expr(.mask.), env = frame)
+#'   }
+#'   .eval_tidy <- function(expr, frame = parent.frame(2L)) {
+#'     mask <- .get_mask(frame)
+#'     rlang::eval_tidy(expr, data = mask, env = frame)
+#'   }
+#'   .addition <- 5L
+#'   fun <- function(nm) {
+#'     val <- .eval_tidy(rlang::expr(.data[[nm]]))
+#'     val + .addition
+#'   }
+#'   list(fun = fun)
+#' }
+#' mask <- bru_data_mask(list(data = list(x = 1:4), fun = fun_factory()))
+#' eval_tidy(quo(fun("x")), data = mask)
+#' eval_tidy(quo(.fun$fun("x")), data = mask)
+#' eval_tidy(quo(.fun.$fun("x")), data = mask)
+
+#'
 bru_data_mask <- function(data,
                           pronouns = NULL,
                           objects = NULL) {
@@ -875,6 +903,7 @@ bru_data_mask <- function(data,
     }
   }
   mask[[".mask"]] <- rlang::as_data_pronoun(mask)
+  assign(".mask.", mask, top_envir)
   class(mask) <- c("bru_data_mask", class(mask))
   mask
 }
@@ -1154,10 +1183,10 @@ bru_agg_data <- function(
 
 
 bru_agg_input_pandemic <- function(
-    input,
-    data_list,
-    .envir,
-    response_block = NULL
+  input,
+  data_list,
+  .envir,
+  response_block = NULL
 ) {
   aggregate_input <- bru_eval_in_data_context(
     {{ input }},
@@ -3577,6 +3606,13 @@ predict.bru <- function(object,
                         include = deprecated(),
                         exclude = deprecated()) {
   object <- bru_check_object_bru(object)
+  info <- object[["bru_info"]]
+  info[["options"]] <- bru_call_options(
+    bru_options(
+      info[["options"]]
+    )
+  )
+  bru_options_set_local(info[["options"]], .reset = TRUE)
 
   # Convert data into list, data.frame or a Spatial object if not provided as
   # such
@@ -3800,6 +3836,13 @@ generate.bru <- function(object,
                          include = deprecated(),
                          exclude = deprecated()) {
   object <- bru_check_object_bru(object)
+  info <- object[["bru_info"]]
+  info[["options"]] <- bru_call_options(
+    bru_options(
+      info[["options"]]
+    )
+  )
+  bru_options_set_local(info[["options"]], .reset = TRUE)
 
   # Convert data into list, data.frame or a Spatial object if not provided as
   # such
