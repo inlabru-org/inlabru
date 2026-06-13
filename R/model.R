@@ -112,7 +112,7 @@ bru_model <- function(components,
     inputs = inputs
   )
 
-  # Evaluate inputs for non-copy components
+  # Evaluate inputs for copy components
   is_copy <- vapply(components, function(x) !is.null(x[["copy"]]), TRUE)
   if (any(is_copy)) {
     inputs_copy <- bru_input(
