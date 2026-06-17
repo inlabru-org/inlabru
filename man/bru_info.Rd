@@ -7,6 +7,10 @@
 \alias{as_bru_info}
 \alias{as_bru_info.bru_info}
 \alias{as_bru_info.bru}
+\alias{as_bru_model}
+\alias{as_bru_model.bru_model}
+\alias{as_bru_model.bru_info}
+\alias{as_bru_model.bru}
 \alias{summary.bru_info}
 \alias{print.summary_bru_info}
 \alias{print.bru_info}
@@ -23,6 +27,14 @@ as_bru_info(object, ...)
 \method{as_bru_info}{bru_info}(object, ...)
 
 \method{as_bru_info}{bru}(object, ...)
+
+as_bru_model(object, ...)
+
+\method{as_bru_model}{bru_model}(object, ...)
+
+\method{as_bru_model}{bru_info}(object, ...)
+
+\method{as_bru_model}{bru}(object, ...)
 
 \method{summary}{bru_info}(object, verbose = TRUE, ...)
 
@@ -66,6 +78,8 @@ components and observation models.
 \itemize{
 \item \code{as_bru_info(bru_info)}: Extract a \code{bru_info} object.
 
+\item \code{as_bru_model(bru_info)}: Extract a \code{bru_model} object.
+
 }}
 \section{Functions}{
 \itemize{
@@ -74,6 +88,14 @@ result object. The default print method shows information about model
 components and observation models.
 
 \item \code{as_bru_info(bru)}: Extract the \code{bru_info} object from an estimated \code{\link[=bru]{bru()}}
+result object.
+
+\item \code{as_bru_model()}: Extract the \code{bru_model} object from an estimated \code{\link[=bru]{bru()}}
+result object.
+
+\item \code{as_bru_model(bru_model)}: Extract a \code{bru_model} object.
+
+\item \code{as_bru_model(bru)}: Extract the \code{bru_model} object from an estimated \code{\link[=bru]{bru()}}
 result object.
 
 }}

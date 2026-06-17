@@ -103,9 +103,25 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
   .envir = rlang::caller_env()
 )
 
-\method{ibm_jacobian}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_jacobian}{bru_obs}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 
-\method{ibm_jacobian}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_jacobian}{bru_obs_list}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 
 \method{ibm_jacobian}{bm_repeat}(
   mapper,
@@ -179,6 +195,9 @@ is set to the caller environment.}
 
 \item{comp_mappers}{A list of mappers, typically from
 \verb{as_bm_list<bru_comp_list>}.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \description{
 Implementations must return a (sparse) matrix of size

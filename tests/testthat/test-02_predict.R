@@ -134,8 +134,9 @@ test_that("bru: predict with _eval", {
   withr::local_seed(1234L)
 
   data <- data.frame(
-    z = rnorm(5),
-    u = 1:5
+    z = rnorm(501),
+    u = seq(1, 5, length.out = 501)
+
   )
   u_mapper <- bru_mapper(
     fm_mesh_1d(
@@ -150,15 +151,16 @@ test_that("bru: predict with _eval", {
   )
 
   skip_if_not_installed("sn")
-  pred <- predict(
+  pred = {set.seed(123L);predict(
     fit,
     newdata = data.frame(u = seq(-1, 6, by = 0.1)),
     formula = ~ data.frame(
       A = fun,
       B = fun_eval(u)
     ),
+    seed = 1234L,
     n.samples = 10L
-  )
+  )}
 
   expect_equal(pred$B, pred$A)
 })

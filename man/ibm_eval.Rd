@@ -11,9 +11,25 @@ ibm_eval(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{default}(mapper, input, state = NULL, ..., jacobian = NULL)
 
-\method{ibm_eval}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_eval}{bru_obs}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 
-\method{ibm_eval}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_eval}{bru_obs_list}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -63,6 +79,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
 \item{comp_mappers}{A list of mappers, typically from
 \verb{as_bm_list<bru_comp_list>}.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \description{
 Implementations must return a vector of length \code{\link[=ibm_n_output]{ibm_n_output()}}.
@@ -84,7 +103,8 @@ Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_scale}},
 \code{\link[=ibm_eval_methods]{bm_shift}},
 \code{\link[=ibm_eval_methods]{bm_sum}},
-\code{\link[=ibm_eval_methods]{bm_taylor}}, \code{bru_obs},
+\code{\link[=ibm_eval_methods]{bm_taylor}},
+\code{\link[=bru_model_mapper_methods]{bru_model}}, \code{bru_obs},
 \code{bru_obs_list}, \code{default}.
 }
 \section{Methods (by class)}{

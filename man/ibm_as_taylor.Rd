@@ -35,7 +35,15 @@ ibm_as_taylor(mapper, input, state = NULL, ...)
 
 \method{ibm_as_taylor}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
 
-\method{ibm_as_taylor}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_as_taylor}{bru_obs_list}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 
 \method{ibm_as_taylor}{bm_repeat}(mapper, input, state, ...)
 
@@ -79,6 +87,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
 \item{comp_mappers}{A list of mappers, typically from
 \verb{as_bm_list<bru_comp_list>}.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \value{
 A \link{bm_taylor} object.

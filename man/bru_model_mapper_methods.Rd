@@ -9,6 +9,9 @@
 \alias{ibm_simplify.bru_comp_list}
 \alias{ibm_as_taylor.bm_list}
 \alias{ibm_simplify.bm_list}
+\alias{ibm_eval2.bru_model}
+\alias{ibm_eval.bru_model}
+\alias{ibm_jacobian.bru_model}
 \title{Mapper methods for model objects}
 \usage{
 \method{ibm_as_taylor}{bru_model}(
@@ -17,7 +20,8 @@
   state = NULL,
   ...,
   options = NULL,
-  comp_mappers = NULL
+  comp_mappers = NULL,
+  eval_fun = NULL
 )
 
 \method{ibm_as_taylor}{bru_comp_list}(mapper, input, state = NULL, ...)
@@ -31,6 +35,36 @@
 \method{ibm_as_taylor}{bm_list}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bm_list}(mapper, input = NULL, state = NULL, ...)
+
+\method{ibm_eval2}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
+
+\method{ibm_eval}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
+
+\method{ibm_jacobian}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -47,6 +81,9 @@ on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{comp_mappers}{A list of mappers, typically from
 \verb{as_bm_list<bru_comp_list>}.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \description{
 Methods for the \code{ibm_as_taylor()} and \code{ibm_simplify()} methods for

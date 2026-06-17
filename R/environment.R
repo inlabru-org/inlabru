@@ -750,7 +750,7 @@ bru_options_default <- function() {
       #'   (new from `2.14.1.9008`).}
       #' }
       #' }
-      autodiff = "pandemic",
+      autodiff = "fullchain",
       #' \item{agg}{Controls the aggregation implementation. One of
       #' \describe{
       #' \item{'pandemic'}{Treats all post-component transformations as a single
@@ -760,7 +760,7 @@ bru_options_default <- function() {
       #'   (new from `2.14.1.9008`).}
       #' }
       #' }
-      agg = "pandemic",
+      agg = "fullchain",
       #' \item{finite_diff}{One of
       #' \describe{
       #' \item{'forward'}{Use onesided finite differences.}

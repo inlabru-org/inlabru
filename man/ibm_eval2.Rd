@@ -17,9 +17,25 @@ ibm_eval2(mapper, input, state = NULL, ...)
 
 \method{ibm_eval2}{bm_expr}(mapper, input, state = NULL, ..., data = NULL)
 
-\method{ibm_eval2}{bru_obs}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_eval2}{bru_obs}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 
-\method{ibm_eval2}{bru_obs_list}(mapper, input, state, ..., multi = FALSE, comp_mappers)
+\method{ibm_eval2}{bru_obs_list}(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -39,6 +55,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
 \item{comp_mappers}{A list of mappers, typically from
 \verb{as_bm_list<bru_comp_list>}.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \description{
 Implementations must return a list with elements \code{offset} and \code{jacobian}.
