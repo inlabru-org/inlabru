@@ -1356,7 +1356,7 @@ bru_eval <- function(model,
       if (k == 1) {
         if (identical(format, "auto")) {
           if ((is.vector(values_) && !is.list(values_)) ||
-              (is.matrix(values_) && (NCOL(values_) == 1))) {
+            (is.matrix(values_) && (NCOL(values_) == 1))) {
             format <- "matrix"
           } else {
             format <- "list"
@@ -1374,7 +1374,6 @@ bru_eval <- function(model,
       } else {
         values[, k] <- values_
       }
-
     }
   }
 
@@ -1404,8 +1403,7 @@ bru_eval <- function(model,
 #' @rdname bru_state
 # @keywords internal
 #' @examples
-#' if (bru_safe_inla()) {
-#' }
+#' if (bru_safe_inla()) {}
 bru_state <- function(x, ...) {
   UseMethod("bru_state", x)
 }

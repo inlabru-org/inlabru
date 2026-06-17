@@ -117,6 +117,12 @@ reference:
   - starts_with("deltaIC")
   - starts_with("devel.cvmeasure")
   - matches("gcpo")
+- title: "Advanced interface functions"
+  desc: "Lower level functions for advanced model construction and evaluation."
+  contents:
+  - matches("^bru_state$")
+  - matches("^bru_eval$")
+  - matches("^bru_eval_fun$")
 - title: "Optimization log information"
   desc: "Accessing the optimization text log, and plotting the optimization convergence."
   contents:

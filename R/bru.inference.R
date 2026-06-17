@@ -3886,25 +3886,25 @@ generate.bru <- function(object,
 
 
   if (method == "pandemic") {
-  state <- evaluate_state(
-    object$bru_info$model,
-    result = object,
-    property = "sample",
-    n = n.samples,
-    seed = seed,
-    num.threads = num.threads,
-    ...
-  )
-} else {
-  state <- bru_state(
-    object,
-    property = "sample",
-    n = n.samples,
-    seed = seed,
-    num.threads = num.threads,
-    ...
-  )
-}
+    state <- evaluate_state(
+      object$bru_info$model,
+      result = object,
+      property = "sample",
+      n = n.samples,
+      seed = seed,
+      num.threads = num.threads,
+      ...
+    )
+  } else {
+    state <- bru_state(
+      object,
+      property = "sample",
+      n = n.samples,
+      seed = seed,
+      num.threads = num.threads,
+      ...
+    )
+  }
   if (is.null(formula)) {
     state
   } else {
@@ -3937,20 +3937,20 @@ generate.bru <- function(object,
     }
 
     if (method == "pandemic") {
-    vals <- evaluate_model(
-       model = object$bru_info$model,
-       state = state,
-       data = newdata,
-       predictor = pred
-     )
-} else {
-    vals <- bru_eval(
-      model = object$bru_info$model,
-      state = state,
-      data = newdata,
-      predictor = pred
-    )
-}
+      vals <- evaluate_model(
+        model = object$bru_info$model,
+        state = state,
+        data = newdata,
+        predictor = pred
+      )
+    } else {
+      vals <- bru_eval(
+        model = object$bru_info$model,
+        state = state,
+        data = newdata,
+        predictor = pred
+      )
+    }
     vals
   }
 }

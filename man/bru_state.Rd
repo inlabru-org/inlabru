@@ -51,6 +51,5 @@ A list of length \code{n}
 Extracts model state summary values or generate samples
 }
 \examples{
-if (bru_safe_inla()) {
-}
+if (bru_safe_inla()) {}
 }
