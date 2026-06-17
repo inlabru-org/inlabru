@@ -3489,6 +3489,7 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @param \dots Additional arguments passed on to `inla.posterior.sample()`
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
 #' of used variables fails, use `used` instead.
+#' @inheritParams bru
 #' @details
 #' In addition to the component names (that give the effect of each component
 #' evaluated for the input data), the suffix `_latent` variable name can be used
@@ -3630,14 +3631,17 @@ predict.bru <- function(object,
                         num.threads = NULL,
                         used = NULL,
                         drop = FALSE,
+                        options = NULL,
                         ...,
                         include = deprecated(),
                         exclude = deprecated()) {
   object <- bru_check_object_bru(object)
   info <- object[["bru_info"]]
+
   info[["options"]] <- bru_call_options(
     bru_options(
-      info[["options"]]
+      info[["options"]],
+      as.bru_options(options)
     )
   )
   bru_options_set_local(info[["options"]], .reset = TRUE)
@@ -3836,6 +3840,7 @@ bru_generate_check_used_deprecation <- function(
 #' @param \dots additional, unused arguments.
 #' @param include,exclude `r lifecycle::badge("deprecated")` If auto-detection
 #' of used variables fails, use `used` instead.
+#' @inheritParams bru
 #' @details
 #' In addition to the component names (that give the effect of each component
 #' evaluated for the input data), the suffix `_latent` variable name can be used
@@ -3860,14 +3865,17 @@ generate.bru <- function(object,
                          seed = 0L,
                          num.threads = NULL,
                          used = NULL,
+                         options = NULL,
                          ...,
                          include = deprecated(),
                          exclude = deprecated()) {
   object <- bru_check_object_bru(object)
   info <- object[["bru_info"]]
+
   info[["options"]] <- bru_call_options(
     bru_options(
-      info[["options"]]
+      info[["options"]],
+      as.bru_options(options)
     )
   )
   bru_options_set_local(info[["options"]], .reset = TRUE)

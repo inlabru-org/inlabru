@@ -15,6 +15,7 @@ generate(object, ...)
   seed = 0L,
   num.threads = NULL,
   used = NULL,
+  options = NULL,
   ...,
   include = deprecated(),
   exclude = deprecated()
@@ -46,6 +47,9 @@ When seed != 0, overridden to "1:1:1"}
 
 \item{used}{Either \code{NULL} or a \code{\link[=bru_used]{bru_used()}} object.
 Default, \code{NULL}, uses auto-detection of used variables in the formula.}
+
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
 of used variables fails, use \code{used} instead.}
