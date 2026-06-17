@@ -152,7 +152,22 @@ reference:
 - subtitle: "Evaluator methods"
   contents:
   - matches("^bru_mapper_generics$")
-  - starts_with("ibm_")
+  - matches("^ibm_n$")
+  - matches("^ibm_n_output$")
+  - matches("^ibm_eval$")
+  - matches("^ibm_eval_methods$")
+  - matches("^ibm_jacobian$")
+  - matches("^ibm_eval2$")
+  - matches("^ibm_as_taylor$")
+  - matches("^ibm_simplify$")
+  - matches("^bru_model_mapper_methods$")
+  - matches("^ibm_values$")
+  - matches("^ibm_invalid_output$")
+  - matches("^ibm_inla_subset$")
+  - matches("^ibm_names$")
+  - matches("^ibm_is_linear$")
+  - matches("^ibm_is_rowwise$")
+  - matches("^ibm_input_")
 - subtitle: "Conversion and helper methods"
   contents:
   - starts_with("as_bru_mapper")
