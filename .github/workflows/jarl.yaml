@@ -18,7 +18,7 @@ jobs:
     name: jarl-check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install jarl without running check
         uses: etiennebacher/setup-jarl@v0.1.1
         with:
