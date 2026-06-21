@@ -61,7 +61,7 @@ local_basic_intercept_testdata <- function() {
   withr::local_seed(123)
   data.frame(
     Intercept = 1,
-    y = rnorm(100)
+    y = 2 + rnorm(100)
   )
 }
 
@@ -69,10 +69,12 @@ local_basic_intercept_testdata <- function() {
 #' @rdname local_testthat
 local_basic_fixed_effect_testdata <- function() {
   withr::local_seed(123)
-  cbind(
-    local_basic_intercept_testdata(),
-    data.frame(x1 = rnorm(100))
+  df <- data.frame(
+    Intercept = 1,
+    x1 = rnorm(100)
   )
+  df$y <- rnorm(100, mean = 2 + 3 * df$x1, sd = 1)
+  df
 }
 
 
