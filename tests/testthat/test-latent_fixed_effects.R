@@ -92,8 +92,8 @@ test_that("basic fixed effect model, order relevance", {
   )
 
   expect_equal(
-    fit2$summary.fixed["Intercept", ],
-    fit1$summary.fixed["Intercept", ],
+    fit2$summary.fixed["Intercept", "mean"],
+    fit1$summary.fixed["Intercept", "mean"],
     tolerance = lowtol
   )
 })

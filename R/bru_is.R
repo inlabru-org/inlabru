@@ -80,134 +80,81 @@ bru_is_additive <- function(x, ...) {
   UseMethod("bru_is_additive")
 }
 
-bru_is_additive_data_frame <- function(x, root_id = 0, ..., verbose = FALSE) {
-  if (root_id == 0) {
-    root_id <- x$id[x$parent == 0]
-    if (length(root_id) != 1L) {
-      stop("Cannot determine parser root id")
-    }
-  }
-
-  x_root <- x[x$id == root_id, , drop = FALSE]
-  if (x_root$token == "SYMBOL") {
-    if (verbose) {
-      message("SYMBOL found")
-    }
-    return(TRUE)
-  }
-  if (x_root$token == "expr") {
-    if (verbose) {
-      message("expr found, may be additive")
-    }
-    x_terms <- x[x$parent == root_id, , drop = FALSE]
-    if (nrow(x_terms) < 1L) {
-      if (verbose) {
-        message("No terms found, assuming non-additive")
-      }
-      return(FALSE)
-    }
-    if (nrow(x_terms) == 1L) {
-      if (verbose) {
-        message("Only one term, checking for symbol")
-      }
-      add <- x_terms$token[1] == "SYMBOL"
-      if (add && verbose) {
-        message("SYMBOL found")
-      }
-      return(add)
-    }
-    if (nrow(x_terms) == 2L) {
-      if (x_terms$token[1] != "'+'") {
-        if (verbose) {
-          message("Only two terms and no '+' found, assuming non-additive")
-        }
-        return(FALSE)
-      }
-      if (verbose) {
-        message("'+' found, may be additive")
-      }
-      add <- bru_is_additive_data_frame(
-        x = x,
-        root_id = x_terms$id[2],
-        ...,
-        verbose = verbose
-      )
-      return(all(add))
-    }
-    if (nrow(x_terms) >= 4L) {
-      if (verbose) {
-        message("More than 3 terms, assuming non-additive")
-      }
-      return(FALSE)
-    }
-    if (x_terms$token[2] == "'+'") {
-      if (verbose) {
-        message("'+' found, may be additive")
-      }
-      add <- c(
-        bru_is_additive_data_frame(
-          x = x,
-          root_id = x_terms$id[1],
-          verbose = verbose
-        ),
-        bru_is_additive_data_frame(
-          x = x,
-          root_id = x_terms$id[3],
-          verbose = verbose
-        )
-      )
-      return(all(add))
-    }
-    if ((x_terms$token[1] == "'('") && (x_terms$token[3] == "')'")) {
-      if (x_terms$token[2] == "expr") {
-        if (verbose) {
-          message("(expr) found, may be additive")
-        }
-        add <- bru_is_additive_data_frame(
-          x = x,
-          root_id = x_terms$id[2],
-          verbose = verbose
-        )
-        return(add)
-      }
-    }
-  }
-
-  if (verbose) {
-    message("No known additive structure found, assuming non-additive")
-  }
-
-  FALSE
-}
-
 #' @rdname bru_is_additive
 #' @export
-bru_is_additive.character <- function(x, ..., verbose = FALSE) {
-  bru_is_additive_data_frame(
-    bru_get_parse_data(x),
-    root_id = 0,
-    ...
-  )
+bru_is_additive.default <- function(x, ..., verbose = FALSE) {
+  if (inherits(x, "{") || inherits(x, "(")) {
+    if (length(x) < 2L) {
+      if (verbose) {
+        message("Empty '{}' or '()' found, assuming non-additive.")
+      }
+      return(FALSE)
+    }
+    return(bru_is_additive(x[[2]], ..., verbose = verbose))
+  }
+  if (verbose) {
+    message(paste0("General class ",
+                   paste0("'", class(x), "'", collapse = ", "),
+                   " found, assuming non-additive."))
+  }
+  FALSE
 }
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.numeric <- function(x, ..., verbose = FALSE) {
+  if (verbose) {
+    message("Numeric found, assuming additive.")
+  }
+  TRUE
+}
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.name <- function(x, ..., verbose = FALSE) {
+  if (verbose) {
+    message("Symbol found, assuming additive.")
+  }
+  TRUE
+}
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.call <- function(x, ..., verbose = FALSE) {
+  if (x[[1]] != as.name("+")) {
+    if (verbose) {
+      message("Non-'+' call found, assuming non-additive")
+    }
+    return(FALSE)
+  }
+  if (verbose) {
+    message("'+' found, may be additive")
+  }
 
+  ok <- bru_is_additive(x[[2]], ..., verbose = verbose)
+  if (length(x) == 2L) {
+    return(ok)
+  }
+
+  ok && bru_is_additive(x[[3]], ..., verbose = verbose)
+}
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.expression <- function(x, ..., verbose = FALSE) {
-  bru_is_additive_data_frame(
-    bru_get_parse_data(as.character(x)),
-    root_id = 0,
-    ...
-  )
+  all(vapply(x, bru_is_additive, ..., verbose = verbose,
+             FUN.VALUE = logical(1)))
 }
-
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.quosure <- function(x, ..., verbose = FALSE) {
+  bru_is_additive(rlang::quo_get_expr(x), ..., verbose = verbose)
+}
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.formula <- function(x, ..., verbose = FALSE) {
-  bru_is_additive_data_frame(
-    bru_get_parse_data(as.character(x)[length(x)]),
-    root_id = 0,
-    ...
-  )
+  bru_is_additive(rlang::as_quosure(x), ..., verbose = verbose)
+}
+#' @rdname bru_is_additive
+#' @export
+bru_is_additive.character <- function(x, ..., verbose = FALSE) {
+  bru_is_additive(rlang::parse_expr(x), ..., verbose = verbose)
 }
 
 

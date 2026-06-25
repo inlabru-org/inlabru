@@ -36,6 +36,7 @@ new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
     is_additive <- NA
     is_additive_dot <- NA
   } else {
+    is_additive <- bru_is_additive(x)
     if (inherits(x, "formula")) {
       form.envir <- environment(x)
       if (!is.null(form.envir)) {
@@ -51,7 +52,6 @@ new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
       pred_text <- x
       formula_text <- glue::glue("~ {pred_text}")
     }
-    is_additive <- bru_is_additive(pred_text)
     is_additive_dot <- identical(pred_text, ".")
     if (is_additive_dot) {
       pred_text <- NULL

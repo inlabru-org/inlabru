@@ -34,6 +34,25 @@ bru_standardise_names <- function(x) {
 }
 
 
+# bru_convert_names <- function(x, comp_names, obs_names) {
+#   # In: "<output.name> for <label>"
+#   # Out: "param_comp_<label>_<short.name>"
+#   INLA::inla.models()$latent[[comp_model]]$hyper
+#   # Should be
+#   #   In: "<name> for <label>"
+#   # but The actual names are hardcoded in inlaprog/src/inla-parse.c as
+#   #   "Group rho_intern"/"GroupRho" and "Group prec_intern"/"GroupPrec"
+#   # Out: "param_comp_<label>_group_<short.name>"
+#   INLA::inla.models()$group[[comp_group_model]]$hyper
+#   # In: "<output.name>" or # "<output.name>[<nr>]"
+#   # However, many models appear to have output.name.intern and output.name
+#   # swapped, and also mismatches between inla.models() and
+#   #   inlaprog/src/inla-parse.c
+#   # Out: "param_obs_<tag>_<short.name>"
+#   INLA::inla.models()$likelihood[[obs_family]]$hyper
+# }
+
+
 #' @title Extract standardised names from a bru or inla result object
 #' @description
 #' Extracts the names of fixed effects, random effects, and hyperparameters,
@@ -234,6 +253,17 @@ post.sample.structured <- function(result, n, seed = NULL,
     )
   }
 
+  comp_lst <- as_bru_comp_list(result)
+  fac.names <- names(comp_lst)[
+    vapply(
+      comp_lst,
+      function(e) {
+        identical(e$main$type, "factor")
+      },
+      TRUE
+    )
+  ]
+
   ssmpl <- list()
   .contents <- attr(samples, ".contents")
   for (i in seq_along(samples)) {
@@ -269,16 +299,6 @@ post.sample.structured <- function(result, n, seed = NULL,
 
     # For effects that were modeled via factors we attach an extra vector
     # holding the samples
-    comp_lst <- as_bru_comp_list(result)
-    fac.names <- names(comp_lst)[
-      vapply(
-        comp_lst,
-        function(e) {
-          identical(e$main$type, "factor")
-        },
-        TRUE
-      )
-    ]
     for (name in fac.names) {
       # TODO: figure out how to interact this with group and replicate info
       names(vals[[name]]) <- comp_lst[[name]]$main$values
@@ -288,7 +308,10 @@ post.sample.structured <- function(result, n, seed = NULL,
       ## Sanitize the variable names; replace problems with "_".
       ## Needs to handle whatever INLA uses to describe the hyperparameters.
       ## Known to include " " and "-" and potentially "(" and ")".
-      names(smpl.hyperpar) <- bru_standardise_names(names(smpl.hyperpar))
+      if (i == 1L) {
+        smpl.hyperpar.names <- bru_standardise_names(names(smpl.hyperpar))
+      }
+      names(smpl.hyperpar) <- smpl.hyperpar.names
     }
     ssmpl[[i]] <- c(vals, smpl.hyperpar)
   }
