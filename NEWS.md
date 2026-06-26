@@ -11,6 +11,8 @@
   uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
   (`2.14.1.9007`)
 * New predictor evaluation and linearisation implementation (`2.14.1.9008`)
+* Improved `bru_used` variable detection, supporting pronoun and container
+  object access detection. (`2.14.1.9010`)
 
 ## Bug fixes
 
