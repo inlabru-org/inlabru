@@ -100,7 +100,7 @@ if \code{labels} is non-NULL.
 bru_used(used, labels = c("a", "c"))
 (used <- new_bru_used(~ a + b + c_latent + d_latent))
 bru_used(used, labels = c("a", "c"))
-(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
+(used <- new_bru_used(~ a_eval(.latent$c)))
 bru_used(used, labels = c("a", "c"))
 
 }

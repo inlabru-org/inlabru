@@ -1724,12 +1724,14 @@ ibm_eval.bm_taylor <- function(mapper,
       the_names <- intersect(names(mapper[["jacobian"]]), names(state))
       missing_names <- setdiff(names(mapper[["jacobian"]]), names(state))
       if (length(missing_names) > 0) {
-        if(any(
-          vapply(missing_names, function(nm) {
-            NCOL(mapper[["jacobian"]][[nm]]) > 0
-          },
-          logical(1)
-          ))) {
+        if (any(
+          vapply(
+            missing_names, function(nm) {
+              NCOL(mapper[["jacobian"]][[nm]]) > 0
+            },
+            logical(1)
+          )
+        )) {
           stop(paste0(
             "Names in jacobian list missing from state list: ",
             nm

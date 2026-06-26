@@ -93,9 +93,11 @@ bru_is_additive.default <- function(x, ..., verbose = FALSE) {
     return(bru_is_additive(x[[2]], ..., verbose = verbose))
   }
   if (verbose) {
-    message(paste0("General class ",
-                   paste0("'", class(x), "'", collapse = ", "),
-                   " found, assuming non-additive."))
+    message(paste0(
+      "General class ",
+      paste0("'", class(x), "'", collapse = ", "),
+      " found, assuming non-additive."
+    ))
   }
   FALSE
 }
@@ -138,8 +140,10 @@ bru_is_additive.call <- function(x, ..., verbose = FALSE) {
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.expression <- function(x, ..., verbose = FALSE) {
-  all(vapply(x, bru_is_additive, ..., verbose = verbose,
-             FUN.VALUE = logical(1)))
+  all(vapply(x, bru_is_additive, ...,
+    verbose = verbose,
+    FUN.VALUE = logical(1)
+  ))
 }
 #' @rdname bru_is_additive
 #' @export

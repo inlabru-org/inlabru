@@ -3,10 +3,8 @@
 \name{new_bru_used}
 \alias{new_bru_used}
 \alias{new_bru_used.NULL}
+\alias{new_bru_used.default}
 \alias{new_bru_used.character}
-\alias{new_bru_used.expression}
-\alias{new_bru_used.quosure}
-\alias{new_bru_used.formula}
 \title{Store information about used components}
 \usage{
 new_bru_used(
@@ -27,34 +25,16 @@ new_bru_used(
   labels = NULL
 )
 
+\method{new_bru_used}{default}(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+)
+
 \method{new_bru_used}{character}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{new_bru_used}{expression}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{new_bru_used}{quosure}(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-\method{new_bru_used}{formula}(
   x,
   ...,
   effect = NULL,
@@ -121,25 +101,16 @@ in the predictor expression is detected automatically.
 \item \code{new_bru_used(`NULL`)}: Create a \code{bru_used} object from effect name
 character vectors.
 
-\item \code{new_bru_used(character)}: Create a \code{bru_used} object from a \code{character}
-representation of an expression.
+\item \code{new_bru_used(default)}: Create a \code{bru_used} object from an expression
+object supported by \code{\link[=bru_used_vars]{bru_used_vars()}}.
 
-\item \code{new_bru_used(expression)}: Create a \code{bru_used} object from an expression
-object.
-
-\item \code{new_bru_used(quosure)}: Create a \code{bru_used} object from an \code{rlang} \code{expr}
-object.
-
-\item \code{new_bru_used(formula)}: Create a \code{bru_used} object from a formula (only the
-right-hand side is used).
+\item \code{new_bru_used(character)}: Create a \code{bru_used} object from a string.
 
 }}
 \examples{
 (used <- new_bru_used(~.))
 bru_used(used, labels = c("a", "c"))
 (used <- new_bru_used(~ a + b + c_latent + d_latent))
-bru_used(used, labels = c("a", "c"))
-(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
 bru_used(used, labels = c("a", "c"))
 
 }
