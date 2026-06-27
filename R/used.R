@@ -5,20 +5,24 @@
 #'
 #' @param x Object to be updated
 #' @param labels character vector of component labels
-#' @param \dots Unused
-#' @returns An updated version of `x`
+#' @returns An updated version of `x`. In the `bru_used` information, only
+#'   components that are in `labels` are retained. If the ".effect", ".effect.",
+#'   ".latent", or ".latent." pronoun/container object names are present in the
+#'   input `effect` part, all labels will be included in the output `effect` and
+#'   `latent` parts, respectively, except for those that are specifically
+#'   excluded in an `effect_exclude` part.
 #' @keywords internal
 #' @export
 #' @family bru_used
-bru_used_update <- function(x, labels, ...) {
+bru_used_update <- function(x, labels) {
   UseMethod("bru_used_update")
 }
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_obs_list <- function(x, labels, ...) {
+bru_used_update.bru_obs_list <- function(x, labels) {
   for (k in seq_along(x)) {
-    x[[k]] <- bru_used_update(x[[k]], labels = labels, ...)
+    x[[k]] <- bru_used_update(x[[k]], labels = labels)
   }
   x
 }
@@ -28,8 +32,7 @@ bru_used_update.bru_obs_list <- function(x, labels, ...) {
 bru_used_update.bru_obs <- function(x, labels, ...) {
   x[["pred_expr"]] <- bru_used_update(
     x[["pred_expr"]],
-    labels = labels,
-    ...
+    labels = labels
   )
   x <- bru_compat_pre_2_14_bru_obs(x)
   x
@@ -37,9 +40,9 @@ bru_used_update.bru_obs <- function(x, labels, ...) {
 
 #' @rdname bru_used_update
 #' @export
-bru_used_update.bru_pred_expr <- function(x, labels, ...) {
+bru_used_update.bru_pred_expr <- function(x, labels) {
   pre_used <- bru_used(x)
-  used <- bru_used_update(pre_used, labels = labels, ...)
+  used <- bru_used_update(pre_used, labels = labels)
   if (isTRUE(x[["is_additive"]])) {
     if ((length(used$latent) > 0) ||
       (length(setdiff(pre_used$effect, used$effect)) > 0)) {
@@ -74,6 +77,14 @@ bru_used_update.bru_pred_expr <- function(x, labels, ...) {
 #' @export
 bru_used_update.bru_used <- function(x, labels, ...) {
   used <- x
+  eff <- c(".effect", ".effect.")
+  lat <- c(".latent", ".latent.")
+  if (any(lat %in% used$effect)) {
+    used$latent <- union(setdiff(used$latent, lat), labels)
+  }
+  if (any(eff %in% used$effect)) {
+    used$effect <- union(setdiff(used$effect, eff), labels)
+  }
   used$effect <-
     parse_inclusion(
       labels,
