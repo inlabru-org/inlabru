@@ -6,13 +6,21 @@ test_that("Joint gcpo", {
   ## partition
   cvpart <- cv_hex(
     gorillas_sf$boundary,
-    cellsize = 0.5,
+    cellsize = 5, # 0.5 too fine for the test; too slow
     n_group = 3,
     resolution = c(95, 80)
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
+
+  mesh <- fm_mesh_2d(
+    boundary = list(
+      gorillas_sf$boundary,
+      fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
+    ),
+    crs = fmesher::fm_crs(gorillas_sf$mesh)
+  )
 
   ## split
   gorillas_nests_major <-
@@ -35,7 +43,7 @@ test_that("Joint gcpo", {
 
   # model
   matern <- INLA::inla.spde2.pcmatern(
-    gorillas_sf$mesh,
+    mesh,
     prior.range = c(0.1, 0.01),
     prior.sigma = c(1, 0.01)
   )
@@ -48,11 +56,12 @@ test_that("Joint gcpo", {
   fml.major <- geometry ~ Intercept + Common + Difference / 2
   fml.minor <- geometry ~ Intercept + Common - Difference / 2
 
-  lik_major <- bru_obs("cp",
+  lik_major <- bru_obs(
+    "cp",
     formula = fml.major,
     samplers = cvpart,
     data = gorillas_nests_major,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(
       enable = TRUE,
       type.cv = "joint",
@@ -60,7 +69,8 @@ test_that("Joint gcpo", {
     ),
     tag = "major"
   )
-  lik_minor <- bru_obs("cp",
+  lik_minor <- bru_obs(
+    "cp",
     formula = fml.minor,
     samplers = cvpart,
     data = gorillas_nests_minor,
@@ -171,13 +181,21 @@ test_that("bru_block_gcpo returns correct structure for single likelihood with
 
   cvpart <- cv_hex(
     gorillas_sf$boundary,
-    cellsize = 0.5,
+    cellsize = 3, # 0.5 too small for the test; too slow
     n_group = 3,
     resolution = c(95, 80)
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
+
+  mesh <- fm_mesh_2d(
+    boundary = list(
+      gorillas_sf$boundary,
+      fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
+    ),
+    crs = fmesher::fm_crs(gorillas_sf$mesh)
+  )
 
   nests <- gorillas_sf$nests
   a <- sf::st_intersects(nests, cvpart)
@@ -188,9 +206,9 @@ test_that("bru_block_gcpo returns correct structure for single likelihood with
 
   fit <- lgcp(
     components = geometry ~ Intercept(1),
-    data = nests,
+    data = nests[1:10, , drop = FALSE],
     samplers = cvpart,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(
       enable = TRUE,
       type.cv = "joint"
@@ -220,7 +238,7 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
 
   cvpart <- cv_hex(
     gorillas_sf$boundary,
-    cellsize = 0.5,
+    cellsize = 3,
     n_group = 3,
     resolution = c(95, 80)
   )
@@ -228,6 +246,13 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
 
+  mesh <- fm_mesh_2d(
+    boundary = list(
+      gorillas_sf$boundary,
+      fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
+    ),
+    crs = fmesher::fm_crs(gorillas_sf$mesh)
+  )
   ## split
   gorillas_nests_major <-
     gorillas_sf$nests[gorillas_sf$nests$group == "major", ]
@@ -249,12 +274,8 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
 
   elev <- gorillas_sf_gcov()$elevation
   elev <- elev - mean(terra::values(elev), na.rm = TRUE)
-  f.elev <- function(where) {
-    v <- eval_spatial(elev, where, layer = "elevation")
-    v
-  }
 
-  cmp <- ~ elev(f.elev(.data.), model = "linear") +
+  cmp <- ~ elev(elev, model = "linear") +
     Intercept(1)
 
   fml.major <- geometry ~ Intercept
@@ -263,8 +284,8 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
   lik_major <- bru_obs("cp",
     formula = fml.major,
     samplers = cvpart,
-    data = gorillas_nests_major,
-    domain = list(geometry = gorillas_sf$mesh),
+    data = gorillas_nests_major[1:10, , drop = FALSE],
+    domain = list(geometry = mesh),
     control.gcpo = list(
       enable = TRUE,
       type.cv = "joint"
@@ -274,8 +295,8 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
   lik_minor <- bru_obs("cp",
     formula = fml.minor,
     samplers = cvpart,
-    data = gorillas_nests_minor,
-    domain = list(geometry = gorillas_sf$mesh),
+    data = gorillas_nests_minor[1:10, , drop = FALSE],
+    domain = list(geometry = mesh),
     control.gcpo = list(
       enable = TRUE,
       type.cv = "joint"
@@ -306,13 +327,21 @@ test_that("bru_gcpo_table returns correct structure for multiple fits", {
 
   cvpart <- cv_hex(
     gorillas_sf$boundary,
-    cellsize = 0.5,
+    cellsize = 3,
     n_group = 3,
     resolution = c(95, 80)
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
+
+  mesh <- fm_mesh_2d(
+    boundary = list(
+      gorillas_sf$boundary,
+      fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
+    ),
+    crs = fmesher::fm_crs(gorillas_sf$mesh)
+  )
 
   nests <- gorillas_sf$nests
 
@@ -326,26 +355,22 @@ test_that("bru_gcpo_table returns correct structure for multiple fits", {
   # covariate
   elev <- gorillas_sf_gcov()$elevation
   elev <- elev - mean(terra::values(elev), na.rm = TRUE)
-  f.elev <- function(where) {
-    v <- eval_spatial(elev, where, layer = "elevation")
-    v
-  }
 
   # models
   fit1 <- lgcp(
     components = geometry ~ Intercept(1),
-    data = nests,
+    data = nests[1:10, , drop = FALSE],
     samplers = cvpart,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
 
   fit2 <- lgcp(
     components = geometry ~ Intercept(1) +
-      elev(f.elev(.data.), model = "linear"),
-    data = nests,
+      elev(elev, model = "linear"),
+    data = nests[1:10, , drop = FALSE],
     samplers = cvpart,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
 
@@ -398,7 +423,7 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   # block grid
   cvpart <- cv_hex(
     boundary,
-    cellsize = 0.1,
+    cellsize = 0.3,
     n_group = 1,
     resolution = c(80, 80)
   )
