@@ -360,8 +360,9 @@ bru_used_vars.call <- function(x, result = new_bru_used_vars()) {
   if (fun %in% c("$", "[", "[[")) {
     # Unambiguous access to a variable via a pronoun or object,
     # e.g. .data$var or .data.[["var"]]; add `var` to result$objects$.data, etc.
-    # Otherwise add the container object to result$vars, as well as recursively for
-    # the accessor(s), as the access is ambiguous and might involve the entire object.
+    # Otherwise add the container object to result$vars, as well as recursively
+    # for the accessor(s), as the access is ambiguous and might involve the
+    # entire object.
     obj <- as.character(x[[2]])
     if ((length(x) == 3) && is.symbol(x[[2]]) && (
       (fun == "$") ||
