@@ -1,17 +1,15 @@
 # Niharika Reddy Peddinenikalva
 # Vacation Scholarship project
-# Updated for sf by Finn Lindgren 2024
 
+suppressPackageStartupMessages(library("INLA"))
+suppressPackageStartupMessages(library("inlabru"))
+suppressPackageStartupMessages(library("fmesher"))
 suppressPackageStartupMessages(library("RColorBrewer"))
 suppressPackageStartupMessages(library("ggplot2"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("lwgeom"))
 suppressPackageStartupMessages(library("patchwork"))
 suppressPackageStartupMessages(library("terra"))
-suppressPackageStartupMessages(library("sf"))
-suppressPackageStartupMessages(library("INLA"))
-suppressPackageStartupMessages(library("inlabru"))
-suppressPackageStartupMessages(library("fmesher"))
 theme_set(theme_bw())
 
 
@@ -24,15 +22,15 @@ theme_set(theme_bw())
 #' calculating the residuals for the given set of polygons B
 
 #' Input:
-#' @param samplers `sf` polygons containing partitions for which
+#' @param samplers A SpatialPolygonDataFrame containing partitions for which
 #' residuals are to be calculated
 #' @param domain A mesh object
-#' @param observations `sf` points containing observed data
+#' @param observations A SpatialPointsDataFrame containing observed data
 #'
 #' Output:
 #' @return A_sum - matrix used to compute the summation term of the residuals
 #' @return A_integrate - matrix used to compute the integral term
-#' @return df - `sf` containing all the locations 'u' for
+#' @return df - SpatialPointsDataFrame containing all the locations 'u' for
 #' calculating residuals
 #'
 prepare_residual_calculations <- function(samplers, domain, observations) {
@@ -47,39 +45,24 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
     block = ips$.block, block.rescale = "none"
   )
 
-
   # Set-up the A_sum matrix
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
   idx <- sf::st_within(
-    observations,
-    samplers,
+    sf::st_as_sf(observations),
+    sf::st_as_sf(samplers),
     sparse = TRUE
   )
-  A_sum <- sparseMatrix(
-    i = unlist(idx),
-    j = rep(
-      seq_len(nrow(observations)),
-      lengths(idx)
-    ),
-    x = rep(1, length(unlist(idx))),
-    dims = c(nrow(samplers), nrow(observations))
-  )
-
+  A_sum <- fmesher::fm_block(block = unlist(idx), n_block = NROW(samplers))
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
-  df <- st_as_sf(
-    data.frame(
-      obs = rep(FALSE, domain$n),
-      x = domain$loc[, 1],
-      y = domain$loc[, 2]
-    ),
-    coords = c("x", "y"),
-    crs = fm_crs(domain)
+  df <- sp::SpatialPointsDataFrame(
+    coords = rbind(domain$loc[, 1:2], sp::coordinates(observations)),
+    data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
+    proj4string = fm_CRS(domain)
   )
-  df <- dplyr::bind_rows(df, observations)
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)
@@ -96,7 +79,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 #'
 #' Inputs:
 #' @param model fitted model for which residuals need to be calculated
-#' @param df sf object containing all the locations 'u'
+#' @param df SpatialPointsDataFrame object containing all the locations 'u'
 #' for calculating residuals
 #' @param expr an expression object containing the formula of the model
 #' @param A_sum matrix used to compute the summation term of the residuals
@@ -208,7 +191,7 @@ set_csc <- function(residuals, col_theme) {
 #' plots the three types of residuals for each polygon
 #'
 #' Input:
-#' @param samplers A sf containing partitions for which
+#' @param samplers A SpatialPolygonsDataFrame containing partitions for which
 #' residuals are to be calculated
 #' @param residuals frame containing residual information for each of the
 #' partitions of the subset 'B'
@@ -270,30 +253,28 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 #' https://rpubs.com/huanfaChen/grid_from_polygon
 #'
 #' Input:
-#' @param samplers A sf polygon containing region for which
+#' @param samplers A SpatialPolygonsDataFrame containing region for which
 #' partitions need to be created
 #' @param resolution resolution of the grids that are required
 #' @param nrows number of rows of grids that are required
 #' @param ncols number of columns of grids that are required
 #'
 #' Output:
-#' @return a partitioned sf with polygons as required
+#' @return a partitioned SpatialPolygonsDataFrame as required
 #'
 #'
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- terra::rast(
-      terra::ext(samplers),
-      crs = fm_proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       nrows = nrows, ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- terra::rast(
-      terra::ext(samplers),
-      crs = fm_proj4string(samplers),
+    grid <- terra::rast(terra::ext(samplers),
+      crs = sp::proj4string(samplers),
       resolution = resolution
     )
   }
@@ -301,10 +282,12 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   gridPolygon <- terra::as.polygons(grid)
 
   # Extract the boundary with subpolygons only
-  sf::st_as_sf(
-    terra::intersect(
-      gridPolygon,
-      terra::vect(samplers)
+  sf::as_Spatial(
+    sf::st_as_sf(
+      terra::intersect(
+        gridPolygon,
+        terra::vect(samplers)
+      )
     )
   )
 }

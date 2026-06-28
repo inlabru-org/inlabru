@@ -61,9 +61,9 @@ navbar:
       - text: LGCPs - An example in space and time
         href: articles/2d_lgcp_spatiotemporal.html
       - text: LGCPs - Residuals (sf version)
-        href: articles/2d_lgcp_residuals_sf.html
-      - text: LGCPs - Residuals (sp version)
         href: articles/2d_lgcp_residuals.html
+      - text: LGCPs - Residuals (sp version)
+        href: articles/2d_lgcp_residuals_sp.html
       - text: LGCPs - Distance sampling and per-transect covariates (work in progress)
         href: articles/2d_lgcp_per_transect_covars.html
     technical-articles:
@@ -89,6 +89,7 @@ navbar:
 
 redirects:
   - ["articles/2d_lgcp_sf.html", "articles/2d_lgcp.html"]
+  - ["articles/2d_lgcp_residuals_sf.html", "articles/2d_lgcp_residuals.html"]
   - ["articles/components_vignette.html", "articles/component.html"]
 
 reference:
