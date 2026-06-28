@@ -122,23 +122,30 @@ residuals.
 
 ### Scaling Residuals
 By taking $h(u) = \vb{1} \{ u \in B\}$, we get the raw residuals:
+$$
 \begin{aligned}
     R(B, \hat{h}, \hat{\theta}) & = I(B, \hat{h}, \hat{\lambda}) = 
     \sum_{x_i \in \vb{x} \cap B}h(x_i) - \int_B \hat{h}(u)\hat{\lambda}(u)\,du\\
     & = n(\vb{x} \cap B) - \int_B \hat{\lambda}(u) \,du
 \end{aligned}
+$$
 
 ### Inverse Residuals
 By taking $h(u) = \frac{1}{\lambda (u)}$, we may encounter the case where 
 $\lambda(u) = 0$. The GNZ-formula
-\begin{equation}
-\E \left[ \sum_{x_i \in \vb{X}} h(x_i)\right] = 
+
+$$
+\begin{aligned}
+\E \left[ \sum_{x_i \in \vb{X}} h(x_i)\right]& = 
 \E \left[ \int_W h(u) \lambda(u) \,du \right],
-\end{equation}
+\end{aligned}
+$$
 would still hold for the first terms of the $h$-weighted residuals to exist. If
 we define $h(u) \lambda(u) = 0$ for all $u$ such that $\lambda(u) = 0$, then the
 second term of $h$-weighted residuals will also exist and the inverse residual
 is given by
+
+$$
 \begin{aligned}
     R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) & = 
     \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
@@ -146,9 +153,11 @@ is given by
     & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
     \int_B \vb{1} \{ x_i \in \vb{x} \} \,du 
 \end{aligned}
+$$
     
 ### Pearson Residuals
 By using $h(u) = \frac{1}{\sqrt{\lambda(u)}}$, the Pearson residual is given by
+$$
 \begin{aligned}
     R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right) 
     & = \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
@@ -156,6 +165,7 @@ By using $h(u) = \frac{1}{\sqrt{\lambda(u)}}$, the Pearson residual is given by
     & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
     \int_B \sqrt{\hat{\lambda}(u)} \,du 
 \end{aligned}
+$$
 Here, zero values of $\hat{\lambda}(u)$ do not cause any issues with calculating
 residuals as we set $\hat{h}(u) \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)}$ for
 all $u$.
