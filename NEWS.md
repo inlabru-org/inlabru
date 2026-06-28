@@ -5,6 +5,11 @@
 * Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
   support the `broom` package tidying framework. Thanks to Novica Nakov
   (`2.14.1.9005`)
+* Add observation `family` options `nzbinomial`, `nznbinomial`, `nzcenpoisson`,
+  and `nzbetabinomial` for non-zero truncated models, acting like `nzpoisson`.
+  Will automatically switch to INLA implementations if available, otherwise
+  uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
+  (`2.14.1.9007`)
 
 ## Bug fixes
 
@@ -18,6 +23,8 @@
   consistency. (`2.14.1.9002`)
 * (Re)enable non-integer point weights for `family = "cp"` models, by using
   # `family = "xpoisson"` (`2.14.1.9003`)
+* Fix layer indexing in `bru_fill_missing()` for `SpatRaster` data that resulted
+  in an error for layers beyond the first layer (`2.14.1.9006`)
 
 ## Other changes
 

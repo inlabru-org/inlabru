@@ -134,7 +134,7 @@ fit_null <- bru(
 library(dplyr)
 bind_rows(
   glance(fit_null) |> mutate(model = "intercept only"),
-  glance(fit)      |> mutate(model = "intercept + slope")
+  glance(fit) |> mutate(model = "intercept + slope")
 ) |>
   select(model, dic, waic, marginal_loglik, nobs)
 ```
@@ -177,9 +177,11 @@ ggplot() +
     aes(x, ymin = .fitted_low, ymax = .fitted_high),
     fill = "steelblue", alpha = 0.3
   ) +
-  geom_line(data = augmented,
-            aes(x, .fitted),
-            colour = "steelblue", linewidth = 1) +
+  geom_line(
+    data = augmented,
+    aes(x, .fitted),
+    colour = "steelblue", linewidth = 1
+  ) +
   labs(
     title = "Posterior fitted line with 95 % credible band",
     x = "x", y = "y"
