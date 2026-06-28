@@ -149,7 +149,7 @@ $$
     \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
     & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
-    \int_B \vb{1} \{ x_i \in \vb{x} \} \,du 
+    \int_B \vb{1} \{ \hat{\lambda}(u) > 0 \} \,du 
 \end{aligned}
 $$
     
@@ -175,7 +175,7 @@ $$
 \int_B \hat{\lambda}(u) \,du \\
 \text{Inverse:} \qquad & R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) 
 & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
-\int_B \vb{1} \{ x_i \in \vb{x} \} \,du \\
+\int_B \vb{1} \{ \hat{\lambda}(u) > 0 \} \,du \\
 \text{Pearson:} \qquad &  R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta}
 \right) & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - 
 \int_B \sqrt{\hat{\lambda}(u)} \,du 
@@ -194,7 +194,7 @@ reliable for any sample size.
 
 The use of the inverse residual in this project is less clear. However, we do 
 know that it is easier to compute this residual since we have the GNZ formula to
-estimate the value of $h(u) = \frac{1}{\lambda(u)} for any value $\lambda(u)$. 
+estimate the value of $h(u) = \frac{1}{\lambda(u)}$ for any value $\lambda(u)$. 
 
 For notation's sake in this discussion, let $h_{s}(u), h_{i}(u), h_p(u)$ 
 indicate the weight function for scaling, inverse and Pearson residuals 
