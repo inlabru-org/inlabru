@@ -30,7 +30,7 @@ Set things up
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
-#library(inlabru)
+# library(inlabru)
 devtools::document()
 devtools::load_all()
 library(fmesher)
@@ -193,7 +193,7 @@ cvpart <- cv_hex(boundary, cellsize = 0.15, n_group = 1)
 ggplot() +
   gg(cvpart, aes(fill = group), alpha = 0.5) +
   gg(boundary, alpha = 0) +
-  gg(nests, color = "white", cex = 0.5)+
+  gg(nests, color = "white", cex = 0.5) +
   theme(legend.position = "none")
 ```
 
@@ -220,9 +220,11 @@ better match the covariate. In the code below,`enable = TRUE` tells `INLA` that 
 mesh_int <- fm_subdivide(mesh, 2)
 mesh_int <- mesh
 
-gcpo_config <- list(enable = TRUE,type.cv = "joint")
-options_config <- list(bru_verbose = 0,
-                       control.compute(config = FALSE))
+gcpo_config <- list(enable = TRUE, type.cv = "joint")
+options_config <- list(
+  bru_verbose = 0,
+  control.compute(config = FALSE)
+)
 ```
 
 
@@ -235,7 +237,6 @@ fit_hpp <- lgcp(
   control.gcpo = gcpo_config,
   options = options_config
 )
-
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit_hpp.rds")
@@ -266,7 +267,6 @@ fit_veg <- lgcp(
   control.gcpo = gcpo_config,
   options = options_config
 )
-
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit_veg.rds")
@@ -281,7 +281,7 @@ if ((!.cache_recompute) &&
     domain = list(geometry = mesh_int),
     control.gcpo = gcpo_config,
     options = options_config
-)
+  )
 
   saveRDS(fit_veg, .cache_file)
 }
@@ -296,7 +296,7 @@ fit_field <- lgcp(
   domain = list(geometry = mesh_int),
   control.gcpo = gcpo_config,
   options = options_config
-  )
+)
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit_field.rds")
@@ -318,14 +318,14 @@ if ((!.cache_recompute) &&
 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
- fit_veg_field <- lgcp(
-    comp_veg_field,
-    nests,
-    samplers = cvpart,
-    domain = list(geometry = mesh_int),
-    control.gcpo = gcpo_config,
-    options = options_config
-    )
+fit_veg_field <- lgcp(
+  comp_veg_field,
+  nests,
+  samplers = cvpart,
+  domain = list(geometry = mesh_int),
+  control.gcpo = gcpo_config,
+  options = options_config
+)
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit_veg_field.rds")
@@ -340,7 +340,7 @@ if ((!.cache_recompute) &&
     domain = list(geometry = mesh_int),
     control.gcpo = gcpo_config,
     options = options_config
-    )
+  )
   saveRDS(fit_veg_field, .cache_file)
 }
 ```
@@ -348,14 +348,14 @@ if ((!.cache_recompute) &&
 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
- fit_veg_elev_field <- lgcp(
-    comp_veg_elev_field,
-    nests,
-    samplers = cvpart,
-    domain = list(geometry = mesh_int),
-    control.gcpo = gcpo_config,
-    options = options_config
-    )
+fit_veg_elev_field <- lgcp(
+  comp_veg_elev_field,
+  nests,
+  samplers = cvpart,
+  domain = list(geometry = mesh_int),
+  control.gcpo = gcpo_config,
+  options = options_config
+)
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
 .cache_file <- file.path(.cache_dir, "fit_veg_elev_field.rds")
@@ -370,7 +370,7 @@ if ((!.cache_recompute) &&
     domain = list(geometry = mesh_int),
     control.gcpo = gcpo_config,
     options = options_config
-    )
+  )
   saveRDS(fit_veg_elev_field, .cache_file)
 }
 ```
@@ -398,10 +398,11 @@ gcpo_df <- bru_gcpo_table(
   )
 )
 
-gcpo_df[,-1] <- log(gcpo_df[, -1])
-knitr::kable(tibble(Models = names(gcpo_df)[-1],
-                    GCPO = colSums(gcpo_df[, -1])))
-             
+gcpo_df[, -1] <- log(gcpo_df[, -1])
+knitr::kable(tibble(
+  Models = names(gcpo_df)[-1],
+  GCPO = colSums(gcpo_df[, -1])
+))
 ```
 
 ### Plotting  regional scores
@@ -410,12 +411,12 @@ A valuable feature of the regional CV approach, is to assess regions where model
 
 
 ```{r}
-names(gcpo_df)[1] <- 'block_ID'
-gcpo_block_ID <- cvpart |> dplyr::left_join(gcpo_df, 'block_ID')
+names(gcpo_df)[1] <- "block_ID"
+gcpo_block_ID <- cvpart |> dplyr::left_join(gcpo_df, "block_ID")
 ggplot() +
   gg(gcpo_block_ID, aes(fill = Fit_veg - Fit_hpp), alpha = 1) +
   gg(boundary, alpha = 0) +
-gg(nests, color = "white", cex = 0.2)
+  gg(nests, color = "white", cex = 0.2)
 ```
 
 
@@ -425,7 +426,7 @@ A similar analysis could be done to assess the gain from the `SPDE smoother` whe
 ggplot() +
   gg(gcpo_block_ID, aes(fill = Fit_veg_field - Fit_veg), alpha = 1) +
   gg(boundary, alpha = 0) +
-gg(nests, color = "white", cex = 0.2)
+  gg(nests, color = "white", cex = 0.2)
 ```
 
 
@@ -433,15 +434,15 @@ We can also look at the contribution from the `elevation` covariate, which sligh
 
 ```{r}
 plt_gcpo_elev <- ggplot() +
-  gg(gcpo_block_ID , aes(fill = Fit_veg_elev_field - Fit_veg_field), 
-     alpha = 1) +
+  gg(gcpo_block_ID, aes(fill = Fit_veg_elev_field - Fit_veg_field),
+    alpha = 1
+  ) +
   gg(boundary, alpha = 0) +
-gg(nests, color = "white", cex = 0.2)
+  gg(nests, color = "white", cex = 0.2)
 
-plt_post_elev <- plot(fit_veg_elev_field, 'elev')
+plt_post_elev <- plot(fit_veg_elev_field, "elev")
 
-plt_gcpo_elev +  plt_post_elev
-
+plt_gcpo_elev + plt_post_elev
 ```
 
 
