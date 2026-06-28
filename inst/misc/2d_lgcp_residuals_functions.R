@@ -41,12 +41,10 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 
   # Set-up the A_integrate matrix
   # A_integrate has as many rows as polygons in the samplers,
-  # as many columns as mesh points
-  A_integrate <- inla.spde.make.A(
-    mesh = domain, ips, weights = ips$weight,
-    block = ips$.block, block.rescale = "none"
+  # as many columns as integration points
+  A_integrate <- fmesher::fm_block(
+    block = ips$.block, weights = ips$weight, n_block = NROW(samplers)
   )
-
 
   # Set-up the A_sum matrix
   # A_sum has as many rows as polygons in the samplers,
@@ -57,29 +55,12 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
     samplers,
     sparse = TRUE
   )
-  A_sum <- sparseMatrix(
-    i = unlist(idx),
-    j = rep(
-      seq_len(nrow(observations)),
-      lengths(idx)
-    ),
-    x = rep(1, length(unlist(idx))),
-    dims = c(nrow(samplers), nrow(observations))
-  )
-
+  A_sum <- fmesher::fm_block(block = unlist(idx), n_block = NROW(samplers))
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
-  df <- st_as_sf(
-    data.frame(
-      obs = rep(FALSE, domain$n),
-      x = domain$loc[, 1],
-      y = domain$loc[, 2]
-    ),
-    coords = c("x", "y"),
-    crs = fm_crs(domain)
-  )
-  df <- dplyr::bind_rows(df, observations)
+  ips$obs <- FALSE
+  df <- dplyr::bind_rows(ips, observations)
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)

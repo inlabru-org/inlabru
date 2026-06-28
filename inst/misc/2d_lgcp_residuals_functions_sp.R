@@ -45,7 +45,6 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
     block = ips$.block, block.rescale = "none"
   )
 
-
   # Set-up the A_sum matrix
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
@@ -55,16 +54,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
     sf::st_as_sf(samplers),
     sparse = TRUE
   )
-  A_sum <- sparseMatrix(
-    i = unlist(idx),
-    j = rep(
-      seq_len(nrow(observations)),
-      lengths(idx)
-    ),
-    x = rep(1, length(unlist(idx))),
-    dims = c(nrow(samplers), nrow(observations))
-  )
-
+  A_sum <- fmesher::fm_block(block = unlist(idx), n_block = NROW(samplers))
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
