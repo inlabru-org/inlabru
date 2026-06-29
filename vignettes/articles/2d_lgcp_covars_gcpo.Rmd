@@ -30,9 +30,7 @@ Set things up
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
-# library(inlabru)
-devtools::document()
-devtools::load_all()
+library(inlabru)
 library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
@@ -253,7 +251,7 @@ if ((!.cache_recompute) &&
     options = options_config
   )
 
-  saveRDS(fit_veg_elev_field, .cache_file)
+  saveRDS(fit_hpp, .cache_file)
 }
 ```
 
