@@ -30,8 +30,7 @@ Set things up
 
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
-# library(inlabru)
-devtools::load_all()
+library(inlabru)
 library(fmesher)
 library(RColorBrewer)
 library(ggplot2)
