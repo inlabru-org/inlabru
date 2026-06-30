@@ -4,7 +4,7 @@ author: "David Borchers, Finn Lindgren and Hans Montcho"
 date: "Generated on `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{LGCPs - Model comparison using Cross Validation}
+  %\VignetteIndexEntry{LGCPs - Model comparison}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -31,6 +31,7 @@ Set things up
 ```{r results="hide",warning=FALSE,message=FALSE}
 library(INLA)
 # library(inlabru)
+devtools::document()
 devtools::load_all()
 library(fmesher)
 library(RColorBrewer)
@@ -55,9 +56,9 @@ We are going to fit some spatial models to the gorilla data, and compare them us
 Leave-Region-Out Cross Validation
 -----------------------------------
 
-In point pattern analysis,  the available information comes from  *events locations* and *empty regions*,  and this should be taken into consideration for models comparison. Here, we use a  *leave-region-out cross validation* approach,  in which the domain is partitioned into subregions, and the model is used the predict the likelihood contribution from  holdout subregions.
+In point pattern analysis,  the available information comes from  *events locations* and *empty regions*,  and this should be taken into consideration for models comparison. Here, we use a  *leave-region-out cross validation* approach for model comparison,  in which the domain is partitioned into subregions, and the model is used the predict the likelihood contribution from  holdout subregions.
 
-Let $Y$ be a LGCP with intensity $\lambda(.)$ defined on a bounded domain $\Omega$, and we observe a point pattern $\mathbf{y} = (y_1,\cdots, y_n)$. Then the log likelihood is defined as 
+Let $Y$ be LGCP with intensity $\lambda(.)$ defined on a bounded domain $\Omega$, and we observe a point pattern $\mathbf{y} = (y_1,\cdots, y_n)$. Then the log likelihood is defined as 
 
 $$
 \ell(\lambda(.);\mathbf{y}, \Omega) = |\Omega| - \int_{\Omega}\lambda(s)ds + \sum_{y_i \in \mathbf{y}\cap\Omega } \ln \lambda(y_i). 
@@ -72,7 +73,7 @@ and we note that, this representation *is not equivalent to the aggregated count
 
 To fit the model, we use the complete information from $\ell(\lambda(.);\mathbf{y}, \Omega)$. For model comparison, however,  the  likelihood contribution, $\ell_j(\lambda(.);\mathbf{y}, B_j)$ from  each $B_j$, is left out and after fitting the model, we evaluate its predictive performance on the holdout subregion using the logarithmic scoring rule. 
 
-The aggregated Group Conditional Predictive Ordinate (GCPO)  is defined as the sum of  the logarithm of the joint leave-region-out predictive distribution 
+The aggregated Group Conditional Predictive Ordinate (GCPO)  is defined as sum of  the logarithm of the joint leave-region-out predictive distribution 
 
 $$\text{GCPO} = \sum_{j=1}^J \log \pi(\mathbf{y}_{B_j} | \mathbf{y}_{-B_j}) $$
 where we define  
@@ -95,7 +96,7 @@ data(gorillas_sf, package = "inlabru")
 This dataset is a list (see `help(gorillas_sf)` for details. Extract the objects
 you need from the list, for convenience:
 
-```{r warning=FALSE,message=FALSE}
+```{r }
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
@@ -169,10 +170,14 @@ comp_veg_field <- geometry ~
   field(geometry, model = pcmatern)
 
 # fit_veg_elev_field
+f.elev <- function(where) {
+  v <- eval_spatial(elev, where, layer = "elevation")
+  v
+}
 comp_veg_elev_field <- geometry ~
   -1 +
   vegetation(gcov$vegetation, model = "factor_full") +
-  elev(elev, model = "linear") +
+  elev(f.elev(.data.), model = "linear") +
   field(geometry, model = pcmatern)
 ```
 
@@ -180,7 +185,7 @@ comp_veg_elev_field <- geometry ~
 
 To enable the block or regional  `group.cv` calculations, we need to split the domain into spatial
 regions, and compute the association of each observed point to these subregions.
-The `cv_hex` function allows to create hexagonal partitions, but *if meaningful subregions of interest are available, these must be used to define the likelihood contribution*.  
+The `cv_hex` function allows to create hexagonal partitions, but if meaningful subregions of interest are available, these must be used to define the likelihood contribution.  
 
 ```{r warning=FALSE,message=FALSE}
 cvpart <- cv_hex(boundary, cellsize = 0.15, n_group = 1)
@@ -209,14 +214,19 @@ nests$.block <- unlist(a)
 ### Fitting the models
 
 Fit the models as usual, and increase the integration scheme resolution to
-better match the covariate. In the code below, `enable = TRUE` for `control.gcpo`  tells `INLA` that the `GCPO` must be calculated,  `type.cv = "joint"` ensures that we are doing a joint prediction for the entire region. For speed, we set `control.compute(config=FALSE)` to compute the `group.cv` *score conditional on posterior mode of the hyperparameters*. 
+better match the covariate. In the code below,`enable = TRUE` tells `INLA` that the `Cross validation score` must be calculated,  `type.cv = "joint"` ensures that we are doing a joint prediction for the entire region. For speed, we set `control.compute(config=FALSE)` to compute the `group.cv` *score conditional on posterior mode of the hyperparameters*. 
 
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
+mesh_int <- fm_subdivide(mesh, 2)
 mesh_int <- mesh
-# mesh_int <- fm_subdivide(mesh, 2)
+
+gcpo_config <- list(enable = TRUE, type.cv = "joint")
+options_config <- list(
+  bru_verbose = 0,
+  control.compute(config = FALSE)
+)
 ```
 
-The homogeneous model
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 fit_hpp <- lgcp(
@@ -224,8 +234,8 @@ fit_hpp <- lgcp(
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh_int),
-  control.gcpo = list(enable = TRUE, type.cv = "joint"),
-  options = list(control.compute(config = FALSE))
+  control.gcpo = gcpo_config,
+  options = options_config
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -239,23 +249,23 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh_int),
-    control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    options = list(control.compute(config = FALSE))
+    control.gcpo = gcpo_config,
+    options = options_config
   )
 
-  saveRDS(fit_hpp, .cache_file)
+  saveRDS(fit_veg_elev_field, .cache_file)
 }
 ```
 
-Accounting for `vegetation`
+
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 fit_veg <- lgcp(
   comp_veg,
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh_int),
-  control.gcpo = list(enable = TRUE, type.cv = "joint"),
-  options = list(control.compute(config = FALSE))
+  control.gcpo = gcpo_config,
+  options = options_config
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -269,23 +279,23 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh_int),
-    control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    options = list(control.compute(config = FALSE))
+    control.gcpo = gcpo_config,
+    options = options_config
   )
 
   saveRDS(fit_veg, .cache_file)
 }
 ```
 
-Accounting for the spatial dependence with the `SPDE smoother`
+
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 fit_field <- lgcp(
   comp_field,
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh_int),
-  control.gcpo = list(enable = TRUE, type.cv = "joint"),
-  options = list(control.compute(config = FALSE))
+  control.gcpo = gcpo_config,
+  options = options_config
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -299,24 +309,22 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh_int),
-    control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    options = list(control.compute(config = FALSE))
+    control.gcpo = gcpo_config,
+    options = options_config
   )
   saveRDS(fit_field, .cache_file)
 }
 ```
 
 
-
-Accounting for `vegetation` and spatial dependence with the `SPDE smoother`
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 fit_veg_field <- lgcp(
   comp_veg_field,
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh_int),
-  control.gcpo = list(enable = TRUE, type.cv = "joint"),
-  options = list(control.compute(config = FALSE))
+  control.gcpo = gcpo_config,
+  options = options_config
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -330,14 +338,14 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh_int),
-    control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    options = list(control.compute(config = FALSE))
+    control.gcpo = gcpo_config,
+    options = options_config
   )
   saveRDS(fit_veg_field, .cache_file)
 }
 ```
 
-The last model which accounts for `elevation`, `vegetation` and spatial dependence with the `SPDE smoother`
+
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
 fit_veg_elev_field <- lgcp(
@@ -345,8 +353,8 @@ fit_veg_elev_field <- lgcp(
   nests,
   samplers = cvpart,
   domain = list(geometry = mesh_int),
-  control.gcpo = list(enable = TRUE, type.cv = "joint"),
-  options = list(control.compute(config = FALSE))
+  control.gcpo = gcpo_config,
+  options = options_config
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
@@ -360,8 +368,8 @@ if ((!.cache_recompute) &&
     nests,
     samplers = cvpart,
     domain = list(geometry = mesh_int),
-    control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    options = list(control.compute(config = FALSE))
+    control.gcpo = gcpo_config,
+    options = options_config
   )
   saveRDS(fit_veg_elev_field, .cache_file)
 }
@@ -372,15 +380,14 @@ if ((!.cache_recompute) &&
 There are mainly two functions `bru_block_gcpo` and `bru_gcpo_table` for models comparison using cross validation. `bru_block_gcpo` is used to  access  individual scores for a *single* model, and its output is a list containing the index for each region and the corresponding CV score.  On the other hand, `bru_gcpo_table` is used for *multiple* models comparison.
 
 
-```{r warning=FALSE,message=FALSE}
+```{r}
 gcpo_hpp <- bru_block_gcpo(fit_hpp)
 str(gcpo_hpp)
 ```
 
 
-From the table below, the  `vegetation` covariate is a strong predictor, as expected, but also the `SPDE smoother`.  Including `elevation` in the model already containing `vegetation` and the `SPDE smoother` does not provide any considerable gain in terms of predictive score.  These conclusions are similar to the ones obtained from the [vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html), although the latter was mainly based on in-sample  analysis.
-
-```{r warning=FALSE,message=FALSE}
+From the table below, the  `vegetation` covariate is a strong predictor, as expected, but also the `SPDE smoother`.  Including `elevation` in the model already containing `vegetation` and the `SPDE smoother` does not provide any considerable gain in terms of predictive score.  These conclusions are similar to the ones obtained from the [vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html), although the latter was mainly based on in-sample analysis.
+```{r}
 gcpo_df <- bru_gcpo_table(
   list(
     Fit_hpp = fit_hpp,
@@ -403,7 +410,7 @@ knitr::kable(tibble(
 A valuable feature of the regional CV approach, is to assess regions where models might provide better fits or to detect some missing covariate. As an illustration, by evaluating the difference in  the log predictive density per region between models `Fit_veg` and `Fit_hpp`, we can see that including `vegetation` improves the prediction in regions with high number of nests,  which was expected, since  most of the nests falls in the primary vegetation type.
 
 
-```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
+```{r}
 names(gcpo_df)[1] <- "block_ID"
 gcpo_block_ID <- cvpart |> dplyr::left_join(gcpo_df, "block_ID")
 ggplot() +
@@ -415,7 +422,7 @@ ggplot() +
 
 A similar analysis could be done to assess the gain from the `SPDE smoother` when added to the model with `vegetation`. Indeed, most of the subregions with increased GCPO are nearby regions, probably as a result of the  spatial component. 
 
-```{r warning=FALSE,message=FALSE}
+```{r}
 ggplot() +
   gg(gcpo_block_ID, aes(fill = Fit_veg_field - Fit_veg), alpha = 1) +
   gg(boundary, alpha = 0) +
@@ -423,9 +430,9 @@ ggplot() +
 ```
 
 
-We can also look at the contribution from the `elevation` covariate, which slightly increased the log score in few subregions,  but overall, it seems to not be relevant.  
+We can also look at the contribution from the `elevation` covariate, which slightly increased the log score in few subregions,  but overall, it seems to not be relevant. This was also expected from its posterior distribution.   
 
-```{r warning=FALSE,message=FALSE}
+```{r}
 plt_gcpo_elev <- ggplot() +
   gg(gcpo_block_ID, aes(fill = Fit_veg_elev_field - Fit_veg_field),
     alpha = 1
@@ -433,20 +440,10 @@ plt_gcpo_elev <- ggplot() +
   gg(boundary, alpha = 0) +
   gg(nests, color = "white", cex = 0.2)
 
-plt_gcpo_elev
-```
-
-
-The `elevation` covariate not being predictively relevant, in the presence  of the  `vegetation` covariate and the `SPDE smoother`, was also expected from its posterior distribution. 
-
-```{r warning=FALSE,message=FALSE}
 plt_post_elev <- plot(fit_veg_elev_field, "elev")
-plt_post_elev
+
+plt_gcpo_elev + plt_post_elev
 ```
 
-### Summary
 
-Based on the previous analysis,  we would select the model  containing `vegetation` and the `SPDE smoother`. Here, we use hexagonal partition, but we could also compare the models over different regions size or geometry to add some robustness to the selection procedure. However, the approximation strategy to  avoid model refits and compute the GCPOs  might become less accurate for regions that are too large. In the case of very few but large regions, we recommend refitting the model.  
-
-
-Also, it is important to note the small difference in the GCPOs between some of the models, making model selection less straightforward. This illustrates the need for uncertainty quantification, that we are currently investigating. 
+Therefore, based on the previous analysis,  we would select the model  containing `vegetation` and the `SPDE smoother`. We note the small difference in the GCPOs between some of the models, making model selection less straightforward. This illustrates the need for uncertainty quantification, that we are currently investigating. 
