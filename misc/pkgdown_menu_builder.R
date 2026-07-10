@@ -11,7 +11,8 @@ get_info_original <- function(lines, pattern) {
   }
   begin <- min(which(found))
   version <- sub(
-    pattern = "</small>", replacement = "",
+    pattern = "</small>",
+    replacement = "",
     x = sub(
       pattern = pattern,
       replacement = "",
@@ -22,7 +23,12 @@ get_info_original <- function(lines, pattern) {
   )
   list(original = TRUE, begin = begin, end = begin, version = version)
 }
-get_info_updated <- function(lines, pattern_begin, pattern_end, pattern_endtag) {
+get_info_updated <- function(
+  lines,
+  pattern_begin,
+  pattern_end,
+  pattern_endtag
+) {
   found <- grepl(
     pattern = pattern_begin,
     x = lines,
@@ -47,7 +53,8 @@ get_info_updated <- function(lines, pattern_begin, pattern_end, pattern_endtag) 
     return(NULL)
   }
   version <- trimws(sub(
-    pattern = pattern_endtag, replacement = "",
+    pattern = pattern_endtag,
+    replacement = "",
     x = sub(
       pattern = pattern_begin,
       replacement = "",
@@ -153,7 +160,7 @@ get_version_names <- function(versions) {
     get_version_name(versions$devel, versions),
     vapply(versions$old, function(x) get_version_name(x, versions), "")
   ) |>
-  setNames(c(versions$current, versions$devel, versions$old))
+    setNames(c(versions$current, versions$devel, versions$old))
 }
 get_version_name <- function(version, versions) {
   if (is.null(version)) {
@@ -169,9 +176,6 @@ get_version_name <- function(version, versions) {
     NULL
   }
 }
-
-
-
 
 
 as_menu_line <- function(x, this_version, this_subpath, versions) {
@@ -199,11 +203,18 @@ as_menu_line <- function(x, this_version, this_subpath, versions) {
     path <- glue("{path_to_root}{version_path}{this_dirname}{this_basename}")
   }
   version_name <- get_version_name(x, versions)
-  glue("<li><a class=\"dropdown-item\" href=\"{path}\" title=\"{version_name}\">{version_name}</a></li>")
+  glue(
+    "<li><a class=\"dropdown-item\" href=\"{path}\" title=\"{version_name}\">{version_name}</a></li>"
+  )
 }
 get_menu_lines <- function(this_version, this_subpath, versions) {
   list(
-    current = as_menu_line(versions$current, this_version, this_subpath, versions),
+    current = as_menu_line(
+      versions$current,
+      this_version,
+      this_subpath,
+      versions
+    ),
     devel = as_menu_line(versions$devel, this_version, this_subpath, versions),
     old = vapply(
       versions$old,
@@ -224,7 +235,7 @@ get_menu <- function(this_version, this_subpath, versions) {
     <li><h6 class="dropdown-header" data-toc-skip>Older releases</h6></li>
     {glue_collapse(menu_lines$old, sep="\n    ")}
 '
-      )
+    )
   }
   version_name <- get_version_name(this_version, versions)
   menu <- glue(
@@ -263,7 +274,12 @@ get_subpaths <- function(base_path, this_version, versions) {
   files
 }
 
-update_menus_for_subpath <- function(base_path, this_version, this_subpath, versions) {
+update_menus_for_subpath <- function(
+  base_path,
+  this_version,
+  this_subpath,
+  versions
+) {
   version_path <- get_version_path(this_version, versions)
   path <- file.path(base_path, glue("{version_path}{this_subpath}"))
   lines <- get_lines(path)
@@ -295,4 +311,3 @@ update_menus <- function(base_path, versions = get_versions(base_path)) {
 #config <- yaml::read_yaml("_pkgdown.yml")
 #base_url <- config$url
 #update_menus("docs")
-

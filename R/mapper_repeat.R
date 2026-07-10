@@ -132,8 +132,7 @@ ibm_values.bm_repeat <- function(mapper, ...) {
 }
 
 
-bm_repeat_sub_lin <- function(mapper, input, state,
-                              ...) {
+bm_repeat_sub_lin <- function(mapper, input, state, ...) {
   # We need all the sub_lin objects even for linear mappers
   idx <- bm_repeat_indexing(
     n_map = ibm_n(mapper[["mapper"]]),
@@ -160,11 +159,15 @@ bm_repeat_sub_lin <- function(mapper, input, state,
 #'   repeated submapper.
 #' @export
 #'
-ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
-                                   inla_f = FALSE,
-                                   multi = FALSE,
-                                   ...,
-                                   sub_lin = NULL) {
+ibm_jacobian.bm_repeat <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_repeat_sub_lin(mapper, input, state)
   }
@@ -177,10 +180,11 @@ ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
   # Combine the matrices (A1, A2, A3, ...) -> permuted cbind(A1, A2, A3, ...)
   A <- do.call(cbind, A)
   if (isTRUE(mapper[["interleaved"]])) {
-    A <- A %*% bm_repeat_indexing_matrix(
-      n_map = ibm_n(mapper[["mapper"]]),
-      n_rep = mapper[["n_rep"]]
-    )
+    A <- A %*%
+      bm_repeat_indexing_matrix(
+        n_map = ibm_n(mapper[["mapper"]]),
+        n_rep = mapper[["n_rep"]]
+      )
   }
   A
 }
@@ -189,10 +193,14 @@ ibm_jacobian.bm_repeat <- function(mapper, input, state = NULL,
 #' @export
 #' @rdname ibm_eval
 #'
-ibm_eval.bm_repeat <- function(mapper, input, state,
-                               multi = FALSE,
-                               ...,
-                               sub_lin = NULL) {
+ibm_eval.bm_repeat <- function(
+  mapper,
+  input,
+  state,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_repeat_sub_lin(mapper, input, state)
   }
@@ -210,11 +218,12 @@ ibm_eval.bm_repeat <- function(mapper, input, state,
 #' @export
 #' @rdname ibm_linear
 #'
-ibm_linear.bm_repeat <- function(mapper, input, state,
-                                 ...) {
+ibm_linear.bm_repeat <- function(mapper, input, state, ...) {
   sub_lin <-
     bm_repeat_sub_lin(
-      mapper, input, state,
+      mapper,
+      input,
+      state,
       ...
     )
   eval2 <- ibm_eval2(
@@ -238,8 +247,7 @@ ibm_linear.bm_repeat <- function(mapper, input, state,
 #' Passes on the input to the corresponding method.
 #' @export
 #'
-ibm_invalid_output.bm_repeat <- function(mapper, input, state,
-                                         ...) {
+ibm_invalid_output.bm_repeat <- function(mapper, input, state, ...) {
   idx <- bm_repeat_indexing(
     n_map = ibm_n(mapper[["mapper"]]),
     n_rep = mapper[["n_rep"]],
@@ -275,9 +283,7 @@ NULL
 #' @examples
 #' (idx <- bm_repeat_indexing(3, 2, FALSE))
 #' (idx <- bm_repeat_indexing(3, 2, TRUE))
-bm_repeat_indexing <- function(n_map,
-                               n_rep,
-                               interleaved = FALSE) {
+bm_repeat_indexing <- function(n_map, n_rep, interleaved = FALSE) {
   if (isTRUE(interleaved)) {
     list(
       offsets = seq_len(n_rep) - 1L,

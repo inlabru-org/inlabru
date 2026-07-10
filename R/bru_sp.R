@@ -91,8 +91,14 @@ sfill <- function(data, where = NULL) {
 #' }
 #' }
 #'
-sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
-                  format = c("sp", "sf")) {
+sline <- function(
+  data,
+  start.cols,
+  end.cols,
+  crs = fm_crs(),
+  to.crs = NULL,
+  format = c("sp", "sf")
+) {
   format <- match.arg(format)
 
   sp <- as.data.frame(data[, start.cols])
@@ -127,7 +133,9 @@ sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
   }
 
   # If requested, change CRS
-  if (!is.null(to.crs)) slines <- fm_transform(slines, to.crs)
+  if (!is.null(to.crs)) {
+    slines <- fm_transform(slines, to.crs)
+  }
 
   slines
 }
@@ -173,11 +181,13 @@ sline <- function(data, start.cols, end.cols, crs = fm_crs(), to.crs = NULL,
 #' }
 #' }
 #'
-spoly <- function(data,
-                  cols = colnames(data)[1:2],
-                  crs = fm_crs(),
-                  to.crs = NULL,
-                  format = c("sp", "sf")) {
+spoly <- function(
+  data,
+  cols = colnames(data)[1:2],
+  crs = fm_crs(),
+  to.crs = NULL,
+  format = c("sp", "sf")
+) {
   format <- match.arg(format)
   if (identical(format, "sp")) {
     bru_safe_sp(force = TRUE)
@@ -197,6 +207,8 @@ spoly <- function(data,
   }
 
   # If requested, change CRS
-  if (!is.null(to.crs)) pol <- fm_transform(pol, to.crs)
+  if (!is.null(to.crs)) {
+    pol <- fm_transform(pol, to.crs)
+  }
   pol
 }

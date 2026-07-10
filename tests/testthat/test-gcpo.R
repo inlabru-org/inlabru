@@ -48,10 +48,9 @@ test_that("Joint gcpo", {
     prior.sigma = c(1, 0.01)
   )
 
-  cmp <- ~
-    Common(geometry, model = matern) +
-      Difference(geometry, model = matern) +
-      Intercept(1)
+  cmp <- ~ Common(geometry, model = matern) +
+    Difference(geometry, model = matern) +
+    Intercept(1)
 
   fml.major <- geometry ~ Intercept + Common + Difference / 2
   fml.minor <- geometry ~ Intercept + Common - Difference / 2
@@ -103,16 +102,16 @@ test_that("bru_block_gcpo works for regular gaussian models", {
   df$y <- 2 + 3 * df$x + rnorm(n, sd = 0.5)
 
   gcpo_opts <- list(
-    enable         = TRUE,
-    type.cv        = "joint",
+    enable = TRUE,
+    type.cv = "joint",
     num.level.sets = 2
   )
 
   # fit full model with auto-generated groups
   fit_full <- bru(
     y ~ Intercept(1) + x,
-    family       = "gaussian",
-    data         = df,
+    family = "gaussian",
+    data = df,
     control.gcpo = gcpo_opts
   )
 
@@ -140,9 +139,9 @@ test_that("bru_block_gcpo works for regular gaussian models", {
     family = "gaussian",
     data = df,
     control.gcpo = list(
-      enable  = TRUE,
+      enable = TRUE,
       type.cv = "joint",
-      groups  = fixed_groups
+      groups = fixed_groups
     )
   )
 
@@ -163,7 +162,7 @@ test_that("bru_block_gcpo works for regular gaussian models", {
   expect_equal(ncol(tbl), 4L)
 
   gcpo_summary <- data.frame(
-    gcpo      = colSums(tbl[, c("full", "null")]),
+    gcpo = colSums(tbl[, c("full", "null")]),
     row.names = c("full", "null")
   )
   expect_named(gcpo_summary, "gcpo")
@@ -281,7 +280,8 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
   fml.major <- geometry ~ Intercept
   fml.minor <- geometry ~ Intercept + elev
 
-  lik_major <- bru_obs("cp",
+  lik_major <- bru_obs(
+    "cp",
     formula = fml.major,
     samplers = cvpart,
     data = gorillas_nests_major[1:10, , drop = FALSE],
@@ -292,7 +292,8 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
     ),
     tag = "major"
   )
-  lik_minor <- bru_obs("cp",
+  lik_minor <- bru_obs(
+    "cp",
     formula = fml.minor,
     samplers = cvpart,
     data = gorillas_nests_minor[1:10, , drop = FALSE],
@@ -409,8 +410,8 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   loc.domain <- matrix(c(0, 0, 1, 0, 1, 1, 0, 1), ncol = 2, byrow = TRUE)
   mesh <- fmesher::fm_mesh_2d_inla(
     loc.domain = loc.domain,
-    max.edge   = c(0.2, 0.3),
-    offset     = c(0.1, 0.1)
+    max.edge = c(0.2, 0.3),
+    offset = c(0.1, 0.1)
   )
 
   # unit square boundary
@@ -438,7 +439,9 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
     coords = c("x", "y")
   )
   a <- sf::st_intersects(pts, cvpart)
-  if (any(lengths(a) != 1)) stop("Point in none or multiple polygons")
+  if (any(lengths(a) != 1)) {
+    stop("Point in none or multiple polygons")
+  }
   pts$.block <- unlist(a)
 
   # gaussian data
@@ -451,19 +454,19 @@ test_that("bru_block_gcpo works for mixed joint model (gaussian + cp)", {
   # likelihoods
   lik_gauss <- bru_obs(
     y ~ Intercept,
-    family       = "gaussian",
-    data         = df_gauss,
+    family = "gaussian",
+    data = df_gauss,
     control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    tag          = "gauss"
+    tag = "gauss"
   )
   lik_cp <- bru_obs(
     geometry ~ Intercept,
-    family       = "cp",
-    data         = pts,
-    samplers     = cvpart,
-    domain       = list(geometry = mesh),
+    family = "cp",
+    data = pts,
+    samplers = cvpart,
+    domain = list(geometry = mesh),
     control.gcpo = list(enable = TRUE, type.cv = "joint"),
-    tag          = "cp"
+    tag = "cp"
   )
 
   fit <- bru(~ Intercept(1), lik_gauss, lik_cp)

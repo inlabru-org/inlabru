@@ -81,13 +81,15 @@ test_data_discrete <- function() {
   data <- data.frame(x = xx)
   x <- seq(1, 55, length = 55)
   mesh1D <- fm_mesh_1d(x, boundary = "free")
-  matern <- INLA::inla.spde2.pcmatern(mesh1D,
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh1D,
     prior.range = c(0.01, 0.01),
     prior.sigma = c(1, 0.01),
     constr = TRUE
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
-  fit <- lgcp(mdl,
+  fit <- lgcp(
+    mdl,
     data = data,
     domain = list(x = x),
     options = list(

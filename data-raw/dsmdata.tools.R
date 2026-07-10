@@ -73,9 +73,13 @@ define.blocks.f <- function(seg = NULL, covar.col = NULL, geometry = "euc") {
   # Loop through remaining segments
   for (i in 2:num.seg) {
     # Update block if transect changes from previous segment
-    if (seg$Transect.Label[i] != seg$Transect.Label[i - 1]) j <- j + 1
+    if (seg$Transect.Label[i] != seg$Transect.Label[i - 1]) {
+      j <- j + 1
+    }
     # Update block if there is a gap from previous segment
-    if (gap[i] == 1) j <- j + 1
+    if (gap[i] == 1) {
+      j <- j + 1
+    }
     # If same transect, then update block if covars change from previous segment
     if (seg$Transect.Label[i] == seg$Transect.Label[i - 1]) {
       chg <- 0
@@ -124,7 +128,9 @@ get.blocks.f <- function(seg = NULL, geometry = "euc") {
     }
     # Total effort for block
     first$Effort <- sum(temp$Effort)
-    if (i == 1) blocks <- first
+    if (i == 1) {
+      blocks <- first
+    }
     if (i > 1) blocks <- rbind(blocks, first)
   } # End of blocks
 
@@ -212,14 +218,20 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
       dists.small <- temp[, cols.dist]
       for (j in 1:num.temp) {
         block.dist <- cbind(one.block, dists.small[j, ])
-        if (j == 1) comb <- rbind(cbind(one.block, one.dists.small), block.dist)
+        if (j == 1) {
+          comb <- rbind(cbind(one.block, one.dists.small), block.dist)
+        }
         if (j > 1) comb <- rbind(comb, block.dist)
       } # End of sightings
     }
     # No sightings for block and so combine with missing distance data
-    if (num.temp == 0) comb <- cbind(one.block, one.dists.small)
+    if (num.temp == 0) {
+      comb <- cbind(one.block, one.dists.small)
+    }
     # Add blocks together
-    if (i == 1) all <- comb
+    if (i == 1) {
+      all <- comb
+    }
     if (i > 1) all <- rbind(all, comb)
   } # End of blocks
 
@@ -239,8 +251,11 @@ combine.dsmdata.f <- function(blocks = NULL, dists = NULL) {
 }
 
 
-get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
-                                 geometry = "euc") {
+get.direction.unit.f <- function(
+  data = NULL,
+  is.blocks = TRUE,
+  geometry = "euc"
+) {
   # NOTE: old param: data=data
 
   # Get the quadrant and angle (from 0 to 360o) using blocks (is.block=T) or
@@ -283,14 +298,30 @@ get.direction.unit.f <- function(data = NULL, is.blocks = TRUE,
     diff.y <- temp$new.y[num.temp] - temp$new.y[1]
     #  what.angle <- atan2(diff.y,diff.x) * (180/pi)
     what.angle <- atan(diff.y / diff.x) * (180 / pi)
-    if (quad == 1) unit$angle[i] <- 0
-    if (quad == 2) unit$angle[i] <- 90
-    if (quad == 3) unit$angle[i] <- 180
-    if (quad == 4) unit$angle[i] <- 270
-    if (quad == 5) unit$angle[i] <- 90 - abs(what.angle)
-    if (quad == 6) unit$angle[i] <- 90 + abs(what.angle)
-    if (quad == 7) unit$angle[i] <- 180 + abs(what.angle)
-    if (quad == 8) unit$angle[i] <- 270 + abs(what.angle)
+    if (quad == 1) {
+      unit$angle[i] <- 0
+    }
+    if (quad == 2) {
+      unit$angle[i] <- 90
+    }
+    if (quad == 3) {
+      unit$angle[i] <- 180
+    }
+    if (quad == 4) {
+      unit$angle[i] <- 270
+    }
+    if (quad == 5) {
+      unit$angle[i] <- 90 - abs(what.angle)
+    }
+    if (quad == 6) {
+      unit$angle[i] <- 90 + abs(what.angle)
+    }
+    if (quad == 7) {
+      unit$angle[i] <- 180 + abs(what.angle)
+    }
+    if (quad == 8) {
+      unit$angle[i] <- 270 + abs(what.angle)
+    }
     unit$what.angle[i] <- what.angle
   } # End of units
 
@@ -419,10 +450,12 @@ get.direction.segment.f <- function(data = NULL, geometry = "euc") {
 }
 
 
-start_end_points_segments_f <- function(seg = NULL,
-                                        use.tran = FALSE,
-                                        tran = NULL,
-                                        geometry = "euc") {
+start_end_points_segments_f <- function(
+  seg = NULL,
+  use.tran = FALSE,
+  tran = NULL,
+  geometry = "euc"
+) {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN
   # compatibility issues
@@ -536,26 +569,40 @@ get.quadrant.f <- function(start.x, start.y, end.x, end.y, tol = 0.0000001) {
 
   if (abs(x.diff) < tol) {
     # Points N
-    if (end.y > start.y) quad <- 1
+    if (end.y > start.y) {
+      quad <- 1
+    }
     # S
     if (end.y < start.y) quad <- 3
   }
   if (abs(y.diff) < tol) {
     # Points E
-    if (end.x > start.x) quad <- 2
+    if (end.x > start.x) {
+      quad <- 2
+    }
     # W
     if (end.x < start.x) quad <- 4
   }
   # NE
-  if (end.x > start.x && end.y > start.y) quad <- 5
+  if (end.x > start.x && end.y > start.y) {
+    quad <- 5
+  }
   # SE
-  if (end.x > start.x && end.y < start.y) quad <- 6
+  if (end.x > start.x && end.y < start.y) {
+    quad <- 6
+  }
   # SW
-  if (end.x < start.x && end.y < start.y) quad <- 7
+  if (end.x < start.x && end.y < start.y) {
+    quad <- 7
+  }
   # NW
-  if (end.x < start.x && end.y > start.y) quad <- 8
+  if (end.x < start.x && end.y > start.y) {
+    quad <- 8
+  }
 
-  if (is.na(quad)) print("Quadrant not assigned")
+  if (is.na(quad)) {
+    print("Quadrant not assigned")
+  }
 
   quad
 }
@@ -588,8 +635,9 @@ geo.distance.f <- function(lon1, lat1, lon2, lat2) {
     rlat2 <- lat2 * rad
 
     rlon <- (lon2 - lon1) * rad
-    posdist <- 60 * (1 / rad) * acos(sin(rlat1) * sin(rlat2) +
-      cos(rlat1) * cos(rlat2) * cos(rlon))
+    posdist <- 60 *
+      (1 / rad) *
+      acos(sin(rlat1) * sin(rlat2) + cos(rlat1) * cos(rlat2) * cos(rlon))
   }
 
   # Convert to km
@@ -615,8 +663,12 @@ get.triangle.sides.f <- function(seg.len = NULL, angle = NULL) {
 }
 
 
-generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
-                                    do.plot = FALSE) {
+generate_obs_location_f <- function(
+  seg = NULL,
+  dists = NULL,
+  geometry = "euc",
+  do.plot = FALSE
+) {
   #
   # NOTE the parameter seg used to be "seg=segments", which caused CRAN
   # compatibility issues
@@ -640,7 +692,9 @@ generate_obs_location_f <- function(seg = NULL, dists = NULL, geometry = "euc",
   new.sgt$y <- rep(NA, num.sgt)
   new.sgt <- data.frame(new.sgt)
 
-  if (do.plot) stop("do.plot code has been removed") # par(ask=T)
+  if (do.plot) {
+    stop("do.plot code has been removed")
+  } # par(ask=T)
   for (i in 1:num.sgt) {
     temp <- seg[seg$Sample.Label == dists$Sample.Label[i], ]
     # Randomly choose location along line
@@ -767,12 +821,14 @@ get.point.along.segment.f <- function(x1, y1, x2, y2, quad = NULL, seg.angle) {
 }
 
 
-get.coords.f <- function(quad = NULL,
-                         alpha = NULL,
-                         new.x = NULL,
-                         new.y = NULL,
-                         pd = NULL,
-                         side = NULL) {
+get.coords.f <- function(
+  quad = NULL,
+  alpha = NULL,
+  new.x = NULL,
+  new.y = NULL,
+  pd = NULL,
+  side = NULL
+) {
   # NOTE old parameterization:
   # quad=quadrant, alpha=angle, new.x=x.reference, new.y=y.reference,
   # pd=perp.dist, side=side.of.segment
@@ -882,7 +938,6 @@ get.hypot.f <- function(side1, side2) {
 #
 # }
 
-
 what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
   # NOTE old parameterization: dy=diff.y,dx=diff.x,quad=quadrant
 
@@ -890,14 +945,30 @@ what.angle.f <- function(dy = NULL, dx = NULL, quad = NULL) {
   # direction (quadrant)
 
   what.angle <- atan(dy / dx) * (180 / pi)
-  if (quad == 1) angle <- 0
-  if (quad == 2) angle <- 90
-  if (quad == 3) angle <- 180
-  if (quad == 4) angle <- 270
-  if (quad == 5) angle <- 90 - abs(what.angle)
-  if (quad == 6) angle <- 90 + abs(what.angle)
-  if (quad == 7) angle <- 180 + (90 - abs(what.angle))
-  if (quad == 8) angle <- 270 + abs(what.angle)
+  if (quad == 1) {
+    angle <- 0
+  }
+  if (quad == 2) {
+    angle <- 90
+  }
+  if (quad == 3) {
+    angle <- 180
+  }
+  if (quad == 4) {
+    angle <- 270
+  }
+  if (quad == 5) {
+    angle <- 90 - abs(what.angle)
+  }
+  if (quad == 6) {
+    angle <- 90 + abs(what.angle)
+  }
+  if (quad == 7) {
+    angle <- 180 + (90 - abs(what.angle))
+  }
+  if (quad == 8) {
+    angle <- 270 + abs(what.angle)
+  }
 
   angle
 }

@@ -277,9 +277,11 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(

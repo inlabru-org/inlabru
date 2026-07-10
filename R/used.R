@@ -41,8 +41,10 @@ bru_used_update.bru_pred_expr <- function(x, labels, ...) {
   pre_used <- bru_used(x)
   used <- bru_used_update(pre_used, labels = labels, ...)
   if (isTRUE(x[["is_additive"]])) {
-    if ((length(used$latent) > 0) ||
-      (length(setdiff(pre_used$effect, used$effect)) > 0)) {
+    if (
+      (length(used$latent) > 0) ||
+        (length(setdiff(pre_used$effect, used$effect)) > 0)
+    ) {
       x[["is_additive"]] <- FALSE
       x[["is_linear"]] <- FALSE
 
@@ -186,12 +188,14 @@ bru_used <- function(x = NULL, ...) {
 #' @keywords internal
 #' @family bru_used
 #' @export
-new_bru_used <- function(x = NULL,
-                         ...,
-                         effect = NULL,
-                         effect_exclude = NULL,
-                         latent = NULL,
-                         labels = NULL) {
+new_bru_used <- function(
+  x = NULL,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   # Need to specify the dispatch object explicitly to handle the NULL case:
   UseMethod("new_bru_used", x)
 }
@@ -199,12 +203,14 @@ new_bru_used <- function(x = NULL,
 #' @describeIn new_bru_used Create a `bru_used` object from effect name
 #'   character vectors.
 #' @export
-new_bru_used.NULL <- function(x = NULL,
-                              ...,
-                              effect = NULL,
-                              effect_exclude = NULL,
-                              latent = NULL,
-                              labels = NULL) {
+new_bru_used.NULL <- function(
+  x = NULL,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   used <- structure(
     list(
       effect = effect,
@@ -331,11 +337,14 @@ bru_used.default <- function(x, ...) {
 #' @describeIn new_bru_used Create a `bru_used` object from a `character`
 #' representation of an expression.
 #' @export
-new_bru_used.character <- function(x, ...,
-                                   effect = NULL,
-                                   effect_exclude = NULL,
-                                   latent = NULL,
-                                   labels = NULL) {
+new_bru_used.character <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   form <- x
   if (is.null(effect)) {
     effect <- bru_used_vars(form, functions = FALSE)
@@ -371,11 +380,14 @@ new_bru_used.character <- function(x, ...,
 #' @describeIn new_bru_used Create a `bru_used` object from an expression
 #'   object.
 #' @export
-new_bru_used.expression <- function(x, ...,
-                                    effect = NULL,
-                                    effect_exclude = NULL,
-                                    latent = NULL,
-                                    labels = NULL) {
+new_bru_used.expression <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   attributes(x) <- NULL
   y <- deparse1(x, collapse = "\n")
   new_bru_used(
@@ -391,11 +403,14 @@ new_bru_used.expression <- function(x, ...,
 #' @describeIn new_bru_used Create a `bru_used` object from an `rlang` `expr`
 #'   object.
 #' @export
-new_bru_used.quosure <- function(x, ...,
-                                 effect = NULL,
-                                 effect_exclude = NULL,
-                                 latent = NULL,
-                                 labels = NULL) {
+new_bru_used.quosure <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   y <- deparse1(rlang::quo_get_expr(x), collapse = "\n")
   attributes(y) <- NULL
   new_bru_used(
@@ -412,11 +427,14 @@ new_bru_used.quosure <- function(x, ...,
 #' @describeIn new_bru_used Create a `bru_used` object from a formula (only the
 #' right-hand side is used).
 #' @export
-new_bru_used.formula <- function(x, ...,
-                                 effect = NULL,
-                                 effect_exclude = NULL,
-                                 latent = NULL,
-                                 labels = NULL) {
+new_bru_used.formula <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   form <- x[[length(x)]]
   ex <- deparse1(form, collapse = "\n")
   new_bru_used(

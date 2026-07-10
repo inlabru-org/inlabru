@@ -62,9 +62,7 @@ test_that("Factor mapper", {
     )
   for (factor_mapping in rev(c("full", "contrast"))) {
     values <- all_values[[factor_mapping]]
-    mapper <- bm_factor(all_values[["full"]],
-      factor_mapping = factor_mapping
-    )
+    mapper <- bm_factor(all_values[["full"]], factor_mapping = factor_mapping)
 
     input <- c("b", "b", "a", "c")
     state <- all_state[[factor_mapping]]
@@ -115,13 +113,16 @@ test_that("Automated factor releveling", {
   )
 
   boundary <- sf::st_sf(
-    geometry =
-      sf::st_sfc(
-        sf::st_polygon(list(rbind(
-          c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)
-        ))),
-        crs = 5070
-      )
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(rbind(
+        c(0, 0),
+        c(1, 0),
+        c(1, 1),
+        c(0, 1),
+        c(0, 0)
+      ))),
+      crs = 5070
+    )
   )
 
   mesh <- fmesher::fm_mesh_2d(
@@ -267,7 +268,6 @@ test_that("Aggregate mapper", {
   expect_equal(ibm_eval(mapper, input = input, state = state), val)
   expect_equal(ibm_jacobian(mapper, input = input, state = state), A)
 
-
   mapper <- bm_aggregate(rescale = TRUE)
 
   expect_equal(ibm_n(mapper), NA_integer_)
@@ -296,10 +296,12 @@ test_that("Aggregate mapper", {
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
       ibm_eval(mapper, input = input, state = state - delta)) /
-      (2 * sum(delta^2)^0.5)
+    (2 * sum(delta^2)^0.5)
   jac_deriv <-
-    as.vector(ibm_jacobian(mapper, input = input, state = state) %*%
-      (delta / sum(delta^2)^0.5))
+    as.vector(
+      ibm_jacobian(mapper, input = input, state = state) %*%
+        (delta / sum(delta^2)^0.5)
+    )
   expect_equal(
     num_deriv,
     jac_deriv,
@@ -337,7 +339,6 @@ test_that("logsumexp mapper", {
     tolerance = lowtol
   )
 
-
   input <-
     list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
 
@@ -363,7 +364,6 @@ test_that("logsumexp mapper", {
     A,
     tolerance = midtol
   )
-
 
   mapper <- bm_logsumexp(rescale = TRUE)
 
@@ -406,10 +406,12 @@ test_that("logsumexp mapper", {
   num_deriv <-
     (ibm_eval(mapper, input = input, state = state + delta) -
       ibm_eval(mapper, input = input, state = state - delta)) /
-      (2 * sum(delta^2)^0.5)
+    (2 * sum(delta^2)^0.5)
   jac_deriv <-
-    as.vector(ibm_jacobian(mapper, input = input, state = state) %*%
-      (delta / sum(delta^2)^0.5))
+    as.vector(
+      ibm_jacobian(mapper, input = input, state = state) %*%
+        (delta / sum(delta^2)^0.5)
+    )
   expect_equal(
     num_deriv,
     jac_deriv,
@@ -599,17 +601,20 @@ test_that("Collect mapper, direct construction", {
   expect_equal(ibm_jacobian(mapper, list_data), A)
   expect_equal(
     as(
-      ibm_jacobian(mapper, list_data[["u"]], inla_f = TRUE)[
-        , ibm_inla_subset(mapper),
+      ibm_jacobian(mapper, list_data[["u"]], inla_f = TRUE)[,
+        ibm_inla_subset(mapper),
         drop = FALSE
       ],
       "dgTMatrix"
     ),
-    as(A[
-      seq_along(list_data[["u"]]),
-      ibm_inla_subset(mapper),
-      drop = FALSE
-    ], "dgTMatrix")
+    as(
+      A[
+        seq_along(list_data[["u"]]),
+        ibm_inla_subset(mapper),
+        drop = FALSE
+      ],
+      "dgTMatrix"
+    )
   )
 })
 
@@ -630,26 +635,15 @@ test_that("Collect mapper, automatic construction", {
 
   cmp1 <- y ~
     -1 +
-    indep(val,
-      model = "bym2",
-      mapper = mapper,
-      graph = Matrix::Diagonal(4) + 1
-    )
+    indep(val, model = "bym2", mapper = mapper, graph = Matrix::Diagonal(4) + 1)
 
   cmp2 <- y ~
     -1 +
-    indep(val,
-      model = "bym2",
-      n = 4,
-      graph = Matrix::Diagonal(4) + 1
-    )
+    indep(val, model = "bym2", n = 4, graph = Matrix::Diagonal(4) + 1)
 
   cmp3 <- y ~
     -1 +
-    indep(val,
-      model = "bym2",
-      graph = Matrix::Diagonal(4) + 1
-    )
+    indep(val, model = "bym2", graph = Matrix::Diagonal(4) + 1)
 
   lik <- bru_obs(formula = y ~ ., data = data)
 
@@ -683,17 +677,21 @@ test_that("Collect mapper, automatic construction", {
     )
 
     if (inla_f) {
-      input <- list(core = list(
-        main = data$val,
-        group = rep(1, 3),
-        replicate = rep(1, 3)
-      ))
+      input <- list(
+        core = list(
+          main = data$val,
+          group = rep(1, 3),
+          replicate = rep(1, 3)
+        )
+      )
     } else {
-      input <- list(core = list(
-        main = list(u = data$val),
-        group = rep(1, 3),
-        replicate = rep(1, 3)
-      ))
+      input <- list(
+        core = list(
+          main = list(u = data$val),
+          group = rep(1, 3),
+          replicate = rep(1, 3)
+        )
+      )
     }
 
     J <- as.matrix(ibm_jacobian(
@@ -703,14 +701,16 @@ test_that("Collect mapper, automatic construction", {
     ))
 
     expect_identical(
-      as.matrix(ibm_jacobian(cmp2$indep$mapper,
+      as.matrix(ibm_jacobian(
+        cmp2$indep$mapper,
         input = input,
         inla_f = inla_f
       )),
       J
     )
     expect_identical(
-      as.matrix(ibm_jacobian(cmp3$indep$mapper,
+      as.matrix(ibm_jacobian(
+        cmp3$indep$mapper,
         input = input,
         inla_f = inla_f
       )),
@@ -744,7 +744,8 @@ test_that("Collect mapper works", {
 
   expect_no_error({
     fit_bru <-
-      bru(~ Intercept(1) + field(x, model = "bym", graph = graph),
+      bru(
+        ~ Intercept(1) + field(x, model = "bym", graph = graph),
         formula = y ~ Intercept + field,
         data = data,
         options = list(bru_initial = list(field = rep(10, 8)))
@@ -768,11 +769,13 @@ test_that("Marginal mapper", {
   val2 <- ibm_eval(m2, state = state2, reverse = TRUE)
   expect_equal(val2, val1)
 
-  dqexp <- function(p,
-                    rate = 1,
-                    lower.tail = TRUE,
-                    log.p = FALSE,
-                    log = FALSE) {
+  dqexp <- function(
+    p,
+    rate = 1,
+    lower.tail = TRUE,
+    log.p = FALSE,
+    log = FALSE
+  ) {
     if (log.p) {
       if (lower.tail) {
         val <- log1p(-exp(p)) + log(rate)
@@ -876,15 +879,21 @@ test_that("Repeat mapper works", {
   expect_no_error({
     fit_bru <-
       bru(
-        y ~ Intercept(1) + field(
-          x,
-          model = "iid",
-          mapper = bm_repeat(bm_index(4), n_rep = 2)
-        ),
+        y ~ Intercept(1) +
+          field(
+            x,
+            model = "iid",
+            mapper = bm_repeat(bm_index(4), n_rep = 2)
+          ),
         data = data,
-        control.family = list(hyper = list(prec = list(
-          initial = log(1e8), fixed = TRUE
-        ))),
+        control.family = list(
+          hyper = list(
+            prec = list(
+              initial = log(1e8),
+              fixed = TRUE
+            )
+          )
+        ),
         options = list(bru_initial = list(field = rep(10, 8)))
       )
   })
@@ -918,18 +927,24 @@ test_that("Reparam mapper works", {
   expect_no_error({
     fit_bru_pipe <-
       bru(
-        ~ 0 + field(
-          list(AA = B, BB = x),
-          model = "iid",
-          mapper = bm_pipe(list(AA = bm_matrix(ncol(B)), BB = bm_index(8))),
-          constr = FALSE
-        ),
+        ~ 0 +
+          field(
+            list(AA = B, BB = x),
+            model = "iid",
+            mapper = bm_pipe(list(AA = bm_matrix(ncol(B)), BB = bm_index(8))),
+            constr = FALSE
+          ),
         bru_obs(
           formula = y ~ .,
           data = data,
-          control.family = list(hyper = list(prec = list(
-            initial = log(1e8), fixed = TRUE
-          )))
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = log(1e8),
+                fixed = TRUE
+              )
+            )
+          )
         ),
         options = list(bru_initial = list(field = rep(10, 8)))
       )
@@ -937,17 +952,23 @@ test_that("Reparam mapper works", {
   expect_no_error({
     fit_bru_reparam <-
       bru(
-        ~ 0 + field(
-          x,
-          model = "iid",
-          mapper = bm_reparam(bm_index(8), B = B)
-        ),
+        ~ 0 +
+          field(
+            x,
+            model = "iid",
+            mapper = bm_reparam(bm_index(8), B = B)
+          ),
         bru_obs(
           formula = y ~ .,
           data = data,
-          control.family = list(hyper = list(prec = list(
-            initial = log(1e8), fixed = TRUE
-          )))
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = log(1e8),
+                fixed = TRUE
+              )
+            )
+          )
         ),
         options = list(bru_initial = list(field = rep(10, 8)))
       )

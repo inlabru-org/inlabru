@@ -13,7 +13,12 @@
 # @param end_with The message ends with
 # @verbosity Default: 2
 # @ verbose_store Default: T
-bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_with = NULL) {
+bru_log_list <- function(
+  x,
+  attr_names = "sf_column",
+  start_with = NULL,
+  end_with = NULL
+) {
   for (i in seq_along(x)) {
     bru_log_message(
       paste0(
@@ -24,7 +29,8 @@ bru_log_list <- function(x, attr_names = "sf_column", start_with = NULL, end_wit
         end_with,
         ".\n"
       ),
-      verbosity = 2, verbose_store = TRUE
+      verbosity = 2,
+      verbose_store = TRUE
     )
   }
 }
