@@ -57,7 +57,6 @@ test_that("Georeferenced data with sf", {
     tolerance = midtol
   )
 
-
   # Check that explicit access to the data object works
   cmp <- obs ~ Intercept(1) + field(sf::st_coordinates(.data.), model = matern)
 
@@ -123,11 +122,8 @@ test_that("Georeferenced data with sf, with groups", {
     prior.range = c(4, 0.01)
   )
 
-  cmp <- obs ~ Intercept(1) + field(geometry,
-    model = matern,
-    group = season,
-    ngroup = 2
-  )
+  cmp <- obs ~ Intercept(1) +
+    field(geometry, model = matern, group = season, ngroup = 2)
 
   fit <- bru(
     cmp,

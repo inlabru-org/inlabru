@@ -44,8 +44,10 @@ bru_used_update.bru_pred_expr <- function(x, labels) {
   pre_used <- bru_used(x)
   used <- bru_used_update(pre_used, labels = labels)
   if (isTRUE(x[["is_additive"]])) {
-    if ((length(used$latent) > 0) ||
-      (length(setdiff(pre_used$effect, used$effect)) > 0)) {
+    if (
+      (length(used$latent) > 0) ||
+        (length(setdiff(pre_used$effect, used$effect)) > 0)
+    ) {
       x[["is_additive"]] <- FALSE
       x[["is_linear"]] <- FALSE
 
@@ -195,12 +197,14 @@ bru_used <- function(x = NULL, ...) {
 #' @keywords internal
 #' @family bru_used
 #' @export
-new_bru_used <- function(x = NULL,
-                         ...,
-                         effect = NULL,
-                         effect_exclude = NULL,
-                         latent = NULL,
-                         labels = NULL) {
+new_bru_used <- function(
+  x = NULL,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   # Need to specify the dispatch object explicitly to handle the NULL case:
   UseMethod("new_bru_used", x)
 }
@@ -208,12 +212,14 @@ new_bru_used <- function(x = NULL,
 #' @describeIn new_bru_used Create a `bru_used` object from effect name
 #'   character vectors.
 #' @export
-new_bru_used.NULL <- function(x = NULL,
-                              ...,
-                              effect = NULL,
-                              effect_exclude = NULL,
-                              latent = NULL,
-                              labels = NULL) {
+new_bru_used.NULL <- function(
+  x = NULL,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   used <- structure(
     list(
       effect = effect,
@@ -302,11 +308,13 @@ bru_used_vars <- function(x, result = new_bru_used_vars()) {
 }
 #' @export
 #' @describeIn bru_used_vars Create a `bru_used_vars` object.
-new_bru_used_vars <- function(x = list(
-                                vars = character(0),
-                                funs = character(0),
-                                objects = list()
-                              )) {
+new_bru_used_vars <- function(
+  x = list(
+    vars = character(0),
+    funs = character(0),
+    objects = list()
+  )
+) {
   stopifnot(is.list(x))
   stopifnot(all(c("vars", "funs", "objects") %in% names(x)))
   stopifnot(is.character(x$vars))
@@ -364,10 +372,12 @@ bru_used_vars.call <- function(x, result = new_bru_used_vars()) {
     # for the accessor(s), as the access is ambiguous and might involve the
     # entire object.
     obj <- as.character(x[[2]])
-    if ((length(x) == 3) && is.symbol(x[[2]]) && (
-      (fun == "$") ||
-        ((fun %in% c("[", "[[")) && is.character(x[[3]]))
-    )) {
+    if (
+      (length(x) == 3) &&
+        is.symbol(x[[2]]) &&
+        ((fun == "$") ||
+          ((fun %in% c("[", "[[")) && is.character(x[[3]])))
+    ) {
       result$objects[[obj]] <- union(
         result$objects[[obj]],
         as.character(x[[3]])
@@ -416,8 +426,12 @@ bru_used_vars.formula <- function(x, result = new_bru_used_vars()) {
 #' @export
 format.bru_used_vars <- function(x, ...) {
   paste0(
-    "vars: {", paste0(x$vars, collapse = ", "), "}, ",
-    "funs: {", paste0(x$funs, collapse = ", "), "}, ",
+    "vars: {",
+    paste0(x$vars, collapse = ", "),
+    "}, ",
+    "funs: {",
+    paste0(x$funs, collapse = ", "),
+    "}, ",
     "objects[",
     if (length(x$objects) == 0) {
       ""
@@ -425,9 +439,13 @@ format.bru_used_vars <- function(x, ...) {
       paste0(
         names(x$objects),
         ": {",
-        vapply(x$objects, function(y) {
-          paste0(y, collapse = ", ")
-        }, character(1)),
+        vapply(
+          x$objects,
+          function(y) {
+            paste0(y, collapse = ", ")
+          },
+          character(1)
+        ),
         "}",
         collapse = ", "
       )
@@ -452,11 +470,14 @@ bru_used.default <- function(x, ...) {
 #' @describeIn new_bru_used Create a `bru_used` object from an expression
 #' object supported by [bru_used_vars()].
 #' @export
-new_bru_used.default <- function(x, ...,
-                                 effect = NULL,
-                                 effect_exclude = NULL,
-                                 latent = NULL,
-                                 labels = NULL) {
+new_bru_used.default <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   if (is.null(effect) || is.null(latent)) {
     result <- bru_used_vars(x)
     if (is.null(effect)) {
@@ -501,11 +522,14 @@ new_bru_used.default <- function(x, ...,
 
 #' @describeIn new_bru_used Create a `bru_used` object from a string.
 #' @export
-new_bru_used.character <- function(x, ...,
-                                   effect = NULL,
-                                   effect_exclude = NULL,
-                                   latent = NULL,
-                                   labels = NULL) {
+new_bru_used.character <- function(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+) {
   new_bru_used(
     x = rlang::parse_expr(x),
     ...,

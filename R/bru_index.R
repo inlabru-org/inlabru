@@ -149,7 +149,8 @@ bru_index.bru_comp <- function(object, inla_f, ...) {
   nms <- names(idx)
   present <- match(nms, c("main", "group", "replicate"))
   names(idx) <-
-    glue("{object[['label']]}{suffix}",
+    glue(
+      "{object[['label']]}{suffix}",
       suffix = c("", ".group", ".repl")[present]
     )
   idx

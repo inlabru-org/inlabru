@@ -197,9 +197,7 @@ bru_log_bookmarks <- function(x = NULL) {
 #' Utility function for computing log position offsets.
 #' @family inlabru log methods
 #' @inheritParams bru_log_bookmark
-bru_log_offset <- function(x = NULL,
-                           bookmark = NULL,
-                           offset = NULL) {
+bru_log_offset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   if (is.null(x)) {
     log_length <- length(bru_env_get()[["log"]])
   } else {
@@ -379,11 +377,7 @@ format.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
 #'
 print.bru_log <- function(x, ..., timestamp = TRUE, verbosity = FALSE) {
   cat(
-    format(x,
-      ...,
-      timestamp = timestamp,
-      verbosity = verbosity
-    ),
+    format(x, ..., timestamp = timestamp, verbosity = verbosity),
     sep = "\n"
   )
   invisible(x)
@@ -511,32 +505,37 @@ as.character.bru_log <- function(x, ...) {
 #' }
 #' @export
 
-bru_log_message <- function(..., domain = NULL, appendLF = TRUE,
-                            verbosity = 1L,
-                            allow_verbose = TRUE, verbose = NULL,
-                            verbose_store = NULL,
-                            x = NULL) {
+bru_log_message <- function(
+  ...,
+  domain = NULL,
+  appendLF = TRUE,
+  verbosity = 1L,
+  allow_verbose = TRUE,
+  verbose = NULL,
+  verbose_store = NULL,
+  x = NULL
+) {
   new_x <- data.frame(
-    message = .makeMessage(...,
-      domain = domain,
-      appendLF = FALSE
-    ),
+    message = .makeMessage(..., domain = domain, appendLF = FALSE),
     timestamp = Sys.time(),
     verbosity = as.integer(verbosity)
   )
   if (allow_verbose) {
-    if ((!is.null(verbose) && (verbose >= verbosity)) ||
-      (is.null(verbose) &&
-        bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)) {
+    if (
+      (!is.null(verbose) && (verbose >= verbosity)) ||
+        (is.null(verbose) &&
+          bru_options_get("bru_verbose", include_default = TRUE) >= verbosity)
+    ) {
       message(new_x[["message"]], domain = NA, appendLF = appendLF)
     }
   }
-  if ((!is.null(verbose_store) && (verbose_store >= verbosity)) ||
-    !allow_verbose ||
-    (is.null(verbose_store) &&
-      (bru_options_get("bru_verbose_store",
-        include_default = TRUE
-      ) >= verbosity))) {
+  if (
+    (!is.null(verbose_store) && (verbose_store >= verbosity)) ||
+      !allow_verbose ||
+      (is.null(verbose_store) &&
+        (bru_options_get("bru_verbose_store", include_default = TRUE) >=
+          verbosity))
+  ) {
     if (is.null(x)) {
       envir <- bru_env_get()
       envir[["log"]][["log"]] <- rbind(envir[["log"]][["log"]], new_x)
@@ -872,9 +871,9 @@ bru_options_deprecated <- function(args) {
       warning(glue(
         "Ignoring deprecated global options ",
         glue_collapse(
-          glue("'{depr}'",
-            depr =
-              names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
+          glue(
+            "'{depr}'",
+            depr = names(deprecated_args)[nzchar(names(deprecated_args)) == 0]
           ),
           sep = ", "
         ),
@@ -1105,9 +1104,11 @@ bru_options_reset <- function() {
 #' print(my_fun(FALSE))
 #' print(bru_options_get("bru_verbose"))
 #' @export
-bru_options_set_local <- function(...,
-                                  .reset = FALSE,
-                                  .envir = parent.frame()) {
+bru_options_set_local <- function(
+  ...,
+  .reset = FALSE,
+  .envir = parent.frame()
+) {
   original_options <- bru_options_get(include_default = FALSE)
   withr::defer(bru_options_set(original_options, .reset = TRUE), envir = .envir)
   invisible(bru_options_set(..., .reset = .reset))
@@ -1135,11 +1136,13 @@ bru_options_set_local <- function(...,
 #' @method summary bru_options
 #' @export
 #' @rdname summary.bru_options
-summary.bru_options <- function(object,
-                                legend = TRUE,
-                                include_global = TRUE,
-                                include_default = TRUE,
-                                ...) {
+summary.bru_options <- function(
+  object,
+  legend = TRUE,
+  include_global = TRUE,
+  include_default = TRUE,
+  ...
+) {
   traverse <- function(combined, default, global, object) {
     result <- list()
     for (name in sort(names(combined))) {
@@ -1147,8 +1150,10 @@ summary.bru_options <- function(object,
         result[[name]] <- list(
           is_list = TRUE,
           value = traverse(
-            combined[[name]], default[[name]],
-            global[[name]], object[[name]]
+            combined[[name]],
+            default[[name]],
+            global[[name]],
+            object[[name]]
           )
         )
       } else {
@@ -1159,25 +1164,24 @@ summary.bru_options <- function(object,
           } else {
             combined[[name]]
           },
-          origin =
-            if (
-              !is.null(default[[name]]) &&
-                identical(default[[name]], combined[[name]])
-            ) {
-              "default"
-            } else if (
-              !is.null(global[[name]]) &&
-                identical(global[[name]], combined[[name]])
-            ) {
-              "global"
-            } else if (
-              !is.null(object[[name]]) &&
-                identical(object[[name]], combined[[name]])
-            ) {
-              "user"
-            } else {
-              "unknown"
-            }
+          origin = if (
+            !is.null(default[[name]]) &&
+              identical(default[[name]], combined[[name]])
+          ) {
+            "default"
+          } else if (
+            !is.null(global[[name]]) &&
+              identical(global[[name]], combined[[name]])
+          ) {
+            "global"
+          } else if (
+            !is.null(object[[name]]) &&
+              identical(object[[name]], combined[[name]])
+          ) {
+            "user"
+          } else {
+            "unknown"
+          }
         )
       }
     }
@@ -1226,11 +1230,14 @@ print.summary_bru_options <- function(x, ...) {
           prefix = glue("{prefix}\t")
         )
       } else {
-        cat(glue(
-          "{prefix}{name} =",
-          "\t{tree[[name]]$value}",
-          "\t({tree[[name]]$origin})"
-        ), "\n")
+        cat(
+          glue(
+            "{prefix}{name} =",
+            "\t{tree[[name]]$value}",
+            "\t({tree[[name]]$origin})"
+          ),
+          "\n"
+        )
       }
     }
   }

@@ -5,10 +5,21 @@ devtools::load_all()
 
 timing <- NULL
 nn <- c(1, 10, 100)
-mm <- c(1, 3, 10,
-        30, 100, 300, 1000,
-        3000, 10000, 30000, 100000,
-        300000, 1000000)
+mm <- c(
+  1,
+  3,
+  10,
+  30,
+  100,
+  300,
+  1000,
+  3000,
+  10000,
+  30000,
+  100000,
+  300000,
+  1000000
+)
 nm_max <- c(A = 3000, B = 1000000, C = 3000)
 timer_max <- 10
 
@@ -42,52 +53,54 @@ for (k in seq_len(nrow(n_df))) {
   X <- rnorm(N)
 
   if (N <= nm_max["A"]) {
-  A <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "pandemic",
-      agg = "pandemic"
-    ))
-    model <- bru_model(
-      ~ -1 + x(x, model = "iid"),
-      bru_obs(
-        formula = y ~ cos(x),
-        is_rowwise = TRUE,
-        data = data,
-        response_data = response_data,
-        family = "gaussian",
-        aggregate = if (n == 1) NULL else "logsumexp"
+    A <- {
+      local_bru_options_set(
+        bru_method = list(
+          autodiff = "pandemic",
+          agg = "pandemic"
+        )
       )
-    )
-
-    used <- bru_used(model$lhoods)
-    expect_equal(used[["effect"]], "x")
-
-    idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
-
-    iter <- 0
-    toc <- proc.time()[1]
-    while (toc[length(toc)] - toc[1] < timer_max) {
-      iter <- iter + 1
-      comp_lin <- ibm_as_taylor(model, input = inp, state = NULL)
-      lin <- bru_compute_linearisation(
-        model,
-        lhoods = model$lhoods,
-        input = inp,
-        state = list(x = X),
-        comp_simple = comp_lin
+      model <- bru_model(
+        ~ -1 + x(x, model = "iid"),
+        bru_obs(
+          formula = y ~ cos(x),
+          is_rowwise = TRUE,
+          data = data,
+          response_data = response_data,
+          family = "gaussian",
+          aggregate = if (n == 1) NULL else "logsumexp"
+        )
       )
-      toc <- c(toc, proc.time()[1])
+
+      used <- bru_used(model$lhoods)
+      expect_equal(used[["effect"]], "x")
+
+      idx <- bru_index(model, used = used)
+      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+
+      iter <- 0
+      toc <- proc.time()[1]
+      while (toc[length(toc)] - toc[1] < timer_max) {
+        iter <- iter + 1
+        comp_lin <- ibm_as_taylor(model, input = inp, state = NULL)
+        lin <- bru_compute_linearisation(
+          model,
+          lhoods = model$lhoods,
+          input = inp,
+          state = list(x = X),
+          comp_simple = comp_lin
+        )
+        toc <- c(toc, proc.time()[1])
+      }
+      diff(toc)
     }
-    diff(toc)
-  }
-  A_iter <- iter
-  if (length(A) > 1) {
-    A_sd <- sd(A) / sqrt(iter)
-  } else {
-    A_sd <- NA
-  }
-  A <- mean(A)
+    A_iter <- iter
+    if (length(A) > 1) {
+      A_sd <- sd(A) / sqrt(iter)
+    } else {
+      A_sd <- NA
+    }
+    A <- mean(A)
   } else {
     A_iter <- NULL
     A_sd <- NULL
@@ -95,48 +108,47 @@ for (k in seq_len(nrow(n_df))) {
   }
 
   if (N <= nm_max["B"]) {
-  B <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "fullchain",
-      agg = "fullchain"
-    ))
-    model <- bru_model(
-      ~ -1 + x(x, model = "iid"),
-      bru_obs(
-        formula = y ~ cos(x),
-        is_rowwise = TRUE,
-        data = data,
-        response_data = response_data,
-        family = "gaussian",
-        aggregate = if (n == 1) NULL else "logsumexp"
+    B <- {
+      local_bru_options_set(
+        bru_method = list(
+          autodiff = "fullchain",
+          agg = "fullchain"
+        )
       )
-    )
-    used <- bru_used(model$lhoods)
-    expect_equal(used[["effect"]], "x")
-
-    idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
-
-    iter <- 0
-    toc <- proc.time()[1]
-    while (toc[length(toc)] - toc[1] < timer_max) {
-      iter <- iter + 1
-      lin <- ibm_as_taylor(model,
-                           input = inp,
-                           state = list(x = X)
+      model <- bru_model(
+        ~ -1 + x(x, model = "iid"),
+        bru_obs(
+          formula = y ~ cos(x),
+          is_rowwise = TRUE,
+          data = data,
+          response_data = response_data,
+          family = "gaussian",
+          aggregate = if (n == 1) NULL else "logsumexp"
+        )
       )
-      toc <- c(toc, proc.time()[1])
+      used <- bru_used(model$lhoods)
+      expect_equal(used[["effect"]], "x")
+
+      idx <- bru_index(model, used = used)
+      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+
+      iter <- 0
+      toc <- proc.time()[1]
+      while (toc[length(toc)] - toc[1] < timer_max) {
+        iter <- iter + 1
+        lin <- ibm_as_taylor(model, input = inp, state = list(x = X))
+        toc <- c(toc, proc.time()[1])
+      }
+
+      diff(toc)
     }
-
-    diff(toc)
-  }
-  B_iter <- iter
-  if (length(B) > 1) {
-    B_sd <- sd(B) / sqrt(iter)
-  } else {
-    B_sd <- NA
-  }
-  B <- mean(B)
+    B_iter <- iter
+    if (length(B) > 1) {
+      B_sd <- sd(B) / sqrt(iter)
+    } else {
+      B_sd <- NA
+    }
+    B <- mean(B)
   } else {
     B_iter <- NULL
     B_sd <- NULL
@@ -144,48 +156,47 @@ for (k in seq_len(nrow(n_df))) {
   }
 
   if ((N <= nm_max["C"]) || ((N <= nm_max["B"]) && (n == 1))) {
-  C <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "fullchain",
-      agg = "pandemic"
-    ))
-    model <- bru_model(
-      ~ -1 + x(x, model = "iid"),
-      bru_obs(
-        formula = y ~ cos(x),
-        is_rowwise = TRUE,
-        data = data,
-        response_data = response_data,
-        family = "gaussian",
-        aggregate = if (n == 1) NULL else "logsumexp"
+    C <- {
+      local_bru_options_set(
+        bru_method = list(
+          autodiff = "fullchain",
+          agg = "pandemic"
+        )
       )
-    )
-
-    used <- bru_used(model$lhoods)
-    expect_equal(used[["effect"]], "x")
-
-    idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
-
-    iter <- 0
-    toc <- proc.time()[1]
-    while (toc[length(toc)] - toc[1] < timer_max) {
-      iter <- iter + 1
-      lin <- ibm_as_taylor(model,
-                           input = inp,
-                           state = list(x = X)
+      model <- bru_model(
+        ~ -1 + x(x, model = "iid"),
+        bru_obs(
+          formula = y ~ cos(x),
+          is_rowwise = TRUE,
+          data = data,
+          response_data = response_data,
+          family = "gaussian",
+          aggregate = if (n == 1) NULL else "logsumexp"
+        )
       )
-      toc <- c(toc, proc.time()[1])
+
+      used <- bru_used(model$lhoods)
+      expect_equal(used[["effect"]], "x")
+
+      idx <- bru_index(model, used = used)
+      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+
+      iter <- 0
+      toc <- proc.time()[1]
+      while (toc[length(toc)] - toc[1] < timer_max) {
+        iter <- iter + 1
+        lin <- ibm_as_taylor(model, input = inp, state = list(x = X))
+        toc <- c(toc, proc.time()[1])
+      }
+      diff(toc)
     }
-    diff(toc)
-  }
-  C_iter <- iter
-  if (length(C) > 1) {
-    C_sd <- sd(C) / sqrt(iter)
-  } else {
-    C_sd <- NA
-  }
-  C <- mean(C)
+    C_iter <- iter
+    if (length(C) > 1) {
+      C_sd <- sd(C) / sqrt(iter)
+    } else {
+      C_sd <- NA
+    }
+    C <- mean(C)
   } else {
     C_iter <- NULL
     C_sd <- NULL
@@ -206,7 +217,8 @@ for (k in seq_len(nrow(n_df))) {
 
   timing <-
     bind_rows(
-      timing, timing_
+      timing,
+      timing_
     )
 }
 
@@ -227,9 +239,15 @@ timing_est <- lapply(
       Time ~ (a1 * (n == nn[1]) + a2 * (n == nn[2]) + a3 * (n == nn[3])) +
         (b1 * (n == nn[1]) + b2 * (n == nn[2]) + b3 * (n == nn[3])) * N^d,
       data = dat,
-      start = list(a1 = 0.01, a2 = 0.01, a3 = 0.01,
-                   b1 = 0.01, b2 = 0.01, b3 = 0.01,
-                   d = 1),
+      start = list(
+        a1 = 0.01,
+        a2 = 0.01,
+        a3 = 0.01,
+        b1 = 0.01,
+        b2 = 0.01,
+        b3 = 0.01,
+        d = 1
+      ),
       weights = 1 / (dat$Time_sd)
     )
   }
@@ -253,11 +271,13 @@ ggplot(
     linetype = as.factor(n)
   )
 ) +
-  geom_ribbon(aes(ymin = pmax(0.01, Time - 2*Time_sd), ymax = Time + 2*Time_sd),
-              alpha = 0.1) +
+  geom_ribbon(
+    aes(ymin = pmax(0.01, Time - 2 * Time_sd), ymax = Time + 2 * Time_sd),
+    alpha = 0.1
+  ) +
   geom_line() +
   geom_point() +
-#  geom_line(aes(y = Time_Est), color = "black") +
+  #  geom_line(aes(y = Time_Est), color = "black") +
   scale_x_log10() +
   scale_y_log10() +
   labs(

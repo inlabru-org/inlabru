@@ -79,7 +79,9 @@ for (methodB in c(
     method = methodB, alpha = 1.5
   )
 }
+doplot <- FALSE
 if (require("ggplot2") && require("patchwork")) {
+  if (doplot) {
   print(
     ggplot(
       data =
@@ -101,11 +103,13 @@ if (require("ggplot2") && require("patchwork")) {
       scale_y_log10() +
       scale_x_log10()
   )
+  }
 
   idx <- seq_len(fmesher::fm_dof(m))
   idx <- seq_len(10)
   method0 <- "laplace"
   theta <- qr.solve(B[[method0]][, idx, drop = FALSE], m$loc[, 1])
+  if (doplot) {
   print(
     ggplot() +
       gg(m,
@@ -119,9 +123,11 @@ if (require("ggplot2") && require("patchwork")) {
       ) +
       scale_fill_distiller(palette = "RdBu")
   )
+  }
 
   ev <- fmesher::fm_evaluator(m, dims = c(60, 60))
   df <- NULL
+  if (doplot) {
   for (method in c(
     "laplace", "laplace2",
     "graphdistance",
@@ -149,9 +155,11 @@ if (require("ggplot2") && require("patchwork")) {
       )
     }
   }
+  }
   df$norm[df$fun == "fun01"] <- NA
   df$orig[df$orig == 0] <- NA
   df$norm[df$norm == 0] <- NA
+  if (doplot) {
   print(
     ggplot(data = df[df$index <= 4, ]) +
       geom_tile(aes(x, y, fill = orig),
@@ -173,6 +181,7 @@ if (require("ggplot2") && require("patchwork")) {
       scale_fill_distiller(palette = "RdBu", limits = c(0, 1)) + #* 2-0.5) +
       facet_wrap(vars(fun, method))
   )
+  }
 }
 }
 

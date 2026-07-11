@@ -140,7 +140,10 @@ bru_is_additive.call <- function(x, ..., verbose = FALSE) {
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.expression <- function(x, ..., verbose = FALSE) {
-  all(vapply(x, bru_is_additive, ...,
+  all(vapply(
+    x,
+    bru_is_additive,
+    ...,
     verbose = verbose,
     FUN.VALUE = logical(1)
   ))

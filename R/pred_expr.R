@@ -28,8 +28,13 @@ NULL
 #' @examples
 #' (new_bru_pred_expr(~ x + z + Intercept))
 #'
-new_bru_pred_expr <- function(x, ..., used = NULL, is_rowwise = NULL,
-                              .envir = parent.frame()) {
+new_bru_pred_expr <- function(
+  x,
+  ...,
+  used = NULL,
+  is_rowwise = NULL,
+  .envir = parent.frame()
+) {
   pred_text <- NULL
   resp_text <- NULL
   if (is.null(x)) {
@@ -176,12 +181,14 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
   if (is.null(pred_text)) {
     pred_text <- "BRU_EXPRESSION"
   }
-  if (!identical(format, "text_raw") &&
-    grepl(
-      pattern = "BRU_EXPRESSION",
-      x = pred_text,
-      fixed = TRUE
-    )) {
+  if (
+    !identical(format, "text_raw") &&
+      grepl(
+        pattern = "BRU_EXPRESSION",
+        x = pred_text,
+        fixed = TRUE
+      )
+  ) {
     included <- bru_used(x)[["effect"]]
     pred_text <-
       gsub(
@@ -192,7 +199,8 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
       )
   }
 
-  switch(format,
+  switch(
+    format,
     text = pred_text,
     quo = rlang::parse_quo(pred_text, env = x[[".envir"]]),
     expr = rlang::parse_expr(pred_text),

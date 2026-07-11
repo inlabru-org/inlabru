@@ -9,15 +9,28 @@ download_dat <- read.csv(paste0(
 
 robins_subset <- download_dat |>
   select(
-    circle, bcr, state, year, std_yr, count, log_hrs,
-    lon, lat, obs
+    circle,
+    bcr,
+    state,
+    year,
+    std_yr,
+    count,
+    log_hrs,
+    lon,
+    lat,
+    obs
   ) |>
   mutate(year = year + 1899) |>
   filter(
-    state %in% c(
-      "TEXAS", "OKLAHOMA", "KANSAS", "MISSOURI",
-      "ARKANSAS", "LOUISIANA"
-    ),
+    state %in%
+      c(
+        "TEXAS",
+        "OKLAHOMA",
+        "KANSAS",
+        "MISSOURI",
+        "ARKANSAS",
+        "LOUISIANA"
+      ),
     year >= 1987
   )
 

@@ -58,10 +58,7 @@ bru_mapper_sum <- function(...) {
 #' @export
 #' @rdname ibm_n
 #'
-ibm_n.bm_sum <- function(mapper,
-                         inla_f = FALSE,
-                         multi = FALSE,
-                         ...) {
+ibm_n.bm_sum <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (multi) {
     mapper[["n_multi"]]
   } else {
@@ -118,10 +115,7 @@ ibm_n_output.bm_sum <- function(mapper, input, state = NULL, ...) {
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_sum <- function(mapper,
-                              inla_f = FALSE,
-                              multi = FALSE,
-                              ...) {
+ibm_values.bm_sum <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (multi) {
     mapper[["values_multi"]]
   } else {
@@ -132,9 +126,7 @@ ibm_values.bm_sum <- function(mapper,
 #' @export
 #' @rdname ibm_is_linear
 #'
-ibm_is_linear.bm_sum <- function(mapper,
-                                 multi = FALSE,
-                                 ...) {
+ibm_is_linear.bm_sum <- function(mapper, multi = FALSE, ...) {
   if (multi) {
     mapper[["is_linear_multi"]]
   } else {
@@ -157,12 +149,11 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
         state_subset <- state[n_offset[x] + seq_len(mapper[["n_multi"]][[x]])]
         ibm_as_taylor(
           mapper[["mappers"]][[x]],
-          input =
-            if (mapper[["single_input"]]) {
-              input
-            } else {
-              input[[x]]
-            },
+          input = if (mapper[["single_input"]]) {
+            input
+          } else {
+            input[[x]]
+          },
           state = state_subset
         )
       }
@@ -181,11 +172,15 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
 #' with unnamed but ordered columns.
 #' @export
 #'
-ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
-                                inla_f = FALSE,
-                                multi = FALSE,
-                                ...,
-                                sub_lin = NULL) {
+ibm_jacobian.bm_sum <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_sum_sub_lin(mapper, input, state)
   }
@@ -204,10 +199,14 @@ ibm_jacobian.bm_sum <- function(mapper, input, state = NULL,
 #' @export
 #' @rdname ibm_eval_methods
 #'
-ibm_eval.bm_sum <- function(mapper, input, state,
-                            multi = FALSE,
-                            ...,
-                            sub_lin = NULL) {
+ibm_eval.bm_sum <- function(
+  mapper,
+  input,
+  state,
+  multi = FALSE,
+  ...,
+  sub_lin = NULL
+) {
   if (is.null(sub_lin)) {
     sub_lin <- bm_sum_sub_lin(mapper, input, state)
   }
@@ -225,11 +224,12 @@ ibm_eval.bm_sum <- function(mapper, input, state,
 #' @export
 #' @rdname ibm_as_taylor
 #'
-ibm_as_taylor.bm_sum <- function(mapper, input, state,
-                                 ...) {
+ibm_as_taylor.bm_sum <- function(mapper, input, state, ...) {
   sub_lin <-
     bm_sum_sub_lin(
-      mapper, input, state,
+      mapper,
+      input,
+      state,
       ...
     )
   eval2 <- ibm_eval2(
@@ -259,9 +259,13 @@ ibm_as_taylor.bm_sum <- function(mapper, input, state,
 #' with unnamed but ordered columns.
 #' @export
 #'
-ibm_invalid_output.bm_sum <- function(mapper, input, state,
-                                      multi = FALSE,
-                                      ...) {
+ibm_invalid_output.bm_sum <- function(
+  mapper,
+  input,
+  state,
+  multi = FALSE,
+  ...
+) {
   input <- bm_sum_prepare_input(mapper, input)
   invalid <-
     lapply(

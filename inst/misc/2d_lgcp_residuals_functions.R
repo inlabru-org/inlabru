@@ -15,7 +15,6 @@ suppressPackageStartupMessages(library("fmesher"))
 theme_set(theme_bw())
 
 
-
 #' ----------------------------------
 #' prepare_residual_calculations
 #' ----------------------------------
@@ -43,7 +42,9 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # A_integrate has as many rows as polygons in the samplers,
   # as many columns as integration points
   A_integrate <- fmesher::fm_block(
-    block = ips$.block, weights = ips$weight, n_block = NROW(samplers)
+    block = ips$.block,
+    weights = ips$weight,
+    n_block = NROW(samplers)
   )
 
   # Set-up the A_sum matrix
@@ -65,7 +66,6 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)
 }
-
 
 
 #' ------------
@@ -99,15 +99,12 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
       h2 <- 1 / lambda
       h3 <- 1 / sqrt(lambda)
       data.frame(
-        Scaling_Residuals =
-          as.vector(A_sum %*% h1[obs]) -
-            as.vector(A_integrate %*% (h1 * lambda)[!obs]),
-        Inverse_Residuals =
-          as.vector(A_sum %*% h2[obs]) -
-            as.vector(A_integrate %*% (h2 * lambda)[!obs]),
-        Pearson_Residuals =
-          as.vector(A_sum %*% h3[obs]) -
-            as.vector(A_integrate %*% (h3 * lambda)[!obs])
+        Scaling_Residuals = as.vector(A_sum %*% h1[obs]) -
+          as.vector(A_integrate %*% (h1 * lambda)[!obs]),
+        Inverse_Residuals = as.vector(A_sum %*% h2[obs]) -
+          as.vector(A_integrate %*% (h2 * lambda)[!obs]),
+        Pearson_Residuals = as.vector(A_sum %*% h3[obs]) -
+          as.vector(A_integrate %*% (h3 * lambda)[!obs])
       )
     },
     used = bru_used(expr)
@@ -119,9 +116,6 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
   res$Pearson_Residuals$Type <- "Pearson Residuals"
   do.call(rbind, res)
 }
-
-
-
 
 
 #' --------------
@@ -152,34 +146,32 @@ set_csc <- function(residuals, col_theme) {
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[1]),
       name = "Scaling Residual",
-      limits =
-        cscrange[cscrange$Type == "Scaling Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Scaling Residuals", 2] *
+        c(-1, 1)
     )
 
   inverse_csc <-
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[2]),
       name = "Inverse Residual",
-      limits =
-        cscrange[cscrange$Type == "Inverse Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Inverse Residuals", 2] *
+        c(-1, 1)
     )
 
   pearson_csc <-
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[3]),
       name = "Pearson Residual",
-      limits =
-        cscrange[cscrange$Type == "Pearson Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Pearson Residuals", 2] *
+        c(-1, 1)
     )
 
-  list("Scaling" = scaling_csc,
-       "Inverse" = inverse_csc,
-       "Pearson" = pearson_csc)
+  list(
+    "Scaling" = scaling_csc,
+    "Inverse" = inverse_csc,
+    "Pearson" = pearson_csc
+  )
 }
-
 
 
 #' ---------------
@@ -199,7 +191,6 @@ set_csc <- function(residuals, col_theme) {
 #' Output:
 #' @return a list of three subplots scaling, inverse and Pearson residuals
 #' for the different partitions of samplers
-
 
 residual_plot <- function(samplers, residuals, csc, model_name) {
   # Initialise the scaling residuals plot
@@ -234,12 +225,11 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 
   # Return the three plots in a list
   list(
-    Scaling = scaling, Inverse = inverse,
+    Scaling = scaling,
+    Inverse = inverse,
     Pearson = pearson
   )
 }
-
-
 
 
 #' ------------------
@@ -267,7 +257,8 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
     grid <- terra::rast(
       terra::ext(samplers),
       crs = fm_proj4string(samplers),
-      nrows = nrows, ncols = ncols
+      nrows = nrows,
+      ncols = ncols
     )
   }
 

@@ -7,15 +7,18 @@ test_that("bru: factor component", {
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
   input.df <- within(input.df, {
-    y <- 5 + 2 * cos(1:10) +
+    y <- 5 +
+      2 * cos(1:10) +
       rnorm(10, mean = 0, sd = 1)[zz] +
       rnorm(10, mean = 0, sd = 0.1)
   })
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
-    family = "gaussian", data = input.df
+  fit <- bru(
+    y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
+    family = "gaussian",
+    data = input.df
   )
 
   # Predict posterior statistics of 'x'
@@ -66,7 +69,8 @@ test_that("bru: factor component", {
   expect_equal(nrow(xpost2), 4)
   expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
 
-  xipost <- generate(fit,
+  xipost <- generate(
+    fit,
     newdata = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
@@ -78,7 +82,6 @@ test_that("bru: factor component", {
 
   expect_true(is.matrix(xipost))
   expect_equal(rownames(xipost), c("Intercept", "x"))
-
 
   # Evaluate effect with _eval feature
 
@@ -109,7 +112,6 @@ test_that("bru: factor component", {
     0
   )
 
-
   xpost5 <- predict(
     fit,
     newdata = NULL,
@@ -119,10 +121,7 @@ test_that("bru: factor component", {
   )
 
   # sd for z(11) should be close to 1
-  expect_equal(mean(xpost5[2, "sd"]),
-    1,
-    tolerance = hitol
-  )
+  expect_equal(mean(xpost5[2, "sd"]), 1, tolerance = hitol)
 })
 
 

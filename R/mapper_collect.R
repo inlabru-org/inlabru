@@ -268,7 +268,11 @@ ibm_eval.bm_collect <- function(
 #' @rdname ibm_as_taylor
 #'
 ibm_as_taylor.bm_collect <- function(
-  mapper, input, state, inla_f = FALSE, ...
+  mapper,
+  input,
+  state,
+  inla_f = FALSE,
+  ...
 ) {
   if (mapper[["hidden"]] && inla_f) {
     input <- list(input)

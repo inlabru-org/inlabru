@@ -341,9 +341,11 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(
@@ -551,10 +553,12 @@ test_that("New method `fullchain` works", {
 
   comp <- ~ Intercept(1) + x + y
 
-  local_bru_options_set(bru_method = list(
-    agg = "pandemic",
-    autodiff = "pandemic"
-  ))
+  local_bru_options_set(
+    bru_method = list(
+      agg = "pandemic",
+      autodiff = "pandemic"
+    )
+  )
   fit <- bru(
     comp,
     bru_obs(
@@ -574,9 +578,11 @@ test_that("New method `fullchain` works", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(
@@ -598,10 +604,12 @@ test_that("New method `fullchain` works", {
     comp_mappers = comp_mappers
   )
 
-  local_bru_options_set(bru_method = list(
-    agg = "pandemic",
-    autodiff = "fullchain"
-  ))
+  local_bru_options_set(
+    bru_method = list(
+      agg = "pandemic",
+      autodiff = "fullchain"
+    )
+  )
   fit2 <- bru(
     comp,
     bru_obs(
@@ -621,9 +629,11 @@ test_that("New method `fullchain` works", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(
@@ -645,10 +655,12 @@ test_that("New method `fullchain` works", {
     comp_mappers = comp2_mappers
   )
 
-  local_bru_options_set(bru_method = list(
-    agg = "fullchain",
-    autodiff = "fullchain"
-  ))
+  local_bru_options_set(
+    bru_method = list(
+      agg = "fullchain",
+      autodiff = "fullchain"
+    )
+  )
   fit3 <- bru(
     comp,
     bru_obs(
@@ -668,9 +680,11 @@ test_that("New method `fullchain` works", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(
@@ -691,7 +705,6 @@ test_that("New method `fullchain` works", {
     state = list(Intercept = 1, x = 2, y = 3),
     comp_mappers = comp3_mappers
   )
-
 
   # bench::mark(A={
   # local_bru_options_set(bru_method = list(

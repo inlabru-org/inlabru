@@ -43,11 +43,13 @@ test_that("Linearisation", {
   inp <- bru_input(model, lhoods, inla_f = TRUE)
 
   if (identical(bru_options_get("bru_method")$autodiff, "fullchain")) {
-    lin0 <- ibm_as_taylor(model,
+    lin0 <- ibm_as_taylor(
+      model,
       input = inp,
       state = list(Int_y = 0, Int_z = 0, x = 0)
     )
-    lin <- ibm_as_taylor(model,
+    lin <- ibm_as_taylor(
+      model,
       input = inp,
       state = list(x = 1 / 5, Int_y = -4, Int_z = log(4))
     )
@@ -176,10 +178,12 @@ test_that("Linearisation 2", {
   #  profvis::profvis({
   #  bench::mark(
   A <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "pandemic",
-      agg = "pandemic"
-    ))
+    local_bru_options_set(
+      bru_method = list(
+        autodiff = "pandemic",
+        agg = "pandemic"
+      )
+    )
     model <- bru_model(
       components = bru_comp_list(~ -1 + x(x, model = "iid")),
       lhoods = bru_obs(
@@ -217,10 +221,12 @@ test_that("Linearisation 2", {
   }
   #   ,
   B <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "fullchain",
-      agg = "fullchain"
-    ))
+    local_bru_options_set(
+      bru_method = list(
+        autodiff = "fullchain",
+        agg = "fullchain"
+      )
+    )
     model <-
       bru_model(
         components = ~ -1 + x(x, model = "iid"),
@@ -240,22 +246,18 @@ test_that("Linearisation 2", {
     idx <- bru_index(model, used = used)
     inp <- bru_input(model, model$lhoods, inla_f = TRUE)
 
-    lin0 <- ibm_as_taylor(model,
-      input = inp,
-      state = list(x = X)
-    )
-    lin <- ibm_as_taylor(model,
-      input = inp,
-      state = list(x = X / 5)
-    )
+    lin0 <- ibm_as_taylor(model, input = inp, state = list(x = X))
+    lin <- ibm_as_taylor(model, input = inp, state = list(x = X / 5))
     list(lin0, lin)
   }
   #    ,
   C <- {
-    local_bru_options_set(bru_method = list(
-      autodiff = "fullchain",
-      agg = "pandemic"
-    ))
+    local_bru_options_set(
+      bru_method = list(
+        autodiff = "fullchain",
+        agg = "pandemic"
+      )
+    )
     model <- bru_model(
       components = ~ -1 + x(x, model = "iid"),
       bru_obs(
@@ -274,14 +276,8 @@ test_that("Linearisation 2", {
     idx <- bru_index(model, used = used)
     inp <- bru_input(model, model$lhoods, inla_f = TRUE)
 
-    lin0 <- ibm_as_taylor(model,
-      input = inp,
-      state = list(x = X)
-    )
-    lin <- ibm_as_taylor(model,
-      input = inp,
-      state = list(x = X / 5)
-    )
+    lin0 <- ibm_as_taylor(model, input = inp, state = list(x = X))
+    lin <- ibm_as_taylor(model, input = inp, state = list(x = X / 5))
     list(lin0, lin)
   }
   #    ,

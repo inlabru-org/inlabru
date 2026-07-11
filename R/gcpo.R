@@ -10,7 +10,6 @@
 #                                iinla()  (all in bru.inference.R)
 # User-facing:                   bru_block_gcpo(), bru_gcpo_table()
 
-
 # Benchmark results:
 # > x <- sample(1:1000, size = 1000000, replace = TRUE)
 # > bench::mark(
@@ -20,8 +19,10 @@
 # expression      min   median `itr/sec`
 # R             4.23s    4.23s     0.236
 # C            97.1ms  97.97ms    10.1
-convert_group_cv_blocks_to_friends_list <- function(group_cv_block,
-                                                    method = "C") {
+convert_group_cv_blocks_to_friends_list <- function(
+  group_cv_block,
+  method = "C"
+) {
   # Would like:
   # group_cv_friends <- lapply(seq_len(max(ips$.block)), function(i) {
   #   which(group_cv_block == i)
@@ -85,11 +86,13 @@ bru_obs_control_gcpo <- function(x, ...) {
 #'   non-NULL `control.gcpo$weights`.
 #' @export
 #' @rdname bru_obs_gcpo
-bru_obs_control_gcpo.bru_obs <- function(x,
-                                         index_offset,
-                                         index_length = bru_response_size(x),
-                                         force_weights,
-                                         ...) {
+bru_obs_control_gcpo.bru_obs <- function(
+  x,
+  index_offset,
+  index_length = bru_response_size(x),
+  force_weights,
+  ...
+) {
   c.gcpo <- x[["control.gcpo"]]
   if (is.null(c.gcpo)) {
     return(list())
@@ -128,9 +131,7 @@ bru_obs_control_gcpo.bru_obs <- function(x,
 #'   with per-likelihood settings.
 #' @export
 #' @rdname bru_obs_gcpo
-bru_obs_control_gcpo.bru_obs_list <- function(x,
-                                              control.gcpo = NULL,
-                                              ...) {
+bru_obs_control_gcpo.bru_obs_list <- function(x, control.gcpo = NULL, ...) {
   response_sizes <- bru_response_size(x)
 
   any_element <- vapply(
@@ -239,7 +240,7 @@ bru_block_gcpo_from_groups <- function(lh, gcpo_vec, offset) {
   idx <- offset + seq_len(n)
   list(
     blocks = seq_len(n),
-    gcpo   = gcpo_vec[idx]
+    gcpo = gcpo_vec[idx]
   )
 }
 
@@ -288,13 +289,13 @@ bru_block_gcpo_single <- function(fit) {
   if (nlhoods == 1L) {
     return(list(
       blocks = setNames(list(results[[1L]]$blocks), lhood_names[1L]),
-      gcpo   = results[[1L]]$gcpo
+      gcpo = results[[1L]]$gcpo
     ))
   }
 
   list(
     blocks = setNames(lapply(results, `[[`, "blocks"), lhood_names),
-    gcpo   = setNames(lapply(results, `[[`, "gcpo"), lhood_names)
+    gcpo = setNames(lapply(results, `[[`, "gcpo"), lhood_names)
   )
 }
 

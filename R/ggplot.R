@@ -277,12 +277,14 @@ gg.data.frame <- function(...) {
 #' }
 #' }
 #'
-gg.bru_prediction <- function(data,
-                              mapping = NULL,
-                              ribbon = TRUE,
-                              alpha = NULL,
-                              bar = FALSE,
-                              ...) {
+gg.bru_prediction <- function(
+  data,
+  mapping = NULL,
+  ribbon = TRUE,
+  alpha = NULL,
+  bar = FALSE,
+  ...
+) {
   if (inherits(data, c("Spatial", "SpatRaster", "RasterLayer", "sf"))) {
     return(NextMethod())
   }
@@ -305,9 +307,11 @@ gg.bru_prediction <- function(data,
 
   requireNamespace("ggplot2")
   # Convert from old and inla style names
-  if (("median" %in% names(data)) &&
-    !("0.5quant" %in% names(data)) &&
-    !("q0.5" %in% names(data))) {
+  if (
+    ("median" %in% names(data)) &&
+      !("0.5quant" %in% names(data)) &&
+      !("q0.5" %in% names(data))
+  ) {
     names(data)[names(data) == "median"] <- "q0.5"
   }
   new_quant_names <- list(
@@ -354,7 +358,8 @@ gg.bru_prediction <- function(data,
           y = .data$summary,
           color = .data$variable
         ),
-        shape = 95, size = 0
+        shape = 95,
+        size = 0
       )
     )
     if (length(quant_names) > 0) {
@@ -383,7 +388,9 @@ gg.bru_prediction <- function(data,
           x = .data$variable,
           y = .data$mean
         ),
-        color = "black", shape = 20, size = med_sz
+        color = "black",
+        shape = 20,
+        size = med_sz
       )
     )
     if ("q0.5" %in% quant_names) {
@@ -395,7 +402,9 @@ gg.bru_prediction <- function(data,
             x = .data$variable,
             y = .data$q0.5
           ),
-          color = "black", shape = 3, size = sz * 2 / 3
+          color = "black",
+          shape = 3,
+          size = sz * 2 / 3
         )
       )
     }
@@ -730,14 +739,20 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   if (is.null(cnames)) {
     cnames <- c("x", "y")
   }
-  sp <- do.call(rbind, lapply(
-    qq,
-    function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))
-  ))
-  ep <- do.call(rbind, lapply(
-    qq,
-    function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
-  ))
+  sp <- do.call(
+    rbind,
+    lapply(
+      qq,
+      function(k) do.call(rbind, lapply(k, function(x) x[1:(nrow(x) - 1), ]))
+    )
+  )
+  ep <- do.call(
+    rbind,
+    lapply(
+      qq,
+      function(k) do.call(rbind, lapply(k, function(x) x[2:(nrow(x)), ]))
+    )
+  )
   colnames(sp) <- cnames
   colnames(ep) <- glue("end.{cnames}")
   if (!inherits(data, "SpatialLinesDataFrame")) {
@@ -755,7 +770,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
             },
             0
           )
-        ), ,
+        ),
+        ,
         drop = FALSE
       ]
     )
@@ -834,10 +850,13 @@ gg.SpatialGridDataFrame <- function(data, ...) {
 #' @export
 #' @param mask A `sp::SpatialPolygons` object defining the region that is
 #'   plotted.
-gg.SpatialPixelsDataFrame <- function(data,
-                                      mapping = NULL,
-                                      crs = NULL,
-                                      mask = NULL, ...) {
+gg.SpatialPixelsDataFrame <- function(
+  data,
+  mapping = NULL,
+  crs = NULL,
+  mask = NULL,
+  ...
+) {
   bru_safe_sp(force = TRUE)
   if (!is.null(crs)) {
     data <- fm_transform(data, crs)
@@ -1023,21 +1042,24 @@ gg.SpatRaster <- function(data, ...) {
 #' }
 #' }
 #'
-gg.fm_mesh_2d <- function(data,
-                          color = NULL,
-                          alpha = NULL,
-                          edge.color = "grey",
-                          edge.linewidth = 0.25,
-                          interior = TRUE,
-                          int.color = "blue",
-                          int.linewidth = 0.5,
-                          exterior = TRUE,
-                          ext.color = "black",
-                          ext.linewidth = 1,
-                          crs = NULL,
-                          mask = NULL,
-                          nx = 500, ny = 500,
-                          ...) {
+gg.fm_mesh_2d <- function(
+  data,
+  color = NULL,
+  alpha = NULL,
+  edge.color = "grey",
+  edge.linewidth = 0.25,
+  interior = TRUE,
+  int.color = "blue",
+  int.linewidth = 0.5,
+  exterior = TRUE,
+  ext.color = "black",
+  ext.linewidth = 1,
+  crs = NULL,
+  mask = NULL,
+  nx = 500,
+  ny = 500,
+  ...
+) {
   requireNamespace("ggplot2")
   if (is.null(color) && ("colour" %in% names(list(...)))) {
     color <- list(...)[["colour"]]
@@ -1065,16 +1087,14 @@ gg.fm_mesh_2d <- function(data,
         } else {
           px$alpha <- fm_evaluate(proj, field = alpha)
         }
-        gg <- gg(px,
+        gg <- gg(
+          px,
           ggplot2::aes(fill = .data[["color"]]),
           alpha = px[["alpha"]],
           geom = "tile"
         )
       } else {
-        gg <- gg(px,
-          ggplot2::aes(fill = .data[["color"]]),
-          geom = "tile"
-        )
+        gg <- gg(px, ggplot2::aes(fill = .data[["color"]]), geom = "tile")
       }
     }
 
@@ -1197,9 +1217,13 @@ gg.fm_mesh_2d <- function(data,
 #' }
 #' }
 #'
-gg.fm_mesh_1d <- function(data,
-                          mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
-                          y = 0, shape = 4, ...) {
+gg.fm_mesh_1d <- function(
+  data,
+  mapping = ggplot2::aes(.data[["x"]], .data[["y"]]),
+  y = 0,
+  shape = 4,
+  ...
+) {
   df <- data.frame(x = data$loc, y = y)
   ggplot2::geom_point(data = df, mapping = mapping, shape = shape, ...)
 }
@@ -1239,13 +1263,15 @@ gg.fm_mesh_1d <- function(data,
 #'     gg(elev)
 #' }
 #' }
-gg.RasterLayer <- function(data,
-                           mapping = ggplot2::aes(
-                             x = .data[["x"]],
-                             y = .data[["y"]],
-                             fill = .data[["layer"]]
-                           ),
-                           ...) {
+gg.RasterLayer <- function(
+  data,
+  mapping = ggplot2::aes(
+    x = .data[["x"]],
+    y = .data[["y"]],
+    fill = .data[["layer"]]
+  ),
+  ...
+) {
   requireNamespace("ggplot2")
   requireNamespace("raster")
   spdf <- as(data, "SpatialPixelsDataFrame")
@@ -1386,8 +1412,10 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
     # Make the panel
     # ncol: Number of columns of plots
     # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots / cols)),
-      ncol = cols, nrow = ceiling(numPlots / cols)
+    layout <- matrix(
+      seq(1, cols * ceiling(numPlots / cols)),
+      ncol = cols,
+      nrow = ceiling(numPlots / cols)
     )
   }
 
@@ -1405,10 +1433,13 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
 
-      print(plots[[i]], vp = grid::viewport(
-        layout.pos.row = matchidx$row,
-        layout.pos.col = matchidx$col
-      ))
+      print(
+        plots[[i]],
+        vp = grid::viewport(
+          layout.pos.row = matchidx$row,
+          layout.pos.col = matchidx$col
+        )
+      )
     }
   }
 }

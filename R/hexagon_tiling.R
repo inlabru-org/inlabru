@@ -22,12 +22,14 @@
 #' @export
 #'
 #' @author Man Ho Suen
-cv_partition <- function(samplers,
-                         resolution = NULL,
-                         nrows = NULL,
-                         ncols = NULL,
-                         chess = TRUE,
-                         ...) {
+cv_partition <- function(
+  samplers,
+  resolution = NULL,
+  nrows = NULL,
+  ncols = NULL,
+  chess = TRUE,
+  ...
+) {
   requireNamespace("terra")
   # Create a grid for the given boundary
   if (is.null(resolution)) {
@@ -110,11 +112,11 @@ cv_partition <- function(samplers,
 #' @examples
 #' if (interactive()) {
 #'   bnd <- gorillas_sf$boundary
-#'   hex_cv <- cv_hex(bnd, cellsize = 0.5, n_group = 3, resolution = 100)
+#'   hex_cv <- cv_hex(bnd, cellsize = 2, n_group = 3, resolution = 100)
 #'   plot(hex_cv)
 #'
-#'   chess <- cv_partition(bnd, resolution = 0.5, chess = TRUE)
-#'   plot(chess$white)
+#'   chess <- cv_partition(bnd, resolution = 1.5, chess = TRUE)
+#'   plot(chess$black$geometry, col = "black")
 #' }
 #'
 cv_hex <- function(samplers, cellsize = 0.5, n_group = 3, ...) {

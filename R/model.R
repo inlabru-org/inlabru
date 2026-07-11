@@ -68,10 +68,12 @@
 #' @return A [bru_model] object
 #' @keywords internal
 
-bru_model <- function(components,
-                      lhoods,
-                      options = list(),
-                      .envir = parent.frame()) {
+bru_model <- function(
+  components,
+  lhoods,
+  options = list(),
+  .envir = parent.frame()
+) {
   options <- bru_call_options(options)
 
   .response <- extract_response(components)
@@ -145,9 +147,13 @@ bru_model <- function(components,
       used_lh <- bru_used(lhoods[[lh]])
       lhoods[[lh]][["pred_expr"]][["is_linear"]] <-
         (length(used_lh$latent) == 0) &&
-          all(vapply(components[used_lh$effect], function(cmp) {
+        all(vapply(
+          components[used_lh$effect],
+          function(cmp) {
             ibm_is_linear(cmp$mapper)
-          }, TRUE))
+          },
+          TRUE
+        ))
     }
     lhoods[[lh]] <- bru_compat_pre_2_14_bru_obs(lhoods[[lh]])
   }
@@ -175,8 +181,7 @@ bru_model <- function(components,
 summary.bru_model <- function(object, ...) {
   result <- structure(
     list(
-      components =
-        summary(as_bru_comp_list(object), ...),
+      components = summary(as_bru_comp_list(object), ...),
       lhoods = {
         # Once lhoods is moved into bru_model, the NULL part will no longer be
         # needed, and as_bru_obs_list() can be used instead.
@@ -251,17 +256,19 @@ print.bru_model <- function(x, ...) {
 #'
 #' @keywords internal
 #' @rdname evaluate_model
-evaluate_model <- function(model,
-                           state,
-                           data = NULL,
-                           data_extra = NULL,
-                           input = NULL,
-                           comp_simple = NULL,
-                           predictor = NULL,
-                           format = NULL,
-                           used = NULL,
-                           n_pred = NULL,
-                           ...) {
+evaluate_model <- function(
+  model,
+  state,
+  data = NULL,
+  data_extra = NULL,
+  input = NULL,
+  comp_simple = NULL,
+  predictor = NULL,
+  format = NULL,
+  used = NULL,
+  n_pred = NULL,
+  ...
+) {
   comp_lst <- as_bru_comp_list(model)
   if (inherits(predictor, "bru_pred_expr")) {
     if (!is.null(used)) {
@@ -343,18 +350,22 @@ evaluate_model <- function(model,
 #' @export
 #' @rdname evaluate_model
 #' @keywords internal
-evaluate_state <- function(model,
-                           result,
-                           property = "mode",
-                           n = 1,
-                           seed = 0L,
-                           num.threads = NULL,
-                           internal_hyperpar = FALSE,
-                           ...) {
+evaluate_state <- function(
+  model,
+  result,
+  property = "mode",
+  n = 1,
+  seed = 0L,
+  num.threads = NULL,
+  internal_hyperpar = FALSE,
+  ...
+) {
   # Evaluate random states, or a single property
   if (property == "sample") {
-    state <- post.sample.structured(result,
-      n = n, seed = seed,
+    state <- post.sample.structured(
+      result,
+      n = n,
+      seed = seed,
       num.threads = num.threads,
       ...
     )
@@ -405,9 +416,13 @@ evaluate_effect_single_state <- function(...) {
 #' @rdname evaluate_effect
 #' @keywords internal
 
-evaluate_effect_single_state.bru_mapper <- function(component, input, state,
-                                                    ...,
-                                                    label = NULL) {
+evaluate_effect_single_state.bru_mapper <- function(
+  component,
+  input,
+  state,
+  ...,
+  label = NULL
+) {
   values <- ibm_eval(component, input = input, state = state, ...)
 
   not_ok <- ibm_invalid_output(
@@ -417,11 +432,15 @@ evaluate_effect_single_state.bru_mapper <- function(component, input, state,
   )
   if (any(not_ok)) {
     if (is.null(label)) {
-      warning("Inputs for a mapper give some invalid outputs.",
+      warning(
+        "Inputs for a mapper give some invalid outputs.",
         immediate. = TRUE
       )
     } else {
-      warning("Inputs for '", label, "' give some invalid outputs.",
+      warning(
+        "Inputs for '",
+        label,
+        "' give some invalid outputs.",
         immediate. = TRUE
       )
     }
@@ -435,10 +454,12 @@ evaluate_effect_single_state.bru_mapper <- function(component, input, state,
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_single_state.bm_list <- function(components,
-                                                 input,
-                                                 state,
-                                                 ...) {
+evaluate_effect_single_state.bm_list <- function(
+  components,
+  input,
+  state,
+  ...
+) {
   result <- list()
   for (label in names(components)) {
     result[[label]] <- evaluate_effect_single_state(
@@ -455,10 +476,12 @@ evaluate_effect_single_state.bm_list <- function(components,
 #' @export
 #' @rdname evaluate_effect
 #' @keywords internal
-evaluate_effect_single_state.bru_comp_list <- function(components,
-                                                       input,
-                                                       state,
-                                                       ...) {
+evaluate_effect_single_state.bru_comp_list <- function(
+  components,
+  input,
+  state,
+  ...
+) {
   comp_simple <- ibm_simplify(components, input = input, state = state, ...)
   evaluate_effect_single_state(comp_simple, input = input, state = state, ...)
 }
@@ -511,15 +534,17 @@ evaluate_effect_single_state.bru_comp_list <- function(components,
 #' @return A list or matrix is returned, as specified by `format`
 #' @keywords internal
 #' @rdname evaluate_predictor
-evaluate_predictor <- function(model,
-                               state,
-                               data,
-                               data_extra,
-                               effects,
-                               predictor,
-                               used = NULL,
-                               format = "auto",
-                               n_pred = NULL) {
+evaluate_predictor <- function(
+  model,
+  state,
+  data,
+  data_extra,
+  effects,
+  predictor,
+  used = NULL,
+  format = "auto",
+  n_pred = NULL
+) {
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
   comp_lst <- as_bru_comp_list(model)
@@ -591,10 +616,13 @@ evaluate_predictor <- function(model,
       .iid_precision <- paste0("Precision_for_", .comp$label)
       .iid_cache <- list()
       .iid_cache_index <- NULL
-      eval_fun <- function(main, group = NULL,
-                           replicate = NULL,
-                           weights = NULL,
-                           .state = NULL) {
+      eval_fun <- function(
+        main,
+        group = NULL,
+        replicate = NULL,
+        weights = NULL,
+        .state = NULL
+      ) {
         n_input <- ibm_n_output(
           .mapper[["mappers"]][["core"]][["mappers"]][["main"]],
           input = main
@@ -639,7 +667,8 @@ evaluate_predictor <- function(model,
               '" give some invalid outputs.'
             )
           }
-        } else { # .is_iid, invalid indices give new samples
+        } else {
+          # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the
           # initial mapper (subsequent mappers in the component pipe
           # are assumed to keep the same length and validity)
@@ -713,17 +742,16 @@ evaluate_predictor <- function(model,
       )
     )
 
-    result_ <- rlang::eval_tidy(predictor,
-      data = data_mask,
-      env = envir
-    )
+    result_ <- rlang::eval_tidy(predictor, data = data_mask, env = envir)
     if (!is.null(n_pred) && is.numeric(result_) && length(result_) == 1) {
       result_ <- rep(result_, n_pred)
     }
     if (k == 1) {
       if (identical(format, "auto")) {
-        if ((is.vector(result_) && !is.list(result_)) ||
-          (is.matrix(result_) && (NCOL(result_) == 1))) {
+        if (
+          (is.vector(result_) && !is.list(result_)) ||
+            (is.matrix(result_) && (NCOL(result_) == 1))
+        ) {
           format <- "matrix"
         } else {
           format <- "list"
@@ -797,11 +825,13 @@ evaluate_predictor <- function(model,
 #'   )
 #' }
 #' }
-bru_comp_eval <- function(main,
-                          group = NULL,
-                          replicate = NULL,
-                          weights = NULL,
-                          .state = NULL) {
+bru_comp_eval <- function(
+  main,
+  group = NULL,
+  replicate = NULL,
+  weights = NULL,
+  .state = NULL
+) {
   stop(paste0(
     "In your predictor expression, use 'mylabel_eval(...)' instead of\n",
     "'bru_comp_eval(...)'.  See ?bru_comp_eval for more information."
@@ -838,9 +868,15 @@ NULL
 #' @export
 #' @param options A [bru_options] options object or a list of options passed
 #' on to [bru_options()]
-ibm_as_taylor.bru_model <- function(mapper, input, state = NULL, ...,
-                                    options = NULL, comp_mappers = NULL,
-                                    eval_fun = NULL) {
+ibm_as_taylor.bru_model <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
   options <- bru_call_options(options)
@@ -913,10 +949,7 @@ ibm_as_taylor.bru_comp_list <- function(mapper, input, state = NULL, ...) {
 #' @rdname ibm_as_taylor
 #' @export
 #'
-ibm_as_taylor.bru_comp <- function(mapper,
-                                   input,
-                                   state = NULL,
-                                   ...) {
+ibm_as_taylor.bru_comp <- function(mapper, input, state = NULL, ...) {
   bru_log_message(
     paste0("Linearise component '", mapper[["label"]], "'"),
     verbosity = 5
@@ -955,10 +988,7 @@ ibm_simplify.bru_model <- function(mapper, input = NULL, state = NULL, ...) {
 
 #' @rdname bru_model_mapper_methods
 #' @export
-ibm_simplify.bru_comp <- function(mapper,
-                                  input = NULL,
-                                  state = NULL,
-                                  ...) {
+ibm_simplify.bru_comp <- function(mapper, input = NULL, state = NULL, ...) {
   bru_log_message(
     paste0("Linearise component '", mapper[["label"]], "'"),
     verbosity = 5
@@ -973,10 +1003,12 @@ ibm_simplify.bru_comp <- function(mapper,
 #' @rdname bru_model_mapper_methods
 #' @export
 #'
-ibm_simplify.bru_comp_list <- function(mapper,
-                                       input = NULL,
-                                       state = NULL,
-                                       ...) {
+ibm_simplify.bru_comp_list <- function(
+  mapper,
+  input = NULL,
+  state = NULL,
+  ...
+) {
   comp <- mapper
   included <- parse_inclusion(names(comp), names(input), NULL)
 
@@ -1059,9 +1091,15 @@ ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
 
 #' @rdname bru_model_mapper_methods
 #' @export
-ibm_eval2.bru_model <- function(mapper, input, state = NULL, ...,
-                                options = NULL, comp_mappers = NULL,
-                                eval_fun = NULL) {
+ibm_eval2.bru_model <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
   options <- bru_call_options(options)
@@ -1098,9 +1136,15 @@ ibm_eval2.bru_model <- function(mapper, input, state = NULL, ...,
 
 #' @rdname bru_model_mapper_methods
 #' @export
-ibm_eval.bru_model <- function(mapper, input, state = NULL, ...,
-                               options = NULL, comp_mappers = NULL,
-                               eval_fun = NULL) {
+ibm_eval.bru_model <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
   options <- bru_call_options(options)
@@ -1137,9 +1181,15 @@ ibm_eval.bru_model <- function(mapper, input, state = NULL, ...,
 
 #' @rdname bru_model_mapper_methods
 #' @export
-ibm_jacobian.bru_model <- function(mapper, input, state = NULL, ...,
-                                   options = NULL, comp_mappers = NULL,
-                                   eval_fun = NULL) {
+ibm_jacobian.bru_model <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+) {
   model <- mapper
   stopifnot(inherits(model, "bru_model"))
   options <- bru_call_options(options)
@@ -1248,16 +1298,18 @@ ibm_jacobian.bru_model <- function(mapper, input, state = NULL, ...,
 #'   )
 #' }
 #'
-bru_eval <- function(model,
-                     state,
-                     data = NULL,
-                     data_extra = NULL,
-                     input_comp = NULL,
-                     comp_mappers = NULL,
-                     predictor = NULL,
-                     format = NULL,
-                     used = NULL,
-                     ...) {
+bru_eval <- function(
+  model,
+  state,
+  data = NULL,
+  data_extra = NULL,
+  input_comp = NULL,
+  comp_mappers = NULL,
+  predictor = NULL,
+  format = NULL,
+  used = NULL,
+  ...
+) {
   format <- match.arg(format, c("auto", "matrix", "list"))
   comp_lst <- as_bru_comp_list(model)
   if (inherits(predictor, "bru_pred_expr")) {
@@ -1355,8 +1407,10 @@ bru_eval <- function(model,
 
       if (k == 1) {
         if (identical(format, "auto")) {
-          if ((is.vector(values_) && !is.list(values_)) ||
-            (is.matrix(values_) && (NCOL(values_) == 1))) {
+          if (
+            (is.vector(values_) && !is.list(values_)) ||
+              (is.matrix(values_) && (NCOL(values_) == 1))
+          ) {
             format <- "matrix"
           } else {
             format <- "list"
@@ -1410,8 +1464,7 @@ bru_state <- function(x, ...) {
 
 #' @rdname bru_state
 #' @export
-bru_state.bru_model <- function(x,
-                                ...) {
+bru_state.bru_model <- function(x, ...) {
   state <- list(lapply(
     as_bru_comp_list(x),
     function(xx) {
@@ -1424,20 +1477,30 @@ bru_state.bru_model <- function(x,
 
 #' @rdname bru_state
 #' @export
-bru_state.bru <- function(x,
-                          property = "mode",
-                          n = 1,
-                          seed = 0L,
-                          num.threads = NULL,
-                          internal_hyperpar = FALSE,
-                          ...) {
+bru_state.bru <- function(
+  x,
+  property = "mode",
+  n = 1,
+  seed = 0L,
+  num.threads = NULL,
+  internal_hyperpar = FALSE,
+  ...
+) {
   # Evaluate random states, or a single property
-  property <- match.arg(property, c(
-    "sample", "zeros",
-    "mode", "mean", "0.025quant", "0.975quant",
-    "sd",
-    "joint_mode", "predictor_sd"
-  ))
+  property <- match.arg(
+    property,
+    c(
+      "sample",
+      "zeros",
+      "mode",
+      "mean",
+      "0.025quant",
+      "0.975quant",
+      "sd",
+      "joint_mode",
+      "predictor_sd"
+    )
+  )
   if (property == "sample") {
     state <- post.sample.structured(
       x,

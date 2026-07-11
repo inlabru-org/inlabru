@@ -9,10 +9,14 @@ test_that("Latent models: RW2 mapping", {
     obs = rep(c(1, 2, 1, 4, 2), times = 4) + rnorm(20, sd = 0.5)
   )
 
-  cmp1 <- obs ~ time(time,
-    model = "rw2", values = 2^(0:4),
-    constr = FALSE, scale.model = TRUE
-  ) - Intercept
+  cmp1 <- obs ~ time(
+    time,
+    model = "rw2",
+    values = 2^(0:4),
+    constr = FALSE,
+    scale.model = TRUE
+  ) -
+    Intercept
   fit1 <- bru(cmp1, data = data1, family = "gaussian")
 
   expect_equal(
@@ -39,13 +43,20 @@ test_that("Latent models: RW2 mapping, data is list with different I/O sizes", {
     obs = rep(c(1, 2, 1, 4, 2), times = 4) + rnorm(20, sd = 0.5)
   )
 
-  cmp1 <- obs ~ time(time,
-    model = "rw2", values = 2^(0:4),
-    constr = FALSE, scale.model = TRUE
-  ) - Intercept
+  cmp1 <- obs ~ time(
+    time,
+    model = "rw2",
+    values = 2^(0:4),
+    constr = FALSE,
+    scale.model = TRUE
+  ) -
+    Intercept
   formula <- obs ~ rep(time, times = 4)
-  fit1 <- bru(cmp1,
-    formula = formula, data = data1, family = "gaussian",
+  fit1 <- bru(
+    cmp1,
+    formula = formula,
+    data = data1,
+    family = "gaussian",
     is_rowwise = FALSE
   )
 

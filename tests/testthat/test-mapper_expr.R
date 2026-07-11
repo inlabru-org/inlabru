@@ -26,7 +26,8 @@ test_that("Expr mapper", {
   val_reference <- cos(state$x) + state$y[c(1, 1, 2)] + dat$z
   expect_equal(val, val_reference)
 
-  A <- ibm_jacobian(mapper,
+  A <- ibm_jacobian(
+    mapper,
     input = list(),
     state = state,
     data = list(data = dat)

@@ -410,7 +410,6 @@ ibm_is_linear.bm_expr <- function(mapper, ...) {
 #   NULL
 # }
 
-
 ibm_jacobian_bm_expr_var <- function(
   mapper,
   input,
@@ -448,8 +447,10 @@ ibm_jacobian_bm_expr_var <- function(
 
   N <- length(state[[var]])
 
-  if (("rowwise" %in% mapper$assume) &&
-    ("no_root" %in% mapper$assume)) {
+  if (
+    ("rowwise" %in% mapper$assume) &&
+      ("no_root" %in% mapper$assume)
+  ) {
     # Sum of dE/dv * dv/du for all affected derived variables v and root
     # variable u, computed element-wise.
     B <- Matrix::Matrix(0.0, n_offset, N)
@@ -594,8 +595,8 @@ ibm_jacobian.bm_expr <- function(
   n_offset <- NROW(offset)
   assume_rowwise <-
     ("no_root" %in% mapper[["assume"]]) &&
-      ("rowwise" %in% mapper[["assume"]]) &&
-      is.data.frame(data[["data"]])
+    ("rowwise" %in% mapper[["assume"]]) &&
+    is.data.frame(data[["data"]])
   if (assume_rowwise) {
     if (!is.null(n_offset) && (NROW(offset) != n_offset)) {
       stop(
@@ -661,9 +662,7 @@ bm_expr_data_mask <- function(
   .envir = rlang::caller_env()
 ) {
   suffix <- mapper[["labels"]][["suffix"]]
-  if (
-    is.null(suffix) || (is.character(suffix) && identical(suffix, ""))
-  ) {
+  if (is.null(suffix) || (is.character(suffix) && identical(suffix, ""))) {
     state_with_suffix <- NULL
   } else {
     state_names_with_suffix <-
@@ -716,7 +715,8 @@ ibm_eval.bm_expr <- function(
 ) {
   if (is.null(data_mask)) {
     data_mask <- bm_expr_data_mask(
-      mapper, input,
+      mapper,
+      input,
       state = state,
       derived = derived,
       data = data,
@@ -793,10 +793,7 @@ ibm_eval2.bm_expr <- function(mapper, input, state = NULL, ..., data = NULL) {
 #' mapper <- bm_expr(~ cos(x))
 #' summary(mapper)
 #' summary(mapper, depth = 1)
-format.bm_expr <- function(x, ...,
-                           prefix = "",
-                           initial = prefix,
-                           depth = 1) {
+format.bm_expr <- function(x, ..., prefix = "", initial = prefix, depth = 1) {
   txt <- NextMethod()
   if (depth <= 0) {
     return(txt)
@@ -811,9 +808,6 @@ format.bm_expr <- function(x, ...,
     )
   txt
 }
-
-
-
 
 
 # bru_obs ####
@@ -857,10 +851,13 @@ bru_eval_fun.bru_comp <- function(x, ...) {
   .eval_tidy <- function(expr, mask, frame = parent.frame(2L)) {
     rlang::eval_tidy(expr, data = mask, env = frame)
   }
-  eval_fun <- function(main, group = NULL,
-                       replicate = NULL,
-                       weights = NULL,
-                       .state = NULL) {
+  eval_fun <- function(
+    main,
+    group = NULL,
+    replicate = NULL,
+    weights = NULL,
+    .state = NULL
+  ) {
     .mask <- .get_mask()
     n_input <- ibm_n_output(
       .mapper[["mappers"]][["core"]][["mappers"]][["main"]],
@@ -905,7 +902,8 @@ bru_eval_fun.bru_comp <- function(x, ...) {
           '" give some invalid outputs.'
         )
       }
-    } else { # .is_iid, invalid indices give new samples
+    } else {
+      # .is_iid, invalid indices give new samples
       # Check for known invalid output elements, based on the
       # initial mapper (subsequent mappers in the component pipe
       # are assumed to keep the same length and validity)
@@ -972,7 +970,13 @@ bru_eval_fun.bru_model <- function(x, ...) {
 #' @param eval_fun A list of functions, typically from
 #'   [bru_eval_fun()].
 ibm_eval2.bru_obs <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   used <- bru_used(mapper)
   nms <- unique(c(used$effect, used$latent))
@@ -1136,7 +1140,13 @@ ibm_eval2.bru_obs <- function(
 #' @inheritParams ibm_eval2
 #' @export
 ibm_eval.bru_obs <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   used <- bru_used(mapper)
   nms <- unique(c(used$effect, used$latent))
@@ -1239,7 +1249,13 @@ ibm_eval.bru_obs <- function(
 #' @inheritParams ibm_eval2
 #' @export
 ibm_jacobian.bru_obs <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   result <- ibm_eval2(
     mapper,
@@ -1259,7 +1275,12 @@ ibm_jacobian.bru_obs <- function(
 #' @rdname ibm_as_taylor
 #' @export
 ibm_as_taylor.bru_obs <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers
 ) {
   stopifnot(isTRUE(multi))
   eval2 <- ibm_eval2(
@@ -1290,13 +1311,24 @@ ibm_as_taylor.bru_obs <- function(
 #' @rdname ibm_eval2
 #' @export
 ibm_eval2.bru_obs_list <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   results <- lapply(
     setNames(seq_along(mapper), names(mapper)),
     function(m) {
-      ibm_eval2.bru_obs(mapper[[m]], input[[m]], state, ...,
-        multi = TRUE, comp_mappers = if (inherits(comp_mappers, "bm_list")) {
+      ibm_eval2.bru_obs(
+        mapper[[m]],
+        input[[m]],
+        state,
+        ...,
+        multi = TRUE,
+        comp_mappers = if (inherits(comp_mappers, "bm_list")) {
           comp_mappers
         } else {
           comp_mappers[[m]]
@@ -1361,13 +1393,24 @@ ibm_eval2.bru_obs_list <- function(
 #' @rdname ibm_eval
 #' @export
 ibm_eval.bru_obs_list <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   offset <- lapply(
     setNames(seq_along(mapper), names(mapper)),
     function(m) {
-      ibm_eval.bru_obs(mapper[[m]], input[[m]], state, ...,
-        multi = TRUE, comp_mappers = if (inherits(comp_mappers, "bm_list")) {
+      ibm_eval.bru_obs(
+        mapper[[m]],
+        input[[m]],
+        state,
+        ...,
+        multi = TRUE,
+        comp_mappers = if (inherits(comp_mappers, "bm_list")) {
           comp_mappers
         } else {
           comp_mappers[[m]]
@@ -1387,7 +1430,13 @@ ibm_eval.bru_obs_list <- function(
 #' @rdname ibm_jacobian
 #' @export
 ibm_jacobian.bru_obs_list <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   result <- ibm_eval2(
     mapper,
@@ -1407,7 +1456,13 @@ ibm_jacobian.bru_obs_list <- function(
 #' @rdname ibm_as_taylor
 #' @export
 ibm_as_taylor.bru_obs_list <- function(
-  mapper, input, state, ..., multi = FALSE, comp_mappers, eval_fun = NULL
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
 ) {
   stopifnot(isTRUE(multi))
 
