@@ -67,6 +67,9 @@ that have state dependent output size.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 }
+\value{
+An integer denoting the mapper output length.
+}
 \description{
 Implementations must return an integer denoting the
 mapper output length.
@@ -79,6 +82,11 @@ that can accept \code{list()} inputs require their own method implementations.
 \item \code{ibm_n_output(default)}: Returns \code{NROW(input)}
 
 }}
+\examples{
+m <- bm_linear()
+ibm_n_output(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

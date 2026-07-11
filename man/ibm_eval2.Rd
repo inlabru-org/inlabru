@@ -22,6 +22,12 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+A list with elements \code{offset} and \code{jacobian}, where \code{offset} is a
+vector of length \code{ibm_n_output(mapper, input, state, ...)}, and \code{jacobian}
+is a matrix of size \code{ibm_n_output(mapper, input, state, ...)} by
+\code{ibm_n(mapper, inla_f = FALSE)}.
+}
 \description{
 Implementations must return a list with elements \code{offset} and \code{jacobian}.
 The \code{input} contents must
@@ -38,6 +44,11 @@ their own \code{ibm_eval2} method if joint construction of evaluation and Jacobi
 is more efficient than separate or sequential construction.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_eval2(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

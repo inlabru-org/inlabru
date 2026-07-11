@@ -709,6 +709,7 @@ NULL
 #'   Alternatively, an existing `bru_mapper` object with or without associated
 #'   input can be provided, in which case the input from that mapper
 #'   is copied.
+#' @returns - `ibm_input_set`: The `mapper` with the `input` associated with it.
 #' @export
 #' @examples
 #' (m <- bm_autodetect())
@@ -734,6 +735,8 @@ ibm_input_set <- function(mapper, input) {
 }
 #' @describeIn ibm_input Create and add a `bru_input` to a `bru_mapper`.
 #' @param \dots Passed on to [new_bru_input()].
+#' @returns - `ibm_input_new`: The `mapper` with the new `bru_input` associated
+#'   with it.
 #' @export
 ibm_input_new <- function(mapper, ...) {
   stopifnot(inherits(mapper, "bru_mapper"))
@@ -741,17 +744,24 @@ ibm_input_new <- function(mapper, ...) {
 }
 #' @describeIn ibm_input Check if a `bru_input` is associated with a
 #' `bru_mapper`.
+#' @returns - `ibm_input_available()`: logical; `TRUE` if a `bru_input` is
+#'   associated with the `mapper`, and `FALSE` otherwise.
 #' @export
 ibm_input_available <- function(mapper) {
   !is.null(mapper[[".input"]])
 }
 #' @describeIn ibm_input Get the `bru_input` associated with a `bru_mapper`.
+#' @returns - `ibm_input_get`: The [bru_input] associated with the `mapper`,
+#' if it is available.
 #' @export
 ibm_input_get <- function(mapper) {
   stopifnot(ibm_input_available(mapper))
   mapper[[".input"]]
 }
 #' @describeIn bru_input Evaluate the input associated with a `bru_mapper`.
+#' @returns - `bru_input(bru_mapper)`: The evaluated input associated with a
+#'   mapper; see [ibm_input] for details on how to associate a `bru_input` with
+#'   a `bru_mapper`.
 #' @seealso [ibm_input]
 #' @export
 bru_input.bru_mapper <- function(x, ..., label = "<unknown>") {

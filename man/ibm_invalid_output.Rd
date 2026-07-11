@@ -46,6 +46,10 @@ as "bym2", which can be handled by \code{bm_collect}.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 }
+\value{
+A logical vector of length \code{ibm_n_output(mapper, input, state, ...)}
+indicating which, if any, output elements of \code{ibm_eval(mapper, input, state, ...)} are known to be invalid.
+}
 \description{
 Implementations should return a logical vector of length
 \code{ibm_n_output(mapper, input, state, ...)} indicating which, if any,
@@ -88,6 +92,10 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 
 }}
+\examples{
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_invalid_output(m, input = c(1, 1), state = c(1, 2))
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},
