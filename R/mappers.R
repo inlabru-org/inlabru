@@ -328,7 +328,7 @@ ibm_inla_subset <- function(mapper, ...) {
 #' @inheritParams ibm_n_output
 #' @examples
 #' m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
-#' ibm_invalid_output(m, input = c(1, 1), state = c(1, 2))
+#' ibm_invalid_output(m, input = list(A = 1, B = 2), state = c(1, 2))
 ibm_invalid_output <- function(mapper, input, state, ...) {
   UseMethod("ibm_invalid_output")
 }
