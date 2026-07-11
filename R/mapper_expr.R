@@ -23,6 +23,7 @@
 #'   expression, in addition to the data mask pronoun version.
 #' @param .envir The environment for the expression evaluation. By default, this
 #'   is set to the caller environment.
+#' @returns A `bm_expr` mapper object
 #' @details
 #' The `input` is currently ignored.
 #'

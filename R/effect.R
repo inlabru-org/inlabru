@@ -1858,8 +1858,12 @@ make_mapper <- function(
   mappers[[1]]
 }
 
-#' Convert components to R code
-#'
+#' @title Convert components to R code
+#' @description Convert a [formula] describing latent model components to R code
+#'   strings that can be evaluated to create the corresponding [bru_comp]
+#'   objects.
+#' @returns a character vector of R code strings, one for each component in the
+#'   formula.
 #' @aliases bru_formula_to_bru_obs_code
 #' @keywords internal
 #' @param components A [formula] describing latent model components.

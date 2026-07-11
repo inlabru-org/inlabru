@@ -14,6 +14,10 @@ bru_timings(object, ...)
 
 \item{\dots}{unused}
 }
+\value{
+A \code{data.frame} or \code{tibble} with columns \code{Task}, \code{Iteration}, \code{Time},
+\code{System}, and \code{Elapsed}.
+}
 \description{
 Extracts a data.frame or tibble with information about the \code{Time} (CPU),
 \code{System}, and \code{Elapsed} time for each step of a \code{bru()} run.

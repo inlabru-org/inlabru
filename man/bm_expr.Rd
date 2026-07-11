@@ -41,6 +41,9 @@ expression, in addition to the data mask pronoun version.}
 \item{.envir}{The environment for the expression evaluation. By default, this
 is set to the caller environment.}
 }
+\value{
+A \code{bm_expr} mapper object
+}
 \description{
 Constructs an expression mapping
 }

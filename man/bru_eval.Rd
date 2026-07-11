@@ -53,6 +53,10 @@ expression for a state.
 
 \item{\dots}{Additional arguments, unused.}
 }
+\value{
+A \code{matrix} or \code{list} (see \code{format}) of evaluated predictor
+expressions.
+}
 \description{
 Evaluate
 }

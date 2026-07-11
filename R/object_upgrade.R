@@ -235,7 +235,7 @@ bru_info_upgrade_functions <- function() {
       # Update log format to new format
 
       object_full[["bru_iinla"]][["log"]] <-
-        bru_log_new(
+        new_bru_log(
           object_full[["bru_iinla"]][["log"]][["log"]],
           bookmarks = object_full[["bru_iinla"]][["log"]][["bookmarks"]]
         )

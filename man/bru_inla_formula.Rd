@@ -20,6 +20,9 @@ bru_inla_formula(x, ...)
 
 \item{\dots}{Additional arguments passed on to submethods}
 }
+\value{
+A \link{formula} suited for use in \code{INLA::inla()}
+}
 \description{
 Extracts the INLA formula used in a \code{bru} model
 }

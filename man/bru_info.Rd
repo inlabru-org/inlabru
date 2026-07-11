@@ -62,8 +62,12 @@ definition information. Default: \code{FALSE}}
 
 \item{x}{An  object to be printed}
 }
+\value{
+A \code{bru_info} object
+}
 \description{
-The \code{bru_info} class is used to store metadata about \code{bru} models.
+The \code{bru_info} class is used to store metadata about \code{bru}
+models.
 }
 \section{Methods (by class)}{
 \itemize{

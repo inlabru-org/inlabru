@@ -31,6 +31,9 @@ the stacks. (default "BRU.response")}
 \item{new.name}{The name to be used for the expanded observation matrix,
 possibly the same as an old name. (default "BRU.response")}
 }
+\value{
+A single stack with a multi-likelihood observation matrix
+}
 \description{
 Helper functions for multi-likelihood models
 }

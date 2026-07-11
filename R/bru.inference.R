@@ -67,10 +67,10 @@ generate <- function(object, ...) {
   UseMethod("generate")
 }
 
-#' Methods for bru_info objects
-#'
-#' The `bru_info` class is used to store metadata about `bru` models.
-#'
+#' @title Methods for bru_info objects
+#' @description The `bru_info` class is used to store metadata about `bru`
+#'   models.
+#' @returns A `bru_info` object
 #' @export
 #' @rdname bru_info
 bru_info <- function(...) {
@@ -189,6 +189,7 @@ as_bru_model.bru <- function(object, ...) {
 #'
 #' @param x An object containing information about an INLA formula
 #' @param \dots Additional arguments passed on to submethods
+#' @returns A [formula] suited for use in `INLA::inla()`
 #' @export
 #' @keywords internal
 bru_inla_formula <- function(x, ...) {
@@ -271,6 +272,8 @@ print.bru_info <- function(x, ...) {
 #' `System`, and `Elapsed` time for each step of a `bru()` run.
 #' @param object A fitted `bru` object
 #' @param \dots unused
+#' @returns A `data.frame` or `tibble` with columns `Task`, `Iteration`, `Time`,
+#'   `System`, and `Elapsed`.
 #' @export
 bru_timings <- function(object, ...) {
   UseMethod("bru_timings")
@@ -851,6 +854,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
 #' @param pronouns,objects If `NULL` (default), all named elements of `data` are
 #' used as pronouns/objects. If character vector(s), only the matching named
 #' elements of `data` will be available as pronouns/objects.
+#' @returns A data mask environment for use with [rlang::eval_tidy()].
 #' @examples
 #' m <- bru_data_mask(
 #'   data = list(

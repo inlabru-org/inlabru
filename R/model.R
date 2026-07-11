@@ -1254,6 +1254,8 @@ ibm_jacobian.bru_model <- function(
 #' @param used A [bru_used()] object, or NULL (default)
 #' @param \dots Additional arguments, unused.
 #'
+#' @returns A `matrix` or `list` (see `format`) of evaluated predictor
+#'   expressions.
 # @keywords internal
 #' @rdname bru_eval
 #' @examples

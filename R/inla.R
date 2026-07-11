@@ -363,7 +363,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
 #'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
-#' @return a list of modified stacks with multicolumn observations
+#' @returns A list of modified stacks with multicolumn observations
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
 #'
@@ -462,6 +462,7 @@ bru_inla.stack.mexpand <- function(
 #'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
+#' @returns A single stack with a multi-likelihood observation matrix
 #' @export
 #' @keywords internal
 #' @rdname bru_inla.stack.mjoin
@@ -480,7 +481,7 @@ bru_inla.stack.mjoin <- function(
       old.names = old.names,
       new.name = new.name
     )
-    do.call(
+    joined <- do.call(
       INLA::inla.stack.join,
       c(
         stacks,
@@ -490,24 +491,24 @@ bru_inla.stack.mjoin <- function(
         )
       )
     )
-  } else {
-    stacks <- bru_inla.stack.mexpand(
-      ...,
-      old.names = old.names,
-      new.name = new.name
-    )
-    do.call(
-      INLA::inla.stack.join,
-      c(
-        stacks,
-        list(
-          compress = compress,
-          remove.unused = remove.unused,
-          multi.family = TRUE
-        )
+    return(joined)
+  }
+  stacks <- bru_inla.stack.mexpand(
+    ...,
+    old.names = old.names,
+    new.name = new.name
+  )
+  do.call(
+    INLA::inla.stack.join,
+    c(
+      stacks,
+      list(
+        compress = compress,
+        remove.unused = remove.unused,
+        multi.family = TRUE
       )
     )
-  }
+  )
 }
 
 
