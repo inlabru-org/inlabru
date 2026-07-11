@@ -14,19 +14,29 @@ ibm_inla_subset(mapper, ...)
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+A logical vector of \code{TRUE/FALSE} for the subset such that, given the
+full A matrix and values output, \code{A[, subset, drop = FALSE]} and
+\code{values[subset]} (or \code{values[subset, , drop = FALSE]} for data.frame
+values) are equal to the \code{inla_f = TRUE} version of A and values.
+}
 \description{
-Implementations must return a logical vector of \code{TRUE/FALSE} for
-the subset such that, given the full A matrix and values output,
-\code{A[, subset, drop = FALSE]} and \code{values[subset]}
-(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
-to the \code{inla_f = TRUE} version of A and values. The default method uses
-the \code{ibm_values} output to construct the subset indexing.
+Implementations must return a logical vector of \code{TRUE/FALSE} for the subset
+such that, given the full A matrix and values output, \code{A[, subset, drop = FALSE]} and \code{values[subset]} (or \code{values[subset, , drop = FALSE]} for
+data.frame values) are equal to the \code{inla_f = TRUE} version of A and values.
+The default method uses the \code{ibm_values} output to construct the subset
+indexing.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{ibm_inla_subset(default)}: Uses the [ibm_values\verb{()] output to construct the inla subset indexing as the difference between }inla_f=FALSE\code{and}inla_f=TRUE\verb{. Extra arguments such as }multi\verb{are passed on to [ibm_values()]. This means it supports both regular vector values and}multi=1` data.frame values.
 
 }}
+\examples{
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_inla_subset(m)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

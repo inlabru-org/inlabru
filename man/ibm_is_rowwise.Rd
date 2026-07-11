@@ -14,6 +14,9 @@ ibm_is_rowwise(mapper, ...)
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+logical; \code{TRUE} if the mapper is rowwise, \code{FALSE} otherwise.
+}
 \description{
 Implementations must return \code{TRUE} or \code{FALSE}.
 If \code{TRUE} (returned by the default method unless the mapper
@@ -27,6 +30,11 @@ blockwise evaluation is always possible.
 \code{is_rowwise} from the mapper object if it exists, and otherwise \code{TRUE}.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_is_rowwise(m)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

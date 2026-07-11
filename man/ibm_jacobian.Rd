@@ -199,6 +199,10 @@ is set to the caller environment.}
 \item{eval_fun}{A list of functions, typically from
 \code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
+\value{
+A (sparse) matrix of size \code{ibm_n_output(mapper, input, inla_f)} by
+\code{ibm_n(mapper, inla_f = FALSE)}.
+}
 \description{
 Implementations must return a (sparse) matrix of size
 \code{ibm_n_output(mapper, input, inla_f)}
@@ -275,6 +279,11 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_jacobian(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

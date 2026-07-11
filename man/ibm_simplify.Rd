@@ -63,6 +63,11 @@ also with the simplified mappers, since the \code{taylor} mappers are not
 dependent on inputs.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_simplify(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

@@ -98,6 +98,8 @@ add_mappers <- function(...) {
 #'
 #' @param \dots Parameters passed on to other methods
 #'
+#' @returns A `bru_comp` object defining a latent component and its associated
+#'   effect mapping.
 #' @rdname bru_comp
 #' @aliases component
 #' @seealso [bru_input()], [summary.bru_comp()]
@@ -645,6 +647,8 @@ bru_compat_pre_2_14_bru_comp <- function(comp) {
 #' @param object The object to operate on
 #' @param lhoods A [bru_obs_list] object
 #' @param .envir An evaluation environment for non-formula input
+#' @returns A `bru_comp_list` object, which is a named list of `bru_comp`
+#'   objects.
 #' @export
 #' @rdname bru_comp_list
 #' @aliases bru_component_list
@@ -1668,9 +1672,8 @@ make_submapper <- function(
 #' @export
 #' @examples
 #' if (bru_safe_inla()) {
-#'   library(INLA)
 #'   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
-#'   spde <- inla.spde2.pcmatern(mesh,
+#'   spde <- INLA::inla.spde2.pcmatern(mesh,
 #'     prior.range = c(1, 0.5),
 #'     prior.sigma = c(1, 0.5)
 #'   )

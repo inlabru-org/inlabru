@@ -38,6 +38,9 @@ Implementations do not normally need to do anything different, except
 for mappers of the type needed for hidden multicomponent models such
 as "bym2", which can be handled by \code{bm_collect}.}
 }
+\value{
+logical; \code{TRUE} if the mapper is linear/affine, \code{FALSE} otherwise.
+}
 \description{
 Implementations must return \code{TRUE} or \code{FALSE}.
 If \code{TRUE} (returned by the default method unless the mapper
@@ -50,6 +53,11 @@ may assume the mapper is linear/affine.
 \code{is_linear} from the mapper object if it exists, and otherwise \code{TRUE}.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_is_linear(m)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

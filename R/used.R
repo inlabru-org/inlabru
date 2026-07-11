@@ -346,6 +346,7 @@ bru_used_vars.default <- function(x, result = new_bru_used_vars()) {
   }
   result
 }
+
 #' @rdname bru_used_vars
 #' @export
 `bru_used_vars.<-` <- function(x, result = new_bru_used_vars()) {
@@ -361,6 +362,7 @@ bru_used_vars.default <- function(x, result = new_bru_used_vars()) {
   }
   result
 }
+
 #' @rdname bru_used_vars
 #' @export
 bru_used_vars.call <- function(x, result = new_bru_used_vars()) {

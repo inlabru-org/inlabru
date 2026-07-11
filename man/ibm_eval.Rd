@@ -83,6 +83,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 \item{eval_fun}{A list of functions, typically from
 \code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
+\value{
+A vector of length \code{ibm_n_output(mapper, input, state, ...)}.
+}
 \description{
 Implementations must return a vector of length \code{\link[=ibm_n_output]{ibm_n_output()}}.
 The \code{input} contents must
@@ -115,6 +118,11 @@ as \code{ibm_jacobian(...) \%*\% state}.  When \code{state} is \code{NULL},
 a zero vector of length \code{\link[=ibm_n_output]{ibm_n_output()}} is returned.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_eval(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

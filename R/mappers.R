@@ -58,7 +58,8 @@ NULL
 #' @title Size of the latent vector of a mapping
 #' @description
 #' Implementations must return the size of the latent vector
-#' being mapped to.
+#' being mapped.
+#' @returns An integer denoting the size of the latent vector being mapped.
 #' @export
 #' @inheritParams ibm_n_output
 #' @family mapper methods
@@ -76,10 +77,15 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
 #' @param state A vector of latent state values for the mapping,
 #' of length `ibm_n(mapper, inla_f = FALSE)`
 #' @param input Data input for the mapper.
+#' @returns An integer denoting the mapper output length.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_n_output(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_n_output")
 }
@@ -91,9 +97,14 @@ ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
 #' The exception is the method for `bm_multi`, that returns a
 #' multi-column data frame if `multi=TRUE`.
+#' @returns A vector  of length `ibm_n(mapper, inla_f = FALSE)`
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_index(4)
+#' ibm_values(m)
+#'
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
@@ -105,9 +116,14 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' If `TRUE` (returned by the default method unless the mapper
 #' contains an `is_linear` variable), users of the mapper
 #' may assume the mapper is linear/affine.
+#' @returns logical; `TRUE` if the mapper is linear/affine, `FALSE` otherwise.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_linear()
+#' ibm_is_linear(m)
+#'
 ibm_is_linear <- function(mapper, ...) {
   UseMethod("ibm_is_linear")
 }
@@ -118,9 +134,14 @@ ibm_is_linear <- function(mapper, ...) {
 #' contains an `is_rowwise` variable), users of the mapper
 #' may assume the mapper uses its inputs in "rowwise" manner, so that
 #' blockwise evaluation is always possible.
+#' @returns logical; `TRUE` if the mapper is rowwise, `FALSE` otherwise.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_linear()
+#' ibm_is_rowwise(m)
+#'
 ibm_is_rowwise <- function(mapper, ...) {
   UseMethod("ibm_is_rowwise")
 }
@@ -131,10 +152,17 @@ ibm_is_rowwise <- function(mapper, ...) {
 #' `ibm_n_output(mapper, input, inla_f)`
 #' by `ibm_n(mapper, inla_f = FALSE)`. The `inla_f=TRUE` argument should
 #' only affect the allowed type of input format.
+#' @returns A (sparse) matrix of size `ibm_n_output(mapper, input, inla_f)` by
+#'   `ibm_n(mapper, inla_f = FALSE)`.
 #' @export
 #' @family mapper methods
+#' @param sub_lin Internal, optional pre-computed sub-mapper information
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_jacobian(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_jacobian")
 }
@@ -157,6 +185,10 @@ ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_as_taylor(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_as_taylor <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_as_taylor")
 }
@@ -181,6 +213,10 @@ ibm_linear <- function(...) {
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_simplify(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
   UseMethod("ibm_simplify")
 }
@@ -198,6 +234,11 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 #' @inheritDotParams ibm_eval_methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @returns A vector of length `ibm_n_output(mapper, input, state, ...)`.
+#' @examples
+#' m <- bm_linear()
+#' ibm_eval(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_eval <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval")
 }
@@ -221,6 +262,14 @@ NULL
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @returns A list with elements `offset` and `jacobian`, where `offset` is a
+#'   vector of length `ibm_n_output(mapper, input, state, ...)`, and `jacobian`
+#'   is a matrix of size `ibm_n_output(mapper, input, state, ...)` by
+#'   `ibm_n(mapper, inla_f = FALSE)`.
+#' @examples
+#' m <- bm_linear()
+#' ibm_eval2(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_eval2 <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval2")
 }
@@ -230,6 +279,7 @@ ibm_eval2 <- function(mapper, input, state = NULL, ...) {
 #' Implementations must return a character vector of sub-mapper names, or
 #' `NULL`. Intended for providing information about multi-mappers and mapper
 #' collections.
+#' @returns A character vector or `NULL`
 #' @export
 #' @examples
 #' # ibm_names
@@ -239,6 +289,10 @@ ibm_eval2 <- function(mapper, input, state = NULL, ...) {
 #' ibm_names(mapper)
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_multi(list(A = bm_linear(), B = bm_linear()))
+#' ibm_names(m)
+#'
 ibm_names <- function(mapper) {
   UseMethod("ibm_names")
 }
@@ -256,15 +310,23 @@ ibm_names <- function(mapper) {
 
 #' @title Find index subset of INLA visible states
 #' @description
-#' Implementations must return a logical vector of `TRUE/FALSE` for
-#' the subset such that, given the full A matrix and values output,
-#' `A[, subset, drop = FALSE]` and `values[subset]`
-#' (or `values[subset, , drop = FALSE]` for data.frame values) are equal
-#' to the `inla_f = TRUE` version of A and values. The default method uses
-#' the `ibm_values` output to construct the subset indexing.
+#' Implementations must return a logical vector of `TRUE/FALSE` for the subset
+#' such that, given the full A matrix and values output, `A[, subset, drop =
+#' FALSE]` and `values[subset]` (or `values[subset, , drop = FALSE]` for
+#' data.frame values) are equal to the `inla_f = TRUE` version of A and values.
+#' The default method uses the `ibm_values` output to construct the subset
+#' indexing.
+#' @returns A logical vector of `TRUE/FALSE` for the subset such that, given the
+#'   full A matrix and values output, `A[, subset, drop = FALSE]` and
+#'   `values[subset]` (or `values[subset, , drop = FALSE]` for data.frame
+#'   values) are equal to the `inla_f = TRUE` version of A and values.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+#' ibm_inla_subset(m)
+#'
 ibm_inla_subset <- function(mapper, ...) {
   UseMethod("ibm_inla_subset")
 }
@@ -276,10 +338,16 @@ ibm_inla_subset <- function(mapper, ...) {
 #' output elements of `ibm_eval(mapper, input, state, ...)` are known to be
 #' invalid.
 #' For for multi/collect mappers, a list, when given a `multi=TRUE` argument.
+#' @returns A logical vector of length `ibm_n_output(mapper, input, state, ...)`
+#'   indicating which, if any, output elements of `ibm_eval(mapper, input,
+#'   state, ...)` are known to be invalid.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+#' ibm_invalid_output(m, input = c(1, 1), state = c(1, 2))
 ibm_invalid_output <- function(mapper, input, state, ...) {
   UseMethod("ibm_invalid_output")
 }

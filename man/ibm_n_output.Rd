@@ -85,6 +85,9 @@ variables. If \code{NULL} or missing, defaults to an empty list.}
 \item{data}{should be a list with data objects, with the main object called
 \code{data}; see \code{\link[=bm_expr]{bm_expr()}} for details.}
 }
+\value{
+An integer denoting the mapper output length.
+}
 \description{
 Implementations must return an integer denoting the
 mapper output length.
@@ -97,6 +100,11 @@ that can accept \code{list()} inputs require their own method implementations.
 \item \code{ibm_n_output(default)}: Returns \code{NROW(input)}
 
 }}
+\examples{
+m <- bm_linear()
+ibm_n_output(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},
