@@ -550,6 +550,13 @@ bru_used.bru <- function(x, ..., join = TRUE) {
 }
 
 #' @describeIn bru_used Extract the `bru_used` information for the collection
+#' of observation models used in a `bru_model` object.
+#' @export
+bru_used.bru_model <- function(x, ..., join = TRUE) {
+  bru_used(as_bru_obs_list(x), ..., join = join)
+}
+
+#' @describeIn bru_used Extract the `bru_used` information for the collection
 #' of observation models used in a `bru_info` object.
 #' @export
 bru_used.bru_info <- function(x, ..., join = TRUE) {

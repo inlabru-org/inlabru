@@ -3,14 +3,15 @@
 \name{bru_state}
 \alias{bru_state}
 \alias{bru_state.bru_model}
+\alias{bru_state.inla}
 \alias{bru_state.bru}
 \title{Extract model state properties or samples}
 \usage{
 bru_state(x, ...)
 
-\method{bru_state}{bru_model}(x, ...)
+\method{bru_state}{bru_model}(x, ..., state = NULL)
 
-\method{bru_state}{bru}(
+\method{bru_state}{inla}(
   x,
   property = "mode",
   n = 1,
@@ -19,12 +20,17 @@ bru_state(x, ...)
   internal_hyperpar = FALSE,
   ...
 )
+
+\method{bru_state}{bru}(x, property = "mode", ...)
 }
 \arguments{
 \item{x}{Object}
 
 \item{\dots}{Further arguments, passed on to \code{post.sample.structured()} when
 \code{property="sample"}.}
+
+\item{state}{A list of initial state vectors, one for each component. If
+\code{NULL}, all-zero vectors are returned for each component.}
 
 \item{property}{Property of the model components to obtain value from.
 Default: "mode". Other options are "mean", "0.025quant", "0.975quant",

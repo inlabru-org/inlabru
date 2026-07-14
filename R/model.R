@@ -269,6 +269,7 @@ evaluate_model <- function(
   n_pred = NULL,
   ...
 ) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   comp_lst <- as_bru_comp_list(model)
   if (inherits(predictor, "bru_pred_expr")) {
     if (!is.null(used)) {
@@ -360,6 +361,7 @@ evaluate_state <- function(
   internal_hyperpar = FALSE,
   ...
 ) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   # Evaluate random states, or a single property
   if (property == "sample") {
     state <- post.sample.structured(
@@ -1465,21 +1467,33 @@ bru_state <- function(x, ...) {
 }
 
 #' @rdname bru_state
+#' @param state A list of initial state vectors, one for each component. If
+#' `NULL`, all-zero vectors are returned for each component.
 #' @export
-bru_state.bru_model <- function(x, ...) {
-  state <- list(lapply(
-    as_bru_comp_list(x),
-    function(xx) {
-      rep(0.0, ibm_n(xx[["mapper"]]))
+bru_state.bru_model <- function(x, ..., state = NULL) {
+  comp_lst <- as_bru_comp_list(x)
+  if (is.null(state)) {
+    state <- list()
+  }
+  state <- state[intersect(names(comp_lst), names(state))]
+  for (lab in names(comp_lst)) {
+    if (is.null(state[[lab]])) {
+      state[[lab]] <- rep(0, ibm_n(comp_lst[[lab]][["mapper"]]))
+    } else if (length(state[[lab]]) == 1) {
+      state[[lab]] <-
+        rep(
+          state[[lab]],
+          ibm_n(comp_lst[[lab]][["mapper"]])
+        )
     }
-  ))
+  }
 
-  state
+  list(state)
 }
 
 #' @rdname bru_state
 #' @export
-bru_state.bru <- function(
+bru_state.inla <- function(
   x,
   property = "mode",
   n = 1,
@@ -1493,7 +1507,6 @@ bru_state.bru <- function(
     property,
     c(
       "sample",
-      "zeros",
       "mode",
       "mean",
       "0.025quant",
@@ -1513,9 +1526,6 @@ bru_state.bru <- function(
     )
     return(state)
   }
-  if (property == "zeros") {
-    return(bru_state(as_bru_model(x)))
-  }
   state <- list(extract_property(
     result = x,
     property = property,
@@ -1523,4 +1533,33 @@ bru_state.bru <- function(
   ))
 
   state
+}
+
+#' @rdname bru_state
+#' @export
+bru_state.bru <- function(
+  x,
+  property = "mode",
+  ...
+) {
+  # Evaluate random states, or a single property
+  property <- match.arg(
+    property,
+    c(
+      "sample",
+      "zeros",
+      "mode",
+      "mean",
+      "0.025quant",
+      "0.975quant",
+      "sd",
+      "joint_mode",
+      "predictor_sd"
+    )
+  )
+  if (property == "zeros") {
+    return(bru_state(as_bru_model(x)))
+  }
+  # Invoke method for "inla"
+  NextMethod()
 }

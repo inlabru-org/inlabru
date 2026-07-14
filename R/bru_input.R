@@ -497,13 +497,22 @@ bru_input_text.bru_comp_list <- function(x, ...) {
 #' @describeIn bru_input Computes the component inputs for included components
 #' for each observation model.
 #'
-#' @param lhoods A `bru_obs_list` object containing all observations models.
+#' @param lhoods `r lifecycle::badge("deprecated")` from `2.14.1.9011`, as it's
+#'   now part of the [bru_model] object.
+#'   A `bru_obs_list` object containing all observations models.
 #' @return * `bru_input(bru_model)`: A list of mapper input values,
 #'   with one entry for each observation model, each containing a list
 #'   of inputs for the components used by the corresponding observation model.
 #' @export
-bru_input.bru_model <- function(x, lhoods, ...) {
-  bru_input(lhoods, components = as_bru_comp_list(x), ...)
+bru_input.bru_model <- function(x, lhoods = deprecated(), ...) {
+  if (lifecycle::is_present(lhoods)) {
+    lifecycle::deprecate_warn(
+      "2.14.1.9011",
+      "bru_input.bru_model(lhoods)",
+      details = "The 'lhoods' argument is now part of the 'bru_model' object."
+    )
+  }
+  bru_input(as_bru_obs_list(x), components = as_bru_comp_list(x), ...)
 }
 
 #' @rdname bru_input

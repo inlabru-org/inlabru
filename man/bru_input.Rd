@@ -34,7 +34,7 @@ bru_input(...)
 
 \method{bru_input}{bru_comp_list}(x, ...)
 
-\method{bru_input}{bru_model}(x, lhoods, ...)
+\method{bru_input}{bru_model}(x, lhoods = deprecated(), ...)
 
 \method{bru_input}{bru_obs}(x, components, ...)
 
@@ -81,7 +81,9 @@ package), or stop with an error.}
 \item{.envir}{environment in which to evaluate the input expression. Default
 is \code{parent.frame()}}
 
-\item{lhoods}{A \code{bru_obs_list} object containing all observations models.}
+\item{lhoods}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} from \verb{2.14.1.9011}, as it's
+now part of the \link{bru_model} object.
+A \code{bru_obs_list} object containing all observations models.}
 
 \item{components}{A \code{bru_comp_list} object containing all components
 defined in the model.}

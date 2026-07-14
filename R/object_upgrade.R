@@ -508,6 +508,16 @@ bru_info_upgrade_functions <- function() {
       }
 
       object
+    },
+    "2.14.1.9011" = function(object) {
+      if (is.null(object[["model"]][["inputs"]])) {
+        object[["model"]][["inputs"]] <- object[["inputs"]]
+      }
+      if (is.null(object[["model"]][["lhoods"]])) {
+        object[["model"]][["lhoods"]] <- object[["lhoods"]]
+      }
+
+      object
     }
   )
 }
@@ -515,8 +525,14 @@ bru_info_upgrade <- function(
   object,
   new_version = getNamespaceVersion("inlabru")
 ) {
-  object_full <- object
-  object <- object[["bru_info"]]
+  if (inherits(object, "bru_info")) {
+    return_bru_info <- TRUE
+    object_full <- list()
+  } else {
+    return_bru_info <- FALSE
+    object_full <- object
+    object <- object[["bru_info"]]
+  }
   msg <- NULL
   if (!is.list(object)) {
     msg <- "Not a list"
@@ -534,6 +550,9 @@ bru_info_upgrade <- function(
   old_ver <- object[["inlabru_version"]]
   compare_version <- utils::compareVersion(new_version, old_ver)
   if (compare_version == 0) {
+    if (return_bru_info) {
+      return(object)
+    }
     return(object_full)
   }
 
@@ -544,6 +563,9 @@ bru_info_upgrade <- function(
         "which is newer than the running version {new_version}."
       )
     )
+    if (return_bru_info) {
+      return(object)
+    }
     return(object_full)
   }
 
@@ -562,7 +584,9 @@ bru_info_upgrade <- function(
     if (utils::compareVersion(ver, old_ver) > 0) {
       message("Upgrading bru_info to ", ver)
       if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
-        object_full <- upgrade_functions[[ver]](object_full = object_full)
+        if (!return_bru_info) {
+          object_full <- upgrade_functions[[ver]](object_full = object_full)
+        }
       } else {
         object <- upgrade_functions[[ver]](object)
       }
@@ -572,8 +596,11 @@ bru_info_upgrade <- function(
   }
 
   object[["inlabru_version"]] <- new_version
-  object_full[["bru_info"]] <- object
   message(glue("Upgraded bru_info to {new_version}"))
+  if (return_bru_info) {
+    return(object)
+  }
 
+  object_full[["bru_info"]] <- object
   object_full
 }

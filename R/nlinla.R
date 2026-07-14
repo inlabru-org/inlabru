@@ -7,6 +7,7 @@
 #' @rdname bru_compute_linearisation
 #' @keywords internal
 bru_compute_linearisation <- function(...) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   UseMethod("bru_compute_linearisation")
 }
 

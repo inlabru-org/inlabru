@@ -597,8 +597,7 @@ test_that("New method `fullchain` works", {
   ibm_eval(
     obs_list,
     bru_input(
-      fit$bru_info$model,
-      lhoods = obs_list
+      fit$bru_info$model
     ),
     state = list(Intercept = 1, x = 2, y = 3),
     comp_mappers = comp_mappers
@@ -648,8 +647,7 @@ test_that("New method `fullchain` works", {
   ibm_eval(
     obs2_list,
     bru_input(
-      fit2$bru_info$model,
-      lhoods = obs2_list
+      fit2$bru_info$model
     ),
     state = list(Intercept = 1, x = 2, y = 3),
     comp_mappers = comp2_mappers
@@ -699,8 +697,7 @@ test_that("New method `fullchain` works", {
   ibm_eval(
     obs3_list,
     bru_input(
-      fit3$bru_info$model,
-      lhoods = obs3_list
+      fit3$bru_info$model
     ),
     state = list(Intercept = 1, x = 2, y = 3),
     comp_mappers = comp3_mappers

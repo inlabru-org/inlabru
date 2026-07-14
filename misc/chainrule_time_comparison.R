@@ -76,7 +76,7 @@ for (k in seq_len(nrow(n_df))) {
       expect_equal(used[["effect"]], "x")
 
       idx <- bru_index(model, used = used)
-      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+      inp <- bru_input(model, inla_f = TRUE)
 
       iter <- 0
       toc <- proc.time()[1]
@@ -130,7 +130,7 @@ for (k in seq_len(nrow(n_df))) {
       expect_equal(used[["effect"]], "x")
 
       idx <- bru_index(model, used = used)
-      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+      inp <- bru_input(model, inla_f = TRUE)
 
       iter <- 0
       toc <- proc.time()[1]
@@ -179,7 +179,7 @@ for (k in seq_len(nrow(n_df))) {
       expect_equal(used[["effect"]], "x")
 
       idx <- bru_index(model, used = used)
-      inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+      inp <- bru_input(model, inla_f = TRUE)
 
       iter <- 0
       toc <- proc.time()[1]

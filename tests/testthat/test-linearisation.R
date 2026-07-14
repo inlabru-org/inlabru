@@ -40,7 +40,7 @@ test_that("Linearisation", {
   lhoods <- model$lhoods
 
   idx <- bru_index(model, used = bru_used(lhoods))
-  inp <- bru_input(model, lhoods, inla_f = TRUE)
+  inp <- bru_input(model, inla_f = TRUE)
 
   if (identical(bru_options_get("bru_method")$autodiff, "fullchain")) {
     lin0 <- ibm_as_taylor(
@@ -200,7 +200,7 @@ test_that("Linearisation 2", {
     expect_equal(used[["effect"]], "x")
 
     idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+    inp <- bru_input(model, inla_f = TRUE)
 
     comp_lin <- ibm_as_taylor(model, input = inp, state = NULL)
     lin0 <- bru_compute_linearisation(
@@ -244,7 +244,7 @@ test_that("Linearisation 2", {
     expect_equal(used[["effect"]], "x")
 
     idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+    inp <- bru_input(model, inla_f = TRUE)
 
     lin0 <- ibm_as_taylor(model, input = inp, state = list(x = X))
     lin <- ibm_as_taylor(model, input = inp, state = list(x = X / 5))
@@ -274,7 +274,7 @@ test_that("Linearisation 2", {
     expect_equal(used[["effect"]], "x")
 
     idx <- bru_index(model, used = used)
-    inp <- bru_input(model, model$lhoods, inla_f = TRUE)
+    inp <- bru_input(model, inla_f = TRUE)
 
     lin0 <- ibm_as_taylor(model, input = inp, state = list(x = X))
     lin <- ibm_as_taylor(model, input = inp, state = list(x = X / 5))
