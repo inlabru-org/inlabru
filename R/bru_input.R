@@ -512,6 +512,9 @@ bru_input.bru_model <- function(x, lhoods = deprecated(), ...) {
       details = "The 'lhoods' argument is now part of the 'bru_model' object."
     )
   }
+  if (!is.null(x[["inputs"]])) {
+    return(x[["inputs"]])
+  }
   bru_input(as_bru_obs_list(x), components = as_bru_comp_list(x), ...)
 }
 

@@ -489,18 +489,9 @@ bru <- function(
     options$bru_max_iter <- 1
   }
 
-  # Until the storage format is changed in a backwards incompatible way,
-  # move lhoods and inputs out of bru.model:
-  lhoods <- bru.model[["lhoods"]]
-  inputs <- bru.model[["inputs"]]
-  #  bru.model[["lhoods"]] <- NULL
-  #  bru.model[["inputs"]] <- NULL
-
   info <- bru_info(
     method = "bru",
     model = bru.model,
-    #    inputs = inputs,
-    #    lhoods = lhoods,
     log = bru_log()["bru"],
     options = options
   )
@@ -511,7 +502,6 @@ bru <- function(
   if (options$bru_run) {
     result <- iinla(
       model = as_bru_model(info),
-      inputs = info[["inputs"]],
       options = info[["options"]]
     )
   } else {
@@ -555,9 +545,9 @@ bru_rerun <- function(result, options = list()) {
 
   orig_timings <- result[["bru_timings"]]
 
+  model <- as_bru_model(info)
   result <- iinla(
-    model = as_bru_model(info),
-    inputs = info[["inputs"]],
+    model = model,
     initial = result,
     options = info[["options"]]
   )
@@ -4015,14 +4005,14 @@ generate.bru <- function(
 
     if (method == "pandemic") {
       vals <- evaluate_model(
-        model = object$bru_info$model,
+        model = as_bru_model(object),
         state = state,
         data = newdata,
         predictor = pred
       )
     } else {
       vals <- bru_eval(
-        model = object$bru_info$model,
+        model = as_bru_model(object),
         state = state,
         data = newdata,
         predictor = pred
@@ -5036,8 +5026,6 @@ bru_timer_done <- function(timer) {
 #'
 #' @export
 #' @param model A [bru_model] object
-#' @param inputs Optional pre-computed  list of per-likelihood component
-#'   evaluations, from [bru_input.bru_obs_list()].
 #' @param initial A previous `bru` result or a list of named latent variable
 #' initial states (missing elements are set to zero), to be used as starting
 #' point, or `NULL`. If non-null, overrides `options$bru_initial`
@@ -5045,6 +5033,10 @@ bru_timer_done <- function(timer) {
 #' @param lhoods `r lifecycle::badge("deprecated")` Deprecated from version
 #'   `2.14.1.9011`, since the [bru_obs_list] information is now part of the
 #'   [bru_model] object.
+#' @param inputs `r lifecycle::badge("deprecated")` Deprecated from version
+#'   `2.14.1.9011`, since the inputs information is now part of the
+#'   [bru_model] object. Optional pre-computed list of per-likelihood component
+#'   evaluations, from [bru_input.bru_obs_list()].
 #' @return An `iinla` object that inherits from `INLA::inla`, with an
 #' added field `bru_iinla` with elements
 #' \describe{
@@ -5059,10 +5051,10 @@ bru_timer_done <- function(timer) {
 
 iinla <- function(
   model,
-  inputs = NULL,
   initial = NULL,
   options,
-  lhoods = deprecated()
+  lhoods = deprecated(),
+  inputs = deprecated()
 ) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
@@ -5070,7 +5062,7 @@ iinla <- function(
   if (lifecycle::is_present(lhoods)) {
     lifecycle::deprecate_warn(
       "2.14.1.9011",
-      "iinla(lhoods = )",
+      "iinla(lhoods)",
       details = paste0(
         "The `lhoods` argument is deprecated.\n",
         "The `lhoods` information is contained in the `bru_model` ",
@@ -5367,13 +5359,14 @@ iinla <- function(
     orig_timings <- old.result[["bru_iinla"]][["timings"]]
   }
 
-  if (is.null(inputs)) {
-    bru_log_message(
-      "iinla: Evaluate component inputs",
-      verbosity = 3
+  if (lifecycle::is_present(inputs)) {
+    lifecycle::deprecate_warn(
+      "2.14.1.9011",
+      "iinla(inputs)",
+      "iinla()"
     )
-    inputs <- bru_input(model)
   }
+  inputs <- bru_input(model)
 
   timings <- bru_timer_do(timings, "Simplify", 1L)
   bru_log_message(

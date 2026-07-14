@@ -4,6 +4,7 @@
 \alias{bru_set_missing}
 \alias{bru_set_missing<-}
 \alias{bru_set_missing.bru}
+\alias{bru_set_missing.bru_model}
 \alias{bru_set_missing.bru_info}
 \alias{bru_set_missing.bru_obs_list}
 \alias{bru_set_missing.bru_obs}
@@ -17,6 +18,8 @@ bru_set_missing(object, keep = FALSE, ...)
 bru_set_missing(x, ...) <- value
 
 \method{bru_set_missing}{bru}(object, keep = FALSE, ...)
+
+\method{bru_set_missing}{bru_model}(object, keep = FALSE, ...)
 
 \method{bru_set_missing}{bru_info}(object, keep = FALSE, ...)
 
