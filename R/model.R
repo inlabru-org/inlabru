@@ -866,7 +866,7 @@ NULL
 #'   for each observation model, with the offset and jacobians evaluated for the
 #'   predictor of the observation model, and the component mappers passed on as
 #'   `comp_mappers` for the evaluation of the jacobians.
-#'   @param comp_mappers A [bm_list()] of mappers, either the original component
+#' @param comp_mappers A [bm_list()] of mappers, either the original component
 #'   mappers, or simplified mappers.
 #'
 #' @export

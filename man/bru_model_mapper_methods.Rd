@@ -94,8 +94,8 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \item{options}{A \link{bru_options} options object or a list of options passed
 on to \code{\link[=bru_options]{bru_options()}}}
 
-\item{comp_mappers}{A list of mappers, typically from
-\verb{as_bm_list<bru_comp_list>}.}
+\item{comp_mappers}{A \code{\link[=bm_list]{bm_list()}} of mappers, either the original component
+mappers, or simplified mappers.}
 
 \item{eval_fun}{A list of functions, typically from
 \code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
@@ -114,8 +114,6 @@ If \code{autodiff} is not "pandemic", returns a list of \link{bm_taylor} objects
 for each observation model, with the offset and jacobians evaluated for the
 predictor of the observation model, and the component mappers passed on as
 \code{comp_mappers} for the evaluation of the jacobians.
-@param comp_mappers A \code{\link[=bm_list]{bm_list()}} of mappers, either the original component
-mappers, or simplified mappers.
 
 \item \code{ibm_simplify(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bru_mapper}

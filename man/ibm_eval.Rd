@@ -95,7 +95,8 @@ for the mapper.
 Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_collect}},
 \code{\link[=ibm_eval_methods]{bm_const}},
-\code{\link[=ibm_eval_methods]{bm_expr}}, \code{bm_list},
+\code{\link[=ibm_eval_methods]{bm_expr}},
+\code{\link[=bru_model_mapper_methods]{bm_list}},
 \code{\link[=ibm_eval_methods]{bm_logitaverage}},
 \code{\link[=ibm_eval_methods]{bm_logsumexp}},
 \code{\link[=ibm_eval_methods]{bm_marginal}},
@@ -106,9 +107,11 @@ Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_scale}},
 \code{\link[=ibm_eval_methods]{bm_shift}},
 \code{\link[=ibm_eval_methods]{bm_sum}},
-\code{\link[=ibm_eval_methods]{bm_taylor}}, \code{bru_comp},
-\code{bru_comp_list}, \code{\link[=bru_model_mapper_methods]{bru_model}},
-\code{bru_obs}, \code{bru_obs_list}, \code{default}.
+\code{\link[=ibm_eval_methods]{bm_taylor}},
+\code{\link[=bru_model_mapper_methods]{bru_comp}},
+\code{\link[=bru_model_mapper_methods]{bru_comp_list}},
+\code{\link[=bru_model_mapper_methods]{bru_model}}, \code{bru_obs},
+\code{bru_obs_list}, \code{default}.
 }
 \section{Methods (by class)}{
 \itemize{
