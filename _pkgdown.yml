@@ -127,6 +127,7 @@ reference:
 - title: "Optimization log information"
   desc: "Accessing the optimization text log, and plotting the optimization convergence."
   contents:
+  - starts_with("new_bru_log")
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
   - starts_with("bru_timings")

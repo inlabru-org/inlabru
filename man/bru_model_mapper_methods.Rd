@@ -9,7 +9,12 @@
 \alias{ibm_simplify.bru_comp_list}
 \alias{ibm_as_taylor.bm_list}
 \alias{ibm_simplify.bm_list}
+\alias{ibm_eval2.bm_list}
+\alias{ibm_eval.bm_list}
+\alias{ibm_jacobian.bm_list}
 \alias{ibm_eval2.bru_model}
+\alias{ibm_eval.bru_comp_list}
+\alias{ibm_eval.bru_comp}
 \alias{ibm_eval.bru_model}
 \alias{ibm_jacobian.bru_model}
 \title{Mapper methods for model objects}
@@ -36,6 +41,12 @@
 
 \method{ibm_simplify}{bm_list}(mapper, input = NULL, state = NULL, ...)
 
+\method{ibm_eval2}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_jacobian}{bm_list}(mapper, input, state = NULL, ...)
+
 \method{ibm_eval2}{bru_model}(
   mapper,
   input,
@@ -45,6 +56,10 @@
   comp_mappers = NULL,
   eval_fun = NULL
 )
+
+\method{ibm_eval}{bru_comp_list}(mapper, input, state = NULL, ..., comp_mappers = NULL)
+
+\method{ibm_eval}{bru_comp}(mapper, input, state = NULL, ...)
 
 \method{ibm_eval}{bru_model}(
   mapper,

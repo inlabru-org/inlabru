@@ -393,6 +393,7 @@ evaluate_state <- function(
 #' @export
 #' @rdname evaluate_effect
 evaluate_effect_single_state <- function(...) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   UseMethod("evaluate_effect_single_state")
 }
 
@@ -547,6 +548,7 @@ evaluate_predictor <- function(
   format = "auto",
   n_pred = NULL
 ) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   stopifnot(inherits(model, "bru_model"))
   format <- match.arg(format, c("auto", "matrix", "list"))
   comp_lst <- as_bru_comp_list(model)
@@ -1093,6 +1095,69 @@ ibm_simplify.bm_list <- function(mapper, input = NULL, state = NULL, ...) {
 
 #' @rdname bru_model_mapper_methods
 #' @export
+ibm_eval2.bm_list <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...
+) {
+  result <- list()
+  for (nm in names(mapper)) {
+    result[[nm]] <- ibm_eval2(
+      mapper[[nm]],
+      input = input[[nm]],
+      state = state[[nm]],
+      ...
+    )
+  }
+
+  result
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_eval.bm_list <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...
+) {
+  result <- list()
+  for (nm in names(mapper)) {
+    result[[nm]] <- ibm_eval(
+      mapper[[nm]],
+      input = input[[nm]],
+      state = state[[nm]],
+      ...
+    )
+  }
+
+  result
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_jacobian.bm_list <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...
+) {
+  result <- list()
+  for (nm in names(mapper)) {
+    result[[nm]] <- ibm_jacobian(
+      mapper[[nm]],
+      input = input[[nm]],
+      state = state[[nm]],
+      ...
+    )
+  }
+
+  result
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
 ibm_eval2.bru_model <- function(
   mapper,
   input,
@@ -1132,6 +1197,53 @@ ibm_eval2.bru_model <- function(
     ...,
     comp_mappers = comp_mappers,
     eval_fun = eval_fun
+  )
+  result
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_eval.bru_comp_list <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  comp_mappers = NULL
+) {
+  if (is.null(comp_mappers)) {
+    comp_mappers <- ibm_simplify(
+      mapper,
+      input = input,
+      inla_f = TRUE
+    )
+  }
+  result <- ibm_eval(
+    comp_mappers,
+    input = input,
+    state = state,
+    ...
+  )
+  result
+}
+
+#' @rdname bru_model_mapper_methods
+#' @export
+ibm_eval.bru_comp <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...
+) {
+  comp_mapper <- ibm_simplify(
+    mapper,
+    input = input,
+    inla_f = TRUE
+  )
+  result <- ibm_eval(
+    comp_mapper,
+    input = input,
+    state = state,
+    ...
   )
   result
 }

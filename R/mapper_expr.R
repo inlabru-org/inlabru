@@ -988,18 +988,20 @@ ibm_eval2.bru_obs <- function(
   # TODO: check consistency; nms should be equal to names(state) or a subset of
   # it, and should include nothing from param_nms.
 
-  derived <- list()
-  jacobians <- list()
-  for (nm in intersect(nms, used$effect)) {
-    res <- ibm_eval2(
-      comp_mappers[[nm]],
-      input = input[["comp"]][[nm]],
-      state = state[[nm]],
-      ...
-    )
-    derived[[nm]] <- res$offset
-    jacobians[[nm]] <- setNames(list(res$jacobian), nm = nm)
-  }
+  der_nms <- intersect(nms, used$effect)
+  res <- ibm_eval2(
+    comp_mappers[der_nms],
+    input = input[["comp"]][der_nms],
+    state = state[der_nms],
+    ...
+  )
+  derived <- lapply(res, function(x) x$offset)
+  jacobians <- lapply(
+    setNames(nm = der_nms),
+    function(x) {
+      setNames(list(res[[x]]$jacobian), nm = x)
+    }
+  )
 
   pred_expr <- mapper[["pred_expr"]]
   expr_mapper <- bm_expr(
@@ -1159,16 +1161,13 @@ ibm_eval.bru_obs <- function(
   # it, and should include nothing from param_nms.
 
   derived <- list()
-  jacobians <- list()
-  for (nm in intersect(nms, used$effect)) {
-    res <- ibm_eval(
-      comp_mappers[[nm]],
-      input = input[["comp"]][[nm]],
-      state = state[[nm]],
-      ...
-    )
-    derived[[nm]] <- res
-  }
+  der_nms <- intersect(nms, used$effect)
+  derived <- ibm_eval(
+    comp_mappers[der_nms],
+    input = input[["comp"]][der_nms],
+    state = state[der_nms],
+    ...
+  )
 
   pred_expr <- mapper[["pred_expr"]]
   expr_mapper <- bm_expr(
