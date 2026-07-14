@@ -675,8 +675,14 @@ bru_set_missing.bru <- function(object, keep = FALSE, ...) {
 }
 #' @export
 #' @rdname bru_set_missing
-bru_set_missing.bru_info <- function(object, keep = FALSE, ...) {
+bru_set_missing.bru_model <- function(object, keep = FALSE, ...) {
   bru_set_missing(object[["lhoods"]], ...) <- keep
+  object
+}
+#' @export
+#' @rdname bru_set_missing
+bru_set_missing.bru_info <- function(object, keep = FALSE, ...) {
+  bru_set_missing(object[["model"]][["lhoods"]], ...) <- keep
   object
 }
 #' @export
