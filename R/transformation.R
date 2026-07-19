@@ -56,7 +56,7 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
         )
       )
   }
-  if (sum(!upper) > 0) {
+  if (any(!upper)) {
     res[!upper] <-
       do.call(
         qfun,
@@ -119,7 +119,7 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
         log.p = TRUE
       )
   }
-  if (sum(!upper) > 0) {
+  if (any(!upper)) {
     res[!upper] <-
       qnorm(
         do.call(

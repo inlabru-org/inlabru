@@ -518,6 +518,48 @@ bru_info_upgrade_functions <- function() {
       }
 
       object
+    },
+    "2.14.1.9012" = function(object) {
+      # Update lhoods to new bru_pred_expr object storage format
+      if (!is.null(object[["model"]][["lhoods"]])) {
+        lhood_upgrader <- function(x) {
+          pe <- x[["pred_expr"]]
+          if (is.null(pe[["pred_expr"]])) {
+            pred_quo <- NULL
+          } else {
+            pred_quo <- rlang::new_quosure(
+              pe[["pred_expr"]],
+              env = pe[[".envir"]]
+            )
+          }
+          if (is.null(pe[["resp_text"]])) {
+            resp_quo <- NULL
+          } else {
+            resp_quo <- rlang::parse_quo(
+              pe[["resp_text"]],
+              env = pe[[".envir"]]
+            )
+          }
+          x[["pred_expr"]] <- structure(
+            list(
+              type = "expr",
+              pred_quo = pred_quo,
+              is_additive = pe[["is_additive"]],
+              is_rowwise = pe[["is_rowwise"]],
+              is_linear = pe[["is_linear"]],
+              used = pe[["used"]],
+              .envir = pe[[".envir"]],
+              resp_quo = resp_quo
+            ),
+            class = "bru_pred_expr"
+          )
+          x
+        }
+        object[["model"]][["lhoods"]] <-
+          lapply(object[["model"]][["lhoods"]], lhood_upgrader)
+      }
+
+      object
     }
   )
 }

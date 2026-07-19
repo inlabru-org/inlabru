@@ -755,9 +755,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   )
   colnames(sp) <- cnames
   colnames(ep) <- glue("end.{cnames}")
-  if (!inherits(data, "SpatialLinesDataFrame")) {
-    df <- data.frame(cbind(sp, ep))
-  } else {
+  if (inherits(data, "SpatialLinesDataFrame")) {
     df <- data.frame(
       cbind(sp, ep),
       data@data[
@@ -775,6 +773,8 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
         drop = FALSE
       ]
     )
+  } else {
+    df <- data.frame(cbind(sp, ep))
   }
   dmap <- ggplot2::aes(
     x = .data[[cnames[1]]],

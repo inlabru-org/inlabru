@@ -3175,12 +3175,12 @@ ibm_eval.bm_marginal <- function(
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
-  if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
+  if (xor(isTRUE(mapper[["inverse"]]), reverse)) {
     val <- do.call(
-      bru_forward_transformation,
+      bru_inverse_transformation,
       c(
         list(
-          qfun = mapper[["qfun"]],
+          pfun = mapper[["pfun"]],
           x = state
         ),
         mapper[["param"]]
@@ -3188,10 +3188,10 @@ ibm_eval.bm_marginal <- function(
     )
   } else {
     val <- do.call(
-      bru_inverse_transformation,
+      bru_forward_transformation,
       c(
         list(
-          pfun = mapper[["pfun"]],
+          qfun = mapper[["qfun"]],
           x = state
         ),
         mapper[["param"]]
@@ -3515,13 +3515,9 @@ bm_multi <- function(mappers, simplify = FALSE) {
   mapper <- list(
     mappers = mappers,
     n_multi = lapply(mappers, ibm_n),
-    n_inla_multi = lapply(mappers, function(x) {
-      ibm_n(x, inla_f = TRUE)
-    }),
+    n_inla_multi = lapply(mappers, ibm_n, inla_f = TRUE),
     values_multi = lapply(mappers, ibm_values),
-    values_inla_multi = lapply(mappers, function(x) {
-      ibm_values(x, inla_f = TRUE)
-    }),
+    values_inla_multi = lapply(mappers, ibm_values, inla_f = TRUE),
     is_linear_multi = lapply(mappers, ibm_is_linear),
     is_rowwise_multi = lapply(mappers, ibm_is_rowwise)
   )

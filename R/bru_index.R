@@ -163,7 +163,7 @@ bru_index.bru_comp <- function(object, inla_f, ...) {
 #'   A list of list of indices into the latent variables compatible with each
 #'   component mapper.
 bru_index.bru_comp_list <- function(object, inla_f, ...) {
-  lapply(object, function(x) bru_index(x, inla_f = inla_f, ...))
+  lapply(object, bru_index, inla_f = inla_f, ...)
 }
 
 

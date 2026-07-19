@@ -39,7 +39,7 @@ bru_is_linear.bru_obs <- function(x, ...) {
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_obs_list <- function(x, ...) {
-  vapply(x, function(lh) bru_is_linear(lh, ...), logical(1))
+  vapply(x, bru_is_linear, logical(1), ...)
 }
 #' @rdname bru_is_linear
 #' @export
@@ -93,11 +93,11 @@ bru_is_additive.default <- function(x, ..., verbose = FALSE) {
     return(bru_is_additive(x[[2]], ..., verbose = verbose))
   }
   if (verbose) {
-    message(paste0(
+    message(
       "General class ",
       paste0("'", class(x), "'", collapse = ", "),
       " found, assuming non-additive."
-    ))
+    )
   }
   FALSE
 }
@@ -178,7 +178,7 @@ bru_is_additive.bru_obs <- function(x, ...) {
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.bru_obs_list <- function(x, ...) {
-  vapply(x, function(lh) bru_is_additive(lh, ...), logical(1))
+  vapply(x, bru_is_additive, logical(1), ...)
 }
 
 
@@ -209,12 +209,12 @@ bru_is_rowwise.bru_obs <- function(x, ...) {
 #' @rdname bru_is_rowwise
 #' @export
 bru_is_rowwise.bru_obs_list <- function(x, ...) {
-  vapply(x, function(lh) bru_is_rowwise(lh, ...), logical(1))
+  vapply(x, bru_is_rowwise, logical(1), ...)
 }
 #' @rdname bru_is_rowwise
 #' @export
 bru_is_rowwise.bru_comp_list <- function(x, ...) {
-  vapply(x, bru_is_rowwise, logical(1))
+  vapply(x, bru_is_rowwise, logical(1), ...)
 }
 #' @rdname bru_is_rowwise
 #' @export

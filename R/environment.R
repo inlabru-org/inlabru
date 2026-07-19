@@ -116,12 +116,12 @@ new_bru_log <- function(x = NULL, bookmarks = NULL) {
     log <- data.frame(
       message = character(0)
     )
-  } else if (!is.data.frame(x)) {
+  } else if (is.data.frame(x)) {
+    log <- x
+  } else {
     log <- data.frame(
       message = as.character(x)
     )
-  } else {
-    log <- x
   }
   if (is.null(log[["timestamp"]])) {
     ts <- Sys.time()
@@ -889,7 +889,7 @@ bru_options_deprecated <- function(args) {
           ),
           sep = ", "
         ),
-        ".",
+        "."
       ))
       names_args <- setdiff(
         names_args,
@@ -1003,7 +1003,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     disallowed_null <-
       intersect(
         names(options),
-        c("bru_max_iter")
+        "bru_max_iter"
       )
     disallowed_null <- disallowed_null[are_null[disallowed_null]]
     if (length(disallowed_null) > 0) {

@@ -177,7 +177,7 @@ make_hierarchical_mesh_basis <- function(
   if (is.null(alpha)) {
     alpha <- (1 + fmesher::fm_manifold_dim(mesh)) / 2
   }
-  stopifnot((alpha >= 1) && (alpha <= 2))
+  stopifnot(alpha >= 1, alpha <= 2)
   # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
   # only the computational neighbourhood structure:
   fem <- fm_fem(mesh, order = 2)

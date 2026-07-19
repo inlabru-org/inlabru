@@ -315,12 +315,14 @@ new_bru_used_vars <- function(
     objects = list()
   )
 ) {
-  stopifnot(is.list(x))
-  stopifnot(all(c("vars", "funs", "objects") %in% names(x)))
-  stopifnot(is.character(x$vars))
-  stopifnot(is.character(x$funs))
-  stopifnot(is.list(x$objects))
-  stopifnot(length(x$objects) == length(names(x$objects)))
+  stopifnot(
+    is.list(x),
+    all(c("vars", "funs", "objects") %in% names(x)),
+    is.character(x$vars),
+    is.character(x$funs),
+    is.list(x$objects),
+    length(x$objects) == length(names(x$objects))
+  )
   structure(
     x,
     class = "bru_used_vars"

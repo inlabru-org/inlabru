@@ -64,8 +64,7 @@ run_example <- function(file, pkg, run_donttest) {
     File = basename(file),
     Example = code,
     Runtime = runtime,
-    RunDontTest = run_donttest,
-    stringsAsFactors = FALSE
+    RunDontTest = run_donttest
   )
   return(results)
 }

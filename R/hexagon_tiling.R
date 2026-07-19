@@ -78,12 +78,11 @@ cv_partition <- function(
     #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
     # ggplot() + gg(data = grid_chess_black_sf, aes(fill = lyr.1)) +
     #   geom_sf(data = nepal_bnd, col = "red", fill = "NA")
-  } else {
-    # Extract the boundary with subpolygons only
-    gridPolygon <- sf::st_as_sf(
-      terra::intersect(gridPolygon, terra::vect(samplers))
-    )
   }
+  # Extract the boundary with subpolygons only
+  gridPolygon <- sf::st_as_sf(
+    terra::intersect(gridPolygon, terra::vect(samplers))
+  )
   gridPolygon
 }
 

@@ -754,7 +754,7 @@ ibm_as_taylor.bm_expr <- function(
     jacobians = jacobians,
     inla_f = FALSE,
     multi = TRUE,
-    ...,
+    ...
   )
   bm_taylor(
     offset = eval2$offset,
@@ -890,20 +890,7 @@ bru_eval_fun.bru_comp <- function(x, ...) {
       input = .input,
       state = .state
     )
-    if (!.is_iid) {
-      not_ok <- ibm_invalid_output(
-        .mapper[["mappers"]][[1]],
-        input = .input[[1]],
-        state = .state
-      )
-      if (any(not_ok)) {
-        warning(
-          "Inputs for `ibm_eval()` for '",
-          .comp[["label"]],
-          '" give some invalid outputs.'
-        )
-      }
-    } else {
+    if (.is_iid) {
       # .is_iid, invalid indices give new samples
       # Check for known invalid output elements, based on the
       # initial mapper (subsequent mappers in the component pipe
@@ -939,6 +926,19 @@ bru_eval_fun.bru_comp <- function(x, ...) {
           0.0
         )
       }
+    } else {
+      not_ok <- ibm_invalid_output(
+        .mapper[["mappers"]][[1]],
+        input = .input[[1]],
+        state = .state
+      )
+      if (any(not_ok)) {
+        warning(
+          "Inputs for `ibm_eval()` for '",
+          .comp[["label"]],
+          '" give some invalid outputs.'
+        )
+      }
     }
 
     as.matrix(.values)
@@ -963,6 +963,27 @@ bru_eval_fun.bru_model <- function(x, ...) {
   bru_eval_fun(as_bru_comp_list(x, ...))
 }
 
+
+bru_expr_as_mapper <- function(pred_expr) {
+  expr_mapper <- bm_expr(
+    bru_pred_expr(pred_expr, format = "quo"),
+    labels = list(
+      root = "latent",
+      derived = "effects",
+      suffix = "_latent"
+    ),
+    assume = c(
+      if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
+      if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
+      if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
+      if (isTRUE(length(bru_used(pred_expr)[["latent"]]) == 0L)) {
+        "no_root"
+      } else {
+        NULL
+      }
+    )
+  )
+}
 
 #' @rdname ibm_eval2
 #' @export
@@ -1004,20 +1025,7 @@ ibm_eval2.bru_obs <- function(
   )
 
   pred_expr <- mapper[["pred_expr"]]
-  expr_mapper <- bm_expr(
-    bru_pred_expr(pred_expr, format = "quo"),
-    labels = list(
-      root = "latent",
-      derived = "effects",
-      suffix = "_latent"
-    ),
-    assume = c(
-      if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
-      if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
-      if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
-      if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL
-    )
-  )
+  expr_mapper <- bru_expr_as_mapper(pred_expr)
 
   res2 <- ibm_eval2(
     expr_mapper,
@@ -1170,20 +1178,7 @@ ibm_eval.bru_obs <- function(
   )
 
   pred_expr <- mapper[["pred_expr"]]
-  expr_mapper <- bm_expr(
-    bru_pred_expr(pred_expr, format = "quo"),
-    labels = list(
-      root = "latent",
-      derived = "effects",
-      suffix = "_latent"
-    ),
-    assume = c(
-      if (isTRUE(bru_is_rowwise(pred_expr))) "rowwise" else NULL,
-      if (isTRUE(bru_is_linear(pred_expr))) "linear" else NULL,
-      if (isTRUE(bru_is_additive(pred_expr))) "additive" else NULL,
-      if (isTRUE(length(used[["latent"]]) == 0L)) "no_root" else NULL
-    )
-  )
+  expr_mapper <- bru_expr_as_mapper(pred_expr)
 
   val <- ibm_eval(
     expr_mapper,

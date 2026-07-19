@@ -19,16 +19,16 @@ bru_standardise_names <- function(x) {
     },
     "name"
   )
-  not_ok <- grepl("__", x = new_names)
+  not_ok <- grepl("__", x = new_names, fixed = TRUE)
   while (any(not_ok)) {
     new_names[not_ok] <- vapply(
       new_names[not_ok],
       function(x) {
-        gsub("__", "_", x = x, fixed = FALSE)
+        gsub("__", "_", x = x, fixed = TRUE)
       },
       "name"
     )
-    not_ok <- grepl("__", x = new_names)
+    not_ok <- grepl("__", x = new_names, fixed = TRUE)
   }
   new_names
 }
@@ -639,7 +639,7 @@ variables.inla <- function(result, include.random = TRUE) {
       type = character(0),
       model = character(0),
       as.data.frame(
-        matrix(NA, 0, length(col.names), dimnames = list(c(), col.names))
+        matrix(NA, 0, length(col.names), dimnames = list(NULL, col.names))
       )
     ))
   }
@@ -710,7 +710,26 @@ variables.inla <- function(result, include.random = TRUE) {
   if (random.missing) {
     random <- list(handle.missing(col.names))
   } else {
-    if (!include.random) {
+    if (include.random) {
+      random <-
+        lapply(
+          seq_along(result$summary.random),
+          function(x) {
+            output <- handle.data.frame(
+              result$summary.random[[x]],
+              "random",
+              result$model.random[x],
+              col.names
+            )
+            rownames(output) <-
+              paste(
+                names(result$summary.random)[x],
+                seq_len(nrow(result$summary.random[[x]]))
+              )
+            output
+          }
+        )
+    } else {
       random <-
         lapply(
           seq_along(result$summary.random),
@@ -727,25 +746,6 @@ variables.inla <- function(result, include.random = TRUE) {
             )
             rownames(output) <-
               names(result$summary.random)[x]
-            output
-          }
-        )
-    } else {
-      random <-
-        lapply(
-          seq_along(result$summary.random),
-          function(x) {
-            output <- handle.data.frame(
-              result$summary.random[[x]],
-              "random",
-              result$model.random[x],
-              col.names
-            )
-            rownames(output) <-
-              paste(
-                names(result$summary.random)[x],
-                seq_len(nrow(result$summary.random[[x]]))
-              )
             output
           }
         )

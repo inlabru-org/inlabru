@@ -65,7 +65,7 @@ glance.bru <- function(x, ...) {
 
   nobs_val <- tryCatch(
     {
-      if (any(bru_obs_family(x) %in% "cp")) {
+      if (any(bru_obs_family(x) == "cp")) {
         NA_integer_
       } else {
         sum(bru_response_size(x))

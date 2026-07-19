@@ -482,7 +482,7 @@ bru_input_text.bru_comp <- function(x, ..., label = x$label) {
 #' @rdname bru_input
 bru_input.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input(bru_comp_list)", verbosity = 4)
-  lapply(x, function(xx) bru_input(xx, ...))
+  lapply(x, bru_input, ...)
 }
 
 #' @return * `bru_input_text(bru_comp_list)`: A list of mapper input definition
@@ -491,7 +491,7 @@ bru_input.bru_comp_list <- function(x, ...) {
 #' @rdname bru_input_text
 bru_input_text.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input_text(bru_comp_list)", verbosity = 4)
-  lapply(x, function(xx) bru_input_text(xx, ...))
+  lapply(x, bru_input_text, ...)
 }
 
 #' @describeIn bru_input Computes the component inputs for included components
@@ -566,7 +566,7 @@ bru_input.bru_obs_list <- function(x, components, ...) {
     "Evaluate component inputs for each observation model",
     verbosity = 3L
   )
-  lapply(x, function(xx) bru_input(xx, components = components, ...))
+  lapply(x, bru_input, components = components, ...)
 }
 
 
@@ -585,11 +585,11 @@ bru_input_layer <- function(
     }
   )
   if (inherits(input_layer, "error")) {
-    stop(paste0(
+    stop(
       "Failed to evaluate 'layer' input '",
       glue_collapse(rlang::as_label(layer), sep = "\n"),
       glue("' for '{label}:layer'.")
-    ))
+    )
   }
   if (is.null(input_layer) && is.null(selector)) {
     if (label %in% names(e_input)) {
@@ -619,7 +619,7 @@ input_eval <- function(...) {
 #' @keywords internal
 evaluate_inputs <- function(...) {
   lifecycle::deprecate_warn(
-    when = "2.12.9023",
+    when = "2.12.0.9023",
     "evaluate_inputs()",
     "bru_input()"
   )

@@ -5,7 +5,10 @@ test_that("mdata", {
   set.seed(12345L)
 
   sim.poisson <- function(prob, m) {
-    stopifnot(length(prob) == length(m) && length(prob) > 0)
+    stopifnot(
+      length(prob) == length(m),
+      length(prob) > 0
+    )
     n <- length(m)
     y <- numeric(n)
     event <- (runif(n) < prob)

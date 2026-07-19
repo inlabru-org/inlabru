@@ -35,42 +35,32 @@ new_bru_pred_expr <- function(
   is_rowwise = NULL,
   .envir = parent.frame()
 ) {
-  pred_text <- NULL
-  resp_text <- NULL
+  if (is.character(x)) {
+    x <- as.formula(glue::glue("~ {x}"), env = .envir)
+  }
+  pred_quo <- NULL
+  resp_quo <- NULL
   if (is.null(x)) {
     is_additive <- NA
     is_additive_dot <- NA
   } else {
     is_additive <- bru_is_additive(x)
-    if (inherits(x, "formula")) {
-      form.envir <- environment(x)
-      if (!is.null(form.envir)) {
-        .envir <- form.envir
-      }
-      formula_text <- deparse1(x, collapse = "\n")
-      x <- as.character(x)
-      pred_text <- x[length(x)]
-      if (length(x) > 2) {
-        resp_text <- x[2]
+    if (rlang::is_quosure(x)) {
+      pred_quo <- x
+    } else if (inherits(x, "formula")) {
+      .envir <- environment(x) %||% .envir
+      pred_quo <- rlang::new_quosure(rlang::f_rhs(x), .envir)
+      resp_expr <- rlang::f_lhs(x)
+      if (!is.null(resp_expr)) {
+        resp_quo <- rlang::new_quosure(resp_expr, .envir)
       }
     } else {
-      pred_text <- x
-      formula_text <- glue::glue("~ {pred_text}")
+      pred_quo <- rlang::new_quosure(x, .envir)
     }
-    is_additive_dot <- identical(pred_text, ".")
+    is_additive_dot <- identical(rlang::get_expr(pred_quo), as.symbol("."))
     if (is_additive_dot) {
-      pred_text <- NULL
+      pred_quo <- NULL
     }
-  }
-  if (is.null(pred_text)) {
-    pred_expr <- NULL
-  } else {
-    pred_expr <- rlang::parse_expr(pred_text)
-  }
-  if (is.null(resp_text)) {
-    resp_expr <- NULL
-  } else {
-    resp_expr <- rlang::parse_expr(resp_text)
   }
   structure(
     list(
@@ -79,16 +69,14 @@ new_bru_pred_expr <- function(
       # the latter also needing "hyper" information, so that generate.bru
       # can rely on this class for all use cases.
       type = "expr", # One of "expr", "additive", "list"
-      pred_text = pred_text,
-      pred_expr = pred_expr,
+      pred_quo = pred_quo,
       is_additive = is_additive,
       # Also depends on component defs, so may be changed later:
       is_linear = is_additive,
       is_rowwise = is_rowwise,
-      used = if (is.null(used)) bru_used(pred_text) else used,
+      used = used %||% bru_used(pred_quo),
       .envir = .envir,
-      resp_text = resp_text,
-      resp_expr = resp_expr
+      resp_quo = resp_quo
     ),
     class = "bru_pred_expr"
   )
@@ -106,6 +94,30 @@ bru_compat_pre_2_14_bru_obs <- function(lh) {
   lh$used <- lh$pred_expr$used
   lh$allow_combine <- !isTRUE(lh$pred_expr$is_rowwise)
   lh
+}
+
+expr_symbol_replace <- function(expr, sym, repl) {
+  if (is.null(expr)) {
+    return(NULL)
+  }
+  q <- rlang::is_quosure(expr)
+  ex <- rlang::get_expr(expr)
+  if (q) {
+    env <- rlang::get_env(expr)
+  }
+  sym <- rlang::enexpr(sym)
+  repl <- rlang::enexpr(repl)
+  if (is.recursive(ex)) {
+    for (k in seq_along(ex)) {
+      ex[[k]] <- expr_symbol_replace(ex[[k]], !!sym, !!repl)
+    }
+  } else if (is.symbol(ex) && (ex == sym)) {
+    ex <- repl
+  }
+  if (q) {
+    return(rlang::new_quosure(ex, env))
+  }
+  ex
 }
 
 #' @describeIn bru_pred_expr Accessor generic for `bru_pred_expr` objects,
@@ -140,6 +152,13 @@ bru_pred_expr.bru_info <- function(x, ...) {
 }
 
 #' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` object stored
+#' inside a `bru_model` object.
+#' @export
+bru_pred_expr.bru_model <- function(x, ...) {
+  bru_pred_expr(as_bru_obs_list(x), ...)
+}
+
+#' @describeIn bru_pred_expr Accessor for the `bru_pred_expr` object stored
 #' inside a `bru` object.
 #' @export
 bru_pred_expr.bru <- function(x, ...) {
@@ -156,10 +175,17 @@ bru_pred_expr.bru <- function(x, ...) {
 #' * `"formula"` (the original formula input if available, otherwise
 #'   constructed from the expression),
 #' * `"formula_text"` (a text version of the "formula"),
-#' * `"text_raw"` (plain text, without substituting `BRU_EXPRESSION`), or
 #' * `"resp_text"` (plain text of the response side of the formula).
+#' @param raw Logical; whether to return the raw expression without
+#'   substituting `BRU_EXPRESSION` with the used latent variables.
+#'   Default: `FALSE`
 #' @export
-bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
+bru_pred_expr.bru_pred_expr <- function(
+  x,
+  ...,
+  format = "object",
+  raw = FALSE
+) {
   format <- match.arg(
     format,
     c(
@@ -169,7 +195,8 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
       "expr",
       "formula",
       "formula_text",
-      "text_raw",
+      "resp_quo",
+      "resp_expr",
       "resp_text"
     )
   )
@@ -177,53 +204,50 @@ bru_pred_expr.bru_pred_expr <- function(x, ..., format = "object") {
     return(x)
   }
 
-  pred_text <- x[["pred_text"]]
-  if (is.null(pred_text)) {
-    pred_text <- "BRU_EXPRESSION"
-  }
-  if (
-    !identical(format, "text_raw") &&
-      grepl(
-        pattern = "BRU_EXPRESSION",
-        x = pred_text,
-        fixed = TRUE
-      )
-  ) {
+  pred_quo <- x[["pred_quo"]]
+  if (is.null(pred_quo)) {
+    if (raw) {
+      pred_quo <- rlang::new_quosure(as.symbol("BRU_EXPRESSION"), x[[".envir"]])
+    } else {
+      included <- bru_used(x)[["effect"]]
+      if (length(included) == 0L) {
+        pred_quo <- rlang::parse_quo(
+          ".",
+          env = x[[".envir"]]
+        )
+      } else {
+        pred_quo <- rlang::parse_quo(
+          paste0(included, collapse = " + "),
+          env = x[[".envir"]]
+        )
+      }
+    }
+  } else if ((!raw) && ("BRU_EXPRESSION" %in% bru_used_vars(pred_quo)$vars)) {
     included <- bru_used(x)[["effect"]]
-    pred_text <-
-      gsub(
-        pattern = "BRU_EXPRESSION",
-        replacement = paste0(included, collapse = " + "),
-        x = pred_text,
-        fixed = TRUE
-      )
+    pred_quo <- expr_symbol_replace(
+      pred_quo,
+      sym = !!as.symbol("BRU_EXPRESSION"),
+      repl = !!rlang::parse_expr(paste0(included, collapse = " + "))
+    )
   }
 
   switch(
     format,
-    text = pred_text,
-    quo = rlang::parse_quo(pred_text, env = x[[".envir"]]),
-    expr = rlang::parse_expr(pred_text),
-    formula = {
-      formula_text <- bru_pred_expr(x, format = "formula_text")
-      as.formula(formula_text, env = x[[".envir"]])
-    },
-    formula_text = if (is.null(x[["formula_text"]])) {
-      if (is.null(pred_text) || identical(pred_text, "")) {
-        p_txt <- "."
-      } else {
-        p_txt <- pred_text
-      }
-      if (!is.null(x[["resp_text"]])) {
-        glue::glue("{x$resp_text} ~ {p_txt}")
-      } else {
-        glue::glue("~ {p_txt}")
-      }
-    } else {
-      x[["formula_text"]]
-    },
-    text_raw = pred_text,
-    resp_text = x[["resp_text"]],
+    quo = pred_quo,
+    expr = rlang::get_expr(pred_quo),
+    text = deparse1(rlang::get_expr(pred_quo), collapse = "\n"),
+    formula = rlang::new_formula(
+      lhs = rlang::get_expr(x[["resp_quo"]]),
+      rhs = rlang::get_expr(pred_quo),
+      env = x[[".envir"]]
+    ),
+    formula_text = deparse1(
+      bru_pred_expr(x, format = "formula", raw = raw),
+      collapse = "\n"
+    ),
+    resp_quo = x[["resp_quo"]],
+    resp_expr = rlang::get_expr(x[["resp_quo"]]),
+    resp_text = deparse1(rlang::get_expr(x[["resp_quo"]]), collapse = "\n"),
     stop(glue::glue("Unknown format '{format}'"))
   )
 }

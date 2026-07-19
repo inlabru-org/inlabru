@@ -327,8 +327,10 @@ evaluate_predictor <- function(
   format = "auto",
   n_pred = NULL
 ) {
-  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
-  stopifnot(inherits(model, "bru_model"))
+  stopifnot(
+    identical(bru_options_get("bru_method")$autodiff, "pandemic"),
+    inherits(model, "bru_model")
+  )
   format <- match.arg(format, c("auto", "matrix", "list"))
   comp_lst <- as_bru_comp_list(model)
   if (inherits(predictor, "bru_pred_expr")) {
@@ -437,20 +439,7 @@ evaluate_predictor <- function(
           input = .input,
           state = .state
         )
-        if (!.is_iid) {
-          not_ok <- ibm_invalid_output(
-            .mapper[["mappers"]][[1]],
-            input = .input[[1]],
-            state = .state
-          )
-          if (any(not_ok)) {
-            warning(
-              "Inputs for `ibm_eval()` for '",
-              .comp[["label"]],
-              '" give some invalid outputs.'
-            )
-          }
-        } else {
+        if (.is_iid) {
           # .is_iid, invalid indices give new samples
           # Check for known invalid output elements, based on the
           # initial mapper (subsequent mappers in the component pipe
@@ -486,6 +475,19 @@ evaluate_predictor <- function(
               key,
               function(k) .iid_cache[[k]],
               0.0
+            )
+          }
+        } else {
+          not_ok <- ibm_invalid_output(
+            .mapper[["mappers"]][[1]],
+            input = .input[[1]],
+            state = .state
+          )
+          if (any(not_ok)) {
+            warning(
+              "Inputs for `ibm_eval()` for '",
+              .comp[["label"]],
+              '" give some invalid outputs.'
             )
           }
         }

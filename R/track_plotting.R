@@ -72,14 +72,12 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   track_data <- fit$bru_iinla$track
   if (!is.null(from)) {
-    stopifnot(is.numeric(from))
-    stopifnot(from >= 0)
+    stopifnot(is.numeric(from), from >= 0)
   } else {
     from <- min(track_data$iteration)
   }
   if (!is.null(to)) {
-    stopifnot(is.numeric(to))
-    stopifnot(to >= 0)
+    stopifnot(is.numeric(to), to >= 0)
   } else {
     to <- max(track_data$iteration)
   }
@@ -684,14 +682,18 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 
   track_data <- fit$bru_iinla$inla_track
   if (!is.null(from)) {
-    stopifnot(is.numeric(from))
-    stopifnot(from >= 0)
+    stopifnot(
+      is.numeric(from),
+      from >= 0
+    )
   } else {
     from <- min(track_data$iteration)
   }
   if (!is.null(to)) {
-    stopifnot(is.numeric(to))
-    stopifnot(to >= 0)
+    stopifnot(
+      is.numeric(to),
+      to >= 0
+    )
   } else {
     to <- max(track_data$iteration)
   }

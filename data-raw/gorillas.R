@@ -266,7 +266,7 @@ import_gorillas_sf <- function(overwrite = FALSE) {
   filename <- file.path("inst", gorillas_sf$gcov_file)
   if (!file.exists(filename) || overwrite) {
     if (file.exists(filename)) {
-      message(paste0("Overwriting existing ", filename))
+      message("Overwriting existing ", filename)
     }
 
     terra::writeRaster(
@@ -274,7 +274,7 @@ import_gorillas_sf <- function(overwrite = FALSE) {
       datatype = "FLT8S", # Avoid integer storage of doubles
       filename = filename,
       overwrite = overwrite,
-      gdal = c("COMPRESS=LZW")
+      gdal = "COMPRESS=LZW"
     )
   }
 
@@ -298,7 +298,7 @@ import_gorillas_sf_old <- function(gorillas = NULL, overwrite = FALSE) {
   filename <- file.path("inst", gorillas_sf$gcov_file)
   if (!file.exists(filename) || overwrite) {
     if (file.exists(filename)) {
-      message(paste0("Overwriting existing ", filename))
+      message("Overwriting existing ", filename)
     }
     gcov <- terra::rast(gorillas$gcov[[1]])
     for (k in seq_len(length(gorillas$gcov) - 1L) + 1L) {
@@ -309,7 +309,7 @@ import_gorillas_sf_old <- function(gorillas = NULL, overwrite = FALSE) {
       gcov,
       filename = filename,
       overwrite = overwrite,
-      gdal = c("COMPRESS=LZW")
+      gdal = "COMPRESS=LZW"
     )
   }
 

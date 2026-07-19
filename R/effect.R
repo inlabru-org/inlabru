@@ -1608,7 +1608,7 @@ make_submapper <- function(
   if (
     is.factor(values) ||
       is.character(values) ||
-      (!is.null(subcomp_type) && (subcomp_type %in% "factor"))
+      (!is.null(subcomp_type) && (subcomp_type == "factor"))
   ) {
     return(
       bm_factor(
@@ -1790,7 +1790,7 @@ make_mapper <- function(
   if (subcomp[["type"]] %in% c("offset", "const")) {
     return(bm_const())
   }
-  if (subcomp[["type"]] %in% c("fixed")) {
+  if (subcomp[["type"]] == "fixed") {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
     } else if (!is.null(input_values)) {
@@ -2132,9 +2132,9 @@ print.summary_component <- function(x, ...) {
   if (is.null(x[["Summary"]])) {
     for (name in names(x)) {
       if (!is.null(x[[name]])) {
-        if (name %in% "Label") {
+        if (name == "Label") {
           cat(glue("Label:\t{x[[name]]}"), "\n")
-        } else if (name %in% "Mapper") {
+        } else if (name == "Mapper") {
           cat(glue("  Map:\t{glue::glue_collapse(x[[name]])}"), "\n")
         } else {
           cat(glue("  {name}:\t{glue::glue_collapse(x[[name]])}"), "\n")

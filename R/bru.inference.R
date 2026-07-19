@@ -304,17 +304,19 @@ bru_obs_list_construct <- function(
   }
   dot_is_lhood <- vapply(
     lhoods,
-    function(lh) inherits(lh, "bru_obs"),
-    TRUE
+    inherits,
+    TRUE,
+    "bru_obs"
   )
   dot_is_lhood_list <- vapply(
     lhoods,
-    function(lh) inherits(lh, "bru_obs_list"),
-    TRUE
+    inherits,
+    TRUE,
+    "bru_obs_list"
   )
   if (any(dot_is_lhood | dot_is_lhood_list)) {
     if (!all(dot_is_lhood | dot_is_lhood_list)) {
-      stop(paste0(
+      stop(
         "Cannot mix `bru_obs()` parameters with `bru_obs` ",
         "and `bru_obs_list` objects.",
         "\n  Check if the argument(s) ",
@@ -325,7 +327,7 @@ bru_obs_list_construct <- function(
         ),
         " were meant to be given to a call to 'bru_obs()',\n  or in the ",
         "'options' list argument instead."
-      ))
+      )
     }
   } else {
     if (is.null(lhoods[["formula"]])) {
@@ -688,18 +690,18 @@ bru_set_missing.bru_obs_list <- function(object, keep = FALSE, ...) {
   if (is.null(names(keep))) {
     idxs <- seq_along(object)
     if (length(keep) != length(object)) {
-      stop(paste0(
+      stop(
         "When `keep` is not named list or vector, it must have ",
         "length matching the number of observation models."
-      ))
+      )
     }
   } else {
     idxs <- intersect(names(keep), names(object))
     if (length(setdiff(names(keep), names(object))) > 0) {
-      stop(paste0(
+      stop(
         "Some observation models in `keep` were not found: ",
         glue_collapse(glue("'{setdiff(names(keep), names(object))}'"), ", ")
-      ))
+      )
     }
   }
   for (idx in idxs) {
@@ -1019,10 +1021,10 @@ complete_coordnames <- function(data_coordnames, ips_coordnames) {
       length(data_coordnames)
     )
   )
-  from_data <- which(!(data_coordnames %in% ""))
+  from_data <- which(data_coordnames != "")
   new_coordnames[from_data] <- data_coordnames[from_data]
   from_ips <- setdiff(
-    which(!(ips_coordnames %in% "")),
+    which(ips_coordnames != ""),
     from_data
   )
   new_coordnames[from_ips] <- ips_coordnames[from_ips]
@@ -1051,10 +1053,9 @@ extended_bind_rows <- function(...) {
     function(data) {
       vapply(
         data,
-        function(x) {
-          inherits(x, "sfc")
-        },
-        TRUE
+        inherits,
+        TRUE,
+        "sfc"
       )
     }
   )
@@ -1496,16 +1497,29 @@ bru_obs_agg <- function(
       response_block = {{ response_block }}
     )
 
-    pred_text <- bru_pred_expr(lh, format = "text_raw")
-    pred_text <- glue(
-      "{{ibm_eval(BRU_aggregate_mapper, input = BRU_aggregate_input,",
-      " state = {{{pred_text}}})}}"
+    pred_quo <- bru_pred_expr(lh, format = "quo", raw = TRUE)
+    pred_quo <- expr_symbol_replace(
+      rlang::new_quosure(
+        rlang::parse_expr(
+          "
+          ibm_eval(
+            BRU_aggregate_mapper,
+            input = BRU_aggregate_input,
+            state = {
+              BRU_PRED_EXPR
+            }
+          )
+          "
+        ),
+        env = rlang::get_env(pred_quo)
+      ),
+      sym = !!as.symbol("BRU_PRED_EXPR"),
+      repl = !!rlang::get_expr(pred_quo)
     )
     lh$pred_expr <- new_bru_pred_expr(
-      pred_text,
+      pred_quo,
       used = lh$pred_expr$used,
-      is_rowwise = FALSE,
-      .envir = lh$pred_expr$.envir
+      is_rowwise = FALSE
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- FALSE
@@ -1723,7 +1737,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   }
   if (ips_is_Spatial) {
     if ("coordinates" %in% names(response)) {
-      idx <- names(response) %in% "coordinates"
+      idx <- names(response) == "coordinates"
       data <- as.data.frame(response$coordinates)
       if (!all(idx)) {
         data <- dplyr::bind_cols(data, as.data.frame(response[!idx]))
@@ -1805,28 +1819,36 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
         n_block = n_block
       )
 
-    pred_text <- bru_pred_expr(lh, format = "text_raw")
-    pred_text <- glue(
-      "
-        {{
-          BRU_eta <- {{
-            {pred_text}
-          }}
+    pred_quo <- bru_pred_expr(lh, format = "quo", raw = TRUE)
+    pred_quo <- expr_symbol_replace(
+      rlang::parse_quo(
+        "
+        {
+          BRU_eta <- {
+            BRU_PRED_EXPR
+          }
           BRU_eta <- rep_len(BRU_eta, length(BRU_aggregate))
-          c(ibm_eval(
+          c(
+            ibm_eval(
               BRU_cp_agg,
               list(block = .block[BRU_aggregate]),
               state = BRU_eta[BRU_aggregate] *
-                BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
-            BRU_eta[!BRU_aggregate])
-        }}"
+                BRU_point_weights[BRU_aggregate]
+            )[BRU_cp_block_subset],
+            BRU_eta[!BRU_aggregate]
+          )
+        }
+        ",
+        env = rlang::get_env(pred_quo)
+      ),
+      sym = !!as.symbol("BRU_PRED_EXPR"),
+      repl = !!rlang::get_expr(pred_quo)
     )
     old_pred_expr <- bru_pred_expr(lh)
     lh$pred_expr <- new_bru_pred_expr(
-      pred_text,
+      pred_quo,
       used = lh$pred_expr$used,
-      is_rowwise = FALSE,
-      .envir = lh$pred_expr$.envir
+      is_rowwise = FALSE
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
@@ -2085,9 +2107,6 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         n_block = n_block
       )
 
-    old_pred_expr <- bru_pred_expr(lh)
-    pred_text <- bru_pred_expr(old_pred_expr, format = "text_raw")
-    resp_text <- bru_pred_expr(old_pred_expr, format = "resp_text")
     lh$data_extra[["BRU_cp_predictor"]] <-
       function(eta, data, data_extra) {
         eta <- rep_len(eta, length(data$BRU_aggregate))
@@ -2101,17 +2120,35 @@ bru_obs_family_cp <- function(lh, options, .envir) {
           eta[!data$BRU_aggregate]
         )
       }
-    pred_text <-
-      glue("BRU_cp_predictor({{ {pred_text} }}, .data., .data_extra.)")
+
+    old_pred_expr <- bru_pred_expr(lh)
+    pred_quo <- bru_pred_expr(old_pred_expr, format = "quo", raw = TRUE)
+    resp_quo <- bru_pred_expr(old_pred_expr, format = "resp_quo")
+    pred_quo <- bru_pred_expr(lh, format = "quo", raw = TRUE)
+    pred_quo <- expr_symbol_replace(
+      rlang::parse_quo(
+        "
+        BRU_cp_predictor(
+          {
+            BRU_PRED_EXPR
+          },
+          .data.,
+          .data_extra.
+        )
+        ",
+        env = rlang::get_env(pred_quo)
+      ),
+      sym = !!as.symbol("BRU_PRED_EXPR"),
+      repl = !!rlang::get_expr(pred_quo)
+    )
     lh$pred_expr <- new_bru_pred_expr(
-      pred_text,
+      pred_quo,
       used = lh$pred_expr$used,
-      is_rowwise = FALSE,
-      .envir = lh$pred_expr$.envir
+      is_rowwise = FALSE
     )
     lh$pred_expr$is_additive <- FALSE
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
-    lh$pred_expr$resp_text <- resp_text
+    lh$pred_expr$resp_quo <- resp_quo
 
     data <- extended_bind_rows(
       dplyr::bind_cols(
@@ -2630,7 +2667,7 @@ bru_obs <- function(
   pred_expr <- new_bru_pred_expr(formula, used = used, .envir = .envir)
 
   # Set the response name
-  if (is.null(pred_expr$resp_text)) {
+  if (is.null(pred_expr$resp_quo)) {
     formula_text <- deparse1(formula, collapse = "    \n", width.cutoff = 80L)
     stop(glue::glue(
       "Missing response variable name or expression in formula for ",
@@ -2638,7 +2675,7 @@ bru_obs <- function(
       "  Formula: {formula_text}"
     ))
   }
-  response_expr <- rlang::parse_expr(pred_expr$resp_text)
+  response_expr <- bru_pred_expr(pred_expr, format = "resp_expr")
   data_list <- list(response_data = response_data, data = data)
   response <- tryCatch(
     expr = bru_eval_in_data_context(
@@ -2987,9 +3024,9 @@ bru_obs_list.list <- function(object, ..., .tag = NULL) {
       )
     )
   }
-  is_obs <- vapply(object, function(x) inherits(x, "bru_obs"), TRUE)
+  is_obs <- vapply(object, inherits, TRUE, "bru_obs")
   if (!all(is_obs)) {
-    is_obs_list <- vapply(object, function(x) inherits(x, "bru_obs_list"), TRUE)
+    is_obs_list <- vapply(object, inherits, TRUE, "bru_obs_list")
     if (!all(is_obs_list)) {
       object <- lapply(seq_along(object), function(k) {
         bru_obs_list(object[[k]], .tag = names(object)[k])
@@ -3149,9 +3186,9 @@ summary.bru_obs_list <- function(object, verbose = TRUE, ...) {
   structure(
     lapply(
       object,
-      function(x) {
-        summary(x, verbose = verbose, ...)
-      }
+      summary,
+      verbose = verbose,
+      ...
     ),
     class = "summary_bru_obs_list"
   )
@@ -3327,7 +3364,7 @@ bru_obs_control_family.bru_obs_list <- function(x, control.family = NULL, ...) {
       bru_log_warn(
         glue(
           "Global control.family option overrides settings in likelihood(s) ",
-          "{glue_collapse(which(like_has_cf), sep = ', ', last = ' and ')}",
+          "{glue_collapse(which(like_has_cf), sep = ', ', last = ' and ')}"
         )
       )
     }
@@ -4945,7 +4982,7 @@ latent_names <- function(state) {
 tidy_state <- function(state, value_name = "value") {
   df <- data.frame(
     effect = rep(names(state), lengths(state)),
-    index = unlist(lapply(lengths(state), function(x) seq_len(x))),
+    index = unlist(lapply(lengths(state), seq_len)),
     THEVALUE = unlist(state)
   )
   nm <- names(df)
@@ -4955,7 +4992,7 @@ tidy_state <- function(state, value_name = "value") {
   df
 }
 tidy_states <- function(states, value_name = "value", id_name = "iteration") {
-  df <- lapply(states, function(x) tidy_state(x, value_name = value_name))
+  df <- lapply(states, tidy_state, value_name = value_name)
   id <- rep(seq_along(states), each = nrow(df[[1]]))
   df <- do.call(rbind, df)
   df[[id_name]] <- id

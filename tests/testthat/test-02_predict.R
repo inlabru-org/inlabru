@@ -63,11 +63,11 @@ test_that("bru: factor component", {
   # The default statistics include mean, standard deviation,
   # the 2.5% quantile, the median, the 97.5% quantile
   expect_true(is.data.frame(xpost))
-  expect_equal(nrow(xpost), 1)
+  expect_identical(nrow(xpost), 1L)
 
   expect_true(is.data.frame(xpost2))
-  expect_equal(nrow(xpost2), 4)
-  expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
+  expect_identical(nrow(xpost2), 4L)
+  expect_identical(rownames(xpost2), c("a", "b", "a_b", "c"))
 
   xipost <- generate(
     fit,
@@ -81,7 +81,7 @@ test_that("bru: factor component", {
   )
 
   expect_true(is.matrix(xipost))
-  expect_equal(rownames(xipost), c("Intercept", "x"))
+  expect_identical(rownames(xipost), c("Intercept", "x"))
 
   # Evaluate effect with _eval feature
 
@@ -97,12 +97,12 @@ test_that("bru: factor component", {
   )
 
   # The first four rows should equal the last 5 rows.
-  expect_equal(
+  expect_identical(
     xpost4[1:5, , drop = FALSE],
     xpost4[6:10, , drop = FALSE]
   )
   # The index 12 values should be equal.
-  expect_equal(
+  expect_identical(
     xpost4[4, , drop = FALSE],
     xpost4[5, , drop = FALSE]
   )
