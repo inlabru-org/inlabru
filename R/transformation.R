@@ -36,7 +36,7 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
     }
   }
   res <- numeric(length(x))
-  if (sum(upper) > 0) {
+  if (any(upper)) {
     res[upper] <-
       do.call(
         qfun,
@@ -56,7 +56,7 @@ bru_forward_transformation <- function(qfun, x, ..., tail.split. = 0) {
         )
       )
   }
-  if (any(!upper)) {
+  if (!all(upper)) {
     res[!upper] <-
       do.call(
         qfun,
