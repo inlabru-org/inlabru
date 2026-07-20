@@ -101,7 +101,7 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
     }
   }
   res <- numeric(length(x))
-  if (sum(upper) > 0) {
+  if (any(upper)) {
     res[upper] <-
       qnorm(
         do.call(
@@ -119,7 +119,7 @@ bru_inverse_transformation <- function(pfun, x, ..., tail.split. = NULL) {
         log.p = TRUE
       )
   }
-  if (any(!upper)) {
+  if (!all(upper)) {
     res[!upper] <-
       qnorm(
         do.call(
