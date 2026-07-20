@@ -49,7 +49,6 @@ bru_used_update.bru_pred_expr <- function(x, labels) {
         (length(setdiff(pre_used$effect, used$effect)) > 0)
     ) {
       x[["is_additive"]] <- FALSE
-      x[["is_linear"]] <- FALSE
 
       if (is.null(x[["pred_expr"]])) {
         pred_text <- paste0(pre_used$effect, collapse = " + ")

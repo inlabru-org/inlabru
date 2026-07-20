@@ -29,12 +29,14 @@ bru_is_linear.bru_info <- function(x, ...) {
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_model <- function(x, ...) {
-  bru_is_linear(as_bru_comp_list(x), ...)
+  all(bru_is_linear(as_bru_obs_list(x), ...)) &&
+    all(bru_is_linear(as_bru_comp_list(x), ...))
 }
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_obs <- function(x, ...) {
-  bru_is_linear(x[["pred_expr"]])
+  bru_is_additive(x[["pred_expr"]]) &&
+    (is.null(x[["aggregate"]]) || bru_is_linear(x[["aggregate"]]))
 }
 #' @rdname bru_is_linear
 #' @export
@@ -44,7 +46,7 @@ bru_is_linear.bru_obs_list <- function(x, ...) {
 #' @rdname bru_is_linear
 #' @export
 bru_is_linear.bru_pred_expr <- function(x, ...) {
-  isTRUE(x[["is_linear"]])
+  isTRUE(x[["is_additive"]])
 }
 #' @rdname bru_is_linear
 #' @export
@@ -62,6 +64,7 @@ bru_is_linear.bru_mapper <- function(x, ...) {
   ibm_is_linear(x)
 }
 
+# is_linear ---------------------------------------------------------------
 
 #' @title Check for predictor expression additivity
 #' @description Checks if a predictor expression is additive or not
@@ -173,7 +176,7 @@ bru_is_additive.bru_pred_expr <- function(x, ...) {
 #' @rdname bru_is_additive
 #' @export
 bru_is_additive.bru_obs <- function(x, ...) {
-  bru_is_additive(x[["pred_expr"]], ...)
+  bru_is_additive(x[["pred_expr"]], ...) && is.null(x[["aggregate"]])
 }
 #' @rdname bru_is_additive
 #' @export

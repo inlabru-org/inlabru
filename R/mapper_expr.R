@@ -448,6 +448,7 @@ ibm_jacobian_bm_expr_var <- function(
 
   N <- length(state[[var]])
 
+  # TODO: Take advantage of "additive" being in `mapper$assume`
   if (
     ("rowwise" %in% mapper$assume) &&
       ("no_root" %in% mapper$assume)
@@ -1044,7 +1045,8 @@ ibm_eval2.bru_obs <- function(
   )
 
   # Feed forward into optional transformation mapper.
-  # TODO: work in progress... Should be part of the pred_expr object
+  # TODO: work in progress... Should perhaps be part of the pred_expr object,
+  # or in a wrapper pipeline.
   post_mapper <- mapper[["aggregate"]]
   if (is.null(post_mapper)) {
     n_resp <- bru_response_size(mapper)

@@ -487,7 +487,7 @@ bru <- function(
   )
 
   # Set max iterations to 1 if all likelihood formulae are linear
-  if (all(vapply(bru.model[["lhoods"]], bru_is_linear, TRUE))) {
+  if (bru_is_linear(bru.model)) {
     options$bru_max_iter <- 1
   }
 
@@ -1522,7 +1522,6 @@ bru_obs_agg <- function(
       is_rowwise = FALSE
     )
     lh$pred_expr$is_additive <- FALSE
-    lh$pred_expr$is_linear <- FALSE
     lh$data_extra[["BRU_aggregate_mapper"]] <- aggregate
     lh$data_extra[["BRU_aggregate_input"]] <- aggregate_input
 
@@ -1850,8 +1849,6 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       used = lh$pred_expr$used,
       is_rowwise = FALSE
     )
-    lh$pred_expr$is_additive <- FALSE
-    lh$pred_expr$is_linear <- old_pred_expr$is_linear
 
     data <- extended_bind_rows(
       dplyr::bind_cols(
@@ -2147,7 +2144,6 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       is_rowwise = FALSE
     )
     lh$pred_expr$is_additive <- FALSE
-    lh$pred_expr$is_linear <- old_pred_expr$is_linear
     lh$pred_expr$resp_quo <- resp_quo
 
     data <- extended_bind_rows(

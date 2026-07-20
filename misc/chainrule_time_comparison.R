@@ -21,7 +21,7 @@ mm <- c(
   1000000
 )
 nm_max <- c(A = 3000, B = 1000000, C = 3000)
-timer_max <- 10
+timer_max <- 1
 
 n_df <- expand.grid(
   n = nn,
@@ -29,6 +29,17 @@ n_df <- expand.grid(
 ) |>
   arrange(desc(n * m)) |>
   dplyr::filter()
+
+time_est <- 3 * timer_max * sum(n_df$n * n_df$m <= max(nm_max))
+cat(
+  "Estimated runtime: >= ",
+  floor(time_est / 60),
+  "min ",
+  time_est - 60 * floor(time_est / 60),
+  "sec",
+  "\n",
+  sep = ""
+)
 
 for (k in seq_len(nrow(n_df))) {
   n <- n_df[k, "n"]
@@ -278,13 +289,13 @@ ggplot(
   geom_line() +
   geom_point() +
   #  geom_line(aes(y = Time_Est), color = "black") +
-  scale_x_log10() +
-  scale_y_log10() +
+  scale_x_log10(guide = "axis_logticks") +
+  scale_y_log10(guide = "axis_logticks") +
   labs(
     x = "N",
     y = "Seconds per evaluation",
     shape = "Aggregation",
     linetype = "Aggregation"
   ) +
-  theme_minimal() +
+  #  theme_minimal() +
   coord_cartesian(ylim = c(0.01, 5))

@@ -141,20 +141,7 @@ bru_model <- function(
   environment(components) <- env
   environment(formula) <- env
 
-  # Check linearity
   for (lh in seq_along(lhoods)) {
-    if (bru_is_linear(lhoods[[lh]])) {
-      used_lh <- bru_used(lhoods[[lh]])
-      lhoods[[lh]][["pred_expr"]][["is_linear"]] <-
-        (length(used_lh$latent) == 0) &&
-        all(vapply(
-          components[used_lh$effect],
-          function(cmp) {
-            ibm_is_linear(cmp$mapper)
-          },
-          TRUE
-        ))
-    }
     lhoods[[lh]] <- bru_compat_pre_2_14_bru_obs(lhoods[[lh]])
   }
 

@@ -546,7 +546,6 @@ bru_info_upgrade_functions <- function() {
               pred_quo = pred_quo,
               is_additive = pe[["is_additive"]],
               is_rowwise = pe[["is_rowwise"]],
-              is_linear = pe[["is_linear"]],
               used = pe[["used"]],
               .envir = pe[[".envir"]],
               resp_quo = resp_quo

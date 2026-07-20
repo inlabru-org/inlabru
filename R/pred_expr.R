@@ -45,6 +45,9 @@ new_bru_pred_expr <- function(
     is_additive_dot <- NA
   } else {
     is_additive <- bru_is_additive(x)
+    if (!is.null(is_rowwise)) {
+      is_additive <- is_additive && is_rowwise
+    }
     if (rlang::is_quosure(x)) {
       pred_quo <- x
     } else if (inherits(x, "formula")) {
@@ -71,8 +74,6 @@ new_bru_pred_expr <- function(
       type = "expr", # One of "expr", "additive", "list"
       pred_quo = pred_quo,
       is_additive = is_additive,
-      # Also depends on component defs, so may be changed later:
-      is_linear = is_additive,
       is_rowwise = is_rowwise,
       used = used %||% bru_used(pred_quo),
       .envir = .envir,
@@ -259,11 +260,10 @@ bru_pred_expr.bru_pred_expr <- function(
 format.bru_pred_expr <- function(x, ...) {
   glue::glue(
     "    Predictor: {predictor}\n",
-    "    Additive/Linear/Rowwise: {is_additive}/{is_linear}/{is_rowwise}\n",
+    "    Additive/Rowwise: {is_additive}/{is_rowwise}\n",
     "    Used components: {format(used)}",
     predictor = bru_pred_expr(x, format = "formula_text"),
     is_additive = bru_is_additive(x),
-    is_linear = bru_is_linear(x),
     is_rowwise = bru_is_rowwise(x),
     used = bru_used(x)
   )
