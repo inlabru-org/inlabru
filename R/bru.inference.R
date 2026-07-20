@@ -4978,7 +4978,7 @@ latent_names <- function(state) {
 tidy_state <- function(state, value_name = "value") {
   df <- data.frame(
     effect = rep(names(state), lengths(state)),
-    index = unlist(lapply(lengths(state), seq_len)),
+    index = sequence(lengths(state)),
     THEVALUE = unlist(state)
   )
   nm <- names(df)
