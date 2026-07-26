@@ -843,11 +843,19 @@ test_that("Mesh 1d mapper", {
 test_that("Mesh 2d mapper", {
   m <- bru_mapper(fmesher::fmexample$mesh)
 
-  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = FALSE)
+  loc <- fmesher::fm_pixels(
+    fmesher::fmexample$mesh,
+    dims = c(5, 5),
+    mask = FALSE
+  )
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 25)
 
-  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
+  loc <- fmesher::fm_pixels(
+    fmesher::fmexample$mesh,
+    dims = c(5, 5),
+    mask = TRUE
+  )
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 9)
 })

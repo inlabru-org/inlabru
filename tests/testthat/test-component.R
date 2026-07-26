@@ -310,7 +310,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     ~ effect(
       x,
       model = "rw2",
-      mapper = fmesher::bru_mapper(mesh1, indexed = FALSE)
+      mapper = bru_mapper(mesh1, indexed = FALSE)
     ) -
       1
   )
