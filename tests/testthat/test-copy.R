@@ -79,15 +79,16 @@ test_that("bru: inla copy feature", {
   df2 <- within(df2, {
     y <- 1 + (6 * x) + rnorm(length(x), mean = 0, sd = 0.1)
   })
-  cmp <- ~
-    +1 +
-      myLin1(x,
-        model = "rw1",
-        mapper = bru_mapper(fm_mesh_1d(seq(-1, 1, length.out = 100)),
-          indexed = FALSE
-        )
-      ) +
-      myLin2(x, copy = "myLin1", fixed = FALSE)
+  cmp <- ~ +1 +
+    myLin1(
+      x,
+      model = "rw1",
+      mapper = bru_mapper(
+        fm_mesh_1d(seq(-1, 1, length.out = 100)),
+        indexed = FALSE
+      )
+    ) +
+    myLin2(x, copy = "myLin1", fixed = FALSE)
   cmps <- bru_comp_list(cmp)
 
   fit <- bru(
@@ -104,7 +105,6 @@ test_that("bru: inla copy feature", {
     ),
     options = list(control.inla = list(int.strategy = "eb"))
   )
-
 
   expect_equal(
     fit$summary.fixed["Intercept", "mean"],
@@ -190,7 +190,6 @@ test_that("bru: inla copy feature", {
 #   expect_equal(pr[, "mean"], c(3, 6), tolerance = midtol)
 # })
 
-
 test_that("Component copy feature", {
   skip_on_cran()
   local_bru_safe_inla()
@@ -210,18 +209,21 @@ test_that("Component copy feature", {
     )
   })
 
-  inlaform <- y ~ 0 + x0 +
+  inlaform <- y ~ 0 +
+    x0 +
     f(x1, model = "rw2", values = sort(unique(mydata$x1)), scale.model = TRUE) +
     f(x2, copy = "x1", fixed = FALSE)
   fit <- INLA::inla(
     formula = inlaform,
-    data = mydata, family = "poisson",
+    data = mydata,
+    family = "poisson",
     inla.mode = bru_options_get("inla.mode"),
     control.compute = list(config = TRUE),
     control.inla = list(int.strategy = "eb")
   )
 
-  cmp <- y ~ 0 + x0 +
+  cmp <- y ~ 0 +
+    x0 +
     x1(x1, model = "rw2", scale.model = TRUE) +
     x2(x2, copy = "x1", fixed = FALSE)
   fit_bru <- bru(
@@ -275,7 +277,8 @@ test_that("Component copy feature with group", {
     y <- rnorm(prod(n), x1^1.0 / n[1] * 4 + x2^1.0 / n[1] * 4 * 10, 1)
   })
 
-  inlaform <- y ~ -1 + Intercept +
+  inlaform <- y ~ -1 +
+    Intercept +
     f(
       x1,
       model = "rw1",
@@ -283,25 +286,25 @@ test_that("Component copy feature with group", {
       scale.model = TRUE,
       group = z
     ) +
-    f(x2,
-      copy = "x1",
-      fixed = FALSE,
-      group = z2
-    )
+    f(x2, copy = "x1", fixed = FALSE, group = z2)
   fit <- INLA::inla(
-    formula = inlaform, data = mydata, family = "normal",
+    formula = inlaform,
+    data = mydata,
+    family = "normal",
     control.inla = list(int.strategy = "eb"),
     control.compute = list(config = TRUE),
     inla.mode = bru_options_get("inla.mode")
   )
 
-  cmp <- ~ -1 + Intercept +
+  cmp <- ~ -1 +
+    Intercept +
     x1(x1, model = "rw1", scale.model = TRUE, group = z) +
     x2(x2, copy = "x1", fixed = FALSE, group = z2)
   fit_bru <- bru(
     cmp,
     formula = y ~ Intercept + x1 + x2,
-    family = "normal", data = mydata,
+    family = "normal",
+    data = mydata,
     options = list(
       bru_max_iter = 1,
       control.inla = list(int.strategy = "eb")

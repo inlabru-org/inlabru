@@ -38,8 +38,10 @@ import.seals <- function(
 
   #' Select a strip
 
-  seals <- seals[(sp::coordinates(seals)[, 2] > 7947) &
-    (sp::coordinates(seals)[, 2] < 7954), ] # strip 9
+  seals <- seals[
+    (sp::coordinates(seals)[, 2] > 7947) &
+      (sp::coordinates(seals)[, 2] < 7954),
+  ] # strip 9
   # seals = seals[(sp::coordinates(seals)[,2]>7931) &
   #  (sp::coordinates(seals)[,2]<7938.5), ] # strip 12
   # seals = seals[(sp::coordinates(seals)[,2]>7925) &
@@ -125,7 +127,6 @@ import.seals_sf <- function() {
 
   seals
 }
-
 
 # seals_sf <- import.seals_sf()
 # usethis::use_data(seals_sf, overwrite = TRUE, compress = "xz")

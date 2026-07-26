@@ -29,5 +29,8 @@ bru_obs.character <- function(x, ...) {
 #' @export
 #' @rdname bru_obs
 bru_obs.proto_bru_obs_cp <- function(x, E, ...) {
-  return(structure(list(model = "possion", E = E), class = c("bru_obs_cp", "bru_obs")))
+  return(structure(
+    list(model = "possion", E = E),
+    class = c("bru_obs_cp", "bru_obs")
+  ))
 }

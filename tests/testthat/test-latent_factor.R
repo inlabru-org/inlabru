@@ -60,16 +60,26 @@ test_that("bru: factor component", {
   expect_equal(
     fit$summary.random$fac2$mean,
     c(
-      1.213695, -1.723471,  1.310547, -1.671748,
-      1.302147, -1.700772,  1.271110
+      1.213695,
+      -1.723471,
+      1.310547,
+      -1.671748,
+      1.302147,
+      -1.700772,
+      1.271110
     ),
     tolerance = midtol
   )
   expect_equal(
     fit$summary.random$fac2$sd,
     c(
-      0.5225545, 0.5212273, 0.5216542, 0.5216542,
-      0.5216542, 0.5216542, 0.5216542
+      0.5225545,
+      0.5212273,
+      0.5216542,
+      0.5216542,
+      0.5216542,
+      0.5216542,
+      0.5216542
     ),
     tolerance = hitol
   )
@@ -130,7 +140,6 @@ test_that("bru: indexed factor component", {
       )
     )
   )
-
 
   # Check factor effect results
   expect_equal(

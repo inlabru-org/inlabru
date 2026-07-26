@@ -19,7 +19,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
     as.detection.effort(dsdata$effort, ...)
   }
 
-
   detdata.dsdata <- function(data, detection = NULL, ...) {
     if (is.null(detection)) {
       data$effort[as.detection(data)[, "start"], ]
@@ -31,7 +30,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   segdata.dsdata <- function(data, ...) {
     data$effort[is.na(data$effort$det), ]
   }
-
 
   # Extract detection pointers from effort data
   #
@@ -46,7 +44,6 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
     class(det) <- c("detection", "data.frame")
     det
   }
-
 
   # Convert dsdata into sf objects
   #
@@ -181,11 +178,13 @@ import_mexdolphin_sf <- function() {
   )
   cmps <-
     geometry + distance ~
-    Intercept(1) +
-    df.lsigma(1) +
-    spat(geometry, model = matern)
+      Intercept(1) +
+      df.lsigma(1) +
+      spat(geometry, model = matern)
   pred <- ~ log(1 - exp(-(distance / exp(df.lsigma))^-1)) +
-    spat + Intercept + log(2)
+    spat +
+    Intercept +
+    log(2)
   r <- lgcp(
     data = mexdolphin$points,
     samplers = cbind(mexdolphin$samplers, data.frame(weight = 1)),

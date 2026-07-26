@@ -105,12 +105,14 @@
 #' }
 #' }
 #'
-sample.lgcp <- function(mesh,
-                        loglambda,
-                        strategy = NULL,
-                        R = NULL,
-                        samplers = NULL,
-                        ignore.CRS = FALSE) {
+sample.lgcp <- function(
+  mesh,
+  loglambda,
+  strategy = NULL,
+  R = NULL,
+  samplers = NULL,
+  ignore.CRS = FALSE
+) {
   mesh <- fm_as_fm(mesh)
   if (inherits(mesh, "fm_mesh_1d")) {
     xmin <- mesh$interval[1]
@@ -142,9 +144,12 @@ sample.lgcp <- function(mesh,
         points <- runif(n = Npoints, min = xmin, max = xmax)
         proj <- fm_basis(mesh, points, full = TRUE)
         if (length(loglambda) == 1) {
-          lambda_ratio <- exp(as.vector(
-            Matrix::rowSums(proj$A) * loglambda
-          ) - wmax)
+          lambda_ratio <- exp(
+            as.vector(
+              Matrix::rowSums(proj$A) * loglambda
+            ) -
+              wmax
+          )
         } else {
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - wmax)
         }
@@ -241,7 +246,8 @@ sample.lgcp <- function(mesh,
         if (is.geocent) {
           if (abs(1 - space.R / area.R) > 1e-2) {
             warning(
-              "The mesh has radius '", space.R,
+              "The mesh has radius '",
+              space.R,
               "', but crs information is available. ",
               "Using radius 6371 for area calculations."
             )
@@ -314,8 +320,10 @@ sample.lgcp <- function(mesh,
           )
 
           A <- fm_basis(mesh, points)
-          lambda_ratio <- exp(as.vector(A %*% loglambda) -
-            loglambda_max[triangle])
+          lambda_ratio <- exp(
+            as.vector(A %*% loglambda) -
+              loglambda_max[triangle]
+          )
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep, , drop = FALSE]
           waste_ratio <- sum(keep) / length(keep)

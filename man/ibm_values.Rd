@@ -83,6 +83,9 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \item{n_state}{integer giving the length of the state vector for mappers
 that have state dependent output size.}
 }
+\value{
+A vector  of length \code{ibm_n(mapper, inla_f = FALSE)}
+}
 \description{
 When \code{inla_f=TRUE}, implementations must return a vector that
 would be interpretable by an \code{INLA::f(..., values = ...)} specification.
@@ -111,6 +114,11 @@ For character labels, the labels as a factor variable.
 \code{\link[=bm_factor]{bm_factor()}}).
 
 }}
+\examples{
+m <- bm_index(4)
+ibm_values(m)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

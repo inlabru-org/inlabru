@@ -159,8 +159,12 @@
 #' }
 #' }
 #'
-make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL,
-                                         alpha = 1) {
+make_hierarchical_mesh_basis <- function(
+  mesh,
+  forward = TRUE,
+  method = NULL,
+  alpha = 1
+) {
   if (is.null(alpha)) {
     alpha <- (1 + fmesher::fm_manifold_dim(mesh)) / 2
   }
@@ -261,13 +265,27 @@ make_hierarchical_mesh_basis <- function(mesh, forward = TRUE, method = NULL,
   B
 }
 
-make_basis_fcn <- function(start, inner, D, max_dist, G, Gadj, method = NULL,
-                           G2 = NULL, alpha = 1) {
-  method <- match.arg(method, c(
-    "graphdistance",
-    "laplace", "laplace2",
-    "graphlaplace", "graphlaplace2"
-  ))
+make_basis_fcn <- function(
+  start,
+  inner,
+  D,
+  max_dist,
+  G,
+  Gadj,
+  method = NULL,
+  G2 = NULL,
+  alpha = 1
+) {
+  method <- match.arg(
+    method,
+    c(
+      "graphdistance",
+      "laplace",
+      "laplace2",
+      "graphlaplace",
+      "graphlaplace2"
+    )
+  )
   front <- D == max_dist
   if (is.logical(inner)) {
     inner <- which(inner)
@@ -279,7 +297,8 @@ make_basis_fcn <- function(start, inner, D, max_dist, G, Gadj, method = NULL,
   }
   ii <- c(start, inner)
   jj <- rep(1, length(ii))
-  xx <- switch(method,
+  xx <- switch(
+    method,
     "graphdistance" = {
       c(1, (max_dist - D[inner]) / max_dist)
     },

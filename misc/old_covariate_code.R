@@ -10,7 +10,12 @@
 # @author Fabian E. Bachl <\email{f.e.bachl@@bath.ac.uk}>
 
 make.covdata <- function(mesh, values, mesh.coords, time.coords) {
-  covdata <- list(mesh = mesh, values = values, mesh.coords = mesh.coords, time.coords = time.coords)
+  covdata <- list(
+    mesh = mesh,
+    values = values,
+    mesh.coords = mesh.coords,
+    time.coords = time.coords
+  )
   class(covdata) <- c("covdata", "list")
   return(covdata)
 }
@@ -33,10 +38,16 @@ covdata.import <- function(dframe, colname, data) {
   scale <- max(abs(dframe[, colname]))
   dframe[, colname] <- dframe[, colname] / scale
 
-  spde.mdl <- INLA::inla.spde2.matern(mesh = data$mesh, alpha = 2, prior.variance.nominal = 10, theta.prior.prec = 0.1)
+  spde.mdl <- INLA::inla.spde2.matern(
+    mesh = data$mesh,
+    alpha = 2,
+    prior.variance.nominal = 10,
+    theta.prior.prec = 0.1
+  )
   A <- fm_evaluator(data$mesh, loc = covloc)$proj$A
   stack <- INLA::inla.stack(
-    data = list(y = dframe[, colname]), A = list(A, 1),
+    data = list(y = dframe[, colname]),
+    A = list(A, 1),
     effects = list(spde = 1:spde.mdl$n.spde, m = rep(1, nrow(dframe))),
     # Make sure components with zero derivative are kept:
     remove.unused = FALSE
@@ -52,10 +63,13 @@ covdata.import <- function(dframe, colname, data) {
 
   value <- scale * result$summary.random$spde[, "mode", drop = FALSE]
 
-  make.covdata(mesh = data$mesh, values = value, mesh.coords = data$mesh.coords, time.coords = NULL)
+  make.covdata(
+    mesh = data$mesh,
+    values = value,
+    mesh.coords = data$mesh.coords,
+    time.coords = NULL
+  )
 }
-
-
 
 
 # Make covariate function
@@ -85,7 +99,6 @@ make.covariate <- function(cdata, method = NULL, ...) {
 }
 
 
-
 # Get covariate value at given location/time
 #
 # @export
@@ -101,17 +114,26 @@ get.value <- function(covariate, loc) {
   if (length(times) > 0) {
     for (t in times) {
       msk <- loc[, covariate$time.coords] == t
-      proj <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[msk, covariate$mesh.coords]))$proj
+      proj <- fm_evaluator(
+        covariate$mesh,
+        loc = as.matrix(loc[msk, covariate$mesh.coords])
+      )$proj
       A <- proj$A
       inside <- proj$ok
       values[msk] <- as.vector(A %*% covariate$values[, as.character(t)])
       values[msk & !inside] <- NA
     }
   } else {
-    proj <- fm_evaluator(covariate$mesh, loc = as.matrix(loc[, covariate$mesh.coords]))$proj
+    proj <- fm_evaluator(
+      covariate$mesh,
+      loc = as.matrix(loc[, covariate$mesh.coords])
+    )$proj
     A <- proj$A
     inside <- proj$ok
-    inside <- fm_is_within(loc = as.matrix(loc[, covariate$mesh.coords]), covariate$mesh)
+    inside <- fm_is_within(
+      loc = as.matrix(loc[, covariate$mesh.coords]),
+      covariate$mesh
+    )
     values <- as.vector(A %*% covariate$values[, 1])
     values[!inside] <- NA
   }
@@ -195,10 +217,12 @@ get.smean <- function(covariate, loc = NULL, weights = NULL) {
   if (is.null(weights)) {
     weights <- rep(1, covariate$mesh$n)
   }
-  weights <- weights * Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order = 1)$c0)
+  weights <- weights *
+    Matrix::diag(INLA::inla.mesh.fem(covariate$mesh, order = 1)$c0)
   weights <- weights / sum(weights)
 
-  loc2 <- data.frame(covariate$mesh$loc[, seq_len(length(covariate$mesh.coords)),
+  loc2 <- data.frame(covariate$mesh$loc[,
+    seq_len(length(covariate$mesh.coords)),
     drop = FALSE
   ])
   colnames(loc2) <- covariate$mesh.coords
@@ -215,7 +239,6 @@ get.smean <- function(covariate, loc = NULL, weights = NULL) {
   }
   return(sm)
 }
-
 
 
 # Get mean

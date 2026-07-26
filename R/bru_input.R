@@ -27,11 +27,13 @@ NULL
 #' (inp <- new_bru_input(x, "LABEL"))
 #' bru_input(inp, data.frame(x = 1:3))
 #'
-new_bru_input <- function(input,
-                          label = NULL,
-                          layer = NULL,
-                          selector = NULL,
-                          ...) {
+new_bru_input <- function(
+  input,
+  label = NULL,
+  layer = NULL,
+  selector = NULL,
+  ...
+) {
   inp <- structure(
     list(
       input = rlang::enquo(input),
@@ -103,12 +105,14 @@ bru_input_text <- function(...) {
 #' @param .envir environment in which to evaluate the input expression. Default
 #'   is `parent.frame()`
 #' @export
-bru_input.bru_input <- function(x,
-                                data = NULL,
-                                mask = NULL,
-                                null.on.fail = FALSE,
-                                .envir = parent.frame(),
-                                ...) {
+bru_input.bru_input <- function(
+  x,
+  data = NULL,
+  mask = NULL,
+  null.on.fail = FALSE,
+  .envir = parent.frame(),
+  ...
+) {
   bru_log_message(
     glue("bru_input(bru_input) for ({x$label})"),
     verbosity = 5
@@ -204,9 +208,7 @@ bru_input.bru_input <- function(x,
           val <- as.data.frame(val)
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_CRS(orig_data),
-            error = function(e) {}
-          )
+          data_crs <- tryCatch(fm_CRS(orig_data), error = function(e) {})
           if (!fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
           }
@@ -230,14 +232,16 @@ bru_input.bru_input <- function(x,
       return(NULL)
     }
     val <- as(val, "Matrix")
-  } else if (inherits(
-    e_input,
-    gsub(
-      pattern = "^eval_spatial\\.([^*]*)\\*?",
-      replacement = "\\1",
-      x = format(utils::.S3methods("eval_spatial"))
+  } else if (
+    inherits(
+      e_input,
+      gsub(
+        pattern = "^eval_spatial\\.([^*]*)\\*?",
+        replacement = "\\1",
+        x = format(utils::.S3methods("eval_spatial"))
+      )
     )
-  )) {
+  ) {
     input_layer <-
       bru_input_layer(
         layer = x[["layer"]],
@@ -280,12 +284,17 @@ bru_input.bru_input <- function(x,
   # models
   # Answer: should respect the lhood "include/exclude" info for the component
   # list
-  if ((inherits(e_input, c(
-    "SpatialGridDataFrame",
-    "SpatialPixelsDataFrame",
-    "SpatRaster"
-  ))) &&
-    anyNA(as.data.frame(val))) {
+  if (
+    (inherits(
+      e_input,
+      c(
+        "SpatialGridDataFrame",
+        "SpatialPixelsDataFrame",
+        "SpatRaster"
+      )
+    )) &&
+      anyNA(as.data.frame(val))
+  ) {
     msg <- glue(
       "Model input '",
       glue_collapse(rlang::as_label(x$input), sep = "\n"),
@@ -296,8 +305,11 @@ bru_input.bru_input <- function(x,
     bru_log_warn(msg)
 
     val <- bru_fill_missing(
-      data = e_input, where = orig_data, values = val,
-      layer = layer, selector = NULL
+      data = e_input,
+      where = orig_data,
+      values = val,
+      layer = layer,
+      selector = NULL
     )
   }
 
@@ -328,9 +340,7 @@ bru_input.bru_input <- function(x,
 #' @describeIn bru_input_text Extract the input definitions from a `bru_input`
 #'   object, as a named character vector
 #' @export
-bru_input_text.bru_input <- function(x,
-                                     .envir = parent.frame(),
-                                     ...) {
+bru_input_text.bru_input <- function(x, .envir = parent.frame(), ...) {
   bru_log_message(
     glue("bru_input_text(bru_input) for ({x$label})"),
     verbosity = 5
@@ -532,12 +542,14 @@ bru_input.bru_obs_list <- function(x, components, ...) {
 }
 
 
-bru_input_layer <- function(layer,
-                            selector = NULL,
-                            mask,
-                            .envir = parent.frame(),
-                            label,
-                            e_input) {
+bru_input_layer <- function(
+  layer,
+  selector = NULL,
+  mask,
+  .envir = parent.frame(),
+  label,
+  e_input
+) {
   input_layer <- tryCatch(
     rlang::eval_tidy(layer, data = mask, env = .envir),
     error = function(e) {
@@ -605,8 +617,13 @@ evaluate_inputs <- function(...) {
 #' @rdname summary.bru_input
 #' @export
 #' @method format bru_input
-format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
-                             type = NULL) {
+format.bru_input <- function(
+  x,
+  verbose = TRUE,
+  ...,
+  label.override = NULL,
+  type = NULL
+) {
   inp <- x[["input"]]
   if (!is.null(label.override)) {
     lab <- label.override
@@ -635,13 +652,16 @@ format.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL,
 #' @method summary bru_input
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.bru_input
-summary.bru_input <- function(object,
-                              verbose = TRUE,
-                              ...,
-                              label.override = NULL) {
+summary.bru_input <- function(
+  object,
+  verbose = TRUE,
+  ...,
+  label.override = NULL
+) {
   res <- structure(
     list(
-      text = format(object,
+      text = format(
+        object,
         verbose = verbose,
         ...,
         label.override = label.override
@@ -659,11 +679,7 @@ summary.bru_input <- function(object,
 #' @rdname summary.bru_input
 print.bru_input <- function(x, verbose = TRUE, ..., label.override = NULL) {
   cat(
-    format(x,
-      verbose = verbose,
-      ...,
-      label.override = label.override
-    ),
+    format(x, verbose = verbose, ..., label.override = label.override),
     "\n",
     sep = ""
   )
@@ -693,6 +709,7 @@ NULL
 #'   Alternatively, an existing `bru_mapper` object with or without associated
 #'   input can be provided, in which case the input from that mapper
 #'   is copied.
+#' @returns - `ibm_input_set`: The `mapper` with the `input` associated with it.
 #' @export
 #' @examples
 #' (m <- bm_autodetect())
@@ -718,6 +735,8 @@ ibm_input_set <- function(mapper, input) {
 }
 #' @describeIn ibm_input Create and add a `bru_input` to a `bru_mapper`.
 #' @param \dots Passed on to [new_bru_input()].
+#' @returns - `ibm_input_new`: The `mapper` with the new `bru_input` associated
+#'   with it.
 #' @export
 ibm_input_new <- function(mapper, ...) {
   stopifnot(inherits(mapper, "bru_mapper"))
@@ -725,17 +744,24 @@ ibm_input_new <- function(mapper, ...) {
 }
 #' @describeIn ibm_input Check if a `bru_input` is associated with a
 #' `bru_mapper`.
+#' @returns - `ibm_input_available()`: logical; `TRUE` if a `bru_input` is
+#'   associated with the `mapper`, and `FALSE` otherwise.
 #' @export
 ibm_input_available <- function(mapper) {
   !is.null(mapper[[".input"]])
 }
 #' @describeIn ibm_input Get the `bru_input` associated with a `bru_mapper`.
+#' @returns - `ibm_input_get`: The [bru_input] associated with the `mapper`,
+#' if it is available.
 #' @export
 ibm_input_get <- function(mapper) {
   stopifnot(ibm_input_available(mapper))
   mapper[[".input"]]
 }
 #' @describeIn bru_input Evaluate the input associated with a `bru_mapper`.
+#' @returns - `bru_input(bru_mapper)`: The evaluated input associated with a
+#'   mapper; see [ibm_input] for details on how to associate a `bru_input` with
+#'   a `bru_mapper`.
 #' @seealso [ibm_input]
 #' @export
 bru_input.bru_mapper <- function(x, ..., label = "<unknown>") {

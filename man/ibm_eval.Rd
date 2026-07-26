@@ -106,6 +106,9 @@ If \code{TRUE} (or positive), recurse one level into sub-mappers}
 
 \item{sub_lin}{Internal, optional pre-computed sub-mapper information}
 }
+\value{
+A vector of length \code{ibm_n_output(mapper, input, state, ...)}.
+}
 \description{
 Implementations must return a vector of length \code{\link[=ibm_n_output]{ibm_n_output()}}.
 The \code{input} contents must
@@ -153,6 +156,11 @@ for \code{marginal} returns \code{qfun(pnorm(x), param)}, evaluated in a numeric
 stable way. Otherwise, evaluates the inverse \code{qnorm(pfun(x, param))} instead.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_eval(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

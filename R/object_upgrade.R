@@ -1,5 +1,7 @@
-bru_check_object_bru <- function(object,
-                                 new_version = getNamespaceVersion("inlabru")) {
+bru_check_object_bru <- function(
+  object,
+  new_version = getNamespaceVersion("inlabru")
+) {
   object <-
     bru_info_upgrade(
       object,
@@ -11,8 +13,10 @@ bru_check_object_bru <- function(object,
 # Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
 bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
-    if (is.null(lhoods[[k]][["used"]]) &&
-      is.null(lhoods[[k]][["used_components"]])) {
+    if (
+      is.null(lhoods[[k]][["used"]]) &&
+        is.null(lhoods[[k]][["used_components"]])
+    ) {
       used <- bru_used(
         NULL,
         effect = lhoods[[k]][["include_components"]],
@@ -486,8 +490,10 @@ bru_info_upgrade_functions <- function() {
     }
   )
 }
-bru_info_upgrade <- function(object,
-                             new_version = getNamespaceVersion("inlabru")) {
+bru_info_upgrade <- function(
+  object,
+  new_version = getNamespaceVersion("inlabru")
+) {
   object_full <- object
   object <- object[["bru_info"]]
   msg <- NULL
@@ -507,8 +513,10 @@ bru_info_upgrade <- function(object,
   old_ver <- object[["inlabru_version"]]
   if (utils::compareVersion(new_version, old_ver) > 0) {
     warning(
-      glue("Old bru_info object version {old_ver} detected.
-            Attempting upgrade to version {new_version}.")
+      glue(
+        "Old bru_info object version {old_ver} detected.
+            Attempting upgrade to version {new_version}."
+      )
     )
 
     upgrade_functions <- bru_info_upgrade_functions()

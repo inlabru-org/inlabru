@@ -12,7 +12,8 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
 
   gorillas <- gorillas_sf
 
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(
+    gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(5, 0.01)
   )
@@ -54,7 +55,8 @@ test_that("2D LGCP fitting and prediction: Plot sampling", {
   #  }
 
   cmp <- geometry ~ my.spde(main = geometry, model = matern)
-  fit <- lgcp(cmp,
+  fit <- lgcp(
+    cmp,
     data = gorillas$plotsample$nests,
     samplers = gorillas$plotsample$plots,
     domain = list(geometry = gorillas$mesh),

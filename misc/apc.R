@@ -1,7 +1,9 @@
 # More on special bru likelihoods - aggregated poisson count (apc)
 if (family == "apc") {
   if (is.null(data)) {
-    stop("You called like() with family='apc' but no 'data' argument was supplied.")
+    stop(
+      "You called like() with family='apc' but no 'data' argument was supplied."
+    )
   }
 
   if (is.null(ips)) {
@@ -14,7 +16,9 @@ if (family == "apc") {
   }
 
   if (length(E) > 1) {
-    warning("Exposure/effort parameter E should be a scalar for likelihood 'apc'.")
+    warning(
+      "Exposure/effort parameter E should be a scalar for likelihood 'apc'."
+    )
   }
 
   ips_is_Spatial <- inherits(ips, "Spatial")
@@ -73,7 +77,9 @@ if (family == "apc") {
     if (!linear) {
       expr_text <- as.character(formula)[length(as.character(formula))]
       expr_text <- paste0(
-        "{BRU_eta <- ", expr_text, "\n",
+        "{BRU_eta <- ",
+        expr_text,
+        "\n",
         " c(mean(BRU_eta[BRU_aggregate]), BRU_eta[!BRU_aggregate])}"
       )
     } else {

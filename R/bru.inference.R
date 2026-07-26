@@ -86,10 +86,12 @@ bru_info <- function(...) {
 #' @param INLA_version character; INLA package version. Default: NULL, for
 #' automatically detecting the version
 #' @describeIn bru_info Create a `bru_info` object
-bru_info.character <- function(method,
-                               ...,
-                               inlabru_version = NULL,
-                               INLA_version = NULL) {
+bru_info.character <- function(
+  method,
+  ...,
+  inlabru_version = NULL,
+  INLA_version = NULL
+) {
   if (is.null(inlabru_version)) {
     inlabru_version <-
       tryCatch(
@@ -261,9 +263,13 @@ bru_timings.bru <- function(object, ...) {
 #   a list of one or more [bru_obs()] or [bru_obs_list()] objects,
 #   or a list of arguments for a call to [bru_obs()].
 # Returns: A bru_obs_list object.
-bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
-                                   .response = . ~ .,
-                                   .components = NULL) {
+bru_obs_list_construct <- function(
+  args,
+  options,
+  .envir = parent.frame(),
+  .response = . ~ .,
+  .components = NULL
+) {
   lhoods <- args
   if (inherits(lhoods, c("bru_obs", "bru_obs_list"))) {
     lhoods <- list(lhoods)
@@ -286,7 +292,8 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
         "\n  Check if the argument(s) ",
         glue_collapse(
           glue("'{names(lhoods)[!(dot_is_lhood | dot_is_lhood_list)]}'"),
-          sep = ", ", last = ", and "
+          sep = ", ",
+          last = ", and "
         ),
         " were meant to be given to a call to 'bru_obs()',\n  or in the ",
         "'options' list argument instead."
@@ -424,10 +431,12 @@ bru_obs_list_construct <- function(args, options, .envir = parent.frame(),
 #' }
 #' }
 #'
-bru <- function(components = ~ Intercept(1),
-                ...,
-                options = list(),
-                .envir = parent.frame()) {
+bru <- function(
+  components = ~ Intercept(1),
+  ...,
+  options = list(),
+  .envir = parent.frame()
+) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
   # Update default options
@@ -801,9 +810,7 @@ parse_inclusion <- function(thenames, include = NULL, exclude = NULL) {
   }
 }
 
-bru_data_mask <- function(data,
-                          pronouns = NULL,
-                          objects = NULL) {
+bru_data_mask <- function(data, pronouns = NULL, objects = NULL) {
   if (is.null(pronouns) || is.null(objects)) {
     nms <- setdiff(names(data), "")
     if (is.null(pronouns)) {
@@ -891,10 +898,12 @@ bru_data_mask <- function(data,
 #' )
 #'
 #' @export
-bru_eval_in_data_context <- function(input,
-                                     data = NULL,
-                                     default = NULL,
-                                     .envir = parent.frame()) {
+bru_eval_in_data_context <- function(
+  input,
+  data = NULL,
+  default = NULL,
+  .envir = parent.frame()
+) {
   input <- rlang::enquo(input)
   deparse_input <- rlang::expr_text(input)
   if (inherits(data, "bru_data_mask")) {
@@ -1232,13 +1241,16 @@ bru_agg_input <- function(input, data_list, .envir) {
 }
 
 
-bru_obs_agg <- function(lh,
-                        aggregate = NULL,
-                        aggregate_input = NULL,
-                        options = list(),
-                        .envir = parent.frame()) {
+bru_obs_agg <- function(
+  lh,
+  aggregate = NULL,
+  aggregate_input = NULL,
+  options = list(),
+  .envir = parent.frame()
+) {
   if (!is.null(aggregate) && is.character(aggregate)) {
-    aggregate <- switch(aggregate,
+    aggregate <- switch(
+      aggregate,
       "none" = NULL,
       bm_aggregate(type = aggregate)
     )
@@ -1312,7 +1324,8 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
         "list(",
         paste0(
           vapply(
-            domain_names, function(x) {
+            domain_names,
+            function(x) {
               if (identical(x, "coordinates")) {
                 glue("{x} = sp::{x}(.data.)")
               } else {
@@ -1355,10 +1368,12 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       ))
     }
     if (!setequal(names(response), names(domain))) {
-      stop(glue("
+      stop(glue(
+        "
           Mismatch between response and domain names:
             names(response) = ({glue_collapse(names(response), sep = ', ')})
-            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"
+      ))
     }
 
     ips <- fm_int(
@@ -1366,10 +1381,12 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       samplers = samplers,
       int.args = options[["bru_int_args"]]
     )
-    if ((inherits(samplers, "Spatial") ||
-      inherits(data, "Spatial") ||
-      inherits(response[["coordinates"]], "Spatial")) &&
-      inherits(ips, "sf")) {
+    if (
+      (inherits(samplers, "Spatial") ||
+        inherits(data, "Spatial") ||
+        inherits(response[["coordinates"]], "Spatial")) &&
+        inherits(ips, "sf")
+    ) {
       ips <- sf::as_Spatial(ips)
     }
   }
@@ -1394,12 +1411,15 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       colnames(response$coordinates) <- new_coordnames$data
       sp::coordnames(ips) <- new_coordnames$ips
     } else {
-      if (inherits(response, c("sf", "sfc")) ||
-        (is.list(response) &&
-          any(vapply(
-            response,
-            function(x) inherits(x, c("sf", "sfc")), TRUE
-          )))) {
+      if (
+        inherits(response, c("sf", "sfc")) ||
+          (is.list(response) &&
+            any(vapply(
+              response,
+              function(x) inherits(x, c("sf", "sfc")),
+              TRUE
+            )))
+      ) {
         ips <- sf::st_as_sf(ips)
         ips_is_Spatial <- FALSE
       }
@@ -1438,8 +1458,10 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     }
   } else {
     data <- tibble::as_tibble(response)
-    if (("geometry" %in% names(data)) &&
-      inherits(data$geometry, "sfc")) {
+    if (
+      ("geometry" %in% names(data)) &&
+        inherits(data$geometry, "sfc")
+    ) {
       sf::st_geometry(data) <- "geometry"
     }
   }
@@ -1454,8 +1476,10 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
-  if ((length(additional_data_names) > 0) &&
-    (NROW(data_) == sum(N_data))) {
+  if (
+    (length(additional_data_names) > 0) &&
+      (NROW(data_) == sum(N_data))
+  ) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
   }
   if (is.null(data[[".block"]])) {
@@ -1507,7 +1531,8 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       )
 
     pred_text <- bru_pred_expr(lh, format = "text_raw")
-    pred_text <- glue("
+    pred_text <- glue(
+      "
         {{
           BRU_eta <- {{
             {pred_text}
@@ -1519,7 +1544,8 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
               state = BRU_eta[BRU_aggregate] *
                 BRU_point_weights[BRU_aggregate])[BRU_cp_block_subset],
             BRU_eta[!BRU_aggregate])
-        }}")
+        }}"
+    )
     old_pred_expr <- bru_pred_expr(lh)
     lh$pred_expr <- new_bru_pred_expr(
       pred_text,
@@ -1531,14 +1557,12 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     lh$pred_expr$is_linear <- old_pred_expr$is_linear
 
     data <- extended_bind_rows(
-      dplyr::bind_cols(data,
+      dplyr::bind_cols(
+        data,
         BRU_aggregate = TRUE,
         BRU_point_weights = point_weights
       ),
-      dplyr::bind_cols(ips,
-        BRU_aggregate = FALSE,
-        BRU_point_weights = 0.0
-      )
+      dplyr::bind_cols(ips, BRU_aggregate = FALSE, BRU_point_weights = 0.0)
     )
 
     if (!is.null(lh$control.gcpo)) {
@@ -1601,10 +1625,12 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
 }
 
 bru_obs_family_cp <- function(lh, options, .envir) {
-  if (inherits(lh[["data"]], "Spatial") ||
-    inherits(lh[["BRU_original_response_data"]], "Spatial") ||
-    inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
-    inherits(lh[["integration_info"]][["ips"]], "Spatial")) {
+  if (
+    inherits(lh[["data"]], "Spatial") ||
+      inherits(lh[["BRU_original_response_data"]], "Spatial") ||
+      inherits(lh[["integration_info"]][["samplers"]], "Spatial") ||
+      inherits(lh[["integration_info"]][["ips"]], "Spatial")
+  ) {
     return(bru_obs_family_cp_sp(lh, options, .envir))
   }
 
@@ -1631,7 +1657,8 @@ bru_obs_family_cp <- function(lh, options, .envir) {
         "list(",
         paste0(
           vapply(
-            domain_names, function(x) {
+            domain_names,
+            function(x) {
               if (identical(x, "coordinates")) {
                 glue("{x} = sp::{x}(.data.)")
               } else {
@@ -1674,10 +1701,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       ))
     }
     if (!setequal(names(response), names(domain))) {
-      stop(glue("
+      stop(glue(
+        "
           Mismatch between response and domain names:
             names(response) = ({glue_collapse(names(response), sep = ', ')})
-            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"))
+            names(domain)   = ({glue_collapse(names(domain), sep = ', ')})"
+      ))
     }
 
     ips <- fm_int(
@@ -1713,8 +1742,10 @@ bru_obs_family_cp <- function(lh, options, .envir) {
   }
 
   data <- tibble::as_tibble(response)
-  if (("geometry" %in% names(data)) &&
-    inherits(data$geometry, "sfc")) {
+  if (
+    ("geometry" %in% names(data)) &&
+      inherits(data$geometry, "sfc")
+  ) {
     sf::st_geometry(data) <- "geometry"
   }
 
@@ -1729,8 +1760,10 @@ bru_obs_family_cp <- function(lh, options, .envir) {
 
   # Add back additional data
   additional_data_names <- setdiff(names(data_), names(data))
-  if ((length(additional_data_names) > 0) &&
-    (NROW(data_) == sum(N_data))) {
+  if (
+    (length(additional_data_names) > 0) &&
+      (NROW(data_) == sum(N_data))
+  ) {
     data <- cbind(data, tibble::as_tibble(data_)[additional_data_names])
   }
   if (is.null(data[[".block"]])) {
@@ -1806,14 +1839,12 @@ bru_obs_family_cp <- function(lh, options, .envir) {
     lh$pred_expr$resp_text <- resp_text
 
     data <- extended_bind_rows(
-      dplyr::bind_cols(data,
+      dplyr::bind_cols(
+        data,
         BRU_aggregate = TRUE,
         BRU_point_weights = point_weights
       ),
-      dplyr::bind_cols(ips,
-        BRU_aggregate = FALSE,
-        BRU_point_weights = 0.0
-      )
+      dplyr::bind_cols(ips, BRU_aggregate = FALSE, BRU_point_weights = 0.0)
     )
     the_family <- "poisson"
   } else {
@@ -1898,9 +1929,11 @@ bru_obs_check_used_deprecation <- function(
   env = rlang::caller_env(),
   user_env = rlang::caller_env(2)
 ) {
-  if (lifecycle::is_present(include) ||
-    lifecycle::is_present(exclude) ||
-    lifecycle::is_present(include_latent)) {
+  if (
+    lifecycle::is_present(include) ||
+      lifecycle::is_present(exclude) ||
+      lifecycle::is_present(include_latent)
+  ) {
     if (lifecycle::is_present(include)) {
       bru_log_message(
         paste0(
@@ -1980,12 +2013,14 @@ bru_obs_check_used_deprecation <- function(
   used
 }
 
-bru_obs_handle_is_rowwise <- function(pred_expr,
-                                      is_rowwise = NULL,
-                                      allow_combine = NULL,
-                                      data,
-                                      response_data,
-                                      aggregate) {
+bru_obs_handle_is_rowwise <- function(
+  pred_expr,
+  is_rowwise = NULL,
+  allow_combine = NULL,
+  data,
+  response_data,
+  aggregate
+) {
   if (is.null(is_rowwise) && is.logical(allow_combine)) {
     is_rowwise <- !allow_combine
   }
@@ -2253,31 +2288,33 @@ bru_obs_handle_is_rowwise <- function(pred_expr,
 #' }
 #' }
 #'
-bru_obs <- function(formula = . ~ .,
-                    family = "gaussian",
-                    data = NULL,
-                    response_data = NULL,
-                    data_extra = NULL,
-                    E = NULL,
-                    Ntrials = NULL,
-                    weights = NULL,
-                    scale = NULL,
-                    domain = NULL,
-                    samplers = NULL,
-                    ips = NULL,
-                    used = NULL,
-                    is_rowwise = NULL,
-                    aggregate = NULL,
-                    aggregate_input = NULL,
-                    control.family = NULL,
-                    control.gcpo = NULL,
-                    tag = NULL,
-                    options = list(),
-                    .envir = parent.frame(),
-                    include = deprecated(),
-                    exclude = deprecated(),
-                    include_latent = deprecated(),
-                    allow_combine = deprecated()) {
+bru_obs <- function(
+  formula = . ~ .,
+  family = "gaussian",
+  data = NULL,
+  response_data = NULL,
+  data_extra = NULL,
+  E = NULL,
+  Ntrials = NULL,
+  weights = NULL,
+  scale = NULL,
+  domain = NULL,
+  samplers = NULL,
+  ips = NULL,
+  used = NULL,
+  is_rowwise = NULL,
+  aggregate = NULL,
+  aggregate_input = NULL,
+  control.family = NULL,
+  control.gcpo = NULL,
+  tag = NULL,
+  options = list(),
+  .envir = parent.frame(),
+  include = deprecated(),
+  exclude = deprecated(),
+  include_latent = deprecated(),
+  allow_combine = deprecated()
+) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
 
@@ -2308,10 +2345,7 @@ bru_obs <- function(formula = . ~ .,
   )
 
   # Build expressions from formula:
-  pred_expr <- new_bru_pred_expr(formula,
-    used = used,
-    .envir = .envir
-  )
+  pred_expr <- new_bru_pred_expr(formula, used = used, .envir = .envir)
 
   # Set the response name
   if (is.null(pred_expr$resp_text)) {
@@ -2411,7 +2445,8 @@ bru_obs <- function(formula = . ~ .,
   lh <- bru_compat_pre_2_14_bru_obs(lh)
 
   if (!is.null(aggregate)) {
-    lh <- bru_obs_agg(lh,
+    lh <- bru_obs_agg(
+      lh,
       aggregate = aggregate,
       aggregate_input = {{ aggregate_input }},
       options = options,
@@ -2457,13 +2492,15 @@ bru_obs <- function(formula = . ~ .,
 #' method for `inlabru` prior to version `2.12.0`. Use [bru_obs()] instead.
 #' @param \dots Arguments passed from `like()` to `bru_obs()`
 #' @export
-like <- function(...,
-                 E = NULL,
-                 Ntrials = NULL,
-                 weights = NULL,
-                 scale = NULL,
-                 options = list(),
-                 .envir = parent.frame()) {
+like <- function(
+  ...,
+  E = NULL,
+  Ntrials = NULL,
+  weights = NULL,
+  scale = NULL,
+  options = list(),
+  .envir = parent.frame()
+) {
   options <- bru_call_options(options)
   bru_options_set_local(options, .reset = TRUE)
   bru_log_message(
@@ -2581,8 +2618,10 @@ set_list_names <- function(x, tag, priority = "immutable") {
   tag_names <- vapply(
     x,
     function(xx) {
-      if (is.null(xx[[tag]]) ||
-        identical(xx[[tag]], "")) {
+      if (
+        is.null(xx[[tag]]) ||
+          identical(xx[[tag]], "")
+      ) {
         NA_character_
       } else {
         xx[[tag]]
@@ -2603,12 +2642,14 @@ set_list_names <- function(x, tag, priority = "immutable") {
         if (identical(list_names[k], tag_names[k])) {
           return(list_names[k])
         }
-        stop(glue("
+        stop(glue(
+          "
           When `priority = 'immutable'`, the tag and name must match.
           Cannot combine objects with mismatching tags and names:
             Tag: {tag_names[k]}
             Name: {list_names[k]}
-          Use `NA` for either the tag or name, or use matching tags/names."))
+          Use `NA` for either the tag or name, or use matching tags/names."
+        ))
       } else if (priority == "tag") {
         if (!is.na(tag_names[k])) {
           return(tag_names[k])
@@ -2771,8 +2812,9 @@ summary.bru_obs <- function(object, verbose = TRUE, ...) {
       family = object[["family"]],
       data_class = class(object[["data"]]),
       response_class = class(object[["response_data"]][[object[["response"]]]]),
-      predictor =
-        glue::glue("{bru_pred_expr(object, format = 'formula_text')}"),
+      predictor = glue::glue(
+        "{bru_pred_expr(object, format = 'formula_text')}"
+      ),
       is_additive = bru_is_additive(object),
       is_linear = bru_is_linear(object),
       is_rowwise = bru_is_rowwise(object),
@@ -2862,18 +2904,17 @@ print.summary_bru_obs <- function(x, ...) {
         glue::glue_data(lh, "'{response_class}'"),
         sep = ", "
       ),
-      predictor =
-        if (length(lh$predictor) > 1) {
+      predictor = if (length(lh$predictor) > 1) {
+        paste0(
+          "\n        ",
           paste0(
-            "\n        ",
-            paste0(
-              lh$predictor,
-              collapse = "\n        "
-            )
+            lh$predictor,
+            collapse = "\n        "
           )
-        } else {
-          lh$predictor
-        }
+        )
+      } else {
+        lh$predictor
+      }
     ),
     "\n"
   )
@@ -2985,9 +3026,7 @@ bru_obs_control_family.bru_obs <- function(x, control.family = NULL, ...) {
 
 #' @export
 #' @rdname bru_obs_methods
-bru_obs_control_family.bru_obs_list <- function(x,
-                                                control.family = NULL,
-                                                ...) {
+bru_obs_control_family.bru_obs_list <- function(x, control.family = NULL, ...) {
   # Extract the control.family information for each likelihood
   if (!is.null(control.family)) {
     if (length(control.family) != length(x)) {
@@ -3093,17 +3132,19 @@ bru_obs_control_family.bru_obs_list <- function(x,
 #' }
 #' }
 #'
-lgcp <- function(components,
-                 data,
-                 domain = NULL,
-                 samplers = NULL,
-                 ips = NULL,
-                 formula = . ~ .,
-                 E = NULL,
-                 weights = NULL,
-                 ...,
-                 options = list(),
-                 .envir = parent.frame()) {
+lgcp <- function(
+  components,
+  data,
+  domain = NULL,
+  samplers = NULL,
+  ips = NULL,
+  formula = . ~ .,
+  E = NULL,
+  weights = NULL,
+  ...,
+  options = list(),
+  .envir = parent.frame()
+) {
   # If formula response missing, copy from components (for formula input)
   if (inherits(components, "formula")) {
     response <- extract_response(components)
@@ -3111,8 +3152,11 @@ lgcp <- function(components,
   }
   lik <- bru_obs(
     family = "cp",
-    formula = formula, data = data,
-    domain = domain, samplers = samplers, ips = ips,
+    formula = formula,
+    data = data,
+    domain = domain,
+    samplers = samplers,
+    ips = ips,
     ...,
     E = {{ E }},
     weights = {{ weights }},
@@ -3133,20 +3177,30 @@ expand_to_dataframe <- function(x, data = NULL) {
   }
   if (inherits(x, "Spatial")) {
     bru_safe_sp(force = TRUE)
-    if (inherits(x, "SpatialPixels") &&
-      !inherits(x, "SpatialPixelsDataFrame")) {
+    if (
+      inherits(x, "SpatialPixels") &&
+        !inherits(x, "SpatialPixelsDataFrame")
+    ) {
       result <- sp::SpatialPixelsDataFrame(x, data = data)
-    } else if (inherits(x, "SpatialGrid") &&
-      !inherits(x, "SpatialGridDataFrame")) {
+    } else if (
+      inherits(x, "SpatialGrid") &&
+        !inherits(x, "SpatialGridDataFrame")
+    ) {
       result <- sp::SpatialGridDataFrame(x, data = data)
-    } else if (inherits(x, "SpatialLines") &&
-      !inherits(x, "SpatialLinesDataFrame")) {
+    } else if (
+      inherits(x, "SpatialLines") &&
+        !inherits(x, "SpatialLinesDataFrame")
+    ) {
       result <- sp::SpatialLinesDataFrame(x, data = data)
-    } else if (inherits(x, "SpatialPolygons") &&
-      !inherits(x, "SpatialPolygonsDataFrame")) {
+    } else if (
+      inherits(x, "SpatialPolygons") &&
+        !inherits(x, "SpatialPolygonsDataFrame")
+    ) {
       result <- sp::SpatialPolygonsDataFrame(x, data = data)
-    } else if (inherits(x, "SpatialPoints") &&
-      !inherits(x, "SpatialPointsDataFrame")) {
+    } else if (
+      inherits(x, "SpatialPoints") &&
+        !inherits(x, "SpatialPointsDataFrame")
+    ) {
       # Other classes inherit from SpatialPoints, so need to be handled first
       result <- sp::SpatialPointsDataFrame(x, data = data)
     } else {
@@ -3336,18 +3390,20 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' }
 #' }
 #'
-predict.bru <- function(object,
-                        newdata = NULL,
-                        formula = NULL,
-                        n.samples = 100,
-                        seed = 0L,
-                        probs = c(0.025, 0.5, 0.975),
-                        num.threads = NULL,
-                        used = NULL,
-                        drop = FALSE,
-                        ...,
-                        include = deprecated(),
-                        exclude = deprecated()) {
+predict.bru <- function(
+  object,
+  newdata = NULL,
+  formula = NULL,
+  n.samples = 100,
+  seed = 0L,
+  probs = c(0.025, 0.5, 0.975),
+  num.threads = NULL,
+  used = NULL,
+  drop = FALSE,
+  ...,
+  include = deprecated(),
+  exclude = deprecated()
+) {
   object <- bru_check_object_bru(object)
 
   # Convert data into list, data.frame or a Spatial object if not provided as
@@ -3437,8 +3493,10 @@ predict.bru <- function(object,
           ),
           probs = probs
         )
-      if (!drop &&
-        (NROW(newdata) == NROW(tmp))) {
+      if (
+        !drop &&
+          (NROW(newdata) == NROW(tmp))
+      ) {
         smy[[nm]] <- expand_to_dataframe(newdata, tmp)
       } else {
         smy[[nm]] <- tmp
@@ -3446,8 +3504,10 @@ predict.bru <- function(object,
     }
   } else {
     tmp <- bru_summarise(data = vals, probs = probs)
-    if (!drop &&
-      (NROW(newdata) == NROW(tmp))) {
+    if (
+      !drop &&
+        (NROW(newdata) == NROW(tmp))
+    ) {
       smy <- expand_to_dataframe(newdata, tmp)
     } else {
       smy <- tmp
@@ -3561,16 +3621,18 @@ bru_generate_check_used_deprecation <- function(
 #' @seealso [predict.bru]
 #' @rdname generate
 
-generate.bru <- function(object,
-                         newdata = NULL,
-                         formula = NULL,
-                         n.samples = 100,
-                         seed = 0L,
-                         num.threads = NULL,
-                         used = NULL,
-                         ...,
-                         include = deprecated(),
-                         exclude = deprecated()) {
+generate.bru <- function(
+  object,
+  newdata = NULL,
+  formula = NULL,
+  n.samples = 100,
+  seed = 0L,
+  num.threads = NULL,
+  used = NULL,
+  ...,
+  include = deprecated(),
+  exclude = deprecated()
+) {
   object <- bru_check_object_bru(object)
 
   # Convert data into list, data.frame or a Spatial object if not provided as
@@ -3650,9 +3712,16 @@ generate.bru <- function(object,
 #   integer \code{x}
 # @param verbose Be verbose?
 
-montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
-                                 mcerr = 0.01, n = 100, discrete = FALSE,
-                                 verbose = FALSE) {
+montecarlo.posterior <- function(
+  dfun,
+  sfun,
+  x = NULL,
+  samples = NULL,
+  mcerr = 0.01,
+  n = 100,
+  discrete = FALSE,
+  verbose = FALSE
+) {
   .Deprecated()
   xmaker <- function(hpd) {
     mid <- (hpd[2] + hpd[1]) / 2
@@ -3680,11 +3749,12 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
   }
 
   # Round x if needed
-  if (discrete) x <- unique(round(x))
+  if (discrete) {
+    x <- unique(round(x))
+  }
 
   # First density estimate
   lest <- dfun(x, samples)
-
 
   converged <- FALSE
   while (!converged) {
@@ -3692,7 +3762,9 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
     xnew <- xmaker2(INLA::inla.hpdmarginal(0.999, list(x = x, y = lest)))
 
     # Map last estimate to the HPD interval
-    if (discrete) xnew <- unique(round(xnew))
+    if (discrete) {
+      xnew <- unique(round(xnew))
+    }
     lest <- INLA::inla.dmarginal(xnew, list(x = x, y = lest))
     x <- xnew
 
@@ -3757,9 +3829,13 @@ montecarlo.posterior <- function(dfun, sfun, x = NULL, samples = NULL,
 #' bru_summarise(matrix(rexp(10000), 10, 1000), max_moment = 4, probs = NULL)
 #'
 #' @keywords internal
-bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
-                          x = NULL, cbind.only = FALSE,
-                          max_moment = 2) {
+bru_summarise <- function(
+  data,
+  probs = c(0.025, 0.5, 0.975),
+  x = NULL,
+  cbind.only = FALSE,
+  max_moment = 2
+) {
   if (is.list(data)) {
     data <- do.call(cbind, data)
   }
@@ -3778,8 +3854,12 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
       smy <- data.frame(
         rowMeans(data, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        as.matrix(apply(data,
-          MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+        as.matrix(apply(
+          data,
+          MARGIN = 1,
+          quantile,
+          probs = probs,
+          na.rm = TRUE,
           names = FALSE
         ))
       )
@@ -3788,8 +3868,12 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
       smy <- data.frame(
         rowMeans(data, na.rm = TRUE),
         apply(data, MARGIN = 1, sd, na.rm = TRUE),
-        t(apply(data,
-          MARGIN = 1, quantile, probs = probs, na.rm = TRUE,
+        t(apply(
+          data,
+          MARGIN = 1,
+          quantile,
+          probs = probs,
+          na.rm = TRUE,
           names = FALSE
         ))
       )
@@ -3826,7 +3910,8 @@ bru_summarise <- function(data, probs = c(0.025, 0.5, 0.975),
     # +2 replaced by 3-(n-3)/(n-1) = 2n/(n-1), from Rao 1973, p438
     sd.mc_std_err <-
       sqrt(pmax(0, ekurtosis + 2 * N / (N - 1))) *
-        smy[["sd"]] / sqrt(4 * N)
+      smy[["sd"]] /
+      sqrt(4 * N)
     # Include sd MC error in estimate of mean MC error:
     smy[["mean.mc_std_err"]] <- (smy[["sd"]] + sd.mc_std_err * 2) / sqrt(N)
     smy[["sd.mc_std_err"]] <- sd.mc_std_err
@@ -3869,7 +3954,8 @@ nonlin_predictor <- function(param, state) {
             input = param[["input"]][[lh_idx]],
             state = list(state),
             comp_simple = param[["comp_simple"]][[lh_idx]],
-            predictor = bru_pred_expr(param[["lhoods"]][[lh_idx]],
+            predictor = bru_pred_expr(
+              param[["lhoods"]][[lh_idx]],
               format = "expr"
             ),
             format = "matrix",
@@ -3926,16 +4012,18 @@ line_search_opt_target_exact <- function(x, param, nonlin_param) {
 # @export
 # @rdname bru_line_search
 
-bru_line_search <- function(model,
-                            lhoods,
-                            lin,
-                            state0,
-                            state,
-                            input,
-                            comp_lin,
-                            comp_simple,
-                            weights = 1,
-                            options) {
+bru_line_search <- function(
+  model,
+  lhoods,
+  lin,
+  state0,
+  state,
+  input,
+  comp_lin,
+  comp_simple,
+  weights = 1,
+  options
+) {
   # Metrics ----
   pred_scalprod <- function(delta1, delta2) {
     if (!all(is.finite(delta1)) || !all(is.finite(delta2))) {
@@ -4036,8 +4124,10 @@ bru_line_search <- function(model,
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
 
-    while ((do_finite && nonfin) ||
-      (do_contract && ((norm0 > norm01 * fact) || (norm1 > norm01 * fact)))) {
+    while (
+      (do_finite && nonfin) ||
+        (do_contract && ((norm0 > norm01 * fact) || (norm1 > norm01 * fact)))
+    ) {
       if (do_finite && nonfin) {
         finite_active <- finite_active - 1
       } else {
@@ -4072,9 +4162,11 @@ bru_line_search <- function(model,
   }
 
   # Expansion method ----
-  if (do_expand &&
-    finite_active == 0 &&
-    contract_active == 0) {
+  if (
+    do_expand &&
+      finite_active == 0 &&
+      contract_active == 0
+  ) {
     overstep <- FALSE
     norm0 <- pred_norm(nonlin_pred - lin_pred0)
     norm1 <- pred_norm(nonlin_pred - lin_pred1)
@@ -4185,8 +4277,10 @@ bru_line_search <- function(model,
       )
     }
 
-    if ((norm1_opt > norm01) ||
-      identical(options$bru_method$line_opt_method, "full")) {
+    if (
+      (norm1_opt > norm01) ||
+        identical(options$bru_method$line_opt_method, "full")
+    ) {
       alpha <-
         optimise(
           line_search_opt_target_exact,
@@ -4252,15 +4346,20 @@ bru_line_search <- function(model,
   }
 
   bru_log_message(
-    glue("
+    glue(
+      "
       iinla: |lin1-lin0| = {signif(pred_norm(lin_pred1 - lin_pred0), 4)}
         <eta-lin1,delta>/|delta| = {signif(rel1, 4)}
         |eta-lin0 - delta <delta,eta-lin0>/<delta,delta>| = {signif(rel2, 4)}",
       rel1 = pred_scalprod(nonlin_pred - lin_pred1, lin_pred1 - lin_pred0) /
         pred_norm(lin_pred1 - lin_pred0),
-      rel2 = pred_norm(nonlin_pred - lin_pred0 - (lin_pred1 - lin_pred0) *
-        pred_scalprod(lin_pred1 - lin_pred0, nonlin_pred - lin_pred0) /
-        pred_norm2(lin_pred1 - lin_pred0))
+      rel2 = pred_norm(
+        nonlin_pred -
+          lin_pred0 -
+          (lin_pred1 - lin_pred0) *
+            pred_scalprod(lin_pred1 - lin_pred0, nonlin_pred - lin_pred0) /
+            pred_norm2(lin_pred1 - lin_pred0)
+      )
     ),
     verbosity = 4
   )
@@ -4293,7 +4392,7 @@ bru_line_search <- function(model,
 
   active <-
     (finite_active + contract_active + expand_active != 0) ||
-      (abs(step_scaling - 1) > 0.001)
+    (abs(step_scaling - 1) > 0.001)
 
   if (active && (options$bru_verbose <= 2)) {
     bru_log_message(
@@ -4316,19 +4415,23 @@ bru_line_search <- function(model,
     requireNamespace("ggplot2")
     requireNamespace("patchwork")
     pl1 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$lin0 - .data$lin1),
         col = "start"
       )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$lin1 - .data$lin1),
         col = "inla"
       )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$nonlin1 - .data$lin1),
         col = "full"
       )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         (.data$nonlinopt - .data$lin1),
         col = "opt"
       )) +
@@ -4364,19 +4467,15 @@ bru_line_search <- function(model,
       ) +
       ggplot2::ylab("(eta - lin1) * sqrt(w)")
     pl3 <- ggplot2::ggplot(df_debug) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
-        .data$lin0,
-        col = "start"
-      )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
-        .data$lin1,
-        col = "inla"
-      )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin0, col = "start")) +
+      ggplot2::geom_point(ggplot2::aes(.data$idx, .data$lin1, col = "inla")) +
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         .data$nonlin1,
         col = "full"
       )) +
-      ggplot2::geom_point(ggplot2::aes(.data$idx,
+      ggplot2::geom_point(ggplot2::aes(
+        .data$idx,
         .data$nonlinopt,
         col = "opt"
       )) +
@@ -4417,8 +4516,8 @@ bru_line_search <- function(model,
       ggplot2::ylab("state")
     pl1234 <-
       ((pl1 | pl2) / (pl3 | pl4)) +
-        patchwork::plot_layout(guides = "collect") &
-        ggplot2::theme(legend.position = "right")
+      patchwork::plot_layout(guides = "collect") &
+      ggplot2::theme(legend.position = "right")
 
     # Compute deviations in the delta = lin1-lin0 direction and the orthogonal
     # direction
@@ -4461,16 +4560,14 @@ bru_line_search <- function(model,
         )
     }
 
-
     pl0 <-
       ggplot2::ggplot(
-        data =
-          data.frame(
-            along = along,
-            ortho = ortho,
-            distance = distance^0.5,
-            what = "eta"
-          ),
+        data = data.frame(
+          along = along,
+          ortho = ortho,
+          distance = distance^0.5,
+          what = "eta"
+        ),
         mapping = ggplot2::aes(.data$along, .data$ortho, col = .data$what)
       ) +
       ggplot2::geom_path() +
@@ -4671,8 +4768,10 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     }
 
     track <-
-      if (is.null(orig_track) ||
-        setequal(names(orig_track), track_names)) {
+      if (
+        is.null(orig_track) ||
+          setequal(names(orig_track), track_names)
+      ) {
         do.call(dplyr::bind_rows, c(list(orig_track), track))
       } else {
         track <- do.call(dplyr::bind_rows, track)
@@ -4716,7 +4815,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       }
       if (max(new_n) > orig_n) {
         if (is.null(orig_inla_track[["theta"]])) {
-          orig_inla_track[["theta"]] <- matrix(NA_real_,
+          orig_inla_track[["theta"]] <- matrix(
+            NA_real_,
             nrow = NROW(orig_inla_track),
             ncol = max(new_n)
           )
@@ -4724,7 +4824,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
           orig_inla_track[["theta"]] <-
             cbind(
               orig_inla_track[["theta"]],
-              matrix(NA_real_,
+              matrix(
+                NA_real_,
                 nrow = NROW(orig_inla_track),
                 ncol = max(new_n) - orig_n
               )
@@ -4739,14 +4840,12 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
             if (NCOL(x[["theta"]]) < orig_n) {
               if (is.null(x[["theta"]])) {
                 x[["theta"]] <-
-                  matrix(NA_real_,
-                    nrow = NROW(x),
-                    ncol = orig_n
-                  )
+                  matrix(NA_real_, nrow = NROW(x), ncol = orig_n)
               } else {
                 x[["theta"]] <- cbind(
                   x[["theta"]],
-                  matrix(NA_real_,
+                  matrix(
+                    NA_real_,
                     nrow = NROW(x),
                     ncol = orig_n - NCOL(x[["theta"]])
                   )
@@ -4838,7 +4937,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       states <- c(states, states[length(states)])
     } else {
       # Set old result
-      states <- evaluate_state(model,
+      states <- evaluate_state(
+        model,
         lhoods = lhoods,
         result = initial,
         property = "joint_mode"
@@ -4895,8 +4995,10 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     track_size <- max(orig_track[["iteration"]])
   }
   inla_track <- list()
-  if (is.null(old.result[["bru_iinla"]][["inla_track"]]) ||
-    (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0L)) {
+  if (
+    is.null(old.result[["bru_iinla"]][["inla_track"]]) ||
+      (NROW(old.result[["bru_iinla"]][["inla_track"]]) == 0L)
+  ) {
     orig_inla_track <- NULL
     inla_track_size <- 0L
   } else {
@@ -5031,10 +5133,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     if ((k > 1) || (!is.null(result) && !is.null(result$mode))) {
       inla.options[["control.mode"]]$restart <- TRUE
       inla.options[["control.mode"]]$theta <- result$mode$theta
-      inla.options[["control.mode"]]$x <- (
-        previous_x +
-          (result$mode$x - previous_x) * line_search[["step_scaling"]]
-      )
+      inla.options[["control.mode"]]$x <- (previous_x +
+        (result$mode$x - previous_x) * line_search[["step_scaling"]])
       result_indexing <- inla_result_latent_idx(result)
       # Reset the predictor values, to avoid spurious iteration effects.
       inla.options[["control.mode"]]$x[result_indexing$APredictor] <- 0
@@ -5049,17 +5149,22 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
       inla.options[["control.inla"]]$step.factor <- 1
       inla.options[["control.inla"]]$tolerance.step <- 1e-10
 
-      if (identical(
-        result$.args$control.inla[["stencil"]],
-        INLA::inla.set.control.inla.default()$stencil
-      )) {
+      if (
+        identical(
+          result$.args$control.inla[["stencil"]],
+          INLA::inla.set.control.inla.default()$stencil
+        )
+      ) {
         inla.options$control.inla$stencil <- 9
       }
 
       h.def <- INLA::inla.set.control.inla.default()$h
-      if (identical(
-        result$.args$control.inla[["h"]], h.def
-      )) {
+      if (
+        identical(
+          result$.args$control.inla[["h"]],
+          h.def
+        )
+      ) {
         inla.options$control.inla$h <-
           0.2 * result$.args$control.inla[["h"]]
       } else {
@@ -5094,13 +5199,16 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     inla.data <-
       c(
         stk.data,
-        do.call(c, c(
-          lapply(
-            as_bru_comp_list(model),
-            function(xx) as.list(bru_comp_env_extra(xx))
-          ),
-          use.names = FALSE
-        ))
+        do.call(
+          c,
+          c(
+            lapply(
+              as_bru_comp_list(model),
+              function(xx) as.list(bru_comp_env_extra(xx))
+            ),
+            use.names = FALSE
+          )
+        )
       )
     #        list.data(model$formula))
 
@@ -5261,10 +5369,9 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
     if (!do_final_integration) {
       # Update stack given current result
       state0 <- states[[length(states)]]
-      state <- evaluate_state(model,
-        result = result,
-        property = "joint_mode"
-      )[[1]]
+      state <- evaluate_state(model, result = result, property = "joint_mode")[[
+        1
+      ]]
       if ((options$bru_max_iter > 1)) {
         if (do_line_search) {
           timings <- bru_timer_do(timings, "Line search", k + 1L)
@@ -5320,7 +5427,8 @@ iinla <- function(model, lhoods, inputs = NULL, initial = NULL, options) {
         if (utils::packageVersion("INLA") <= "24.06.02") {
           stk.data <- INLA::inla.stack.data(stk)
         } else {
-          stk.data <- INLA::inla.stack.data(stk,
+          stk.data <- INLA::inla.stack.data(
+            stk,
             .response.name = "BRU.response"
           )
         }
@@ -5467,8 +5575,10 @@ auto_additive_formula <- function(formula, components) {
 
 # Extract the LHS of a formula, as response ~ .
 extract_response <- function(formula) {
-  if (inherits(formula, "formula") &&
-    (length(as.character(formula)) == 3)) {
+  if (
+    inherits(formula, "formula") &&
+      (length(as.character(formula)) == 3)
+  ) {
     as.formula(glue("{as.character(formula)[2]} ~ ."))
   } else {
     . ~ .
@@ -5479,8 +5589,10 @@ auto_response <- function(formula, response) {
   if (!inherits(formula, "formula")) {
     return(formula)
   }
-  if ((length(as.character(formula)) == 3) &&
-    (as.character(formula)[2] != ".")) {
+  if (
+    (length(as.character(formula)) == 3) &&
+      (as.character(formula)[2] != ".")
+  ) {
     # Already has response; do nothing
     return(formula)
   }

@@ -1,6 +1,6 @@
 ---
 title: "Residual Analysis of spatial point process models using Bayesian methods"
-author: "Niharika Reddy Peddinenikalva"
+author: "Niharika Reddy Peddinenikalva, with sf updates by Finn Lindgren"
 date: "`r Sys.Date()`"
 output: html_document
 header-includes: 
@@ -26,10 +26,10 @@ library("dplyr")
 library("lwgeom")
 library("patchwork")
 library("terra")
+library("sf")
 library("INLA")
 library("inlabru")
 library("fmesher")
-bru_safe_sp(force = TRUE)
 ```
 
 ```{r, eval=TRUE, echo=FALSE, cache=FALSE}
@@ -57,7 +57,9 @@ source(code_location)
 ```{r , eval=FALSE, echo=TRUE}
 # Load function definitions
 source(
-  system.file("misc", "2d_lgcp_residuals_functions.R",
+  system.file(
+    "misc",
+    "2d_lgcp_residuals_functions.R",
     package = "inlabru"
   )
 )
@@ -119,34 +121,41 @@ Changing the choice of the weight function $h$, yields  different types of
 residuals. 
 
 ### Scaling Residuals
-By taking $h(u) = \vb{1} \{ u \in B\}$, we get the raw residuals:
+By taking $h(u) \equiv 1$, we get the raw residuals:
+$$
 \begin{aligned}
     R(B, \hat{h}, \hat{\theta}) & = I(B, \hat{h}, \hat{\lambda}) = 
     \sum_{x_i \in \vb{x} \cap B}h(x_i) - \int_B \hat{h}(u)\hat{\lambda}(u)\,du\\
     & = n(\vb{x} \cap B) - \int_B \hat{\lambda}(u) \,du
 \end{aligned}
+$$
 
 ### Inverse Residuals
 By taking $h(u) = \frac{1}{\lambda (u)}$, we may encounter the case where 
 $\lambda(u) = 0$. The GNZ-formula
-\begin{equation}
-\E \left[ \sum_{x_i \in \vb{X}} h(x_i)\right] = 
+$$
+\begin{aligned}
+\E \left[ \sum_{x_i \in \vb{X}} h(x_i)\right]& = 
 \E \left[ \int_W h(u) \lambda(u) \,du \right],
-\end{equation}
+\end{aligned}
+$$
 would still hold for the first terms of the $h$-weighted residuals to exist. If
 we define $h(u) \lambda(u) = 0$ for all $u$ such that $\lambda(u) = 0$, then the
 second term of $h$-weighted residuals will also exist and the inverse residual
 is given by
+$$
 \begin{aligned}
     R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) & = 
     \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
     & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
-    \int_B \vb{1} \{ x_i \in \vb{x} \} \,du 
+    \int_B \vb{1} \{ \hat{\lambda}(u) > 0 \} \,du 
 \end{aligned}
+$$
     
 ### Pearson Residuals
 By using $h(u) = \frac{1}{\sqrt{\lambda(u)}}$, the Pearson residual is given by
+$$
 \begin{aligned}
     R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right) 
     & = \sum_{x_i \in \vb{x} \cap B} \hat{h}(x_i) - 
@@ -154,21 +163,24 @@ By using $h(u) = \frac{1}{\sqrt{\lambda(u)}}$, the Pearson residual is given by
     & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
     \int_B \sqrt{\hat{\lambda}(u)} \,du 
 \end{aligned}
+$$
 Here, zero values of $\hat{\lambda}(u)$ do not cause any issues with calculating
 residuals as we set $\hat{h}(u) \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)}$ for
 all $u$.
 
 So the three types of residuals are:
-\begin{eqnarray}
-\text{Scaled:} \qquad & R(B, \hat{h}, \hat{\theta}) & = n(\vb{x} \cap B) - 
+$$
+\begin{aligned}
+\text{Scaled:} && R(B, 1, \hat{\theta}) &= n(\vb{x} \cap B) - 
 \int_B \hat{\lambda}(u) \,du \\
-\text{Inverse:} \qquad & R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) 
-& = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
-\int_B \vb{1} \{ x_i \in \vb{x} \} \,du \\
-\text{Pearson:} \qquad &  R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta}
-\right) & = \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - 
+\text{Inverse:} && R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) 
+&= \sum_{x_i \in \vb{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - 
+\int_B \vb{1} \{ \hat{\lambda}(u) > 0 \} \,du \\
+\text{Pearson:} &&  R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta}
+\right) &= \sum_{x_i \in \vb{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - 
 \int_B \sqrt{\hat{\lambda}(u)} \,du 
-\end{eqnarray}
+\end{aligned}
+$$
 
 Note that $\hat{\lambda}(u)$ and $\hat{h}(u)$ are estimates of $\lambda (u)$ and
 $h(u)$ respectively
@@ -182,12 +194,12 @@ reliable for any sample size.
 
 The use of the inverse residual in this project is less clear. However, we do 
 know that it is easier to compute this residual since we have the GNZ formula to
-estimate the value of $h(u) = \frac{1}{\lambda(u)} for any value $\lambda(u)$. 
+estimate the value of $h(u) = \frac{1}{\lambda(u)}$ for any value $\lambda(u)$. 
 
 For notation's sake in this discussion, let $h_{s}(u), h_{i}(u), h_p(u)$ 
 indicate the weight function for scaling, inverse and Pearson residuals 
 respectively. 
-Then, $h_s(u) = \vb{1}\{u \in B\}$, $h_i(u) = \frac{1}{\lambda(u)}$,
+Then, $h_s(u) \equiv 1$, $h_i(u) = \frac{1}{\lambda(u)}$,
 $h_p(u) = \frac{1}{\sqrt{\lambda(u)}}$. 
 We can also see that $h_s(u) = \left(h_i(u)\right)^0$  and $h_p(u) = 
 \left(h_i(u)\right)^{1/2}$, so the values of the Pearson residuals would lie 
@@ -230,11 +242,11 @@ data using different model definitions.
 
 ```{r load-data, echo=TRUE}
 # Load data
-gorillas <- gorillas_sp()
+gorillas <- inlabru::gorillas_sf
 nests <- gorillas$nests
 mesh <- gorillas$mesh
 boundary <- gorillas$boundary
-gcov <- gorillas$gcov
+gcov <- gorillas_sf_gcov()
 ```
 
 Initially, the set $B$ is defines as $B=W$, where $W$ is the object `boundary`. 
@@ -272,21 +284,21 @@ The residuals of the model are also computed where $B = W$.
 
 ```{r veg-mod, echo=TRUE}
 # Define the vegetation model
-comp1 <- coordinates ~
+comp1 <- geometry ~
   vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
 
 fit1 <- lgcp(comp1, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
 
 # Display the model
 int1 <- predict(fit1,
-  newdata = fm_pixels(mesh, mask = boundary, format = "sp"),
+  newdata = fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(vegetation + Intercept)
 )
 ggplot() +
-  gg(int1) +
+  gg(int1, geom = "tile") +
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests, color = "DarkGreen")
 
@@ -314,7 +326,8 @@ continuous variable.
 ```{r elevation-model-setup, echo=FALSE}
 # Setting up the elevation model
 elev <- gcov$elevation
-elev$elevation <- elev$elevation - mean(elev$elevation, na.rm = TRUE)
+terra::values(elev) <- terra::values(elev) -
+  mean(terra::values(elev), na.rm = TRUE)
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.05, 0.01)
@@ -326,22 +339,22 @@ displays the model in the form of a plot.
 
 ```{r elev-mod, echo=TRUE}
 # Define the Elevation model
-comp2 <- coordinates ~ elev(elev, model = "linear") +
-  mySmooth(coordinates, model = matern) + Intercept(1)
+comp2 <- geometry ~ elev(elev, model = "linear") +
+  mySmooth(geometry, model = matern) + Intercept(1)
 
 fit2 <- lgcp(comp2, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
 
 # Display the model
 int2 <- predict(
   fit2,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(elev + mySmooth + Intercept)
 )
 ggplot() +
-  gg(int2) +
+  gg(int2, geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
@@ -373,12 +386,12 @@ computed where $B = W$.
 ```{r int-mod, echo=TRUE}
 # Define the Intercept model. Need to explicitly extend it to match the
 # data size to use it in spatial predictions.
-comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
+comp3 <- geometry ~ Intercept(rep(1, nrow(.data.)))
 lik3 <- bru_obs(
-  coordinates ~ .,
+  geometry ~ .,
   data = nests,
   samplers = boundary,
-  domain = list(coordinates = mesh),
+  domain = list(geometry = mesh),
   family = "cp"
 )
 fit3 <- bru(comp3, lik3)
@@ -386,11 +399,11 @@ fit3 <- bru(comp3, lik3)
 # Display the model
 int3 <- predict(
   fit3,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(Intercept)
 )
 ggplot() +
-  gg(int3) +
+  gg(int3, geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
@@ -422,22 +435,22 @@ computed where $B = W$.
 
 ```{r smooth-mod, echo=TRUE}
 # Define the Smooth model
-comp4 <- coordinates ~ mySmooth(coordinates, model = matern) +
+comp4 <- geometry ~ mySmooth(geometry, model = matern) +
   Intercept(1)
 fit4 <- lgcp(comp4, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
 
 # Display the model
 int4 <- predict(
   fit4,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(mySmooth + Intercept)
 )
 ggplot() +
-  gg(int4) +
-  gg(boundary) +
+  gg(int4, geom = "tile") +
+  gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
 
@@ -455,6 +468,7 @@ knitr::kable(edit_df(
   c("Type", "mean.mc_std_err", "sd.mc_std_err", "median")
 ))
 ```
+
 ### Comparing models
 Firstly, from the plots of the four models, we see that there are visual
 similarities in what the Elevation and smooth models appear to be. So, we would

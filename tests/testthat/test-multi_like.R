@@ -4,7 +4,8 @@ test_that("Multiple likelihoods: basic model", {
 
   withr::local_seed(123L)
 
-  lik1 <- bru_obs("gaussian",
+  lik1 <- bru_obs(
+    "gaussian",
     formula = y ~ .,
     data = data.frame(
       x = rep(c(1, 1.5, 2, 3, 4), 2),
@@ -14,7 +15,8 @@ test_that("Multiple likelihoods: basic model", {
     # Checks that control.family is handled
     control.family = list(hyper = list(prec = list(fixed = TRUE)))
   )
-  lik2 <- bru_obs("poisson",
+  lik2 <- bru_obs(
+    "poisson",
     formula = y ~ .,
     data = data.frame(
       x = c(2, 2.5, 3, 4, 5),
@@ -33,18 +35,23 @@ test_that("Multiple likelihoods: basic model", {
     sort(union(lik1$data$x, lik2$data$x))
   )
 
-  cmp <- bru_comp_list(~ -1 +
-    effect(x,
-      model = "rw2",
-      values = seq(1, 5, by = 0.25),
-      scale.model = TRUE
-    ) +
-    int1(1) + int2(1))
+  cmp <- bru_comp_list(
+    ~ -1 +
+      effect(
+        x,
+        model = "rw2",
+        values = seq(1, 5, by = 0.25),
+        scale.model = TRUE
+      ) +
+      int1(1) +
+      int2(1)
+  )
 
   fit <- bru(cmp, lik1, lik2)
 
   expect_equal(nrow(fit$summary.hyperpar), 1)
-  expect_equal(fit$summary.hyperpar["Precision for effect", "mean"],
+  expect_equal(
+    fit$summary.hyperpar["Precision for effect", "mean"],
     2.0459,
     tolerance = midtol
   )

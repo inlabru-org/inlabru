@@ -113,6 +113,12 @@ for each of the components used by the corresponding observation model.
 with one entry for each observation model, each containing a list
 of inputs for the components used by the corresponding observation model.
 }
+
+\itemize{
+\item \code{bru_input(bru_mapper)}: The evaluated input associated with a
+mapper; see \link{ibm_input} for details on how to associate a \code{bru_input} with
+a \code{bru_mapper}.
+}
 }
 \description{
 Store and evaluate component inputs, including support for

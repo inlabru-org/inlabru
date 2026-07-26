@@ -85,11 +85,13 @@ inla_result_latent_idx <- function(result) {
           list(
             result$misc$configs$contents$start[
               result$misc$configs$contents$tag == x
-            ] - 1 + seq_len(
-              result$misc$configs$contents$length[
-                result$misc$configs$contents$tag == x
-              ]
-            )
+            ] -
+              1 +
+              seq_len(
+                result$misc$configs$contents$length[
+                  result$misc$configs$contents$tag == x
+                ]
+              )
           )
         names(idx) <- x
         idx
@@ -114,8 +116,7 @@ inla_result_latent_idx <- function(result) {
 #' random effect vector, and hyperparameter. The hyperparameter names are
 #' standardised with [bru_standardise_names()]
 #' @keywords internal
-extract_property <- function(result, property,
-                             internal_hyperpar = FALSE) {
+extract_property <- function(result, property, internal_hyperpar = FALSE) {
   stopifnot(inherits(result, "inla"))
   ret <- list()
 
@@ -200,8 +201,13 @@ extract_property <- function(result, property,
 ##          in the first sample
 ##
 
-post.sample.structured <- function(result, n, seed = NULL,
-                                   num.threads = NULL, ...) {
+post.sample.structured <- function(
+  result,
+  n,
+  seed = NULL,
+  num.threads = NULL,
+  ...
+) {
   if (!is.null(seed) && (seed != 0L)) {
     num.threads <- "1:1:1"
   }
@@ -256,7 +262,8 @@ post.sample.structured <- function(result, n, seed = NULL,
         name <- names(result$summary.random)[k]
         #        model <- result$model.random[k]
         #        if (!(model == "Constrained linear")) {
-        vals[[name]] <- extract_entries(name,
+        vals[[name]] <- extract_entries(
+          name,
           smpl.latent,
           .contents = .contents
         )
@@ -313,8 +320,11 @@ extract_entries <- function(name, smpl, .contents = NULL) {
     warning(glue("Element '{name}' not found in posterior sample."))
     return(numeric(0L))
   }
-  vals <- smpl[.contents[["start"]][idx] +
-    seq_len(.contents[["length"]][idx]) - 1L]
+  vals <- smpl[
+    .contents[["start"]][idx] +
+      seq_len(.contents[["length"]][idx]) -
+      1L
+  ]
   vals
 }
 
@@ -338,9 +348,11 @@ extract_entries <- function(name, smpl, .contents = NULL) {
 #' @keywords internal
 #' @rdname bru_inla.stack.mexpand
 
-bru_inla.stack.mexpand <- function(...,
-                                   old.names = "BRU.response",
-                                   new.name = "BRU.response") {
+bru_inla.stack.mexpand <- function(
+  ...,
+  old.names = "BRU.response",
+  new.name = "BRU.response"
+) {
   stacks <- list(...)
   if (length(old.names) == 1) {
     old.names <- rep(old.names, length(stacks))
@@ -351,7 +363,8 @@ bru_inla.stack.mexpand <- function(...,
       LHS <- INLA::inla.stack.LHS(stacks[[x]])[[old.names[x]]]
       ifelse(is.vector(LHS), 1, NCOL(LHS))
     },
-    stacks = stacks, old.names = old.names
+    stacks = stacks,
+    old.names = old.names
   ))
   y.offset <- c(0, cumsum(y.cols))
   y.cols.total <- sum(y.cols)
@@ -432,36 +445,46 @@ bru_inla.stack.mexpand <- function(...,
 #' @rdname bru_inla.stack.mjoin
 #'
 
-bru_inla.stack.mjoin <- function(...,
-                                 compress = TRUE,
-                                 remove.unused = TRUE,
-                                 old.names = "BRU.response",
-                                 new.name = "BRU.response") {
+bru_inla.stack.mjoin <- function(
+  ...,
+  compress = TRUE,
+  remove.unused = TRUE,
+  old.names = "BRU.response",
+  new.name = "BRU.response"
+) {
   if (utils::packageVersion("INLA") <= "24.06.02") {
-    stacks <- bru_inla.stack.mexpand(...,
+    stacks <- bru_inla.stack.mexpand(
+      ...,
       old.names = old.names,
       new.name = new.name
     )
-    do.call(INLA::inla.stack.join, c(
-      stacks,
-      list(
-        compress = compress,
-        remove.unused = remove.unused
+    do.call(
+      INLA::inla.stack.join,
+      c(
+        stacks,
+        list(
+          compress = compress,
+          remove.unused = remove.unused
+        )
       )
-    ))
+    )
   } else {
-    stacks <- bru_inla.stack.mexpand(...,
+    stacks <- bru_inla.stack.mexpand(
+      ...,
       old.names = old.names,
       new.name = new.name
     )
-    do.call(INLA::inla.stack.join, c(
-      stacks,
-      list(
-        compress = compress,
-        remove.unused = remove.unused,
-        multi.family = TRUE
+    do.call(
+      INLA::inla.stack.join,
+      c(
+        stacks,
+        list(
+          compress = compress,
+          remove.unused = remove.unused,
+          multi.family = TRUE
+        )
       )
-    ))
+    )
   }
 }
 
@@ -475,24 +498,28 @@ bru_inla.stack.mjoin <- function(...,
 #' @param ggp logical; unused
 #' @param lwd numeric; line width
 #' @export
-plotmarginal.inla <- function(result,
-                              varname = NULL,
-                              index = NULL,
-                              link = function(x) {
-                                x
-                              },
-                              add = FALSE,
-                              ggp = TRUE,
-                              lwd = 3,
-                              ...) {
+plotmarginal.inla <- function(
+  result,
+  varname = NULL,
+  index = NULL,
+  link = function(x) {
+    x
+  },
+  add = FALSE,
+  ggp = TRUE,
+  lwd = 3,
+  ...
+) {
   requireNamespace("ggplot2")
   vars <- variables.inla(result)
   ovarname <- varname
 
-  if (varname %in% c(result$names.fixed, rownames(result$summary.hyperpar)) ||
-    (!is.null(index) && (varname %in% names(result$summary.random)))) {
-    if (varname %in% rownames(vars) &&
-      vars[varname, "type"] == "fixed") {
+  if (
+    varname %in%
+      c(result$names.fixed, rownames(result$summary.hyperpar)) ||
+      (!is.null(index) && (varname %in% names(result$summary.random)))
+  ) {
+    if (varname %in% rownames(vars) && vars[varname, "type"] == "fixed") {
       marg <- INLA::inla.tmarginal(link, result$marginals.fixed[[varname]])
     } else if (varname %in% names(result$summary.random)) {
       marg <- INLA::inla.tmarginal(
@@ -506,8 +533,9 @@ plotmarginal.inla <- function(result,
           ovarname <- vars[ovarname, "ID"]
         }
       }
-    } else if (varname %in% rownames(vars) &&
-      vars[varname, "type"] == "hyperpar") {
+    } else if (
+      varname %in% rownames(vars) && vars[varname, "type"] == "hyperpar"
+    ) {
       marg <- INLA::inla.tmarginal(link, result$marginals.hyperpar[[varname]])
     }
     uq <- INLA::inla.qmarginal(0.975, marg)
@@ -534,30 +562,45 @@ plotmarginal.inla <- function(result,
       ggplot2::geom_segment(x = lq, y = 0, xend = lq, yend = lqy) +
       ggplot2::geom_segment(x = uq, y = 0, xend = uq, yend = uqy) +
       ggplot2::geom_ribbon(
-        data = inner.marg, ymin = 0,
-        ggplot2::aes(ymax = .data[["y"]]), alpha = 0.1
+        data = inner.marg,
+        ymin = 0,
+        ggplot2::aes(ymax = .data[["y"]]),
+        alpha = 0.1
       ) +
       ggplot2::xlab(ovarname) +
       ggplot2::ylab("pdf")
   } else {
     df <- result$summary.random[[varname]]
     colnames(df) <- c(
-      "ID", "mean", "sd", "lower", "mid", "upper", "mode", "kld"
+      "ID",
+      "mean",
+      "sd",
+      "lower",
+      "mid",
+      "upper",
+      "mode",
+      "kld"
     )
     df$mean <- link(df$mean)
     h <- 1e-6
-    df$sd <- link(df$sd) * abs((link(df$mean + h) - link(df$mean - h)) /
-      (2 * h))
+    df$sd <- link(df$sd) *
+      abs(
+        (link(df$mean + h) - link(df$mean - h)) /
+          (2 * h)
+      )
     df$lower <- link(df$lower)
     df$mid <- link(df$mid)
     df$upper <- link(df$upper)
     df$mode <- link(df$mode)
     p <- ggplot2::ggplot(df, ggplot2::aes(.data[["ID"]], .data[["mode"]]))
     p +
-      ggplot2::geom_ribbon(ggplot2::aes(
-        ymin = .data[["lower"]],
-        ymax = .data[["upper"]]
-      ), alpha = 0.1) +
+      ggplot2::geom_ribbon(
+        ggplot2::aes(
+          ymin = .data[["lower"]],
+          ymax = .data[["upper"]]
+        ),
+        alpha = 0.1
+      ) +
       ggplot2::geom_line() +
       ggplot2::geom_point() +
       ggplot2::geom_line(ggplot2::aes(y = .data[["mean"]]), col = 2) +
@@ -573,9 +616,7 @@ variables.inla <- function(result, include.random = TRUE) {
       type = character(0),
       model = character(0),
       as.data.frame(
-        matrix(NA, 0, length(col.names),
-          dimnames = list(c(), col.names)
-        )
+        matrix(NA, 0, length(col.names), dimnames = list(c(), col.names))
       )
     ))
   }
@@ -583,7 +624,10 @@ variables.inla <- function(result, include.random = TRUE) {
   handle.missing.columns <- function(data, col.names) {
     missing.names <- setdiff(col.names, colnames(data))
     if (length(missing.names) > 0) {
-      df <- as.data.frame(matrix(NA, nrow(data), length(missing.names),
+      df <- as.data.frame(matrix(
+        NA,
+        nrow(data),
+        length(missing.names),
         dimnames = list(NULL, missing.names)
       ))
       data <- dplyr::bind_cols(data, df)
@@ -625,7 +669,9 @@ variables.inla <- function(result, include.random = TRUE) {
   } else {
     fixed <- handle.data.frame(
       result$summary.fixed,
-      "fixed", "fixed", col.names
+      "fixed",
+      "fixed",
+      col.names
     )
   }
   if (hyperpar.missing) {
@@ -633,7 +679,9 @@ variables.inla <- function(result, include.random = TRUE) {
   } else {
     hyperpar <- handle.data.frame(
       result$summary.hyperpar,
-      "hyperpar", NA, col.names
+      "hyperpar",
+      NA,
+      col.names
     )
   }
   if (random.missing) {

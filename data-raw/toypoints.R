@@ -14,11 +14,16 @@ inner_boundary <-
         list(
           matrix(
             c(
-              pi, -pi,
-              pi, pi,
-              -pi, pi,
-              -pi, -pi,
-              pi, -pi
+              pi,
+              -pi,
+              pi,
+              pi,
+              -pi,
+              pi,
+              -pi,
+              -pi,
+              pi,
+              -pi
             ),
             byrow = TRUE,
             nrow = 5
@@ -86,7 +91,8 @@ beta_0 <- 3
 sigma_noise <- 0.2
 set.seed(1320)
 samp <- fmesher::fm_matern_sample(mesh, rho = rho, sigma = sigma_matern)[, 1]
-locs$z <- beta_0 + fmesher::fm_evaluate(mesh, loc = locs, field = samp) +
+locs$z <- beta_0 +
+  fmesher::fm_evaluate(mesh, loc = locs, field = samp) +
   rnorm(
     n = nrow(locs),
     sd = sigma_noise
@@ -104,10 +110,7 @@ ggplot() +
   scale_colour_viridis_c()
 
 pred_locs <- st_sf(
-  geometry = st_sample(inner_boundary,
-    type = "regular",
-    size = 100 * 100
-  )
+  geometry = st_sample(inner_boundary, type = "regular", size = 100 * 100)
 )
 
 toypoints <- list(

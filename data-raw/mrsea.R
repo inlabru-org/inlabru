@@ -103,15 +103,16 @@ import.mrsea <- function(format = c("sf", "sp")) {
     mesh <- dset$mesh
     mesh$crs <- fm_crs(crs)
 
-
     # Boundary
-    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+    boundary <- spoly(
+      dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
       cols = c(1, 2),
       crs = crs
     )
 
     # Covariates
-    covar <- sp::SpatialPointsDataFrame(depth[, c("x", "y")],
+    covar <- sp::SpatialPointsDataFrame(
+      depth[, c("x", "y")],
       data = depth[, "depth", drop = FALSE],
       proj4string = crs
     )
@@ -126,7 +127,10 @@ import.mrsea <- function(format = c("sf", "sp")) {
     # Transects lines
     lns <- subset(dset$effort, is.na(det))
     class(lns) <- "data.frame"
-    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"),
+    lns <- sline(
+      lns,
+      c("start.x", "start.y"),
+      c("end.x", "end.y"),
       crs = crs,
       format = "sf"
     )
@@ -142,7 +146,8 @@ import.mrsea <- function(format = c("sf", "sp")) {
     mesh$crs <- crs
 
     # Boundary
-    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+    boundary <- spoly(
+      dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
       cols = c(1, 2),
       crs = crs,
       format = "sf"

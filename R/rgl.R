@@ -44,7 +44,6 @@ glplot <- function(object, ...) {
 #'   plot.
 #' @param color vector of R color characters. See material3d() for details.
 
-
 glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
   if (length(sp::coordnames(object)) < 3) {
     ll <- data.frame(object)
@@ -74,16 +73,28 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
 
 glplot.SpatialLines <- function(object, add = TRUE, ...) {
   qq <- sp::coordinates(object)
-  sp <- do.call(rbind, lapply(qq, function(k) {
-    do.call(rbind, lapply(k, function(x) {
-      x[1:(nrow(x) - 1), ]
-    }))
-  }))
-  ep <- do.call(rbind, lapply(qq, function(k) {
-    do.call(rbind, lapply(k, function(x) {
-      x[2:(nrow(x)), ]
-    }))
-  }))
+  sp <- do.call(
+    rbind,
+    lapply(qq, function(k) {
+      do.call(
+        rbind,
+        lapply(k, function(x) {
+          x[1:(nrow(x) - 1), ]
+        })
+      )
+    })
+  )
+  ep <- do.call(
+    rbind,
+    lapply(qq, function(k) {
+      do.call(
+        rbind,
+        lapply(k, function(x) {
+          x[2:(nrow(x)), ]
+        })
+      )
+    })
+  )
   sp <- data.frame(x = sp[, 1], y = sp[, 2], z = 0)
   ep <- data.frame(x = ep[, 1], y = ep[, 2], z = 0)
 
@@ -99,7 +110,8 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
   ce <- sp::coordinates(ep)
   na <- matrix(NA, ncol = 3, nrow = nrow(cs))
 
-  mm <- matrix(t(cbind(cs, ce, na)),
+  mm <- matrix(
+    t(cbind(cs, ce, na)),
     ncol = 3,
     nrow = 3 * nrow(ce),
     byrow = TRUE
@@ -146,15 +158,20 @@ glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
 #' @param axes If TRUE, plot x, y and z axes.
 #' @param box If TRUE, plot a box around the globe.
 #' @param xlab,ylab,zlab Axes labels
-globe <- function(R = 1,
-                  R.grid = 1.05,
-                  specular = "black",
-                  axes = FALSE,
-                  box = FALSE,
-                  xlab = "", ylab = "", zlab = "") {
+globe <- function(
+  R = 1,
+  R.grid = 1.05,
+  specular = "black",
+  axes = FALSE,
+  box = FALSE,
+  xlab = "",
+  ylab = "",
+  zlab = ""
+) {
   # coordinates for texture
   n.smp <- 50
-  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)),
+  lat <- matrix(
+    -asin(seq(-1, 1, length.out = n.smp)),
     n.smp,
     n.smp,
     byrow = TRUE
@@ -166,7 +183,10 @@ globe <- function(R = 1,
 
   # globe and texture
   requireNamespace("rgl")
-  rgl::persp3d(x, y, z,
+  rgl::persp3d(
+    x,
+    y,
+    z,
     col = "white",
     texture = system.file("misc", "Lambert_ocean.png", package = "inlabru"),
     specular = "black",
