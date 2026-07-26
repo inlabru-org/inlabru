@@ -22,12 +22,14 @@
 #' @export
 #'
 #' @author Man Ho Suen
-cv_partition <- function(samplers,
-                         resolution = NULL,
-                         nrows = NULL,
-                         ncols = NULL,
-                         chess = TRUE,
-                         ...) {
+cv_partition <- function(
+  samplers,
+  resolution = NULL,
+  nrows = NULL,
+  ncols = NULL,
+  chess = TRUE,
+  ...
+) {
   requireNamespace("terra")
   # Create a grid for the given boundary
   if (is.null(resolution)) {

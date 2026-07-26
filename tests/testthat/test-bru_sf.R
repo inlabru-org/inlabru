@@ -54,7 +54,8 @@ test_that("sf gorillas lgcp vignette", {
   #   gg(mesh_sf) +
   #   geom_sf(data = gorillas_sf$boundary, alpha = 0.2, fill = "blue")
 
-  matern <- INLA::inla.spde2.pcmatern(mesh_sf,
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh_sf,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(0.1, 0.01)
   )

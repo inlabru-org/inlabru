@@ -176,8 +176,8 @@ test_that("Marginal parameter transformation", {
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- bru_comp_list(~
-    sigma(
+  cmp <- bru_comp_list(
+    ~ sigma(
       1,
       prec.linear = 1,
       marginal = bm_marginal(
@@ -186,7 +186,9 @@ test_that("Marginal parameter transformation", {
         dfun = dexp,
         rate = 1 / 8
       )
-    ) + Intercept(1))
+    ) +
+      Intercept(1)
+  )
   form <- distance ~ log_hr(distance, sigma = sigma) + Intercept
 
   pts <- mexdolphin_sf$points

@@ -123,6 +123,10 @@ that is applied before scaling by \code{weights}.}
 If NULL, an new environment is created. Can be accessed via
 \code{\link[=bru_comp_env_extra]{bru_comp_env_extra()}}}
 }
+\value{
+A \code{bru_comp} object defining a latent component and its associated
+effect mapping.
+}
 \description{
 Similar to \code{glm()}, \code{gam()} and \code{inla()}, \code{\link[=bru]{bru()}} models can be constructed
 via a formula-like syntax, where each latent effect is specified. However, in

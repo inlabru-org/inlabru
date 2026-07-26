@@ -47,6 +47,9 @@ of mappers in the multi-mapper x}
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+A character vector or \code{NULL}
+}
 \description{
 Implementations must return a character vector of sub-mapper names, or
 \code{NULL}. Intended for providing information about multi-mappers and mapper
@@ -75,6 +78,9 @@ mapper <- bm_multi(list(A = bm_index(2), B = bm_index(2)))
 ibm_names(mapper)
 ibm_names(mapper) <- c("new", "names")
 ibm_names(mapper)
+m <- bm_multi(list(A = bm_linear(), B = bm_linear()))
+ibm_names(m)
+
 }
 \seealso{
 Other mapper methods:

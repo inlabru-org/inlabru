@@ -5,8 +5,10 @@ test_that("fm_pixels sp vs sf", {
   skip_if_not_installed("sn")
   withr::local_options(lifecycle_verbosity = "quiet")
 
-  mesh <- fm_mesh_2d_inla(cbind(0, 0),
-    offset = 10, max.edge = 1,
+  mesh <- fm_mesh_2d_inla(
+    cbind(0, 0),
+    offset = 10,
+    max.edge = 1,
     crs = fm_CRS("longlat_globe")
   )
 
@@ -38,7 +40,8 @@ test_that("fm_pixels sp vs sf", {
   system.time({
     withr::local_seed(1234L)
     surface1 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sp")
-    density1 <- predict(fit,
+    density1 <- predict(
+      fit,
       surface1,
       ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
       n.samples = 10,
@@ -49,7 +52,8 @@ test_that("fm_pixels sp vs sf", {
   system.time({
     withr::local_seed(1234L)
     surface2 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sf")
-    density2 <- predict(fit,
+    density2 <- predict(
+      fit,
       surface2,
       ~ exp(field_eval(geometry) + Intercept),
       n.samples = 10,

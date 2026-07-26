@@ -58,7 +58,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   # distdata[1:2, ]
 
-
   # Generate location for detections if location missing
   # Use do.plot=T to see the location generated for each detection
   if (!("x" %in% colnames(distdata))) {
@@ -76,7 +75,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   # Only one strata for this data so need to add this information
   newdata$strat <- 1
   # newdata[1:3, ]
-
 
   # Automated mesh construction
   loc <- rbind(

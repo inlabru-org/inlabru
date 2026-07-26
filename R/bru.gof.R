@@ -167,7 +167,7 @@ bincount <- function(
   )
   pint$inside <-
     (pint$counts >= pint[[miname]]) &
-      (pint$counts <= pint[[mxname]])
+    (pint$counts <= pint[[mxname]])
 
   ggp <- ggplot2::ggplot() +
     ggplot2::geom_crossbar(

@@ -181,14 +181,17 @@ access_trace_add <- function(
     }
     arguments <- arguments_[[method_name]]
     trace_name <- trace_name_[[method_name]]
-    code <- c(glue::glue(
-      "#' @export
+    code <- c(
+      glue::glue(
+        "#' @export
        #'
        `{full_name}` <- function(x, {arguments}) {{
          access_trace({trace_name}, package = {package_text})
          NextMethod()
        }}"
-    ), "")
+      ),
+      ""
+    )
     write(
       code,
       file = file,

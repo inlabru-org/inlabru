@@ -29,6 +29,26 @@ is copied.}
 
 \item{\dots}{Passed on to \code{\link[=new_bru_input]{new_bru_input()}}.}
 }
+\value{
+\itemize{
+\item \code{ibm_input_set}: The \code{mapper} with the \code{input} associated with it.
+}
+
+\itemize{
+\item \code{ibm_input_new}: The \code{mapper} with the new \code{bru_input} associated
+with it.
+}
+
+\itemize{
+\item \code{ibm_input_available()}: logical; \code{TRUE} if a \code{bru_input} is
+associated with the \code{mapper}, and \code{FALSE} otherwise.
+}
+
+\itemize{
+\item \code{ibm_input_get}: The \link{bru_input} associated with the \code{mapper},
+if it is available.
+}
+}
 \description{
 Associate \link{bru_input} objects with \link{bru_mapper} objects.
 }

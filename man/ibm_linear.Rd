@@ -71,6 +71,11 @@ the needed information.
 \item \code{ibm_linear(default)}: Calls \code{\link[=ibm_eval2]{ibm_eval2()}} and returns a \link{bm_taylor} object.
 
 }}
+\examples{
+m <- bm_linear()
+ibm_linear(m, input = c(1, 3, 4, 5, 2), state = 2)
+
+}
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},

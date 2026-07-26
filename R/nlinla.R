@@ -36,21 +36,23 @@ bru_compute_linearisation <- function(...) {
 #'
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_comp <- function(cmp,
-                                               model,
-                                               lhood_expr,
-                                               data,
-                                               data_extra,
-                                               input,
-                                               state,
-                                               comp_simple,
-                                               effects,
-                                               pred0,
-                                               used,
-                                               is_rowwise,
-                                               eps,
-                                               n_pred = NULL,
-                                               ...) {
+bru_compute_linearisation.bru_comp <- function(
+  cmp,
+  model,
+  lhood_expr,
+  data,
+  data_extra,
+  input,
+  state,
+  comp_simple,
+  effects,
+  pred0,
+  used,
+  is_rowwise,
+  eps,
+  n_pred = NULL,
+  ...
+) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
@@ -190,28 +192,25 @@ bru_compute_linearisation.bru_comp <- function(cmp,
         } else {
           list(state_eps)
         },
-        data =
-          if (assume_rowwise) {
-            data[row_subset, , drop = FALSE]
-          } else {
-            data
-          },
+        data = if (assume_rowwise) {
+          data[row_subset, , drop = FALSE]
+        } else {
+          data
+        },
         data_extra = data_extra,
-        effects =
-          if (symmetric_diffs) {
-            effects_eps
-          } else {
-            list(effects_eps)
-          },
+        effects = if (symmetric_diffs) {
+          effects_eps
+        } else {
+          list(effects_eps)
+        },
         predictor = lhood_expr,
         used = used,
         format = "matrix",
-        n_pred =
-          if (assume_rowwise) {
-            length(row_subset)
-          } else {
-            n_pred
-          }
+        n_pred = if (assume_rowwise) {
+          length(row_subset)
+        } else {
+          n_pred
+        }
       )
       # Store sparse triplet information
       if (symmetric_diffs) {
@@ -279,14 +278,16 @@ bru_compute_linearisation.bru_comp <- function(cmp,
 #' @param model A `bru_model` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_obs <- function(lhood,
-                                              model,
-                                              data,
-                                              input,
-                                              state,
-                                              comp_simple,
-                                              eps,
-                                              ...) {
+bru_compute_linearisation.bru_obs <- function(
+  lhood,
+  model,
+  data,
+  input,
+  state,
+  comp_simple,
+  eps,
+  ...
+) {
   used <- bru_used(lhood)
   pred_expr <- bru_pred_expr(lhood)
   is_rowwise <- bru_is_rowwise(pred_expr)
@@ -370,13 +371,15 @@ bru_compute_linearisation.bru_obs <- function(lhood,
 #' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_obs_list <- function(lhoods,
-                                                   model,
-                                                   input,
-                                                   state,
-                                                   comp_simple,
-                                                   eps = 1e-5,
-                                                   ...) {
+bru_compute_linearisation.bru_obs_list <- function(
+  lhoods,
+  model,
+  input,
+  state,
+  comp_simple,
+  eps = 1e-5,
+  ...
+) {
   # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
@@ -395,12 +398,20 @@ bru_compute_linearisation.bru_obs_list <- function(lhoods,
 
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_model <- function(model, lhoods,
-                                                input, state,
-                                                comp_simple, ...) {
-  bru_compute_linearisation(lhoods,
+bru_compute_linearisation.bru_model <- function(
+  model,
+  lhoods,
+  input,
+  state,
+  comp_simple,
+  ...
+) {
+  bru_compute_linearisation(
+    lhoods,
     model = model,
-    input = input, state = state,
-    comp_simple = comp_simple, ...
+    input = input,
+    state = state,
+    comp_simple = comp_simple,
+    ...
   )
 }

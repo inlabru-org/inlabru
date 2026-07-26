@@ -88,9 +88,12 @@ that have state dependent output size.}
 
 \item{input}{Data input for the mapper.}
 }
+\value{
+An integer denoting the size of the latent vector being mapped.
+}
 \description{
 Implementations must return the size of the latent vector
-being mapped to.
+being mapped.
 }
 \section{Methods (by class)}{
 \itemize{
