@@ -49,11 +49,11 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     sp::coordinates(ll) <- c(sp::coordnames(object), "TMP.ZCOORD")
-    sp::proj4string(ll) <- fm_CRS(object)
+    sp::proj4string(ll) <- fmesher::fm_CRS(object)
     object <- ll
   }
 
-  object <- fm_transform(object, crs = fm_crs("sphere"))
+  object <- fmesher::fm_transform(object, crs = fmesher::fm_crs("sphere"))
   cc <- sp::coordinates(object)
   requireNamespace("rgl")
   rgl::points3d(
@@ -100,11 +100,11 @@ glplot.SpatialLines <- function(object, add = TRUE, ...) {
 
   sp::coordinates(sp) <- c("x", "y", "z")
   sp::coordinates(ep) <- c("x", "y", "z")
-  sp::proj4string(sp) <- fm_CRS(object)
-  sp::proj4string(ep) <- fm_CRS(object)
+  sp::proj4string(sp) <- fmesher::fm_CRS(object)
+  sp::proj4string(ep) <- fmesher::fm_CRS(object)
 
-  sp <- fm_transform(sp, crs = fm_crs("sphere"))
-  ep <- fm_transform(ep, crs = fm_crs("sphere"))
+  sp <- fmesher::fm_transform(sp, crs = fmesher::fm_crs("sphere"))
+  ep <- fmesher::fm_transform(ep, crs = fmesher::fm_crs("sphere"))
 
   cs <- sp::coordinates(sp)
   ce <- sp::coordinates(ep)
@@ -136,7 +136,11 @@ glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
   if (object$manifold == "S2") {
     # mesh$loc = mesh$loc
   } else {
-    object <- fm_transform(object, crs = fm_crs("sphere"), passthrough = TRUE)
+    object <- fmesher::fm_transform(
+      object,
+      crs = fmesher::fm_crs("sphere"),
+      passthrough = TRUE
+    )
   }
 
   if (is.null(col)) {

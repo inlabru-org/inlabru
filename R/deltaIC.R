@@ -123,7 +123,7 @@ deltaIC <- function(..., criterion = "DIC") {
 # lgcp_IC(fit_veg,nests,vegetation,list(geometry=mesh_int),boundary)
 # lgcp_IC(fit_veg,nests,vegetation,list(geometry=mesh_int),cvpart)
 lgcp_IC <- function(fit, data, predictor, domain, samplers, n.samples = 2000L) {
-  int_points <- fm_int(domain = domain, samplers = samplers)
+  int_points <- fmesher::fm_int(domain = domain, samplers = samplers)
   agg <- bm_aggregate(type = "sum", n_block = 1L)
   agg_block <- bm_aggregate(type = "sum", n_block = max(int_points$.block))
   if (is.null(data[[".block"]]) || (max(int_points$.block) == 1L)) {

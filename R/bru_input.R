@@ -208,8 +208,11 @@ bru_input.bru_input <- function(
           val <- as.data.frame(val)
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_CRS(orig_data), error = function(e) {})
-          if (!fm_crs_is_null(data_crs)) {
+          data_crs <- tryCatch(
+            fmesher::fm_CRS(orig_data),
+            error = function(e) {}
+          )
+          if (!fmesher::fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
           }
           val

@@ -61,7 +61,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
   points <- sf::st_as_sf(
     tibble::as_tibble(detdata(dset)),
     coords = cnames,
-    crs = fm_crs(crs)
+    crs = fmesher::fm_crs(crs)
   )
 
   # Extract effort and convert to sf lines
@@ -73,7 +73,7 @@ as.spatial.dsdata <- function(dset, cnames, crs) {
     sf::st_linestring(as.matrix(rbind(sp[k, ], ep[k, ])))
   })
 
-  spl <- sf::st_as_sfc(lilist, crs = fm_crs(crs))
+  spl <- sf::st_as_sfc(lilist, crs = fmesher::fm_crs(crs))
   tmp_names <- setdiff(
     names(segdata(dset)),
     c(
@@ -114,14 +114,14 @@ import_mexdolphin_sf <- function() {
     "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 ",
     "+ellps=GRS80 +datum=NAD83 +units=m +no_defs"
   )
-  data_crs <- fm_crs(data.p4s)
+  data_crs <- fmesher::fm_crs(data.p4s)
 
   dset <- import.dsmdata(mexdolphins, covar.col = 8)
-  dset$mesh$crs <- fm_crs(data_crs)
+  dset$mesh$crs <- fmesher::fm_crs(data_crs)
   mexdolphin <- as.spatial.dsdata(
     dset,
     cnames = c("x", "y"),
-    crs = fm_crs(data_crs)
+    crs = fmesher::fm_crs(data_crs)
   )
 
   # Target CRS
@@ -129,11 +129,17 @@ import_mexdolphin_sf <- function() {
     "+proj=lcc +lat_1=20 +lat_2=60 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 ",
     "+ellps=GRS80 +datum=NAD83 +units=km +no_defs +towgs84=0,0,0"
   )
-  target_crs <- fm_crs(target.p4s)
+  target_crs <- fmesher::fm_crs(target.p4s)
 
   # Units to km
-  mexdolphin$points <- fm_transform(mexdolphin$points, crs = target_crs)
-  mexdolphin$samplers <- fm_transform(mexdolphin$samplers, crs = target_crs)
+  mexdolphin$points <- fmesher::fm_transform(
+    mexdolphin$points,
+    crs = target_crs
+  )
+  mexdolphin$samplers <- fmesher::fm_transform(
+    mexdolphin$samplers,
+    crs = target_crs
+  )
   mexdolphin$points$distance <- mexdolphin$points$distance / 1000
   mexdolphin$points$Effort <- mexdolphin$points$Effort / 1000
   mexdolphin$points$mid.x <- mexdolphin$points$mid.x / 1000
@@ -145,7 +151,7 @@ import_mexdolphin_sf <- function() {
   mexdolphin$samplers$mid.x <- mexdolphin$samplers$mid.x / 1000
   mexdolphin$samplers$mid.y <- mexdolphin$samplers$mid.y / 1000
   mexdolphin$samplers$Effort <- mexdolphin$samplers$Effort / 1000
-  mexdolphin$mesh <- fm_transform(mexdolphin$mesh, crs = target_crs)
+  mexdolphin$mesh <- fmesher::fm_transform(mexdolphin$mesh, crs = target_crs)
   mexdolphin$mesh$loc <- fmesher::fm_unify_coords(mexdolphin$mesh$loc)
 
   # Remove all-NA columns such as "distance" from samplers, since they may
@@ -160,13 +166,13 @@ import_mexdolphin_sf <- function() {
   mexdolphin$samplers <- mexdolphin$samplers[!all_na]
 
   ##### Prediction polygon
-  poly_pred <- fm_segm(mexdolphin$mesh, boundary = FALSE)
-  fm_is_bnd(poly_pred) <- TRUE
-  fm_crs(poly_pred) <- fm_crs(target_crs)
+  poly_pred <- fmesher::fm_segm(mexdolphin$mesh, boundary = FALSE)
+  fmesher::fm_is_bnd(poly_pred) <- TRUE
+  fmesher::fm_crs(poly_pred) <- fmesher::fm_crs(target_crs)
   poly_pred <- sf::st_as_sf(
-    tibble::tibble(weight = 1, geometry = fm_as_sfc(poly_pred))
+    tibble::tibble(weight = 1, geometry = fmesher::fm_as_sfc(poly_pred))
   )
-  poly_pred <- fm_zm(poly_pred, target = "XY")
+  poly_pred <- fmesher::fm_zm(poly_pred, target = "XY")
   mexdolphin$ppoly <- poly_pred
 
   ##### Simulate a whole population #####
@@ -214,15 +220,15 @@ import_mexdolphin_sf <- function() {
 
   mexdolphin$simulated <- sf::st_as_sf(pts)
   mexdolphin$simulated$size <- 1
-  #  sf::st_crs(mexdolphin$simulated) <- fm_CRS(target_crs)
+  #  sf::st_crs(mexdolphin$simulated) <- fmesher::fm_CRS(target_crs)
 
   #### Depth covariate #####
   depth <- sf::st_as_sf(
     mexdolphins$preddata[, c("x", "y", "depth"), drop = FALSE],
     coords = c("x", "y"),
-    crs = fm_crs(data_crs)
+    crs = fmesher::fm_crs(data_crs)
   )
-  mexdolphin$depth <- fm_transform(depth, target_crs)
+  mexdolphin$depth <- fmesher::fm_transform(depth, target_crs)
 
   # return
   mexdolphin

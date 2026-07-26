@@ -296,7 +296,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- fm_mesh_1d(
+  mesh1 <- fmesher::fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
@@ -307,7 +307,12 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- bru_comp_list(
-    ~ effect(x, model = "rw2", mapper = bru_mapper(mesh1, indexed = FALSE)) - 1
+    ~ effect(
+      x,
+      model = "rw2",
+      mapper = fmesher::bru_mapper(mesh1, indexed = FALSE)
+    ) -
+      1
   )
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
@@ -468,7 +473,7 @@ test_that("Component inputs: non-numeric input detection", {
     data.frame(x = c(-15, 15, 15, -15), y = c(25, 25, 50, 50)),
     format = "sf"
   )
-  mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
+  mesh <- fmesher::fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
   matern <-
     INLA::inla.spde2.pcmatern(
       mesh,
@@ -505,7 +510,7 @@ test_that("Component inputs: non-numeric input detection", {
     ibm_eval(
       as_bru_comp_list(model)$field$mapper,
       input = input,
-      state = rep(1, fm_dof(mesh))
+      state = rep(1, fmesher::fm_dof(mesh))
     ),
     "The input to a bm_scale evaluation must be numeric or logical."
   )

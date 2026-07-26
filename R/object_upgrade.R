@@ -493,7 +493,7 @@ bru_info_upgrade_functions <- function() {
         object[["model"]][["inputs"]] <- object[["inputs"]]
       }
       if (is.null(object[["model"]][["lhoods"]])) {
-        object[["model"]][["lhoods"]] <- object[["lhoods"]]
+        object[["model"]][["lhoods"]] <- as_bru_obs_list(object[["lhoods"]])
       }
       if (!is.null(object[["model"]][["inputs"]])) {
         # bru_model input changed from list of <component inputs>)
@@ -555,7 +555,9 @@ bru_info_upgrade_functions <- function() {
           x
         }
         object[["model"]][["lhoods"]] <-
-          lapply(object[["model"]][["lhoods"]], lhood_upgrader)
+          as_bru_obs_list(
+            lapply(object[["model"]][["lhoods"]], lhood_upgrader)
+          )
       }
 
       object

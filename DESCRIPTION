@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.14.1.9012
+Version: 2.14.1.9013
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -59,22 +59,22 @@ Additional_repositories: https://inla.r-inla-download.org/R/testing
 Encoding: UTF-8
 Depends:
     methods,
-    R (>= 4.1.0),
-    stats
+    R (>= 4.1.0)
 Imports:
-    generics,
     dplyr,
     fmesher (>= 0.7.0),
+    generics,
     glue,
     lifecycle,
     MatrixModels,
     Matrix,
+    Rcpp,
     rlang,
     sf,
+    stats,
     tibble,
     utils,
-    withr,
-    Rcpp
+    withr
 Suggests:
     covr,
     ggplot2,

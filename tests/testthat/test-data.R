@@ -27,7 +27,7 @@ test_that("Component construction: default mesh/mapping, data is list", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- fm_mesh_1d(
+  mesh1 <- fmesher::fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
@@ -109,7 +109,7 @@ test_that("Component construction: separate response_data input", {
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik2)))
   expect_equal(ibm_values(cmp2$effect$mapper, multi = 1)$main, lik2$data$x)
 
-  mesh1 <- fm_mesh_1d(lik1$data$x)
+  mesh1 <- fmesher::fm_mesh_1d(lik1$data$x)
   expect_error(
     bru_comp_list(
       ~ effect(x, model = "rw2", mapper = mesh1) - 1

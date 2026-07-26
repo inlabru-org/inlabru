@@ -19,7 +19,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
   fit <- bru(
     comp,
     bru_obs(
-      z ~ fm_block_eval(
+      z ~ fmesher::fm_block_eval(
         block = grp,
         n_block = nrow(obs),
         weights = weights,
@@ -57,7 +57,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
   fit_sf <- bru(
     comp_sf,
     bru_obs(
-      z ~ fm_block_eval(
+      z ~ fmesher::fm_block_eval(
         block = grp,
         weights = weights,
         rescale = TRUE,

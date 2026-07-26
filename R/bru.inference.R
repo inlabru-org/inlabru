@@ -238,8 +238,7 @@ summary.bru_info <- function(object, verbose = TRUE, ...) {
     list(
       inlabru_version = object[["inlabru_version"]],
       INLA_version = object[["INLA_version"]],
-      components = summary(object[["model"]], verbose = verbose, ...),
-      lhoods = summary(as_bru_obs_list(object), verbose = verbose, ...)
+      model = summary(object[["model"]], verbose = verbose, ...)
     ),
     class = "summary_bru_info"
   )
@@ -251,10 +250,7 @@ summary.bru_info <- function(object, verbose = TRUE, ...) {
 print.summary_bru_info <- function(x, ...) {
   cat(glue("inlabru version: {x$inlabru_version}"), "\n")
   cat(glue("INLA version: {x$INLA_version}"), "\n")
-  print(x$components)
-  if (!is.null(x$lhoods)) {
-    print(x$lhoods)
-  }
+  print(x$model)
   invisible(x)
 }
 
@@ -1072,16 +1068,16 @@ extended_bind_rows <- function(...) {
         "Column '{nm}' is not a simple feature column in all data objects."
       ))
     }
-    the_crs <- fm_crs(dt[[sf_data_idx_[1]]][[nm]])
+    the_crs <- fmesher::fm_crs(dt[[sf_data_idx_[1]]][[nm]])
     for (i in sf_data_idx_) {
       if (!inherits(dt[[i]][[nm]], "sfc")) {
         stop(glue(
           "Column '{nm}' is not a simple feature column in all data objects."
         ))
       }
-      dt_crs <- fm_crs(dt[[i]][[nm]])
-      if (!fm_crs_is_identical(dt_crs, the_crs)) {
-        dt[[i]][[nm]] <- fm_transform(dt[[i]][[nm]], crs = the_crs)
+      dt_crs <- fmesher::fm_crs(dt[[i]][[nm]])
+      if (!fmesher::fm_crs_is_identical(dt_crs, the_crs)) {
+        dt[[i]][[nm]] <- fmesher::fm_transform(dt[[i]][[nm]], crs = the_crs)
       }
     }
 
@@ -1179,7 +1175,7 @@ bru_agg_data <- function(
 ) {
   if (is.null(ips)) {
     if (!is.null(domain)) {
-      ips <- fm_int(
+      ips <- fmesher::fm_int(
         domain = domain,
         samplers = samplers,
         int.args = options[["bru_int_args"]]
@@ -1664,7 +1660,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
       ))
     }
 
-    ips <- fm_int(
+    ips <- fmesher::fm_int(
       domain = domain,
       samplers = samplers,
       int.args = options[["bru_int_args"]]
@@ -1689,9 +1685,9 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
   if (ips_is_Spatial) {
     bru_safe_sp(force = TRUE)
     ips_coordnames <- sp::coordnames(ips)
-    ips_crs <- fm_CRS(ips)
+    ips_crs <- fmesher::fm_CRS(ips)
     # For backwards compatibility:
-    data_crs <- fm_CRS(data)
+    data_crs <- fmesher::fm_CRS(data)
 
     if ("coordinates" %in% names(response)) {
       data_coordnames <- colnames(response$coordinates)
@@ -1902,7 +1898,7 @@ bru_obs_family_cp_sp <- function(lh, options, .envir) {
     data <- sp::SpatialPointsDataFrame(
       coords = as.matrix(data[data_coordnames]),
       data = data[non_coordnames],
-      proj4string = fm_CRS(data_crs),
+      proj4string = fmesher::fm_CRS(data_crs),
       match.ID = FALSE
     )
   }
@@ -2003,7 +1999,7 @@ bru_obs_family_cp <- function(lh, options, .envir) {
       ))
     }
 
-    ips <- fm_int(
+    ips <- fmesher::fm_int(
       domain = domain,
       samplers = samplers,
       int.args = options[["bru_int_args"]]
@@ -3240,10 +3236,7 @@ print.summary_bru_obs <- function(x, ...) {
 #' @rdname bru_obs_print
 #' @export
 print.summary_bru_obs_list <- function(x, ...) {
-  cat("Observation models:\n")
-  for (lh in x) {
-    print(lh)
-  }
+  lapply(x, print)
   invisible(x)
 }
 
@@ -5651,7 +5644,7 @@ iinla <- function(
 
     timings <- bru_timer_do(timings, "Run inla()", k)
 
-    result <- fm_try_callstack(
+    result <- fmesher::fm_try_callstack(
       do.call(
         INLA::inla,
         inla.options.merged,

@@ -463,8 +463,8 @@ devel.cvmeasure <- function(
     # PRESENTED TO YOU BY HACKY McHACKERSON
     #
 
-    wips <- fm_int(mesh, samplers)
-    A <- fm_basis(mesh, loc = wips)
+    wips <- fmesher::fm_int(mesh, samplers)
+    A <- fmesher::fm_basis(mesh, loc = wips)
 
     weights <- wips$weight
     weights <- weights / sum(weights)

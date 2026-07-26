@@ -1404,7 +1404,7 @@ ibm_jacobian.bm_fm_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -1425,7 +1425,7 @@ ibm_jacobian.bm_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 
@@ -1507,7 +1507,7 @@ ibm_jacobian.bm_fm_mesh_1d <- function(mapper, input, ...) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
   # Note: Handles NA input from fmesher 0.2.0.9002, with fixes in 0.4.0.9003
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -1532,7 +1532,7 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## _index ####
@@ -2611,7 +2611,7 @@ ibm_values.bm_aggregate <- function(mapper, ..., state = NULL, n_state = NULL) {
 #'
 ibm_jacobian.bm_aggregate <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  fm_block(
+  fmesher::fm_block(
     block = input[["block"]],
     weights = input[["weights"]],
     log_weights = input[["log_weights"]],
@@ -2627,7 +2627,7 @@ ibm_jacobian.bm_aggregate <- function(mapper, input, state = NULL, ...) {
 ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
-    fm_block_eval(
+    fmesher::fm_block_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2699,7 +2699,7 @@ bru_mapper_logsumexp <- function(...) {
 #'
 ibm_jacobian.bm_logsumexp <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  input <- fm_block_prep(
+  input <- fmesher::fm_block_prep(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2711,7 +2711,7 @@ ibm_jacobian.bm_logsumexp <- function(mapper, input, state = NULL, ...) {
   n_state <- length(input$block)
   n_out <- input$n_block
 
-  log_weights <- fm_block_log_weights(
+  log_weights <- fmesher::fm_block_log_weights(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2721,7 +2721,7 @@ ibm_jacobian.bm_logsumexp <- function(mapper, input, state = NULL, ...) {
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- fm_block_log_shift(
+  shift <- fmesher::fm_block_log_shift(
     log_weights = w_state,
     block = input[["block"]],
     n_block = n_out
@@ -2762,7 +2762,7 @@ ibm_eval.bm_logsumexp <- function(
 ) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2821,7 +2821,7 @@ bm_logitaverage <- function(n_block = NULL) {
 #'
 ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  input <- fm_block_prep(
+  input <- fmesher::fm_block_prep(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2833,7 +2833,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
   n_state <- length(input$block)
   n_out <- input$n_block
 
-  log_weights <- fm_block_log_weights(
+  log_weights <- fmesher::fm_block_log_weights(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2847,12 +2847,12 @@ ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
   # Compute shift for stable log-sum-exp
   w_state1 <- state1 + log_weights
   w_state2 <- state2 + log_weights
-  shift1 <- fm_block_log_shift(
+  shift1 <- fmesher::fm_block_log_shift(
     log_weights = w_state1,
     block = input[["block"]],
     n_block = n_out
   )
-  shift2 <- fm_block_log_shift(
+  shift2 <- fmesher::fm_block_log_shift(
     log_weights = w_state2,
     block = input[["block"]],
     n_block = n_out
@@ -2908,7 +2908,7 @@ ibm_eval.bm_logitaverage <- function(
   state1 <- plogis(state, log.p = TRUE)
   state2 <- plogis(-state, log.p = TRUE)
   val_1 <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2918,7 +2918,7 @@ ibm_eval.bm_logitaverage <- function(
       log = TRUE
     )
   val_2 <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -3684,7 +3684,7 @@ ibm_jacobian.bm_multi <- function(
   # (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
   A_ <- sub_A[[1]]
   for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-    A_ <- fm_row_kron(sub_A[[k + 1]], A_)
+    A_ <- fmesher::fm_row_kron(sub_A[[k + 1]], A_)
   }
   A_
 }

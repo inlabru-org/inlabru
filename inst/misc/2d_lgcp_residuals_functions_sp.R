@@ -34,7 +34,7 @@ theme_set(theme_bw())
 #'
 prepare_residual_calculations <- function(samplers, domain, observations) {
   # Calculate the integration weights for A_integrate
-  ips <- fm_int(domain = domain, samplers = samplers)
+  ips <- fmesher::fm_int(domain = domain, samplers = samplers)
 
   # Set-up the A_integrate matrix
   # A_integrate has as many rows as polygons in the samplers,
@@ -63,7 +63,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
   df <- sp::SpatialPointsDataFrame(
     coords = rbind(domain$loc[, 1:2], sp::coordinates(observations)),
     data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
-    proj4string = fm_CRS(domain)
+    proj4string = fmesher::fm_CRS(domain)
   )
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals

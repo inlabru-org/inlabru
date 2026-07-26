@@ -85,7 +85,7 @@ import.mrsea <- function(format = c("sf", "sp")) {
   if (format == "sp") {
     ############ FORMAT USING sp objects ##############
 
-    crs <- fm_CRS("+proj=utm +zone=32 +units=km")
+    crs <- fmesher::fm_CRS("+proj=utm +zone=32 +units=km")
 
     # Transects lines
     lns <- subset(dset$effort, is.na(det))
@@ -101,7 +101,7 @@ import.mrsea <- function(format = c("sf", "sp")) {
 
     # Mesh
     mesh <- dset$mesh
-    mesh$crs <- fm_crs(crs)
+    mesh$crs <- fmesher::fm_crs(crs)
 
     # Boundary
     boundary <- spoly(
@@ -122,7 +122,7 @@ import.mrsea <- function(format = c("sf", "sp")) {
   } else {
     ############ FORMAT USING sf objects ##############
 
-    crs <- fm_crs("+proj=utm +zone=32 +units=km")
+    crs <- fmesher::fm_crs("+proj=utm +zone=32 +units=km")
 
     # Transects lines
     lns <- subset(dset$effort, is.na(det))

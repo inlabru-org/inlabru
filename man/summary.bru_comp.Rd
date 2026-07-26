@@ -9,7 +9,7 @@
 \alias{format.bru_subcomp}
 \alias{summary.bru_subcomp}
 \alias{print.bru_subcomp}
-\alias{print.summary_component}
+\alias{print.summary_bru_comp}
 \alias{print.summary_bru_comp_list}
 \alias{print.summary_bru_subcomp}
 \title{Summarise components}
@@ -30,7 +30,7 @@
 
 \method{print}{bru_subcomp}(x, verbose = TRUE, ..., label.override = NULL)
 
-\method{print}{summary_component}(x, ...)
+\method{print}{summary_bru_comp}(x, ...)
 
 \method{print}{summary_bru_comp_list}(x, ...)
 

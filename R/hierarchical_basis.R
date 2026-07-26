@@ -180,7 +180,7 @@ make_hierarchical_mesh_basis <- function(
   stopifnot(alpha >= 1, alpha <= 2)
   # Construct neighbour matrix in a way that doesn't involve the mesh specifics;
   # only the computational neighbourhood structure:
-  fem <- fm_fem(mesh, order = 2)
+  fem <- fmesher::fm_fem(mesh, order = 2)
   G1 <- fem$g1
   G2 <- fem$g2
   G <- G1

@@ -29,10 +29,12 @@
 #' [Poisson2_1D], [Poisson2_1D] and [toygroups].
 #'
 #' @aliases inlabru
-#' @import stats
+#' @importFrom stats na.omit sd as.formula dnorm median optimise pbinom plogis
+#' @importFrom stats pnorm qchisq qlogis qnorm quantile rnorm rpois runif
+#' @importFrom stats setNames terms update.formula qexp pexp
 #' @import methods
 #' @importFrom Matrix diag
-#' @import fmesher
+#' @importFrom fmesher fm_crs
 #' @importFrom glue glue
 #' @importFrom glue glue_data
 #' @importFrom glue glue_collapse

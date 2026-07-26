@@ -47,8 +47,8 @@ ggplot() +
     alpha = 0.1
   )
 
-boundary <- fm_as_segm_list(list(inner_boundary, outer_boundary))
-mesh <- fm_mesh_2d_inla(
+boundary <- fmesher::fm_as_segm_list(list(inner_boundary, outer_boundary))
+mesh <- fmesher::fm_mesh_2d_inla(
   boundary = boundary,
   max.edge = c(0.5, 2),
   offset = c(pi, pi)

@@ -13,7 +13,7 @@ check_spatstat <- function(pkg = "spatstat.geom") {
       return(FALSE)
     }
   } else {
-    caller_name <- fm_caller_name(1)
+    caller_name <- fmesher::fm_caller_name(1)
     stop(paste0(
       "package '",
       pkg,

@@ -32,6 +32,8 @@
 ## Other changes
 
 * Remove dependency on `plyr`. Fixes #301 (`2.14.1.9004`)
+* Move `stats` from `Depends:` to `Imports:` to avoid unnecessary namespace
+  clashes (`2.14.1.9013`)
 
 # inlabru 2.14.1
 

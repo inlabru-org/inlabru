@@ -1283,8 +1283,8 @@ make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
       ))
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_CRS)
-    crs_info <- lapply(inp_crs, fm_wkt)
+    inp_crs <- lapply(inp, fmesher::fm_CRS)
+    crs_info <- lapply(inp_crs, fmesher::fm_wkt)
     null_crs <- vapply(crs_info, is.null, logical(1))
     inconsistent_crs <-
       (length(unique(unlist(crs_info))) > 1) ||
@@ -1311,7 +1311,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
       ))
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_crs)
+    inp_crs <- lapply(inp, fmesher::fm_crs)
     null_crs <- vapply(inp_crs, is.na, logical(1))
     inconsistent_crs <-
       (length(unique(inp_crs)) > 1) ||
@@ -1624,7 +1624,7 @@ make_submapper <- function(
     if (allow_interpolation) {
       return(
         bru_mapper(
-          fm_mesh_1d(values),
+          fmesher::fm_mesh_1d(values),
           indexed = require_indexed
         )
       )
@@ -2028,7 +2028,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
     )
     result$Summary <- Summary
   }
-  class(result) <- "summary_component"
+  class(result) <- "summary_bru_comp"
   result
 }
 
@@ -2128,7 +2128,7 @@ print.bru_subcomp <- function(x, verbose = TRUE, ..., label.override = NULL) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.bru_comp
 
-print.summary_component <- function(x, ...) {
+print.summary_bru_comp <- function(x, ...) {
   if (is.null(x[["Summary"]])) {
     for (name in names(x)) {
       if (!is.null(x[[name]])) {

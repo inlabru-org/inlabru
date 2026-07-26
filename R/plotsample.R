@@ -146,7 +146,7 @@ plotsample <- function(
       i
     )
   }
-  plots <- sp::SpatialPolygons(polys, proj4string = fm_CRS(spdf))
+  plots <- sp::SpatialPolygons(polys, proj4string = fmesher::fm_CRS(spdf))
   # remove bits of plot outside boundary
   plots <- raster::intersect(boundary, plots)
   # extract only those nests inside the polygons (neat!)

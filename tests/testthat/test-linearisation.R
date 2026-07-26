@@ -171,7 +171,7 @@ test_that("Linearisation 2", {
     eta <- cos(x)
   })
   response_data <- data.frame(
-    y = fm_block_logsumexp_eval(block = data$.block, values = data$eta)
+    y = fmesher::fm_block_logsumexp_eval(block = data$.block, values = data$eta)
   )
   X <- rnorm(N)
 

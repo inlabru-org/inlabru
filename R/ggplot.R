@@ -18,7 +18,7 @@ gmap <- function(...) {
     what = "gmap()",
     details = "ggmap isn't supported anymore."
   )
-  # data <- fm_transform(data, crs = fm_crs("longlat_globe"))
+  # data <- fmesher::fm_transform(data, crs = fmesher::fm_crs("longlat_globe"))
   # df <- cbind(sp::coordinates(data), data@data)
   #
   # # Figure out a sensible bounding box (range of data plus 30%)
@@ -94,7 +94,7 @@ gm <- function(...) {
     with = "gg()",
     details = "ggmap isn't supported anymore."
   )
-  gg(..., crs = fm_CRS("+proj=longlat"))
+  gg(..., crs = fmesher::fm_CRS("+proj=longlat"))
 }
 
 
@@ -567,7 +567,7 @@ gg.SpatialPoints <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs)
+    data <- fmesher::fm_transform(data, crs)
   }
 
   df <- as.data.frame(data)
@@ -700,10 +700,10 @@ gg.sf <- function(data, mapping = NULL, ..., geom = "sf") {
           stat = "sf_coordinates",
           ...
         ),
-        if (fmesher::fm_crs_is_null(fm_crs(data))) {
+        if (fmesher::fm_crs_is_null(fmesher::fm_crs(data))) {
           ggplot2::coord_sf(default = TRUE)
         } else {
-          ggplot2::coord_sf(default = TRUE, crs = fm_crs(data))
+          ggplot2::coord_sf(default = TRUE, crs = fmesher::fm_crs(data))
         }
       )
   }
@@ -731,7 +731,7 @@ gg.SpatialLines <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
   requireNamespace("ggplot2")
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs)
+    data <- fmesher::fm_transform(data, crs)
   }
 
   qq <- sp::coordinates(data)
@@ -809,7 +809,7 @@ gg.SpatialPolygons <- function(data, mapping = NULL, crs = NULL, ...) {
   bru_safe_sp(force = TRUE)
   data <- sf::st_as_sf(data)
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs, passthrough = TRUE)
+    data <- fmesher::fm_transform(data, crs, passthrough = TRUE)
   }
   arg <- list(...)
   if ("alpha" %in% names(arg)) {
@@ -859,7 +859,7 @@ gg.SpatialPixelsDataFrame <- function(
 ) {
   bru_safe_sp(force = TRUE)
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs)
+    data <- fmesher::fm_transform(data, crs)
   }
   if (!is.null(mask)) {
     data <- data[as.vector(!is.na(sp::over(data, mask))), ]
@@ -1068,8 +1068,8 @@ gg.fm_mesh_2d <- function(
     if (inherits(mask, "Spatial")) {
       # For backwards compatibility with old plotting code, use Spatial
       # format, and mask only in the gg.Spatial* method.
-      px <- fm_pixels(data, dims = c(nx, ny), format = "sp")
-      A <- fm_basis(data, px)
+      px <- fmesher::fm_pixels(data, dims = c(nx, ny), format = "sp")
+      A <- fmesher::fm_basis(data, px)
       px$color <- as.vector(A %*% color)
       if (!is.null(alpha)) {
         px$alpha <- as.vector(A %*% alpha)
@@ -1078,14 +1078,19 @@ gg.fm_mesh_2d <- function(
         gg <- gg(px, mask = mask)
       }
     } else {
-      px <- fm_pixels(data, dims = c(nx, ny), mask = mask, format = "sf")
-      proj <- fm_evaluator(data, px)
-      px$color <- fm_evaluate(proj, field = color)
+      px <- fmesher::fm_pixels(
+        data,
+        dims = c(nx, ny),
+        mask = mask,
+        format = "sf"
+      )
+      proj <- fmesher::fm_evaluator(data, px)
+      px$color <- fmesher::fm_evaluate(proj, field = color)
       if (!is.null(alpha)) {
         if (length(alpha) == 1) {
           px$alpha <- alpha
         } else {
-          px$alpha <- fm_evaluate(proj, field = alpha)
+          px$alpha <- fmesher::fm_evaluate(proj, field = alpha)
         }
         gg <- gg(
           px,
@@ -1105,7 +1110,7 @@ gg.fm_mesh_2d <- function(
     stop("Geom not implemented for spherical meshes (manifold = S2)")
   }
   if (!is.null(crs)) {
-    data <- fm_transform(data, crs = crs)
+    data <- fmesher::fm_transform(data, crs = crs)
   }
 
   df <- rbind(

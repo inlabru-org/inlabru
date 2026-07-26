@@ -172,12 +172,8 @@ summary.bru_model <- function(object, ...) {
       lhoods = {
         # Once lhoods is moved into bru_model, the NULL part will no longer be
         # needed, and as_bru_obs_list() can be used instead.
-        bru_obs_lst <- object[["lhoods"]]
-        if (is.null(bru_obs_lst)) {
-          NULL
-        } else {
-          summary(bru_obs_lst, ...)
-        }
+        bru_obs_lst <- as_bru_obs_list(object)
+        summary(bru_obs_lst, ...)
       }
     ),
     class = "summary_bru_model"
