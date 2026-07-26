@@ -40,7 +40,11 @@ library(patchwork)
 Introduction
 ----------------------------------
 
-We are going to fit some spatial models to the gorilla data, and compare them using  cross validation.  For illustration, we consider the same models from the [vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html), and we  only focus on the practical aspects of LGCPs comparison.  More specifically, we consider the following models:
+We are going to fit some spatial models to the gorilla data, and compare them
+using  cross validation.  For illustration, we consider the same models from the
+[vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html),
+and we  only focus on the practical aspects of LGCPs comparison.  More specifically,
+we consider the following models:
 
 | Models  | Components |
 | -------- | -------- | 
@@ -54,24 +58,38 @@ We are going to fit some spatial models to the gorilla data, and compare them us
 Leave-Region-Out Cross Validation
 -----------------------------------
 
-In point pattern analysis,  the available information comes from  *events locations* and *empty regions*,  and this should be taken into consideration for models comparison. Here, we use a  *leave-region-out cross validation* approach,  in which the domain is partitioned into subregions, and the model is used the predict the likelihood contribution from  holdout subregions.
+In point pattern analysis,  the available information comes from
+*events locations* and *empty regions*,  and this should be taken into
+consideration for models comparison. Here, we use a
+*leave-region-out cross validation* approach,  in which the domain is
+partitioned into subregions, and the model is used the predict the likelihood
+contribution from  holdout subregions.
 
-Let $Y$ be a LGCP with intensity $\lambda(.)$ defined on a bounded domain $\Omega$, and we observe a point pattern $\mathbf{y} = (y_1,\cdots, y_n)$. Then the log likelihood is defined as 
+Let $Y$ be a LGCP with intensity $\lambda(.)$ defined on a bounded domain
+$\Omega$, and we observe a point pattern $\mathbf{y} = (y_1,\cdots, y_n)$.
+Then the log likelihood is defined as 
 
 $$
 \ell(\lambda(.);\mathbf{y}, \Omega) = |\Omega| - \int_{\Omega}\lambda(s)ds + \sum_{y_i \in \mathbf{y}\cap\Omega } \ln \lambda(y_i). 
 $$
 
-Now, if we  consider a partition $\Omega = \Cup_{j=1}^J B_j$ of the domain; we can split the log likelihood into regional log likelihood contributions as  $\ell(\lambda(.);\mathbf{y}, \Omega) = \sum_{j=1}^J \ell_j(\lambda(.);\mathbf{y}, B_j)$  where
+Now, if we  consider a partition $\Omega = \Cup_{j=1}^J B_j$ of the domain; we
+can split the log likelihood into regional log likelihood contributions as
+$\ell(\lambda(.);\mathbf{y}, \Omega) = \sum_{j=1}^J \ell_j(\lambda(.);\mathbf{y}, B_j)$,
+where
 
 $$
 \ell_j(\lambda(.);\mathbf{y}, B_j) = |B_j| - \int_{B_j}\lambda(s)ds + \sum_{y_i \in \mathbf{y}\cap B_j } \ln \lambda(y_i),
 $$
 and we note that, this representation *is not equivalent to the aggregated count or grid* approach. 
 
-To fit the model, we use the complete information from $\ell(\lambda(.);\mathbf{y}, \Omega)$. For model comparison, however,  the  likelihood contribution, $\ell_j(\lambda(.);\mathbf{y}, B_j)$ from  each $B_j$, is left out and after fitting the model, we evaluate its predictive performance on the holdout subregion using the logarithmic scoring rule. 
+To fit the model, we use the complete information from $\ell(\lambda(.);\mathbf{y}, \Omega)$.
+For model comparison, however,  the  likelihood contribution, $\ell_j(\lambda(.);\mathbf{y}, B_j)$
+from  each $B_j$, is left out and after fitting the model, we evaluate its predictive performance
+on the holdout subregion using the logarithmic scoring rule. 
 
-The aggregated Group Conditional Predictive Ordinate (GCPO)  is defined as the sum of  the logarithm of the joint leave-region-out predictive distribution 
+The aggregated Group Conditional Predictive Ordinate (GCPO)  is defined as the sum of
+the logarithm of the joint leave-region-out predictive distribution 
 
 $$\text{GCPO} = \sum_{j=1}^J \log \pi(\mathbf{y}_{B_j} | \mathbf{y}_{-B_j}) $$
 where we define  
@@ -81,7 +99,9 @@ $$
 $$ 
 
 In principle, the model should be refitted $J$ times, however, a fast and accurate 
-approximation to the leave-region-out predictive distribution, accessible via the `control.gcpo` argument, allows us to compute the approximate GCPO score from a single model fit using the complete point pattern. 
+approximation to the leave-region-out predictive distribution, accessible via the
+`control.gcpo` argument, allows us to compute the approximate GCPO score from a
+single model fit using the complete point pattern. 
 
 
 Get the data
@@ -130,7 +150,8 @@ ggplot() +
   gg(nests, color = "white", cex = 0.5)
 ```
 
-For the spatial component, we use a SPDE type smoother, with the mesh, boundary and nests illustrated below:
+For the spatial component, we use a SPDE type smoother, with the mesh, boundary
+and nests illustrated below:
 
 ```{r warning=FALSE,message=FALSE}
 ggplot() +
@@ -179,7 +200,8 @@ comp_veg_elev_field <- geometry ~
 
 To enable the block or regional  `group.cv` calculations, we need to split the domain into spatial
 regions, and compute the association of each observed point to these subregions.
-The `cv_hex` function allows to create hexagonal partitions, but *if meaningful subregions of interest are available, these must be used to define the likelihood contribution*.  
+The `cv_hex` function allows to create hexagonal partitions, but
+*if meaningful subregions of interest are available, these must be used to define the likelihood contribution*.  
 
 ```{r warning=FALSE,message=FALSE}
 cvpart <- cv_hex(boundary, cellsize = 0.15, n_group = 1)
@@ -192,7 +214,8 @@ ggplot() +
 ```
 
 
-It is important check that *every event belongs to a region*, to ensure  the regional likelihood contribution is properly calculated:
+It is important check that *every event belongs to a region*, to ensure
+the regional likelihood contribution is properly calculated:
 
 ```{r warning=FALSE,message=FALSE}
 cvpart$block_ID <- seq_len(nrow(cvpart))
@@ -208,7 +231,11 @@ nests$.block <- unlist(a)
 ### Fitting the models
 
 Fit the models as usual, and increase the integration scheme resolution to
-better match the covariate. In the code below, `enable = TRUE` for `control.gcpo`  tells `INLA` that the `GCPO` must be calculated,  `type.cv = "joint"` ensures that we are doing a joint prediction for the entire region. For speed, we set `control.compute(config=FALSE)` to compute the `group.cv` *score conditional on posterior mode of the hyperparameters*. 
+better match the covariate. In the code below, `enable = TRUE` for `control.gcpo`
+tells `INLA` that the `GCPO` must be calculated,  `type.cv = "joint"` ensures
+that we are doing a joint prediction for the entire region. For speed, we set
+`control.compute(config=FALSE)` to compute the `group.cv` *score conditional
+on posterior mode of the hyperparameters*. 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
 mesh_int <- mesh
@@ -377,7 +404,12 @@ str(gcpo_hpp)
 ```
 
 
-From the table below, the  `vegetation` covariate is a strong predictor, as expected, but also the `SPDE smoother`.  Including `elevation` in the model already containing `vegetation` and the `SPDE smoother` does not provide any considerable gain in terms of predictive score.  These conclusions are similar to the ones obtained from the [vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html), although the latter was mainly based on in-sample  analysis.
+From the table below, the  `vegetation` covariate is a strong predictor, as
+expected, but also the `SPDE smoother`.  Including `elevation` in the model
+already containing `vegetation` and the `SPDE smoother` does not provide any
+considerable gain in terms of predictive score.  These conclusions are similar
+to the ones obtained from the [vignette on spatial covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html),
+although the latter was mainly based on in-sample  analysis.
 
 ```{r warning=FALSE,message=FALSE}
 gcpo_df <- bru_gcpo_table(
@@ -391,7 +423,7 @@ gcpo_df <- bru_gcpo_table(
 )
 
 gcpo_df[, -1] <- log(gcpo_df[, -1])
-knitr::kable(tibble(
+knitr::kable(tibble::tibble(
   Models = names(gcpo_df)[-1],
   GCPO = colSums(gcpo_df[, -1])
 ))
@@ -399,7 +431,12 @@ knitr::kable(tibble(
 
 ### Plotting  regional scores
 
-A valuable feature of the regional CV approach, is to assess regions where models might provide better fits or to detect some missing covariate. As an illustration, by evaluating the difference in  the log predictive density per region between models `Fit_veg` and `Fit_hpp`, we can see that including `vegetation` improves the prediction in regions with high number of nests,  which was expected, since  most of the nests falls in the primary vegetation type.
+A valuable feature of the regional CV approach, is to assess regions where models
+might provide better fits or to detect some missing covariate. As an illustration,
+by evaluating the difference in  the log predictive density per region between
+models `Fit_veg` and `Fit_hpp`, we can see that including `vegetation` improves
+the prediction in regions with high number of nests,  which was expected, since
+most of the nests falls in the primary vegetation type.
 
 
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE}
@@ -412,7 +449,9 @@ ggplot() +
 ```
 
 
-A similar analysis could be done to assess the gain from the `SPDE smoother` when added to the model with `vegetation`. Indeed, most of the subregions with increased GCPO are nearby regions, probably as a result of the  spatial component. 
+A similar analysis could be done to assess the gain from the `SPDE smoother`
+when added to the model with `vegetation`. Indeed, most of the subregions with
+increased GCPO are nearby regions, probably as a result of the  spatial component. 
 
 ```{r warning=FALSE,message=FALSE}
 ggplot() +
@@ -422,7 +461,8 @@ ggplot() +
 ```
 
 
-We can also look at the contribution from the `elevation` covariate, which slightly increased the log score in few subregions,  but overall, it seems to not be relevant.  
+We can also look at the contribution from the `elevation` covariate, which
+slightly increased the log score in few subregions,  but overall, it seems to not be relevant.  
 
 ```{r warning=FALSE,message=FALSE}
 plt_gcpo_elev <- ggplot() +
@@ -436,7 +476,8 @@ plt_gcpo_elev
 ```
 
 
-The `elevation` covariate not being predictively relevant, in the presence  of the  `vegetation` covariate and the `SPDE smoother`, was also expected from its posterior distribution. 
+The `elevation` covariate not being predictively relevant, in the presence
+of the  `vegetation` covariate and the `SPDE smoother`, was also expected from its posterior distribution. 
 
 ```{r warning=FALSE,message=FALSE}
 plt_post_elev <- plot(fit_veg_elev_field, "elev")
@@ -445,7 +486,15 @@ plt_post_elev
 
 ### Summary
 
-Based on the previous analysis,  we would select the model  containing `vegetation` and the `SPDE smoother`. Here, we use hexagonal partition, but we could also compare the models over different regions size or geometry to add some robustness to the selection procedure. However, the approximation strategy to  avoid model refits and compute the GCPOs  might become less accurate for regions that are too large. In the case of very few but large regions, we recommend refitting the model.  
+Based on the previous analysis,  we would select the model  containing
+`vegetation` and the `SPDE smoother`. Here, we use hexagonal partition, but we
+could also compare the models over different regions size or geometry to add
+some robustness to the selection procedure. However, the approximation strategy
+to  avoid model refits and compute the GCPOs  might become less accurate for
+regions that are too large. In the case of very few but large regions, we
+recommend refitting the model.  
 
 
-Also, it is important to note the small difference in the GCPOs between some of the models, making model selection less straightforward. This illustrates the need for uncertainty quantification, that we are currently investigating. 
+Also, it is important to note the small difference in the GCPOs between some of
+the models, making model selection less straightforward. This illustrates the
+need for uncertainty quantification, that we are currently investigating. 
