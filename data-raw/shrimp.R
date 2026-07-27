@@ -9,10 +9,7 @@
 import.shrimp <- function() {
   # Load the raw data
   load(
-    file = file.path(
-      system.file("extdata", package = "inlabru"),
-      "gamba.Rdata"
-    )
+    file = system.file("extdata", "gamba.Rdata", package = "inlabru")
   )
 
   # Use lat/lon which is actually in a utm system
@@ -27,8 +24,12 @@ import.shrimp <- function() {
   # Rename columns
   colnames(gamba) <- c("catch", "landing", "depth", "northing", "easting")
 
-  original_crs <- fm_crs("+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs")
-  new_crs <- fm_crs("+proj=utm +zone=30 +datum=WGS84 +units=km +no_defs")
+  original_crs <- fmesher::fm_crs(
+    "+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs"
+  )
+  new_crs <- fmesher::fm_crs(
+    "+proj=utm +zone=30 +datum=WGS84 +units=km +no_defs"
+  )
 
   # Turn into spatial object
   gamba1 <- sf::st_as_sf(
@@ -36,18 +37,18 @@ import.shrimp <- function() {
     coords = c("easting", "northing"),
     crs = original_crs
   )
-  gamba1 <- fm_transform(
+  gamba1 <- fmesher::fm_transform(
     gamba1,
     new_crs
   )
 
   # Make a mesh
-  bnd <- fm_nonconvex_hull_inla(gamba1, 20)
-  bnd2 <- fm_nonconvex_hull_inla(gamba1, 50)
-  mesh <- fm_mesh_2d_inla(
+  bnd <- fmesher::fm_nonconvex_hull_inla(gamba1, 20)
+  bnd2 <- fmesher::fm_nonconvex_hull_inla(gamba1, 50)
+  mesh <- fmesher::fm_mesh_2d_inla(
     boundary = list(bnd, bnd2),
     max.edge = c(5, 20),
-    crs = fm_crs(gamba1)
+    crs = fmesher::fm_crs(gamba1)
   )
 
   # Final shrimp object

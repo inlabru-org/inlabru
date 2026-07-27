@@ -92,13 +92,13 @@ materncov.bands <- function(
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
+    if (fmesher::fm_manifold(manifold, "S1") && is.null(S1.L)) {
       S1.L <- diff(manifold$interval)
     }
-    manifold <- fm_manifold(manifold)
+    manifold <- fmesher::fm_manifold(manifold)
   }
-  if (fm_manifold(manifold, "R")) {
-    d <- fm_manifold_dim(manifold)
+  if (fmesher::fm_manifold(manifold, "R")) {
+    d <- fmesher::fm_manifold_dim(manifold)
     calc.corr <- calc.corr.R
     calc.cov <- calc.cov.R
   } else if (manifold == "S1") {

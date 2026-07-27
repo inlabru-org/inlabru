@@ -120,7 +120,7 @@ comp_veg_alt <-
 Fit the model as usual, and increasing the integration scheme resolution to
 better match the covariate:
 ```{r results='hide',warning=FALSE,message=FALSE,eval=FALSE}
-mesh_int <- fm_subdivide(mesh, 2)
+mesh_int <- fmesher::fm_subdivide(mesh, 2)
 fit_veg <- lgcp(
   comp_veg,
   nests,
@@ -129,7 +129,7 @@ fit_veg <- lgcp(
 )
 ```
 ```{r results='hide',warning=FALSE,message=FALSE,eval=TRUE,echo=FALSE}
-mesh_int <- fm_subdivide(mesh, 2)
+mesh_int <- fmesher::fm_subdivide(mesh, 2)
 .cache_file <- file.path(.cache_dir, "fit_veg.rds")
 if ((!.cache_recompute) &&
   file.exists(.cache_file)) {
@@ -175,7 +175,7 @@ have nests. What about the estimated abundance (there are really 647 nests
 there):
 
 ```{r warning=FALSE,message=FALSE}
-ips <- fm_int(mesh_int, boundary)
+ips <- fmesher::fm_int(mesh_int, boundary)
 Lambda_veg <- predict(fit_veg, ips, ~ sum(weight * exp(vegetation)))
 Lambda_veg
 ```
@@ -241,7 +241,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda_veg_field <- predict(
   fit_veg_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + vegetation))
 )
 Lambda_veg_field
@@ -336,7 +336,7 @@ ggplot() +
 ```{r warning=FALSE,message=FALSE}
 Lambda_field <- predict(
   fit_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + Intercept))
 )
 Lambda_field
@@ -580,7 +580,7 @@ SPDE. Adapt the code used for the vegetation factor to do this.
 ```{r warning=FALSE,message=FALSE}
 Lambda_elev_field <- predict(
   fit_elev_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(Intercept + elev + field))
 )
 Lambda_elev_field
@@ -619,14 +619,14 @@ of `N` in the prediction object, for easier plotting.
 
 ```{r fig.show="hide",warning=FALSE,message=FALSE, eval=TRUE, echo=TRUE}
 Lambda_elev_field <- predict(
-  fit_elev_field, fm_int(mesh_int, boundary),
+  fit_elev_field, fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + elev + Intercept))
 )
 Lambda_elev_field
 
 Nest_elev_field <- predict(
   fit_elev_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,

@@ -7,6 +7,7 @@
 #' @rdname bru_compute_linearisation
 #' @keywords internal
 bru_compute_linearisation <- function(...) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   UseMethod("bru_compute_linearisation")
 }
 
@@ -51,6 +52,7 @@ bru_compute_linearisation.bru_comp <- function(
   is_rowwise,
   eps,
   n_pred = NULL,
+  finite_diff = "forward",
   ...
 ) {
   label <- cmp[["label"]]
@@ -86,13 +88,11 @@ bru_compute_linearisation.bru_comp <- function(
     if (assume_rowwise) {
       if (!is.null(n_pred) && (NROW(pred0) != n_pred)) {
         stop(
-          "Number of rows (",
-          NROW(pred0),
-          ") in the predictor for component '",
-          label,
-          "' does not match the length implied by the response data (",
-          n_pred,
-          ")."
+          glue(
+            "The number of values ({NROW(pred0)}) in the predictor for ",
+            "observation model ",
+            "<unknown> does not match the expected length ({n_pred})."
+          )
         )
       }
       if (NROW(A) == 1L) {
@@ -102,9 +102,9 @@ bru_compute_linearisation.bru_comp <- function(
   }
 
   triplets <- list(
-    i = integer(0),
-    j = integer(0),
-    x = numeric(0)
+    i = vector("list", NROW(state[[label]])),
+    j = vector("list", NROW(state[[label]])),
+    x = vector("list", NROW(state[[label]]))
   )
 
   if (!all(is.finite(pred0))) {
@@ -114,7 +114,7 @@ bru_compute_linearisation.bru_comp <- function(
     )
   }
 
-  symmetric_diffs <- FALSE
+  symmetric_diffs <- identical(finite_diff, "central")
   for (k in seq_len(NROW(state[[label]]))) {
     if (is.null(A)) {
       row_subset <- seq_len(NROW(pred0))
@@ -246,18 +246,18 @@ bru_compute_linearisation.bru_comp <- function(
       }
       nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
       if (assume_rowwise) {
-        triplets$i <- c(triplets$i, row_subset[nonzero])
+        triplets$i[[k]] <- row_subset[nonzero]
       } else {
-        triplets$i <- c(triplets$i, which(nonzero))
+        triplets$i[[k]] <- which(nonzero)
       }
-      triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
-      triplets$x <- c(triplets$x, values[nonzero] / eps)
+      triplets$j[[k]] <- rep(k, sum(nonzero))
+      triplets$x[[k]] <- values[nonzero] / eps
     }
   }
   B <- Matrix::sparseMatrix(
-    i = triplets$i,
-    j = triplets$j,
-    x = triplets$x,
+    i = unlist(triplets$i),
+    j = unlist(triplets$j),
+    x = unlist(triplets$x),
     dims = c(NROW(pred0), NROW(state[[label]]))
   )
   if (NROW(B) != NROW(pred0)) {
@@ -288,12 +288,13 @@ bru_compute_linearisation.bru_obs <- function(
   eps,
   ...
 ) {
+  comp_input <- input[["comp"]]
   used <- bru_used(lhood)
   pred_expr <- bru_pred_expr(lhood)
   is_rowwise <- bru_is_rowwise(pred_expr)
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
-    input = input[used[["effect"]]],
+    input = comp_input[used[["effect"]]],
     state = state[used[["effect"]]]
   )
 
@@ -326,7 +327,7 @@ bru_compute_linearisation.bru_obs <- function(
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
           comp_simple[[label]],
-          input[[label]],
+          comp_input[[label]],
           state[[label]]
         )
         if (NROW(A) == 1) {
@@ -346,7 +347,7 @@ bru_compute_linearisation.bru_obs <- function(
             lhood_expr = lhood_expr,
             data = data,
             data_extra = lhood[["data_extra"]],
-            input = input,
+            input = comp_input,
             state = state,
             comp_simple = comp_simple[[label]],
             effects = effects,

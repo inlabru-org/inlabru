@@ -179,7 +179,8 @@ and specify integration domains for the spatial and distance dimensions:
 ```{r results="hide",warning=FALSE,message=FALSE, echo = TRUE}
 fit <- lgcp(
   components = cmp,
-  mexdolphin$points,
+  is_rowwise = TRUE,
+  data = mexdolphin$points,
   samplers = mexdolphin$samplers,
   domain = list(
     geometry = mesh,

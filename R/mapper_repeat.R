@@ -45,7 +45,10 @@
 #' ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 #'
 bm_repeat <- function(mapper, n_rep, interleaved = FALSE) {
-  stopifnot((length(n_rep) > 0L) && sum(n_rep) > 0L)
+  stopifnot(
+    length(n_rep) > 0L,
+    sum(n_rep) > 0L
+  )
   if ((length(n_rep) == 1L) || !any(interleaved)) {
     n_rep <- sum(n_rep)
     if (n_rep == 1L) {
@@ -144,7 +147,7 @@ bm_repeat_sub_lin <- function(mapper, input, state, ...) {
       seq_len(mapper[["n_rep"]]),
       function(x) {
         state_subset <- state[idx$offsets[x] + idx$index]
-        ibm_linear(
+        ibm_as_taylor(
           mapper[["mapper"]],
           input = input,
           state = state_subset
@@ -191,7 +194,7 @@ ibm_jacobian.bm_repeat <- function(
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_repeat <- function(
   mapper,
@@ -216,9 +219,9 @@ ibm_eval.bm_repeat <- function(
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_repeat <- function(mapper, input, state, ...) {
+ibm_as_taylor.bm_repeat <- function(mapper, input, state, ...) {
   sub_lin <-
     bm_repeat_sub_lin(
       mapper,

@@ -36,7 +36,7 @@ theme_set(theme_bw())
 #'
 prepare_residual_calculations <- function(samplers, domain, observations) {
   # Calculate the integration weights for A_integrate
-  ips <- fm_int(domain = domain, samplers = samplers)
+  ips <- fmesher::fm_int(domain = domain, samplers = samplers)
 
   # Set-up the A_integrate matrix
   # A_integrate has as many rows as polygons in the samplers,
@@ -256,7 +256,7 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   if (is.null(resolution)) {
     grid <- terra::rast(
       terra::ext(samplers),
-      crs = fm_proj4string(samplers),
+      crs = fmesher::fm_proj4string(samplers),
       nrows = nrows,
       ncols = ncols
     )
@@ -265,7 +265,7 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   if (is.null(c(nrows, ncols))) {
     grid <- terra::rast(
       terra::ext(samplers),
-      crs = fm_proj4string(samplers),
+      crs = fmesher::fm_proj4string(samplers),
       resolution = resolution
     )
   }

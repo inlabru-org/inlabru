@@ -36,6 +36,7 @@ Other mappers:
 \code{\link[=bm_aggregate]{bm_aggregate()}},
 \code{\link[=bm_collect]{bm_collect()}},
 \code{\link[=bm_const]{bm_const()}},
+\code{\link[=bm_expr]{bm_expr()}},
 \code{\link[=bm_factor]{bm_factor()}},
 \code{\link{bm_fm_mesh_1d}},
 \code{\link[=bm_fmesher]{bm_fmesher()}},

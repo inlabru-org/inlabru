@@ -103,8 +103,8 @@ print(bru_log(), timestamp = TRUE, verbosity = TRUE)
 Other inlabru log methods:
 \code{\link[=bru_log_bookmark]{bru_log_bookmark()}},
 \code{\link[=bru_log_message]{bru_log_message()}},
-\code{\link[=bru_log_new]{bru_log_new()}},
 \code{\link[=bru_log_offset]{bru_log_offset()}},
-\code{\link[=bru_log_reset]{bru_log_reset()}}
+\code{\link[=bru_log_reset]{bru_log_reset()}},
+\code{\link[=new_bru_log]{new_bru_log()}}
 }
 \concept{inlabru log methods}

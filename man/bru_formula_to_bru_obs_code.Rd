@@ -9,8 +9,14 @@ bru_formula_to_bru_obs_code(components, add = "")
 \arguments{
 \item{components}{A \link{formula} describing latent model components.}
 }
+\value{
+a character vector of R code strings, one for each component in the
+formula.
+}
 \description{
-Convert components to R code
+Convert a \link{formula} describing latent model components to R code
+strings that can be evaluated to create the corresponding \link{bru_comp}
+objects.
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com}

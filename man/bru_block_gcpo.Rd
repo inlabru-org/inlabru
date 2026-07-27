@@ -55,14 +55,24 @@ if (bru_safe_inla()) {
   # Block-based example (lgcp)
   cvpart <- cv_hex(
     gorillas_sf$boundary,
-    cellsize = 0.5,
+    cellsize = 5, # Set to 0.5 for a more realistic, but slower, example
     n_group = 3,
     resolution = c(95, 80)
   )
   cvpart$block_ID <- seq_len(nrow(cvpart))
   cvpart$group <- NULL
 
-  nests <- gorillas_sf$nests
+  # Coarser mesh to make the example run faster:
+  mesh <- fmesher::fm_mesh_2d(
+    boundary = list(
+      gorillas_sf$boundary,
+      fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
+    ),
+    crs = fmesher::fm_crs(gorillas_sf$mesh)
+  )
+
+  # Use all nests for a more realistic, but slower, example
+  nests <- gorillas_sf$nests[1:10, , drop = FALSE]
   a <- sf::st_intersects(nests, cvpart)
   nests$.block <- unlist(a)
 
@@ -70,7 +80,7 @@ if (bru_safe_inla()) {
     geometry ~ Intercept(1),
     data = nests,
     samplers = cvpart,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
   result <- bru_block_gcpo(fit1)
@@ -80,7 +90,7 @@ if (bru_safe_inla()) {
 
   # Multiple models
   pcmatern <- INLA::inla.spde2.pcmatern(
-    gorillas_sf$mesh,
+    mesh,
     prior.sigma = c(1, 0.01),
     prior.range = c(0.1, 0.01)
   )
@@ -88,7 +98,7 @@ if (bru_safe_inla()) {
     geometry ~ Intercept(1) + field(geometry, model = pcmatern),
     data = nests,
     samplers = cvpart,
-    domain = list(geometry = gorillas_sf$mesh),
+    domain = list(geometry = mesh),
     control.gcpo = list(enable = TRUE, type.cv = "joint")
   )
   result <- bru_block_gcpo(list(Model1 = fit1, Model2 = fit2))

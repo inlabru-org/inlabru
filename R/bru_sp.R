@@ -95,7 +95,7 @@ sline <- function(
   data,
   start.cols,
   end.cols,
-  crs = fm_crs(),
+  crs = fmesher::fm_crs(),
   to.crs = NULL,
   format = c("sp", "sf")
 ) {
@@ -113,7 +113,7 @@ sline <- function(
     lilist <- lapply(seq_len(nrow(sp)), function(k) {
       sp::Lines(list(sp::Line(rbind(sp[k, ], ep[k, ]))), ID = k)
     })
-    spl <- sp::SpatialLines(lilist, proj4string = fm_CRS(crs))
+    spl <- sp::SpatialLines(lilist, proj4string = fmesher::fm_CRS(crs))
 
     df <- data[, setdiff(names(data), c(start.cols, end.cols))]
     rownames(df) <- seq_len(nrow(df))
@@ -126,7 +126,7 @@ sline <- function(
         ep[k, , drop = FALSE]
       )))
     })
-    lin <- sf::st_sfc(lin, crs = fm_crs(crs))
+    lin <- sf::st_sfc(lin, crs = fmesher::fm_crs(crs))
     df <- data[, setdiff(names(data), c(start.cols, end.cols))]
     rownames(df) <- seq_len(nrow(df))
     slines <- sf::st_sf(geometry = lin, df)
@@ -134,7 +134,7 @@ sline <- function(
 
   # If requested, change CRS
   if (!is.null(to.crs)) {
-    slines <- fm_transform(slines, to.crs)
+    slines <- fmesher::fm_transform(slines, to.crs)
   }
 
   slines
@@ -184,7 +184,7 @@ sline <- function(
 spoly <- function(
   data,
   cols = colnames(data)[1:2],
-  crs = fm_crs(),
+  crs = fmesher::fm_crs(),
   to.crs = NULL,
   format = c("sp", "sf")
 ) {
@@ -194,7 +194,10 @@ spoly <- function(
 
     po <- sp::Polygon(data[, cols], hole = FALSE)
     pos <- sp::Polygons(list(po), ID = "tmp")
-    predpoly <- sp::SpatialPolygons(list(pos), proj4string = fm_CRS(crs))
+    predpoly <- sp::SpatialPolygons(
+      list(pos),
+      proj4string = fmesher::fm_CRS(crs)
+    )
     df <- data.frame(weight = 1)
     rownames(df) <- "tmp"
     pol <- sp::SpatialPolygonsDataFrame(predpoly, data = df)
@@ -202,13 +205,13 @@ spoly <- function(
     po <- sf::st_polygon(
       list(as.matrix(data[c(seq_len(NROW(data)), 1L), cols]))
     )
-    po <- sf::st_sfc(po, crs = fm_crs(crs))
+    po <- sf::st_sfc(po, crs = fmesher::fm_crs(crs))
     pol <- sf::st_sf(geometry = po, weight = 1, check_ring_dir = FALSE)
   }
 
   # If requested, change CRS
   if (!is.null(to.crs)) {
-    pol <- fm_transform(pol, to.crs)
+    pol <- fmesher::fm_transform(pol, to.crs)
   }
   pol
 }

@@ -6,8 +6,12 @@
 \usage{
 bru_env_get()
 }
+\value{
+An \code{environment}
+}
 \description{
-Get access to the internal environment
+Access the internal inlabru environment which stores the global
+log and options objects.
 }
 \details{
 The environment is defined in \verb{0_inlabru_envir.R} which is loaded

@@ -2,6 +2,7 @@
 
 ## New features
 
+* New predictor evaluation and linearisation implementation (`2.14.1.9008`)
 * Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
   support the `broom` package tidying framework. Thanks to Novica Nakov
   (`2.14.1.9005`)
@@ -10,6 +11,10 @@
   Will automatically switch to INLA implementations if available, otherwise
   uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
   (`2.14.1.9007`)
+* Improved `bru_used` variable detection, supporting pronoun and container
+  object access detection. (`2.14.1.9010`)
+* Add `log` argument to `bru_timings_plot()` to allow logarithmic scaling of
+  the time axis (`2.14.1.9014`)
 
 ## Bug fixes
 
@@ -22,13 +27,15 @@
   definitions, ensuring a consistent mapper construction, and post-estimation
   consistency. (`2.14.1.9002`)
 * (Re)enable non-integer point weights for `family = "cp"` models, by using
-  # `family = "xpoisson"` (`2.14.1.9003`)
+  `family = "xpoisson"` (`2.14.1.9003`)
 * Fix layer indexing in `bru_fill_missing()` for `SpatRaster` data that resulted
   in an error for layers beyond the first layer (`2.14.1.9006`)
 
 ## Other changes
 
 * Remove dependency on `plyr`. Fixes #301 (`2.14.1.9004`)
+* Move `stats` from `Depends:` to `Imports:` to avoid unnecessary namespace
+  clashes (`2.14.1.9013`)
 
 # inlabru 2.14.1
 

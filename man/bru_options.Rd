@@ -143,8 +143,31 @@ Default \verb{<not set>}.}
 \item{bru_method}{
 List of arguments controlling the iterative inlabru method:
 \describe{
-\item{taylor}{'pandemic'
-(default, from version 2.1.15).}
+\item{autodiff}{Controls the linearisation calculation method. One of
+\describe{
+\item{'pandemic'}{Treats all post-component transformations as a single
+calculation (the default from version \verb{2.1.15}).}
+\item{'fullchain'}{Uses the chain rule for the composition of
+components, predictor, and post-predictor transformations
+(new from \verb{2.14.1.9008}).}
+}
+}
+\item{agg}{Controls the aggregation implementation. One of
+\describe{
+\item{'pandemic'}{Treats all post-component transformations as a single
+calculation (the default from version \verb{2.1.15}).}
+\item{'fullchain'}{Uses the chain rule for the composition of
+components, predictor, and post-predictor transformations
+(new from \verb{2.14.1.9008}).}
+}
+}
+\item{finite_diff}{One of
+\describe{
+\item{'forward'}{Use onesided finite differences.}
+\item{'central'}{Use symmetric differences.}
+}
+}
+\item{taylor}{'pandemic' (the default from version \verb{2.1.15}).}
 \item{search}{Either 'all' (default), to use all available line search
 methods, or one or more of
 \describe{
@@ -153,8 +176,7 @@ methods, or one or more of
 \item{'expand'}{(increase step size until no improvement)}
 \item{'optimise'}{(fast approximate error norm minimisation)}
 }
-To disable line search, set to an empty vector. Line search is not
-available for \code{taylor="legacy"}.}
+To disable line search, set to an empty vector.}
 \item{factor}{
 Numeric, \eqn{> 1} determining the line search step scaling multiplier.
 Default \eqn{(1 + \sqrt{5})/2}{(1+sqrt(5))/2}.}

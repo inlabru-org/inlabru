@@ -122,9 +122,16 @@ reference:
   - starts_with("deltaIC")
   - starts_with("devel.cvmeasure")
   - matches("gcpo")
+- title: "Advanced interface functions"
+  desc: "Lower level functions for advanced model construction and evaluation."
+  contents:
+  - matches("^bru_state$")
+  - matches("^bru_eval$")
+  - matches("^bru_eval_fun$")
 - title: "Optimization log information"
   desc: "Accessing the optimization text log, and plotting the optimization convergence."
   contents:
+  - starts_with("new_bru_log")
   - starts_with("bru_log")
   - starts_with("bru_convergence_plot")
   - starts_with("bru_timings")
@@ -151,7 +158,22 @@ reference:
 - subtitle: "Evaluator methods"
   contents:
   - matches("^bru_mapper_generics$")
-  - starts_with("ibm_")
+  - matches("^ibm_n$")
+  - matches("^ibm_n_output$")
+  - matches("^ibm_eval$")
+  - matches("^ibm_eval_methods$")
+  - matches("^ibm_jacobian$")
+  - matches("^ibm_eval2$")
+  - matches("^ibm_as_taylor$")
+  - matches("^ibm_simplify$")
+  - matches("^bru_model_mapper_methods$")
+  - matches("^ibm_values$")
+  - matches("^ibm_invalid_output$")
+  - matches("^ibm_inla_subset$")
+  - matches("^ibm_names$")
+  - matches("^ibm_is_linear$")
+  - matches("^ibm_is_rowwise$")
+  - matches("^ibm_input_")
 - subtitle: "Conversion and helper methods"
   contents:
   - starts_with("as_bru_mapper")
@@ -222,6 +244,7 @@ reference:
   - matches("multiplot")
   - matches("spoly")
   - matches("sline")
+  - matches("ibm_linear")
 #- title: "Other functions"
 #  desc: "Other functions"
 #  contents:

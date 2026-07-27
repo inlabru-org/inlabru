@@ -8,7 +8,7 @@ sline(
   data,
   start.cols,
   end.cols,
-  crs = fm_crs(),
+  crs = fmesher::fm_crs(),
   to.crs = NULL,
   format = c("sp", "sf")
 )

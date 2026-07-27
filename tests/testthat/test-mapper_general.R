@@ -14,7 +14,7 @@ test_that("Linear mapper", {
   )
   expect_equal(
     ibm_eval(
-      ibm_linear(mapper, input = input, state = state),
+      ibm_as_taylor(mapper, input = input, state = state),
       state = state
     ),
     input * state
@@ -41,7 +41,7 @@ test_that("Index mapper", {
   )
   expect_equal(
     ibm_eval(
-      ibm_linear(mapper, input = input, state = state),
+      ibm_as_taylor(mapper, input = input, state = state),
       state = state
     ),
     val
@@ -85,7 +85,7 @@ test_that("Factor mapper", {
     )
     expect_equal(
       ibm_eval(
-        ibm_linear(mapper, input = input, state = state),
+        ibm_as_taylor(mapper, input = input, state = state),
         state = state
       ),
       val
@@ -742,6 +742,17 @@ test_that("Collect mapper works", {
     data = data
   )
 
+  local_bru_options_set(bru_method = list(autodiff = "pandemic"))
+  expect_no_error({
+    fit_bru <-
+      bru(
+        ~ Intercept(1) + field(x, model = "bym", graph = graph),
+        formula = y ~ Intercept + field,
+        data = data,
+        options = list(bru_initial = list(field = rep(10, 8)))
+      )
+  })
+  local_bru_options_set(bru_method = list(autodiff = "fullchain"))
   expect_no_error({
     fit_bru <-
       bru(
@@ -832,11 +843,19 @@ test_that("Mesh 1d mapper", {
 test_that("Mesh 2d mapper", {
   m <- bru_mapper(fmesher::fmexample$mesh)
 
-  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = FALSE)
+  loc <- fmesher::fm_pixels(
+    fmesher::fmexample$mesh,
+    dims = c(5, 5),
+    mask = FALSE
+  )
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 25)
 
-  loc <- fm_pixels(fmesher::fmexample$mesh, dims = c(5, 5), mask = TRUE)
+  loc <- fmesher::fm_pixels(
+    fmesher::fmexample$mesh,
+    dims = c(5, 5),
+    mask = TRUE
+  )
   val <- ibm_eval(m, input = loc, state = seq_len(ibm_n(m)))
   expect_length(val, 9)
 })

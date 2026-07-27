@@ -9,7 +9,34 @@ NULL
   if (is.null(seed)) expr else withr::with_seed(seed, expr)
 }
 
-#' Tidy a bru model fit
+.find_quant_lo_up_inla <- function(data) {
+  quant_names <- names(data)[grepl("^[01]\\.?[0-9]*quant$", names(data))]
+  if (length(quant_names) == 0) {
+    return(NULL)
+  }
+  quant_probs <- as.numeric(
+    sub("quant$", "", quant_names)
+  )
+  quant_names[c(which.min(quant_probs), which.max(quant_probs))]
+}
+.find_quant_lo_up_bru <- function(data) {
+  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*$", names(data))]
+  if (length(quant_names) == 0) {
+    return(NULL)
+  }
+  quant_probs <- as.numeric(
+    sub("quant$", "", quant_names)
+  )
+  quant_names[c(which.min(quant_probs), which.max(quant_probs))]
+}
+
+
+#' @title Extract a bru model fit into a tidy tibble
+#'
+#' @description This function extracts the fixed effect coefficients or
+#'   hyperparameters from a fitted `bru` object and returns them in a tidy
+#'   tibble format. See [generics::tidy()] for more details on the tidy data
+#'   format.
 #'
 #' @param x A fitted `bru` object.
 #' @param effects `"fixed"` (default) or `"hyperpar"`.
@@ -18,36 +45,43 @@ NULL
 #' @method tidy bru
 #' @export
 tidy.bru <- function(x, effects = "fixed", ...) {
+  x <- bru_check_object_bru(x)
   if (effects == "fixed") {
     fe <- x$summary.fixed
     if (is.null(fe)) {
-      stop("No fixed effects found on bru fit.")
+      stop("No fixed effects found in bru fit.")
     }
+    loup <- .find_quant_lo_up_inla(fe)
     tibble(
       term = rownames(fe),
       estimate = fe$mean,
       std.error = fe$sd,
-      conf.low = fe$`0.025quant`,
-      conf.high = fe$`0.975quant`
+      conf.low = fe[[loup[1]]],
+      conf.high = fe[[loup[2]]]
     )
   } else if (effects == "hyperpar") {
     hp <- x$summary.hyperpar
     if (is.null(hp)) {
-      stop("No hyperparameters found on bru fit.")
+      stop("No hyperparameters found in bru fit.")
     }
+    loup <- .find_quant_lo_up_inla(hp)
     tibble(
       term = rownames(hp),
       estimate = hp$mean,
       std.error = hp$sd,
-      conf.low = hp$`0.025quant`,
-      conf.high = hp$`0.975quant`
+      conf.low = hp[[loup[1]]],
+      conf.high = hp[[loup[2]]]
     )
   } else {
     stop("`effects` must be \"fixed\" or \"hyperpar\".")
   }
 }
 
-#' Glance at a bru model fit
+#' @title Glance at a bru model fit
+#'
+#' @description This function returns a one-row tibble of model summaries from a
+#'   fitted `bru` object. See [generics::glance()] for more details on the
+#'   glance format.
 #'
 #' @param x A fitted `bru` object.
 #' @param ... Unused.
@@ -59,13 +93,18 @@ tidy.bru <- function(x, effects = "fixed", ...) {
 #' @method glance bru
 #' @export
 glance.bru <- function(x, ...) {
+  x <- bru_check_object_bru(x)
   dic_val <- x$dic$dic %||% NA_real_
   waic_val <- x$waic$waic %||% NA_real_
   mlik_val <- tryCatch(x$mlik[1, 1], error = function(e) NA_real_) %||% NA_real_
 
+  if (any(bru_obs_family(x) == "cp")) {
+    waic_val <- NA_real_
+  }
+
   nobs_val <- tryCatch(
     {
-      if (any(bru_obs_family(x) %in% "cp")) {
+      if (any(bru_obs_family(x) == "cp")) {
         NA_integer_
       } else {
         sum(bru_response_size(x))
@@ -95,11 +134,12 @@ glance.bru <- function(x, ...) {
   )
 }
 
-#' Augment a bru model fit with fitted values
+#' @title Augment a bru model fit with fitted values
 #'
-#' Adds posterior mean and credible interval columns to `data`. The user must
-#' supply `pred_formula` because inlabru prediction expressions are arbitrary R
-#' and cannot be recovered from the fit object alone.
+#' @description Adds posterior mean and credible interval columns to `data`. The
+#'   user must supply `pred_formula` because inlabru prediction expressions are
+#'   arbitrary R and cannot be recovered from the fit object alone. Also see
+#'   [generics::augment()].
 #'
 #' @param x A fitted `bru` object.
 #' @param data A data frame of covariate values.
@@ -123,6 +163,7 @@ augment.bru <- function(
   seed = NULL,
   ...
 ) {
+  x <- bru_check_object_bru(x)
   preds <- .with_seed(
     seed,
     predict(
@@ -140,12 +181,13 @@ augment.bru <- function(
     names(data),
     c(".fitted", ".fitted_low", ".fitted_high", ".fitted_sd")
   )] <- NULL
+  loup <- .find_quant_lo_up_bru(preds)
   bind_cols(
     data,
     tibble(
       .fitted = preds$mean,
-      .fitted_low = preds$q0.025,
-      .fitted_high = preds$q0.975,
+      .fitted_low = preds[[loup[1]]],
+      .fitted_high = preds[[loup[2]]],
       .fitted_sd = preds$sd
     )
   )

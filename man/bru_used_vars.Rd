@@ -2,52 +2,78 @@
 % Please edit documentation in R/used.R
 \name{bru_used_vars}
 \alias{bru_used_vars}
-\alias{bru_used_vars.character}
+\alias{new_bru_used_vars}
+\alias{bru_used_vars.default}
+\alias{bru_used_vars.<-}
+\alias{bru_used_vars.call}
 \alias{bru_used_vars.expression}
 \alias{bru_used_vars.quosure}
 \alias{bru_used_vars.formula}
+\alias{format.bru_used_vars}
+\alias{print.bru_used_vars}
 \title{Extract basic variable names from expression}
 \usage{
-bru_used_vars(x, functions = FALSE)
+bru_used_vars(x, result = new_bru_used_vars())
 
-\method{bru_used_vars}{character}(x, functions = FALSE)
+new_bru_used_vars(
+  x = list(vars = character(0), funs = character(0), objects = list())
+)
 
-\method{bru_used_vars}{expression}(x, functions = FALSE)
+\method{bru_used_vars}{default}(x, result = new_bru_used_vars())
 
-\method{bru_used_vars}{quosure}(x, functions = FALSE)
+\method{bru_used_vars}{`<-`}(x, result = new_bru_used_vars())
 
-\method{bru_used_vars}{formula}(x, functions = FALSE)
+\method{bru_used_vars}{call}(x, result = new_bru_used_vars())
+
+\method{bru_used_vars}{expression}(x, result = new_bru_used_vars())
+
+\method{bru_used_vars}{quosure}(x, result = new_bru_used_vars())
+
+\method{bru_used_vars}{formula}(x, result = new_bru_used_vars())
+
+\method{format}{bru_used_vars}(x, ...)
+
+\method{print}{bru_used_vars}(x, ...)
 }
 \arguments{
-\item{x}{A \code{formula}, \code{expression}, or \code{character}}
+\item{x}{A \code{formula}, \code{expression}, or other supported class. For the
+\code{format} and \code{print} methods, a \code{bru_used_vars} object.}
 
-\item{functions}{logical; if TRUE, include function names}
+\item{result}{A \code{bru_used_vars} object; a list with elements \code{vars}, \code{funs},
+and \code{objects}, by default provided by \code{\link[=new_bru_used_vars]{new_bru_used_vars()}}}
 }
 \value{
-If successful, a character vector, otherwise \code{NULL}
+A \code{bru_used_vars} object with elements
+\describe{
+\item{vars}{character; names of directly accessed variables.}
+\item{funs}{character; names of functions called.}
+\item{objects}{named list; one character vector per container objects with
+variables names accessed via \code{$}, \code{[[}, or
+\code{[}. If
+the access is ambiguous, the container object name is stored in \code{vars}.
+}
+}
 }
 \description{
-Extracts the variable names from an R expression by pre- and post-processing
-around \code{\link[=all.vars]{all.vars()}}.
-First replaces \code{$} with \code{[[} indexing, so that internal column/variable names
-are ignored, then calls \code{all.vars()}.
+Extracts the variable names and function names from an R expression by
+traversing the expression structure. Internal helper function for
+\code{\link[=new_bru_used]{new_bru_used()}} and \code{\link[=bru_used]{bru_used()}}.
 }
-\section{Methods (by class)}{
+\section{Functions}{
 \itemize{
-\item \code{bru_used_vars(formula)}: Only the right-hand side is used.
+\item \code{new_bru_used_vars()}: Create a \code{bru_used_vars} object.
 
 }}
 \examples{
 bru_used_vars(~.)
 bru_used_vars(~ a + b + c_latent + d_eval())
-bru_used_vars(expression(a + b + c_latent + d_eval()))
 
-bru_used_vars(~., functions = TRUE)
-bru_used_vars(~ a + b + c_latent + d_eval(), functions = TRUE)
-bru_used_vars(expression(a + b + c_latent + d_eval()), functions = TRUE)
-
+# Ignores the LHS:
 bru_used_vars(a ~ b)
-bru_used_vars(expression(a ~ b))
+
+# Detects variables accessed via pronouns and objects,
+# as well as function calls:
+bru_used_vars(~ cos(x$z) + y_eval() + .latent$"q")
 
 }
 \seealso{

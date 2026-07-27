@@ -208,8 +208,11 @@ bru_input.bru_input <- function(
           val <- as.data.frame(val)
           sp::coordinates(val) <- seq_len(ncol(val))
           # Allow proj4string failures:
-          data_crs <- tryCatch(fm_CRS(orig_data), error = function(e) {})
-          if (!fm_crs_is_null(data_crs)) {
+          data_crs <- tryCatch(
+            fmesher::fm_CRS(orig_data),
+            error = function(e) {}
+          )
+          if (!fmesher::fm_crs_is_null(data_crs)) {
             sp::proj4string(val) <- data_crs
           }
           val
@@ -482,7 +485,7 @@ bru_input_text.bru_comp <- function(x, ..., label = x$label) {
 #' @rdname bru_input
 bru_input.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input(bru_comp_list)", verbosity = 4)
-  lapply(x, function(xx) bru_input(xx, ...))
+  lapply(x, bru_input, ...)
 }
 
 #' @return * `bru_input_text(bru_comp_list)`: A list of mapper input definition
@@ -491,19 +494,31 @@ bru_input.bru_comp_list <- function(x, ...) {
 #' @rdname bru_input_text
 bru_input_text.bru_comp_list <- function(x, ...) {
   bru_log_message("bru_input_text(bru_comp_list)", verbosity = 4)
-  lapply(x, function(xx) bru_input_text(xx, ...))
+  lapply(x, bru_input_text, ...)
 }
 
 #' @describeIn bru_input Computes the component inputs for included components
 #' for each observation model.
 #'
-#' @param lhoods A `bru_obs_list` object containing all observations models.
+#' @param lhoods `r lifecycle::badge("deprecated")` from `2.14.1.9011`, as it's
+#'   now part of the [bru_model] object.
+#'   A `bru_obs_list` object containing all observations models.
 #' @return * `bru_input(bru_model)`: A list of mapper input values,
 #'   with one entry for each observation model, each containing a list
 #'   of inputs for the components used by the corresponding observation model.
 #' @export
-bru_input.bru_model <- function(x, lhoods, ...) {
-  bru_input(lhoods, components = as_bru_comp_list(x), ...)
+bru_input.bru_model <- function(x, lhoods = deprecated(), ...) {
+  if (lifecycle::is_present(lhoods)) {
+    lifecycle::deprecate_warn(
+      "2.14.1.9011",
+      "bru_input.bru_model(lhoods)",
+      details = "The 'lhoods' argument is now part of the 'bru_model' object."
+    )
+  }
+  if (!is.null(x[["inputs"]])) {
+    return(x[["inputs"]])
+  }
+  bru_input(as_bru_obs_list(x), components = as_bru_comp_list(x), ...)
 }
 
 #' @rdname bru_input
@@ -518,14 +533,30 @@ bru_input.bru_obs <- function(x, components, ...) {
     return(list())
   }
 
-  bru_input(
+  mask <- bru_data_mask(
+    list(
+      data = x[["data"]],
+      response_data = x[["response_data"]],
+      data_extra = x[["data_extra"]]
+    )
+  )
+
+  input <- list()
+  input$comp <- bru_input(
     components[included],
     data = x[["data"]],
-    mask = bru_data_mask(
-      list(data = x[["data"]], data_extra = x[["data_extra"]])
-    ),
+    mask = mask,
     ...
   )
+  if (!is.null(x[["aggregate"]])) {
+    input$post <- bru_agg_input(
+      x[["aggregate"]],
+      mask = mask,
+      .envir = x[["env"]]
+    )
+  }
+
+  input
 }
 
 #' @rdname bru_input
@@ -538,7 +569,7 @@ bru_input.bru_obs_list <- function(x, components, ...) {
     "Evaluate component inputs for each observation model",
     verbosity = 3L
   )
-  lapply(x, function(xx) bru_input(xx, components = components, ...))
+  lapply(x, bru_input, components = components, ...)
 }
 
 
@@ -557,11 +588,11 @@ bru_input_layer <- function(
     }
   )
   if (inherits(input_layer, "error")) {
-    stop(paste0(
+    stop(
       "Failed to evaluate 'layer' input '",
       glue_collapse(rlang::as_label(layer), sep = "\n"),
       glue("' for '{label}:layer'.")
-    ))
+    )
   }
   if (is.null(input_layer) && is.null(selector)) {
     if (label %in% names(e_input)) {
@@ -591,7 +622,7 @@ input_eval <- function(...) {
 #' @keywords internal
 evaluate_inputs <- function(...) {
   lifecycle::deprecate_warn(
-    when = "2.12.9023",
+    when = "2.12.0.9023",
     "evaluate_inputs()",
     "bru_input()"
   )

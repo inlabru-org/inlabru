@@ -53,6 +53,7 @@ ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 Other mappers:
 \code{\link[=bm_collect]{bm_collect()}},
 \code{\link[=bm_const]{bm_const()}},
+\code{\link[=bm_expr]{bm_expr()}},
 \code{\link[=bm_factor]{bm_factor()}},
 \code{\link{bm_fm_mesh_1d}},
 \code{\link[=bm_fmesher]{bm_fmesher()}},

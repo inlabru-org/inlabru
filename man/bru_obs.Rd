@@ -31,6 +31,7 @@ bru_obs(
   is_rowwise = NULL,
   aggregate = NULL,
   aggregate_input = NULL,
+  response_block = NULL,
   control.family = NULL,
   control.gcpo = NULL,
   tag = NULL,
@@ -159,26 +160,32 @@ inverted version, such that \code{is_rowwise = !allow_combine}.}
 "none". \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version
 \verb{2.12.0.9013}.}
 
-\item{aggregate_input}{\code{NULL} or an optional input list to the mapper
-defined by non-NULL \code{aggregate}, overriding the default,
+\item{aggregate_input, response_block}{\code{NULL} or an optional input list to the
+mapper defined by non-NULL \code{aggregate}, overriding the default,
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{list(block = .data.[[".block"]],
-     weights = .data.[["weight"]],
-     n_block = bru_response_size(.response_data.),
-     block_response = ".block")
+\if{html}{\out{<div class="sourceCode">}}\preformatted{aggregate_input = list(
+  block = .data.[[".block"]],
+  weights = .data.[["weight"]],
+  n_block = bru_response_size(.response_data.)
+),
+response_block = .response_data.[[".block"]]
 }\if{html}{\out{</div>}}
 
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}, available from version \verb{2.12.0.9013}.
 
-From \verb{2.13.0.9016}, it will look for a \code{block_response} element in the
-list, which should be the name of a response variable in \code{response_data} to
-match the \code{block} information against, allowing character or factor
+From \verb{2.13.0.9016} to \verb{2.14.1.9007}, it would look for a \code{block_response}
+character element in the list, but from \verb{2.14.1.9008}, the separate
+argument \code{reponse_block} should be used instead, with an expression to be
+evaluated in the input data context. \code{response_block} should evaluate to a
+vector of the same length as the response data, with values that can be
+used to index into the rows of the response variable to determine which
+rows of the predictor expression to aggregate, allowing character or factor
 aggregation block information to be used by replacing \code{block} with
-\code{match(block, block_response)}. If not supplied, the name
-\code{".block"} is tried. If that isn't available, the \code{block} information must
-be supplied directly as a numeric or integer vector, indexing into the rows
-of the response variable. Having no \code{block_response} variable is equivalent
-to having
+\code{match(block, response_block)}. If not supplied, the variable \code{.block} in
+the \code{response_data} is tried. If that isn't available, the \code{block}
+information must be supplied directly as a numeric or integer vector,
+indexing into the rows of the response variable. Having no \code{response_block}
+variable is equivalent to having
 \code{response_data$.block = seq_len(bru_response_size(response_data))}.}
 
 \item{control.family}{A optional \code{list} of \code{INLA::control.family} options}

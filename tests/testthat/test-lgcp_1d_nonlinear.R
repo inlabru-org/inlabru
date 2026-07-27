@@ -25,7 +25,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -64,7 +64,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form_list,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -199,7 +199,7 @@ test_that("Marginal parameter transformation", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,

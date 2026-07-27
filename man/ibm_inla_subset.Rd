@@ -19,8 +19,6 @@ A logical vector of \code{TRUE/FALSE} for the subset such that, given the
 full A matrix and values output, \code{A[, subset, drop = FALSE]} and
 \code{values[subset]} (or \code{values[subset, , drop = FALSE]} for data.frame
 values) are equal to the \code{inla_f = TRUE} version of A and values.
-
-A logical vector indicating which \code{ibm_values(mapper, inla_f = FALSE)} elements are in the \code{ibm_values(mapper, inla_f = TRUE)} vector.
 }
 \description{
 Implementations must return a logical vector of \code{TRUE/FALSE} for the subset
@@ -42,13 +40,13 @@ ibm_inla_subset(m)
 \seealso{
 Other mapper methods:
 \code{\link{bru_mapper_generics}},
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
 \code{\link[=ibm_eval]{ibm_eval()}},
 \code{\link[=ibm_eval2]{ibm_eval2()}},
 \code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
 \code{\link[=ibm_is_linear]{ibm_is_linear()}},
 \code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
 \code{\link[=ibm_jacobian]{ibm_jacobian()}},
-\code{\link[=ibm_linear]{ibm_linear()}},
 \code{\link[=ibm_n]{ibm_n()}},
 \code{\link[=ibm_n_output]{ibm_n_output()}},
 \code{\link[=ibm_names]{ibm_names()}},

@@ -11,7 +11,7 @@ test_that("Georeferenced data with sf", {
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
   mydata <- sf::st_as_sf(mydata, coords = c("Easting", "Northing"))
 
-  mesh <- fm_mesh_2d_inla(
+  mesh <- fmesher::fm_mesh_2d_inla(
     loc = mydata,
     offset = 5,
     max.edge = 4,
@@ -84,7 +84,7 @@ test_that("Georeferenced data with sf", {
     tolerance = midtol
   )
 
-  pred_df <- fm_pixels(mesh, dims = c(8, 8), format = "sf")
+  pred_df <- fmesher::fm_pixels(mesh, dims = c(8, 8), format = "sf")
 
   skip_if_not_installed("sn")
   pred <- predict(fit, pred_df, ~ exp(Intercept + field), n.samples = 5)
@@ -109,7 +109,7 @@ test_that("Georeferenced data with sf, with groups", {
   mydata[["obs"]] <- (mydata$Easting - 20) / 10 + rnorm(NROW(mydata))
   mydata <- sf::st_as_sf(mydata, coords = c("Easting", "Northing"))
 
-  mesh <- fm_mesh_2d_inla(
+  mesh <- fmesher::fm_mesh_2d_inla(
     loc = mydata,
     offset = 5,
     max.edge = 4,

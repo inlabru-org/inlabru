@@ -42,53 +42,9 @@ with code examples for versions up to 2.1.13. For later versions,
 updated versions of these tutorials, as well as new examples, can be
 found at <https://inlabru-org.github.io/inlabru/articles/>
 
-## Installation
+## Online documentation
 
-You can install the current [CRAN
-version](https://cran.r-project.org/package=inlabru) version of inlabru,
-using the basic `install.packages()` function, or
-[pak](https://pak.r-lib.org/), after adding the INLA repository added to
-the list of repositories:
-
-``` r
-options(repos = c(
-  INLA = "https://inla.r-inla-download.org/R/testing",
-  getOption("repos")
-))
-install.packages("inlabru")
-```
-
-or
-
-``` r
-# install.packages("pak")
-pak::pak("inlabru")
-```
-
-### Development version on r-universe
-
-Track the development version builds via
-[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
-
-``` r
-options(repos = c(
-  inlabruorg = "https://inlabru-org.r-universe.dev",
-  getOption("repos")
-))
-pak::pak("inlabru")
-```
-
-This will pick the r-universe version if it is more recent than the CRAN
-version.
-
-### Development version on github
-
-Install the development version
-[GitHub](https://github.com/inlabru-org/inlabru) with
-
-``` r
-pak::pak("inlabru-org/inlabru")
-```
+<https://inlabru-org.github.io/inlabru/>
 
 ## Example
 
@@ -153,3 +109,51 @@ Nest intensity per km squared
 </p>
 
 </div>
+
+## Installation
+
+You can install the current [CRAN
+version](https://cran.r-project.org/package=inlabru) version of inlabru,
+using the basic `install.packages()` function, or
+[pak](https://pak.r-lib.org/), after adding the INLA repository added to
+the list of repositories:
+
+``` r
+options(repos = c(
+  INLA = "https://inla.r-inla-download.org/R/testing",
+  getOption("repos")
+))
+install.packages("inlabru")
+```
+
+or
+
+``` r
+# install.packages("pak")
+pak::pak("inlabru")
+```
+
+### Development version on r-universe
+
+Track the development version builds via
+[inlabru-org.r-universe.dev](https://inlabru-org.r-universe.dev/builds):
+
+``` r
+options(repos = c(
+  inlabruorg = "https://inlabru-org.r-universe.dev",
+  getOption("repos")
+))
+pak::pak("inlabru")
+```
+
+This will pick the r-universe version if it is more recent than the CRAN
+version.
+
+### Development version on github
+
+Install the development version
+[GitHub](https://github.com/inlabru-org/inlabru) with
+
+``` r
+pak::pak("inlabru-org/inlabru")
+```

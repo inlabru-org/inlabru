@@ -147,7 +147,7 @@ bm_sum_sub_lin <- function(mapper, input, state, ...) {
       indexing,
       function(x) {
         state_subset <- state[n_offset[x] + seq_len(mapper[["n_multi"]][[x]])]
-        ibm_linear(
+        ibm_as_taylor(
           mapper[["mappers"]][[x]],
           input = if (mapper[["single_input"]]) {
             input
@@ -197,7 +197,7 @@ ibm_jacobian.bm_sum <- function(
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_sum <- function(
   mapper,
@@ -222,9 +222,9 @@ ibm_eval.bm_sum <- function(
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_sum <- function(mapper, input, state, ...) {
+ibm_as_taylor.bm_sum <- function(mapper, input, state, ...) {
   sub_lin <-
     bm_sum_sub_lin(
       mapper,
@@ -240,7 +240,7 @@ ibm_linear.bm_sum <- function(mapper, input, state, ...) {
     ...,
     sub_lin = sub_lin
   )
-  bru_mapper_taylor(
+  bm_taylor(
     offset = eval2$offset,
     jacobian = eval2$jacobian,
     state0 = state,

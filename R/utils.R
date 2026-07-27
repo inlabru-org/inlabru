@@ -483,11 +483,15 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
   }
 
   if (inherits(where, "SpatialPoints")) {
-    where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
+    where <- fmesher::fm_transform(
+      where,
+      crs = fmesher::fm_CRS(data),
+      passthrough = TRUE
+    )
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
-        proj4string = fm_CRS(where)
+        proj4string = fmesher::fm_CRS(where)
       )
     }
   }
@@ -519,7 +523,11 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
   if (!inherits(where, c("sf", "sfc", "sfg"))) {
     where <- sf::st_as_sf(where)
   }
-  where <- fm_transform(where, crs = sf::st_crs(data), passthrough = TRUE)
+  where <- fmesher::fm_transform(
+    where,
+    crs = sf::st_crs(data),
+    passthrough = TRUE
+  )
 
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
@@ -619,20 +627,21 @@ eval_spatial.SpatRaster <- function(
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
-    handle_crs <- (!fm_crs_is_null(fm_crs(where)) &&
-      !fm_crs_is_null(fm_crs(data)))
+    handle_crs <- (!fmesher::fm_crs_is_null(fmesher::fm_crs(where)) &&
+      !fmesher::fm_crs_is_null(fmesher::fm_crs(data)))
     if (handle_crs) {
-      where <- fmesher::fm_transform(where, fm_crs(data))
+      where <- fmesher::fm_transform(where, fmesher::fm_crs(data))
     }
     where <- terra::vect(where)
     if (handle_crs) {
-      # Terra's data crs might not be detected as the same as fm_crs(data)
+      # Terra's data crs might not be detected as the same as
+      # fmesher::fm_crs(data)
       where <- terra::project(where, data)
     }
   } else {
     if (
-      !fm_crs_is_null(fm_crs(where)) &&
-        !fm_crs_is_null(fm_crs(data))
+      !fmesher::fm_crs_is_null(fmesher::fm_crs(where)) &&
+        !fmesher::fm_crs_is_null(fmesher::fm_crs(data))
     ) {
       where <- terra::project(where, data)
     }
@@ -795,7 +804,7 @@ bru_fill_missing <- function(
   # Only one layer from here on.
   layer <- layers
 
-  data_crs <- fm_crs(data)
+  data_crs <- fmesher::fm_crs(data)
   if (inherits(data, "SpatRaster")) {
     requireNamespace("terra")
     data_values <- terra::values(
@@ -824,7 +833,7 @@ bru_fill_missing <- function(
     data_coord <- data_coord[!data_notok, , drop = FALSE]
   }
 
-  where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
+  where <- fmesher::fm_transform(where, crs = data_crs, passthrough = TRUE)
 
   values_notok <- is.na(values)
 
@@ -953,5 +962,11 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     "row_kron()",
     "fmesher::fm_row_kron()"
   )
-  fm_row_kron(M1 = M1, M2 = M2, repl = repl, n.repl = n.repl, weights = weights)
+  fmesher::fm_row_kron(
+    M1 = M1,
+    M2 = M2,
+    repl = repl,
+    n.repl = n.repl,
+    weights = weights
+  )
 }

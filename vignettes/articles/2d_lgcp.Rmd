@@ -121,7 +121,7 @@ an optional argument `geom = "tile"` that converts the plot to the type used for
 ```{r results="hide",warning=FALSE,message=FALSE, fig.height=4,fig.width=9}
 pred <- predict(
   fit,
-  fm_pixels(mesh, mask = boundary),
+  fmesher::fm_pixels(mesh, mask = boundary),
   ~ data.frame(
     lambda = exp(mySmooth + Intercept),
     loglambda = mySmooth + Intercept
@@ -193,7 +193,7 @@ Finally, estimate abundance using the `predict` function. As a first step we nee
 ```{r eval=TRUE,warning=FALSE,message=FALSE,echo=TRUE}
 Lambda <- predict(
   fit,
-  fm_int(mesh, boundary),
+  fmesher::fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda
@@ -203,7 +203,7 @@ Given some generous interval boundaries (500, 800) for lambda we can estimate th
 ```{r,warning=FALSE,message=FALSE,echo=TRUE}
 Nest <- predict(
   fit,
-  fm_int(mesh, boundary),
+  fmesher::fm_int(mesh, boundary),
   ~ data.frame(
     N = 500:800,
     dpois(500:800,

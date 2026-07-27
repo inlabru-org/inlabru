@@ -1,8 +1,11 @@
 #' @include 0_inlabru_envir.R
 
 #' @title Get access to the internal environment
+#' @description Access the internal inlabru environment which stores the global
+#' log and options objects.
 #' @details The environment is defined in `0_inlabru_envir.R` which is loaded
 #'   first.
+#' @returns An `environment`
 #' @keywords internal
 bru_env_get <- function() {
   pkg_envir <- parent.env(environment())
@@ -64,7 +67,7 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
     envir <- bru_env_get()
     log_length <- length(envir[["log"]])
     if (offset >= log_length) {
-      envir[["log"]] <- bru_log_new()
+      envir[["log"]] <- new_bru_log()
       return(invisible(NULL))
     }
     if (offset == 0L) {
@@ -77,7 +80,7 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
   # Clear log up to the given offset
   log_length <- length(x)
   if (offset >= log_length) {
-    x <- bru_log_new()
+    x <- new_bru_log()
     return(invisible(x))
   }
   if (offset == 0L) {
@@ -94,31 +97,40 @@ bru_log_reset <- function(x = NULL, bookmark = NULL, offset = NULL) {
 #' @description
 #' Create a `bru_log` object, by default empty.
 #' @param x An optional character vector of log messages, or `data.frame`
-#' with columns `message`, `timestamp`, and `verbosity`.
+#' with columns `message`, `timestamp`, and `verbosity`, or a `bru_log` object.
 #' @param bookmarks An optional `integer` vector of named bookmarks
 #' message in `x`.
+#' @returns A new `bru_log` object.
 #' @family inlabru log methods
 #' @examples
-#' x <- bru_log_new()
+#' x <- new_bru_log()
 #' x <- bru_log_message("Test message", x = x)
 #' print(x)
-bru_log_new <- function(x = NULL, bookmarks = NULL) {
-  if (is.null(x)) {
-    x <- character(0)
-  }
-  if (!is.data.frame(x)) {
-    x <- data.frame(
+new_bru_log <- function(x = NULL, bookmarks = NULL) {
+  if (inherits(x, "bru_log")) {
+    log <- x[["log"]]
+    if (is.null(bookmarks)) {
+      bookmarks <- x[["bookmarks"]]
+    }
+  } else if (is.null(x)) {
+    log <- data.frame(
+      message = character(0)
+    )
+  } else if (is.data.frame(x)) {
+    log <- x
+  } else {
+    log <- data.frame(
       message = as.character(x)
     )
   }
-  if (is.null(x[["timestamp"]])) {
+  if (is.null(log[["timestamp"]])) {
     ts <- Sys.time()
     is.na(ts) <- TRUE
-    ts <- rep(ts, nrow(x))
-    x[["timestamp"]] <- ts
+    ts <- rep(ts, nrow(log))
+    log[["timestamp"]] <- ts
   }
-  if (is.null(x[["verbosity"]])) {
-    x[["verbosity"]] <- integer(nrow(x))
+  if (is.null(log[["verbosity"]])) {
+    log[["verbosity"]] <- integer(nrow(log))
   }
   bookmarks <- if (is.null(bookmarks)) {
     integer(0)
@@ -128,7 +140,7 @@ bru_log_new <- function(x = NULL, bookmarks = NULL) {
   }
   x <- structure(
     list(
-      log = x,
+      log = log,
       bookmarks = bookmarks
     ),
     class = "bru_log"
@@ -303,7 +315,7 @@ bru_log <- function(x = NULL, verbosity = NULL) {
 #' @rdname bru_log
 #' @export
 bru_log.character <- function(x, verbosity = NULL) {
-  y <- bru_log_new(x = x)
+  y <- new_bru_log(x = x)
   if (!is.null(verbosity)) {
     i <- bru_log_index(y, i = NULL, verbosity = verbosity)
     y <- y[i]
@@ -325,7 +337,7 @@ bru_log.bru_log <- function(x, verbosity = NULL) {
 #' @export
 bru_log.iinla <- function(x, verbosity = NULL) {
   if (is.null(x[["log"]])) {
-    return(bru_log_new(character(0)))
+    return(new_bru_log(character(0)))
   }
   bru_log(x[["log"]], verbosity = verbosity)
 }
@@ -336,7 +348,7 @@ bru_log.bru <- function(x, verbosity = NULL) {
   x <- bru_check_object_bru(x)
 
   if (is.null(x[["bru_info"]][["log"]])) {
-    result <- bru_log_new(character(0))
+    result <- new_bru_log(character(0))
   } else {
     result <- bru_log(x[["bru_info"]][["log"]], verbosity = verbosity)
   }
@@ -407,7 +419,7 @@ as.character.bru_log <- function(x, ...) {
       marks[k] <- sum(i <= marks[k])
     }
   }
-  bru_log_new(
+  new_bru_log(
     x = x[["log"]][i, , drop = FALSE],
     bookmarks = marks
   )
@@ -425,7 +437,7 @@ as.character.bru_log <- function(x, ...) {
   )
   if (any(is_ch)) {
     for (k in which(is_ch)) {
-      obj[[k]] <- bru_log_new(x = obj[[k]])
+      obj[[k]] <- new_bru_log(x = obj[[k]])
     }
   }
   stopifnot(all(vapply(
@@ -438,7 +450,7 @@ as.character.bru_log <- function(x, ...) {
     obj[[k]][["bookmarks"]] <- obj[[k]][["bookmarks"]] + offset
     offset <- offset + length(obj[[k]])
   }
-  bru_log_new(
+  new_bru_log(
     x = do.call(rbind, lapply(obj, function(x) x[["log"]])),
     bookmarks = do.call(c, lapply(obj, function(x) x[["bookmarks"]]))
   )
@@ -740,8 +752,34 @@ bru_options_default <- function() {
     #' List of arguments controlling the iterative inlabru method:
     #' \describe{
     bru_method = list(
-      #' \item{taylor}{'pandemic'
-      #' (default, from version 2.1.15).}
+      #' \item{autodiff}{Controls the linearisation calculation method. One of
+      #' \describe{
+      #' \item{'pandemic'}{Treats all post-component transformations as a single
+      #'   calculation (the default from version `2.1.15`).}
+      #' \item{'fullchain'}{Uses the chain rule for the composition of
+      #'   components, predictor, and post-predictor transformations
+      #'   (new from `2.14.1.9008`).}
+      #' }
+      #' }
+      autodiff = "fullchain",
+      #' \item{agg}{Controls the aggregation implementation. One of
+      #' \describe{
+      #' \item{'pandemic'}{Treats all post-component transformations as a single
+      #'   calculation (the default from version `2.1.15`).}
+      #' \item{'fullchain'}{Uses the chain rule for the composition of
+      #'   components, predictor, and post-predictor transformations
+      #'   (new from `2.14.1.9008`).}
+      #' }
+      #' }
+      agg = "fullchain",
+      #' \item{finite_diff}{One of
+      #' \describe{
+      #' \item{'forward'}{Use onesided finite differences.}
+      #' \item{'central'}{Use symmetric differences.}
+      #' }
+      #' }
+      finite_diff = "forward",
+      #' \item{taylor}{'pandemic' (the default from version `2.1.15`).}
       taylor = "pandemic",
       #' \item{search}{Either 'all' (default), to use all available line search
       #' methods, or one or more of
@@ -751,8 +789,7 @@ bru_options_default <- function() {
       #' \item{'expand'}{(increase step size until no improvement)}
       #' \item{'optimise'}{(fast approximate error norm minimisation)}
       #' }
-      #' To disable line search, set to an empty vector. Line search is not
-      #' available for `taylor="legacy"`.}
+      #' To disable line search, set to an empty vector.}
       search = "all",
       #' \item{factor}{
       #' Numeric, \eqn{> 1} determining the line search step scaling multiplier.
@@ -852,7 +889,7 @@ bru_options_deprecated <- function(args) {
           ),
           sep = ", "
         ),
-        ".",
+        "."
       ))
       names_args <- setdiff(
         names_args,
@@ -966,7 +1003,7 @@ bru_options_check <- function(options, ignore_null = TRUE) {
     disallowed_null <-
       intersect(
         names(options),
-        c("bru_max_iter")
+        "bru_max_iter"
       )
     disallowed_null <- disallowed_null[are_null[disallowed_null]]
     if (length(disallowed_null) > 0) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tidiers.R
 \name{tidy.bru}
 \alias{tidy.bru}
-\title{Tidy a bru model fit}
+\title{Extract a bru model fit into a tidy tibble}
 \usage{
 \method{tidy}{bru}(x, effects = "fixed", ...)
 }
@@ -17,5 +17,8 @@
 A tibble with one row per term.
 }
 \description{
-Tidy a bru model fit
+This function extracts the fixed effect coefficients or
+hyperparameters from a fitted \code{bru} object and returns them in a tidy
+tibble format. See \code{\link[generics:tidy]{generics::tidy()}} for more details on the tidy data
+format.
 }

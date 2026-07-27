@@ -22,7 +22,7 @@ the stacks. (default "BRU.response")}
 possibly the same as an old name. (default "BRU.response")}
 }
 \value{
-a list of modified stacks with multicolumn observations
+A list of modified stacks with multicolumn observations
 }
 \description{
 Expand observation vectors/matrices in stacks into to a multicolumn matrix

@@ -14,7 +14,7 @@ test_that("Joint gcpo", {
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
 
-  mesh <- fm_mesh_2d(
+  mesh <- fmesher::fm_mesh_2d(
     boundary = list(
       gorillas_sf$boundary,
       fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
@@ -188,7 +188,7 @@ test_that("bru_block_gcpo returns correct structure for single likelihood with
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
 
-  mesh <- fm_mesh_2d(
+  mesh <- fmesher::fm_mesh_2d(
     boundary = list(
       gorillas_sf$boundary,
       fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
@@ -245,7 +245,7 @@ test_that("bru_block_gcpo returns correct structure for multiple likelihoods
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
 
-  mesh <- fm_mesh_2d(
+  mesh <- fmesher::fm_mesh_2d(
     boundary = list(
       gorillas_sf$boundary,
       fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)
@@ -336,7 +336,7 @@ test_that("bru_gcpo_table returns correct structure for multiple fits", {
   cvpart$group <- NULL
   nblock <- nrow(cvpart)
 
-  mesh <- fm_mesh_2d(
+  mesh <- fmesher::fm_mesh_2d(
     boundary = list(
       gorillas_sf$boundary,
       fmesher::fm_segm(gorillas_sf$mesh, boundary = TRUE)

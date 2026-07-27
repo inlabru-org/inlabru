@@ -1,8 +1,19 @@
 # Internal checker for spatstat packages
 # Adapted from Adrian Baddeley and Ege Rubak
 check_spatstat <- function(pkg = "spatstat.geom") {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    caller_name <- fm_caller_name(1)
+  if (requireNamespace(pkg, quietly = TRUE)) {
+    spst_ver <- try(utils::packageVersion("spatstat"), silent = TRUE)
+    if (!inherits(spst_ver, "try-error") && spst_ver < "2.0-0") {
+      warning(paste0(
+        "You have an old version of 'spatstat' installed which is ",
+        "incompatible with '",
+        pkg,
+        "'. Please update 'spatstat' (or uninstall it)."
+      ))
+      return(FALSE)
+    }
+  } else {
+    caller_name <- fmesher::fm_caller_name(1)
     stop(paste0(
       "package '",
       pkg,
@@ -14,17 +25,6 @@ check_spatstat <- function(pkg = "spatstat.geom") {
       },
       "; please install it (or the full spatstat package) first"
     ))
-  } else {
-    spst_ver <- try(utils::packageVersion("spatstat"), silent = TRUE)
-    if (!inherits(spst_ver, "try-error") && spst_ver < "2.0-0") {
-      warning(paste0(
-        "You have an old version of 'spatstat' installed which is ",
-        "incompatible with '",
-        pkg,
-        "'. Please update 'spatstat' (or uninstall it)."
-      ))
-      return(FALSE)
-    }
   }
   TRUE
 }

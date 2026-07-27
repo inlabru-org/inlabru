@@ -962,7 +962,7 @@ add_mappers.bru_comp <- function(
     data = lh_data,
     inputs = lapply(
       inputs,
-      function(x) x[[component$label]][["core"]][["main"]]
+      function(x) x[["comp"]][[component$label]][["core"]][["main"]]
     ),
     env = component$env,
     require_indexed = FALSE
@@ -974,7 +974,7 @@ add_mappers.bru_comp <- function(
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["core"]][["group"]]
+        function(x) x[["comp"]][[component$label]][["core"]][["group"]]
       ),
       env = component$env,
       require_indexed = TRUE
@@ -987,7 +987,7 @@ add_mappers.bru_comp <- function(
       data = lh_data,
       inputs = lapply(
         inputs,
-        function(x) x[[component$label]][["core"]][["replicate"]]
+        function(x) x[["comp"]][[component$label]][["core"]][["replicate"]]
       ),
       env = component$env,
       require_indexed = TRUE
@@ -1283,8 +1283,8 @@ make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
       ))
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_CRS)
-    crs_info <- lapply(inp_crs, fm_wkt)
+    inp_crs <- lapply(inp, fmesher::fm_CRS)
+    crs_info <- lapply(inp_crs, fmesher::fm_wkt)
     null_crs <- vapply(crs_info, is.null, logical(1))
     inconsistent_crs <-
       (length(unique(unlist(crs_info))) > 1) ||
@@ -1311,7 +1311,7 @@ make_unique_inputs <- function(inp, allow_list = FALSE, label = "") {
       ))
     }
     inconsistent_crs <- FALSE
-    inp_crs <- lapply(inp, fm_crs)
+    inp_crs <- lapply(inp, fmesher::fm_crs)
     null_crs <- vapply(inp_crs, is.na, logical(1))
     inconsistent_crs <-
       (length(unique(inp_crs)) > 1) ||
@@ -1608,7 +1608,7 @@ make_submapper <- function(
   if (
     is.factor(values) ||
       is.character(values) ||
-      (!is.null(subcomp_type) && (subcomp_type %in% "factor"))
+      (!is.null(subcomp_type) && (subcomp_type == "factor"))
   ) {
     return(
       bm_factor(
@@ -1624,7 +1624,7 @@ make_submapper <- function(
     if (allow_interpolation) {
       return(
         bru_mapper(
-          fm_mesh_1d(values),
+          fmesher::fm_mesh_1d(values),
           indexed = require_indexed
         )
       )
@@ -1790,7 +1790,7 @@ make_mapper <- function(
   if (subcomp[["type"]] %in% c("offset", "const")) {
     return(bm_const())
   }
-  if (subcomp[["type"]] %in% c("fixed")) {
+  if (subcomp[["type"]] == "fixed") {
     if (!is.null(subcomp[["values"]])) {
       labels <- subcomp[["values"]]
     } else if (!is.null(input_values)) {
@@ -1858,8 +1858,12 @@ make_mapper <- function(
   mappers[[1]]
 }
 
-#' Convert components to R code
-#'
+#' @title Convert components to R code
+#' @description Convert a [formula] describing latent model components to R code
+#'   strings that can be evaluated to create the corresponding [bru_comp]
+#'   objects.
+#' @returns a character vector of R code strings, one for each component in the
+#'   formula.
 #' @aliases bru_formula_to_bru_obs_code
 #' @keywords internal
 #' @param components A [formula] describing latent model components.
@@ -2024,7 +2028,7 @@ summary.bru_comp <- function(object, ..., depth = Inf, verbose = TRUE) {
     )
     result$Summary <- Summary
   }
-  class(result) <- "summary_component"
+  class(result) <- "summary_bru_comp"
   result
 }
 
@@ -2124,13 +2128,13 @@ print.bru_subcomp <- function(x, verbose = TRUE, ..., label.override = NULL) {
 #' @author Finn Lindgren \email{finn.lindgren@@gmail.com}
 #' @rdname summary.bru_comp
 
-print.summary_component <- function(x, ...) {
+print.summary_bru_comp <- function(x, ...) {
   if (is.null(x[["Summary"]])) {
     for (name in names(x)) {
       if (!is.null(x[[name]])) {
-        if (name %in% "Label") {
+        if (name == "Label") {
           cat(glue("Label:\t{x[[name]]}"), "\n")
-        } else if (name %in% "Mapper") {
+        } else if (name == "Mapper") {
           cat(glue("  Map:\t{glue::glue_collapse(x[[name]])}"), "\n")
         } else {
           cat(glue("  {name}:\t{glue::glue_collapse(x[[name]])}"), "\n")

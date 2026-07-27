@@ -119,7 +119,6 @@ library(fmesher)
 select <- dplyr::select
 options(scipen = 99999)
 options(max.print = 99999)
-options(stringsAsFactors = FALSE)
 ```
 ```{r echo=FALSE}
 INLA::inla.setOption(num.threads = "2:1")

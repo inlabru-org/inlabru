@@ -19,20 +19,38 @@ bru_standardise_names <- function(x) {
     },
     "name"
   )
-  not_ok <- grepl("__", x = new_names)
+  not_ok <- grepl("__", x = new_names, fixed = TRUE)
   while (any(not_ok)) {
     new_names[not_ok] <- vapply(
       new_names[not_ok],
       function(x) {
-        gsub("__", "_", x = x, fixed = FALSE)
+        gsub("__", "_", x = x, fixed = TRUE)
       },
       "name"
     )
-    not_ok <- grepl("__", x = new_names)
+    not_ok <- grepl("__", x = new_names, fixed = TRUE)
   }
   new_names
 }
 
+
+# bru_convert_names <- function(x, comp_names, obs_names) {
+#   # In: "<output.name> for <label>"
+#   # Out: "param_comp_<label>_<short.name>"
+#   INLA::inla.models()$latent[[comp_model]]$hyper
+#   # Should be
+#   #   In: "<name> for <label>"
+#   # but The actual names are hardcoded in inlaprog/src/inla-parse.c as
+#   #   "Group rho_intern"/"GroupRho" and "Group prec_intern"/"GroupPrec"
+#   # Out: "param_comp_<label>_group_<short.name>"
+#   INLA::inla.models()$group[[comp_group_model]]$hyper
+#   # In: "<output.name>" or # "<output.name>[<nr>]"
+#   # However, many models appear to have output.name.intern and output.name
+#   # swapped, and also mismatches between inla.models() and
+#   #   inlaprog/src/inla-parse.c
+#   # Out: "param_obs_<tag>_<short.name>"
+#   INLA::inla.models()$likelihood[[obs_family]]$hyper
+# }
 
 #' @title Extract standardised names from a bru or inla result object
 #' @description
@@ -240,6 +258,17 @@ post.sample.structured <- function(
     )
   }
 
+  comp_lst <- as_bru_comp_list(result)
+  fac.names <- names(comp_lst)[
+    vapply(
+      comp_lst,
+      function(e) {
+        identical(e$main$type, "factor")
+      },
+      TRUE
+    )
+  ]
+
   ssmpl <- list()
   .contents <- attr(samples, ".contents")
   for (i in seq_along(samples)) {
@@ -276,16 +305,6 @@ post.sample.structured <- function(
 
     # For effects that were modeled via factors we attach an extra vector
     # holding the samples
-    comp_lst <- as_bru_comp_list(result)
-    fac.names <- names(comp_lst)[
-      vapply(
-        comp_lst,
-        function(e) {
-          identical(e$main$type, "factor")
-        },
-        TRUE
-      )
-    ]
     for (name in fac.names) {
       # TODO: figure out how to interact this with group and replicate info
       names(vals[[name]]) <- comp_lst[[name]]$main$values
@@ -295,7 +314,10 @@ post.sample.structured <- function(
       ## Sanitize the variable names; replace problems with "_".
       ## Needs to handle whatever INLA uses to describe the hyperparameters.
       ## Known to include " " and "-" and potentially "(" and ")".
-      names(smpl.hyperpar) <- bru_standardise_names(names(smpl.hyperpar))
+      if (i == 1L) {
+        smpl.hyperpar.names <- bru_standardise_names(names(smpl.hyperpar))
+      }
+      names(smpl.hyperpar) <- smpl.hyperpar.names
     }
     ssmpl[[i]] <- c(vals, smpl.hyperpar)
   }
@@ -341,7 +363,7 @@ extract_entries <- function(name, smpl, .contents = NULL) {
 #'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
-#' @return a list of modified stacks with multicolumn observations
+#' @returns A list of modified stacks with multicolumn observations
 #' @author Fabian E. Bachl \email{f.e.bachl@@bath.ac.uk} and Finn Lindgren
 #'   \email{finn.lindgren@@gmail.com}
 #'
@@ -440,6 +462,7 @@ bru_inla.stack.mexpand <- function(
 #'   the stacks. (default "BRU.response")
 #' @param new.name The name to be used for the expanded observation matrix,
 #'        possibly the same as an old name. (default "BRU.response")
+#' @returns A single stack with a multi-likelihood observation matrix
 #' @export
 #' @keywords internal
 #' @rdname bru_inla.stack.mjoin
@@ -458,7 +481,7 @@ bru_inla.stack.mjoin <- function(
       old.names = old.names,
       new.name = new.name
     )
-    do.call(
+    joined <- do.call(
       INLA::inla.stack.join,
       c(
         stacks,
@@ -468,24 +491,24 @@ bru_inla.stack.mjoin <- function(
         )
       )
     )
-  } else {
-    stacks <- bru_inla.stack.mexpand(
-      ...,
-      old.names = old.names,
-      new.name = new.name
-    )
-    do.call(
-      INLA::inla.stack.join,
-      c(
-        stacks,
-        list(
-          compress = compress,
-          remove.unused = remove.unused,
-          multi.family = TRUE
-        )
+    return(joined)
+  }
+  stacks <- bru_inla.stack.mexpand(
+    ...,
+    old.names = old.names,
+    new.name = new.name
+  )
+  do.call(
+    INLA::inla.stack.join,
+    c(
+      stacks,
+      list(
+        compress = compress,
+        remove.unused = remove.unused,
+        multi.family = TRUE
       )
     )
-  }
+  )
 }
 
 
@@ -616,7 +639,7 @@ variables.inla <- function(result, include.random = TRUE) {
       type = character(0),
       model = character(0),
       as.data.frame(
-        matrix(NA, 0, length(col.names), dimnames = list(c(), col.names))
+        matrix(NA, 0, length(col.names), dimnames = list(NULL, col.names))
       )
     ))
   }
@@ -687,7 +710,26 @@ variables.inla <- function(result, include.random = TRUE) {
   if (random.missing) {
     random <- list(handle.missing(col.names))
   } else {
-    if (!include.random) {
+    if (include.random) {
+      random <-
+        lapply(
+          seq_along(result$summary.random),
+          function(x) {
+            output <- handle.data.frame(
+              result$summary.random[[x]],
+              "random",
+              result$model.random[x],
+              col.names
+            )
+            rownames(output) <-
+              paste(
+                names(result$summary.random)[x],
+                seq_len(nrow(result$summary.random[[x]]))
+              )
+            output
+          }
+        )
+    } else {
       random <-
         lapply(
           seq_along(result$summary.random),
@@ -704,25 +746,6 @@ variables.inla <- function(result, include.random = TRUE) {
             )
             rownames(output) <-
               names(result$summary.random)[x]
-            output
-          }
-        )
-    } else {
-      random <-
-        lapply(
-          seq_along(result$summary.random),
-          function(x) {
-            output <- handle.data.frame(
-              result$summary.random[[x]],
-              "random",
-              result$model.random[x],
-              col.names
-            )
-            rownames(output) <-
-              paste(
-                names(result$summary.random)[x],
-                seq_len(nrow(result$summary.random[[x]]))
-              )
             output
           }
         )

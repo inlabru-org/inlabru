@@ -72,8 +72,8 @@ test_that("basic fixed effect model, order relevance", {
   fit2 <- bru(mycomp2, family = "normal", data = mydata, options = options)
 
   expect_equal(
-    fit2$summary.fixed["Intercept", ],
-    fit1$summary.fixed["Intercept", ],
+    fit2$summary.fixed["Intercept", "mean"],
+    fit1$summary.fixed["Intercept", "mean"],
     tolerance = lowtol
   )
 })

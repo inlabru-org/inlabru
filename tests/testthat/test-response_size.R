@@ -33,18 +33,30 @@ test_that("Response and predictor mismatch handling", {
       fit3A <- bru(components = cmpA, lik3)
     },
     paste0(
-      "Number of rows \\(2\\) in the predictor for component 'beta' ",
-      "does not match the length implied by the response data \\(10\\)"
+      "The number of values \\(2\\) in the predictor for observation model ",
+      "<unknown> does not match the expected length \\(10\\)."
     )
   )
+
   expect_error(
     {
       fit3B <- bru(components = cmpB, lik3)
     },
-    paste0(
-      "Number of rows \\(20\\) in the predictor for component 'beta' ",
-      "does not match the length implied by the response data \\(10\\)"
-    )
+    if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+      paste0(
+        "The number of values \\(20\\) in the predictor for",
+        " observation model <unknown> does not match the expected length",
+        " \\(10\\)"
+      )
+    } else {
+      paste0(
+        "The number of rows \\(10\\) in the Jacobian for derived variable ",
+        "'beta' with respect to\n",
+        "root variable 'beta' does not match the number of rows \\(20\\) in ",
+        "the expression result;\n",
+        "This indicates the expression was incorrectly inferred to be rowwise."
+      )
+    }
   )
 
   # INLA prior to mdata/surv stack support will give a different error message
@@ -59,12 +71,20 @@ test_that("Response and predictor mismatch handling", {
         family = "gaussian"
       )
     },
-    paste0(
-      "The total number of response values \\(N=2\\) and predictor ",
-      "values \\(N=3\\) do not match.\n",
-      "  This is likely due to a mistake in the component or predictor ",
-      "constructions."
-    )
+    if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+      paste0(
+        "The total number of response values \\(N=2\\) and predictor values",
+        " \\(N=3\\) do not match.\n",
+        "  This is likely due to a mistake in the component or predictor",
+        " constructions."
+      )
+    } else {
+      paste0(
+        "The number of values \\(3\\) in the predictor for ",
+        "observation model <unknown> ",
+        "does not match the expected length \\(2)\\."
+      )
+    }
   )
 })
 

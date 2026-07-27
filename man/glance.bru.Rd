@@ -19,5 +19,7 @@ seconds summed across the phases in \code{fit$bru_timings}, not CPU time.
 not meaningful for such models.
 }
 \description{
-Glance at a bru model fit
+This function returns a one-row tibble of model summaries from a
+fitted \code{bru} object. See \code{\link[generics:glance]{generics::glance()}} for more details on the
+glance format.
 }

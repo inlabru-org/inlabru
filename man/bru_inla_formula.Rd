@@ -3,6 +3,7 @@
 \name{bru_inla_formula}
 \alias{bru_inla_formula}
 \alias{bru_inla_formula.bru}
+\alias{bru_inla_formula.bru_model}
 \alias{bru_inla_formula.bru_info}
 \alias{bru_inla_formula.bru_comp_list}
 \title{Extract INLA formula}
@@ -10,6 +11,8 @@
 bru_inla_formula(x, ...)
 
 \method{bru_inla_formula}{bru}(x, ...)
+
+\method{bru_inla_formula}{bru_model}(x, ...)
 
 \method{bru_inla_formula}{bru_info}(x, ...)
 
@@ -19,6 +22,9 @@ bru_inla_formula(x, ...)
 \item{x}{An object containing information about an INLA formula}
 
 \item{\dots}{Additional arguments passed on to submethods}
+}
+\value{
+A \link{formula} suited for use in \code{INLA::inla()}
 }
 \description{
 Extracts the INLA formula used in a \code{bru} model

@@ -14,6 +14,7 @@
   num.threads = NULL,
   used = NULL,
   drop = FALSE,
+  options = NULL,
   ...,
   include = deprecated(),
   exclude = deprecated()
@@ -49,6 +50,9 @@ Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 \item{drop}{logical; If \code{drop=FALSE}, and
 the prediction summary has the same number of rows as \code{newdata}, then the
 output is a joined object. Default \code{FALSE}.}
+
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
 
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 

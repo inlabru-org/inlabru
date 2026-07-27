@@ -58,7 +58,7 @@ test_that("Component construction: linear model", {
   expect_equal(idx$beta, 1)
 
   # A-matrix
-  comp_lin <- ibm_linear(cmp, input = inp, inla_f = FALSE)
+  comp_lin <- ibm_as_taylor(cmp, input = inp, inla_f = FALSE)
   A <- ibm_jacobian(comp_lin)
   expect_s4_class(A, "dgCMatrix")
   expect_equal(nrow(A), 10)
@@ -66,19 +66,31 @@ test_that("Component construction: linear model", {
   expect_equal(as.vector(A), 1:10)
 
   # Value
-  v <- evaluate_effect_single_state(comp_lin, state = 2)
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    v <- evaluate_effect_single_state(comp_lin, state = 2)
+  } else {
+    v <- ibm_eval(comp_lin, state = 2)
+  }
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
-  v <- evaluate_effect_single_state(comp_lin, state = 2, A = A)
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    v <- evaluate_effect_single_state(comp_lin, state = 2, A = A)
+  } else {
+    v <- ibm_eval(comp_lin, state = 2)
+  }
   expect_equal(v, 2 * df$x, ignore_attr = TRUE)
 
   cmps <- bru_comp_list(list(cmp))
   inps <- bru_input(cmps, data = df)
-  v <- evaluate_effect_single_state(
-    cmps,
-    input = inps,
-    state = list(beta = 2)
-  )
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    v <- evaluate_effect_single_state(
+      cmps,
+      input = inps,
+      state = list(beta = 2)
+    )
+  } else {
+    v <- ibm_eval(cmps, input = inps, state = list(beta = 2))
+  }
   expect_equal(v[["beta"]], 2 * df$x, ignore_attr = TRUE)
 })
 
@@ -102,7 +114,11 @@ test_that("Component construction: offset", {
   local_bru_safe_inla()
   cmp <- bru_comp_list(~ -1 + something(a, model = "offset"))
   inp <- bru_input(cmp, data = data.frame(a = 11:15))
-  val <- evaluate_effect_single_state(cmp, input = inp, state = NULL)
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    val <- evaluate_effect_single_state(cmp, input = inp, state = NULL)
+  } else {
+    val <- ibm_eval(cmp, input = inp, state = NULL)
+  }
   expect_equal(
     val$something,
     11:15,
@@ -141,16 +157,20 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(
+  comp_lin <- ibm_as_taylor(
     cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
   )
-  val <- evaluate_effect_single_state(
-    comp_lin,
-    state = list(something = 2)
-  )
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    val <- evaluate_effect_single_state(
+      comp_lin,
+      state = list(something = 2)
+    )
+  } else {
+    val <- ibm_eval(comp_lin, state = list(something = 2))
+  }
   expect_equal(
     val$something,
     2 * 406
@@ -158,16 +178,20 @@ test_that("Component construction: terra", {
 
   cmp <- bru_comp_list(~ -1 + something(r, model = "linear"), lhoods = llik)
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(
+  comp_lin <- ibm_as_taylor(
     cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
   )
-  val <- evaluate_effect_single_state(
-    comp_lin,
-    state = list(something = 2)
-  )
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    val <- evaluate_effect_single_state(
+      comp_lin,
+      state = list(something = 2)
+    )
+  } else {
+    val <- ibm_eval(comp_lin, state = list(something = 2))
+  }
   expect_equal(
     val$something,
     2 * 406
@@ -178,16 +202,20 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(
+  comp_lin <- ibm_as_taylor(
     cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
   )
-  val <- evaluate_effect_single_state(
-    comp_lin,
-    state = list(something = 2)
-  )
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    val <- evaluate_effect_single_state(
+      comp_lin,
+      state = list(something = 2)
+    )
+  } else {
+    val <- ibm_eval(comp_lin, state = list(something = 2))
+  }
   expect_equal(
     val$something,
     2 * 406
@@ -198,16 +226,20 @@ test_that("Component construction: terra", {
     lhoods = llik
   )
   inp <- bru_input(cmp, data = data)
-  comp_lin <- ibm_linear(
+  comp_lin <- ibm_as_taylor(
     cmp,
     input = inp,
     state = list(something = 2),
     inla_f = FALSE
   )
-  val <- evaluate_effect_single_state(
-    comp_lin,
-    state = list(something = 2)
-  )
+  if (identical(bru_options_get("bru_method")$autodiff, "pandemic")) {
+    val <- evaluate_effect_single_state(
+      comp_lin,
+      state = list(something = 2)
+    )
+  } else {
+    val <- ibm_eval(comp_lin, state = list(something = 2))
+  }
   expect_equal(
     val$something,
     2 * 406
@@ -264,7 +296,7 @@ test_that("Component construction: default index/mesh/mapping construction", {
     sort(unique(lik$data$x), na.last = NA)
   )
 
-  mesh1 <- fm_mesh_1d(
+  mesh1 <- fmesher::fm_mesh_1d(
     sort(unique(lik$data$x), na.last = NA)
   )
   expect_error(
@@ -275,7 +307,12 @@ test_that("Component construction: default index/mesh/mapping construction", {
   )
 
   cmp1 <- bru_comp_list(
-    ~ effect(x, model = "rw2", mapper = bru_mapper(mesh1, indexed = FALSE)) - 1
+    ~ effect(
+      x,
+      model = "rw2",
+      mapper = bru_mapper(mesh1, indexed = FALSE)
+    ) -
+      1
   )
   cmp2 <- add_mappers(cmp1, lhoods = bru_obs_list(list(lik)))
   expect_equal(
@@ -436,7 +473,7 @@ test_that("Component inputs: non-numeric input detection", {
     data.frame(x = c(-15, 15, 15, -15), y = c(25, 25, 50, 50)),
     format = "sf"
   )
-  mesh <- fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
+  mesh <- fmesher::fm_mesh_2d_inla(boundary = bnd, max.edge = 100)
   matern <-
     INLA::inla.spde2.pcmatern(
       mesh,
@@ -473,7 +510,7 @@ test_that("Component inputs: non-numeric input detection", {
     ibm_eval(
       as_bru_comp_list(model)$field$mapper,
       input = input,
-      state = rep(1, fm_dof(mesh))
+      state = rep(1, fmesher::fm_dof(mesh))
     ),
     "The input to a bm_scale evaluation must be numeric or logical."
   )

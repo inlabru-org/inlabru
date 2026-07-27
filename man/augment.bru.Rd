@@ -28,7 +28,8 @@ RNG state unchanged (predictions then vary run-to-run because
 \code{.fitted_high}, \code{.fitted_sd}.
 }
 \description{
-Adds posterior mean and credible interval columns to \code{data}. The user must
-supply \code{pred_formula} because inlabru prediction expressions are arbitrary R
-and cannot be recovered from the fit object alone.
+Adds posterior mean and credible interval columns to \code{data}. The
+user must supply \code{pred_formula} because inlabru prediction expressions are
+arbitrary R and cannot be recovered from the fit object alone. Also see
+\code{\link[generics:augment]{generics::augment()}}.
 }

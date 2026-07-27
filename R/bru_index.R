@@ -126,8 +126,31 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @returns * `bru_index(bru_info)`: An `integer` vector.
 bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
-  bru_index(object[["lhoods"]], tag = tag, what = what, ...)
+  bru_index(as_bru_obs_list(object), tag = tag, what = what, ...)
 }
+
+#' @describeIn bru_index Compute all index values for a [bru_model()] object.
+#' Computes the index value matrices for included components according to the
+#' `used` argument.
+#'
+#' @param used A [bru_used()] object
+#' @return * `bru_index(bru_model)`: A named list of `idx_full` and `idx_inla`,
+#' named list of indices, and `inla_subset`, and `inla_subset`,
+#' a named list of logical subset specifications for extracting the `INLA::f()`
+#' compatible index subsets.
+#' @export
+bru_index.bru_model <- function(object, used, ...) {
+  stopifnot(inherits(object, "bru_model"))
+  included <- union(used[["effect"]], used[["latent"]])
+
+  comp_lst <- as_bru_comp_list(object)[included]
+  list(
+    idx_full = bru_index(comp_lst, inla_f = FALSE),
+    idx_inla = bru_index(comp_lst, inla_f = TRUE),
+    inla_subset = inla_subset_eval(comp_lst)
+  )
+}
+
 
 #' @export
 #' @param object A [component].
@@ -163,30 +186,7 @@ bru_index.bru_comp <- function(object, inla_f, ...) {
 #'   A list of list of indices into the latent variables compatible with each
 #'   component mapper.
 bru_index.bru_comp_list <- function(object, inla_f, ...) {
-  lapply(object, function(x) bru_index(x, inla_f = inla_f, ...))
-}
-
-
-#' @describeIn bru_index Compute all index values for a [bru_model()] object.
-#' Computes the index value matrices for included components according to the
-#' `used` argument.
-#'
-#' @param used A [bru_used()] object
-#' @return * `bru_index(bru_model)`: A named list of `idx_full` and `idx_inla`,
-#' named list of indices, and `inla_subset`, and `inla_subset`,
-#' a named list of logical subset specifications for extracting the `INLA::f()`
-#' compatible index subsets.
-#' @export
-bru_index.bru_model <- function(object, used, ...) {
-  stopifnot(inherits(object, "bru_model"))
-  included <- union(used[["effect"]], used[["latent"]])
-
-  comp_lst <- as_bru_comp_list(object)[included]
-  list(
-    idx_full = bru_index(comp_lst, inla_f = FALSE),
-    idx_inla = bru_index(comp_lst, inla_f = TRUE),
-    inla_subset = inla_subset_eval(comp_lst)
-  )
+  lapply(object, bru_index, inla_f = inla_f, ...)
 }
 
 
