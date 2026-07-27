@@ -51,8 +51,8 @@ if (require("spatstat.geom") &&
 #> Loading required package: spatstat.geom
 #> Loading required package: spatstat.data
 #> Loading required package: spatstat.univar
-#> spatstat.univar 3.1-7
-#> spatstat.geom 3.7-3
+#> spatstat.univar 3.2-0
+#> spatstat.geom 3.8-2
 #> 
 #> Attaching package: ‘spatstat.geom’
 #> The following objects are masked from ‘package:raster’:

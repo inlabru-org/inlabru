@@ -3,6 +3,7 @@
 Set things up
 
 ``` r
+
 library(INLA)
 library(inlabru)
 library(tibble)
@@ -18,6 +19,7 @@ Construct sampler transects, with a per-transect covariate,
 `visibility`:
 
 ``` r
+
 samplers <- st_sf(
   bind_rows(
     tibble(
@@ -41,6 +43,7 @@ samplers <- st_sf(
 Point observations, with marks `distance` and `transect`:
 
 ``` r
+
 intensity <- 0.1
 set.seed(1324L)
 N_expected <- c(100 * 10 * intensity * 1, 50 * 10 * intensity * 0.5)
@@ -65,6 +68,7 @@ observations <- st_as_sf(obs_coord, coords = c("x", "y"))
 Domain of interest:
 
 ``` r
+
 bnd <- fm_as_sfc(fm_segm(
   rbind(c(-30, -40), c(125, -20), c(135, 70), c(-20, 40), c(-30, -40)),
   is.bnd = TRUE
@@ -74,6 +78,7 @@ bnd <- fm_as_sfc(fm_segm(
 Computational meshes:
 
 ``` r
+
 mesh <- fm_mesh_2d(
   loc = fm_hexagon_lattice(bnd, edge_len = 5),
   boundary = bnd,
@@ -90,6 +95,7 @@ distance_mesh <- fm_mesh_1d(
 Transect integration scheme, including per-transect covariates:
 
 ``` r
+
 ips <- fm_int(
   domain = list(
     geometry = fm_subdivide(mesh, 1),
@@ -103,20 +109,26 @@ Join per-transect covariates into the point observations, so they are
 available for model fitting:
 
 ``` r
+
 obs_with_transect_info <- observations |>
   left_join(as_tibble(samplers),
     by = "transect",
     suffix = c("", ".sampler")
   )
 
-
 ggplot() +
   geom_fm(data = mesh) +
-  geom_sf(data = ips, aes(size = weight, color = visibility), alpha = 0.2) +
-  scale_size_area() +
+  geom_sf(
+    data = ips,
+    aes(size = weight, color = visibility),
+    alpha = 0.2,
+    stroke = 0
+  ) +
+  scale_size_area(max_size = 3) +
   geom_sf(data = samplers, color = "blue") +
   geom_sf(
-    data = obs_with_transect_info, aes(shape = as.factor(transect)),
+    data = obs_with_transect_info,
+    aes(shape = as.factor(transect)),
     color = "red"
   ) +
   theme_minimal()
@@ -129,6 +141,7 @@ ggplot() +
 Fitting model with visibility.
 
 ``` r
+
 cmp <- ~ Intercept(1) +
   visibility(log(visibility), model = "linear") +
   twosided(log(2), model = "const")
@@ -153,9 +166,10 @@ fit_vis <- bru(
 ```
 
 ``` r
+
 summary(fit_vis)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> Intercept: main = linear(1)
 #> visibility: main = linear(log(visibility))
@@ -169,7 +183,7 @@ summary(fit_vis)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[Intercept, visibility, twosided], latent[] 
 #> Time used:
-#>     Pre = 0.322, Running = 0.231, Post = 0.0356, Total = 0.588 
+#>     Pre = 0.311, Running = 0.424, Post = 0.0342, Total = 0.77 
 #> Fixed effects:
 #>              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 #> Intercept  -2.471 0.108     -2.684   -2.471     -2.258 -2.471   0
@@ -185,6 +199,7 @@ Posterior predictive interval and median for the intensity (true value
 0.1)
 
 ``` r
+
 rbind(
   True = c(NA, intensity, NA),
   Estimated = exp(fit_vis$summary.fixed[1, c(

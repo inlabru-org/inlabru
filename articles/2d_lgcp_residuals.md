@@ -1,9 +1,12 @@
 # Residual Analysis of spatial point process models using Bayesian methods
 
 ``` r
+
 # Load function definitions
 source(
-  system.file("misc", "2d_lgcp_residuals_functions.R",
+  system.file(
+    "misc",
+    "2d_lgcp_residuals_functions.R",
     package = "inlabru"
   )
 )
@@ -59,26 +62,25 @@ function h, yields different types of residuals.
 
 #### Scaling Residuals
 
-By taking h(u) = \mathbf{1} \\ u \in B\\, we get the raw residuals:
-\begin{aligned} R(B, \hat{h}, \hat{\theta}) & = I(B, \hat{h},
-\hat{\lambda}) = \sum\_{x_i \in \mathbf{x} \cap B}h(x_i) - \int_B
-\hat{h}(u)\hat{\lambda}(u)\\du\\ & = n(\mathbf{x} \cap B) - \int_B
-\hat{\lambda}(u) \\du \end{aligned}
+By taking h(u) \equiv 1, we get the raw residuals: \begin{aligned} R(B,
+\hat{h}, \hat{\theta}) & = I(B, \hat{h}, \hat{\lambda}) = \sum\_{x_i \in
+\mathbf{x} \cap B}h(x_i) - \int_B \hat{h}(u)\hat{\lambda}(u)\\du\\ & =
+n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u) \\du \end{aligned}
 
 #### Inverse Residuals
 
 By taking h(u) = \frac{1}{\lambda (u)}, we may encounter the case where
-\lambda(u) = 0. The GNZ-formula \begin{equation} \mathbb{E}\left\[
-\sum\_{x_i \in \mathbf{X}} h(x_i)\right\] = \mathbb{E}\left\[ \int_W
-h(u) \lambda(u) \\du \right\], \end{equation} would still hold for the
+\lambda(u) = 0. The GNZ-formula \begin{aligned} \mathbb{E}\left\[
+\sum\_{x_i \in \mathbf{X}} h(x_i)\right\]& = \mathbb{E}\left\[ \int_W
+h(u) \lambda(u) \\du \right\], \end{aligned} would still hold for the
 first terms of the h-weighted residuals to exist. If we define h(u)
 \lambda(u) = 0 for all u such that \lambda(u) = 0, then the second term
 of h-weighted residuals will also exist and the inverse residual is
 given by \begin{aligned} R\left(B, \frac{1}{\hat{\lambda}},
 \hat{\theta}\right) & = \sum\_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) -
 \int_B \hat{h}(u) \hat{\lambda}(u) \\du \\ & = \sum\_{x_i \in \mathbf{x}
-\cap B} \frac{1}{\hat{\lambda}(x_i)} - \int_B \mathbf{1} \\ x_i \in
-\mathbf{x} \\ \\du \end{aligned}
+\cap B} \frac{1}{\hat{\lambda}(x_i)} - \int_B \mathbf{1} \\
+\hat{\lambda}(u) \> 0 \\ \\du \end{aligned}
 
 #### Pearson Residuals
 
@@ -87,21 +89,19 @@ given by \begin{aligned} R\left( B, \frac{1}{\sqrt{\hat{\lambda}}},
 \hat{\theta} \right) & = \sum\_{x_i \in \mathbf{x} \cap B}
 \hat{h}(x_i) - \int_B \hat{h}(u) \hat{\lambda}(u) \\du \\ & = \sum\_{x_i
 \in \mathbf{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - \int_B
-\sqrt{\hat{\lambda}(u)} \\du \end{aligned}
+\sqrt{\hat{\lambda}(u)} \\du \end{aligned} Here, zero values of
+\hat{\lambda}(u) do not cause any issues with calculating residuals as
+we set \hat{h}(u) \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)} for all u.
 
-Here, zero values of \hat{\lambda}(u) do not cause any issues with
-calculating residuals as we set \hat{h}(u) \hat{\lambda}(u) =
-\sqrt{\hat{\lambda}(u)} for all u.
-
-So the three types of residuals are: \begin{eqnarray} \text{Scaled:}
-\qquad & R(B, \hat{h}, \hat{\theta}) & = n(\mathbf{x} \cap B) - \int_B
-\hat{\lambda}(u) \\du \\ \text{Inverse:} \qquad & R\left(B,
-\frac{1}{\hat{\lambda}}, \hat{\theta}\right) & = \sum\_{x_i \in
-\mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} - \int_B \mathbf{1} \\
-x_i \in \mathbf{x} \\ \\du \\ \text{Pearson:} \qquad & R\left( B,
-\frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta} \right) & = \sum\_{x_i \in
+So the three types of residuals are: \begin{aligned} \text{Scaled:} &&
+R(B, 1, \hat{\theta}) &= n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u)
+\\du \\ \text{Inverse:} && R\left(B, \frac{1}{\hat{\lambda}},
+\hat{\theta}\right) &= \sum\_{x_i \in \mathbf{x} \cap B}
+\frac{1}{\hat{\lambda}(x_i)} - \int_B \mathbf{1} \\ \hat{\lambda}(u) \>
+0 \\ \\du \\ \text{Pearson:} && R\left( B,
+\frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta} \right) &= \sum\_{x_i \in
 \mathbf{x} \cap B} \frac{1}{\sqrt{\hat{\lambda}(x_i)}} - \int_B
-\sqrt{\hat{\lambda}(u)} \\du \end{eqnarray}
+\sqrt{\hat{\lambda}(u)} \\du \end{aligned}
 
 Note that \hat{\lambda}(u) and \hat{h}(u) are estimates of \lambda (u)
 and h(u) respectively
@@ -116,17 +116,18 @@ and hence makes it reliable for any sample size.
 
 The use of the inverse residual in this project is less clear. However,
 we do know that it is easier to compute this residual since we have the
-GNZ formula to estimate the value of \$h(u) = for any value \lambda(u).
+GNZ formula to estimate the value of h(u) = \frac{1}{\lambda(u)} for any
+value \lambda(u).
 
 For notation’s sake in this discussion, let h\_{s}(u), h\_{i}(u), h_p(u)
 indicate the weight function for scaling, inverse and Pearson residuals
-respectively. Then, h_s(u) = \mathbf{1}\\u \in B\\, h_i(u) =
-\frac{1}{\lambda(u)}, h_p(u) = \frac{1}{\sqrt{\lambda(u)}}. We can also
-see that h_s(u) = \left(h_i(u)\right)^0 and h_p(u) =
-\left(h_i(u)\right)^{1/2}, so the values of the Pearson residuals would
-lie somewhere between the other two residuals. So, in our case, the
-inverse residuals would not be very useful, but we do find that they are
-easier to compute by hand in terms of estimates.
+respectively. Then, h_s(u) \equiv 1, h_i(u) = \frac{1}{\lambda(u)},
+h_p(u) = \frac{1}{\sqrt{\lambda(u)}}. We can also see that h_s(u) =
+\left(h_i(u)\right)^0 and h_p(u) = \left(h_i(u)\right)^{1/2}, so the
+values of the Pearson residuals would lie somewhere between the other
+two residuals. So, in our case, the inverse residuals would not be very
+useful, but we do find that they are easier to compute by hand in terms
+of estimates.
 
 ## Computation of Residuals
 
@@ -158,12 +159,13 @@ package uses Latent Gaussian Cox Processes to model the data using
 different model definitions.
 
 ``` r
+
 # Load data
-gorillas <- gorillas_sp()
+gorillas <- inlabru::gorillas_sf
 nests <- gorillas$nests
 mesh <- gorillas$mesh
 boundary <- gorillas$boundary
-gcov <- gorillas$gcov
+gcov <- gorillas_sf_gcov()
 ```
 
 Initially, the set B is defines as B=W, where W is the object
@@ -177,6 +179,7 @@ The function `residual_df` is defined to compute all three types of
 residuals for a given model and choice of B given a set of observations.
 
 ``` r
+
 # Define the subset B
 B <- boundary
 
@@ -202,42 +205,23 @@ also displays the model in the form of a plot. The residuals of the
 model are also computed where B = W.
 
 ``` r
+
 # Define the vegetation model
-comp1 <- coordinates ~
+comp1 <- geometry ~
   vegetation(gcov$vegetation, model = "factor_contrast") + Intercept(1)
 
 fit1 <- lgcp(comp1, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
-```
 
-    ## Warning: The `data` argument of `bru_obs()` has deprecated support for `Spatial` input
-    ## as of inlabru 2.12.0.9023.
-    ## ℹ Please use `sf` input instead.
-    ## ℹ The deprecated feature was likely used in the base package.
-    ##   Please report the issue to the authors.
-    ## This warning is displayed once per session.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
-
-    ## Warning: The `samplers` argument of `bru_obs()` has deprecated support for `Spatial`
-    ## input as of inlabru 2.12.0.9023.
-    ## ℹ Please use `sf` input instead.
-    ## ℹ The deprecated feature was likely used in the base package.
-    ##   Please report the issue to the authors.
-    ## This warning is displayed once per session.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
-
-``` r
 # Display the model
 int1 <- predict(fit1,
-  newdata = fm_pixels(mesh, mask = boundary, format = "sp"),
+  newdata = fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(vegetation + Intercept)
 )
 ggplot() +
-  gg(int1) +
+  gg(int1, geom = "tile") +
   gg(boundary, alpha = 0, lwd = 2) +
   gg(nests, color = "DarkGreen")
 ```
@@ -245,28 +229,22 @@ ggplot() +
 ![](2d_lgcp_residuals_files/figure-html/veg-mod-1.png)
 
 ``` r
+
 # Calculate the residuals for the vegetation model
 veg_res <- residual_df(
   fit1, As$df, expression(exp(vegetation + Intercept)),
   As$A_sum, As$A_integrate
 )
-```
-
-    ## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-``` r
 knitr::kable(
   edit_df(veg_res, c("Type", "mean.mc_std_err", "sd.mc_std_err", "median"))
 )
 ```
 
-|                   |      mean |        sd |     q0.025 |      q0.5 |    q0.975 |
-|:------------------|----------:|----------:|-----------:|----------:|----------:|
-| Scaling_Residuals | 1.7478112 | 26.734137 | -42.500031 | 1.6244632 | 51.849995 |
-| Inverse_Residuals | 0.3908686 |  1.597998 |  -1.859499 | 0.1702541 |  3.705097 |
-| Pearson_Residuals | 0.7804166 |  4.877726 |  -6.276028 | 0.3674610 |  9.607837 |
+|                   |       mean |        sd |     q0.025 |       q0.5 |   q0.975 |
+|:------------------|-----------:|----------:|-----------:|-----------:|---------:|
+| Scaling_Residuals | -0.7252763 | 28.833770 | -51.013362 | -2.4405164 | 51.97342 |
+| Inverse_Residuals |  0.5587179 |  1.645284 |  -1.966520 |  0.3957641 |  4.47847 |
+| Pearson_Residuals |  0.8561556 |  5.055520 |  -7.774578 |  0.9430356 | 11.25007 |
 
 Note: The data frame produced by `residual_df()` originally contains the
 columns `Type`, `mean.mc_std_err`, `sd.mc_std_err` and `median` which
@@ -286,40 +264,24 @@ The code chunk below shows how the model is defined by
 also displays the model in the form of a plot.
 
 ``` r
+
 # Define the Elevation model
-comp2 <- coordinates ~ elev(elev, model = "linear") +
-  mySmooth(coordinates, model = matern) + Intercept(1)
+comp2 <- geometry ~ elev(elev, model = "linear") +
+  mySmooth(geometry, model = matern) + Intercept(1)
 
 fit2 <- lgcp(comp2, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
-```
 
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-    ## Warning: Using `as.character()` on a quosure is deprecated as of rlang 0.3.0. Please use
-    ## `as_label()` or `as_name()` instead.
-    ## This warning is displayed once every 8 hours.
-
-``` r
 # Display the model
 int2 <- predict(
   fit2,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(elev + mySmooth + Intercept)
 )
-```
-
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-``` r
 ggplot() +
-  gg(int2) +
+  gg(int2, geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
@@ -328,19 +290,11 @@ ggplot() +
 
 The residuals of the model when B = W are given below:
 
-    ## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-|                   |      mean |        sd |    q0.025 |       q0.5 |    q0.975 |
-|:------------------|----------:|----------:|----------:|-----------:|----------:|
-| Scaling_Residuals | -23.97598 | 23.501314 | -66.58748 | -23.518672 | 12.002789 |
-| Inverse_Residuals |  -8.57116 |  1.603239 | -10.60975 |  -8.849928 | -4.903587 |
-| Pearson_Residuals | -11.54927 |  3.489102 | -17.63714 | -11.703269 | -4.742784 |
+|                   |       mean |        sd |    q0.025 |       q0.5 |    q0.975 |
+|:------------------|-----------:|----------:|----------:|-----------:|----------:|
+| Scaling_Residuals | -30.053071 | 30.104107 | -92.42106 | -27.197344 | 22.832798 |
+| Inverse_Residuals |  -8.588137 |  1.460373 | -10.65283 |  -8.821934 | -5.684720 |
+| Pearson_Residuals | -12.095661 |  3.490711 | -18.91377 | -11.556431 | -5.893244 |
 
 #### Intercept Model
 
@@ -354,14 +308,15 @@ and also displays the model in the form of a plot. The residuals of the
 model are also computed where B = W.
 
 ``` r
+
 # Define the Intercept model. Need to explicitly extend it to match the
 # data size to use it in spatial predictions.
-comp3 <- coordinates ~ Intercept(rep(1, nrow(.data.)))
+comp3 <- geometry ~ Intercept(rep(1, nrow(.data.)))
 lik3 <- bru_obs(
-  coordinates ~ .,
+  geometry ~ .,
   data = nests,
   samplers = boundary,
-  domain = list(coordinates = mesh),
+  domain = list(geometry = mesh),
   family = "cp"
 )
 fit3 <- bru(comp3, lik3)
@@ -369,11 +324,11 @@ fit3 <- bru(comp3, lik3)
 # Display the model
 int3 <- predict(
   fit3,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(Intercept)
 )
 ggplot() +
-  gg(int3) +
+  gg(int3, geom = "tile") +
   gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
@@ -382,11 +337,11 @@ ggplot() +
 
 The residuals of the model when B = W are given below:
 
-|                   |      mean |        sd |     q0.025 |      q0.5 |    q0.975 |
-|:------------------|----------:|----------:|-----------:|----------:|----------:|
-| Scaling_Residuals | 3.4592980 | 26.579515 | -51.840734 | 4.3995089 | 54.602283 |
-| Inverse_Residuals | 0.1404743 |  0.824181 |  -1.474246 | 0.1360697 |  1.831795 |
-| Pearson_Residuals | 0.7035202 |  4.675643 |  -8.742195 | 0.7737183 | 10.001010 |
+|                   |      mean |         sd |     q0.025 |      q0.5 |    q0.975 |
+|:------------------|----------:|-----------:|-----------:|----------:|----------:|
+| Scaling_Residuals | 4.8574884 | 25.3825493 | -46.753377 | 3.5922626 | 57.763803 |
+| Inverse_Residuals | 0.1815243 |  0.7981514 |  -1.339235 | 0.1109926 |  1.948312 |
+| Pearson_Residuals | 0.9428235 |  4.4970530 |  -7.912881 | 0.6314383 | 10.608573 |
 
 #### Smooth Model
 
@@ -401,36 +356,24 @@ also displays the model in the form of a plot. The residuals of the
 model are also computed where B = W.
 
 ``` r
+
 # Define the Smooth model
-comp4 <- coordinates ~ mySmooth(coordinates, model = matern) +
+comp4 <- geometry ~ mySmooth(geometry, model = matern) +
   Intercept(1)
 fit4 <- lgcp(comp4, nests,
   samplers = boundary,
-  domain = list(coordinates = mesh)
+  domain = list(geometry = mesh)
 )
-```
 
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-``` r
 # Display the model
 int4 <- predict(
   fit4,
-  fm_pixels(mesh, mask = boundary, format = "sp"),
+  fm_pixels(mesh, mask = boundary, format = "sf"),
   ~ exp(mySmooth + Intercept)
 )
-```
-
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-``` r
 ggplot() +
-  gg(int4) +
-  gg(boundary) +
+  gg(int4, geom = "tile") +
+  gg(boundary, alpha = 0) +
   gg(nests, shape = "+")
 ```
 
@@ -438,15 +381,11 @@ ggplot() +
 
 The residuals of the model when B = W are given below:
 
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
 |                   |       mean |        sd |    q0.025 |       q0.5 |    q0.975 |
 |:------------------|-----------:|----------:|----------:|-----------:|----------:|
-| Scaling_Residuals | -35.259516 | 28.775098 | -93.84043 | -32.612609 |  7.912316 |
-| Inverse_Residuals |  -9.007236 |  1.369345 | -11.37878 |  -9.194046 | -5.770816 |
-| Pearson_Residuals | -13.401149 |  4.172879 | -22.92162 | -13.387627 | -5.801904 |
+| Scaling_Residuals | -27.233853 | 26.233671 | -91.10876 | -24.422818 | 15.780166 |
+| Inverse_Residuals |  -9.012403 |  1.385826 | -11.00053 |  -9.289706 | -6.215308 |
+| Pearson_Residuals | -12.629185 |  3.272115 | -21.90405 | -12.533770 | -6.611701 |
 
 #### Comparing models
 
@@ -464,6 +403,7 @@ function for dividing the polygon and calculating the residuals for this
 choice of B.
 
 ``` r
+
 # Create a grid for B partitioned into two
 B1 <- partition(samplers = boundary, nrows = 1, ncols = 2)
 plot(B1, main = "Two partitions of B")
@@ -472,6 +412,7 @@ plot(B1, main = "Two partitions of B")
 ![](2d_lgcp_residuals_files/figure-html/partitioning-B-two-1.png)
 
 ``` r
+
 As1 <- prepare_residual_calculations(
   samplers = B1, domain = mesh,
   observations = nests
@@ -481,13 +422,6 @@ veg_res2 <- residual_df(
   fit1, As1$df, expression(exp(vegetation + Intercept)),
   As1$A_sum, As1$A_integrate
 )
-```
-
-    ## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-``` r
 knitr::kable(edit_df(veg_res2, c(
   "Type", "mean.mc_std_err",
   "sd.mc_std_err", "median"
@@ -496,12 +430,12 @@ knitr::kable(edit_df(veg_res2, c(
 
 |                     |       mean |         sd |     q0.025 |       q0.5 |     q0.975 |
 |:--------------------|-----------:|-----------:|-----------:|-----------:|-----------:|
-| Scaling_Residuals.1 |  40.243091 | 17.6946815 |   7.068818 |  40.139760 |  69.759461 |
-| Scaling_Residuals.2 | -42.692315 | 10.6344348 | -64.877381 | -42.393366 | -25.085568 |
-| Inverse_Residuals.1 |   4.786172 |  1.1452889 |   2.872883 |   4.742520 |   7.033591 |
-| Inverse_Residuals.2 |  -4.631489 |  0.4700378 |  -5.357831 |  -4.658836 |  -3.764648 |
-| Pearson_Residuals.1 |  13.769190 |  3.0311233 |   8.308966 |  13.427197 |  18.855557 |
-| Pearson_Residuals.2 | -13.840198 |  1.8619474 | -17.622310 | -13.905282 | -10.568481 |
+| Scaling_Residuals.1 |  40.870971 | 15.6603840 |   8.947880 |  39.384359 |  69.693679 |
+| Scaling_Residuals.2 | -40.763013 |  9.4465674 | -59.088954 | -40.547925 | -22.991792 |
+| Inverse_Residuals.1 |   5.014250 |  1.0930902 |   3.415318 |   4.962647 |   7.242723 |
+| Inverse_Residuals.2 |  -4.588806 |  0.3912645 |  -5.230760 |  -4.622634 |  -3.765246 |
+| Pearson_Residuals.1 |  14.247506 |  2.7934045 |   9.073768 |  14.170034 |  19.792742 |
+| Pearson_Residuals.2 | -13.465843 |  1.7108375 | -16.639400 | -13.408847 | -10.477080 |
 
 Here, it can be seen that there are two lines of residual data for each
 type of residual. This signifies that the `residual_df` function has
@@ -514,21 +448,17 @@ Another type of partitioning is considered with three sections of the
 region and its residuals are as displayed below:
 ![](2d_lgcp_residuals_files/figure-html/partitioning-B-three-1.png)
 
-    ## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-|                     |       mean |         sd |      q0.025 |       q0.5 |     q0.975 |
-|:--------------------|-----------:|-----------:|------------:|-----------:|-----------:|
-| Scaling_Residuals.1 |  68.900153 |  7.4948986 |  55.2348754 |  67.806693 |  82.050320 |
-| Scaling_Residuals.2 | -23.108225 | 15.3152892 | -50.2808902 | -25.374867 |   7.763197 |
-| Scaling_Residuals.3 | -45.159940 |  4.7421550 | -56.4033289 | -44.561190 | -36.662257 |
-| Inverse_Residuals.1 |   3.379809 |  0.8201499 |   1.9421753 |   3.323580 |   5.139447 |
-| Inverse_Residuals.2 |   2.600641 |  0.7148372 |   1.2831502 |   2.624219 |   4.238956 |
-| Inverse_Residuals.3 |  -5.443006 |  0.0508650 |  -5.5270768 |  -5.448446 |  -5.331791 |
-| Pearson_Residuals.1 |  12.338049 |  1.8304548 |   9.0629142 |  12.433088 |  16.243483 |
-| Pearson_Residuals.2 |   3.473239 |  2.0570798 |  -0.1246689 |   3.014928 |   7.389631 |
-| Pearson_Residuals.3 | -14.922027 |  0.9032380 | -16.8328155 | -14.802350 | -13.186830 |
+|                     |       mean |         sd |     q0.025 |       q0.5 |     q0.975 |
+|:--------------------|-----------:|-----------:|-----------:|-----------:|-----------:|
+| Scaling_Residuals.1 |  69.516075 |  8.4562596 |  52.143802 |  70.340036 |  85.277599 |
+| Scaling_Residuals.2 | -21.830520 | 18.1871110 | -60.742829 | -19.644906 |   9.232902 |
+| Scaling_Residuals.3 | -44.814094 |  4.2382284 | -53.169549 | -44.189972 | -37.529042 |
+| Inverse_Residuals.1 |   3.346556 |  0.7430357 |   1.985054 |   3.299149 |   4.570250 |
+| Inverse_Residuals.2 |   2.615667 |  0.6550878 |   1.430633 |   2.659008 |   3.771736 |
+| Inverse_Residuals.3 |  -5.448156 |  0.0455396 |  -5.525879 |  -5.457213 |  -5.363138 |
+| Pearson_Residuals.1 |  12.422336 |  1.7733352 |   8.815424 |  12.349595 |  15.302914 |
+| Pearson_Residuals.2 |   3.662094 |  2.2042811 |  -1.104472 |   3.815673 |   7.526421 |
+| Pearson_Residuals.3 | -14.922026 |  0.8157558 | -16.550904 | -14.795281 | -13.522248 |
 
 ### Residuals of models at different resolutions
 
@@ -543,35 +473,6 @@ coverage of the `samplers` polygon.
 Using these two new choices of B, the residuals are calculated for all
 four models at both resolutions using `residual_df()`.
 
-    ## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-    ## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-    ## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
-    ## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.
-    ## Attempting to fill in spatially by nearest available value.
-    ## To avoid this basic covariate imputation, supply complete data.
-
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-    ## Warning in handle_problems(e_input): The input evaluation 'coordinates' for
-    ## 'mySmooth' failed. Perhaps you need to load the 'sp' package with
-    ## 'library(sp)'? Attempting 'sp::coordinates'.
-
 The functions `set_csc()` and `residual_plot()` are defined to plot the
 three types of residuals for the model for each partition in B. The code
 chunk below demonstrates how this plotting is done for the vegetation
@@ -579,6 +480,7 @@ model at resolution B = B_3. Here, it is useful for each type of
 residual to have the same colour scale at both resolutions.
 
 ``` r
+
 # Residuals of Vegetation model
 Residual_fit1_B3 <- residual_df(
   model = fit1, df = As3$df,
@@ -668,6 +570,7 @@ The code chunk below demonstrates the code for plotting the “Pearson”
 residuals when B = B_4.
 
 ``` r
+
 # Calculate the residuals for all models at B4
 Residual_fit1_B4 <- residual_df(
   model = fit1, df = As4$df,
@@ -757,20 +660,22 @@ resolutions B_3 and B_4.
 ### Function definitions
 
 ``` r
+
 # Niharika Reddy Peddinenikalva
 # Vacation Scholarship project
+# Updated for sf by Finn Lindgren 2024
 
-suppressPackageStartupMessages(library("INLA"))
-suppressPackageStartupMessages(library("inlabru"))
-suppressPackageStartupMessages(library("fmesher"))
 suppressPackageStartupMessages(library("RColorBrewer"))
 suppressPackageStartupMessages(library("ggplot2"))
 suppressPackageStartupMessages(library("dplyr"))
 suppressPackageStartupMessages(library("lwgeom"))
 suppressPackageStartupMessages(library("patchwork"))
 suppressPackageStartupMessages(library("terra"))
+suppressPackageStartupMessages(library("sf"))
+suppressPackageStartupMessages(library("INLA"))
+suppressPackageStartupMessages(library("inlabru"))
+suppressPackageStartupMessages(library("fmesher"))
 theme_set(theme_bw())
-
 
 
 #' ----------------------------------
@@ -781,62 +686,49 @@ theme_set(theme_bw())
 #' calculating the residuals for the given set of polygons B
 
 #' Input:
-#' @param samplers A SpatialPolygonDataFrame containing partitions for which
+#' @param samplers `sf` polygons containing partitions for which
 #' residuals are to be calculated
 #' @param domain A mesh object
-#' @param observations A SpatialPointsDataFrame containing observed data
+#' @param observations `sf` points containing observed data
 #'
 #' Output:
 #' @return A_sum - matrix used to compute the summation term of the residuals
 #' @return A_integrate - matrix used to compute the integral term
-#' @return df - SpatialPointsDataFrame containing all the locations 'u' for
+#' @return df - `sf` containing all the locations 'u' for
 #' calculating residuals
 #'
 prepare_residual_calculations <- function(samplers, domain, observations) {
   # Calculate the integration weights for A_integrate
-  ips <- fm_int(domain = domain, samplers = samplers)
+  ips <- fmesher::fm_int(domain = domain, samplers = samplers)
 
   # Set-up the A_integrate matrix
   # A_integrate has as many rows as polygons in the samplers,
-  # as many columns as mesh points
-  A_integrate <- inla.spde.make.A(
-    mesh = domain, ips, weights = ips$weight,
-    block = ips$.block, block.rescale = "none"
+  # as many columns as integration points
+  A_integrate <- fmesher::fm_block(
+    block = ips$.block,
+    weights = ips$weight,
+    n_block = NROW(samplers)
   )
-
 
   # Set-up the A_sum matrix
   # A_sum has as many rows as polygons in the samplers,
   # as many columns as observed points
   # each row has 1s for the points in the corresponding polygon
   idx <- sf::st_within(
-    sf::st_as_sf(observations),
-    sf::st_as_sf(samplers),
+    observations,
+    samplers,
     sparse = TRUE
   )
-  A_sum <- sparseMatrix(
-    i = unlist(idx),
-    j = rep(
-      seq_len(nrow(observations)),
-      lengths(idx)
-    ),
-    x = rep(1, length(unlist(idx))),
-    dims = c(nrow(samplers), nrow(observations))
-  )
-
+  A_sum <- fmesher::fm_block(block = unlist(idx), n_block = NROW(samplers))
 
   # Setting up the data frame for calculating residuals
   observations$obs <- TRUE
-  df <- sp::SpatialPointsDataFrame(
-    coords = rbind(domain$loc[, 1:2], sp::coordinates(observations)),
-    data = bind_rows(data.frame(obs = rep(FALSE, domain$n)), observations@data),
-    proj4string = fm_CRS(domain)
-  )
+  ips$obs <- FALSE
+  df <- dplyr::bind_rows(ips, observations)
 
   # Return A-sum, A_integrate and the data frame for predicting the residuals
   list(A_sum = A_sum, A_integrate = A_integrate, df = df)
 }
-
 
 
 #' ------------
@@ -848,7 +740,7 @@ prepare_residual_calculations <- function(samplers, domain, observations) {
 #'
 #' Inputs:
 #' @param model fitted model for which residuals need to be calculated
-#' @param df SpatialPointsDataFrame object containing all the locations 'u'
+#' @param df sf object containing all the locations 'u'
 #' for calculating residuals
 #' @param expr an expression object containing the formula of the model
 #' @param A_sum matrix used to compute the summation term of the residuals
@@ -870,15 +762,12 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
       h2 <- 1 / lambda
       h3 <- 1 / sqrt(lambda)
       data.frame(
-        Scaling_Residuals =
-          as.vector(A_sum %*% h1[obs]) -
-            as.vector(A_integrate %*% (h1 * lambda)[!obs]),
-        Inverse_Residuals =
-          as.vector(A_sum %*% h2[obs]) -
-            as.vector(A_integrate %*% (h2 * lambda)[!obs]),
-        Pearson_Residuals =
-          as.vector(A_sum %*% h3[obs]) -
-            as.vector(A_integrate %*% (h3 * lambda)[!obs])
+        Scaling_Residuals = as.vector(A_sum %*% h1[obs]) -
+          as.vector(A_integrate %*% (h1 * lambda)[!obs]),
+        Inverse_Residuals = as.vector(A_sum %*% h2[obs]) -
+          as.vector(A_integrate %*% (h2 * lambda)[!obs]),
+        Pearson_Residuals = as.vector(A_sum %*% h3[obs]) -
+          as.vector(A_integrate %*% (h3 * lambda)[!obs])
       )
     },
     used = bru_used(expr)
@@ -890,9 +779,6 @@ residual_df <- function(model, df, expr, A_sum, A_integrate) {
   res$Pearson_Residuals$Type <- "Pearson Residuals"
   do.call(rbind, res)
 }
-
-
-
 
 
 #' --------------
@@ -923,34 +809,32 @@ set_csc <- function(residuals, col_theme) {
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[1]),
       name = "Scaling Residual",
-      limits =
-        cscrange[cscrange$Type == "Scaling Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Scaling Residuals", 2] *
+        c(-1, 1)
     )
 
   inverse_csc <-
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[2]),
       name = "Inverse Residual",
-      limits =
-        cscrange[cscrange$Type == "Inverse Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Inverse Residuals", 2] *
+        c(-1, 1)
     )
 
   pearson_csc <-
     scale_fill_gradientn(
       colours = brewer.pal(9, col_theme[3]),
       name = "Pearson Residual",
-      limits =
-        cscrange[cscrange$Type == "Pearson Residuals", 2] *
-          c(-1, 1)
+      limits = cscrange[cscrange$Type == "Pearson Residuals", 2] *
+        c(-1, 1)
     )
 
-  list("Scaling" = scaling_csc,
-       "Inverse" = inverse_csc,
-       "Pearson" = pearson_csc)
+  list(
+    "Scaling" = scaling_csc,
+    "Inverse" = inverse_csc,
+    "Pearson" = pearson_csc
+  )
 }
-
 
 
 #' ---------------
@@ -960,7 +844,7 @@ set_csc <- function(residuals, col_theme) {
 #' plots the three types of residuals for each polygon
 #'
 #' Input:
-#' @param samplers A SpatialPolygonsDataFrame containing partitions for which
+#' @param samplers A sf containing partitions for which
 #' residuals are to be calculated
 #' @param residuals frame containing residual information for each of the
 #' partitions of the subset 'B'
@@ -970,7 +854,6 @@ set_csc <- function(residuals, col_theme) {
 #' Output:
 #' @return a list of three subplots scaling, inverse and Pearson residuals
 #' for the different partitions of samplers
-
 
 residual_plot <- function(samplers, residuals, csc, model_name) {
   # Initialise the scaling residuals plot
@@ -1005,12 +888,11 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 
   # Return the three plots in a list
   list(
-    Scaling = scaling, Inverse = inverse,
+    Scaling = scaling,
+    Inverse = inverse,
     Pearson = pearson
   )
 }
-
-
 
 
 #' ------------------
@@ -1022,28 +904,31 @@ residual_plot <- function(samplers, residuals, csc, model_name) {
 #' https://rpubs.com/huanfaChen/grid_from_polygon
 #'
 #' Input:
-#' @param samplers A SpatialPolygonsDataFrame containing region for which
+#' @param samplers A sf polygon containing region for which
 #' partitions need to be created
 #' @param resolution resolution of the grids that are required
 #' @param nrows number of rows of grids that are required
 #' @param ncols number of columns of grids that are required
 #'
 #' Output:
-#' @return a partitioned SpatialPolygonsDataFrame as required
+#' @return a partitioned sf with polygons as required
 #'
 #'
 partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   # Create a grid for the given boundary
   if (is.null(resolution)) {
-    grid <- terra::rast(terra::ext(samplers),
-      crs = sp::proj4string(samplers),
-      nrows = nrows, ncols = ncols
+    grid <- terra::rast(
+      terra::ext(samplers),
+      crs = fmesher::fm_proj4string(samplers),
+      nrows = nrows,
+      ncols = ncols
     )
   }
 
   if (is.null(c(nrows, ncols))) {
-    grid <- terra::rast(terra::ext(samplers),
-      crs = sp::proj4string(samplers),
+    grid <- terra::rast(
+      terra::ext(samplers),
+      crs = fmesher::fm_proj4string(samplers),
       resolution = resolution
     )
   }
@@ -1051,12 +936,10 @@ partition <- function(samplers, resolution = NULL, nrows = NULL, ncols = NULL) {
   gridPolygon <- terra::as.polygons(grid)
 
   # Extract the boundary with subpolygons only
-  sf::as_Spatial(
-    sf::st_as_sf(
-      terra::intersect(
-        gridPolygon,
-        terra::vect(samplers)
-      )
+  sf::st_as_sf(
+    terra::intersect(
+      gridPolygon,
+      terra::vect(samplers)
     )
   )
 }

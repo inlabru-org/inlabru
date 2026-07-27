@@ -58,8 +58,8 @@ if (bru_safe_inla() &&
   require("sf", quietly = TRUE) &&
   require("RColorBrewer", quietly = TRUE) &&
   require("dplyr", quietly = TRUE)) {
+  doplot <- FALSE
   # Load Gorilla data
-
   gorillas <- gorillas_sf
   gorillas$gcov <- gorillas_sf_gcov()
 
@@ -80,9 +80,16 @@ if (bru_safe_inla() &&
     spde(geometry, model = pcmatern) +
     Intercept(1)
 
+  # Random thinning to speed up the example:
+  thinned_nests <- gorillas$nests[
+    sample(nrow(gorillas$nests), 20, replace = FALSE),
+   ,
+    drop = FALSE
+  ]
+
   fit <- lgcp(
     cmp,
-    gorillas$nests,
+    thinned_nests,
     samplers = gorillas$boundary,
     domain = list(geometry = gorillas$mesh),
     options = list(control.inla = list(int.strategy = "eb"))
@@ -113,6 +120,7 @@ if (bru_safe_inla() &&
     ) |>
     dplyr::mutate(var = sd^2)
 
+  if (doplot) {
   # Plot component mean
 
   ggplot(pred_collect) +
@@ -132,6 +140,7 @@ if (bru_safe_inla() &&
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
+  }
 
   # Calculate variance and correlation measure
 
@@ -157,6 +166,7 @@ if (bru_safe_inla() &&
     limits = lprange
   )
 
+  if (doplot) {
   vm_ <- dplyr::filter(vm, component %in% c("var.joint", "var1", "var2"))
   ggplot(vm_) +
     geom_tile(aes(geometry = geometry, fill = value),
@@ -166,11 +176,13 @@ if (bru_safe_inla() &&
     coord_equal() +
     facet_wrap(~component, nrow = 1) +
     theme(legend.position = "bottom")
+  }
 
   # Relative variance contribution of the components
   # When bo
 
   vm_ <- dplyr::filter(vm, component %in% c("var1_rel", "var2_rel"))
+  if (doplot) {
   ggplot(vm_) +
     geom_tile(aes(geometry = geometry, fill = value),
       stat = "sf_coordinates"
@@ -181,12 +193,13 @@ if (bru_safe_inla() &&
     ) +
     coord_equal() +
     facet_wrap(~component, nrow = 1)
+  }
 
   # Where both relative contributions are larger than 1, the posterior
   # correlations are strongly negative.
 
+  if (doplot) {
   # Covariance and correlation of field and vegetation
-
   vm_cov <- dplyr::filter(vm, component %in% "cov")
   vm_cor <- dplyr::filter(vm, component %in% "cor")
   (ggplot(vm_cov) +
@@ -212,6 +225,7 @@ if (bru_safe_inla() &&
       theme(legend.position = "bottom") +
       ggtitle("Correlations")
   )
+  }
 
   # Variance and correlation integrated over space
 
@@ -235,6 +249,7 @@ if (bru_safe_inla() &&
   )
   vm.int
 }
+#> Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.4.0; sf_use_s2() is TRUE
 #> 
 #> Attaching package: ‘dplyr’
 #> The following objects are masked from ‘package:stats’:
@@ -246,7 +261,7 @@ if (bru_safe_inla() &&
 #> Warning: Model input 'gorillas$gcov$vegetation' for 'vegetation' returned some NA values.
 #> Attempting to fill in spatially by nearest available value.
 #> To avoid this basic covariate imputation, supply complete data.
-#>   var.joint      var1      var2         cor
-#> 1 0.9464693 0.5420626 0.4371194 -0.03360175
+#>   var.joint         var1     var2         cor
+#> 1  73.94724 7.424203e-05 73.94665 0.003482521
 # }
 ```

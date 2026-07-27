@@ -8,8 +8,8 @@
 <title>Spatially Varying Coefficient Models with inlabru • inlabru</title>
 <!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Spatially Varying Coefficient Models with inlabru">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.14.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.15.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
     <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
     <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/tidiers.html">Postprocessing tidiers</a></li>
     <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
@@ -62,9 +63,12 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_per_transect_covars.html">LGCPs - Distance sampling and per-transect covariates (work in progress)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model assessment</h6></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars_gcpo.html">LGCPs - Model comparison using Cross Validation</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sp.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -107,9 +111,9 @@
 Meehan (<a href="mailto:tmeeha@gmail.com" class="email">tmeeha@gmail.com</a>), Elias T. Krainski, Finn Lindgren,
 and Håvard Rue</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2026-05-26</h4>
+            <h4 data-toc-skip class="date">Generated on 2026-07-27</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/stable/vignettes/articles/svc.Rmd" class="external-link"><code>vignettes/articles/svc.Rmd</code></a></small>
       <div class="d-none name"><code>svc.Rmd</code></div>
     </div>
 
@@ -202,8 +206,7 @@ loading some packages, and setting some options.</p>
 <span><span class="co"># set option</span></span>
 <span><span class="va">select</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scipen <span class="op">=</span> <span class="fl">99999</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>max.print <span class="op">=</span> <span class="fl">99999</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>max.print <span class="op">=</span> <span class="fl">99999</span><span class="op">)</span></span></code></pre></div>
 <p>Next we define a coordinate reference system (CRS) for spatial
 analysis and create a base map for later use. The CRS uses the USA
 Contiguous Albers Equal-Area Conic projection, and is identified by the
@@ -508,7 +511,7 @@ define the estimation data. Then we ask <code><a href="https://rdrr.io/pkg/INLA/
 WAIC and CPO (temporarily disabled) to evaluate model fit (also, to save
 the information necessary for posterior sampling we need
 <code>config=TRUE</code>, but this is automatically set by
-<code><a href="../reference/bru.html">bru()</a></code>, as <code><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">inlabru::predict()</a></code> relies on it for
+<code><a href="../reference/bru.html">bru()</a></code>, as <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">inlabru::predict()</a></code> relies on it for
 posterior sampling and prediction). For computing speed, we choose to
 use the simplified Laplace approximation strategy and Empirical Bayes
 estimation. The <code><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla()</a></code> run for this model takes about 1
@@ -541,14 +544,14 @@ spatial ranges of the spatially structured parameters.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># view results</span></span>
 <span><span class="va">res</span><span class="op">$</span><span class="va">summary.hyperpar</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;                               mean             sd</span></span>
-<span><span class="co">#&gt; Precision for kappa     2.27651758     0.46791099</span></span>
-<span><span class="co">#&gt; Range for alpha       920.71957687   358.54285694</span></span>
-<span><span class="co">#&gt; Stdev for alpha         1.96198492     0.48621802</span></span>
-<span><span class="co">#&gt; Range for eps       22853.10886935 70940.09469316</span></span>
-<span><span class="co">#&gt; Stdev for eps           0.38655612     0.22416708</span></span>
-<span><span class="co">#&gt; Range for tau         851.49069880   356.62231416</span></span>
-<span><span class="co">#&gt; Stdev for tau           0.06644838     0.01624144</span></span></code></pre></div>
+<span><span class="co">#&gt;                              mean            sd</span></span>
+<span><span class="co">#&gt; Precision for kappa    2.29064752    0.45717949</span></span>
+<span><span class="co">#&gt; Range for alpha      993.05291484  294.77907265</span></span>
+<span><span class="co">#&gt; Stdev for alpha        2.02091155    0.40520838</span></span>
+<span><span class="co">#&gt; Range for eps       2879.87949480 2024.40642832</span></span>
+<span><span class="co">#&gt; Stdev for eps          0.43201807    0.23067617</span></span>
+<span><span class="co">#&gt; Range for tau        820.41336770  270.32326716</span></span>
+<span><span class="co">#&gt; Stdev for tau          0.06467986    0.01280032</span></span></code></pre></div>
 <p>Next we examine some summaries of the random effect estimates,
 starting with <span class="math inline">\exp(\alpha_s)</span>, which is
 effort-corrected relative abundance at year = 0 (1987), given 1 hour of
@@ -556,7 +559,7 @@ count effort (i.e., log[1]=0).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">alp</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span><span class="op">)</span> <span class="co"># exp(alpha) posterior median</span></span>
 <span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt;  0.03548  0.91050  2.96679  6.66583  8.18477 56.82905</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.03304  0.83327  2.98162  6.71151  7.98647 61.37753</span></span></code></pre></div>
 <p>Note that to avoid issues due to <span class="math inline">E[\exp(x)|y]\neq\exp[E(x|y)]</span>, we use the
 posterior median instead of the posterior mean.</p>
 <p>The summary for <span class="math inline">\epsilon_s</span> shows
@@ -565,7 +568,7 @@ space.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">eps</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span> <span class="co"># epsilon</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.6691  0.8730  0.9952  0.9821  1.0605  1.3388</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.5873  0.8636  0.9997  0.9802  1.0606  1.4099</span></span></code></pre></div>
 <p>The <span class="math inline">\tau_s</span> summary shows how
 long-term, log-linear trends of robin relative abundance have varied
 across space, from annual decreases of around 10% to annual increases of
@@ -573,7 +576,7 @@ around 10%.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">tau</span><span class="op">$</span><span class="st">"0.5quant"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="co"># (exp(tau)-1)*100</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -13.280  -5.661  -1.826  -1.288   2.639  11.668</span></span></code></pre></div>
+<span><span class="co">#&gt; -13.228  -5.603  -1.811  -1.270   2.641  11.512</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="svc-maps">SVC maps<a class="anchor" aria-label="anchor" href="#svc-maps"></a>
@@ -813,7 +816,7 @@ review.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -8,7 +8,7 @@ model structure.
 ## Usage
 
 ``` r
-bru_timings_plot(x)
+bru_timings_plot(x, log = FALSE)
 ```
 
 ## Arguments
@@ -19,6 +19,10 @@ bru_timings_plot(x)
   object, typically a result from
   [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md) for
   a nonlinear predictor model
+
+- log:
+
+  logical; if `TRUE`, the y-axis is on a log scale. Default is `FALSE`.
 
 ## Details
 

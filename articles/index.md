@@ -4,6 +4,8 @@
 
 - [LGCPs - An example in one
   dimension](https://inlabru-org.github.io/inlabru/articles/1d_lgcp.md):
+- [LGCPs - Model comparison using Cross
+  Validation](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars_gcpo.md):
 - [LGCPs - Spatial
   covariates](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars_groupcv.md):
 - [LGCPs - Spatial
@@ -17,7 +19,7 @@
 - [LGCPs - Plot
   sampling](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_plotsampling.md):
 - [Residual Analysis of spatial point process models using Bayesian
-  methods](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals_sf.md):
+  methods](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals_sp.md):
 - [Residual Analysis of spatial point process models using Bayesian
   methods](https://inlabru-org.github.io/inlabru/articles/2d_lgcp_residuals.md):
 - [LGCPs - An example in two
@@ -53,5 +55,7 @@
   Dimension](https://inlabru-org.github.io/inlabru/articles/random_fields.md):
 - [Spatially Varying Coefficient Models with
   inlabru](https://inlabru-org.github.io/inlabru/articles/svc.md):
+- [Tidy model output with broom-style
+  tidiers](https://inlabru-org.github.io/inlabru/articles/tidiers.md):
 - [ZIP and ZAP
   models](https://inlabru-org.github.io/inlabru/articles/zip_zap_models.md):

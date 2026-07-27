@@ -24,6 +24,7 @@ The in-package documentation for the mapper methods is contained in four
 parts:
 
 ``` r
+
 ?bru_mapper # Mapper constructors, with links to predefined mappers
 ?bru_mapper_generics # Generic and default methods
 ?bru_get_mapper # Mapper extraction methods
@@ -45,6 +46,7 @@ The main purpose of each mapper class is to allow evaluating a component
 effect, from given `input` and latent `state`, by calling
 
 ``` r
+
 ibm_eval(mapper, input, state)
 ```
 
@@ -134,6 +136,7 @@ The `shift` mapper adds the `input` vector to the `state` vector. This
 can be used as a stage of a `pipe` mapper.
 
 ``` r
+
 mapper <- bm_shift()
 ibm_eval(mapper,
   input = ...,
@@ -148,6 +151,7 @@ vector. This is used for INLA models to implement the `weights`
 component scaling, as the final stage of a `pipe` mapper, see below.
 
 ``` r
+
 mapper <- bm_scale()
 ibm_eval(mapper,
   input = ...,
@@ -163,6 +167,7 @@ function. This can be used to define components with latent marginal
 `N(0,1)` distribution but non-Gaussian effect.
 
 ``` r
+
 mapper <- bm_marginal(
   qfun = ..., pfun = ..., dfun = ..., ..., inverse = ...
 )
@@ -185,6 +190,7 @@ blockwise summation after scaling the elements by weights. This can be
 used for summation, integration, and averaging (for `rescale=TRUE`).
 
 ``` r
+
 mapper <- bm_aggregate(rescale = ...)
 ibm_eval(mapper,
   input = list(block = ..., weights = ...),
@@ -201,6 +207,7 @@ This can be used for summation, integration, and averaging (for
 `rescale=TRUE`).
 
 ``` r
+
 mapper <- bm_logsumexp(rescale = ...)
 ibm_eval(mapper,
   input = list(block = ..., weights = ...),
@@ -221,6 +228,7 @@ does not give a new Binomial variable, so this type of calculation
 should be used with care.
 
 ``` r
+
 mapper <- bm_logitaverage()
 ibm_eval(mapper,
   input = list(block = ..., weights = ...),
@@ -249,6 +257,7 @@ part of the latent state is only a part of the internal state, such as
 for `"bym"` models.
 
 ``` r
+
 mapper <- bm_collect(list(name1 = ..., name2 = ..., ...),
   hidden = FALSE
 )
@@ -274,6 +283,7 @@ single `rgeneric` or `cgeneric` model is defined on e.g. a space-time
 product domain.
 
 ``` r
+
 mapper <- bm_multi(list(name1 = ..., name2 = ..., ...))
 ibm_eval(mapper,
   input = list(name1 = ..., name2 = ..., ...),
@@ -288,6 +298,7 @@ evaluation result of each mapper is given as the state vector for the
 next mapper.
 
 ``` r
+
 mapper <- bm_pipe(list(name1 = ..., name2 = ..., ...))
 ibm_eval(mapper,
   input = list(name1 = ..., name2 = ..., ...),
@@ -305,6 +316,7 @@ Otherwise, the `input` must be a `list`, `data.frame`, or `matrix`,
 whose elements/columns are passed on to the respective sub-mappers.
 
 ``` r
+
 mapper <- bm_sum(mappers = ..., single_input = ...)
 ibm_eval(mapper,
   input = ...,
@@ -330,6 +342,7 @@ combined, so that the resulting internal mapper structure is a compact
 as possible.
 
 ``` r
+
 mapper <- bm_repeat(mapper = ..., n_rep = ..., interleaved = ...)
 ibm_eval(mapper,
   input = ...,
@@ -343,6 +356,7 @@ All model component mappers are currently defined as a `pipe` mapper
 containing a `multi` mapper followed by a `scale` mapper:
 
 ``` r
+
 mapper <-
   bm_pipe(
     list(
@@ -402,6 +416,7 @@ defined for models of these classes:
   define
 
 ``` r
+
 bru_get_mapper.my_unique_model_class <- function(model, ...) {
   ...
 }
@@ -416,6 +431,7 @@ and register it in the namespace.
 ## Mapper methods
 
 ``` r
+
 ibm_n(mapper, inla_f, ...)
 ibm_n_output(mapper, input, ...)
 ibm_values(mapper, inla_f, ...)
@@ -435,6 +451,7 @@ with `inla_f=TRUE` we get the values needed by
 [`INLA::f()`](https://rdrr.io/pkg/INLA/man/f.html) instead:
 
 ``` r
+
 mapper <- bm_collect(
   list(
     a = bm_index(3),
@@ -453,6 +470,7 @@ ibm_values(mapper, inla_f = TRUE)
 ```
 
 ``` r
+
 ibm_n(mapper, multi = TRUE)
 #> $a
 #> [1] 3
@@ -483,6 +501,7 @@ For the `bm_multi` class, the `multi` argument provides access to the
 inner layers of the multi-mapper:
 
 ``` r
+
 mapper <- bm_multi(list(
   a = bm_index(3),
   b = bm_index(2)
@@ -508,6 +527,7 @@ ibm_values(mapper, multi = TRUE)
 ```
 
 ``` r
+
 ibm_n(mapper, inla_f = TRUE)
 #> [1] 6
 ibm_n(mapper, multi = TRUE, inla_f = TRUE)
@@ -551,6 +571,7 @@ methods are supported by the
 constructor:
 
 ``` r
+
 bm_fmesher(mesh)
 ```
 
@@ -564,6 +585,7 @@ For the `fm_mesh_1d` and `fm_mesh_2d` classes, the default mappers can
 also be constructed by `bru_mapper` method:
 
 ``` r
+
 bru_mapper(mesh)
 ```
 
@@ -572,6 +594,7 @@ the `indexed = FALSE` argument, that gives `mesh$mid` or `mesh$loc` as
 output
 
 ``` r
+
 # If ibm_values() should return
 #   mesh$mid (if available, e.g. for "rw2" models with degree=2 meshes)
 # or
@@ -597,6 +620,7 @@ to use that information. In all these cases, the
 method should be used to properly set the class information:
 
 ``` r
+
 bru_mapper_define(mapper, new_class)
 ```
 
@@ -605,6 +629,7 @@ methods, by instead computing and storing `n`, `n_inla`, `values`, and
 `values_inla` in the mapper object during construction:
 
 ``` r
+
 bru_mapper_define(
   mapper = list(n = 10, values = 1:10),
   new_class = "my_bm_class_name"
@@ -640,6 +665,7 @@ an intercept (`min_degree <= 0`) and linear terms (`min_degree <= 1`)
 should be included in the model.
 
 ``` r
+
 bm_p_quadratic <- function(labels, min_degree = 0, ...) {
   if (is.factor(labels)) {
     mapper <- list(
@@ -660,6 +686,7 @@ The `ibm_n` method can compute the value of n from
 n=1+p+\frac{p(p+1)}{2}:
 
 ``` r
+
 ibm_n.bm_p_quadratic <- function(mapper, ...) {
   p <- length(mapper$labels)
   (mapper$min_degree <= 0) + (mapper$min_degree <= 1) * p + p * (p + 1) / 2
@@ -674,6 +701,7 @@ could have an option argument to the `bm_p_quadratic` constructor to
 control this):
 
 ``` r
+
 ibm_values.bm_p_quadratic <- function(mapper, ...) {
   p <- length(mapper$labels)
   n <- ibm_n(mapper)
@@ -695,6 +723,7 @@ are stored in the mapper object, and then return them. If we change the
 like this, making subsequent method calls faster:
 
 ``` r
+
 bm_p_quadratic <- function(labels, min_degree = 0, ...) {
   ...
   mapper <- bru_mapper_define(mapper, new_class = "bm_p_quadratic")
@@ -712,6 +741,7 @@ the model matrix linking the latent variables to the component effect.
 It’s required that `NULL` input should return a 0-by-n matrix.
 
 ``` r
+
 ibm_jacobian.bm_p_quadratic <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))

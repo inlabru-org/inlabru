@@ -38,6 +38,26 @@ bm_autodetect()
   Passed on to
   [`new_bru_input()`](https://inlabru-org.github.io/inlabru/reference/bru_input.md).
 
+## Value
+
+- `ibm_input_set`: The `mapper` with the `input` associated with it.
+
+&nbsp;
+
+- `ibm_input_new`: The `mapper` with the new `bru_input` associated with
+  it.
+
+&nbsp;
+
+- `ibm_input_available()`: logical; `TRUE` if a `bru_input` is
+  associated with the `mapper`, and `FALSE` otherwise.
+
+&nbsp;
+
+- `ibm_input_get`: The
+  [bru_input](https://inlabru-org.github.io/inlabru/reference/bru_input.md)
+  associated with the `mapper`, if it is available.
+
 ## Functions
 
 - `ibm_input_set()`: Add an existing `bru_input` to a `bru_mapper`.

@@ -53,6 +53,8 @@ x[i, drop = TRUE]
 
 ## Value
 
+A `bm_multi` mapper object.
+
 - `[`-indexing a `bm_multi` extracts a subset `bm_multi` object (for
   drop `FALSE`) or an individual sub-mapper (for drop `TRUE`, and `i`
   identifies a single element)
@@ -66,6 +68,7 @@ Other mappers:
 [`bm_aggregate()`](https://inlabru-org.github.io/inlabru/reference/bm_aggregate.md),
 [`bm_collect()`](https://inlabru-org.github.io/inlabru/reference/bm_collect.md),
 [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md),
+[`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md),
 [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md),
 [`bm_fm_mesh_1d`](https://inlabru-org.github.io/inlabru/reference/bm_fm_mesh_1d.md),
 [`bm_fmesher()`](https://inlabru-org.github.io/inlabru/reference/bm_fmesher.md),
@@ -90,7 +93,7 @@ Other mappers:
 
 ``` r
 (m <- bm_multi(list(a = bm_index(2), b = bm_index(3))))
-#> multi(a = index, b = index)
+#> multi(a = {index}, b = {index})
 ibm_eval2(m, list(a = c(1, 2, 1), b = c(1, 3, 2)), 1:6)
 #> $offset
 #> [1] 1 6 3

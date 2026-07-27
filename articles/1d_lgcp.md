@@ -11,6 +11,7 @@ which things are located, not the number of points in some area.
 Load libraries
 
 ``` r
+
 library(inlabru)
 library(INLA)
 library(mgcv)
@@ -21,12 +22,14 @@ library(fmesher)
 ## Get the data
 
 ``` r
+
 data(Poisson2_1D, package = "inlabru")
 ```
 
 Take a look at the point (and frequency) data
 
 ``` r
+
 ggplot(pts2) +
   geom_histogram(aes(x = x),
     binwidth = 55 / 20,
@@ -43,14 +46,16 @@ ggplot(pts2) +
 Build a 1D mesh:
 
 ``` r
+
 x <- seq(0, 55, length.out = 50)
-mesh1D <- fm_mesh_1d(x, boundary = "free")
+mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
 ```
 
 Make the latent components for a 1D SPDE model, using an
 integrate-to-zero constraint for better identifiability:
 
 ``` r
+
 matern <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(150, 0.75),
   prior.sigma = c(0.1, 0.75),
@@ -70,6 +75,7 @@ standard way of specifying the function space for integration is via the
 `domain` argument.
 
 ``` r
+
 fit.spde <- bru(
   comp,
   bru_obs(x ~ ., family = "cp", data = pts2, domain = list(x = mesh1D))
@@ -94,6 +100,7 @@ the `plot` function. To see the PDF for the range parameter, for
 example:
 
 ``` r
+
 post.range <- spde.posterior(fit.spde, name = "spde1D", what = "range")
 plot(post.range)
 ```
@@ -108,6 +115,7 @@ variance parameters, and for the covariance function (which involves
 both these parameters).
 
 ``` r
+
 post.log.range <- spde.posterior(fit.spde,
   name = "spde1D",
   what = "log.range"
@@ -140,6 +148,7 @@ the ‘response’ scale (i.e. the intensity function \lambda(s)), we call
 `predict` thus:
 
 ``` r
+
 # Set up a data frame of explanatory values at which to predict
 predf <- data.frame(x = seq(0, 55, by = 1))
 pred_spde <- predict(fit.spde,
@@ -153,12 +162,14 @@ while to predict on the linear predictor scale (i.e. that of the log
 intensity, \log(\lambda(s))), we call `predict` thus:
 
 ``` r
+
 pred_spde_lp <- predict(fit.spde, predf, ~ spde1D + Intercept, n.samples = 1000)
 ```
 
 here’s how to plot the prediction and 95% credible interval:
 
 ``` r
+
 plot(pred_spde, color = "red") +
   geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
   xlab("x") + ylab("Intensity")
@@ -176,6 +187,7 @@ frame with `x`- and `y`-coordinates giving the true intensity function,
 values).
 
 ``` r
+
 xs <- seq(0, 55, length = 150)
 true.lambda <- data.frame(x = xs, y = lambda2_1D(xs))
 ```
@@ -183,6 +195,7 @@ true.lambda <- data.frame(x = xs, y = lambda2_1D(xs))
 Plot the fitted and true intensity functions:
 
 ``` r
+
 plot(pred_spde, color = "red") +
   geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
   geom_line(data = true.lambda, aes(x, y)) +
@@ -200,6 +213,7 @@ intervals are shown as red rectangles, the mean fitted value as a short
 horizontal blue line, and the observed data as black points:
 
 ``` r
+
 bc <- bincount(
   result = fit.spde,
   observations = pts2,
@@ -221,6 +235,7 @@ weight. The locations `x` and their weights are constructed using the
 `fm_int` function
 
 ``` r
+
 ips <- fm_int(mesh1D, name = "x")
 head(ips)
 #> # A tibble: 6 × 4
@@ -238,9 +253,10 @@ Lambda <- predict(fit.spde, ips, ~ sum(weight * exp(spde1D + Intercept)))
 You can look at the abundance estimate by typing
 
 ``` r
+
 Lambda
-#>      mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err sd.mc_std_err
-#> 1 129.498 11.51532 109.9495 129.8785 148.3663 129.8785        1.304406     0.7643688
+#>       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err sd.mc_std_err
+#> 1 129.9761 11.99775 108.8752 129.1607 152.232 129.1607        1.344881     0.7255328
 ```
 
 - `mean` is the posterior mean abundance.
@@ -258,6 +274,7 @@ locations, given the intensity function. To include this we need to
 modify [`predict( )`](https://rdrr.io/r/stats/predict.html) as follows:
 
 ``` r
+
 Nest <- predict(
   fit.spde, ips,
   ~ data.frame(
@@ -274,40 +291,44 @@ for evey value of `N` from 50 to 250, rather than for the posterior mean
 `N` alone:
 
 ``` r
+
 Nest[Nest$N %in% 100:105, ]
 #>      N        mean          sd       q0.025        q0.5     q0.975      median mean.mc_std_err
-#> 51 100 0.003477738 0.006177508 1.057055e-06 0.001031955 0.02341088 0.001031955    0.0008213561
-#> 52 101 0.004014452 0.006747335 1.602975e-06 0.001323345 0.02565326 0.001323345    0.0008806210
-#> 53 102 0.004605242 0.007320105 2.407020e-06 0.001680380 0.02783485 0.001680380    0.0009381503
-#> 54 103 0.005250907 0.007889424 3.579300e-06 0.002113029 0.02990875 0.002113029    0.0009933698
-#> 55 104 0.005951517 0.008448647 5.271360e-06 0.002631526 0.03182818 0.002631526    0.0010457409
-#> 56 105 0.006706332 0.008991011 7.689424e-06 0.003246046 0.03354824 0.003246046    0.0010947642
+#> 51 100 0.005044271 0.007425957 9.851963e-07 0.001867916 0.02692838 0.001867916    0.0009380739
+#> 52 101 0.005759038 0.008042072 1.486492e-06 0.002345456 0.02909157 0.002345456    0.0009958755
+#> 53 102 0.006531809 0.008655312 2.221218e-06 0.002916207 0.03112060 0.002916207    0.0010518167
+#> 54 103 0.007360356 0.009258286 3.287397e-06 0.003590648 0.03296814 0.003590648    0.0011054416
+#> 55 104 0.008241304 0.009843174 4.819345e-06 0.004378560 0.03458975 0.004378560    0.0011562649
+#> 56 105 0.009170107 0.010401857 6.999079e-06 0.005288519 0.03594571 0.005288519    0.0012037665
 #>    sd.mc_std_err
-#> 51  0.0010180263
-#> 52  0.0010294378
-#> 53  0.0010306991
-#> 54  0.0010221373
-#> 55  0.0010043809
-#> 56  0.0009783155
+#> 51  0.0009773912
+#> 52  0.0009583415
+#> 53  0.0009314279
+#> 54  0.0008980651
+#> 55  0.0008597377
+#> 56  0.0008179044
 ```
 
 We compute the 95% prediction interval and the median as follows
 
 ``` r
+
 inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x = Nest$N, y = Nest$mean))
-#> [1] 101.4321 130.2557 164.0649
+#> [1]  99.03759 127.51411 164.18648
 ```
 
 Compare `Lambda` to `Nest` by plotting: First calculate the posterior
 conditional on the mean of `Lambda`
 
 ``` r
+
 Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ```
 
 Then plot it and the unconditional posterior
 
 ``` r
+
 ggplot(data = Nest) +
   geom_point(aes(x = N, y = mean, colour = "Posterior")) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +
@@ -336,6 +357,7 @@ estimated intensity function from this GAM fit, together with the LGCP
 fitted above and the true intensity.
 
 ``` r
+
 cd2 <- countdata2
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)),
   family = poisson(),
@@ -353,6 +375,7 @@ You should get a plot like this (thick line is the true intensity, the
 thin solid line the inlabru fit, the dashed line the GAM fit:
 
 ``` r
+
 plot(pred_spde) +
   geom_point(data = pts2, aes(x = x), y = 0, pch = "|", cex = 2) +
   geom_line(

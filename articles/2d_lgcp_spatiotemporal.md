@@ -11,6 +11,7 @@ spatio-temporal SPDE model to estimate species distribution.
 Load libraries
 
 ``` r
+
 library(fmesher)
 library(inlabru)
 library(INLA)
@@ -22,6 +23,7 @@ library(ggplot2)
 Load the dataset, that has coordinates in UTM in kilometres:
 
 ``` r
+
 mrsea <- inlabru::mrsea
 ```
 
@@ -30,6 +32,7 @@ dataset are associated with a season. Let’s have a look at the observed
 points and sampling regions for all seasons:
 
 ``` r
+
 ggplot() +
   geom_fm(data = mrsea$mesh) +
   gg(mrsea$boundary) +
@@ -59,6 +62,7 @@ numerical integration scheme needed for the point process likelihood
 evaluation.
 
 ``` r
+
 matern <- inla.spde2.pcmatern(mrsea$mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(10, 0.01)
@@ -90,6 +94,7 @@ fit <- bru(
 Predict and plot the intensity for all seasons:
 
 ``` r
+
 ppxl <- fm_pixels(mrsea$mesh, mask = mrsea$boundary, format = "sf")
 ppxl_all <- fm_cprod(ppxl, data.frame(season = seq_len(4)))
 
@@ -101,6 +106,7 @@ lambda1 <- predict(
 ```
 
 ``` r
+
 pl1 <- ggplot() +
   gg(lambda1, geom = "tile", aes(fill = q0.5)) +
   gg(mrsea$points, size = 0.3) +
@@ -127,6 +133,7 @@ call. Note that omitting the `season` dimension from `domain` would lead
 to aggregation of all sampling regions over time.
 
 ``` r
+
 ips <- fm_int(
   domain = list(geometry = mrsea$mesh, season = 1:4),
   samplers = mrsea$samplers
@@ -136,10 +143,11 @@ ips <- fm_int(
 Plot the integration points:
 
 ``` r
+
 ggplot() +
   geom_fm(data = mrsea$mesh) +
-  gg(ips, aes(size = weight)) +
-  scale_size_area(max_size = 1) +
+  gg(ips, aes(size = weight), stroke = 0) +
+  scale_size_area(max_size = 2) +
   facet_wrap(~season)
 ```
 

@@ -57,6 +57,15 @@ opts
 #> 
 #> 
 #> $bru_method
+#> $bru_method$autodiff
+#> [1] "fullchain"
+#> 
+#> $bru_method$agg
+#> [1] "fullchain"
+#> 
+#> $bru_method$finite_diff
+#> [1] "forward"
+#> 
 #> $bru_method$taylor
 #> [1] "pandemic"
 #> 

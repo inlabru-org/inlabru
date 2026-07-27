@@ -86,6 +86,44 @@ ibm_jacobian(
   sub_lin = NULL
 )
 
+# S3 method for class 'bm_expr'
+ibm_jacobian(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  derived = NULL,
+  jacobians = NULL,
+  data = NULL,
+  multi = FALSE,
+  offset = NULL,
+  eps = 1e-06,
+  .envir = rlang::caller_env()
+)
+
+# S3 method for class 'bru_obs'
+ibm_jacobian(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
+
+# S3 method for class 'bru_obs_list'
+ibm_jacobian(
+  mapper,
+  input,
+  state,
+  ...,
+  multi = FALSE,
+  comp_mappers,
+  eval_fun = NULL
+)
+
 # S3 method for class 'bm_repeat'
 ibm_jacobian(
   mapper,
@@ -160,6 +198,54 @@ ibm_jacobian(
 
   Internal, optional pre-computed sub-mapper information
 
+- derived:
+
+  The state vectors of variables derived from the root variables. If
+  `NULL` or missing, defaults to an empty list.
+
+- jacobians:
+
+  The state vectors of variables derived from the root If `jacobians` is
+  `NULL` or missing, defaults to an empty list. If not `NULL`, should be
+  a list with named entries, one for variable derived from the root
+  variables. Each list element should be a named list of Jacobian
+  matrices, with names matching the root variables. Missing entries are
+  treated as all-zero matrices.
+
+- data:
+
+  A list with data objects, with the main object called `data`; see
+  [`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md)
+
+- offset:
+
+  The offset value, pre-calculated by
+  [`ibm_eval.bm_expr()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md).
+
+- eps:
+
+  The finite difference step size to use for numerical differentiation.
+  Default is `1e-6`.
+
+- .envir:
+
+  The environment for the expression evaluation. By default, this is set
+  to the caller environment.
+
+- comp_mappers:
+
+  A list of mappers, typically from `as_bm_list<bru_comp_list>`.
+
+- eval_fun:
+
+  A list of functions, typically from
+  [`bru_eval_fun()`](https://inlabru-org.github.io/inlabru/reference/bru_eval_fun.md).
+
+## Value
+
+A (sparse) matrix of size `ibm_n_output(mapper, input, inla_f)` by
+`ibm_n(mapper, inla_f = FALSE)`.
+
 ## Methods (by class)
 
 - `ibm_jacobian(default)`: Mapper classes must implement their own
@@ -220,6 +306,11 @@ ibm_jacobian(
   `hidden=TRUE` in the mapper definition, the input format should
   instead match that of the first, non-hidden, sub-mapper.
 
+- `ibm_jacobian(bm_expr)`: Accepts a `state` list with named entries,
+  one for each variable. The `input` format should match the description
+  given for
+  [`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md).
+
 - `ibm_jacobian(bm_repeat)`: The input should take the format of the
   repeated submapper.
 
@@ -236,15 +327,29 @@ ibm_jacobian(
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
 [`ibm_invalid_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_invalid_output.md),
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md),
 [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+
+## Examples
+
+``` r
+m <- bm_linear()
+ibm_jacobian(m, input = c(1, 3, 4, 5, 2), state = 2)
+#> 5 x 1 sparse Matrix of class "dgCMatrix"
+#>       
+#> [1,] 1
+#> [2,] 3
+#> [3,] 4
+#> [4,] 5
+#> [5,] 2
+```

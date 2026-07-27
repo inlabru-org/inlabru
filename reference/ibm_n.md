@@ -1,7 +1,6 @@
 # Size of the latent vector of a mapping
 
-Implementations must return the size of the latent vector being mapped
-to.
+Implementations must return the size of the latent vector being mapped.
 
 ## Usage
 
@@ -59,6 +58,9 @@ ibm_n(mapper, ...)
 # S3 method for class 'bm_collect'
 ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
 
+# S3 method for class 'bm_expr'
+ibm_n(mapper, ..., input = NULL, state = NULL, multi = FALSE, data = NULL)
+
 # S3 method for class 'bm_repeat'
 ibm_n(mapper, ...)
 
@@ -106,6 +108,17 @@ ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
 
   Data input for the mapper.
 
+- data:
+
+  should be a list with data objects, with the main object called
+  `data`; see
+  [`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md)
+  for details.
+
+## Value
+
+An integer denoting the size of the latent vector being mapped.
+
 ## Methods (by class)
 
 - `ibm_n(default)`: Returns a non-null element 'n' from the mapper
@@ -133,6 +146,7 @@ ibm_n(mapper, inla_f = FALSE, multi = FALSE, ...)
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
@@ -140,7 +154,6 @@ Other mapper methods:
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md),

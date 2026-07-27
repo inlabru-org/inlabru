@@ -1,46 +1,78 @@
 # Extract basic variable names from expression
 
-Extracts the variable names from an R expression by pre- and
-post-processing around
-[`all.vars()`](https://rdrr.io/r/base/allnames.html). First replaces `$`
-with `[[` indexing, so that internal column/variable names are ignored,
-then calls [`all.vars()`](https://rdrr.io/r/base/allnames.html).
+Extracts the variable names and function names from an R expression by
+traversing the expression structure. Internal helper function for
+[`new_bru_used()`](https://inlabru-org.github.io/inlabru/reference/new_bru_used.md)
+and
+[`bru_used()`](https://inlabru-org.github.io/inlabru/reference/bru_used.md).
 
 ## Usage
 
 ``` r
-bru_used_vars(x, functions = FALSE)
+bru_used_vars(x, result = new_bru_used_vars())
 
-# S3 method for class 'character'
-bru_used_vars(x, functions = FALSE)
+new_bru_used_vars(
+  x = list(vars = character(0), funs = character(0), objects = list())
+)
+
+# Default S3 method
+bru_used_vars(x, result = new_bru_used_vars())
+
+# S3 method for class '`<-`'
+bru_used_vars(x, result = new_bru_used_vars())
+
+# S3 method for class 'call'
+bru_used_vars(x, result = new_bru_used_vars())
 
 # S3 method for class 'expression'
-bru_used_vars(x, functions = FALSE)
+bru_used_vars(x, result = new_bru_used_vars())
 
 # S3 method for class 'quosure'
-bru_used_vars(x, functions = FALSE)
+bru_used_vars(x, result = new_bru_used_vars())
 
 # S3 method for class 'formula'
-bru_used_vars(x, functions = FALSE)
+bru_used_vars(x, result = new_bru_used_vars())
+
+# S3 method for class 'bru_used_vars'
+format(x, ...)
+
+# S3 method for class 'bru_used_vars'
+print(x, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  A `formula`, `expression`, or `character`
+  A `formula`, `expression`, or other supported class. For the `format`
+  and `print` methods, a `bru_used_vars` object.
 
-- functions:
+- result:
 
-  logical; if TRUE, include function names
+  A `bru_used_vars` object; a list with elements `vars`, `funs`, and
+  `objects`, by default provided by `new_bru_used_vars()`
 
 ## Value
 
-If successful, a character vector, otherwise `NULL`
+A `bru_used_vars` object with elements
 
-## Methods (by class)
+- vars:
 
-- `bru_used_vars(formula)`: Only the right-hand side is used.
+  character; names of directly accessed variables.
+
+- funs:
+
+  character; names of functions called.
+
+- objects:
+
+  named list; one character vector per container objects with variables
+  names accessed via `$`, `[[`, or `[`. If the access is ambiguous, the
+  container object name is stored in `vars`.
+
+## Functions
+
+- `new_bru_used_vars()`: Create a `bru_used_vars` object.
 
 ## See also
 
@@ -53,22 +85,16 @@ Other bru_used:
 
 ``` r
 bru_used_vars(~.)
-#> NULL
+#> vars: {.}, funs: {}, objects[]
 bru_used_vars(~ a + b + c_latent + d_eval())
-#> [1] "a"        "b"        "c_latent"
-bru_used_vars(expression(a + b + c_latent + d_eval()))
-#> [1] "a"        "b"        "c_latent"
+#> vars: {a, b, c_latent}, funs: {+, d_eval}, objects[]
 
-bru_used_vars(~., functions = TRUE)
-#> NULL
-bru_used_vars(~ a + b + c_latent + d_eval(), functions = TRUE)
-#> [1] "+"        "a"        "b"        "c_latent" "d_eval"  
-bru_used_vars(expression(a + b + c_latent + d_eval()), functions = TRUE)
-#> [1] "expression" "+"          "a"          "b"          "c_latent"  
-#> [6] "d_eval"    
-
+# Ignores the LHS:
 bru_used_vars(a ~ b)
-#> [1] "b"
-bru_used_vars(expression(a ~ b))
-#> [1] "a" "b"
+#> vars: {b}, funs: {}, objects[]
+
+# Detects variables accessed via pronouns and objects,
+# as well as function calls:
+bru_used_vars(~ cos(x$z) + y_eval() + .latent$"q")
+#> vars: {}, funs: {+, cos, y_eval}, objects[x: {z}, .latent: {q}]
 ```

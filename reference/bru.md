@@ -153,13 +153,13 @@ if (bru_safe_inla()) {
   # Obtain summary
   fit$summary.fixed
 }
-#> Changing INLA option num.threads from '16:1' to '1:1:1'.
-#>               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> x         2.027702 0.05210931   1.923574 2.027703   2.131825 2.027703
-#> Intercept 4.959784 0.03684160   4.886164 4.959785   5.033399 4.959784
+#> Changing INLA option num.threads from '4:1' to '1:1:1'.
+#>               mean        sd 0.025quant 0.5quant 0.975quant     mode
+#> x         2.027702 0.0521093   1.923574 2.027703   2.131825 2.027703
+#> Intercept 4.959784 0.0368416   4.886164 4.959785   5.033399 4.959784
 #>                    kld
-#> x         5.769976e-06
-#> Intercept 5.770180e-06
+#> x         5.770000e-06
+#> Intercept 5.770205e-06
 
 
 if (bru_safe_inla()) {
@@ -174,12 +174,12 @@ if (bru_safe_inla()) {
   fit <- bru(~ x + Intercept(1), lik)
   fit$summary.fixed
 }
-#>               mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> x         2.027702 0.05210931   1.923574 2.027703   2.131825 2.027703
-#> Intercept 4.959784 0.03684160   4.886164 4.959785   5.033399 4.959784
+#>               mean        sd 0.025quant 0.5quant 0.975quant     mode
+#> x         2.027702 0.0521093   1.923574 2.027703   2.131825 2.027703
+#> Intercept 4.959784 0.0368416   4.886164 4.959785   5.033399 4.959784
 #>                    kld
-#> x         5.769976e-06
-#> Intercept 5.770180e-06
+#> x         5.770000e-06
+#> Intercept 5.770205e-06
 
 # An important addition to the INLA methodology is bru's ability to use
 # non-linear predictors. Such a predictor can be formulated via bru_obs()'s
@@ -201,11 +201,11 @@ if (bru_safe_inla()) {
   # Check the result (z posterior should be around 2)
   fit$summary.fixed
 }
-#>               mean          sd 0.025quant 0.5quant 0.975quant     mode
-#> z         1.995419 0.007914383   1.979604 1.995419   2.011233 1.995419
-#> Intercept 5.021860 0.041156752   4.939618 5.021861   5.104097 5.021861
+#>               mean         sd 0.025quant 0.5quant 0.975quant     mode
+#> z         1.995419 0.00791756   1.979598 1.995419    2.01124 1.995419
+#> Intercept 5.021860 0.04117309   4.939585 5.021861    5.10413 5.021861
 #>                    kld
-#> z         5.807974e-06
-#> Intercept 5.807739e-06
+#> z         5.753208e-06
+#> Intercept 5.752969e-06
 # }
 ```

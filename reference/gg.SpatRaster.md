@@ -40,6 +40,7 @@ Other geomes:
 ## Examples
 
 ``` r
+# \donttest{
 if (require("ggplot2", quietly = TRUE) &&
   bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
@@ -56,4 +57,6 @@ if (require("ggplot2", quietly = TRUE) &&
 #> The following object is masked from ‘package:stats’:
 #> 
 #>     filter
+
+# }
 ```

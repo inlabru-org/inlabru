@@ -1,12 +1,17 @@
 # Get access to the internal environment
 
-Get access to the internal environment
+Access the internal inlabru environment which stores the global log and
+options objects.
 
 ## Usage
 
 ``` r
 bru_env_get()
 ```
+
+## Value
+
+An `environment`
 
 ## Details
 

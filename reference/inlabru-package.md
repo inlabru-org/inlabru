@@ -21,7 +21,7 @@ and
 Posterior quantities beyond the basic summaries can be calculated with a
 [`predict()`](https://rdrr.io/r/stats/predict.html) method, documented
 in
-[`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md).
+[`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.md).
 For point process inference
 [`lgcp()`](https://inlabru-org.github.io/inlabru/reference/lgcp.md) can
 be used as a shortcut to `bru(..., bru_obs(model="cp", ...))`.

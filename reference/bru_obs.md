@@ -1,4 +1,4 @@
-# Observation model construction for usage with [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
+# Observation model construction for [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
 
 Observation model construction for usage with
 [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md).
@@ -31,6 +31,7 @@ bru_obs(
   is_rowwise = NULL,
   aggregate = NULL,
   aggregate_input = NULL,
+  response_block = NULL,
   control.family = NULL,
   control.gcpo = NULL,
   tag = NULL,
@@ -88,14 +89,24 @@ bru_like_list(...)
 
   A string identifying a valid
   [`INLA::inla`](https://rdrr.io/pkg/INLA/man/inla.html) likelihood
-  family. The default is `gaussian` with identity link. In addition to
-  the likelihoods provided by inla (see
-  `names(INLA::inla.models()$likelihood)`) inlabru supports fitting
-  latent Gaussian Cox processes via `family = "cp"`. As an alternative
-  to [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md),
-  the
-  [`lgcp()`](https://inlabru-org.github.io/inlabru/reference/lgcp.md)
-  function provides a convenient interface to fitting Cox processes.
+  family. The default is `gaussian` with identity link. Apart from the
+  likelihoods provided by INLA (see
+  `names(INLA::inla.models()$likelihood)`) inlabru supports
+
+  `cp`
+
+  :   Cox process likelihood, for fitting point process models. The
+      [`lgcp()`](https://inlabru-org.github.io/inlabru/reference/lgcp.md)
+      function is a shortcut to `bru(..., family = "cp")`.
+
+  `nzbinomial`,`nzbetabinomial`,`nznbinomial`,`nzcenpoisson`
+
+  :   Non-zero versions of "binomial", "betabinomial", "nbinomial", and
+      "cenpoisson", respectively, implemented by setting the zero
+      probability parameter close to zero in the corresponding
+      "zeroinflated\*0" models. It will check if these models have
+      native INLA implementations, and use those instead if available.
+      In INLA `26.06.07`, only "nzpoisson" has a native implementation.
 
 - data:
 
@@ -207,27 +218,34 @@ bru_like_list(...)
   Default `NULL`, interpreted as "none". **\[experimental\]**, available
   from version `2.12.0.9013`.
 
-- aggregate_input:
+- aggregate_input, response_block:
 
   `NULL` or an optional input list to the mapper defined by non-NULL
   `aggregate`, overriding the default,
 
-      list(block = .data.[[".block"]],
-           weights = .data.[["weight"]],
-           n_block = bru_response_size(.response_data.),
-           block_response = ".block")
+      aggregate_input = list(
+        block = .data.[[".block"]],
+        weights = .data.[["weight"]],
+        n_block = bru_response_size(.response_data.)
+      ),
+      response_block = .response_data.[[".block"]]
 
   **\[experimental\]**, available from version `2.12.0.9013`.
 
-  From `2.13.0.9016`, it will look for a `block_response` element in the
-  list, which should be the name of a response variable in
-  `response_data` to match the `block` information against, allowing
-  character or factor aggregation block information to be used by
-  replacing `block` with `match(block, block_response)`. If not
-  supplied, the name `".block"` is tried. If that isn't available, the
-  `block` information must be supplied directly as a numeric or integer
-  vector, indexing into the rows of the response variable. Having no
-  `block_response` variable is equivalent to having
+  From `2.13.0.9016` to `2.14.1.9007`, it would look for a
+  `block_response` character element in the list, but from
+  `2.14.1.9008`, the separate argument `reponse_block` should be used
+  instead, with an expression to be evaluated in the input data context.
+  `response_block` should evaluate to a vector of the same length as the
+  response data, with values that can be used to index into the rows of
+  the response variable to determine which rows of the predictor
+  expression to aggregate, allowing character or factor aggregation
+  block information to be used by replacing `block` with
+  `match(block, response_block)`. If not supplied, the variable `.block`
+  in the `response_data` is tried. If that isn't available, the `block`
+  information must be supplied directly as a numeric or integer vector,
+  indexing into the rows of the response variable. Having no
+  `response_block` variable is equivalent to having
   `response_data$.block = seq_len(bru_response_size(response_data))`.
 
 - control.family:
@@ -427,7 +445,24 @@ if (bru_safe_inla() &&
     ggtitle("Joint model")
 
   (p1 / p2 / pj)
-}
 
+  # Non-zero binomial example:
+  nzdata <- data.frame(ntrials = rep(2:6, 10))
+  nzdata$x <- rnorm(nrow(nzdata))
+  nzdata$count <- rbinom(
+    nrow(nzdata),
+    size = nzdata$ntrials,
+    prob = plogis(nzdata$x)
+  )
+  nzdata <- nzdata[nzdata$count > 0, ]
+  truncated_binomial_obs <-
+    bru_obs(
+      formula = count ~ x,
+      family = "nzbinomial",
+      data = nzdata,
+      Ntrials = ntrials
+    )
+  fit <- bru(~ 0 + x, truncated_binomial_obs)
+}
 # }
 ```

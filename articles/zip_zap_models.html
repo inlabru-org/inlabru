@@ -8,8 +8,8 @@
 <title>ZIP and ZAP models • inlabru</title>
 <!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="ZIP and ZAP models">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.14.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.15.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
     <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
     <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/tidiers.html">Postprocessing tidiers</a></li>
     <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
@@ -62,9 +63,12 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_per_transect_covars.html">LGCPs - Distance sampling and per-transect covariates (work in progress)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model assessment</h6></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars_gcpo.html">LGCPs - Model comparison using Cross Validation</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sp.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -107,7 +111,7 @@
 Perepolkin and Finn Lindgren</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/zip_zap_models.Rmd" class="external-link"><code>vignettes/articles/zip_zap_models.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/stable/vignettes/articles/zip_zap_models.Rmd" class="external-link"><code>vignettes/articles/zip_zap_models.Rmd</code></a></small>
       <div class="d-none name"><code>zip_zap_models.Rmd</code></div>
     </div>
 
@@ -237,8 +241,8 @@ vegetation type and elevation.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_poi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.14.1 </span></span>
-<span><span class="co">#&gt; INLA version: 26.05.21 </span></span>
+<span><span class="co">#&gt; inlabru version: 2.15.0 </span></span>
+<span><span class="co">#&gt; INLA version: 26.06.08 </span></span>
 <span><span class="co">#&gt; Latent components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland)</span></span>
@@ -254,7 +258,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt;     Additive/Linear/Rowwise: TRUE/TRUE/TRUE</span></span>
 <span><span class="co">#&gt;     Used components: effect[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[] </span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.649, Running = 3.36, Post = 0.638, Total = 4.65 </span></span>
+<span><span class="co">#&gt;     Pre = 0.447, Running = 2.65, Post = 0.596, Total = 3.69 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.183 0.380     -0.928   -0.183      0.564 -0.183   0</span></span>
@@ -277,7 +281,7 @@ vegetation type and elevation.</p>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
 <span></span>
 <span></span>
-<span><span class="va">pred_poi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span><span class="va">pred_poi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_poi</span>, <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">expect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span> <span class="co"># vegetation +</span></span>
@@ -349,8 +353,8 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zip</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.14.1 </span></span>
-<span><span class="co">#&gt; INLA version: 26.05.21 </span></span>
+<span><span class="co">#&gt; inlabru version: 2.15.0 </span></span>
+<span><span class="co">#&gt; INLA version: 26.06.08 </span></span>
 <span><span class="co">#&gt; Latent components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland)</span></span>
@@ -366,7 +370,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt;     Additive/Linear/Rowwise: TRUE/TRUE/TRUE</span></span>
 <span><span class="co">#&gt;     Used components: effect[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[] </span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.549, Running = 5.88, Post = 0.147, Total = 6.58 </span></span>
+<span><span class="co">#&gt;     Pre = 0.265, Running = 3.99, Post = 0.0753, Total = 4.33 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; veg_disturbed -0.370 0.370     -1.092   -0.372      0.359 -0.372   0</span></span>
@@ -397,7 +401,7 @@ Var(count)= (1-p)(\lambda+p \lambda^2)
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span>
 <span></span>
-<span><span class="va">pred_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span><span class="va">pred_zip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zip</span>, <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">scaling_prob</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">zero_probability_parameter_for_zero_inflated_poisson_1</span><span class="op">)</span></span>
@@ -466,7 +470,10 @@ modelling presence/absence. Before INLA version <code>23.10.19-1</code>,
 this could be done by fixing the hyperparameter to a small value. The <a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf" class="external-link"><code>nzpossion</code>
 model</a>, available from INLA version <code>23.10.19-1</code>
 implements the <span class="math inline">\text{Poisson}(y\vert
-y&gt;0)</span> model exactly.</p>
+y&gt;0)</span> model exactly. <code>inlabru</code> added shortcuts for
+the hyperparameter approach for “nzbinomal”, “nznbinomial”,
+“nzcenpoisson”, and “nzbetabinomial”, in version
+<code>2.14.1.9007</code>.</p>
 <p>In the resulting model, the truncated Poisson distribution governs
 only the positive counts, while the absences are addressed by a separate
 binomial model that can have its own covariates. It’s worth noting that
@@ -504,24 +511,12 @@ Var(\text{count})&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#  field_count(geometry, copy = "field_present", fixed = FALSE)</span></span>
 <span></span>
 <span><span class="va">truncated_poisson_obs</span> <span class="op">&lt;-</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">package_version</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-reflect.html" class="external-link">getNamespaceVersion</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"23.10.19-1"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
-<span>      family <span class="op">=</span> <span class="st">"zeroinflatedpoisson0"</span>,</span>
-<span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
-<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
-<span>      E <span class="op">=</span> <span class="va">area</span>,</span>
-<span>      control.family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hyper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        initial <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>      <span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
-<span>      family <span class="op">=</span> <span class="st">"nzpoisson"</span>,</span>
-<span>      data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
-<span>      formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
-<span>      E <span class="op">=</span> <span class="va">area</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
+<span>    family <span class="op">=</span> <span class="st">"nzpoisson"</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">counts_df</span><span class="op">[</span><span class="va">counts_df</span><span class="op">$</span><span class="va">present</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>,</span>
+<span>    formula <span class="op">=</span> <span class="va">count</span> <span class="op">~</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">field_count</span> <span class="op">+</span> <span class="va">Intercept_count</span>,</span>
+<span>    E <span class="op">=</span> <span class="va">area</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">present_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
 <span>  family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
@@ -538,8 +533,8 @@ Var(\text{count})&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_zap</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.14.1 </span></span>
-<span><span class="co">#&gt; INLA version: 26.05.21 </span></span>
+<span><span class="co">#&gt; inlabru version: 2.15.0 </span></span>
+<span><span class="co">#&gt; INLA version: 26.06.08 </span></span>
 <span><span class="co">#&gt; Latent components:</span></span>
 <span><span class="co">#&gt; veg_disturbed: main = linear(gcov_vegetation$Disturbed)</span></span>
 <span><span class="co">#&gt; veg_grassland: main = linear(gcov_vegetation$Grassland)</span></span>
@@ -565,14 +560,14 @@ Var(\text{count})&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt;     Additive/Linear/Rowwise: TRUE/TRUE/TRUE</span></span>
 <span><span class="co">#&gt;     Used components: effect[Intercept_count, elevation, field_count], latent[] </span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.438, Running = 4.79, Post = 0.223, Total = 5.45 </span></span>
+<span><span class="co">#&gt;     Pre = 0.383, Running = 4.87, Post = 0.163, Total = 5.41 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld</span></span>
-<span><span class="co">#&gt; veg_disturbed      -1.028 0.637     -2.263   -1.033      0.237  -1.034   0</span></span>
-<span><span class="co">#&gt; veg_grassland      -1.383 0.588     -2.539   -1.382     -0.230  -1.382   0</span></span>
-<span><span class="co">#&gt; Intercept_present -10.828 4.537    -19.995  -10.753     -2.075 -10.750   0</span></span>
+<span><span class="co">#&gt; veg_disturbed      -1.027 0.637     -2.261   -1.032      0.238  -1.032   0</span></span>
+<span><span class="co">#&gt; veg_grassland      -1.382 0.588     -2.537   -1.381     -0.229  -1.381   0</span></span>
+<span><span class="co">#&gt; Intercept_present -10.824 4.540    -19.996  -10.749     -2.066 -10.746   0</span></span>
 <span><span class="co">#&gt; elevation_present   0.004 0.002     -0.001    0.004      0.009   0.004   0</span></span>
-<span><span class="co">#&gt; Intercept_count     1.856 1.691     -1.807    1.952      4.975   2.202   0</span></span>
+<span><span class="co">#&gt; Intercept_count     1.852 1.696     -1.824    1.948      4.979   2.199   0</span></span>
 <span><span class="co">#&gt; elevation           0.001 0.001      0.000    0.001      0.003   0.001   0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
@@ -582,12 +577,12 @@ Var(\text{count})&amp;= \frac{1}{1-\exp(-\lambda)}  p(\lambda+p
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model hyperparameters:</span></span>
 <span><span class="co">#&gt;                          mean    sd 0.025quant 0.5quant 0.975quant  mode</span></span>
-<span><span class="co">#&gt; Range for field_present 2.406 0.727      1.343    2.286       4.17 2.049</span></span>
-<span><span class="co">#&gt; Stdev for field_present 3.164 0.743      1.997    3.066       4.90 2.861</span></span>
-<span><span class="co">#&gt; Range for field_count   0.566 0.237      0.256    0.518       1.17 0.432</span></span>
-<span><span class="co">#&gt; Stdev for field_count   0.801 0.136      0.570    0.788       1.11 0.760</span></span>
+<span><span class="co">#&gt; Range for field_present 2.406 0.726      1.338    2.289       4.17 2.056</span></span>
+<span><span class="co">#&gt; Stdev for field_present 3.165 0.745      1.992    3.068       4.91 2.866</span></span>
+<span><span class="co">#&gt; Range for field_count   0.567 0.238      0.255    0.518       1.17 0.433</span></span>
+<span><span class="co">#&gt; Stdev for field_count   0.802 0.137      0.570    0.789       1.11 0.762</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Marginal log-Likelihood:  -764.28 </span></span>
+<span><span class="co">#&gt; Marginal log-Likelihood:  -764.27 </span></span>
 <span><span class="co">#&gt; CPO, PIT is computed </span></span>
 <span><span class="co">#&gt; Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">#&gt; (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre></div>
@@ -610,7 +605,7 @@ parts.</p>
 <h2 id="predict-intensity-on-the-original-raster-locations">Predict intensity on the original raster locations<a class="anchor" aria-label="anchor" href="#predict-intensity-on-the-original-raster-locations"></a>
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pred_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">pred_zap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_zap</span>,</span>
 <span>  <span class="va">counts_df</span>,</span>
 <span>  <span class="op">~</span> <span class="op">{</span></span>
@@ -685,12 +680,12 @@ variances of the model predictions <span class="math inline">m_i</span>
 and <span class="math inline">s_i^2</span> for each grid box,
 conditioned on the model predictor <span class="math inline">\eta_i</span>.</p>
 <p>Predictive Integral Transform (PIT) <span class="citation">(Marshall
-and Spiegelhalter 2003; Gelman, Meng, and Stern 1996; Held, Schrödle,
-and Rue 2010)</span> is calculated as the cumulative distribution
-function (CDF) of the observed data at each predicted value from the
-model. Mathematically, for each observation <span class="math inline">y_i</span> and its corresponding predicted value
-<span class="math inline">\hat{y}_i</span> from the model, the PIT is
-calculated as follows:</p>
+and Spiegelhalter 2003; Gelman et al. 1996; Held et al. 2010)</span> is
+calculated as the cumulative distribution function (CDF) of the observed
+data at each predicted value from the model. Mathematically, for each
+observation <span class="math inline">y_i</span> and its corresponding
+predicted value <span class="math inline">\hat{y}_i</span> from the
+model, the PIT is calculated as follows:</p>
 <p><span class="math display">PIT_i=P(Y_i\leq \hat y_i \vert
 data)</span></p>
 <p>where <span class="math inline">Y_i</span> is a random variable
@@ -820,21 +815,21 @@ would need to sample from the full posterior count model.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Poisson</td>
-<td align="right">0.6206318</td>
-<td align="right">-2.292871</td>
-<td align="right">0.4469074</td>
+<td align="right">0.6216723</td>
+<td align="right">-2.214451</td>
+<td align="right">0.4470953</td>
 </tr>
 <tr class="even">
 <td align="left">ZIP</td>
-<td align="right">0.7111063</td>
-<td align="right">-2.329507</td>
-<td align="right">0.4648638</td>
+<td align="right">0.7119346</td>
+<td align="right">-2.344356</td>
+<td align="right">0.4647422</td>
 </tr>
 <tr class="odd">
 <td align="left">ZAP</td>
-<td align="right">0.7298371</td>
-<td align="right">-1.994193</td>
-<td align="right">0.4514556</td>
+<td align="right">0.7309681</td>
+<td align="right">-1.979667</td>
+<td align="right">0.4515611</td>
 </tr>
 </tbody>
 </table>
@@ -975,8 +970,8 @@ Comparison</span> of <span>MCMC</span> and <span>INLA</span>.
 Structures</span> - <span>Festschrift</span> in <span>Honour</span> of
 <span>Ludwig Fahrmeir</span>. <span>Berlin</span>:
 <span>Physica-Verlag</span> (<span>Springer</span>), 91-110.</em>,
-edited by T. Kneib and G. Tutz, 91–110. <span>Berlin</span>:
-<span>Physica-Verlag (Springer)</span>. <a href="https://doi.org/10.1007/978-3-7908-2413-1" class="external-link">https://doi.org/10.1007/978-3-7908-2413-1</a>.
+edited by T. Kneib and G. Tutz. <span>Physica-Verlag (Springer)</span>.
+<a href="https://doi.org/10.1007/978-3-7908-2413-1" class="external-link">https://doi.org/10.1007/978-3-7908-2413-1</a>.
 </div>
 <div id="ref-marshall2003ApproximateCrossvalidatoryPredictive" class="csl-entry">
 Marshall, E. C., and D. J. Spiegelhalter. 2003. <span>“Approximate
@@ -1002,7 +997,7 @@ Ordinate</span> for the <span>Normal Distribution</span>.”</span>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

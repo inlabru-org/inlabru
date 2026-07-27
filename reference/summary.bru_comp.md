@@ -29,7 +29,7 @@ summary(object, verbose = TRUE, ..., label.override = NULL)
 # S3 method for class 'bru_subcomp'
 print(x, verbose = TRUE, ..., label.override = NULL)
 
-# S3 method for class 'summary_component'
+# S3 method for class 'summary_bru_comp'
 print(x, ...)
 
 # S3 method for class 'summary_bru_comp_list'

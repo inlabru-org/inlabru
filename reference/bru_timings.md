@@ -22,3 +22,8 @@ bru_timings(object, ...)
 - ...:
 
   unused
+
+## Value
+
+A `data.frame` or `tibble` with columns `Task`, `Iteration`, `Time`,
+`System`, and `Elapsed`.

@@ -23,6 +23,7 @@ bru_compute_linearisation(
   is_rowwise,
   eps,
   n_pred = NULL,
+  finite_diff = "forward",
   ...
 )
 

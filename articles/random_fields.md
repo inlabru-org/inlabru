@@ -3,6 +3,7 @@
 ## Setting things up
 
 ``` r
+
 library(INLA)
 library(inlabru)
 library(mgcv)
@@ -14,6 +15,7 @@ library(patchwork)
 Make a shortcut to a nicer colour scale:
 
 ``` r
+
 colsc <- function(...) {
   scale_fill_gradientn(
     colours = rev(RColorBrewer::brewer.pal(11, "RdYlBu")),
@@ -28,6 +30,7 @@ Load the data and rename the countdata object to `cd` (just because
 ‘`cd`’ is less to type than ‘`countdata2`’.):
 
 ``` r
+
 data(Poisson2_1D)
 cd <- countdata2
 ```
@@ -35,6 +38,7 @@ cd <- countdata2
 Take a look at the count data.
 
 ``` r
+
 cd
 #>            x count exposure
 #> 1   2.319888     9 4.639776
@@ -65,6 +69,7 @@ the point of this is just to provide something to which we can compare
 the `inlabru` model fit.
 
 ``` r
+
 fit2.gam <- gam(count ~ s(x, k = 10) + offset(log(exposure)),
   family = poisson(),
   data = cd
@@ -87,6 +92,7 @@ or the code that makes the predictions immediately below it if you are
 not familiar with GAMs.
 
 ``` r
+
 summary(fit2.gam)
 ```
 
@@ -94,6 +100,7 @@ Make a prediction data frame, get predictions and add them to the data
 frame First make vectors of x-values and associated (equal) exposures:
 
 ``` r
+
 xs <- seq(0, 55, length = 100)
 exposures <- rep(cd$exposure[1], 100)
 ```
@@ -101,12 +108,14 @@ exposures <- rep(cd$exposure[1], 100)
 and put them in a data frame:
 
 ``` r
+
 dat4pred <- data.frame(x = xs, exposure = exposures)
 ```
 
 Then predict
 
 ``` r
+
 pred2.gam <- predict(fit2.gam, newdata = dat4pred, type = "response")
 # add column for prediction in data frame:
 dat4pred2 <- cbind(dat4pred, gam = pred2.gam)
@@ -116,6 +125,7 @@ Plotting the fit and the data using the `ggplot2` commands below should
 give you the plot shown below
 
 ``` r
+
 ggplot(dat4pred2) +
   geom_line(aes(x = x, y = gam), lty = 2) +
   ylim(0, max(dat4pred2$gam, cd$count)) +
@@ -130,6 +140,7 @@ Make mesh. To avoid boundary effects in the region of interest, let the
 mesh extend outside the data range.
 
 ``` r
+
 x <- seq(-10, 65, by = 5) # this sets mesh points - try others if you like
 (mesh1D <- fm_mesh_1d(x, degree = 2, boundary = "free"))
 #> fm_mesh_1d object:
@@ -144,6 +155,7 @@ x <- seq(-10, 65, by = 5) # this sets mesh points - try others if you like
 … and see where the mesh knots are:
 
 ``` r
+
 ggplot() +
   gg(mesh1D)
 ```
@@ -151,6 +163,7 @@ ggplot() +
 We can also draw the basis functions:
 
 ``` r
+
 ggplot() +
   geom_fm(data = mesh1D)
 ```
@@ -163,6 +176,7 @@ represent the intended Gaussian process dependence structure, while not
 adding needless computations.
 
 ``` r
+
 (mesh <- fm_mesh_1d(c(1, 2, 3, 4, 6),
   boundary = c("neumann", "free"),
   degree = 2
@@ -220,6 +234,7 @@ the output to the left of the `~` in the component specification, and
 [`bru_obs()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)).
 
 ``` r
+
 the_spde <- inla.spde2.pcmatern(mesh1D,
   prior.range = c(1, 0.01),
   prior.sigma = c(1, 0.01)
@@ -238,8 +253,8 @@ fit2.bru <- bru(
 )
 
 summary(fit2.bru)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> field: main = spde(x)
 #> Intercept: main = linear(1)
@@ -252,7 +267,7 @@ summary(fit2.bru)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[field, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.531, Running = 0.299, Post = 0.13, Total = 0.96 
+#>     Pre = 0.409, Running = 0.284, Post = 0.0706, Total = 0.763 
 #> Fixed effects:
 #>            mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 #> Intercept 0.631 0.469      -0.41    0.663      1.506 0.733   0
@@ -274,9 +289,10 @@ summary(fit2.bru)
 
 Predict the values at the x points used for mesh (the data argument must
 be a data frame, see
-[`?predict.bru`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)):
+[`?predict.bru`](https://inlabru-org.github.io/inlabru/reference/predict.md)):
 
 ``` r
+
 x4pred <- data.frame(x = xs)
 pred2.bru <- predict(fit2.bru,
   x4pred,
@@ -296,6 +312,7 @@ scale, do you understand why we divide the count by `cd$exposure`? (We
 will in due course allow predictions on the count scale as well.)
 
 ``` r
+
 true.lambda <- data.frame(x = cd$x, y = E_nc2 / cd$exposure)
 ```
 
@@ -306,6 +323,7 @@ curve, with 95% credible intervals shown as a light red band about the
 curve.
 
 ``` r
+
 ggplot() +
   gg(pred2.bru) +
   geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
@@ -320,6 +338,7 @@ ggplot() +
 Compare the `inlabru` fit to the `gam` fit:
 
 ``` r
+
 ggplot() +
   gg(pred2.bru) +
   geom_point(data = cd, aes(x = x, y = count / exposure), cex = 2) +
@@ -336,6 +355,7 @@ We can look at the Intercept posterior using the function
 below.
 
 ``` r
+
 plot(fit2.bru, "Intercept")
 ```
 
@@ -346,12 +366,14 @@ use this function. To see what fixed effect parameters’ posterior
 distributions are available to be plotted, you can type
 
 ``` r
+
 names(fit2.bru$marginals.fixed)
 ```
 
 This does not tell you about the SPDE parameters, and if you type
 
 ``` r
+
 names(fit2.bru$marginals.random)
 #> [1] "field"
 ```
@@ -367,6 +389,7 @@ of the variance because the variance posterior is very skewed and so it
 is easier to view the log of the variance)
 
 ``` r
+
 spde.range <- spde.posterior(fit2.bru, "field", what = "range")
 spde.logvar <- spde.posterior(fit2.bru, "field", what = "log.variance")
 
@@ -382,6 +405,7 @@ We can look at the posterior distributions of the Matern correlation and
 covariance functions as follows:
 
 ``` r
+
 (plot(spde.posterior(fit2.bru, "field", what = "matern.correlation")) /
   plot(spde.posterior(fit2.bru, "field", what = "matern.covariance")))
 ```

@@ -21,30 +21,37 @@
   holder.  
   Lindesay Scott-Howard provided MRSea data import code
 
-- **Seaton Andy**. Contributor.  
+- **Andy Seaton**. Contributor.  
   Andy Seaton provided testing, bugfixes, and vignettes
 
-- **Suen Man Ho**. Contributor, copyright holder.
+- **Man Ho Suen**. Contributor, copyright holder.
   [](https://orcid.org/0009-0003-2281-0776)  
   Man Ho Suen contributed features for aggregated responses and vignette
   updates
 
-- **Roudier Pierre**. Contributor, copyright holder.  
+- **Pierre Roudier**. Contributor, copyright holder.  
   Pierre Roudier contributed general quantile summaries
 
-- **Meehan Tim**. Contributor, copyright holder.  
+- **Tim Meehan**. Contributor, copyright holder.  
   Tim Meehan contributed the SVC vignette and robins data
 
-- **Reddy Peddinenikalva Niharika**. Contributor, copyright holder.  
+- **Niharika Reddy Peddinenikalva**. Contributor, copyright holder.  
   Niharika Peddinenikalva contributed the LGCP residuals vignette
 
-- **Perepolkin Dmytro**. Contributor, copyright holder.  
+- **Dmytro Perepolkin**. Contributor, copyright holder.  
   Dmytro Perepolkin contributed the ZIP/ZAP vignette
+
+- **Novica Nakov**. Contributor.
+  [](https://orcid.org/0009-0005-7773-7718)
+
+- **Hans Montcho**. Contributor, copyright holder.
+  [](https://orcid.org/0000-0003-2510-2102)  
+  Hans Montcho contributed features for joint cross validation
 
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/inlabru-org/inlabru/blob/HEAD/inst/CITATION)
+[`inst/CITATION`](https://github.com/inlabru-org/inlabru/blob/stable/inst/CITATION)
 
 Fabian E. Bachl, Finn Lindgren, David L. Borchers, and Janine B. Illian
 (2019), inlabru: an R package for Bayesian spatial modelling from

@@ -29,37 +29,17 @@ new_bru_used(
   labels = NULL
 )
 
+# Default S3 method
+new_bru_used(
+  x,
+  ...,
+  effect = NULL,
+  effect_exclude = NULL,
+  latent = NULL,
+  labels = NULL
+)
+
 # S3 method for class 'character'
-new_bru_used(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-# S3 method for class 'expression'
-new_bru_used(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-# S3 method for class 'quosure'
-new_bru_used(
-  x,
-  ...,
-  effect = NULL,
-  effect_exclude = NULL,
-  latent = NULL,
-  labels = NULL
-)
-
-# S3 method for class 'formula'
 new_bru_used(
   x,
   ...,
@@ -138,17 +118,11 @@ components and effects are available for use in predictor expressions.
 - `` new_bru_used(`NULL`) ``: Create a `bru_used` object from effect
   name character vectors.
 
-- `new_bru_used(character)`: Create a `bru_used` object from a
-  `character` representation of an expression.
+- `new_bru_used(default)`: Create a `bru_used` object from an expression
+  object supported by
+  [`bru_used_vars()`](https://inlabru-org.github.io/inlabru/reference/bru_used_vars.md).
 
-- `new_bru_used(expression)`: Create a `bru_used` object from an
-  expression object.
-
-- `new_bru_used(quosure)`: Create a `bru_used` object from an `rlang`
-  `expr` object.
-
-- `new_bru_used(formula)`: Create a `bru_used` object from a formula
-  (only the right-hand side is used).
+- `new_bru_used(character)`: Create a `bru_used` object from a string.
 
 ## See also
 
@@ -165,10 +139,6 @@ Other bru_used:
 bru_used(used, labels = c("a", "c"))
 #> Used effect[a, c], latent[]
 (used <- new_bru_used(~ a + b + c_latent + d_latent))
-#> Used effect[a, b], latent[c, d]
-bru_used(used, labels = c("a", "c"))
-#> Used effect[a], latent[c]
-(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
 #> Used effect[a, b], latent[c, d]
 bru_used(used, labels = c("a", "c"))
 #> Used effect[a], latent[c]

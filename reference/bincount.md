@@ -59,7 +59,7 @@ bincount(
 - ...:
 
   arguments passed on to
-  [`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+  [`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.md)
 
 ## Value
 

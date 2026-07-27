@@ -6,16 +6,16 @@ information.
 ## Usage
 
 ``` r
-bru_used_update(x, labels, ...)
+bru_used_update(x, labels)
 
 # S3 method for class 'bru_obs_list'
-bru_used_update(x, labels, ...)
+bru_used_update(x, labels)
 
 # S3 method for class 'bru_obs'
 bru_used_update(x, labels, ...)
 
 # S3 method for class 'bru_pred_expr'
-bru_used_update(x, labels, ...)
+bru_used_update(x, labels)
 
 # S3 method for class 'bru_used'
 bru_used_update(x, labels, ...)
@@ -31,13 +31,14 @@ bru_used_update(x, labels, ...)
 
   character vector of component labels
 
-- ...:
-
-  Unused
-
 ## Value
 
-An updated version of `x`
+An updated version of `x`. In the `bru_used` information, only
+components that are in `labels` are retained. If the ".effect",
+".effect.", ".latent", or ".latent." pronoun/container object names are
+present in the input `effect` part, all labels will be included in the
+output `effect` and `latent` parts, respectively, except for those that
+are specifically excluded in an `effect_exclude` part.
 
 ## See also
 

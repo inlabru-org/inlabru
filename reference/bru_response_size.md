@@ -22,6 +22,9 @@ bru_response_size(object)
 # S3 method for class 'bru_obs_list'
 bru_response_size(object)
 
+# S3 method for class 'bru_model'
+bru_response_size(object)
+
 # S3 method for class 'bru_info'
 bru_response_size(object)
 
@@ -56,6 +59,10 @@ An `integer` vector.
 - `bru_response_size(bru_obs_list)`: Extract the number of observations
   from a `bru_obs_list` object, as a vector with one value per
   observation model.
+
+- `bru_response_size(bru_model)`: Extract the number of observations
+  from a `bru_info` object, as a vector with one value per observation
+  model.
 
 - `bru_response_size(bru_info)`: Extract the number of observations from
   a `bru_info` object, as a vector with one value per observation model.

@@ -35,6 +35,7 @@ The most basic `inla.spde.make.A` call is to map purely spatial points
 to a mesh:
 
 ``` r
+
 mesh <- fm_mesh_2d_inla(cbind(0, 0), offset = 2, max.edge = 10)
 loc <- matrix(runif(10) * 2 - 1, 5, 2)
 ggplot() +
@@ -45,6 +46,7 @@ ggplot() +
 ![](mesh_mapping_files/figure-html/unnamed-chunk-2-1.png)
 
 ``` r
+
 A.loc <- inla.spde.make.A(mesh, loc = loc)
 A.loc
 #> 5 x 9 sparse Matrix of class "dgCMatrix"
@@ -59,6 +61,7 @@ A.loc
 A basic conversion of this becomes
 
 ``` r
+
 A.loc <- fm_basis(mesh, loc = loc)
 A.loc
 #> 5 x 9 sparse Matrix of class "dgCMatrix"
@@ -75,6 +78,7 @@ but this is limited to just the basic case of evaluating on only a mesh.
 With a `bru_mapper`, this becomes the more generally useful
 
 ``` r
+
 mapper <- bru_mapper(mesh)
 A.loc <- ibm_jacobian(mapper, input = loc)
 A.loc
@@ -90,6 +94,7 @@ A.loc
 ### Mapping with a precomputed location mapping
 
 ``` r
+
 index <- c(1, 3, 5, 2, 1, 2)
 inla.spde.make.A(A.loc = A.loc, index = index)
 #> 6 x 9 sparse Matrix of class "dgCMatrix"
@@ -134,6 +139,7 @@ ibm_jacobian(mapper, input = list(index = index))
 ### Group mapping with a group mesh
 
 ``` r
+
 inla.spde.make.A(..., group = group.values, group.mesh = group.mesh)
 
 mapper <- bm_multi(list(
@@ -148,6 +154,7 @@ ibm_jacobian(mapper, input = list(main = loc, group = group.values))
 Blockwise aggregation can be implemented with a `bm_aggregate` mapper.
 
 ``` r
+
 block_rescale <- "none" # one of "none", "count", "weights", "sum"
 inla.spde.make.A(...,
   weights = weights,
@@ -168,6 +175,7 @@ Rescaling options:
 - `block_rescale = "sum"` is not supported by the aggregation mapper.
 
 ``` r
+
 mapper <- bm_pipe(
   list(
     main = bm_multi(list(main = bru_mapper(mesh), ...)),
@@ -188,6 +196,7 @@ ibm_jacobian(mapper,
 ## inla.spde.make.index
 
 ``` r
+
 ngroup <- 2
 nrepl <- 3
 

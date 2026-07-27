@@ -65,5 +65,5 @@ if (bru_safe_inla()) {
 
   bru_comp_env(cmp)
 }
-#> <environment: 0x624ab5dac8d0>
+#> <environment: 0x56455b002d58>
 ```

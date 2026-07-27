@@ -100,6 +100,7 @@ Other mappers:
 [`bm_aggregate()`](https://inlabru-org.github.io/inlabru/reference/bm_aggregate.md),
 [`bm_collect()`](https://inlabru-org.github.io/inlabru/reference/bm_collect.md),
 [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md),
+[`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md),
 [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md),
 [`bm_fm_mesh_1d`](https://inlabru-org.github.io/inlabru/reference/bm_fm_mesh_1d.md),
 [`bm_fmesher()`](https://inlabru-org.github.io/inlabru/reference/bm_fmesher.md),
@@ -124,16 +125,13 @@ Other mappers:
 
 ``` r
 if (bru_safe_inla()) {
-  library(INLA)
   mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
-  spde <- inla.spde2.pcmatern(mesh,
+  spde <- INLA::inla.spde2.pcmatern(mesh,
     prior.range = c(1, 0.5),
     prior.sigma = c(1, 0.5)
   )
   mapper <- bru_get_mapper(spde)
   ibm_n(mapper)
 }
-#> Loading required package: Matrix
-#> 
 #> [1] 42
 ```

@@ -43,3 +43,7 @@ bru_inla.stack.mjoin(
 
   The name to be used for the expanded observation matrix, possibly the
   same as an old name. (default "BRU.response")
+
+## Value
+
+A single stack with a multi-likelihood observation matrix

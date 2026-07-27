@@ -4,10 +4,10 @@
 
 [TABLE]
 
-General classes and methods in `inlabru`
+General classes and methods in `inlabru` {.table}
 
 ### Bru mapper classes
 
 [TABLE]
 
-`bru_mapper` classes and methods in `inlabru`
+`bru_mapper` classes and methods in `inlabru` {.table}

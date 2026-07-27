@@ -178,9 +178,51 @@ For `bru_options` and `bru_options_set`, recognised options are:
 
   List of arguments controlling the iterative inlabru method:
 
+  autodiff
+
+  :   Controls the linearisation calculation method. One of
+
+      'pandemic'
+
+      :   Treats all post-component transformations as a single
+          calculation (the default from version `2.1.15`).
+
+      'fullchain'
+
+      :   Uses the chain rule for the composition of components,
+          predictor, and post-predictor transformations (new from
+          `2.14.1.9008`).
+
+  agg
+
+  :   Controls the aggregation implementation. One of
+
+      'pandemic'
+
+      :   Treats all post-component transformations as a single
+          calculation (the default from version `2.1.15`).
+
+      'fullchain'
+
+      :   Uses the chain rule for the composition of components,
+          predictor, and post-predictor transformations (new from
+          `2.14.1.9008`).
+
+  finite_diff
+
+  :   One of
+
+      'forward'
+
+      :   Use onesided finite differences.
+
+      'central'
+
+      :   Use symmetric differences.
+
   taylor
 
-  :   'pandemic' (default, from version 2.1.15).
+  :   'pandemic' (the default from version `2.1.15`).
 
   search
 
@@ -203,8 +245,7 @@ For `bru_options` and `bru_options_set`, recognised options are:
 
       :   (fast approximate error norm minimisation)
 
-      To disable line search, set to an empty vector. Line search is not
-      available for `taylor="legacy"`.
+      To disable line search, set to an empty vector.
 
   factor
 

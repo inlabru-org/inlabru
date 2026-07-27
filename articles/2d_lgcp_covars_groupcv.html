@@ -8,8 +8,8 @@
 <title>LGCPs - Spatial covariates • inlabru</title>
 <!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="LGCPs - Spatial covariates">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.14.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.15.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
     <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
     <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/tidiers.html">Postprocessing tidiers</a></li>
     <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
@@ -62,9 +63,12 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_per_transect_covars.html">LGCPs - Distance sampling and per-transect covariates (work in progress)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model assessment</h6></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars_gcpo.html">LGCPs - Model comparison using Cross Validation</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sp.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -106,9 +110,9 @@
                         <h4 data-toc-skip class="author">David Borchers
 and Finn Lindgren and Hans Montcho</h4>
             
-            <h4 data-toc-skip class="date">Generated on 2026-05-26</h4>
+            <h4 data-toc-skip class="date">Generated on 2026-07-27</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_covars_groupcv.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_covars_groupcv.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/stable/vignettes/articles/2d_lgcp_covars_groupcv.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_covars_groupcv.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_covars_groupcv.Rmd</code></div>
     </div>
 
@@ -256,9 +260,9 @@ estimated abundance (there are really 647 nests there):</p>
 <span><span class="va">Lambda_veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit_veg</span>, <span class="va">ips</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Lambda_veg</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 646.4625 27.30658 602.7723 645.5679 699.7705 645.5679        3.085927</span></span>
+<span><span class="co">#&gt; 1 650.4316 27.80012 599.6772 652.7794 700.9583 652.7794        3.143283</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.776347</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1.816357</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="continuous-limit-of-waic">Continuous limit of WAIC<a class="anchor" aria-label="anchor" href="#continuous-limit-of-waic"></a>
@@ -298,17 +302,17 @@ estimated abundance (there are really 647 nests there):</p>
 <td align="left">DIC</td>
 <td align="left">Limit</td>
 <td align="right">1998.468</td>
-<td align="right">5.985724</td>
-<td align="right">-3984.965</td>
-<td align="right">0.5750789</td>
-<td align="right">0.2832260</td>
-<td align="right">1.7166098</td>
+<td align="right">6.324597</td>
+<td align="right">-3984.286</td>
+<td align="right">0.6000993</td>
+<td align="right">0.2989089</td>
+<td align="right">1.7980164</td>
 </tr>
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.534</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3945.309</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -318,7 +322,7 @@ estimated abundance (there are really 647 nests there):</p>
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.408</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3985.057</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -328,27 +332,27 @@ estimated abundance (there are really 647 nests there):</p>
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
 <td align="right">1998.468</td>
-<td align="right">5.870070</td>
-<td align="right">-3985.196</td>
-<td align="right">0.5750789</td>
-<td align="right">0.0216020</td>
-<td align="right">1.1933617</td>
+<td align="right">6.151312</td>
+<td align="right">-3984.633</td>
+<td align="right">0.6000993</td>
+<td align="right">0.0225973</td>
+<td align="right">1.2453931</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2121.954</td>
-<td align="right">11.219084</td>
-<td align="right">-4221.471</td>
-<td align="right">0.0998661</td>
-<td align="right">0.0874843</td>
-<td align="right">0.3747008</td>
+<td align="right">2121.944</td>
+<td align="right">11.912484</td>
+<td align="right">-4220.064</td>
+<td align="right">0.0898961</td>
+<td align="right">0.0870493</td>
+<td align="right">0.3538907</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.842</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3944.678</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -358,7 +362,7 @@ estimated abundance (there are really 647 nests there):</p>
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.716</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3984.425</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -424,9 +428,9 @@ that is not captured by the vegetation covariate, using an SPDE:</p>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda_veg_field</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 697.7221 27.58524 645.7022 694.8192 749.8137 694.8192        3.129071</span></span>
+<span><span class="co">#&gt; 1 693.8811 26.84132 653.4034 691.6396 756.2148 691.6396        3.098576</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.852736</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       2.07222</span></span></code></pre></div>
 <p>Look at the contributions to the linear predictor from the SPDE and
 from vegetation:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -500,9 +504,9 @@ Intercept, and choose between models on the basis of DIC, using
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda_field</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 691.4269 27.50113 647.2852 690.1967 746.5829 690.1967        3.133237</span></span>
+<span><span class="co">#&gt; 1 697.8443 31.31112 634.5819 698.0781 753.7081 698.0781        3.539308</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.915621</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      2.040983</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit_veg</span>, <span class="va">fit_veg_field</span>, <span class="va">fit_field</span>, criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DIC"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -519,13 +523,13 @@ Intercept, and choose between models on the basis of DIC, using
 </tr>
 <tr class="even">
 <td align="left">fit_field</td>
-<td align="right">-4876.515</td>
-<td align="right">20.76237</td>
+<td align="right">-4876.514</td>
+<td align="right">20.76282</td>
 </tr>
 <tr class="odd">
 <td align="left">fit_veg</td>
 <td align="right">-3945.309</td>
-<td align="right">951.96775</td>
+<td align="right">951.96773</td>
 </tr>
 </tbody>
 </table>
@@ -586,9 +590,9 @@ Intercept, and choose between models on the basis of DIC, using
 <tr class="odd">
 <td align="left">DIC</td>
 <td align="left">INLA</td>
-<td align="right">2547.124</td>
-<td align="right">108.866611</td>
-<td align="right">-4876.515</td>
+<td align="right">2547.125</td>
+<td align="right">108.867457</td>
+<td align="right">-4876.514</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -598,7 +602,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.534</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3945.309</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -609,7 +613,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">2558.934</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4897.277</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -619,42 +623,42 @@ Intercept, and choose between models on the basis of DIC, using
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">2555.206</td>
-<td align="right">298.040269</td>
-<td align="right">-4514.332</td>
-<td align="right">0.7088688</td>
-<td align="right">9.3094909</td>
-<td align="right">20.0367194</td>
+<td align="right">2555.073</td>
+<td align="right">277.976437</td>
+<td align="right">-4554.193</td>
+<td align="right">0.7162814</td>
+<td align="right">9.2935630</td>
+<td align="right">20.0196886</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">1998.466</td>
-<td align="right">5.991756</td>
-<td align="right">-3984.948</td>
-<td align="right">0.5939056</td>
-<td align="right">0.3523873</td>
-<td align="right">1.8925858</td>
+<td align="right">1998.467</td>
+<td align="right">6.139971</td>
+<td align="right">-3984.655</td>
+<td align="right">0.5865991</td>
+<td align="right">0.3520323</td>
+<td align="right">1.8772629</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">2567.836</td>
-<td align="right">265.633656</td>
-<td align="right">-4604.405</td>
-<td align="right">0.6927950</td>
-<td align="right">8.4495629</td>
-<td align="right">18.2847158</td>
+<td align="right">2567.577</td>
+<td align="right">291.946055</td>
+<td align="right">-4551.262</td>
+<td align="right">0.7162825</td>
+<td align="right">10.9132572</td>
+<td align="right">23.2590793</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2566.998</td>
-<td align="right">108.866611</td>
-<td align="right">-4916.262</td>
+<td align="right">108.867457</td>
+<td align="right">-4916.261</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -664,7 +668,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.408</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3985.057</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -675,7 +679,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2578.807</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4937.024</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -685,41 +689,41 @@ Intercept, and choose between models on the basis of DIC, using
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2409.482</td>
-<td align="right">34.060449</td>
-<td align="right">-4750.843</td>
-<td align="right">0.0860540</td>
-<td align="right">0.3100314</td>
-<td align="right">0.7921708</td>
+<td align="right">2409.438</td>
+<td align="right">35.009616</td>
+<td align="right">-4748.856</td>
+<td align="right">0.0859700</td>
+<td align="right">0.4281899</td>
+<td align="right">1.0283200</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2121.954</td>
-<td align="right">11.697353</td>
-<td align="right">-4220.514</td>
-<td align="right">0.1047337</td>
-<td align="right">0.0979878</td>
-<td align="right">0.4054430</td>
+<td align="right">2121.992</td>
+<td align="right">11.675990</td>
+<td align="right">-4220.633</td>
+<td align="right">0.0950495</td>
+<td align="right">0.0933871</td>
+<td align="right">0.3768733</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2410.068</td>
-<td align="right">33.651806</td>
-<td align="right">-4752.831</td>
-<td align="right">0.0851462</td>
-<td align="right">0.3888814</td>
-<td align="right">0.9480554</td>
+<td align="right">2409.988</td>
+<td align="right">34.389048</td>
+<td align="right">-4751.198</td>
+<td align="right">0.0851305</td>
+<td align="right">0.7331737</td>
+<td align="right">1.6366086</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
-<td align="right">2549.955</td>
-<td align="right">115.855484</td>
+<td align="right">2549.956</td>
+<td align="right">115.856274</td>
 <td align="right">-4868.199</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -730,7 +734,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.842</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3944.678</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -741,7 +745,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">2562.992</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4885.933</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -751,42 +755,42 @@ Intercept, and choose between models on the basis of DIC, using
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">2555.206</td>
-<td align="right">86.041181</td>
-<td align="right">-4938.330</td>
-<td align="right">0.7088688</td>
-<td align="right">0.1407531</td>
-<td align="right">1.6992438</td>
+<td align="right">2555.073</td>
+<td align="right">86.364276</td>
+<td align="right">-4937.417</td>
+<td align="right">0.7162814</td>
+<td align="right">0.1415581</td>
+<td align="right">1.7156789</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">1998.466</td>
-<td align="right">5.904429</td>
-<td align="right">-3985.123</td>
-<td align="right">0.5939056</td>
-<td align="right">0.0229845</td>
-<td align="right">1.2337802</td>
+<td align="right">1998.467</td>
+<td align="right">5.972027</td>
+<td align="right">-3984.991</td>
+<td align="right">0.5865991</td>
+<td align="right">0.0231775</td>
+<td align="right">1.2195532</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">2567.836</td>
-<td align="right">88.308440</td>
-<td align="right">-4959.055</td>
-<td align="right">0.6927950</td>
-<td align="right">0.1445060</td>
-<td align="right">1.6746021</td>
+<td align="right">2567.577</td>
+<td align="right">88.607722</td>
+<td align="right">-4957.939</td>
+<td align="right">0.7162825</td>
+<td align="right">0.1414027</td>
+<td align="right">1.7153703</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2569.829</td>
-<td align="right">115.855484</td>
-<td align="right">-4907.947</td>
+<td align="right">115.856274</td>
+<td align="right">-4907.946</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -796,7 +800,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.716</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3984.425</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -807,7 +811,7 @@ Intercept, and choose between models on the basis of DIC, using
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2582.865</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4925.681</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -934,8 +938,8 @@ complex cases.</p>
 <p>Summary and model selection</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_elev_field</span><span class="op">)</span></span>
-<span><span class="co">#&gt; inlabru version: 2.14.1 </span></span>
-<span><span class="co">#&gt; INLA version: 26.05.21 </span></span>
+<span><span class="co">#&gt; inlabru version: 2.15.0 </span></span>
+<span><span class="co">#&gt; INLA version: 26.06.08 </span></span>
 <span><span class="co">#&gt; Latent components:</span></span>
 <span><span class="co">#&gt; elev: main = linear(f.elev(.data.))</span></span>
 <span><span class="co">#&gt; field: main = spde(geometry)</span></span>
@@ -949,7 +953,7 @@ complex cases.</p>
 <span><span class="co">#&gt;     Additive/Linear/Rowwise: TRUE/TRUE/TRUE</span></span>
 <span><span class="co">#&gt;     Used components: effect[elev, field, Intercept], latent[] </span></span>
 <span><span class="co">#&gt; Time used:</span></span>
-<span><span class="co">#&gt;     Pre = 0.351, Running = 3.59, Post = 0.204, Total = 4.15 </span></span>
+<span><span class="co">#&gt;     Pre = 0.265, Running = 3.4, Post = 0.166, Total = 3.83 </span></span>
 <span><span class="co">#&gt; Fixed effects:</span></span>
 <span><span class="co">#&gt;             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">#&gt; elev       0.003 0.002      0.000    0.003      0.006  0.003   0</span></span>
@@ -978,9 +982,9 @@ complex cases.</p>
 <span><span class="fu"><a href="../reference/deltaIC.html">deltaIC</a></span><span class="op">(</span><span class="va">fit_veg</span>, <span class="va">fit_veg_field</span>, <span class="va">fit_field</span>, <span class="va">fit_elev_field</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            Model       DIC Delta.DIC</span></span>
 <span><span class="co">#&gt; 1  fit_veg_field -4897.277   0.00000</span></span>
-<span><span class="co">#&gt; 2 fit_elev_field -4877.038  20.23913</span></span>
-<span><span class="co">#&gt; 3      fit_field -4876.515  20.76237</span></span>
-<span><span class="co">#&gt; 4        fit_veg -3945.309 951.96775</span></span></code></pre></div>
+<span><span class="co">#&gt; 2 fit_elev_field -4877.038  20.23912</span></span>
+<span><span class="co">#&gt; 3      fit_field -4876.514  20.76282</span></span>
+<span><span class="co">#&gt; 4        fit_veg -3945.309 951.96773</span></span></code></pre></div>
 <p>New definitions:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IC_elev_field</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp_IC.html">lgcp_IC</a></span><span class="op">(</span></span>
@@ -1020,7 +1024,7 @@ complex cases.</p>
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">2549.924</td>
-<td align="right">111.405383</td>
+<td align="right">111.405421</td>
 <td align="right">-4877.038</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1030,9 +1034,9 @@ complex cases.</p>
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">INLA</td>
-<td align="right">2547.124</td>
-<td align="right">108.866611</td>
-<td align="right">-4876.515</td>
+<td align="right">2547.125</td>
+<td align="right">108.867457</td>
+<td align="right">-4876.514</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1042,7 +1046,7 @@ complex cases.</p>
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.534</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3945.309</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1053,7 +1057,7 @@ complex cases.</p>
 <td align="left">DIC</td>
 <td align="left">INLA</td>
 <td align="right">2558.934</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4897.277</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1063,52 +1067,52 @@ complex cases.</p>
 <tr class="odd">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">2558.272</td>
-<td align="right">293.692198</td>
-<td align="right">-4529.160</td>
-<td align="right">0.6970485</td>
-<td align="right">9.4116171</td>
-<td align="right">20.2173313</td>
+<td align="right">2558.447</td>
+<td align="right">280.293693</td>
+<td align="right">-4556.307</td>
+<td align="right">0.7222690</td>
+<td align="right">9.1449199</td>
+<td align="right">19.7343779</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">2555.206</td>
-<td align="right">298.040269</td>
-<td align="right">-4514.332</td>
-<td align="right">0.7088688</td>
-<td align="right">9.3094909</td>
-<td align="right">20.0367194</td>
+<td align="right">2555.073</td>
+<td align="right">277.976437</td>
+<td align="right">-4554.193</td>
+<td align="right">0.7162814</td>
+<td align="right">9.2935630</td>
+<td align="right">20.0196886</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">1998.466</td>
-<td align="right">5.991756</td>
-<td align="right">-3984.948</td>
-<td align="right">0.5939056</td>
-<td align="right">0.3523873</td>
-<td align="right">1.8925858</td>
+<td align="right">1998.467</td>
+<td align="right">6.139971</td>
+<td align="right">-3984.655</td>
+<td align="right">0.5865991</td>
+<td align="right">0.3520323</td>
+<td align="right">1.8772629</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">DIC</td>
 <td align="left">Limit</td>
-<td align="right">2567.836</td>
-<td align="right">265.633656</td>
-<td align="right">-4604.405</td>
-<td align="right">0.6927950</td>
-<td align="right">8.4495629</td>
-<td align="right">18.2847158</td>
+<td align="right">2567.577</td>
+<td align="right">291.946055</td>
+<td align="right">-4551.262</td>
+<td align="right">0.7162825</td>
+<td align="right">10.9132572</td>
+<td align="right">23.2590793</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2569.798</td>
-<td align="right">111.405383</td>
+<td align="right">111.405421</td>
 <td align="right">-4916.785</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1119,8 +1123,8 @@ complex cases.</p>
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2566.998</td>
-<td align="right">108.866611</td>
-<td align="right">-4916.262</td>
+<td align="right">108.867457</td>
+<td align="right">-4916.261</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1130,7 +1134,7 @@ complex cases.</p>
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.408</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3985.057</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1141,7 +1145,7 @@ complex cases.</p>
 <td align="left">DIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2578.807</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4937.024</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1151,52 +1155,52 @@ complex cases.</p>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2409.613</td>
-<td align="right">34.641116</td>
-<td align="right">-4749.945</td>
-<td align="right">0.0858771</td>
-<td align="right">0.3517601</td>
-<td align="right">0.8752744</td>
+<td align="right">2409.727</td>
+<td align="right">35.005531</td>
+<td align="right">-4749.444</td>
+<td align="right">0.0856589</td>
+<td align="right">0.3797570</td>
+<td align="right">0.9308318</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2409.482</td>
-<td align="right">34.060449</td>
-<td align="right">-4750.843</td>
-<td align="right">0.0860540</td>
-<td align="right">0.3100314</td>
-<td align="right">0.7921708</td>
+<td align="right">2409.438</td>
+<td align="right">35.009616</td>
+<td align="right">-4748.856</td>
+<td align="right">0.0859700</td>
+<td align="right">0.4281899</td>
+<td align="right">1.0283200</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2121.954</td>
-<td align="right">11.697353</td>
-<td align="right">-4220.514</td>
-<td align="right">0.1047337</td>
-<td align="right">0.0979878</td>
-<td align="right">0.4054430</td>
+<td align="right">2121.992</td>
+<td align="right">11.675990</td>
+<td align="right">-4220.633</td>
+<td align="right">0.0950495</td>
+<td align="right">0.0933871</td>
+<td align="right">0.3768733</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Blockwise</td>
-<td align="right">2410.068</td>
-<td align="right">33.651806</td>
-<td align="right">-4752.831</td>
-<td align="right">0.0851462</td>
-<td align="right">0.3888814</td>
-<td align="right">0.9480554</td>
+<td align="right">2409.988</td>
+<td align="right">34.389048</td>
+<td align="right">-4751.198</td>
+<td align="right">0.0851305</td>
+<td align="right">0.7331737</td>
+<td align="right">1.6366086</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">2552.901</td>
-<td align="right">118.775592</td>
+<td align="right">118.775628</td>
 <td align="right">-4868.250</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1206,8 +1210,8 @@ complex cases.</p>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
-<td align="right">2549.955</td>
-<td align="right">115.855484</td>
+<td align="right">2549.956</td>
+<td align="right">115.856274</td>
 <td align="right">-4868.199</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1218,7 +1222,7 @@ complex cases.</p>
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">1978.842</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3944.678</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1229,7 +1233,7 @@ complex cases.</p>
 <td align="left">WAIC</td>
 <td align="left">INLA</td>
 <td align="right">2562.992</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4885.933</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1239,52 +1243,52 @@ complex cases.</p>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">2558.272</td>
-<td align="right">88.327854</td>
-<td align="right">-4939.889</td>
-<td align="right">0.6970485</td>
-<td align="right">0.1425597</td>
-<td align="right">1.6792166</td>
+<td align="right">2558.447</td>
+<td align="right">88.429743</td>
+<td align="right">-4940.035</td>
+<td align="right">0.7222690</td>
+<td align="right">0.1445588</td>
+<td align="right">1.7336557</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">2555.206</td>
-<td align="right">86.041181</td>
-<td align="right">-4938.330</td>
-<td align="right">0.7088688</td>
-<td align="right">0.1407531</td>
-<td align="right">1.6992438</td>
+<td align="right">2555.073</td>
+<td align="right">86.364276</td>
+<td align="right">-4937.417</td>
+<td align="right">0.7162814</td>
+<td align="right">0.1415581</td>
+<td align="right">1.7156789</td>
 <td align="left">field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">1998.466</td>
-<td align="right">5.904429</td>
-<td align="right">-3985.123</td>
-<td align="right">0.5939056</td>
-<td align="right">0.0229845</td>
-<td align="right">1.2337802</td>
+<td align="right">1998.467</td>
+<td align="right">5.972027</td>
+<td align="right">-3984.991</td>
+<td align="right">0.5865991</td>
+<td align="right">0.0231775</td>
+<td align="right">1.2195532</td>
 <td align="left">veg</td>
 </tr>
 <tr class="even">
 <td align="left">WAIC</td>
 <td align="left">Limit</td>
-<td align="right">2567.836</td>
-<td align="right">88.308440</td>
-<td align="right">-4959.055</td>
-<td align="right">0.6927950</td>
-<td align="right">0.1445060</td>
-<td align="right">1.6746021</td>
+<td align="right">2567.577</td>
+<td align="right">88.607722</td>
+<td align="right">-4957.939</td>
+<td align="right">0.7162825</td>
+<td align="right">0.1414027</td>
+<td align="right">1.7153703</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="odd">
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
-<td align="right">2572.774</td>
-<td align="right">118.775592</td>
+<td align="right">2572.775</td>
+<td align="right">118.775628</td>
 <td align="right">-4907.998</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1295,8 +1299,8 @@ complex cases.</p>
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2569.829</td>
-<td align="right">115.855484</td>
-<td align="right">-4907.947</td>
+<td align="right">115.856274</td>
+<td align="right">-4907.946</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1306,7 +1310,7 @@ complex cases.</p>
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">1998.716</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3984.425</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1317,7 +1321,7 @@ complex cases.</p>
 <td align="left">WAIC_adjusted</td>
 <td align="left">INLA</td>
 <td align="right">2582.865</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4925.681</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -1360,7 +1364,7 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC</td>
 <td align="right">2558.934</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4897.277</td>
 <td align="right">0.000000</td>
 <td align="right">NA</td>
@@ -1370,19 +1374,19 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC</td>
 <td align="right">2549.924</td>
-<td align="right">111.405383</td>
+<td align="right">111.405421</td>
 <td align="right">-4877.038</td>
-<td align="right">20.239125</td>
+<td align="right">20.239117</td>
 <td align="right">NA</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="odd">
 <td align="left">INLA</td>
 <td align="left">DIC</td>
-<td align="right">2547.124</td>
-<td align="right">108.866611</td>
-<td align="right">-4876.515</td>
-<td align="right">20.762366</td>
+<td align="right">2547.125</td>
+<td align="right">108.867457</td>
+<td align="right">-4876.514</td>
+<td align="right">20.762818</td>
 <td align="right">NA</td>
 <td align="left">field</td>
 </tr>
@@ -1390,57 +1394,57 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC</td>
 <td align="right">1978.534</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3945.309</td>
-<td align="right">951.967750</td>
+<td align="right">951.967729</td>
 <td align="right">NA</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">Limit</td>
 <td align="left">DIC</td>
-<td align="right">2567.836</td>
-<td align="right">265.633656</td>
-<td align="right">-4604.405</td>
+<td align="right">2558.447</td>
+<td align="right">280.293693</td>
+<td align="right">-4556.307</td>
 <td align="right">0.000000</td>
-<td align="right">18.2847158</td>
+<td align="right">19.7343779</td>
+<td align="left">elev + field</td>
+</tr>
+<tr class="even">
+<td align="left">Limit</td>
+<td align="left">DIC</td>
+<td align="right">2555.073</td>
+<td align="right">277.976437</td>
+<td align="right">-4554.193</td>
+<td align="right">2.113799</td>
+<td align="right">20.0196886</td>
+<td align="left">field</td>
+</tr>
+<tr class="odd">
+<td align="left">Limit</td>
+<td align="left">DIC</td>
+<td align="right">2567.577</td>
+<td align="right">291.946055</td>
+<td align="right">-4551.262</td>
+<td align="right">5.044637</td>
+<td align="right">23.2590793</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="even">
 <td align="left">Limit</td>
 <td align="left">DIC</td>
-<td align="right">2558.272</td>
-<td align="right">293.692198</td>
-<td align="right">-4529.160</td>
-<td align="right">75.244421</td>
-<td align="right">20.2173313</td>
-<td align="left">elev + field</td>
-</tr>
-<tr class="odd">
-<td align="left">Limit</td>
-<td align="left">DIC</td>
-<td align="right">2555.206</td>
-<td align="right">298.040269</td>
-<td align="right">-4514.332</td>
-<td align="right">90.073203</td>
-<td align="right">20.0367194</td>
-<td align="left">field</td>
-</tr>
-<tr class="even">
-<td align="left">Limit</td>
-<td align="left">DIC</td>
-<td align="right">1998.466</td>
-<td align="right">5.991756</td>
-<td align="right">-3984.948</td>
-<td align="right">619.456982</td>
-<td align="right">1.8925858</td>
+<td align="right">1998.467</td>
+<td align="right">6.139971</td>
+<td align="right">-3984.655</td>
+<td align="right">571.651762</td>
+<td align="right">1.8772629</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">INLA</td>
 <td align="left">DIC_adjusted</td>
 <td align="right">2578.807</td>
-<td align="right">110.295089</td>
+<td align="right">110.295110</td>
 <td align="right">-4937.024</td>
 <td align="right">0.000000</td>
 <td align="right">NA</td>
@@ -1450,9 +1454,9 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC_adjusted</td>
 <td align="right">2569.798</td>
-<td align="right">111.405383</td>
+<td align="right">111.405421</td>
 <td align="right">-4916.785</td>
-<td align="right">20.239125</td>
+<td align="right">20.239117</td>
 <td align="right">NA</td>
 <td align="left">elev + field</td>
 </tr>
@@ -1460,9 +1464,9 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC_adjusted</td>
 <td align="right">2566.998</td>
-<td align="right">108.866611</td>
-<td align="right">-4916.262</td>
-<td align="right">20.762366</td>
+<td align="right">108.867457</td>
+<td align="right">-4916.261</td>
+<td align="right">20.762818</td>
 <td align="right">NA</td>
 <td align="left">field</td>
 </tr>
@@ -1470,57 +1474,57 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">DIC_adjusted</td>
 <td align="right">1998.408</td>
-<td align="right">5.879493</td>
+<td align="right">5.879491</td>
 <td align="right">-3985.057</td>
-<td align="right">951.967750</td>
+<td align="right">951.967729</td>
 <td align="right">NA</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">Blockwise</td>
 <td align="left">WAIC</td>
-<td align="right">2410.068</td>
-<td align="right">33.651806</td>
-<td align="right">-4752.831</td>
+<td align="right">2409.988</td>
+<td align="right">34.389048</td>
+<td align="right">-4751.198</td>
 <td align="right">0.000000</td>
-<td align="right">0.9480554</td>
+<td align="right">1.6366086</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="even">
 <td align="left">Blockwise</td>
 <td align="left">WAIC</td>
-<td align="right">2409.482</td>
-<td align="right">34.060449</td>
-<td align="right">-4750.843</td>
-<td align="right">1.988454</td>
-<td align="right">0.7921708</td>
-<td align="left">field</td>
+<td align="right">2409.727</td>
+<td align="right">35.005531</td>
+<td align="right">-4749.444</td>
+<td align="right">1.754413</td>
+<td align="right">0.9308318</td>
+<td align="left">elev + field</td>
 </tr>
 <tr class="odd">
 <td align="left">Blockwise</td>
 <td align="left">WAIC</td>
-<td align="right">2409.613</td>
-<td align="right">34.641116</td>
-<td align="right">-4749.945</td>
-<td align="right">2.886782</td>
-<td align="right">0.8752744</td>
-<td align="left">elev + field</td>
+<td align="right">2409.438</td>
+<td align="right">35.009616</td>
+<td align="right">-4748.856</td>
+<td align="right">2.342097</td>
+<td align="right">1.0283200</td>
+<td align="left">field</td>
 </tr>
 <tr class="even">
 <td align="left">Blockwise</td>
 <td align="left">WAIC</td>
-<td align="right">2121.954</td>
-<td align="right">11.697353</td>
-<td align="right">-4220.514</td>
-<td align="right">532.317527</td>
-<td align="right">0.4054430</td>
+<td align="right">2121.992</td>
+<td align="right">11.675990</td>
+<td align="right">-4220.633</td>
+<td align="right">530.565306</td>
+<td align="right">0.3768733</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">INLA</td>
 <td align="left">WAIC</td>
 <td align="right">2562.992</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4885.933</td>
 <td align="right">0.000000</td>
 <td align="right">NA</td>
@@ -1530,19 +1534,19 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">WAIC</td>
 <td align="right">2552.901</td>
-<td align="right">118.775592</td>
+<td align="right">118.775628</td>
 <td align="right">-4868.250</td>
-<td align="right">17.682903</td>
+<td align="right">17.682901</td>
 <td align="right">NA</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="odd">
 <td align="left">INLA</td>
 <td align="left">WAIC</td>
-<td align="right">2549.955</td>
-<td align="right">115.855484</td>
+<td align="right">2549.956</td>
+<td align="right">115.856274</td>
 <td align="right">-4868.199</td>
-<td align="right">17.734139</td>
+<td align="right">17.734570</td>
 <td align="right">NA</td>
 <td align="left">field</td>
 </tr>
@@ -1550,57 +1554,57 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">WAIC</td>
 <td align="right">1978.842</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3944.678</td>
-<td align="right">941.255218</td>
+<td align="right">941.255206</td>
 <td align="right">NA</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">Limit</td>
 <td align="left">WAIC</td>
-<td align="right">2567.836</td>
-<td align="right">88.308440</td>
-<td align="right">-4959.055</td>
+<td align="right">2567.577</td>
+<td align="right">88.607722</td>
+<td align="right">-4957.939</td>
 <td align="right">0.000000</td>
-<td align="right">1.6746021</td>
+<td align="right">1.7153703</td>
 <td align="left">veg + field</td>
 </tr>
 <tr class="even">
 <td align="left">Limit</td>
 <td align="left">WAIC</td>
-<td align="right">2558.272</td>
-<td align="right">88.327854</td>
-<td align="right">-4939.889</td>
-<td align="right">19.166164</td>
-<td align="right">1.6792166</td>
+<td align="right">2558.447</td>
+<td align="right">88.429743</td>
+<td align="right">-4940.035</td>
+<td align="right">17.904129</td>
+<td align="right">1.7336557</td>
 <td align="left">elev + field</td>
 </tr>
 <tr class="odd">
 <td align="left">Limit</td>
 <td align="left">WAIC</td>
-<td align="right">2555.206</td>
-<td align="right">86.041181</td>
-<td align="right">-4938.330</td>
-<td align="right">20.725458</td>
-<td align="right">1.6992438</td>
+<td align="right">2555.073</td>
+<td align="right">86.364276</td>
+<td align="right">-4937.417</td>
+<td align="right">20.521506</td>
+<td align="right">1.7156789</td>
 <td align="left">field</td>
 </tr>
 <tr class="even">
 <td align="left">Limit</td>
 <td align="left">WAIC</td>
-<td align="right">1998.466</td>
-<td align="right">5.904429</td>
-<td align="right">-3985.123</td>
-<td align="right">973.932757</td>
-<td align="right">1.2337802</td>
+<td align="right">1998.467</td>
+<td align="right">5.972027</td>
+<td align="right">-3984.991</td>
+<td align="right">972.947903</td>
+<td align="right">1.2195532</td>
 <td align="left">veg</td>
 </tr>
 <tr class="odd">
 <td align="left">INLA</td>
 <td align="left">WAIC_adjusted</td>
 <td align="right">2582.865</td>
-<td align="right">120.025069</td>
+<td align="right">120.025081</td>
 <td align="right">-4925.681</td>
 <td align="right">0.000000</td>
 <td align="right">NA</td>
@@ -1609,10 +1613,10 @@ complex cases.</p>
 <tr class="even">
 <td align="left">INLA</td>
 <td align="left">WAIC_adjusted</td>
-<td align="right">2572.774</td>
-<td align="right">118.775592</td>
+<td align="right">2572.775</td>
+<td align="right">118.775628</td>
 <td align="right">-4907.998</td>
-<td align="right">17.682903</td>
+<td align="right">17.682901</td>
 <td align="right">NA</td>
 <td align="left">elev + field</td>
 </tr>
@@ -1620,9 +1624,9 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">WAIC_adjusted</td>
 <td align="right">2569.829</td>
-<td align="right">115.855484</td>
-<td align="right">-4907.947</td>
-<td align="right">17.734139</td>
+<td align="right">115.856274</td>
+<td align="right">-4907.946</td>
+<td align="right">17.734570</td>
 <td align="right">NA</td>
 <td align="left">field</td>
 </tr>
@@ -1630,9 +1634,9 @@ complex cases.</p>
 <td align="left">INLA</td>
 <td align="left">WAIC_adjusted</td>
 <td align="right">1998.716</td>
-<td align="right">6.502853</td>
+<td align="right">6.502851</td>
 <td align="right">-3984.425</td>
-<td align="right">941.255218</td>
+<td align="right">941.255206</td>
 <td align="right">NA</td>
 <td align="left">veg</td>
 </tr>
@@ -1721,9 +1725,9 @@ this.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda_elev_field</span></span>
 <span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 696.7061 29.18071 642.3962 691.8045 753.9026 691.8045        3.292922</span></span>
+<span><span class="co">#&gt; 1 695.5474 29.34504 636.4544 697.4044 753.2339 697.4044          3.3367</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.874256</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       2.01098</span></span></code></pre></div>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">fit_elev_field</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">flist</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1759,10 +1763,10 @@ easier plotting.</p>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">field</span> <span class="op">+</span> <span class="va">elev</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">Lambda_elev_field</span></span>
-<span><span class="co">#&gt;       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err</span></span>
-<span><span class="co">#&gt; 1 696.8457 27.06356 650.5211 696.4721 753.7444 696.4721        3.104214</span></span>
+<span><span class="co">#&gt;       mean       sd   q0.025    q0.5   q0.975  median mean.mc_std_err</span></span>
+<span><span class="co">#&gt; 1 695.0666 26.94285 650.0671 693.883 747.1842 693.883        3.020236</span></span>
 <span><span class="co">#&gt;   sd.mc_std_err</span></span>
-<span><span class="co">#&gt; 1      1.989287</span></span>
+<span><span class="co">#&gt; 1      1.629755</span></span>
 <span></span>
 <span><span class="va">Nest_elev_field</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_elev_field</span>,</span>
@@ -1914,7 +1918,7 @@ adding the covariate to the model specification.)</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

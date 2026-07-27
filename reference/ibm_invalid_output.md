@@ -67,6 +67,12 @@ ibm_invalid_output(mapper, input, state, multi = FALSE, ...)
 
   logical; If `TRUE` (or positive), recurse one level into sub-mappers
 
+## Value
+
+A logical vector of length `ibm_n_output(mapper, input, state, ...)`
+indicating which, if any, output elements of
+`ibm_eval(mapper, input, state, ...)` are known to be invalid.
+
 ## Methods (by class)
 
 - `ibm_invalid_output(default)`: Returns an all-`FALSE` logical vector.
@@ -109,15 +115,24 @@ ibm_invalid_output(mapper, input, state, multi = FALSE, ...)
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md),
 [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+
+## Examples
+
+``` r
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_invalid_output(m, input = list(A = 1, B = 2), state = c(1, 2))
+#>    NA    NA 
+#> FALSE FALSE 
+```

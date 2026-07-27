@@ -70,6 +70,10 @@ x[i]
 
   indices specifying elements to extract
 
+## Value
+
+A `bru_comp_list` object, which is a named list of `bru_comp` objects.
+
 ## Methods (by class)
 
 - `bru_comp_list(formula)`: Convert a component formula into a
@@ -102,9 +106,6 @@ x[i]
 Other component constructors:
 [`bru_comp()`](https://inlabru-org.github.io/inlabru/reference/bru_comp.md)
 
-Other component constructors:
-[`bru_comp()`](https://inlabru-org.github.io/inlabru/reference/bru_comp.md)
-
 ## Author
 
 Fabian E. Bachl <bachlfab@gmail.com> and Finn Lindgren
@@ -122,7 +123,7 @@ eff <- bru_comp_list(~ myLinearEffectOfX(main = x, model = "linear"))
 summary(eff[[1]])
 #> Label:   myLinearEffectOfX 
 #>   Type:  main = linear 
-#>   Map:   pipe = multi(main = autodetect(x)) 
+#>   Map:   pipe = multi(main = {autodetect(x)}) 
 #>   INLA formula:  
 #>     ~ . + f(myLinearEffectOfX, model =
 #>       BRU_myLinearEffectOfX_main_model) 

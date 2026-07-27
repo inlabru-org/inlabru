@@ -23,14 +23,14 @@ bru_index(object, tag = NULL, what = NULL, ...)
 # S3 method for class 'bru_info'
 bru_index(object, tag = NULL, what = NULL, ...)
 
+# S3 method for class 'bru_model'
+bru_index(object, used, ...)
+
 # S3 method for class 'bru_comp'
 bru_index(object, inla_f, ...)
 
 # S3 method for class 'bru_comp_list'
 bru_index(object, inla_f, ...)
-
-# S3 method for class 'bru_model'
-bru_index(object, used, ...)
 
 index_eval(...)
 ```
@@ -64,17 +64,17 @@ index_eval(...)
   specification order. If `NULL` (default) computes indices for all
   sub-models.
 
-- inla_f:
-
-  logical; when `TRUE`, must result in values compatible with
-  `INLA::f(...)` an specification and corresponding
-  `INLA::inla.stack(...)` constructions.
-
 - used:
 
   A
   [`bru_used()`](https://inlabru-org.github.io/inlabru/reference/bru_used.md)
   object
+
+- inla_f:
+
+  logical; when `TRUE`, must result in values compatible with
+  `INLA::f(...)` an specification and corresponding
+  `INLA::inla.stack(...)` constructions.
 
 ## Value
 
@@ -94,6 +94,14 @@ index_eval(...)
 
 &nbsp;
 
+- `bru_index(bru_model)`: A named list of `idx_full` and `idx_inla`,
+  named list of indices, and `inla_subset`, and `inla_subset`, a named
+  list of logical subset specifications for extracting the
+  [`INLA::f()`](https://rdrr.io/pkg/INLA/man/f.html) compatible index
+  subsets.
+
+&nbsp;
+
 - `bru_index(bru_comp)`: A list of indices into the latent variables
   compatible with the component mapper.
 
@@ -101,14 +109,6 @@ index_eval(...)
 
 - `bru_index(bru_comp_list)`: A list of list of indices into the latent
   variables compatible with each component mapper.
-
-&nbsp;
-
-- `bru_index(bru_model)`: A named list of `idx_full` and `idx_inla`,
-  named list of indices, and `inla_subset`, and `inla_subset`, a named
-  list of logical subset specifications for extracting the
-  [`INLA::f()`](https://rdrr.io/pkg/INLA/man/f.html) compatible index
-  subsets.
 
 ## Methods (by class)
 

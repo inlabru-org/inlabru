@@ -25,7 +25,7 @@ Functions for constructing models and performing estimation.
   [`bru_like_list()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
   :
 
-  Observation model construction for usage with
+  Observation model construction for
   [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
 
 - [`bru_options()`](https://inlabru-org.github.io/inlabru/reference/bru_options.md)
@@ -83,10 +83,10 @@ Functions for evaluating posterior properties.
 - [`bru_names()`](https://inlabru-org.github.io/inlabru/reference/bru_names.md)
   : Extract standardised names from a bru or inla result object
 
-- [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
-  : Generate samples from fitted bru models
+- [`generate(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+  : Sampling based on bru posteriors
 
-- [`predict(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+- [`predict(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/predict.md)
   : Prediction from fitted bru model
 
 - [`spde.posterior()`](https://inlabru-org.github.io/inlabru/reference/spde.posterior.md)
@@ -101,10 +101,32 @@ Functions for evaluating posterior properties.
 - [`devel.cvmeasure()`](https://inlabru-org.github.io/inlabru/reference/devel.cvmeasure.md)
   : Variance and correlations measures for prediction components
 
+- [`bru_block_gcpo()`](https://inlabru-org.github.io/inlabru/reference/bru_block_gcpo.md)
+  : Extract block-averaged GCPO scores from one or more fitted bru
+  models
+
+- [`bru_gcpo_table()`](https://inlabru-org.github.io/inlabru/reference/bru_gcpo_table.md)
+  : Compare block-averaged GCPO scores across multiple fitted bru models
+
+## Advanced interface functions
+
+Lower level functions for advanced model construction and evaluation.
+
+- [`bru_state()`](https://inlabru-org.github.io/inlabru/reference/bru_state.md)
+  : Extract model state properties or samples
+- [`bru_eval()`](https://inlabru-org.github.io/inlabru/reference/bru_eval.md)
+  : Evaluate or sample from a posterior result given a model and
+  locations
+
 ## Optimization log information
 
 Accessing the optimization text log, and plotting the optimization
 convergence.
+
+- [`new_bru_log()`](https://inlabru-org.github.io/inlabru/reference/new_bru_log.md)
+  :
+
+  Create a `bru_log` object
 
 - [`bru_log()`](https://inlabru-org.github.io/inlabru/reference/bru_log.md)
   [`format(`*`<bru_log>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_log.md)
@@ -127,11 +149,6 @@ convergence.
   [`bru_log_abort()`](https://inlabru-org.github.io/inlabru/reference/bru_log_message.md)
   [`bru_log_warn()`](https://inlabru-org.github.io/inlabru/reference/bru_log_message.md)
   : Add a log message
-
-- [`bru_log_new()`](https://inlabru-org.github.io/inlabru/reference/bru_log_new.md)
-  :
-
-  Create a `bru_log` object
 
 - [`bru_log_offset()`](https://inlabru-org.github.io/inlabru/reference/bru_log_offset.md)
   [`bru_log_index()`](https://inlabru-org.github.io/inlabru/reference/bru_log_offset.md)
@@ -172,6 +189,7 @@ Functions for extracting or querying properties of objects.
 
 - [`bru_info()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`as_bru_info()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
+  [`as_bru_model()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`summary(`*`<bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`print(`*`<summary_bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`print(`*`<bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
@@ -217,6 +235,9 @@ Functions for `bru_mapper` handling.
 - [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md)
   [`bru_mapper_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md)
   : Constant mapper
+
+- [`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md)
+  : Mapper for general expressions
 
 - [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md)
   [`bru_mapper_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md)
@@ -316,23 +337,81 @@ Functions for `bru_mapper` handling.
 - [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md)
   : Generic methods for bru_mapper objects
 
-- [`ibm_linear(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_linear(`*`<bru_comp_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_simplify(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_simplify(`*`<bru_comp>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_simplify(`*`<bru_comp_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_linear(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  [`ibm_simplify(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
-  : Mapper methods for model objects
+- [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md)
+  : Size of the latent vector of a mapping
+
+- [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md)
+  : Output size of a mapping
 
 - [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md)
   : Evaluate a mapping
 
+- [`ibm_eval(`*`<bm_taylor>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_const>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_shift>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_scale>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_aggregate>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_logsumexp>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_logitaverage>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_marginal>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_pipe>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_multi>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_reparam>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_collect>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_expr>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_repeat>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  [`ibm_eval(`*`<bm_sum>`*`)`](https://inlabru-org.github.io/inlabru/reference/ibm_eval_methods.md)
+  :
+
+  Specific `ibm_eval` method implementations
+
+- [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md)
+  : Jacobian of a mapper
+
 - [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md)
   : Evaluate a mapper and its Jacobian
 
+- [`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md)
+  : Compute a mapper linearisation
+
+- [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md)
+  : Simplify a mapper
+
+- [`ibm_as_taylor(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_as_taylor(`*`<bru_comp_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_simplify(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_simplify(`*`<bru_comp>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_simplify(`*`<bru_comp_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_as_taylor(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_simplify(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval2(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_jacobian(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval2(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval(`*`<bru_comp_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval(`*`<bru_comp>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_eval(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  [`ibm_jacobian(`*`<bru_model>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_model_mapper_methods.md)
+  : Mapper methods for model objects
+
+- [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+  : Value vector for a mapping
+
+- [`ibm_invalid_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_invalid_output.md)
+  : Detect invalid input to a mapper
+
 - [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md)
   : Find index subset of INLA visible states
+
+- [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md)
+  [`` `ibm_names<-`() ``](https://inlabru-org.github.io/inlabru/reference/ibm_names.md)
+  : Names of submapper
+
+- [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md)
+  : Check if a mapper is linear/affine
+
+- [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md)
+  : Check if a mapper is rowwise
 
 - [`ibm_input_set()`](https://inlabru-org.github.io/inlabru/reference/ibm_input.md)
   [`ibm_input_new()`](https://inlabru-org.github.io/inlabru/reference/ibm_input.md)
@@ -342,37 +421,6 @@ Functions for `bru_mapper` handling.
   :
 
   Interface between `bru_input` and `bru_mapper`
-
-- [`ibm_invalid_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_invalid_output.md)
-  : Detect invalid input to a mapper
-
-- [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md)
-  : Check if a mapper is linear/affine
-
-- [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md)
-  : Check if a mapper is rowwise
-
-- [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md)
-  : Jacobian of a mapper
-
-- [`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md)
-  : Compute a mapper linearisation
-
-- [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md)
-  : Size of the latent vector of a mapping
-
-- [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md)
-  : Output size of a mapping
-
-- [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md)
-  [`` `ibm_names<-`() ``](https://inlabru-org.github.io/inlabru/reference/ibm_names.md)
-  : Names of submapper
-
-- [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md)
-  : Simplify a mapper
-
-- [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
-  : Value vector for a mapping
 
 ### Conversion and helper methods
 
@@ -458,6 +506,7 @@ Functions for printing.
   [`print(`*`<summary_bru_mapper>`*`)`](https://inlabru-org.github.io/inlabru/reference/bm_summary.md)
   [`print(`*`<bru_mapper>`*`)`](https://inlabru-org.github.io/inlabru/reference/bm_summary.md)
   [`print(`*`<bm_list>`*`)`](https://inlabru-org.github.io/inlabru/reference/bm_summary.md)
+  [`format(`*`<bm_expr>`*`)`](https://inlabru-org.github.io/inlabru/reference/bm_summary.md)
   : mapper object summaries
 
 - [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
@@ -469,6 +518,7 @@ Functions for printing.
 
 - [`bru_info()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`as_bru_info()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
+  [`as_bru_model()`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`summary(`*`<bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`print(`*`<summary_bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
   [`print(`*`<bru_info>`*`)`](https://inlabru-org.github.io/inlabru/reference/bru_info.md)
@@ -549,6 +599,9 @@ Helper functions for more low level operations.
   [`evaluate_inputs()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
   [`gmap()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
   [`gm()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
+  [`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
+  [`bm_mesh_B()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
+  [`bru_mapper_mesh_B()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
   [`row_kron()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
   : Deprecated functions in inlabru
 
@@ -586,6 +639,17 @@ Helper functions for more low level operations.
 
 - [`bru_is_additive()`](https://inlabru-org.github.io/inlabru/reference/bru_is_additive.md)
   : Check for predictor expression additivity
+
+## Tidy postprocessing
+
+Helper functions for ‘tidy’ postprocessing.
+
+- [`tidy(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/tidy.bru.md)
+  : Extract a bru model fit into a tidy tibble
+- [`glance(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/glance.bru.md)
+  : Glance at a bru model fit
+- [`augment(`*`<bru>`*`)`](https://inlabru-org.github.io/inlabru/reference/augment.bru.md)
+  : Augment a bru model fit with fitted values
 
 ## Deprecated methods
 

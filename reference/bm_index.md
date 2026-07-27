@@ -1,6 +1,6 @@
 # Mapper for indexed variables
 
-Create a an indexing mapper
+Create an indexing mapper
 
 ## Usage
 
@@ -20,6 +20,10 @@ bru_mapper_index(...)
 
   Arguments passed on to `bm_index()`
 
+## Value
+
+A `bm_index` mapper object.
+
 ## See also
 
 [bru_mapper](https://inlabru-org.github.io/inlabru/reference/bru_mapper.md),
@@ -29,6 +33,7 @@ Other mappers:
 [`bm_aggregate()`](https://inlabru-org.github.io/inlabru/reference/bm_aggregate.md),
 [`bm_collect()`](https://inlabru-org.github.io/inlabru/reference/bm_collect.md),
 [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md),
+[`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md),
 [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md),
 [`bm_fm_mesh_1d`](https://inlabru-org.github.io/inlabru/reference/bm_fm_mesh_1d.md),
 [`bm_fmesher()`](https://inlabru-org.github.io/inlabru/reference/bm_fmesher.md),

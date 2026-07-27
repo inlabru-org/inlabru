@@ -1,29 +1,27 @@
-# Generate samples from fitted bru models
-
-Generic function for sampling for fitted models. The function invokes
-particular methods which depend on the class of the first argument.
+# Sampling based on bru posteriors
 
 Takes a fitted `bru` object produced by the function
 [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md) and
 produces samples given a new set of values for the model covariates or
 the original values used for the model fit. The samples can be based on
 any R expression that is valid given these values/covariates and the
-joint posterior of the estimated random effects.
+joint posterior of the estimated random effects. Called via the
+[`generics::generate()`](https://generics.r-lib.org/reference/generate.html)
+generic.
 
 ## Usage
 
 ``` r
-generate(object, ...)
-
 # S3 method for class 'bru'
 generate(
-  object,
+  x,
   newdata = NULL,
   formula = NULL,
   n.samples = 100,
   seed = 0L,
   num.threads = NULL,
   used = NULL,
+  options = NULL,
   ...,
   include = deprecated(),
   exclude = deprecated()
@@ -32,14 +30,10 @@ generate(
 
 ## Arguments
 
-- object:
+- x:
 
   A `bru` object obtained by calling
   [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md).
-
-- ...:
-
-  additional, unused arguments.
 
 - newdata:
 
@@ -77,6 +71,17 @@ generate(
   object. Default, `NULL`, uses auto-detection of used variables in the
   formula.
 
+- options:
+
+  A
+  [bru_options](https://inlabru-org.github.io/inlabru/reference/bru_options.md)
+  options object or a list of options passed on to
+  [`bru_options()`](https://inlabru-org.github.io/inlabru/reference/bru_options.md)
+
+- ...:
+
+  additional, unused arguments.
+
 - include, exclude:
 
   **\[deprecated\]** If auto-detection of used variables fails, use
@@ -84,11 +89,11 @@ generate(
 
 ## Value
 
-The form of the value returned by `generate()` depends on the data class
-and prediction formula. Normally, a data.frame is returned, or a list of
-data.frames (if the prediction formula generates a list)
-
-List of generated samples
+The form of the value returned by
+[`generate()`](https://generics.r-lib.org/reference/generate.html)
+depends on the data class and prediction formula. Normally, a data.frame
+is returned, or a list of data.frames (if the prediction formula
+generates a list)
 
 ## Details
 
@@ -108,7 +113,7 @@ realisations for indices greater than `n`, if accessed via
 
 ## See also
 
-[predict.bru](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+[`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.md)
 
 ## Examples
 

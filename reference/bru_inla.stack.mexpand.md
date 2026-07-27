@@ -33,7 +33,7 @@ bru_inla.stack.mexpand(
 
 ## Value
 
-a list of modified stacks with multicolumn observations
+A list of modified stacks with multicolumn observations
 
 ## Author
 

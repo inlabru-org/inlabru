@@ -26,6 +26,13 @@ ibm_inla_subset(mapper, ...)
 
   Arguments passed on to other methods
 
+## Value
+
+A logical vector of `TRUE/FALSE` for the subset such that, given the
+full A matrix and values output, `A[, subset, drop = FALSE]` and
+`values[subset]` (or `values[subset, , drop = FALSE]` for data.frame
+values) are equal to the `inla_f = TRUE` version of A and values.
+
 ## Methods (by class)
 
 - `ibm_inla_subset(default)`: Uses the
@@ -36,15 +43,23 @@ ibm_inla_subset(mapper, ...)
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_invalid_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_invalid_output.md),
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md),
 [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+
+## Examples
+
+``` r
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_inla_subset(m)
+#> [1]  TRUE FALSE
+```

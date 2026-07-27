@@ -3,6 +3,7 @@
 Set things up
 
 ``` r
+
 library(INLA)
 library(inlabru)
 library(fmesher)
@@ -25,6 +26,7 @@ covariate `elevation`
 ## Get the data
 
 ``` r
+
 data(gorillas_sf, package = "inlabru")
 ```
 
@@ -34,6 +36,7 @@ for details. Extract the objects you need from the list, for
 convenience:
 
 ``` r
+
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
@@ -46,6 +49,7 @@ gcov <- gorillas_sf_gcov()
 Look at the vegetation type, nests and boundary:
 
 ``` r
+
 ggplot() +
   gg(gcov$vegetation) +
   gg(boundary, alpha = 0.2) +
@@ -57,6 +61,7 @@ ggplot() +
 Or, with the mesh:
 
 ``` r
+
 ggplot() +
   gg(gcov$vegetation) +
   gg(mesh) +
@@ -76,6 +81,7 @@ this by creating model components with a fixed effect that we call
 `vegetation` (we could call it anything), as follows:
 
 ``` r
+
 comp_veg <- geometry ~ vegetation(gcov$vegetation, model = "factor_full") - 1
 ```
 
@@ -89,6 +95,7 @@ absorb it into an intercept. Instead, we can either use
 `model="factor_contrast"`, which does remove the first level.
 
 ``` r
+
 comp_veg_alt <-
   geometry ~ vegetation(gcov$vegetation, model = "factor_contrast") +
   Intercept(1)
@@ -98,7 +105,8 @@ Fit the model as usual, and increasing the integration scheme resolution
 to better match the covariate:
 
 ``` r
-mesh_int <- fm_subdivide(mesh, 2)
+
+mesh_int <- fmesher::fm_subdivide(mesh, 2)
 fit_veg <- lgcp(
   comp_veg,
   nests,
@@ -119,6 +127,7 @@ The `predict` function of `inlabru` takes into its `data` argument an
 within the boundary, using its `mask` argument, as shown below.
 
 ``` r
+
 pred.df <- fm_pixels(mesh, mask = boundary)
 intensity_veg <- predict(fit_veg, pred.df, ~ exp(vegetation))
 
@@ -138,13 +147,14 @@ low density that have nests. What about the estimated abundance (there
 are really 647 nests there):
 
 ``` r
-ips <- fm_int(mesh_int, boundary)
+
+ips <- fmesher::fm_int(mesh_int, boundary)
 Lambda_veg <- predict(fit_veg, ips, ~ sum(weight * exp(vegetation)))
 Lambda_veg
 #>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 649.5134 24.26793 603.6091 654.6087 686.5454 654.6087        2.712449
+#> 1 644.2712 26.69707 602.0601 646.0208 694.0235 646.0208        2.996064
 #>   sd.mc_std_err
-#> 1       1.42828
+#> 1      1.631785
 ```
 
 #### A model with vegetation type and a SPDE type smoother
@@ -153,6 +163,7 @@ Lets try to `explain` the pattern in nest distribution that is not
 captured by the vegetation covariate, using an SPDE:
 
 ``` r
+
 pcmatern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(1, 0.01),
   prior.range = c(0.1, 0.01)
@@ -165,6 +176,7 @@ comp_veg_field <- geometry ~
 ```
 
 ``` r
+
 fit_veg_field <- lgcp(comp_veg_field,
   nests,
   samplers = boundary,
@@ -175,6 +187,7 @@ fit_veg_field <- lgcp(comp_veg_field,
 And plot the posterior median intensity surface
 
 ``` r
+
 intensity_veg_field <-
   predict(
     fit_veg_field,
@@ -194,22 +207,24 @@ ggplot() +
 … and the expected integrated intensity (mean of abundance)
 
 ``` r
+
 Lambda_veg_field <- predict(
   fit_veg_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + vegetation))
 )
 Lambda_veg_field
 #>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 694.9494 27.84786 652.0636 695.2114 752.5341 695.2114        3.156287
+#> 1 698.0652 27.01589 655.9739 698.7819 752.4428 698.7819        3.040251
 #>   sd.mc_std_err
-#> 1      1.857504
+#> 1       1.69331
 ```
 
 Look at the contributions to the linear predictor from the SPDE and from
 vegetation:
 
 ``` r
+
 lp_veg_field <- predict(fit_veg_field, pred.df, ~ list(
   smooth_veg = field + vegetation,
   smooth = field,
@@ -222,6 +237,7 @@ Here we set it to span the range of the three linear predictor
 components being plotted (medians are plotted by default).
 
 ``` r
+
 lprange <- range(
   lp_veg_field$smooth_veg$median,
   lp_veg_field$smooth$median,
@@ -262,6 +278,7 @@ and choose between models on the basis of DIC, using
 [`deltaIC()`](https://inlabru-org.github.io/inlabru/reference/deltaIC.md).
 
 ``` r
+
 comp_field <- geometry ~ field(geometry, model = pcmatern) + Intercept(1)
 fit_field <- lgcp(comp_field,
   data = nests,
@@ -272,6 +289,7 @@ fit_field <- lgcp(comp_field,
 ```
 
 ``` r
+
 intensity_field <- predict(fit_field, pred.df, ~ exp(field + Intercept))
 
 ggplot() +
@@ -283,27 +301,29 @@ ggplot() +
 ![](2d_lgcp_covars_files/figure-html/unnamed-chunk-21-1.png)
 
 ``` r
+
 Lambda_field <- predict(
   fit_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + Intercept))
 )
 Lambda_field
-#>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 690.1463 29.30895 632.9733 690.2728 744.9189 690.2728        3.336392
+#>       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err
+#> 1 688.6421 26.58389 647.6045 691.4402 737.589 691.4402        3.019264
 #>   sd.mc_std_err
-#> 1      2.027482
+#> 1      1.804378
 ```
 
 ``` r
+
 knitr::kable(deltaIC(fit_veg, fit_veg_field, fit_field, criterion = c("DIC")))
 ```
 
 | Model         |       DIC | Delta.DIC |
 |:--------------|----------:|----------:|
 | fit_veg_field | -4897.277 |   0.00000 |
-| fit_field     | -4876.514 |  20.76309 |
-| fit_veg       | -3945.309 | 951.96775 |
+| fit_field     | -4876.514 |  20.76258 |
+| fit_veg       | -3945.309 | 951.96772 |
 
 #### CV and SPDE parameters for Model 2
 
@@ -311,6 +331,7 @@ We are going with Model `fit_veg_field`. Lets look at the spatial
 distribution of the coefficient of variation
 
 ``` r
+
 ggplot() +
   gg(intensity_veg_field, aes(fill = sd / mean), geom = "tile") +
   gg(boundary, alpha = 0) +
@@ -324,6 +345,7 @@ from `$marginals.random$vegetation` of the fitted object, which contains
 the fixed effect marginal distribution data
 
 ``` r
+
 flist <- vector("list", NROW(fit_veg_field$summary.random$vegetation))
 for (i in seq_along(flist)) {
   flist[[i]] <- plot(fit_veg_field, "vegetation", index = i)
@@ -341,6 +363,7 @@ to obtain and then plot the SPDE parameter posteriors and the Matern
 correlation and covariance functions for this model.
 
 ``` r
+
 spde.range <- spde.posterior(fit_veg_field, "field", what = "range")
 spde.logvar <- spde.posterior(fit_veg_field, "field", what = "log.variance")
 range.plot <- plot(spde.range)
@@ -351,6 +374,7 @@ var.plot <- plot(spde.logvar)
 ![](2d_lgcp_covars_files/figure-html/unnamed-chunk-26-1.png)
 
 ``` r
+
 
 corplot <-
   plot(spde.posterior(fit_veg_field, "field", what = "matern.correlation"))
@@ -367,6 +391,7 @@ Now lets try a model with elevation as a (continuous) explanatory
 variable. (First centre elevations for more stable fitting.)
 
 ``` r
+
 elev <- gcov$elevation
 elev <- elev - mean(terra::values(elev), na.rm = TRUE)
 
@@ -393,6 +418,7 @@ coordinate systems as well. In the following evaluator example function,
 we only add infilling of missing values as a post-processing step.
 
 ``` r
+
 # Note: this method is usually not needed; the automatic invocation of
 # `eval_spatial()` method by the component input evaluator is usually
 # sufficient.
@@ -413,6 +439,7 @@ with elevation and a SPDE, and with SPDE only. We will just fit one with
 elevation and SPDE. We create our model to pass to lgcp thus:
 
 ``` r
+
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(1, 0.01),
   prior.range = c(0.1, 0.01)
@@ -428,6 +455,7 @@ Note how the elevation effect is defined. We could alternatively use the
 like in the vegetation case: we specified it like
 
 ``` r
+
 elev(elev, model = "factor_full")
 ```
 
@@ -435,6 +463,7 @@ whereas with the special function method we specify the covariate like
 this:
 
 ``` r
+
 elev(f.elev(.data.), model = "linear")
 ```
 
@@ -447,6 +476,7 @@ We also now include an intercept term in the model.
 The model is fitted in the usual way:
 
 ``` r
+
 fit_elev_field <- lgcp(comp_elev_field, nests,
   samplers = boundary,
   domain = list(geometry = mesh_int)
@@ -456,9 +486,10 @@ fit_elev_field <- lgcp(comp_elev_field, nests,
 Summary and model selection
 
 ``` r
+
 summary(fit_elev_field)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> elev: main = linear(f.elev(.data.))
 #> field: main = spde(geometry)
@@ -472,7 +503,7 @@ summary(fit_elev_field)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[elev, field, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.289, Running = 3.76, Post = 0.299, Total = 4.35 
+#>     Pre = 0.256, Running = 3.25, Post = 0.156, Total = 3.66 
 #> Fixed effects:
 #>             mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 #> elev       0.003 0.002      0.000    0.003      0.006  0.003   0
@@ -498,14 +529,15 @@ summary(fit_elev_field)
 deltaIC(fit_veg, fit_veg_field, fit_field, fit_elev_field)
 #>            Model       DIC Delta.DIC
 #> 1  fit_veg_field -4897.277   0.00000
-#> 2 fit_elev_field -4877.038  20.23912
-#> 3      fit_field -4876.514  20.76309
-#> 4        fit_veg -3945.309 951.96775
+#> 2 fit_elev_field -4877.038  20.23911
+#> 3      fit_field -4876.514  20.76258
+#> 4        fit_veg -3945.309 951.96772
 ```
 
 Predict and plot the density
 
 ``` r
+
 pred_elev_field <- predict(
   fit_elev_field,
   pred.df,
@@ -536,6 +568,7 @@ elevation and the SPDE.
 First we need to predict on the linear predictor scale.
 
 ``` r
+
 lp_elev_field <- predict(
   fit_elev_field,
   pred.df,
@@ -551,6 +584,7 @@ The code below, which is very similar to that used for the vegetation
 factor variable, produces the plots we want.
 
 ``` r
+
 lprange <- range(
   lp_elev_field$smooth_elev$mean,
   lp_elev_field$elev$mean,
@@ -591,19 +625,21 @@ You might also want to look at the posteriors of the fixed effects and
 of the SPDE. Adapt the code used for the vegetation factor to do this.
 
 ``` r
+
 Lambda_elev_field <- predict(
   fit_elev_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(Intercept + elev + field))
 )
 Lambda_elev_field
-#>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 692.2201 28.28244 647.7691 689.2804 753.4566 689.2804        3.225856
+#>       mean       sd   q0.025    q0.5   q0.975  median mean.mc_std_err
+#> 1 693.0059 30.27658 636.8502 690.617 750.0191 690.617        3.406648
 #>   sd.mc_std_err
-#> 1      1.988058
+#> 1      1.894954
 ```
 
 ``` r
+
 flist <- vector("list", NROW(fit_elev_field$summary.fixed))
 for (i in seq_along(flist)) {
   flist[[i]] <- plot(fit_elev_field, rownames(fit_elev_field$summary.fixed)[i])
@@ -619,6 +655,7 @@ Plot the SPDE parameter posteriors and the Matern correlation and
 covariance functions for this model.
 
 ``` r
+
 spde.range <- spde.posterior(fit_elev_field, "field", what = "range")
 spde.logvar <- spde.posterior(fit_elev_field, "field", what = "log.variance")
 range.plot <- plot(spde.range)
@@ -629,6 +666,7 @@ var.plot <- plot(spde.logvar)
 ![](2d_lgcp_covars_files/figure-html/unnamed-chunk-40-1.png)
 
 ``` r
+
 
 corplot <-
   plot(spde.posterior(fit_elev_field, "field", what = "matern.correlation"))
@@ -643,19 +681,20 @@ Also estimate abundance. The `data.frame` in the second call leads to
 inclusion of `N` in the prediction object, for easier plotting.
 
 ``` r
+
 Lambda_elev_field <- predict(
-  fit_elev_field, fm_int(mesh_int, boundary),
+  fit_elev_field, fmesher::fm_int(mesh_int, boundary),
   ~ sum(weight * exp(field + elev + Intercept))
 )
 Lambda_elev_field
-#>       mean       sd   q0.025     q0.5  q0.975   median mean.mc_std_err
-#> 1 694.7567 25.68199 645.3902 694.0864 740.082 694.0864        2.959295
+#>       mean      sd   q0.025     q0.5   q0.975   median mean.mc_std_err
+#> 1 697.6112 26.6971 642.3827 697.0271 748.9152 697.0271        3.081156
 #>   sd.mc_std_err
-#> 1       1.95548
+#> 1      2.057227
 
 Nest_elev_field <- predict(
   fit_elev_field,
-  fm_int(mesh_int, boundary),
+  fmesher::fm_int(mesh_int, boundary),
   ~ data.frame(
     N = 200:1000,
     density = dpois(200:1000,
@@ -669,6 +708,7 @@ Nest_elev_field <- predict(
 Plot in the same way as in previous practicals
 
 ``` r
+
 Nest_elev_field$plugin_estimate <-
   dpois(Nest_elev_field$N, lambda = Lambda_elev_field$median)
 ggplot(data = Nest_elev_field) +
@@ -706,6 +746,7 @@ isn’t very interesting, but the same method can be applied to non-linear
 effects (e.g. “rw2”) as well, and combined into general R expressions.
 
 ``` r
+
 elev.pred <- predict(
   fit_elev_field,
   data.frame(elevation = seq(0, 100, length.out = 1000)),
@@ -743,6 +784,7 @@ helpful to build on the model you fitted in the previous practical,
 adding the covariate to the model specification.)
 
 ``` r
+
 data(Poisson2_1D)
 x <- seq(0, 55, length.out = 50)
 mesh <- fm_mesh_1d(x, degree = 2, boundary = "free")

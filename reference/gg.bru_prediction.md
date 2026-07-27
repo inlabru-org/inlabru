@@ -2,7 +2,7 @@
 
 This geom serves to visualize `prediction` objects which usually results
 from a call to
-[`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md).
+[`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.md).
 Predictions objects provide summary statistics (mean, median, sd, ...)
 for one or more random variables. For single variables (or if requested
 so by setting `bar = TRUE`), a boxplot-style geom is constructed to show
@@ -44,7 +44,7 @@ plot(x, y = NULL, ...)
 - data:
 
   A prediction object, usually the result of a
-  [`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+  [`predict.bru()`](https://inlabru-org.github.io/inlabru/reference/predict.md)
   call.
 
 - mapping:

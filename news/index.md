@@ -1,5 +1,60 @@
 # Changelog
 
+## inlabru 2.15.0
+
+### New features
+
+- New predictor evaluation and linearisation implementation
+  (`2.14.1.9008`)
+- Add [`tidy()`](https://generics.r-lib.org/reference/tidy.html),
+  [`glance()`](https://generics.r-lib.org/reference/glance.html), and
+  [`augment()`](https://generics.r-lib.org/reference/augment.html)
+  methods for `bru` objects, to support the `broom` package tidying
+  framework. Thanks to Novica Nakov (`2.14.1.9005`)
+- Add observation `family` options `nzbinomial`, `nznbinomial`,
+  `nzcenpoisson`, and `nzbetabinomial` for non-zero truncated models,
+  acting like `nzpoisson`. Will automatically switch to INLA
+  implementations if available, otherwise uses `zeroinflated*0` with the
+  zero-probability fixed to `2e-9`. (`2.14.1.9007`)
+- Improved `bru_used` variable detection, supporting pronoun and
+  container object access detection. (`2.14.1.9010`)
+- Add `log` argument to
+  [`bru_timings_plot()`](https://inlabru-org.github.io/inlabru/reference/bru_timings_plot.md)
+  to allow logarithmic scaling of the time axis (`2.14.1.9014`)
+
+### Bug fixes
+
+- Fix issue [\#298](https://github.com/inlabru-org/inlabru/issues/298),
+  where `weights` input to `copy = ...` components was not consistently
+  passed to the component mapper construction. This could be partly
+  worked around by specifying `weights = 1` in the source component, but
+  only for estimation, so post-estimation computations would still
+  ignore the weights. Now enforces that the same inputs are present in
+  both the source and copy definitions, ensuring a consistent mapper
+  construction, and post-estimation consistency. (`2.14.1.9002`)
+- (Re)enable non-integer point weights for `family = "cp"` models, by
+  using `family = "xpoisson"` (`2.14.1.9003`)
+- Fix layer indexing in
+  [`bru_fill_missing()`](https://inlabru-org.github.io/inlabru/reference/bru_fill_missing.md)
+  for `SpatRaster` data that resulted in an error for layers beyond the
+  first layer (`2.14.1.9006`)
+
+### Namespace changes
+
+- Remove dependency on `plyr`. Fixes
+  [\#301](https://github.com/inlabru-org/inlabru/issues/301)
+  (`2.14.1.9004`)
+- Move `stats` from `Depends:` to `Imports:` to avoid unnecessary
+  namespace clashes (`2.14.1.9013`)
+- Reexport generics
+  [`tidy()`](https://generics.r-lib.org/reference/tidy.html),
+  [`glance()`](https://generics.r-lib.org/reference/glance.html),
+  [`augment()`](https://generics.r-lib.org/reference/augment.html), and
+  [`generate()`](https://generics.r-lib.org/reference/generate.html)
+  from `generics` and
+  [`predict()`](https://rdrr.io/r/stats/predict.html) from `stats`
+  (`2.14.1.9014`)
+
 ## inlabru 2.14.1
 
 CRAN release: 2026-05-01
@@ -117,10 +172,9 @@ CRAN release: 2026-03-08
 - Robustify internal `extended_bind_rows()` method for unifying XY/XYZ
   `sf` coordinate columns (version `2.13.0.9009`)
 - Robustify sf coordinate handling in
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
-  and
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  (version `2.13.0.9027`)
+  [`generate()`](https://generics.r-lib.org/reference/generate.html) and
+  [`predict()`](https://rdrr.io/r/stats/predict.html) (version
+  `2.13.0.9027`)
 - Robustify sf coordinate handling in `bru_obs_family_cp()` for unifying
   XY/XYZ coordinate columns (version `2.13.0.9033`)
 - Add logic for
@@ -133,7 +187,7 @@ CRAN release: 2026-03-08
   through 2.13.0.9017, that introduced a new predictor expression
   storage system (version `2.13.0.9024`)
 - Fix bug in
-  [`bru_obs_control_gcpo()`](https://inlabru-org.github.io/inlabru/reference/bru_obs_methods.md)
+  [`bru_obs_control_gcpo()`](https://inlabru-org.github.io/inlabru/reference/bru_obs_gcpo.md)
   for multi-observation models. (version `2.13.0.9025`)
 
 ## inlabru 2.13.0
@@ -238,9 +292,8 @@ CRAN release: 2025-07-09
   [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
   for non-indexed `fm_mesh_1d` mapper (version `2.12.0.9009`)
 - Deprecate the `include` and `exclude` arguments to
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  and
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+  [`predict()`](https://rdrr.io/r/stats/predict.html) and
+  [`generate()`](https://generics.r-lib.org/reference/generate.html)
   (version `2.12.0.9003`)
 - Assumed that [`NROW()`](https://rdrr.io/r/base/nrow.html) on the main
   component gave the correct size for `group` and `replicate` in the
@@ -613,8 +666,8 @@ CRAN release: 2023-08-28
   [`is.na()`](https://rdrr.io/r/base/NA.html) methods for the `fm_crs`
   and `inla.CRS` classes have been added. (version `2.8.0.9003`)
 - Significant speed up
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  by using `quantile(..., names = FALSE)`. (version `2.8.0.9004`)
+  [`predict()`](https://rdrr.io/r/stats/predict.html) by using
+  `quantile(..., names = FALSE)`. (version `2.8.0.9004`)
 - Improved
   [`row_kron()`](https://inlabru-org.github.io/inlabru/reference/inlabru-deprecated.md)
   code, causing speedups of a factor 2-30 in randomised test cases.
@@ -624,10 +677,9 @@ CRAN release: 2023-08-28
   causing failure when extracting from multiple layers in a single call.
   (version `2.8.0.9007`)
 - Improved handling of posterior sample variable extraction in
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
-  and
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html).
-  Now much faster for large models. (version `2.8.0.9009`)
+  [`generate()`](https://generics.r-lib.org/reference/generate.html) and
+  [`predict()`](https://rdrr.io/r/stats/predict.html). Now much faster
+  for large models. (version `2.8.0.9009`)
 - Fixed linearisation issue when using only the `*_latent` form of a
   component. (version `2.8.0.9015`)
 - Workaround for equivalent but textually different CRS/WKT information
@@ -669,7 +721,7 @@ CRAN release: 2023-06-20
   (in
   [`like()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
   or
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)/[`predict()`](https://rspatial.github.io/terra/reference/predict.html))
+  [`generate()`](https://generics.r-lib.org/reference/generate.html)/[`predict()`](https://rdrr.io/r/stats/predict.html))
   has been updated to when possible extract the list of components from
   the expression itself. The user can override this default if
   necessary, using the `include`/`exclude` arguments.
@@ -687,7 +739,7 @@ CRAN release: 2023-06-20
   [`bru_used()`](https://inlabru-org.github.io/inlabru/reference/bru_used.md)
   methods, that can also be used directly by the user and supplied via
   the `used` argument to
-  [`like()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)/[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)/[`predict()`](https://rspatial.github.io/terra/reference/predict.html).
+  [`like()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)/[`generate()`](https://generics.r-lib.org/reference/generate.html)/[`predict()`](https://rdrr.io/r/stats/predict.html).
 
 - Add
   [`fm_int()`](https://inlabru-org.github.io/fmesher/reference/fm_int.html)
@@ -708,14 +760,12 @@ CRAN release: 2023-06-20
 - Add `edge|int|ext.linewidth` arguments to `gg.inla.mesh`
   [\#188](https://github.com/inlabru-org/inlabru/issues/188)
 
-- Rename the
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  and
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+- Rename the [`predict()`](https://rdrr.io/r/stats/predict.html) and
+  [`generate()`](https://generics.r-lib.org/reference/generate.html)
   `data` arguments to `newdata`, for better compatibility with other
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  methods. The old argument name will still be accepted, but give a
-  warning. Code that does not name the `data` argument is not affected.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) methods. The old
+  argument name will still be accepted, but give a warning. Code that
+  does not name the `data` argument is not affected.
 
 - Note: Coordinate names for `Spatial*` objects have been inconsistently
   available in the predictor expression evaluation. However, due to how
@@ -918,15 +968,14 @@ CRAN release: 2022-09-05
 ### Features
 
 - Add `bru_mapper_harmonics` mapper for `cos` and `sin` basis sets.
-- Allow
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  input data to be be a list.
+- Allow [`predict()`](https://rdrr.io/r/stats/predict.html) input data
+  to be be a list.
 - Allow arbitrary quantile summaries in
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
+  [`predict()`](https://rdrr.io/r/stats/predict.html)
 - Remove `cv`, `var`, `smin`, `smax` summaries from
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
+  [`predict()`](https://rdrr.io/r/stats/predict.html)
 - Add `mean.mc_std_err` and `sd.mc_std_err` output to
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
+  [`predict()`](https://rdrr.io/r/stats/predict.html)
 - Add `robins_subset` data set and associated variable coefficient web
   vignette
 
@@ -1093,13 +1142,11 @@ CRAN release: 2021-03-16
   [`like()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
 - The `include` and `exclude` arguments to
   [`like()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md),
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md),
-  and
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  can be used to specify which components are used for a given
-  likelihood model or predictor expression. This can be used to prevent
-  evaluation of components that are invalid for a likelihood or
-  predictor.
+  [`generate()`](https://generics.r-lib.org/reference/generate.html),
+  and [`predict()`](https://rdrr.io/r/stats/predict.html) can be used to
+  specify which components are used for a given likelihood model or
+  predictor expression. This can be used to prevent evaluation of
+  components that are invalid for a likelihood or predictor.
 - Predictor expressions can access the latent state of a model component
   directly, by adding the suffix `_latent` to the component name,
   e.g. `name_latent`. For
@@ -1161,8 +1208,7 @@ CRAN release: 2021-03-16
 
 ## inlabru 2.2.2
 
-- Fixed issue with
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
+- Fixed issue with [`predict()`](https://rdrr.io/r/stats/predict.html)
   logic for converting output to `Spatial*DataFrame`
 - Use `control.mode=list(restart=FALSE)` in the final inla run for
   nonlinear models, to avoid an unnecessary optimisation.
@@ -1255,9 +1301,8 @@ CRAN release: 2018-07-24
 
 - Added a `NEWS.md` file to track changes to the package.
 - Added `inla` methods for
-  [`predict()`](https://rspatial.github.io/terra/reference/predict.html)
-  and
-  [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+  [`predict()`](https://rdrr.io/r/stats/predict.html) and
+  [`generate()`](https://generics.r-lib.org/reference/generate.html)
   that convert `inla` output into `bru` objects before calling the `bru`
   prediction and posterior sample generator.
 - Added protection for examples requiring optional packages

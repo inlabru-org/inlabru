@@ -58,6 +58,9 @@ ibm_values(mapper, ...)
 # S3 method for class 'bm_collect'
 ibm_values(mapper, inla_f = FALSE, multi = FALSE, ...)
 
+# S3 method for class 'bm_expr'
+ibm_values(mapper, inla_f = FALSE, ...)
+
 # S3 method for class 'bm_repeat'
 ibm_values(mapper, ...)
 
@@ -101,6 +104,10 @@ ibm_values(mapper, inla_f = FALSE, multi = FALSE, ...)
   integer giving the length of the state vector for mappers that have
   state dependent output size.
 
+## Value
+
+A vector of length `ibm_n(mapper, inla_f = FALSE)`
+
 ## Methods (by class)
 
 - `ibm_values(default)`: Returns a non-null element 'values' from the
@@ -128,6 +135,7 @@ ibm_values(mapper, inla_f = FALSE, multi = FALSE, ...)
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
@@ -135,8 +143,15 @@ Other mapper methods:
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md)
+
+## Examples
+
+``` r
+m <- bm_index(4)
+ibm_values(m)
+#> [1] 1 2 3 4
+```

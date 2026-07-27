@@ -68,6 +68,7 @@ To get started with data analysis, we set up the environment, by loading
 some packages, and setting some options.
 
 ``` r
+
 # libraries
 library(maps)
 library(ggplot2)
@@ -88,7 +89,6 @@ library(fmesher)
 select <- dplyr::select
 options(scipen = 99999)
 options(max.print = 99999)
-options(stringsAsFactors = FALSE)
 ```
 
 Next we define a coordinate reference system (CRS) for spatial analysis
@@ -99,6 +99,7 @@ distances between widespread count sites are not especially large
 numbers (Krainski et al. 2018).
 
 ``` r
+
 # define a crs
 epsg6703km <- paste(
   "+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5",
@@ -133,6 +134,7 @@ subset, called `robins_subset`, that can be accessed with
 following code was used to generate the subset:
 
 ``` r
+
 robins_subset <- read.csv(paste0(
   "https://raw.github.com/tmeeha/inlaSVCBC",
   "/master/code/modeling_data.csv"
@@ -156,6 +158,7 @@ of data, add index variables to uniquely index site and year
 information, and transform the coordinates to the `epsg6703km` CRS:
 
 ``` r
+
 data(robins_subset)
 count_dat <- robins_subset |>
   mutate(site_idx = as.numeric(factor(paste(circle, lon, lat)))) |>
@@ -184,6 +187,7 @@ account for variation in count effort, can be seen by plotting raw
 counts per site and year.
 
 ``` r
+
 # map it
 ggplot() +
   geom_sf(
@@ -206,6 +210,7 @@ save the coordinates of the sites, unique and across all years, for
 later spatial modeling and plotting.
 
 ``` r
+
 # make a set of distinct study sites for mapping
 site_map <- count_dat |>
   select(circle, easting, northing) |>
@@ -258,6 +263,7 @@ maximum edge lengths within the inner hull, and within the slightly
 larger outer hull.
 
 ``` r
+
 # make a two extension hulls and mesh for spatial model
 hull <- fm_extensions(
   count_dat,
@@ -275,6 +281,7 @@ mesh <- fm_mesh_2d_inla(
 ```
 
 ``` r
+
 # plot it
 ggplot() +
   gg(data = mesh) +
@@ -302,6 +309,7 @@ this kind of spatial effect to integrate to zero, `constr=TRUE` should
 be added at this stage.
 
 ``` r
+
 # make spde
 spde <- inla.spde2.pcmatern(
   mesh = mesh,
@@ -351,6 +359,7 @@ probability of the standard deviation associated with the random effect
 exceeding 1 is 0.01.
 
 ``` r
+
 # iid prior
 pc_prec <- list(prior = "pcprec", param = c(1, 0.1))
 ```
@@ -365,6 +374,7 @@ sum-to-zero constraint.
 The model described above is translated to `inlabru` modeling syntax as:
 
 ``` r
+
 # components
 svc_components <- ~ -1 +
   kappa(site_idx, model = "iid", constr = TRUE, hyper = list(prec = pc_prec)) +
@@ -421,16 +431,17 @@ CPO (temporarily disabled) to evaluate model fit (also, to save the
 information necessary for posterior sampling we need `config=TRUE`, but
 this is automatically set by
 [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md), as
-[`inlabru::predict()`](https://rspatial.github.io/terra/reference/predict.html)
-relies on it for posterior sampling and prediction). For computing
-speed, we choose to use the simplified Laplace approximation strategy
-and Empirical Bayes estimation. The
+[`inlabru::predict()`](https://rdrr.io/r/stats/predict.html) relies on
+it for posterior sampling and prediction). For computing speed, we
+choose to use the simplified Laplace approximation strategy and
+Empirical Bayes estimation. The
 [`inla()`](https://rdrr.io/pkg/INLA/man/inla.html) run for this model
 takes about 1 minutes on a standard laptop computer. Another option is
 to use the Variational Bayes approximation as detailed in Van Niekerk
 and Rue (2021) and Van Niekerk et. al. (2022).
 
 ``` r
+
 res <- bru(
   svc_components,
   bru_obs(
@@ -455,16 +466,17 @@ of the model, mainly the variance components and the spatial ranges of
 the spatially structured parameters.
 
 ``` r
+
 # view results
 res$summary.hyperpar[-1, c(1, 2)]
-#>                               mean             sd
-#> Precision for kappa     2.27651758     0.46791099
-#> Range for alpha       920.71957687   358.54285694
-#> Stdev for alpha         1.96198492     0.48621802
-#> Range for eps       22853.10886935 70940.09469316
-#> Stdev for eps           0.38655612     0.22416708
-#> Range for tau         851.49069880   356.62231416
-#> Stdev for tau           0.06644838     0.01624144
+#>                              mean            sd
+#> Precision for kappa    2.29064752    0.45717949
+#> Range for alpha      993.05291484  294.77907265
+#> Stdev for alpha        2.02091155    0.40520838
+#> Range for eps       2879.87949480 2024.40642832
+#> Stdev for eps          0.43201807    0.23067617
+#> Range for tau        820.41336770  270.32326716
+#> Stdev for tau          0.06467986    0.01280032
 ```
 
 Next we examine some summaries of the random effect estimates, starting
@@ -472,9 +484,10 @@ with \exp(\alpha_s), which is effort-corrected relative abundance at
 year = 0 (1987), given 1 hour of count effort (i.e., log\[1\]=0).
 
 ``` r
+
 summary(exp(res$summary.random$alp$"0.5quant")) # exp(alpha) posterior median
 #>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-#>  0.03548  0.91050  2.96679  6.66583  8.18477 56.82905
+#>  0.03304  0.83327  2.98162  6.71151  7.98647 61.37753
 ```
 
 Note that to avoid issues due to E\[\exp(x)\|y\]\neq\exp\[E(x\|y)\], we
@@ -484,9 +497,10 @@ The summary for \epsilon_s shows variation in the exponent for the
 effort correction function across space.
 
 ``` r
+
 summary(res$summary.random$eps$mean) # epsilon
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.6691  0.8730  0.9952  0.9821  1.0605  1.3388
+#>  0.5873  0.8636  0.9997  0.9802  1.0606  1.4099
 ```
 
 The \tau_s summary shows how long-term, log-linear trends of robin
@@ -494,9 +508,10 @@ relative abundance have varied across space, from annual decreases of
 around 10% to annual increases of around 10%.
 
 ``` r
+
 summary((exp(res$summary.random$tau$"0.5quant") - 1) * 100) # (exp(tau)-1)*100
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#> -13.280  -5.661  -1.826  -1.288   2.639  11.668
+#> -13.228  -5.603  -1.811  -1.270   2.641  11.512
 ```
 
 ## SVC maps
@@ -507,6 +522,7 @@ spatial structure of these parameter estimates. We start by creating a
 modeling mesh.
 
 ``` r
+
 # get easting and northing limits
 bbox <- fm_bbox(hull[[1]])
 grd_dims <- round(c(x = diff(bbox[[1]]), y = diff(bbox[[2]])) / 25)
@@ -523,6 +539,7 @@ median and range95), turn them into a raster stack, and mask the raster
 stack to the study area.
 
 ``` r
+
 # pull data
 kappa <- data.frame(
   median = exp(res$summary.random$kappa$"0.5quant"),
@@ -553,6 +570,7 @@ pred_grids <- lapply(
 ```
 
 ``` r
+
 # make a terra raster stack with the posterior median and range95
 out_stk <- rast()
 for (j in 1:3) {
@@ -584,6 +602,7 @@ median and 95% uncertainty width (“range95”) for \exp(\kappa_s),
 \exp(\alpha_s), \epsilon_s, and 100(\exp(\tau_s)-1).
 
 ``` r
+
 make_plot_field <- function(data_stk, scale_label) {
   ggplot(states) +
     geom_sf(fill = NA) +
@@ -650,6 +669,7 @@ ps_range95 <- make_plot_site(
 ```
 
 ``` r
+
 # plot together
 ((ps | pa) / (pe | pt))
 ```
@@ -661,6 +681,7 @@ the wintering range of robins is shifting northward as winters become
 warmer due to climate change.
 
 ``` r
+
 # plot together
 ((ps_range95 | pa_range95) / (pe_range95 | pt_range95))
 ```

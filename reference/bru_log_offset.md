@@ -51,5 +51,5 @@ Other inlabru log methods:
 [`bru_log()`](https://inlabru-org.github.io/inlabru/reference/bru_log.md),
 [`bru_log_bookmark()`](https://inlabru-org.github.io/inlabru/reference/bru_log_bookmark.md),
 [`bru_log_message()`](https://inlabru-org.github.io/inlabru/reference/bru_log_message.md),
-[`bru_log_new()`](https://inlabru-org.github.io/inlabru/reference/bru_log_new.md),
-[`bru_log_reset()`](https://inlabru-org.github.io/inlabru/reference/bru_log_reset.md)
+[`bru_log_reset()`](https://inlabru-org.github.io/inlabru/reference/bru_log_reset.md),
+[`new_bru_log()`](https://inlabru-org.github.io/inlabru/reference/new_bru_log.md)

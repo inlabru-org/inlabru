@@ -8,8 +8,8 @@
 <title>Prediction scores • inlabru</title>
 <!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Prediction scores">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.14.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.15.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
     <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
     <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/tidiers.html">Postprocessing tidiers</a></li>
     <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
@@ -62,9 +63,12 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_per_transect_covars.html">LGCPs - Distance sampling and per-transect covariates (work in progress)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model assessment</h6></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars_gcpo.html">LGCPs - Model comparison using Cross Validation</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sp.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -109,7 +113,7 @@ Lindgren</h4>
             <h4 data-toc-skip class="date">Corrections and code updates
 2025-04-09</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/prediction_scores.Rmd" class="external-link"><code>vignettes/prediction_scores.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/stable/vignettes/prediction_scores.Rmd" class="external-link"><code>vignettes/prediction_scores.Rmd</code></a></small>
       <div class="d-none name"><code>prediction_scores.Rmd</code></div>
     </div>
 
@@ -359,13 +363,13 @@ information for the prediction points, run</p>
 <span>  DS <span class="op">=</span> <span class="op">(</span><span class="va">newdata_pois</span><span class="op">$</span><span class="va">y</span> <span class="op">-</span> <span class="va">post_E</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="va">post_Var</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">post_Var</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        SE                  DS          </span></span>
-<span><span class="co">#&gt;  Min.   :5.200e-05   Min.   :0.006632  </span></span>
-<span><span class="co">#&gt;  1st Qu.:5.112e-01   1st Qu.:1.794468  </span></span>
-<span><span class="co">#&gt;  Median :4.897e+00   Median :3.086901  </span></span>
-<span><span class="co">#&gt;  Mean   :1.605e+01   Mean   :3.176005  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:1.860e+01   3rd Qu.:4.219737  </span></span>
-<span><span class="co">#&gt;  Max.   :1.265e+02   Max.   :7.932984</span></span></code></pre></div>
+<span><span class="co">#&gt;        SE                  DS        </span></span>
+<span><span class="co">#&gt;  Min.   :4.400e-05   Min.   :0.0073  </span></span>
+<span><span class="co">#&gt;  1st Qu.:5.114e-01   1st Qu.:1.7952  </span></span>
+<span><span class="co">#&gt;  Median :4.915e+00   Median :3.0866  </span></span>
+<span><span class="co">#&gt;  Mean   :1.604e+01   Mean   :3.1757  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:1.859e+01   3rd Qu.:4.2176  </span></span>
+<span><span class="co">#&gt;  Max.   :1.283e+02   Max.   :7.9304</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="log-probability-and-log-density-scores">Log-Probability and log-density scores<a class="anchor" aria-label="anchor" href="#log-probability-and-log-density-scores"></a>
@@ -385,7 +389,7 @@ probability is <span class="math display">
 <span><span class="va">log_score</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">pred_pois</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">log_score</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.6746  1.8502  2.4290  2.4886  3.0308  5.1072</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.6722  1.8498  2.4301  2.4891  3.0266  5.1163</span></span></code></pre></div>
 <p>to estimate the log_score (increase <code>n.samples</code> if needed
 for sufficiently small Monte Carlo error). Approximate Monte Carlo
 confidence intervals for the scores can be obtained via the Monte Carlo
@@ -399,12 +403,12 @@ standard errors:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      log_S    lower    upper</span></span>
-<span><span class="co">#&gt; 1 2.649383 2.645401 2.653381</span></span>
-<span><span class="co">#&gt; 2 3.256565 3.244013 3.269277</span></span>
-<span><span class="co">#&gt; 3 3.205647 3.194884 3.216526</span></span>
-<span><span class="co">#&gt; 4 2.677222 2.674192 2.680262</span></span>
-<span><span class="co">#&gt; 5 3.091761 3.081482 3.102147</span></span>
-<span><span class="co">#&gt; 6 2.044725 2.043634 2.045817</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 2.646105 2.642178 2.650047</span></span>
+<span><span class="co">#&gt; 2 3.269642 3.256888 3.282560</span></span>
+<span><span class="co">#&gt; 3 3.207851 3.197010 3.218810</span></span>
+<span><span class="co">#&gt; 4 2.678807 2.675784 2.681839</span></span>
+<span><span class="co">#&gt; 5 3.093694 3.083342 3.104154</span></span>
+<span><span class="co">#&gt; 6 2.044958 2.043856 2.046061</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="crps">CRPS<a class="anchor" aria-label="anchor" href="#crps"></a>
@@ -429,7 +433,7 @@ sufficiently large for the posterior predictive probability above <span class="m
 You can check afterwards, and change if needed.</p>
 <ol style="list-style-type: decimal">
 <li>Simulate samples from <span class="math inline">\lambda^{(j)}\sim
-p(\lambda|\text{data})</span> using <code><a href="../reference/generate.html">generate()</a></code> (size <span class="math inline">N\times N_\text{samples}</span>).</li>
+p(\lambda|\text{data})</span> using <code><a href="https://generics.r-lib.org/reference/generate.html" class="external-link">generate()</a></code> (size <span class="math inline">N\times N_\text{samples}</span>).</li>
 <li>For each <span class="math inline">i=1,\dots,N</span>, use the
 samples to estimate the residuals <span class="math inline">r_{ik}=\mathbb{P}(Y\leq k|\text{data})-I(y_i\leq
 k)</span>, for <span class="math inline">k\in 0,1,2,\dots,K</span>,
@@ -453,7 +457,7 @@ with</li>
 <span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">max_K</span><span class="op">)</span></span>
 <span><span class="va">kk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">k</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">newdata_pois</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">newdata_pois</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
-<span><span class="va">pred_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate.html">generate</a></span><span class="op">(</span><span class="va">fit_pois</span>, <span class="va">newdata_pois</span>,</span>
+<span><span class="va">pred_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/generate.html" class="external-link">generate</a></span><span class="op">(</span><span class="va">fit_pois</span>, <span class="va">newdata_pois</span>,</span>
 <span>  formula <span class="op">=</span> <span class="op">~</span> <span class="op">{</span></span>
 <span>    <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Intercept</span> <span class="op">+</span> <span class="va">x</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">ppois</a></span><span class="op">(</span><span class="va">kk</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">lambda</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -470,7 +474,7 @@ with</li>
 <span><span class="co"># Check that the cutoff point K has nearly probability mass 1 below it,</span></span>
 <span><span class="co"># for all i:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">results</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">k</span> <span class="op">==</span> <span class="va">max_K</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Fpred</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.9995078</span></span>
+<span><span class="co">#&gt; [1] 0.9995363</span></span>
 <span></span>
 <span><span class="va">crps_scores</span> <span class="op">&lt;-</span></span>
 <span>  <span class="op">(</span><span class="va">results</span> <span class="op">|&gt;</span></span>
@@ -479,7 +483,7 @@ with</li>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">crps</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">crps_scores</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.2146  0.6704  1.3904  1.9660  2.8459  7.8817</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.2144  0.6685  1.3918  1.9674  2.8509  7.8922</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -553,12 +557,12 @@ points, run</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scores_normal</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        SE                  DS               LS         </span></span>
-<span><span class="co">#&gt;  Min.   :0.0000001   Min.   :-4.687   Min.   :-1.4402  </span></span>
-<span><span class="co">#&gt;  1st Qu.:0.0006669   1st Qu.:-4.607   1st Qu.:-1.3977  </span></span>
-<span><span class="co">#&gt;  Median :0.0039526   Median :-4.251   Median :-1.2089  </span></span>
-<span><span class="co">#&gt;  Mean   :0.0096242   Mean   :-3.643   Mean   :-0.9026  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:0.0133511   3rd Qu.:-3.247   3rd Qu.:-0.6864  </span></span>
-<span><span class="co">#&gt;  Max.   :0.0633760   Max.   : 2.081   Max.   : 1.9175</span></span></code></pre></div>
+<span><span class="co">#&gt;  Min.   :3.900e-08   Min.   :-4.687   Min.   :-1.4403  </span></span>
+<span><span class="co">#&gt;  1st Qu.:6.557e-04   1st Qu.:-4.607   1st Qu.:-1.3986  </span></span>
+<span><span class="co">#&gt;  Median :3.902e-03   Median :-4.257   Median :-1.2116  </span></span>
+<span><span class="co">#&gt;  Mean   :9.614e-03   Mean   :-3.643   Mean   :-0.9030  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:1.328e-02   3rd Qu.:-3.257   3rd Qu.:-0.6903  </span></span>
+<span><span class="co">#&gt;  Max.   :6.311e-02   Max.   : 2.051   Max.   : 1.9024</span></span></code></pre></div>
 <p>Here, we’ve again used the negated log-score, so that small values
 are “better” for all three scores. Since the DS score is based on the
 log-score for Normal predictions, the <em>conditional</em> DS and LS
@@ -576,12 +580,12 @@ uncertainty:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        log_S      lower      upper</span></span>
-<span><span class="co">#&gt; 1 -1.0762666 -1.0824172 -1.0700779</span></span>
-<span><span class="co">#&gt; 2 -1.3997066 -1.4043494 -1.3950421</span></span>
-<span><span class="co">#&gt; 3 -1.0983772 -1.1039149 -1.0928087</span></span>
-<span><span class="co">#&gt; 4 -1.3892141 -1.3941530 -1.3842508</span></span>
-<span><span class="co">#&gt; 5 -0.6752241 -0.6928083 -0.6573252</span></span>
-<span><span class="co">#&gt; 6 -0.2955040 -0.3067642 -0.2841156</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 -1.0762271 -1.0824590 -1.0699560</span></span>
+<span><span class="co">#&gt; 2 -1.3999577 -1.4046059 -1.3952879</span></span>
+<span><span class="co">#&gt; 3 -1.0996326 -1.1051085 -1.0941265</span></span>
+<span><span class="co">#&gt; 4 -1.3884159 -1.3933726 -1.3834345</span></span>
+<span><span class="co">#&gt; 5 -0.6846123 -0.7028606 -0.6660248</span></span>
+<span><span class="co">#&gt; 6 -0.2906450 -0.3017286 -0.2794372</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -645,7 +649,7 @@ expression, and we can use</p>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="va">pred_pois</span><span class="op">$</span><span class="va">cond_scores</span><span class="op">$</span><span class="va">mean</span> <span class="op">-</span> <span class="va">pred_pois</span><span class="op">$</span><span class="va">lambda</span><span class="op">$</span><span class="va">sd</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
-<span><span class="co">#&gt; 2.100e-05 5.129e-01 4.943e+00 1.603e+01 1.861e+01 1.315e+02</span></span></code></pre></div>
+<span><span class="co">#&gt; 8.400e-05 5.073e-01 4.876e+00 1.605e+01 1.855e+01 1.252e+02</span></span></code></pre></div>
 <p>For this particular case, this approach is unlikely to be an
 improvement or more accurate than the basic estimator. Remarkably, this
 estimator of Squared Error isn’t even guaranteed to be positive!
@@ -688,7 +692,7 @@ for the Squared Error; this is because CRPS can be seen as the integral
 over all Brier scores for predicting event indicators of the form <span class="math inline">z=I(y\leq x)</span>, with probability <span class="math inline">F(x)</span>.</p>
 <p>In the Poisson case, we can now estimate the CRPS scores like this,
 that makes the code a bit easier than the previous version that needed
-<code><a href="../reference/generate.html">generate()</a></code>. We can use the Poisson CRPS implementation
+<code><a href="https://generics.r-lib.org/reference/generate.html" class="external-link">generate()</a></code>. We can use the Poisson CRPS implementation
 <code><a href="https://rdrr.io/pkg/scoringRules/man/scores_pois.html" class="external-link">crps_pois()</a></code> from the <a href="https://cran.r-project.org/package=scoringRules" class="external-link"><code>scoringRules</code></a>
 package.</p>
 <p>However, it can be shown that the two approaches have nearly
@@ -724,7 +728,7 @@ expression.</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">F_var</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">crps_score</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;  0.2144  0.6679  1.3924  1.9806  2.8454  7.8456</span></span></code></pre></div>
+<span><span class="co">#&gt;  0.2142  0.6653  1.3952  1.9865  2.8608  7.8867</span></span></code></pre></div>
 <p>Formulas and functions for Poisson CRPS, as well as for other
 distributions, can be found via the <a href="https://cran.r-project.org/package=scoringRules/vignettes/article.pdf" class="external-link">“Evaluating
 Probabilistic Forecasts with scoringRules”</a> vignette of the
@@ -743,7 +747,7 @@ Probabilistic Forecasts with scoringRules”</a> vignette of the
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

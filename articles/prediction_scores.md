@@ -1,6 +1,7 @@
 # Prediction scores
 
 ``` r
+
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -185,6 +186,7 @@ For illustration purposes, consider a simple Poisson model with a single
 covariate x and a linear predictor \eta = \beta_0 + \beta_1 x.
 
 ``` r
+
 df_pois <- tibble::tibble(
   x = rnorm(50),
   y = rpois(length(x), exp(2 + 1 * x))
@@ -220,6 +222,7 @@ point. If `Intercept+x` is the expression for the linear predictor, and
 `newdata` holds the covariate information for the prediction points, run
 
 ``` r
+
 pred_pois <- predict(
   fit_pois,
   newdata_pois,
@@ -233,13 +236,13 @@ scores <- data.frame(
   DS = (newdata_pois$y - post_E)^2 / post_Var + log(post_Var)
 )
 summary(scores)
-#>        SE                  DS          
-#>  Min.   :5.200e-05   Min.   :0.006632  
-#>  1st Qu.:5.112e-01   1st Qu.:1.794468  
-#>  Median :4.897e+00   Median :3.086901  
-#>  Mean   :1.605e+01   Mean   :3.176005  
-#>  3rd Qu.:1.860e+01   3rd Qu.:4.219737  
-#>  Max.   :1.265e+02   Max.   :7.932984
+#>        SE                  DS        
+#>  Min.   :4.400e-05   Min.   :0.0073  
+#>  1st Qu.:5.114e-01   1st Qu.:1.7952  
+#>  Median :4.915e+00   Median :3.0866  
+#>  Mean   :1.604e+01   Mean   :3.1757  
+#>  3rd Qu.:1.859e+01   3rd Qu.:4.2176  
+#>  Max.   :1.283e+02   Max.   :7.9304
 ```
 
 ### Log-Probability and log-density scores
@@ -252,6 +255,7 @@ so we can estimate it using
 [`predict()`](https://rdrr.io/r/stats/predict.html):
 
 ``` r
+
 pred_pois <- predict(fit_pois,
   newdata_pois,
   formula = ~ dpois(y, lambda = exp(Intercept + x)),
@@ -260,7 +264,7 @@ pred_pois <- predict(fit_pois,
 log_score <- -log(pred_pois$mean)
 summary(log_score)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.6746  1.8502  2.4290  2.4886  3.0308  5.1072
+#>  0.6722  1.8498  2.4301  2.4891  3.0266  5.1163
 ```
 
 to estimate the log_score (increase `n.samples` if needed for
@@ -269,6 +273,7 @@ confidence intervals for the scores can be obtained via the Monte Carlo
 standard errors:
 
 ``` r
+
 head(
   data.frame(
     log_S = log_score,
@@ -277,12 +282,12 @@ head(
   )
 )
 #>      log_S    lower    upper
-#> 1 2.649383 2.645401 2.653381
-#> 2 3.256565 3.244013 3.269277
-#> 3 3.205647 3.194884 3.216526
-#> 4 2.677222 2.674192 2.680262
-#> 5 3.091761 3.081482 3.102147
-#> 6 2.044725 2.043634 2.045817
+#> 1 2.646105 2.642178 2.650047
+#> 2 3.269642 3.256888 3.282560
+#> 3 3.207851 3.197010 3.218810
+#> 4 2.678807 2.675784 2.681839
+#> 5 3.093694 3.083342 3.104154
+#> 6 2.044958 2.043856 2.046061
 ```
 
 ### CRPS
@@ -309,7 +314,7 @@ change if needed.
 
 1.  Simulate samples from \lambda^{(j)}\sim p(\lambda\|\text{data})
     using
-    [`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+    [`generate()`](https://generics.r-lib.org/reference/generate.html)
     (size N\times N\_\text{samples}).
 2.  For each i=1,\dots,N, use the samples to estimate the residuals
     r\_{ik}=\mathbb{P}(Y\leq k\|\text{data})-I(y_i\leq k), for k\in
@@ -322,6 +327,7 @@ k\|\lambda^{(j)}\_i) - I(y_i\leq k) \\ . 3. Compute
 \widehat{S}\_\text{CRPS}(F_i,y_i) = \sum\_{k=0}^{K} \widehat{r}\_{ik}^2
 
 ``` r
+
 # some large value, so that 1-F(K) is small
 max_K <- ceiling(max(newdata_pois$y) + 4 * sqrt(max(newdata_pois$y)))
 k <- seq(0, max_K)
@@ -344,7 +350,7 @@ results <- data.frame(
 # Check that the cutoff point K has nearly probability mass 1 below it,
 # for all i:
 min(results |> dplyr::filter(k == max_K) |> pull(Fpred))
-#> [1] 0.9995078
+#> [1] 0.9995363
 
 crps_scores <-
   (results |>
@@ -353,7 +359,7 @@ crps_scores <-
     pull(crps))
 summary(crps_scores)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.2146  0.6704  1.3904  1.9660  2.8459  7.8817
+#>  0.2144  0.6685  1.3918  1.9674  2.8509  7.8922
 ```
 
 ## Normal model example
@@ -370,6 +376,7 @@ For illustration purposes, consider a simple Poisson model with a single
 covariate x and a linear predictor \eta = \beta_0 + \beta_1 x.
 
 ``` r
+
 true_sigma_y <- 0.1
 df_normal <- tibble::tibble(
   x = rnorm(50),
@@ -406,6 +413,7 @@ point. If `Intercept+x` is the expression for the linear predictor, and
 `newdata` holds the covariate information for the prediction points, run
 
 ``` r
+
 pred_normal <- predict(fit_normal, newdata_normal,
   formula = ~ {
     E <- Intercept + x
@@ -427,12 +435,12 @@ scores_normal <- data.frame(
 )
 summary(scores_normal)
 #>        SE                  DS               LS         
-#>  Min.   :0.0000001   Min.   :-4.687   Min.   :-1.4402  
-#>  1st Qu.:0.0006669   1st Qu.:-4.607   1st Qu.:-1.3977  
-#>  Median :0.0039526   Median :-4.251   Median :-1.2089  
-#>  Mean   :0.0096242   Mean   :-3.643   Mean   :-0.9026  
-#>  3rd Qu.:0.0133511   3rd Qu.:-3.247   3rd Qu.:-0.6864  
-#>  Max.   :0.0633760   Max.   : 2.081   Max.   : 1.9175
+#>  Min.   :3.900e-08   Min.   :-4.687   Min.   :-1.4403  
+#>  1st Qu.:6.557e-04   1st Qu.:-4.607   1st Qu.:-1.3986  
+#>  Median :3.902e-03   Median :-4.257   Median :-1.2116  
+#>  Mean   :9.614e-03   Mean   :-3.643   Mean   :-0.9030  
+#>  3rd Qu.:1.328e-02   3rd Qu.:-3.257   3rd Qu.:-0.6903  
+#>  Max.   :6.311e-02   Max.   : 2.051   Max.   : 1.9024
 ```
 
 Here, we’ve again used the negated log-score, so that small values are
@@ -445,6 +453,7 @@ full posterior predictive distribution are not equivalent.
 As for the Poisson case, we can estimate the log-score uncertainty:
 
 ``` r
+
 head(
   data.frame(
     log_S = scores_normal$LS,
@@ -453,12 +462,12 @@ head(
   )
 )
 #>        log_S      lower      upper
-#> 1 -1.0762666 -1.0824172 -1.0700779
-#> 2 -1.3997066 -1.4043494 -1.3950421
-#> 3 -1.0983772 -1.1039149 -1.0928087
-#> 4 -1.3892141 -1.3941530 -1.3842508
-#> 5 -0.6752241 -0.6928083 -0.6573252
-#> 6 -0.2955040 -0.3067642 -0.2841156
+#> 1 -1.0762271 -1.0824590 -1.0699560
+#> 2 -1.3999577 -1.4046059 -1.3952879
+#> 3 -1.0996326 -1.1051085 -1.0941265
+#> 4 -1.3884159 -1.3933726 -1.3834345
+#> 5 -0.6846123 -0.7028606 -0.6660248
+#> 6 -0.2906450 -0.3017286 -0.2794372
 ```
 
 ## Posterior expectation of conditional scores
@@ -492,6 +501,7 @@ averaging over the samples inside the quadratic expression, and we can
 use
 
 ``` r
+
 pred_pois <- predict(fit_pois, newdata_pois, formula = ~ exp(Intercept + x))
 scores <- (newdata_pois$y - pred_pois$mean)^2
 ```
@@ -502,6 +512,7 @@ If we instead take advantage of the new expression above, we have \[y -
 \mathbb{V}(\lambda\|\text{data}) so the score can be estimated by
 
 ``` r
+
 pred_pois <- predict(fit_pois, newdata_pois,
   formula = ~ {
     lambda <- exp(Intercept + x)
@@ -515,7 +526,7 @@ pred_pois <- predict(fit_pois, newdata_pois,
 scores <- pred_pois$cond_scores$mean - pred_pois$lambda$sd^2
 summary(scores)
 #>      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-#> 2.100e-05 5.129e-01 4.943e+00 1.603e+01 1.861e+01 1.315e+02
+#> 8.400e-05 5.073e-01 4.876e+00 1.605e+01 1.855e+01 1.252e+02
 ```
 
 For this particular case, this approach is unlikely to be an improvement
@@ -552,8 +563,8 @@ probability F(x).
 
 In the Poisson case, we can now estimate the CRPS scores like this, that
 makes the code a bit easier than the previous version that needed
-[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md).
-We can use the Poisson CRPS implementation
+[`generate()`](https://generics.r-lib.org/reference/generate.html). We
+can use the Poisson CRPS implementation
 [`crps_pois()`](https://rdrr.io/pkg/scoringRules/man/scores_pois.html)
 from the
 [`scoringRules`](https://cran.r-project.org/package=scoringRules)
@@ -564,6 +575,7 @@ Monte Carlo variance, so the previous version is likely preferable as it
 doesn’t require knowing a closed form CRPS expression.
 
 ``` r
+
 max_K <- 100 # some large value, so that 1-F(K) is small
 pred_pois <- predict(fit_pois, newdata_pois,
   formula = ~ {
@@ -592,7 +604,7 @@ crps_score <-
     pull(F_var))
 summary(crps_score)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.2144  0.6679  1.3924  1.9806  2.8454  7.8456
+#>  0.2142  0.6653  1.3952  1.9865  2.8608  7.8867
 ```
 
 Formulas and functions for Poisson CRPS, as well as for other

@@ -21,6 +21,17 @@ as_bru_info(object, ...)
 # S3 method for class 'bru'
 as_bru_info(object, ...)
 
+as_bru_model(object, ...)
+
+# S3 method for class 'bru_model'
+as_bru_model(object, ...)
+
+# S3 method for class 'bru_info'
+as_bru_model(object, ...)
+
+# S3 method for class 'bru'
+as_bru_model(object, ...)
+
 # S3 method for class 'bru_info'
 summary(object, verbose = TRUE, ...)
 
@@ -66,6 +77,10 @@ print(x, ...)
 
   An object to be printed
 
+## Value
+
+A `bru_info` object
+
 ## Methods (by class)
 
 - `bru_info(character)`: Create a `bru_info` object
@@ -79,6 +94,8 @@ print(x, ...)
 
 - `as_bru_info(bru_info)`: Extract a `bru_info` object.
 
+- `as_bru_model(bru_info)`: Extract a `bru_model` object.
+
 ## Functions
 
 - `as_bru_info()`: Extract the `bru_info` object from an estimated
@@ -87,5 +104,15 @@ print(x, ...)
   components and observation models.
 
 - `as_bru_info(bru)`: Extract the `bru_info` object from an estimated
+  [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
+  result object.
+
+- `as_bru_model()`: Extract the `bru_model` object from an estimated
+  [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
+  result object.
+
+- `as_bru_model(bru_model)`: Extract a `bru_model` object.
+
+- `as_bru_model(bru)`: Extract the `bru_model` object from an estimated
   [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
   result object.

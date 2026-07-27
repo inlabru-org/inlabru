@@ -3,7 +3,7 @@
 Implementations must return a
 [bru_mapper](https://inlabru-org.github.io/inlabru/reference/bru_mapper.md)
 object. The default method returns the result of
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md)
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md)
 for linear/affine mappers, and the original `mapper` for non-linear
 mappers.
 
@@ -68,19 +68,19 @@ ibm_simplify(
 
 The original mapper is returned for non-linear mappers, and the output
 of
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md)
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md)
 is returned for linear mappers.
 
 ## Methods (by class)
 
 - `ibm_simplify(default)`: Calls
-  [`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md)
+  [`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md)
   for linear mappers, and returns the original mapper for non-linear
   mappers.
 
 - `ibm_simplify(bm_pipe)`: Constructs a simplified `pipe` mapper. For
   fully linear pipes, calls
-  [`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md).
+  [`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md).
   For partially non-linear pipes, replaces each sequence of linear
   mappers with a single
   [`bm_taylor()`](https://inlabru-org.github.io/inlabru/reference/bm_taylor.md)
@@ -92,6 +92,7 @@ is returned for linear mappers.
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
@@ -99,8 +100,15 @@ Other mapper methods:
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_n_output()`](https://inlabru-org.github.io/inlabru/reference/ibm_n_output.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+
+## Examples
+
+``` r
+m <- bm_linear()
+ibm_simplify(m, input = c(1, 3, 4, 5, 2), state = 2)
+#> taylor
+```

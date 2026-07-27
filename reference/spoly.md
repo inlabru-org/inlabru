@@ -17,7 +17,7 @@ parameter.
 spoly(
   data,
   cols = colnames(data)[1:2],
-  crs = fm_crs(),
+  crs = fmesher::fm_crs(),
   to.crs = NULL,
   format = c("sp", "sf")
 )

@@ -26,11 +26,14 @@ bru_pred_expr(x, ...)
 # S3 method for class 'bru_info'
 bru_pred_expr(x, ...)
 
+# S3 method for class 'bru_model'
+bru_pred_expr(x, ...)
+
 # S3 method for class 'bru'
 bru_pred_expr(x, ...)
 
 # S3 method for class 'bru_pred_expr'
-bru_pred_expr(x, ..., format = "object")
+bru_pred_expr(x, ..., format = "object", raw = FALSE)
 
 # S3 method for class 'bru_pred_expr'
 format(x, ...)
@@ -84,9 +87,12 @@ print(x, ...)
 
   - `"formula_text"` (a text version of the "formula"),
 
-  - `"text_raw"` (plain text, without substituting `BRU_EXPRESSION`), or
-
   - `"resp_text"` (plain text of the response side of the formula).
+
+- raw:
+
+  Logical; whether to return the raw expression without substituting
+  `BRU_EXPRESSION` with the used latent variables. Default: `FALSE`
 
 ## Methods (by class)
 
@@ -98,6 +104,9 @@ print(x, ...)
 
 - `bru_pred_expr(bru_info)`: Accessor for the `bru_pred_expr` object
   stored inside a `bru_info` object.
+
+- `bru_pred_expr(bru_model)`: Accessor for the `bru_pred_expr` object
+  stored inside a `bru_model` object.
 
 - `bru_pred_expr(bru)`: Accessor for the `bru_pred_expr` object stored
   inside a `bru` object.
@@ -117,7 +126,7 @@ print(x, ...)
 
 ``` r
 (new_bru_pred_expr(~ x + z + Intercept))
-#> Predictor: ~ x + z + Intercept
-#> Additive/Linear/Rowwise: TRUE/TRUE/FALSE
+#> Predictor: ~x + z + Intercept
+#> Additive/Rowwise: TRUE/FALSE
 #> Used components: effect[x, z, Intercept], latent[]
 ```

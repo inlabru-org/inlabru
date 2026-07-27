@@ -8,6 +8,7 @@ Model components are defined using a formula syntax that is similar to
 `R-INLA` but has some differences. The basic syntax is
 
 ``` r
+
 ~ my_component_name(
   main = ...,
   model = ...
@@ -17,8 +18,7 @@ Model components are defined using a formula syntax that is similar to
 `my_component_name` is a user-chosen label for the model component. This
 label is used in model summaries, to label relevant parts of a fitted
 model object, and to access model components when sampling from a model
-using
-[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md)
+using [`generate()`](https://generics.r-lib.org/reference/generate.html)
 and [`predict()`](https://rdrr.io/r/stats/predict.html).
 
 The `main` argument defines the input data for the component. For
@@ -131,6 +131,7 @@ For example, suppose the data has columns named `x` and `y`, then a 2D
 SPDE model component could be specified as
 
 ``` r
+
 ~ my_spde_effect(
   cbind(x, y),
   model = spde_model
@@ -145,6 +146,7 @@ The full data object can be accessed using the `.data.` key-word. An
 equivalent way to define the same component is
 
 ``` r
+
 get_xy <- function(df) {
   cbind(df$x, df$y)
 }
@@ -206,12 +208,14 @@ There are a few shortcuts to defining model components. They are for
 The syntax
 
 ``` r
+
 ~ my_intercept(1)
 ```
 
 can be used as a shortcut for
 
 ``` r
+
 ~ my_intercept(
   main = rep(1, n),
   model = "linear"
@@ -241,6 +245,7 @@ method, which supports several covariate storage types.
 The shortcut
 
 ``` r
+
 ~ my_sp_effect(
   main = a_spatial_object,
   model = "linear"
@@ -252,6 +257,7 @@ internally calls
 which equivalent to
 
 ``` r
+
 ~ my_sp_effect(
   main = eval_spatial(a_spatial_object, .data.),
   model = "linear"
@@ -296,6 +302,7 @@ as input.
 Example syntax:
 
 ``` r
+
 ~ my_fixed_effects(
   main = ~ x1:x2 + x3 * x4,
   model = "fixed"
@@ -305,6 +312,7 @@ Example syntax:
 which is equvalent to
 
 ``` r
+
 ~ my_fixed_effects(
   main = MatrixModels::model.Matrix(~ x1:x2 + x3 * x4, .data.),
   model = "fixed"
@@ -332,6 +340,7 @@ If `main`, `group`, or `replicate` are given as a function with no
 covariates, then this function is applied to the data. For example,
 
 ``` r
+
 ~ a_component(
   main = a_function,
   model = ...
@@ -341,6 +350,7 @@ covariates, then this function is applied to the data. For example,
 is equivalent to
 
 ``` r
+
 ~ a_component(
   main = a_function(.data.),
   model = ...

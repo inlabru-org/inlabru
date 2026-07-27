@@ -11,6 +11,7 @@ to estimate Gorilla abundance.
 Load libraries
 
 ``` r
+
 library(fmesher)
 library(inlabru)
 library(INLA)
@@ -26,6 +27,7 @@ obtained from the `R` package `spatstat`, which contains the locations
 of 647 gorilla nests. We load the dataset like this:
 
 ``` r
+
 data(gorillas_sf, package = "inlabru")
 ```
 
@@ -38,6 +40,7 @@ objects, so that we don’t have to keep typing ‘`gorillas_sf$`’, and
 optionally load the covariates from disk:
 
 ``` r
+
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
@@ -48,6 +51,7 @@ gcov <- gorillas_sf_gcov()
 Plot the points (the nests).
 
 ``` r
+
 ggplot() +
   gg(mesh) +
   geom_sf(data = boundary, alpha = 0.1, fill = "blue") +
@@ -82,6 +86,7 @@ The steps to specifying, fitting and predicting are:
     `fm_pixels(mesh, format = "sf")`.
 
 ``` r
+
 matern <- inla.spde2.pcmatern(
   mesh,
   prior.sigma = c(0.1, 0.01),
@@ -107,9 +112,10 @@ data takes an optional argument `geom = "tile"` that converts the plot
 to the type used for lattice data.
 
 ``` r
+
 pred <- predict(
   fit,
-  fm_pixels(mesh, mask = boundary),
+  fmesher::fm_pixels(mesh, mask = boundary),
   ~ data.frame(
     lambda = exp(mySmooth + Intercept),
     loglambda = mySmooth + Intercept
@@ -135,6 +141,7 @@ You can plot the median, lower 95% and upper 95% density surfaces as
 follows (assuming that the predicted intensity is in object `lambda`).
 
 ``` r
+
 ggplot() +
   gg(
     tidyr::pivot_longer(pred$lambda,
@@ -154,6 +161,7 @@ ggplot() +
 Plot the SPDE parameter and fixed effect parameter posteriors.
 
 ``` r
+
 int.plot <- plot(fit, "Intercept")
 spde.range <- spde.posterior(fit, "mySmooth", what = "range")
 spde.logvar <- spde.posterior(fit, "mySmooth", what = "log.variance")
@@ -168,6 +176,7 @@ var.plot <- plot(spde.logvar)
 Look at the correlation function if you want to:
 
 ``` r
+
 corplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.correlation"))
 covplot <- plot(spde.posterior(fit, "mySmooth", what = "matern.covariance"))
 (covplot / corplot)
@@ -184,25 +193,27 @@ step we need an estimate for the integrated lambda. The integration
 output.
 
 ``` r
+
 Lambda <- predict(
   fit,
-  fm_int(mesh, boundary),
+  fmesher::fm_int(mesh, boundary),
   ~ sum(weight * exp(mySmooth + Intercept))
 )
 Lambda
-#>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 672.1413 25.04956 626.5088 671.0176 725.0979 671.0176        2.838899
+#>      mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
+#> 1 675.907 28.40663 623.8281 675.5544 735.7902 675.5544        3.263137
 #>   sd.mc_std_err
-#> 1      1.669716
+#> 1       2.11237
 ```
 
 Given some generous interval boundaries (500, 800) for lambda we can
 estimate the posterior abundance distribution via
 
 ``` r
+
 Nest <- predict(
   fit,
-  fm_int(mesh, boundary),
+  fmesher::fm_int(mesh, boundary),
   ~ data.frame(
     N = 500:800,
     dpois(500:800,
@@ -215,20 +226,23 @@ Nest <- predict(
 Get its quantiles via
 
 ``` r
+
 inla.qmarginal(c(0.025, 0.5, 0.975), marginal = list(x = Nest$N, y = Nest$mean))
-#> [1] 602.6217 675.2365 746.8163
+#> [1] 595.2843 667.2684 740.8924
 ```
 
 … the mean via
 
 ``` r
+
 inla.emarginal(identity, marginal = list(x = Nest$N, y = Nest$mean))
-#> [1] 674.9842
+#> [1] 667.5486
 ```
 
 and plot posteriors:
 
 ``` r
+
 Nest$plugin_estimate <- dpois(Nest$N, lambda = Lambda$mean)
 ggplot(data = Nest) +
   geom_line(aes(x = N, y = mean, colour = "Posterior")) +

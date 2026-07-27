@@ -60,6 +60,7 @@ Other mappers:
 [`bm_aggregate()`](https://inlabru-org.github.io/inlabru/reference/bm_aggregate.md),
 [`bm_collect()`](https://inlabru-org.github.io/inlabru/reference/bm_collect.md),
 [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md),
+[`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md),
 [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md),
 [`bm_fm_mesh_1d`](https://inlabru-org.github.io/inlabru/reference/bm_fm_mesh_1d.md),
 [`bm_fmesher()`](https://inlabru-org.github.io/inlabru/reference/bm_fmesher.md),
@@ -102,7 +103,7 @@ ibm_eval(m, 1:3, seq_len(ibm_n(m)))
 
 # Interleaving and grouping
 (m <- bm_repeat(m0, c(2, 1, 2), c(TRUE, FALSE, FALSE)))
-#> sum(1 = repeat(2 x index, interleaved), 2 = repeat(3 x index))
+#> sum(1 = {repeat(2 x index, interleaved)}, 2 = {repeat(3 x index)})
 ibm_n(m)
 #> [1] 15
 ibm_values(m)

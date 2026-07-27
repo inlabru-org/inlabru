@@ -40,6 +40,7 @@ R --verbose
 In R:
 
 ``` r
+
 # Now, in a R environment
 options(repos = c(
   INLA = "https://inla.r-inla-download.org/R/testing",

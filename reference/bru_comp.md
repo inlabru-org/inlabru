@@ -187,6 +187,11 @@ bru_comp(
   NULL, an new environment is created. Can be accessed via
   [`bru_comp_env_extra()`](https://inlabru-org.github.io/inlabru/reference/bru_comp_env_extra.md)
 
+## Value
+
+A `bru_comp` object defining a latent component and its associated
+effect mapping.
+
 ## Details
 
 As shorthand,
@@ -257,7 +262,7 @@ Being able to discriminate between \\x\\ and \\\psi\\ is relevant
 because of two functionalities bru offers. The formula parameters of
 both [`bru()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
 and the prediction method
-[predict.bru](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+[predict.bru](https://inlabru-org.github.io/inlabru/reference/predict.md)
 are interpreted in the mathematical sense. For instance, `predict` may
 be used to analyze the analytical combination of the covariate \\x\\ and
 the intercept using
@@ -298,13 +303,13 @@ cmp <- bru_comp_list(~ myLinearEffectOfX(main = x, model = "linear"))
 summary(cmp)
 #> Label:   myLinearEffectOfX 
 #>   Type:  main = linear 
-#>   Map:   pipe = multi(main = autodetect(x)) 
+#>   Map:   pipe = multi(main = {autodetect(x)}) 
 #>   INLA formula:  
 #>     ~ . + f(myLinearEffectOfX, model =
 #>       BRU_myLinearEffectOfX_main_model) 
 #> Label:   Intercept 
 #>   Type:  main = linear 
-#>   Map:   pipe = multi(main = autodetect(1)) 
+#>   Map:   pipe = multi(main = {autodetect(1)}) 
 #>   INLA formula:  
 #>     ~ . + f(Intercept, model = BRU_Intercept_main_model) 
 # Equivalent shortcuts:
@@ -315,7 +320,7 @@ cmp <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 summary(cmp)
 #> Label:   myLinearEffectOfX 
 #>   Type:  main = linear 
-#>   Map:   pipe = multi(main = autodetect(x)) 
+#>   Map:   pipe = multi(main = {autodetect(x)}) 
 #>   INLA formula:  
 #>     ~ . + f(myLinearEffectOfX, model =
 #>       BRU_myLinearEffectOfX_main_model) 
@@ -341,7 +346,7 @@ if (bru_safe_inla()) {
 }
 #> Label:   eff 
 #>   Type:  main = fixed 
-#>   Map:   pipe = multi(main = autodetect(~-1 + x:z)) 
+#>   Map:   pipe = multi(main = {autodetect(~-1 + x:z)}) 
 #>   INLA formula:  
 #>     ~ . + f(eff, model = BRU_eff_main_model, hyper =
 #>       BRU_eff_main_fixed_hyper) 

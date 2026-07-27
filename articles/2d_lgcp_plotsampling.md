@@ -11,6 +11,7 @@ of plots in the survey region.
 Load libraries
 
 ``` r
+
 library(fmesher)
 library(inlabru)
 library(INLA)
@@ -21,6 +22,7 @@ library(ggplot2)
 ## Get the data
 
 ``` r
+
 data(gorillas_sf, package = "inlabru")
 ```
 
@@ -30,6 +32,7 @@ for details. Extract the the objects you need from the list, for
 convenience:
 
 ``` r
+
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
 boundary <- gorillas_sf$boundary
@@ -41,10 +44,12 @@ The `gorillas_sf` data also contains a plot sample subset which covers
 60% of the survey region.
 
 ``` r
+
 sample <- gorillas_sf$plotsample
 ```
 
 ``` r
+
 plotdets <- ggplot() +
   gg(boundary) +
   gg(sample$plots) +
@@ -66,6 +71,7 @@ real plot survey you could not do, because you would not have seen them
 all).
 
 ``` r
+
 plotwithall <- ggplot() +
   gg(boundary) +
   gg(sample$plots) +
@@ -89,6 +95,7 @@ plots are in the `sf` `sample$plots`. Again, we are using the following
 SPDE setup:
 
 ``` r
+
 matern <- inla.spde2.pcmatern(mesh,
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.05, 0.01)
@@ -100,6 +107,7 @@ argument of the function
 [`lgcp( )`](https://inlabru-org.github.io/inlabru/reference/lgcp.md):
 
 ``` r
+
 cmp <- geometry ~ my.spde(geometry, model = matern)
 
 fit <- lgcp(cmp,
@@ -112,11 +120,13 @@ fit <- lgcp(cmp,
 Plot the density surface from your fitted model
 
 ``` r
+
 pxl <- fm_pixels(mesh, mask = boundary)
 lambda.sample <- predict(fit, pxl, ~ exp(my.spde + Intercept))
 ```
 
 ``` r
+
 lambda.sample.plot <- ggplot() +
   gg(lambda.sample, geom = "tile") +
   gg(sample$plots, alpha = 0) +
@@ -134,6 +144,7 @@ actually observed nests into account, by recognising that we have
 complete information in the surveyed plots.
 
 ``` r
+
 Lambda <- predict(
   fit,
   fm_int(mesh, boundary),
@@ -160,6 +171,7 @@ Fit the same model to the full dataset (the points in
 intensity surface and estimate the integrated intensity
 
 ``` r
+
 fit.all <- lgcp(cmp, nests,
   samplers = boundary,
   domain = list(geometry = mesh)
@@ -181,6 +193,7 @@ close to each other if the plot samples gave sufficient information for
 the overall prediction:
 
 ``` r
+
 rbind(
   Plots = Lambda,
   PlotsEmp = Lambda.empirical,
@@ -193,20 +206,21 @@ rbind(
   )
 )
 #>              mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> Plots    658.5487 47.82498 569.8278 661.4738 756.4607 661.4738        5.508716
-#> PlotsEmp 644.6850 40.87001 565.7030 644.3055 724.3850 644.3055        4.662591
-#> All      673.5311 28.41521 625.9454 672.0984 727.6807 672.0984        3.172526
+#> Plots    661.0623 47.34472 578.2771 662.2237 762.1676 662.2237        5.383716
+#> PlotsEmp 640.6520 37.93582 570.5890 640.2118 719.4910 640.2118        4.341687
+#> All      672.4880 24.79734 627.2966 670.5408 718.2919 670.5408        2.812837
 #> AllEmp   647.0000  0.00000 647.0000 647.0000 647.0000       NA              NA
 #>          sd.mc_std_err
-#> Plots         3.631090
-#> PlotsEmp      2.877946
-#> All           1.655024
+#> Plots         3.246222
+#> PlotsEmp      2.740529
+#> All           1.665519
 #> AllEmp              NA
 ```
 
 Now, let’s compare the results
 
 ``` r
+
 library(patchwork)
 lambda.sample.plot + lambda.all.plot +
   plot_layout(guides = "collect") &

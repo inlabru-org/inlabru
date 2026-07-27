@@ -57,6 +57,9 @@ print(
   labels = TRUE,
   collapse = ", "
 )
+
+# S3 method for class 'bm_expr'
+format(x, ..., prefix = "", initial = prefix, depth = 1)
 ```
 
 ## Arguments
@@ -100,6 +103,10 @@ print(
 
   character; separator for printing the summary.
 
+## Value
+
+- `format` character.
+
 ## Examples
 
 ``` r
@@ -114,7 +121,7 @@ mapper <-
     )
   )
 summary(mapper, depth = 2)
-#> pipe = multi(A = index, B = index) -> index
+#> pipe = multi(A = {index}, B = {index}) -> index
 mapper <-
   bm_repeat(
     bm_multi(
@@ -126,7 +133,7 @@ mapper <-
     3
   )
 summary(mapper)
-#> repeat(3 x multi(A = index, B = index))
+#> repeat(3 x multi(A = {index}, B = {index}))
 summary(mapper, depth = 0)
 #> repeat(3 x multi)
 mapper <-
@@ -140,7 +147,12 @@ mapper <-
     matrix(1:36, nrow = 6)
   )
 summary(mapper)
-#> reparam(multi(A = index, B = index))
+#> reparam(multi(A = {index}, B = {index}))
 summary(mapper, depth = 0)
 #> reparam(multi)
+mapper <- bm_expr(~ cos(x))
+summary(mapper)
+#> expr(~cos(x))
+summary(mapper, depth = 1)
+#> expr(~cos(x))
 ```

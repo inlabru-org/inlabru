@@ -11,7 +11,13 @@ information is setup by
 ## Usage
 
 ``` r
-iinla(model, lhoods, inputs = NULL, initial = NULL, options)
+iinla(
+  model,
+  initial = NULL,
+  options,
+  lhoods = deprecated(),
+  inputs = deprecated()
+)
 ```
 
 ## Arguments
@@ -22,17 +28,6 @@ iinla(model, lhoods, inputs = NULL, initial = NULL, options)
   [bru_model](https://inlabru-org.github.io/inlabru/reference/bru_model.md)
   object
 
-- lhoods:
-
-  A list of likelihood objects from
-  [`bru_obs()`](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
-
-- inputs:
-
-  Optional pre-computed list of per-likelihood component evaluations,
-  from
-  [`bru_input.bru_obs_list()`](https://inlabru-org.github.io/inlabru/reference/bru_input.md).
-
 - initial:
 
   A previous `bru` result or a list of named latent variable initial
@@ -42,6 +37,23 @@ iinla(model, lhoods, inputs = NULL, initial = NULL, options)
 - options:
 
   A `bru_options` object.
+
+- lhoods:
+
+  **\[deprecated\]** Deprecated from version `2.14.1.9011`, since the
+  [bru_obs_list](https://inlabru-org.github.io/inlabru/reference/bru_obs.md)
+  information is now part of the
+  [bru_model](https://inlabru-org.github.io/inlabru/reference/bru_model.md)
+  object.
+
+- inputs:
+
+  **\[deprecated\]** Deprecated from version `2.14.1.9011`, since the
+  inputs information is now part of the
+  [bru_model](https://inlabru-org.github.io/inlabru/reference/bru_model.md)
+  object. Optional pre-computed list of per-likelihood component
+  evaluations, from
+  [`bru_input.bru_obs_list()`](https://inlabru-org.github.io/inlabru/reference/bru_input.md).
 
 ## Value
 

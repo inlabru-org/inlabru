@@ -5,14 +5,17 @@
 We’re going to estimate distribution and abundance from a line transect
 survey of dolphins in the Gulf of Mexico. These data are also available
 in the `R` package `dsm` (where they go under the name `mexdolphins`).
-In `inlabru` the data are called `mexdolphin` for `sp` format, and
-`mexdolphin_sf` for `sf` format.
+In `inlabru` the data are called `mexdolphin_sf` for `sf` format, and
+`sp` an format can be obtained using the
+[`mexdolphin_sp()`](https://inlabru-org.github.io/inlabru/reference/mexdolphin_sf.md)
+function.
 
 ## Setting things up
 
 Load libraries
 
 ``` r
+
 library(inlabru)
 library(fmesher)
 library(INLA)
@@ -25,6 +28,7 @@ We’ll start by loading the data, renaming it, and extracting the mesh
 (for convenience).
 
 ``` r
+
 mexdolphin <- mexdolphin_sf
 mesh <- mexdolphin$mesh
 ```
@@ -33,6 +37,7 @@ Plot the data (the initial code below is just to get rid of tick marks,
 if desired)
 
 ``` r
+
 noyticks <- theme(
   axis.text.y = element_blank(),
   axis.ticks = element_blank()
@@ -65,6 +70,7 @@ these data is 8. We start by plotting the distances and histogram of
 frequencies in distance intervals:
 
 ``` r
+
 W <- 8
 ggplot(mexdolphin$points) +
   geom_histogram(aes(x = distance),
@@ -81,6 +87,7 @@ must take distance as its first argument and the linear predictor of the
 sigma parameter as its second:
 
 ``` r
+
 hn <- function(distance, sigma) {
   exp(-0.5 * (distance / sigma)^2)
 }
@@ -93,6 +100,7 @@ somewhat arbitrary value, but motivated by the maximum observation
 distance `W`):
 
 ``` r
+
 bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 ```
 
@@ -101,6 +109,7 @@ detection function form. We need to define a (Matérn) covariance
 function for the SPDE:
 
 ``` r
+
 matern <- inla.spde2.pcmatern(mexdolphin$mesh,
   prior.sigma = c(2, 0.01),
   prior.range = c(50, 0.01)
@@ -115,6 +124,7 @@ We need to now separately define the components of the model (the SPDE,
 the Intercept and the detection function parameter `sigma`)
 
 ``` r
+
 cmp <- ~ mySPDE(main = geometry, model = matern) +
   sigma(1,
     prec.linear = 1,
@@ -131,6 +141,7 @@ the linear predictor (remembering that we need an offset due to the
 unknown direction of the detections!):
 
 ``` r
+
 form <- geometry + distance ~ mySPDE +
   log(hn(distance, sigma)) +
   Intercept + log(2)
@@ -142,6 +153,7 @@ in the predictor expression, requiring corresponding adjustments to the
 later [`predict()`](https://rdrr.io/r/stats/predict.html) calls, etc:
 
 ``` r
+
 # sigma_transf <- function(x) {
 #   bru_forward_transformation(qexp, x, rate = 1 / 8)
 # }
@@ -158,9 +170,11 @@ Then we fit the model, passing both the components and the formula
 specify integration domains for the spatial and distance dimensions:
 
 ``` r
+
 fit <- lgcp(
   components = cmp,
-  mexdolphin$points,
+  is_rowwise = TRUE,
+  data = mexdolphin$points,
   samplers = mexdolphin$samplers,
   domain = list(
     geometry = mesh,
@@ -173,6 +187,7 @@ fit <- lgcp(
 Look at the SPDE parameter posteriors
 
 ``` r
+
 spde.range <- spde.posterior(fit, "mySPDE", what = "range")
 plot(spde.range)
 ```
@@ -180,6 +195,7 @@ plot(spde.range)
 ![](2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-13-1.png)
 
 ``` r
+
 spde.logvar <- spde.posterior(fit, "mySPDE", what = "log.variance")
 plot(spde.logvar)
 ```
@@ -189,11 +205,13 @@ plot(spde.logvar)
 Predict spatial intensity, and plot it:
 
 ``` r
+
 pxl <- fm_pixels(mesh, dims = c(200, 100), mask = mexdolphin$ppoly)
 pr.int <- predict(fit, pxl, ~ exp(mySPDE + Intercept))
 ```
 
 ``` r
+
 ggplot() +
   gg(pr.int, geom = "tile") +
   gg(mexdolphin$ppoly, linewidth = 1, alpha = 0) +
@@ -213,10 +231,11 @@ one below. Here, we should make sure that it doesn’t try to evaluate the
 effects of components that can’t be evaluated using the given input
 data. From version 2.8.0, `inlabru` automatically detects which
 components are involved. See
-[`?predict.bru`](https://inlabru-org.github.io/inlabru/reference/predict.bru.md)
+[`?predict.bru`](https://inlabru-org.github.io/inlabru/reference/predict.md)
 for more information.
 
 ``` r
+
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun <- predict(fit, distdf, ~ hn(distance, sigma))
 plot(dfun)
@@ -224,18 +243,19 @@ plot(dfun)
 
 ![](2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-16-1.png)
 The average detection probability within the maximum detection distance
-is estimated to be 0.7055873.
+is estimated to be 0.6999319.
 
 We can look at the posterior for expected number of dolphins as usual:
 
 ``` r
+
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda <- predict(fit, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda
 #>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 242.2485 55.68981 158.1033 229.3974 356.1677 229.3974        6.241549
+#> 1 253.6056 59.87417 166.9217 255.2476 398.7837 255.2476        6.883002
 #>   sd.mc_std_err
-#> 1       3.36284
+#> 1      4.477929
 ```
 
 and including the randomness about the expected number. In this case, it
@@ -244,6 +264,7 @@ out the Monte Carlo error in the posterior, and this takes a little
 while to compute:
 
 ``` r
+
 Ns <- seq(50, 450, by = 1)
 Nest <- predict(fit, predpts,
   ~ data.frame(
@@ -290,6 +311,7 @@ half-Normal model (such parameters aren’t always comparable, but in this
 example it’s a reasonable choice):
 
 ``` r
+
 hr <- function(distance, sigma) {
   1 - exp(-(distance / sigma)^-1)
 }
@@ -298,6 +320,7 @@ hr <- function(distance, sigma) {
 Solution:
 
 ``` r
+
 formula1 <- geometry + distance ~ mySPDE +
   log(hr(distance, sigma)) +
   Intercept + log(2)
@@ -317,6 +340,7 @@ fit1 <- lgcp(
 Plots:
 
 ``` r
+
 spde.range <- spde.posterior(fit1, "mySPDE", what = "range")
 plot(spde.range)
 ```
@@ -324,6 +348,7 @@ plot(spde.range)
 ![](2d_lgcp_distancesampling_files/figure-html/spde.range.plot-1.png)
 
 ``` r
+
 spde.logvar <- spde.posterior(fit1, "mySPDE", what = "log.variance")
 plot(spde.logvar)
 ```
@@ -331,6 +356,7 @@ plot(spde.logvar)
 ![](2d_lgcp_distancesampling_files/figure-html/spde.logvar.plot-1.png)
 
 ``` r
+
 pr.int1 <- predict(fit1, pxl, ~ exp(mySPDE + Intercept))
 
 ggplot() +
@@ -348,6 +374,7 @@ ggplot() +
 ![](2d_lgcp_distancesampling_files/figure-html/lambda.field.plot-1.png)
 
 ``` r
+
 distdf <- data.frame(distance = seq(0, 8, length.out = 100))
 dfun1 <- predict(fit1, distdf, ~ hr(distance, sigma))
 plot(dfun1)
@@ -356,16 +383,18 @@ plot(dfun1)
 ![](2d_lgcp_distancesampling_files/figure-html/detection.plot-1.png)
 
 ``` r
+
 predpts <- fm_int(mexdolphin$mesh, mexdolphin$ppoly)
 Lambda1 <- predict(fit1, predpts, ~ sum(weight * exp(mySPDE + Intercept)))
 Lambda1
 #>       mean       sd   q0.025     q0.5   q0.975   median mean.mc_std_err
-#> 1 292.4255 84.84793 152.5844 279.2566 473.7728 279.2566        9.755358
+#> 1 285.6374 74.31623 172.2163 286.0136 424.8881 286.0136        8.669447
 #>   sd.mc_std_err
-#> 1      6.352825
+#> 1      6.189122
 ```
 
 ``` r
+
 Ns <- seq(50, 650, by = 1)
 Nest1 <- predict(
   fit1,
@@ -412,6 +441,7 @@ ggplot(data = Nest1) +
 Look at the goodness-of-fit of the two models in the distance dimension
 
 ``` r
+
 bc <- bincount(
   result = fit,
   observations = mexdolphin$points$distance,
@@ -424,6 +454,7 @@ attributes(bc)$ggp
 ![](2d_lgcp_distancesampling_files/figure-html/unnamed-chunk-21-1.png)
 
 ``` r
+
 
 bc1 <- bincount(
   result = fit1,
@@ -441,6 +472,7 @@ attributes(bc1)$ggp
 Half-normal first
 
 ``` r
+
 formula <- distance ~ log(hn(distance, sigma)) + Intercept
 cmp <- ~ sigma(1,
   prec.linear = 1,
@@ -460,6 +492,7 @@ detfun <- predict(dfit, distdf, ~ hn(distance, sigma))
 Hazard-rate next
 
 ``` r
+
 formula1 <- distance ~ log(hr(distance, sigma)) + Intercept
 cmp <- ~ sigma(1,
   prec.linear = 1,
@@ -481,6 +514,7 @@ same area as that of histogram.
 Half-normal:
 
 ``` r
+
 hnline <- data.frame(
   distance = detfun$distance,
   p = detfun$mean,
@@ -501,6 +535,7 @@ hnline$En.upper <- hnline$upper * scale
 Hazard-rate:
 
 ``` r
+
 hrline <- data.frame(
   distance = detfun1$distance,
   p = detfun1$mean,
@@ -521,6 +556,7 @@ hrline$En.upper <- hrline$upper * scale
 Combine lines in a single object for plotting
 
 ``` r
+
 dlines <- rbind(
   cbind(hnline, model = "Half-normal"),
   cbind(hrline, model = "Hazard-rate")
@@ -530,6 +566,7 @@ dlines <- rbind(
 Plot without the 95% credible intervals
 
 ``` r
+
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance),
     breaks = seq(0, 8, length.out = 9),
@@ -548,6 +585,7 @@ Plot with the 95% credible intervals (without taking the count rescaling
 into account)
 
 ``` r
+
 ggplot(data.frame(mexdolphin$points)) +
   geom_histogram(aes(x = distance),
     breaks = seq(0, 8, length.out = 9),

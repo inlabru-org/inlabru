@@ -3,6 +3,7 @@
 (Vignette under construction!)
 
 ``` r
+
 library(fmesher)
 library(dplyr)
 library(ggplot2)
@@ -32,6 +33,7 @@ covariate raster dimensions). Finally, we mask regions outside the study
 area.
 
 ``` r
+
 gorillas_sf <- inlabru::gorillas_sf
 nests <- gorillas_sf$nests
 mesh <- gorillas_sf$mesh
@@ -50,6 +52,7 @@ nests](zip_zap_models_files/figure-html/fig-count-raster-1.png)
 Counts of gorilla nests
 
 ``` r
+
 counts_rstr <- counts_rstr |>
   cellSize(unit = "km") |>
   c(counts_rstr)
@@ -60,6 +63,7 @@ illustrates the pixel locations for all pixels with non-zero counts. We
 create a mesh over the study area and define a prior for it.
 
 ``` r
+
 counts_df <- crds(counts_rstr, df = TRUE, na.rm = TRUE) |>
   bind_cols(values(counts_rstr, mat = TRUE, na.rm = TRUE)) |>
   rename(count = sum) |>
@@ -74,6 +78,7 @@ proportion of land cover for some classes, say classes 2, and 3
 (Disturbed, and Grassland, respectively).
 
 ``` r
+
 gcov_lvls <- gcov$vegetation |> levels()
 gcov_vegetation <- gcov$vegetation |>
   segregate() |>
@@ -88,6 +93,7 @@ class](zip_zap_models_files/figure-html/fig-vegetation-raster-1.png)
 Proportion of vegetation cover by class
 
 ``` r
+
 px_mesh <- fm_mesh_2d_inla(
   loc = st_intersection(st_as_sfc(counts_df), st_buffer(boundary, -0.05)),
   boundary = boundary,
@@ -123,6 +129,7 @@ observation plot (raster cell) to the spatial covariates, such as
 vegetation type and elevation.
 
 ``` r
+
 comps <- ~ veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
   veg_grassland(gcov_vegetation$Grassland, model = "linear") +
   elevation(gcov$elevation, model = "linear") +
@@ -139,8 +146,8 @@ fit_poi <- bru(
   )
 )
 summary(fit_poi)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> veg_disturbed: main = linear(gcov_vegetation$Disturbed)
 #> veg_grassland: main = linear(gcov_vegetation$Grassland)
@@ -156,7 +163,7 @@ summary(fit_poi)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.649, Running = 3.36, Post = 0.638, Total = 4.65 
+#>     Pre = 0.447, Running = 2.65, Post = 0.596, Total = 3.69 
 #> Fixed effects:
 #>                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 #> veg_disturbed -0.183 0.380     -0.928   -0.183      0.564 -0.183   0
@@ -239,6 +246,7 @@ The expected value and variance for the counts are calculated as:
 \lambda^2) \end{gathered}
 
 ``` r
+
 fit_zip <- bru(
   comps,
   bru_obs(
@@ -251,8 +259,8 @@ fit_zip <- bru(
 )
 
 summary(fit_zip)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> veg_disturbed: main = linear(gcov_vegetation$Disturbed)
 #> veg_grassland: main = linear(gcov_vegetation$Grassland)
@@ -268,7 +276,7 @@ summary(fit_zip)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[veg_disturbed, veg_grassland, elevation, field, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.549, Running = 5.88, Post = 0.147, Total = 6.58 
+#>     Pre = 0.265, Running = 3.99, Post = 0.0753, Total = 4.33 
 #> Fixed effects:
 #>                 mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 #> veg_disturbed -0.370 0.370     -1.092   -0.372      0.359 -0.372   0
@@ -371,7 +379,9 @@ binary observation model modelling presence/absence. Before INLA version
 value. The [`nzpossion`
 model](https://inla.r-inla-download.org/r-inla.org/doc/likelihood/nzpoisson.pdf),
 available from INLA version `23.10.19-1` implements the
-\text{Poisson}(y\vert y\>0) model exactly.
+\text{Poisson}(y\vert y\>0) model exactly. `inlabru` added shortcuts for
+the hyperparameter approach for “nzbinomal”, “nznbinomial”,
+“nzcenpoisson”, and “nzbetabinomial”, in version `2.14.1.9007`.
 
 In the resulting model, the truncated Poisson distribution governs only
 the positive counts, while the absences are addressed by a separate
@@ -394,6 +404,7 @@ E(\text{count}) \left(1-\exp(-\lambda) E(\text{count})\right)
 \end{aligned}
 
 ``` r
+
 comps <- ~
   Intercept_count(1) +
     veg_disturbed(gcov_vegetation$Disturbed, model = "linear") +
@@ -408,24 +419,12 @@ comps <- ~
 #  field_count(geometry, copy = "field_present", fixed = FALSE)
 
 truncated_poisson_obs <-
-  if (package_version(getNamespaceVersion("INLA")) < "23.10.19-1") {
-    bru_obs(
-      family = "zeroinflatedpoisson0",
-      data = counts_df[counts_df$present > 0, ],
-      formula = count ~ elevation + field_count + Intercept_count,
-      E = area,
-      control.family = list(hyper = list(theta = list(
-        initial = -20, fixed = TRUE
-      )))
-    )
-  } else {
-    bru_obs(
-      family = "nzpoisson",
-      data = counts_df[counts_df$present > 0, ],
-      formula = count ~ elevation + field_count + Intercept_count,
-      E = area
-    )
-  }
+  bru_obs(
+    family = "nzpoisson",
+    data = counts_df[counts_df$present > 0, ],
+    formula = count ~ elevation + field_count + Intercept_count,
+    E = area
+  )
 
 present_obs <- bru_obs(
   family = "binomial",
@@ -442,8 +441,8 @@ fit_zap <- bru(
 )
 
 summary(fit_zap)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> veg_disturbed: main = linear(gcov_vegetation$Disturbed)
 #> veg_grassland: main = linear(gcov_vegetation$Grassland)
@@ -469,14 +468,14 @@ summary(fit_zap)
 #>     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
 #>     Used components: effect[Intercept_count, elevation, field_count], latent[] 
 #> Time used:
-#>     Pre = 0.438, Running = 4.79, Post = 0.223, Total = 5.45 
+#>     Pre = 0.383, Running = 4.87, Post = 0.163, Total = 5.41 
 #> Fixed effects:
 #>                      mean    sd 0.025quant 0.5quant 0.975quant    mode kld
-#> veg_disturbed      -1.028 0.637     -2.263   -1.033      0.237  -1.034   0
-#> veg_grassland      -1.383 0.588     -2.539   -1.382     -0.230  -1.382   0
-#> Intercept_present -10.828 4.537    -19.995  -10.753     -2.075 -10.750   0
+#> veg_disturbed      -1.027 0.637     -2.261   -1.032      0.238  -1.032   0
+#> veg_grassland      -1.382 0.588     -2.537   -1.381     -0.229  -1.381   0
+#> Intercept_present -10.824 4.540    -19.996  -10.749     -2.066 -10.746   0
 #> elevation_present   0.004 0.002     -0.001    0.004      0.009   0.004   0
-#> Intercept_count     1.856 1.691     -1.807    1.952      4.975   2.202   0
+#> Intercept_count     1.852 1.696     -1.824    1.948      4.979   2.199   0
 #> elevation           0.001 0.001      0.000    0.001      0.003   0.001   0
 #> 
 #> Random effects:
@@ -486,12 +485,12 @@ summary(fit_zap)
 #> 
 #> Model hyperparameters:
 #>                          mean    sd 0.025quant 0.5quant 0.975quant  mode
-#> Range for field_present 2.406 0.727      1.343    2.286       4.17 2.049
-#> Stdev for field_present 3.164 0.743      1.997    3.066       4.90 2.861
-#> Range for field_count   0.566 0.237      0.256    0.518       1.17 0.432
-#> Stdev for field_count   0.801 0.136      0.570    0.788       1.11 0.760
+#> Range for field_present 2.406 0.726      1.338    2.289       4.17 2.056
+#> Stdev for field_present 3.165 0.745      1.992    3.068       4.91 2.866
+#> Range for field_count   0.567 0.238      0.255    0.518       1.17 0.433
+#> Stdev for field_count   0.802 0.137      0.570    0.789       1.11 0.762
 #> 
-#> Marginal log-Likelihood:  -764.28 
+#> Marginal log-Likelihood:  -764.27 
 #> CPO, PIT is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
@@ -514,6 +513,7 @@ two parts.
 ## Predict intensity on the original raster locations
 
 ``` r
+
 pred_zap <- predict(
   fit_zap,
   counts_df,
@@ -587,11 +587,11 @@ X_i based on the expectations and variances of the model predictions m_i
 and s_i^2 for each grid box, conditioned on the model predictor \eta_i.
 
 Predictive Integral Transform (PIT) (Marshall and Spiegelhalter 2003;
-Gelman, Meng, and Stern 1996; Held, Schrödle, and Rue 2010) is
-calculated as the cumulative distribution function (CDF) of the observed
-data at each predicted value from the model. Mathematically, for each
-observation y_i and its corresponding predicted value \hat{y}\_i from
-the model, the PIT is calculated as follows:
+Gelman et al. 1996; Held et al. 2010) is calculated as the cumulative
+distribution function (CDF) of the observed data at each predicted value
+from the model. Mathematically, for each observation y_i and its
+corresponding predicted value \hat{y}\_i from the model, the PIT is
+calculated as follows:
 
 PIT_i=P(Y_i\leq \hat y_i \vert data)
 
@@ -630,6 +630,7 @@ CPO is often used:
 fit.
 
 ``` r
+
 zap_pit <- rep(NA_real_, nrow(counts_df))
 zap_pit[counts_df$count > 0] <- fit_zap$cpo$pit[-seq_len(nrow(counts_df))]
 
@@ -695,6 +696,7 @@ hyperparameters, but for the actual prediction median, one would need to
 sample from the full posterior count model.
 
 ``` r
+
 df <- df |>
   mutate(
     SE = (count - pred_mean)^2,
@@ -723,13 +725,14 @@ knitr::kable(scores)
 
 | Model   |      RMSE |       MDS |       MLG |
 |:--------|----------:|----------:|----------:|
-| Poisson | 0.6206318 | -2.292871 | 0.4469074 |
-| ZIP     | 0.7111063 | -2.329507 | 0.4648638 |
-| ZAP     | 0.7298371 | -1.994193 | 0.4514556 |
+| Poisson | 0.6216723 | -2.214451 | 0.4470953 |
+| ZIP     | 0.7119346 | -2.344356 | 0.4647422 |
+| ZAP     | 0.7309681 | -1.979667 | 0.4515611 |
 
 We see that the average scores are very similar between all three models
 
 ``` r
+
 df <- df |>
   tibble::as_tibble() |>
   cbind(geometry = c(
@@ -752,6 +755,7 @@ df_ <- df |>
 ```
 
 ``` r
+
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ |> filter(Model == "Poisson"), aes(fill = DS), geom = "tile") +
@@ -797,6 +801,7 @@ patchwork::wrap_plots(p1, p2, p3, nrow = 1)
 ![](zip_zap_models_files/figure-html/unnamed-chunk-6-1.png)
 
 ``` r
+
 p1 <- ggplot() +
   geom_fm(data = px_mesh) +
   gg(df_ |> filter(Model == "Poisson"), aes(fill = LG), geom = "tile") +
@@ -858,7 +863,7 @@ Schrödle, B; Rue, H (2010). Posterior and Cross-validatory Predictive
 Checks: A Comparison of MCMC and INLA. In: Kneib, T; Tutz, G.
 Statistical Modelling and Regression Structures - Festschrift in Honour
 of Ludwig Fahrmeir. Berlin: Physica-Verlag (Springer), 91-110.*, edited
-by T. Kneib and G. Tutz, 91–110. Berlin: Physica-Verlag (Springer).
+by T. Kneib and G. Tutz. Physica-Verlag (Springer).
 <https://doi.org/10.1007/978-3-7908-2413-1>.
 
 Marshall, E. C., and D. J. Spiegelhalter. 2003. “Approximate

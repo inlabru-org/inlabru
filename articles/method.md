@@ -80,7 +80,7 @@ linearisation point \boldsymbol{u}\_\*. For a given linearisation point
 \overline{p}\_\boldsymbol{v} ( \boldsymbol{u} \| \boldsymbol{y},
 \widehat{\boldsymbol{\theta}}\_{\boldsymbol{v}} ) .
 
-Define the Bayesian estimation functional[¹](#fn1)
+Define the Bayesian estimation functional[^1]
 f(\overline{p}\_{\boldsymbol{v}}) =
 (\widehat{\boldsymbol{\theta}}\_{\boldsymbol{v}},\widehat{\boldsymbol{u}}\_{\boldsymbol{v}})
 and let f(p)=(\widehat{\boldsymbol{\theta}},\widehat{\boldsymbol{u}})
@@ -400,9 +400,7 @@ However, the first inlabru iteration will give a non-zero estimate of
 \boldsymbol{u}, so that subsequent iteration will involve both \beta and
 \boldsymbol{u}.
 
-------------------------------------------------------------------------
-
-1.  Potential other choices for f(\cdot) include the posterior
+[^1]: Potential other choices for f(\cdot) include the posterior
     expectation \overline{E}(\boldsymbol{u}\|\boldsymbol{y}) and the
     marginal conditional modes, \left\\\mathop{\mathrm{arg\\max}}\_{u_i}
     \overline{p}\_{\boldsymbol{v}}(u_i\|\boldsymbol{y}),\\i=1,\dots,n\right\\,

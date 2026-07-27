@@ -57,8 +57,8 @@ if (bru_safe_inla()) {
 
   deltaIC(fit1, fit2)
 }
-#>   Model      DIC  Delta.DIC
-#> 1  fit2 45.13102 0.00000000
-#> 2  fit1 45.13967 0.00864789
+#>   Model      DIC   Delta.DIC
+#> 1  fit1 41.07570 0.000000000
+#> 2  fit2 41.07789 0.002191575
 # }
 ```

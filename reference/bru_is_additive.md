@@ -7,13 +7,28 @@ Checks if a predictor expression is additive or not
 ``` r
 bru_is_additive(x, ...)
 
-# S3 method for class 'character'
+# Default S3 method
+bru_is_additive(x, ..., verbose = FALSE)
+
+# S3 method for class 'numeric'
+bru_is_additive(x, ..., verbose = FALSE)
+
+# S3 method for class 'name'
+bru_is_additive(x, ..., verbose = FALSE)
+
+# S3 method for class 'call'
 bru_is_additive(x, ..., verbose = FALSE)
 
 # S3 method for class 'expression'
 bru_is_additive(x, ..., verbose = FALSE)
 
+# S3 method for class 'quosure'
+bru_is_additive(x, ..., verbose = FALSE)
+
 # S3 method for class 'formula'
+bru_is_additive(x, ..., verbose = FALSE)
+
+# S3 method for class 'character'
 bru_is_additive(x, ..., verbose = FALSE)
 
 # S3 method for class 'bru_pred_expr'

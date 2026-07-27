@@ -8,8 +8,8 @@
 <title>Residual Analysis of spatial point process models using Bayesian methods • inlabru</title>
 <!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Residual Analysis of spatial point process models using Bayesian methods">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">inlabru</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.14.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.15.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Basic examples</h6></li>
     <li><a class="dropdown-item" href="../articles/random_fields.html">Random field models in 1D</a></li>
     <li><a class="dropdown-item" href="../articles/random_fields_2d.html">Spatial random field models in 2D</a></li>
+    <li><a class="dropdown-item" href="../articles/tidiers.html">Postprocessing tidiers</a></li>
     <li><a class="dropdown-item" href="../articles/publications.html">Publications</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
@@ -62,9 +63,12 @@
     <li><a class="dropdown-item" href="../articles/2d_lgcp_plotsampling.html">LGCPs - Plot sampling</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_multilikelihood.html">LGCPs - Multiple likelihoods</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_spatiotemporal.html">LGCPs - An example in space and time</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sf.html">LGCPs - Residuals (sf version)</a></li>
-    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sp version)</a></li>
     <li><a class="dropdown-item" href="../articles/2d_lgcp_per_transect_covars.html">LGCPs - Distance sampling and per-transect covariates (work in progress)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model assessment</h6></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_covars_gcpo.html">LGCPs - Model comparison using Cross Validation</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals.html">LGCPs - Residuals (sf version)</a></li>
+    <li><a class="dropdown-item" href="../articles/2d_lgcp_residuals_sp.html">LGCPs - Residuals (sp version)</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -104,11 +108,11 @@
 
       <h1>Residual Analysis of spatial point process models using Bayesian methods</h1>
                         <h4 data-toc-skip class="author">Niharika Reddy
-Peddinenikalva</h4>
+Peddinenikalva, with sf updates by Finn Lindgren</h4>
             
-            <h4 data-toc-skip class="date">2026-05-26</h4>
+            <h4 data-toc-skip class="date">2026-07-27</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/HEAD/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/inlabru-org/inlabru/blob/stable/vignettes/articles/2d_lgcp_residuals.Rmd" class="external-link"><code>vignettes/articles/2d_lgcp_residuals.Rmd</code></a></small>
       <div class="d-none name"><code>2d_lgcp_residuals.Rmd</code></div>
     </div>
 
@@ -117,7 +121,9 @@ Peddinenikalva</h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load function definitions</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"misc"</span>, <span class="st">"2d_lgcp_residuals_functions.R"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>    <span class="st">"misc"</span>,</span>
+<span>    <span class="st">"2d_lgcp_residuals_functions.R"</span>,</span>
 <span>    package <span class="op">=</span> <span class="st">"inlabru"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -176,65 +182,71 @@ would yield <span class="math display">
 <div class="section level4">
 <h4 id="scaling-residuals">Scaling Residuals<a class="anchor" aria-label="anchor" href="#scaling-residuals"></a>
 </h4>
-By taking <span class="math inline">h(u) = \mathbf{1} \{ u \in
-B\}</span>, we get the raw residuals:
-<span class="math display">\begin{aligned}
+<p>By taking <span class="math inline">h(u) \equiv 1</span>, we get the
+raw residuals: <span class="math display">
+\begin{aligned}
     R(B, \hat{h}, \hat{\theta}) &amp; = I(B, \hat{h}, \hat{\lambda}) =
     \sum_{x_i \in \mathbf{x} \cap B}h(x_i) - \int_B
 \hat{h}(u)\hat{\lambda}(u)\,du\\
     &amp; = n(\mathbf{x} \cap B) - \int_B \hat{\lambda}(u) \,du
-\end{aligned}</span>
+\end{aligned}
+</span></p>
 </div>
 <div class="section level4">
 <h4 id="inverse-residuals">Inverse Residuals<a class="anchor" aria-label="anchor" href="#inverse-residuals"></a>
 </h4>
-By taking <span class="math inline">h(u) = \frac{1}{\lambda (u)}</span>,
-we may encounter the case where <span class="math inline">\lambda(u) =
-0</span>. The GNZ-formula <span class="math display">\begin{equation}
-\mathbb{E}\left[ \sum_{x_i \in \mathbf{X}} h(x_i)\right] =
+<p>By taking <span class="math inline">h(u) = \frac{1}{\lambda
+(u)}</span>, we may encounter the case where <span class="math inline">\lambda(u) = 0</span>. The GNZ-formula <span class="math display">
+\begin{aligned}
+\mathbb{E}\left[ \sum_{x_i \in \mathbf{X}} h(x_i)\right]&amp; =
 \mathbb{E}\left[ \int_W h(u) \lambda(u) \,du \right],
-\end{equation}</span> would still hold for the first terms of the <span class="math inline">h</span>-weighted residuals to exist. If we define
+\end{aligned}
+</span> would still hold for the first terms of the <span class="math inline">h</span>-weighted residuals to exist. If we define
 <span class="math inline">h(u) \lambda(u) = 0</span> for all <span class="math inline">u</span> such that <span class="math inline">\lambda(u) = 0</span>, then the second term of <span class="math inline">h</span>-weighted residuals will also exist and the
-inverse residual is given by
-<span class="math display">\begin{aligned}
+inverse residual is given by <span class="math display">
+\begin{aligned}
     R\left(B, \frac{1}{\hat{\lambda}}, \hat{\theta}\right) &amp; =
     \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) -
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
     &amp; = \sum_{x_i \in \mathbf{x} \cap B}
 \frac{1}{\hat{\lambda}(x_i)} -
-    \int_B \mathbf{1} \{ x_i \in \mathbf{x} \} \,du
-\end{aligned}</span>
+    \int_B \mathbf{1} \{ \hat{\lambda}(u) &gt; 0 \} \,du
+\end{aligned}
+</span></p>
 </div>
 <div class="section level4">
 <h4 id="pearson-residuals">Pearson Residuals<a class="anchor" aria-label="anchor" href="#pearson-residuals"></a>
 </h4>
-By using <span class="math inline">h(u) =
+<p>By using <span class="math inline">h(u) =
 \frac{1}{\sqrt{\lambda(u)}}</span>, the Pearson residual is given by
-<span class="math display">\begin{aligned}
+<span class="math display">
+\begin{aligned}
     R\left( B, \frac{1}{\sqrt{\hat{\lambda}}}, \hat{\theta} \right)
     &amp; = \sum_{x_i \in \mathbf{x} \cap B} \hat{h}(x_i) -
     \int_B \hat{h}(u) \hat{\lambda}(u) \,du \\
     &amp; = \sum_{x_i \in \mathbf{x} \cap B}
 \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
     \int_B \sqrt{\hat{\lambda}(u)} \,du
-\end{aligned}</span>
-<p>Here, zero values of <span class="math inline">\hat{\lambda}(u)</span> do not cause any issues with
+\end{aligned}
+</span> Here, zero values of <span class="math inline">\hat{\lambda}(u)</span> do not cause any issues with
 calculating residuals as we set <span class="math inline">\hat{h}(u)
 \hat{\lambda}(u) = \sqrt{\hat{\lambda}(u)}</span> for all <span class="math inline">u</span>.</p>
-<p>So the three types of residuals are: <span class="math display">\begin{eqnarray}
-\text{Scaled:} \qquad &amp; R(B, \hat{h}, \hat{\theta}) &amp; =
-n(\mathbf{x} \cap B) -
+<p>So the three types of residuals are: <span class="math display">
+\begin{aligned}
+\text{Scaled:} &amp;&amp; R(B, 1, \hat{\theta}) &amp;= n(\mathbf{x} \cap
+B) -
 \int_B \hat{\lambda}(u) \,du \\
-\text{Inverse:} \qquad &amp; R\left(B, \frac{1}{\hat{\lambda}},
+\text{Inverse:} &amp;&amp; R\left(B, \frac{1}{\hat{\lambda}},
 \hat{\theta}\right)
-&amp; = \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} -
-\int_B \mathbf{1} \{ x_i \in \mathbf{x} \} \,du \\
-\text{Pearson:} \qquad &amp;  R\left( B,
+&amp;= \sum_{x_i \in \mathbf{x} \cap B} \frac{1}{\hat{\lambda}(x_i)} -
+\int_B \mathbf{1} \{ \hat{\lambda}(u) &gt; 0 \} \,du \\
+\text{Pearson:} &amp;&amp;  R\left( B,
 \frac{1}{\sqrt{\hat{\lambda}}},\hat{\theta}
-\right) &amp; = \sum_{x_i \in \mathbf{x} \cap B}
+\right) &amp;= \sum_{x_i \in \mathbf{x} \cap B}
 \frac{1}{\sqrt{\hat{\lambda}(x_i)}} -
 \int_B \sqrt{\hat{\lambda}(u)} \,du
-\end{eqnarray}</span></p>
+\end{aligned}
+</span></p>
 <p>Note that <span class="math inline">\hat{\lambda}(u)</span> and <span class="math inline">\hat{h}(u)</span> are estimates of <span class="math inline">\lambda (u)</span> and <span class="math inline">h(u)</span> respectively</p>
 </div>
 </div>
@@ -249,12 +261,11 @@ since the denominator accounts for variance of the residuals and hence
 makes it reliable for any sample size.</p>
 <p>The use of the inverse residual in this project is less clear.
 However, we do know that it is easier to compute this residual since we
-have the GNZ formula to estimate the value of $h(u) = for any value
+have the GNZ formula to estimate the value of <span class="math inline">h(u) = \frac{1}{\lambda(u)}</span> for any value
 <span class="math inline">\lambda(u)</span>.</p>
 <p>For notation’s sake in this discussion, let <span class="math inline">h_{s}(u), h_{i}(u), h_p(u)</span> indicate the
 weight function for scaling, inverse and Pearson residuals respectively.
-Then, <span class="math inline">h_s(u) = \mathbf{1}\{u \in B\}</span>,
-<span class="math inline">h_i(u) = \frac{1}{\lambda(u)}</span>, <span class="math inline">h_p(u) = \frac{1}{\sqrt{\lambda(u)}}</span>. We can
+Then, <span class="math inline">h_s(u) \equiv 1</span>, <span class="math inline">h_i(u) = \frac{1}{\lambda(u)}</span>, <span class="math inline">h_p(u) = \frac{1}{\sqrt{\lambda(u)}}</span>. We can
 also see that <span class="math inline">h_s(u) =
 \left(h_i(u)\right)^0</span> and <span class="math inline">h_p(u) =
 \left(h_i(u)\right)^{1/2}</span>, so the values of the Pearson residuals
@@ -291,11 +302,11 @@ the ``inlabru” package uses Latent Gaussian Cox Processes to model the
 data using different model definitions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load data</span></span>
-<span><span class="va">gorillas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gorillas_sf.html">gorillas_sp</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">gorillas</span> <span class="op">&lt;-</span> <span class="fu">inlabru</span><span class="fu">::</span><span class="va"><a href="../reference/gorillas_sf.html">gorillas_sf</a></span></span>
 <span><span class="va">nests</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">nests</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">mesh</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">boundary</span></span>
-<span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="va">gorillas</span><span class="op">$</span><span class="va">gcov</span></span></code></pre></div>
+<span><span class="va">gcov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gorillas_sf.html">gorillas_sf_gcov</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Initially, the set <span class="math inline">B</span> is defines as
 <span class="math inline">B=W</span>, where <span class="math inline">W</span> is the object <code>boundary</code>. The
 function <code>prepare_residual_calculations()</code> is defined to
@@ -329,61 +340,41 @@ as a fixed covariate.</p>
 The residuals of the model are also computed where <span class="math inline">B = W</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the vegetation model</span></span>
-<span><span class="va">comp1</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span></span>
+<span><span class="va">comp1</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span></span>
 <span>  <span class="fu">vegetation</span><span class="op">(</span><span class="va">gcov</span><span class="op">$</span><span class="va">vegetation</span>, model <span class="op">=</span> <span class="st">"factor_contrast"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp1</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
-<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: The `data` argument of `bru_obs()` has deprecated support for `Spatial` input</span></span>
-<span><span class="co">## as of inlabru 2.12.0.9023.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `sf` input instead.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">base</span> package.</span></span>
-<span><span class="co">##   Please report the issue to the authors.</span></span>
-<span><span class="co">## <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<pre><code><span><span class="co">## Warning: The `samplers` argument of `bru_obs()` has deprecated support for `Spatial`</span></span>
-<span><span class="co">## input as of inlabru 2.12.0.9023.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `sf` input instead.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">base</span> package.</span></span>
-<span><span class="co">##   Please report the issue to the authors.</span></span>
-<span><span class="co">## <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
-<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
-<span><span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>,</span>
-<span>  newdata <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display the model</span></span>
+<span><span class="va">int1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit1</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int1</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, color <span class="op">=</span> <span class="st">"DarkGreen"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/veg-mod-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for the vegetation model</span></span>
 <span><span class="va">veg_res</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  <span class="va">fit1</span>, <span class="va">As</span><span class="op">$</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="va">As</span><span class="op">$</span><span class="va">A_sum</span>, <span class="va">As</span><span class="op">$</span><span class="va">A_integrate</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
 <span>  <span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Type"</span>, <span class="st">"mean.mc_std_err"</span>, <span class="st">"sd.mc_std_err"</span>, <span class="st">"median"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="26%">
-<col width="14%">
-<col width="14%">
+<col width="25%">
 <col width="15%">
 <col width="14%">
-<col width="14%">
+<col width="15%">
+<col width="15%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
@@ -396,27 +387,27 @@ The residuals of the model are also computed where <span class="math inline">B =
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">1.7478112</td>
-<td align="right">26.734137</td>
-<td align="right">-42.500031</td>
-<td align="right">1.6244632</td>
-<td align="right">51.849995</td>
+<td align="right">-0.7252763</td>
+<td align="right">28.833770</td>
+<td align="right">-51.013362</td>
+<td align="right">-2.4405164</td>
+<td align="right">51.97342</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">0.3908686</td>
-<td align="right">1.597998</td>
-<td align="right">-1.859499</td>
-<td align="right">0.1702541</td>
-<td align="right">3.705097</td>
+<td align="right">0.5587179</td>
+<td align="right">1.645284</td>
+<td align="right">-1.966520</td>
+<td align="right">0.3957641</td>
+<td align="right">4.47847</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">0.7804166</td>
-<td align="right">4.877726</td>
-<td align="right">-6.276028</td>
-<td align="right">0.3674610</td>
-<td align="right">9.607837</td>
+<td align="right">0.8561556</td>
+<td align="right">5.055520</td>
+<td align="right">-7.774578</td>
+<td align="right">0.9430356</td>
+<td align="right">11.25007</td>
 </tr>
 </tbody>
 </table>
@@ -437,211 +428,29 @@ continuous variable.</p>
 <p>The code chunk below shows how the model is defined by
 <code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a
 plot.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the Elevation model</span></span>
-<span><span class="va">comp2</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="va">elev</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">comp2</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span> <span class="fu">elev</span><span class="op">(</span><span class="va">elev</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">mySmooth</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp2</span>, <span class="va">nests</span>,</span>
 <span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
-<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning: Using `as.character()` on a quosure is deprecated as of rlang 0.3.0. Please use</span></span>
-<span><span class="co">## `as_label()` or `as_name()` instead.</span></span>
-<span><span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
-<span><span class="va">int2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display the model</span></span>
+<span><span class="va">int2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit2</span>,</span>
-<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>,</span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">elev</span> <span class="op">+</span> <span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int2</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/elev-mod-1.png" class="r-plt" alt="" width="700"></p>
 <p>The residuals of the model when <span class="math inline">B =
 W</span> are given below:</p>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<table class="table">
-<colgroup>
-<col width="26%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="15%">
-<col width="14%">
-</colgroup>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">mean</th>
-<th align="right">sd</th>
-<th align="right">q0.025</th>
-<th align="right">q0.5</th>
-<th align="right">q0.975</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Scaling_Residuals</td>
-<td align="right">-23.97598</td>
-<td align="right">23.501314</td>
-<td align="right">-66.58748</td>
-<td align="right">-23.518672</td>
-<td align="right">12.002789</td>
-</tr>
-<tr class="even">
-<td align="left">Inverse_Residuals</td>
-<td align="right">-8.57116</td>
-<td align="right">1.603239</td>
-<td align="right">-10.60975</td>
-<td align="right">-8.849928</td>
-<td align="right">-4.903587</td>
-</tr>
-<tr class="odd">
-<td align="left">Pearson_Residuals</td>
-<td align="right">-11.54927</td>
-<td align="right">3.489102</td>
-<td align="right">-17.63714</td>
-<td align="right">-11.703269</td>
-<td align="right">-4.742784</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="intercept-model">Intercept Model<a class="anchor" aria-label="anchor" href="#intercept-model"></a>
-</h4>
-<p>This model is also taken from <a href="https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html" class="uri">https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</a>
-. The model is defined such that the gorilla nests have a constant
-effect.</p>
-<p>The code chunk below shows how the model is defined by
-<code><a href="../reference/bru_obs.html">bru_obs()</a></code> and also displays the model in the form of a
-plot. The residuals of the model are also computed where <span class="math inline">B = W</span>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define the Intercept model. Need to explicitly extend it to match the</span></span>
-<span><span class="co"># data size to use it in spatial predictions.</span></span>
-<span><span class="va">comp3</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">lik3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
-<span>  <span class="va">coordinates</span> <span class="op">~</span> <span class="va">.</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">nests</span>,</span>
-<span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
-<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"cp"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp3</span>, <span class="va">lik3</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Display the model</span></span>
-<span><span class="va">int3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
-<span>  <span class="va">fit3</span>,</span>
-<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
-<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Intercept</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="2d_lgcp_residuals_files/figure-html/int-mod-1.png" class="r-plt" alt="" width="700"></p>
-<p>The residuals of the model when <span class="math inline">B =
-W</span> are given below:</p>
-<table class="table">
-<colgroup>
-<col width="26%">
-<col width="14%">
-<col width="14%">
-<col width="15%">
-<col width="14%">
-<col width="14%">
-</colgroup>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">mean</th>
-<th align="right">sd</th>
-<th align="right">q0.025</th>
-<th align="right">q0.5</th>
-<th align="right">q0.975</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Scaling_Residuals</td>
-<td align="right">3.4592980</td>
-<td align="right">26.579515</td>
-<td align="right">-51.840734</td>
-<td align="right">4.3995089</td>
-<td align="right">54.602283</td>
-</tr>
-<tr class="even">
-<td align="left">Inverse_Residuals</td>
-<td align="right">0.1404743</td>
-<td align="right">0.824181</td>
-<td align="right">-1.474246</td>
-<td align="right">0.1360697</td>
-<td align="right">1.831795</td>
-</tr>
-<tr class="odd">
-<td align="left">Pearson_Residuals</td>
-<td align="right">0.7035202</td>
-<td align="right">4.675643</td>
-<td align="right">-8.742195</td>
-<td align="right">0.7737183</td>
-<td align="right">10.001010</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="smooth-model">Smooth Model<a class="anchor" aria-label="anchor" href="#smooth-model"></a>
-</h4>
-<p>This model is also taken from <a href="https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html" class="uri">https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</a>
-. The model is defined such that the gorilla nests depend on an SPDE
-type smooth function.</p>
-<p>The code chunk below shows how the model is defined by
-<code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
-The residuals of the model are also computed where <span class="math inline">B = W</span>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define the Smooth model</span></span>
-<span><span class="va">comp4</span> <span class="op">&lt;-</span> <span class="va">coordinates</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp4</span>, <span class="va">nests</span>,</span>
-<span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
-<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>coordinates <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Display the model</span></span>
-<span><span class="va">int4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
-<span>  <span class="va">fit4</span>,</span>
-<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sp"</span><span class="op">)</span>,</span>
-<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="2d_lgcp_residuals_files/figure-html/smooth-mod-1.png" class="r-plt" alt="" width="700"></p>
-<p>The residuals of the model when <span class="math inline">B =
-W</span> are given below:</p>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -662,27 +471,183 @@ W</span> are given below:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals</td>
-<td align="right">-35.259516</td>
-<td align="right">28.775098</td>
-<td align="right">-93.84043</td>
-<td align="right">-32.612609</td>
-<td align="right">7.912316</td>
+<td align="right">-30.053071</td>
+<td align="right">30.104107</td>
+<td align="right">-92.42106</td>
+<td align="right">-27.197344</td>
+<td align="right">22.832798</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals</td>
-<td align="right">-9.007236</td>
-<td align="right">1.369345</td>
-<td align="right">-11.37878</td>
-<td align="right">-9.194046</td>
-<td align="right">-5.770816</td>
+<td align="right">-8.588137</td>
+<td align="right">1.460373</td>
+<td align="right">-10.65283</td>
+<td align="right">-8.821934</td>
+<td align="right">-5.684720</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals</td>
-<td align="right">-13.401149</td>
-<td align="right">4.172879</td>
-<td align="right">-22.92162</td>
-<td align="right">-13.387627</td>
-<td align="right">-5.801904</td>
+<td align="right">-12.095661</td>
+<td align="right">3.490711</td>
+<td align="right">-18.91377</td>
+<td align="right">-11.556431</td>
+<td align="right">-5.893244</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="intercept-model">Intercept Model<a class="anchor" aria-label="anchor" href="#intercept-model"></a>
+</h4>
+<p>This model is also taken from <a href="https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html" class="uri">https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</a>
+. The model is defined such that the gorilla nests have a constant
+effect.</p>
+<p>The code chunk below shows how the model is defined by
+<code><a href="../reference/bru_obs.html">bru_obs()</a></code> and also displays the model in the form of a
+plot. The residuals of the model are also computed where <span class="math inline">B = W</span>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define the Intercept model. Need to explicitly extend it to match the</span></span>
+<span><span class="co"># data size to use it in spatial predictions.</span></span>
+<span><span class="va">comp3</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.data.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">lik3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru_obs.html">bru_obs</a></span><span class="op">(</span></span>
+<span>  <span class="va">geometry</span> <span class="op">~</span> <span class="va">.</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">nests</span>,</span>
+<span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"cp"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bru.html">bru</a></span><span class="op">(</span><span class="va">comp3</span>, <span class="va">lik3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display the model</span></span>
+<span><span class="va">int3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit3</span>,</span>
+<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">Intercept</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int3</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="2d_lgcp_residuals_files/figure-html/int-mod-1.png" class="r-plt" alt="" width="700"></p>
+<p>The residuals of the model when <span class="math inline">B =
+W</span> are given below:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="14%">
+<col width="15%">
+<col width="15%">
+<col width="14%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">q0.025</th>
+<th align="right">q0.5</th>
+<th align="right">q0.975</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Scaling_Residuals</td>
+<td align="right">4.8574884</td>
+<td align="right">25.3825493</td>
+<td align="right">-46.753377</td>
+<td align="right">3.5922626</td>
+<td align="right">57.763803</td>
+</tr>
+<tr class="even">
+<td align="left">Inverse_Residuals</td>
+<td align="right">0.1815243</td>
+<td align="right">0.7981514</td>
+<td align="right">-1.339235</td>
+<td align="right">0.1109926</td>
+<td align="right">1.948312</td>
+</tr>
+<tr class="odd">
+<td align="left">Pearson_Residuals</td>
+<td align="right">0.9428235</td>
+<td align="right">4.4970530</td>
+<td align="right">-7.912881</td>
+<td align="right">0.6314383</td>
+<td align="right">10.608573</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="smooth-model">Smooth Model<a class="anchor" aria-label="anchor" href="#smooth-model"></a>
+</h4>
+<p>This model is also taken from <a href="https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html" class="uri">https://inlabru-org.github.io/inlabru/articles/2d_lgcp_covars.html</a>
+. The model is defined such that the gorilla nests depend on an SPDE
+type smooth function.</p>
+<p>The code chunk below shows how the model is defined by
+<code><a href="../reference/lgcp.html">lgcp()</a></code> and also displays the model in the form of a plot.
+The residuals of the model are also computed where <span class="math inline">B = W</span>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define the Smooth model</span></span>
+<span><span class="va">comp4</span> <span class="op">&lt;-</span> <span class="va">geometry</span> <span class="op">~</span> <span class="fu">mySmooth</span><span class="op">(</span><span class="va">geometry</span>, model <span class="op">=</span> <span class="va">matern</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgcp.html">lgcp</a></span><span class="op">(</span><span class="va">comp4</span>, <span class="va">nests</span>,</span>
+<span>  samplers <span class="op">=</span> <span class="va">boundary</span>,</span>
+<span>  domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">mesh</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display the model</span></span>
+<span><span class="va">int4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit4</span>,</span>
+<span>  <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_pixels.html" class="external-link">fm_pixels</a></span><span class="op">(</span><span class="va">mesh</span>, mask <span class="op">=</span> <span class="va">boundary</span>, format <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>,</span>
+<span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">mySmooth</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">int4</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">boundary</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/gg.html">gg</a></span><span class="op">(</span><span class="va">nests</span>, shape <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="2d_lgcp_residuals_files/figure-html/smooth-mod-1.png" class="r-plt" alt="" width="700"></p>
+<p>The residuals of the model when <span class="math inline">B =
+W</span> are given below:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="15%">
+<col width="14%">
+<col width="14%">
+<col width="15%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">q0.025</th>
+<th align="right">q0.5</th>
+<th align="right">q0.975</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Scaling_Residuals</td>
+<td align="right">-27.233853</td>
+<td align="right">26.233671</td>
+<td align="right">-91.10876</td>
+<td align="right">-24.422818</td>
+<td align="right">15.780166</td>
+</tr>
+<tr class="even">
+<td align="left">Inverse_Residuals</td>
+<td align="right">-9.012403</td>
+<td align="right">1.385826</td>
+<td align="right">-11.00053</td>
+<td align="right">-9.289706</td>
+<td align="right">-6.215308</td>
+</tr>
+<tr class="odd">
+<td align="left">Pearson_Residuals</td>
+<td align="right">-12.629185</td>
+<td align="right">3.272115</td>
+<td align="right">-21.90405</td>
+<td align="right">-12.533770</td>
+<td align="right">-6.611701</td>
 </tr>
 </tbody>
 </table>
@@ -705,12 +670,12 @@ which divides a polygon into grids based on number of rows and columns
 or by a desired resolution. The code chunk below demonstrates a use of
 the function for dividing the polygon and calculating the residuals for
 this choice of <span class="math inline">B</span>.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a grid for B partitioned into two</span></span>
 <span><span class="va">B1</span> <span class="op">&lt;-</span> <span class="fu">partition</span><span class="op">(</span>samplers <span class="op">=</span> <span class="va">boundary</span>, nrows <span class="op">=</span> <span class="fl">1</span>, ncols <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">B1</span>, main <span class="op">=</span> <span class="st">"Two partitions of B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="2d_lgcp_residuals_files/figure-html/partitioning-B-two-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">As1</span> <span class="op">&lt;-</span> <span class="fu">prepare_residual_calculations</span><span class="op">(</span></span>
 <span>  samplers <span class="op">=</span> <span class="va">B1</span>, domain <span class="op">=</span> <span class="va">mesh</span>,</span>
 <span>  observations <span class="op">=</span> <span class="va">nests</span></span>
@@ -719,12 +684,8 @@ this choice of <span class="math inline">B</span>.</p>
 <span><span class="va">veg_res2</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  <span class="va">fit1</span>, <span class="va">As1</span><span class="op">$</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">vegetation</span> <span class="op">+</span> <span class="va">Intercept</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="va">As1</span><span class="op">$</span><span class="va">A_sum</span>, <span class="va">As1</span><span class="op">$</span><span class="va">A_integrate</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">edit_df</span><span class="op">(</span><span class="va">veg_res2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Type"</span>, <span class="st">"mean.mc_std_err"</span>,</span>
 <span>  <span class="st">"sd.mc_std_err"</span>, <span class="st">"median"</span></span>
 <span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -748,51 +709,51 @@ this choice of <span class="math inline">B</span>.</p>
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">40.243091</td>
-<td align="right">17.6946815</td>
-<td align="right">7.068818</td>
-<td align="right">40.139760</td>
-<td align="right">69.759461</td>
+<td align="right">40.870971</td>
+<td align="right">15.6603840</td>
+<td align="right">8.947880</td>
+<td align="right">39.384359</td>
+<td align="right">69.693679</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-42.692315</td>
-<td align="right">10.6344348</td>
-<td align="right">-64.877381</td>
-<td align="right">-42.393366</td>
-<td align="right">-25.085568</td>
+<td align="right">-40.763013</td>
+<td align="right">9.4465674</td>
+<td align="right">-59.088954</td>
+<td align="right">-40.547925</td>
+<td align="right">-22.991792</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">4.786172</td>
-<td align="right">1.1452889</td>
-<td align="right">2.872883</td>
-<td align="right">4.742520</td>
-<td align="right">7.033591</td>
+<td align="right">5.014250</td>
+<td align="right">1.0930902</td>
+<td align="right">3.415318</td>
+<td align="right">4.962647</td>
+<td align="right">7.242723</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">-4.631489</td>
-<td align="right">0.4700378</td>
-<td align="right">-5.357831</td>
-<td align="right">-4.658836</td>
-<td align="right">-3.764648</td>
+<td align="right">-4.588806</td>
+<td align="right">0.3912645</td>
+<td align="right">-5.230760</td>
+<td align="right">-4.622634</td>
+<td align="right">-3.765246</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">13.769190</td>
-<td align="right">3.0311233</td>
-<td align="right">8.308966</td>
-<td align="right">13.427197</td>
-<td align="right">18.855557</td>
+<td align="right">14.247506</td>
+<td align="right">2.7934045</td>
+<td align="right">9.073768</td>
+<td align="right">14.170034</td>
+<td align="right">19.792742</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">-13.840198</td>
-<td align="right">1.8619474</td>
-<td align="right">-17.622310</td>
-<td align="right">-13.905282</td>
-<td align="right">-10.568481</td>
+<td align="right">-13.465843</td>
+<td align="right">1.7108375</td>
+<td align="right">-16.639400</td>
+<td align="right">-13.408847</td>
+<td align="right">-10.477080</td>
 </tr>
 </tbody>
 </table>
@@ -805,15 +766,12 @@ defined that plots the residuals for each corresponding polygon of
 <p>Another type of partitioning is considered with three sections of the
 region and its residuals are as displayed below:
 <img src="2d_lgcp_residuals_files/figure-html/partitioning-B-three-1.png" class="r-plt" alt="" width="700"></p>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="26%">
 <col width="14%">
 <col width="14%">
-<col width="15%">
+<col width="14%">
 <col width="14%">
 <col width="14%">
 </colgroup>
@@ -828,75 +786,75 @@ region and its residuals are as displayed below:
 <tbody>
 <tr class="odd">
 <td align="left">Scaling_Residuals.1</td>
-<td align="right">68.900153</td>
-<td align="right">7.4948986</td>
-<td align="right">55.2348754</td>
-<td align="right">67.806693</td>
-<td align="right">82.050320</td>
+<td align="right">69.516075</td>
+<td align="right">8.4562596</td>
+<td align="right">52.143802</td>
+<td align="right">70.340036</td>
+<td align="right">85.277599</td>
 </tr>
 <tr class="even">
 <td align="left">Scaling_Residuals.2</td>
-<td align="right">-23.108225</td>
-<td align="right">15.3152892</td>
-<td align="right">-50.2808902</td>
-<td align="right">-25.374867</td>
-<td align="right">7.763197</td>
+<td align="right">-21.830520</td>
+<td align="right">18.1871110</td>
+<td align="right">-60.742829</td>
+<td align="right">-19.644906</td>
+<td align="right">9.232902</td>
 </tr>
 <tr class="odd">
 <td align="left">Scaling_Residuals.3</td>
-<td align="right">-45.159940</td>
-<td align="right">4.7421550</td>
-<td align="right">-56.4033289</td>
-<td align="right">-44.561190</td>
-<td align="right">-36.662257</td>
+<td align="right">-44.814094</td>
+<td align="right">4.2382284</td>
+<td align="right">-53.169549</td>
+<td align="right">-44.189972</td>
+<td align="right">-37.529042</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.1</td>
-<td align="right">3.379809</td>
-<td align="right">0.8201499</td>
-<td align="right">1.9421753</td>
-<td align="right">3.323580</td>
-<td align="right">5.139447</td>
+<td align="right">3.346556</td>
+<td align="right">0.7430357</td>
+<td align="right">1.985054</td>
+<td align="right">3.299149</td>
+<td align="right">4.570250</td>
 </tr>
 <tr class="odd">
 <td align="left">Inverse_Residuals.2</td>
-<td align="right">2.600641</td>
-<td align="right">0.7148372</td>
-<td align="right">1.2831502</td>
-<td align="right">2.624219</td>
-<td align="right">4.238956</td>
+<td align="right">2.615667</td>
+<td align="right">0.6550878</td>
+<td align="right">1.430633</td>
+<td align="right">2.659008</td>
+<td align="right">3.771736</td>
 </tr>
 <tr class="even">
 <td align="left">Inverse_Residuals.3</td>
-<td align="right">-5.443006</td>
-<td align="right">0.0508650</td>
-<td align="right">-5.5270768</td>
-<td align="right">-5.448446</td>
-<td align="right">-5.331791</td>
+<td align="right">-5.448156</td>
+<td align="right">0.0455396</td>
+<td align="right">-5.525879</td>
+<td align="right">-5.457213</td>
+<td align="right">-5.363138</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.1</td>
-<td align="right">12.338049</td>
-<td align="right">1.8304548</td>
-<td align="right">9.0629142</td>
-<td align="right">12.433088</td>
-<td align="right">16.243483</td>
+<td align="right">12.422336</td>
+<td align="right">1.7733352</td>
+<td align="right">8.815424</td>
+<td align="right">12.349595</td>
+<td align="right">15.302914</td>
 </tr>
 <tr class="even">
 <td align="left">Pearson_Residuals.2</td>
-<td align="right">3.473239</td>
-<td align="right">2.0570798</td>
-<td align="right">-0.1246689</td>
-<td align="right">3.014928</td>
-<td align="right">7.389631</td>
+<td align="right">3.662094</td>
+<td align="right">2.2042811</td>
+<td align="right">-1.104472</td>
+<td align="right">3.815673</td>
+<td align="right">7.526421</td>
 </tr>
 <tr class="odd">
 <td align="left">Pearson_Residuals.3</td>
-<td align="right">-14.922027</td>
-<td align="right">0.9032380</td>
-<td align="right">-16.8328155</td>
-<td align="right">-14.802350</td>
-<td align="right">-13.186830</td>
+<td align="right">-14.922026</td>
+<td align="right">0.8157558</td>
+<td align="right">-16.550904</td>
+<td align="right">-14.795281</td>
+<td align="right">-13.522248</td>
 </tr>
 </tbody>
 </table>
@@ -914,30 +872,6 @@ way <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="
 <p>Using these two new choices of <span class="math inline">B</span>,
 the residuals are calculated for all four models at both resolutions
 using <code>residual_df()</code>.</p>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span>
-<span><span class="co">## Warning in bru_log_warn(msg): Model input 'gcov$vegetation' for 'vegetation' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in bru_log_warn(msg): Model input 'elev' for 'elev' returned some NA values.</span></span>
-<span><span class="co">## Attempting to fill in spatially by nearest available value.</span></span>
-<span><span class="co">## To avoid this basic covariate imputation, supply complete data.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span>
-<span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span>
-<span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for</span></span>
-<span><span class="co">## 'mySmooth' failed. Perhaps you need to load the 'sp' package with</span></span>
-<span><span class="co">## 'library(sp)'? Attempting 'sp::coordinates'.</span></span></code></pre>
 <p>The functions <code>set_csc()</code> and <code>residual_plot()</code>
 are defined to plot the three types of residuals for the model for each
 partition in <span class="math inline">B</span>. The code chunk below
@@ -945,7 +879,7 @@ demonstrates how this plotting is done for the vegetation model at
 resolution <span class="math inline">B = B_3</span>. Here, it is useful
 for each type of residual to have the same colour scale at both
 resolutions.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Residuals of Vegetation model</span></span>
 <span><span class="va">Residual_fit1_B3</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As3</span><span class="op">$</span><span class="va">df</span>,</span>
@@ -1030,7 +964,7 @@ residual and choice of <span class="math inline">B</span>. Here, it is
 useful to have the same colour scale for all the 4 models.</p>
 <p>The code chunk below demonstrates the code for plotting the “Pearson”
 residuals when <span class="math inline">B = B_4</span>.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the residuals for all models at B4</span></span>
 <span><span class="va">Residual_fit1_B4</span> <span class="op">&lt;-</span> <span class="fu">residual_df</span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">fit1</span>, df <span class="op">=</span> <span class="va">As4</span><span class="op">$</span><span class="va">df</span>,</span>
@@ -1122,21 +1056,22 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <div class="section level3">
 <h3 id="function-definitions">Function definitions<a class="anchor" aria-label="anchor" href="#function-definitions"></a>
 </h3>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Niharika Reddy Peddinenikalva</span></span>
 <span><span class="co"># Vacation Scholarship project</span></span>
+<span><span class="co"># Updated for sf by Finn Lindgren 2024</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.inlabru.org" class="external-link">"inlabru"</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">"fmesher"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"RColorBrewer"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-spatial.github.io/lwgeom/" class="external-link">"lwgeom"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://patchwork.data-imaginist.com" class="external-link">"patchwork"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/" class="external-link">"terra"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-spatial.github.io/sf/" class="external-link">"sf"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"INLA"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.inlabru.org" class="external-link">"inlabru"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://inlabru-org.github.io/fmesher/" class="external-link">"fmesher"</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/get_theme.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
 <span></span>
 <span></span>
 <span><span class="co">#' ----------------------------------</span></span>
@@ -1147,62 +1082,49 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span><span class="co">#' calculating the residuals for the given set of polygons B</span></span>
 <span></span>
 <span><span class="co">#' Input:</span></span>
-<span><span class="co">#' @param samplers A SpatialPolygonDataFrame containing partitions for which</span></span>
+<span><span class="co">#' @param samplers `sf` polygons containing partitions for which</span></span>
 <span><span class="co">#' residuals are to be calculated</span></span>
 <span><span class="co">#' @param domain A mesh object</span></span>
-<span><span class="co">#' @param observations A SpatialPointsDataFrame containing observed data</span></span>
+<span><span class="co">#' @param observations `sf` points containing observed data</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' Output:</span></span>
 <span><span class="co">#' @return A_sum - matrix used to compute the summation term of the residuals</span></span>
 <span><span class="co">#' @return A_integrate - matrix used to compute the integral term</span></span>
-<span><span class="co">#' @return df - SpatialPointsDataFrame containing all the locations 'u' for</span></span>
+<span><span class="co">#' @return df - `sf` containing all the locations 'u' for</span></span>
 <span><span class="co">#' calculating residuals</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="va">prepare_residual_calculations</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">domain</span>, <span class="va">observations</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Calculate the integration weights for A_integrate</span></span>
-<span>  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="va">domain</span>, samplers <span class="op">=</span> <span class="va">samplers</span><span class="op">)</span></span>
+<span>  <span class="va">ips</span> <span class="op">&lt;-</span> <span class="fu">fmesher</span><span class="fu">::</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_int.html" class="external-link">fm_int</a></span><span class="op">(</span>domain <span class="op">=</span> <span class="va">domain</span>, samplers <span class="op">=</span> <span class="va">samplers</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Set-up the A_integrate matrix</span></span>
 <span>  <span class="co"># A_integrate has as many rows as polygons in the samplers,</span></span>
-<span>  <span class="co"># as many columns as mesh points</span></span>
-<span>  <span class="va">A_integrate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde.make.A.html" class="external-link">inla.spde.make.A</a></span><span class="op">(</span></span>
-<span>    mesh <span class="op">=</span> <span class="va">domain</span>, <span class="va">ips</span>, weights <span class="op">=</span> <span class="va">ips</span><span class="op">$</span><span class="va">weight</span>,</span>
-<span>    block <span class="op">=</span> <span class="va">ips</span><span class="op">$</span><span class="va">.block</span>, block.rescale <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="co"># as many columns as integration points</span></span>
+<span>  <span class="va">A_integrate</span> <span class="op">&lt;-</span> <span class="fu">fmesher</span><span class="fu">::</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_block.html" class="external-link">fm_block</a></span><span class="op">(</span></span>
+<span>    block <span class="op">=</span> <span class="va">ips</span><span class="op">$</span><span class="va">.block</span>,</span>
+<span>    weights <span class="op">=</span> <span class="va">ips</span><span class="op">$</span><span class="va">weight</span>,</span>
+<span>    n_block <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span></span>
 <span></span>
 <span>  <span class="co"># Set-up the A_sum matrix</span></span>
 <span>  <span class="co"># A_sum has as many rows as polygons in the samplers,</span></span>
 <span>  <span class="co"># as many columns as observed points</span></span>
 <span>  <span class="co"># each row has 1s for the points in the corresponding polygon</span></span>
 <span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_within</a></span><span class="op">(</span></span>
-<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span>,</span>
-<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>    <span class="va">observations</span>,</span>
+<span>    <span class="va">samplers</span>,</span>
 <span>    sparse <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span>
-<span>  <span class="va">A_sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span></span>
-<span>    i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span>,</span>
-<span>    j <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
+<span>  <span class="va">A_sum</span> <span class="op">&lt;-</span> <span class="fu">fmesher</span><span class="fu">::</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_block.html" class="external-link">fm_block</a></span><span class="op">(</span>block <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">idx</span><span class="op">)</span>, n_block <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Setting up the data frame for calculating residuals</span></span>
 <span>  <span class="va">observations</span><span class="op">$</span><span class="va">obs</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
-<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://edzer.github.io/sp/reference/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span></span>
-<span>    coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">domain</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://edzer.github.io/sp/reference/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">observations</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="va">domain</span><span class="op">$</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>, <span class="va">observations</span><span class="op">@</span><span class="va">data</span><span class="op">)</span>,</span>
-<span>    proj4string <span class="op">=</span> <span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_CRS_sp.html" class="external-link">fm_CRS</a></span><span class="op">(</span><span class="va">domain</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="va">ips</span><span class="op">$</span><span class="va">obs</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">ips</span>, <span class="va">observations</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Return A-sum, A_integrate and the data frame for predicting the residuals</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A_sum <span class="op">=</span> <span class="va">A_sum</span>, A_integrate <span class="op">=</span> <span class="va">A_integrate</span>, df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span></span>
 <span></span>
 <span></span>
 <span><span class="co">#' ------------</span></span>
@@ -1214,7 +1136,7 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span><span class="co">#'</span></span>
 <span><span class="co">#' Inputs:</span></span>
 <span><span class="co">#' @param model fitted model for which residuals need to be calculated</span></span>
-<span><span class="co">#' @param df SpatialPointsDataFrame object containing all the locations 'u'</span></span>
+<span><span class="co">#' @param df sf object containing all the locations 'u'</span></span>
 <span><span class="co">#' for calculating residuals</span></span>
 <span><span class="co">#' @param expr an expression object containing the formula of the model</span></span>
 <span><span class="co">#' @param A_sum matrix used to compute the summation term of the residuals</span></span>
@@ -1227,7 +1149,7 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span></span>
 <span><span class="va">residual_df</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">df</span>, <span class="va">expr</span>, <span class="va">A_sum</span>, <span class="va">A_integrate</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Compute residuals</span></span>
-<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>    object <span class="op">=</span> <span class="va">model</span>,</span>
 <span>    newdata <span class="op">=</span> <span class="va">df</span>,</span>
 <span>    <span class="op">~</span> <span class="op">{</span></span>
@@ -1236,15 +1158,12 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span>      <span class="va">h2</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">lambda</span></span>
 <span>      <span class="va">h3</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>        Scaling_Residuals <span class="op">=</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h1</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h1</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>        Inverse_Residuals <span class="op">=</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h2</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h2</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>        Pearson_Residuals <span class="op">=</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h3</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h3</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span></span>
+<span>        Scaling_Residuals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h1</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h1</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        Inverse_Residuals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h2</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h2</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        Pearson_Residuals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_sum</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">h3</span><span class="op">[</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">A_integrate</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">h3</span> <span class="op">*</span> <span class="va">lambda</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">obs</span><span class="op">]</span><span class="op">)</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">}</span>,</span>
 <span>    used <span class="op">=</span> <span class="fu"><a href="../reference/bru_used.html">bru_used</a></span><span class="op">(</span><span class="va">expr</span><span class="op">)</span></span>
@@ -1256,9 +1175,6 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span>  <span class="va">res</span><span class="op">$</span><span class="va">Pearson_Residuals</span><span class="op">$</span><span class="va">Type</span> <span class="op">&lt;-</span> <span class="st">"Pearson Residuals"</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">res</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span></span>
-<span></span>
-<span></span>
 <span></span>
 <span></span>
 <span><span class="co">#' --------------</span></span>
@@ -1289,34 +1205,32 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span></span>
 <span>      colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="va">col_theme</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>      name <span class="op">=</span> <span class="st">"Scaling Residual"</span>,</span>
-<span>      limits <span class="op">=</span></span>
-<span>        <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Scaling Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>      limits <span class="op">=</span> <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Scaling Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span>  <span class="va">inverse_csc</span> <span class="op">&lt;-</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span></span>
 <span>      colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="va">col_theme</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>      name <span class="op">=</span> <span class="st">"Inverse Residual"</span>,</span>
-<span>      limits <span class="op">=</span></span>
-<span>        <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Inverse Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>      limits <span class="op">=</span> <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Inverse Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span>  <span class="va">pearson_csc</span> <span class="op">&lt;-</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradientn</a></span><span class="op">(</span></span>
 <span>      colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">brewer.pal</a></span><span class="op">(</span><span class="fl">9</span>, <span class="va">col_theme</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>      name <span class="op">=</span> <span class="st">"Pearson Residual"</span>,</span>
-<span>      limits <span class="op">=</span></span>
-<span>        <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Pearson Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>      limits <span class="op">=</span> <span class="va">cscrange</span><span class="op">[</span><span class="va">cscrange</span><span class="op">$</span><span class="va">Type</span> <span class="op">==</span> <span class="st">"Pearson Residuals"</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">*</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Scaling"</span> <span class="op">=</span> <span class="va">scaling_csc</span>,</span>
-<span>       <span class="st">"Inverse"</span> <span class="op">=</span> <span class="va">inverse_csc</span>,</span>
-<span>       <span class="st">"Pearson"</span> <span class="op">=</span> <span class="va">pearson_csc</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Scaling"</span> <span class="op">=</span> <span class="va">scaling_csc</span>,</span>
+<span>    <span class="st">"Inverse"</span> <span class="op">=</span> <span class="va">inverse_csc</span>,</span>
+<span>    <span class="st">"Pearson"</span> <span class="op">=</span> <span class="va">pearson_csc</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span></span>
 <span></span>
 <span></span>
 <span><span class="co">#' ---------------</span></span>
@@ -1326,7 +1240,7 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span><span class="co">#' plots the three types of residuals for each polygon</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' Input:</span></span>
-<span><span class="co">#' @param samplers A SpatialPolygonsDataFrame containing partitions for which</span></span>
+<span><span class="co">#' @param samplers A sf containing partitions for which</span></span>
 <span><span class="co">#' residuals are to be calculated</span></span>
 <span><span class="co">#' @param residuals frame containing residual information for each of the</span></span>
 <span><span class="co">#' partitions of the subset 'B'</span></span>
@@ -1336,7 +1250,6 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span><span class="co">#' Output:</span></span>
 <span><span class="co">#' @return a list of three subplots scaling, inverse and Pearson residuals</span></span>
 <span><span class="co">#' for the different partitions of samplers</span></span>
-<span></span>
 <span></span>
 <span><span class="va">residual_plot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">residuals</span>, <span class="va">csc</span>, <span class="va">model_name</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Initialise the scaling residuals plot</span></span>
@@ -1371,12 +1284,11 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span></span>
 <span>  <span class="co"># Return the three plots in a list</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    Scaling <span class="op">=</span> <span class="va">scaling</span>, Inverse <span class="op">=</span> <span class="va">inverse</span>,</span>
+<span>    Scaling <span class="op">=</span> <span class="va">scaling</span>,</span>
+<span>    Inverse <span class="op">=</span> <span class="va">inverse</span>,</span>
 <span>    Pearson <span class="op">=</span> <span class="va">pearson</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span></span>
-<span></span>
 <span></span>
 <span></span>
 <span><span class="co">#' ------------------</span></span>
@@ -1388,28 +1300,31 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span><span class="co">#' https://rpubs.com/huanfaChen/grid_from_polygon</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' Input:</span></span>
-<span><span class="co">#' @param samplers A SpatialPolygonsDataFrame containing region for which</span></span>
+<span><span class="co">#' @param samplers A sf polygon containing region for which</span></span>
 <span><span class="co">#' partitions need to be created</span></span>
 <span><span class="co">#' @param resolution resolution of the grids that are required</span></span>
 <span><span class="co">#' @param nrows number of rows of grids that are required</span></span>
 <span><span class="co">#' @param ncols number of columns of grids that are required</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' Output:</span></span>
-<span><span class="co">#' @return a partitioned SpatialPolygonsDataFrame as required</span></span>
+<span><span class="co">#' @return a partitioned sf with polygons as required</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="va">partition</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">samplers</span>, <span class="va">resolution</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">nrows</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">ncols</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Create a grid for the given boundary</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">resolution</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
-<span>      crs <span class="op">=</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://edzer.github.io/sp/reference/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
-<span>      nrows <span class="op">=</span> <span class="va">nrows</span>, ncols <span class="op">=</span> <span class="va">ncols</span></span>
+<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span></span>
+<span>      <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>      crs <span class="op">=</span> <span class="fu">fmesher</span><span class="fu">::</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs_wkt.html" class="external-link">fm_proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>      nrows <span class="op">=</span> <span class="va">nrows</span>,</span>
+<span>      ncols <span class="op">=</span> <span class="va">ncols</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nrows</span>, <span class="va">ncols</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
-<span>      crs <span class="op">=</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://edzer.github.io/sp/reference/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>    <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span></span>
+<span>      <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
+<span>      crs <span class="op">=</span> <span class="fu">fmesher</span><span class="fu">::</span><span class="fu"><a href="https://inlabru-org.github.io/fmesher/reference/fm_crs_wkt.html" class="external-link">fm_proj4string</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span>,</span>
 <span>      resolution <span class="op">=</span> <span class="va">resolution</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
@@ -1417,12 +1332,10 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 <span>  <span class="va">gridPolygon</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.polygons.html" class="external-link">as.polygons</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Extract the boundary with subpolygons only</span></span>
-<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link">as_Spatial</a></span><span class="op">(</span></span>
-<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span></span>
-<span>      <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/intersect.html" class="external-link">intersect</a></span><span class="op">(</span></span>
-<span>        <span class="va">gridPolygon</span>,</span>
-<span>        <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span></span>
-<span>      <span class="op">)</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span></span>
+<span>    <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/intersect.html" class="external-link">intersect</a></span><span class="op">(</span></span>
+<span>      <span class="va">gridPolygon</span>,</span>
+<span>      <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">samplers</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -1459,7 +1372,7 @@ resolutions <span class="math inline">B_3</span> and <span class="math inline">B
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -20,6 +20,9 @@ bru_used(x, ...)
 # S3 method for class 'bru'
 bru_used(x, ..., join = TRUE)
 
+# S3 method for class 'bru_model'
+bru_used(x, ..., join = TRUE)
+
 # S3 method for class 'bru_info'
 bru_used(x, ..., join = TRUE)
 
@@ -81,6 +84,9 @@ list of such objects (for methods with `join = FALSE`)
 - `bru_used(bru)`: Extract the `bru_used` information for the collection
   of observation models used in a `bru` object.
 
+- `bru_used(bru_model)`: Extract the `bru_used` information for the
+  collection of observation models used in a `bru_model` object.
+
 - `bru_used(bru_info)`: Extract the `bru_used` information for the
   collection of observation models used in a `bru_info` object.
 
@@ -125,8 +131,8 @@ bru_used(used, labels = c("a", "c"))
 #> Used effect[a, b], latent[c, d]
 bru_used(used, labels = c("a", "c"))
 #> Used effect[a], latent[c]
-(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
-#> Used effect[a, b], latent[c, d]
+(used <- new_bru_used(~ a_eval(.latent$c)))
+#> Used effect[], latent[c, a]
 bru_used(used, labels = c("a", "c"))
-#> Used effect[a], latent[c]
+#> Used effect[], latent[a, c]
 ```

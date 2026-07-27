@@ -5,8 +5,7 @@ example for use in cross validation (with
 [`bru_rerun()`](https://inlabru-org.github.io/inlabru/reference/bru.md))
 or prior sampling (with
 [`bru_rerun()`](https://inlabru-org.github.io/inlabru/reference/bru.md)
-and
-[`generate()`](https://inlabru-org.github.io/inlabru/reference/generate.md),
+and [`generate()`](https://generics.r-lib.org/reference/generate.html),
 but see "Prior sampling caveats" below).
 
 ## Usage
@@ -17,6 +16,9 @@ bru_set_missing(object, keep = FALSE, ...)
 bru_set_missing(x, ...) <- value
 
 # S3 method for class 'bru'
+bru_set_missing(object, keep = FALSE, ...)
+
+# S3 method for class 'bru_model'
 bru_set_missing(object, keep = FALSE, ...)
 
 # S3 method for class 'bru_info'

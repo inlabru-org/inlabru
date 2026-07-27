@@ -41,6 +41,18 @@ ibm_n_output(mapper, ...)
 # S3 method for class 'bm_collect'
 ibm_n_output(mapper, input, state = NULL, inla_f = FALSE, multi = FALSE, ...)
 
+# S3 method for class 'bm_expr'
+ibm_n_output(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  derived = NULL,
+  n_state = NULL,
+  data = NULL
+)
+
 # S3 method for class 'bm_repeat'
 ibm_n_output(mapper, ...)
 
@@ -90,6 +102,22 @@ ibm_n_output(mapper, input, state = NULL, ...)
 
   logical; If `TRUE` (or positive), recurse one level into sub-mappers
 
+- derived:
+
+  The state vectors of variables derived from the root variables. If
+  `NULL` or missing, defaults to an empty list.
+
+- data:
+
+  should be a list with data objects, with the main object called
+  `data`; see
+  [`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md)
+  for details.
+
+## Value
+
+An integer denoting the mapper output length.
+
 ## Methods (by class)
 
 - `ibm_n_output(default)`: Returns `NROW(input)`
@@ -98,6 +126,7 @@ ibm_n_output(mapper, input, state = NULL, ...)
 
 Other mapper methods:
 [`bru_mapper_generics`](https://inlabru-org.github.io/inlabru/reference/bru_mapper_generics.md),
+[`ibm_as_taylor()`](https://inlabru-org.github.io/inlabru/reference/ibm_as_taylor.md),
 [`ibm_eval()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval.md),
 [`ibm_eval2()`](https://inlabru-org.github.io/inlabru/reference/ibm_eval2.md),
 [`ibm_inla_subset()`](https://inlabru-org.github.io/inlabru/reference/ibm_inla_subset.md),
@@ -105,8 +134,15 @@ Other mapper methods:
 [`ibm_is_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_linear.md),
 [`ibm_is_rowwise()`](https://inlabru-org.github.io/inlabru/reference/ibm_is_rowwise.md),
 [`ibm_jacobian()`](https://inlabru-org.github.io/inlabru/reference/ibm_jacobian.md),
-[`ibm_linear()`](https://inlabru-org.github.io/inlabru/reference/ibm_linear.md),
 [`ibm_n()`](https://inlabru-org.github.io/inlabru/reference/ibm_n.md),
 [`ibm_names()`](https://inlabru-org.github.io/inlabru/reference/ibm_names.md),
 [`ibm_simplify()`](https://inlabru-org.github.io/inlabru/reference/ibm_simplify.md),
 [`ibm_values()`](https://inlabru-org.github.io/inlabru/reference/ibm_values.md)
+
+## Examples
+
+``` r
+m <- bm_linear()
+ibm_n_output(m, input = c(1, 3, 4, 5, 2), state = 2)
+#> [1] 5
+```

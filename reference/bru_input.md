@@ -36,7 +36,7 @@ bru_input(x, ..., label = x$label)
 bru_input(x, ...)
 
 # S3 method for class 'bru_model'
-bru_input(x, lhoods, ...)
+bru_input(x, lhoods = deprecated(), ...)
 
 # S3 method for class 'bru_obs'
 bru_input(x, components, ...)
@@ -115,7 +115,9 @@ bru_input(x, ..., label = "<unknown>")
 
 - lhoods:
 
-  A `bru_obs_list` object containing all observations models.
+  **\[deprecated\]** from `2.14.1.9011`, as it's now part of the
+  [bru_model](https://inlabru-org.github.io/inlabru/reference/bru_model.md)
+  object. A `bru_obs_list` object containing all observations models.
 
 - components:
 
@@ -141,15 +143,21 @@ bru_input(x, ..., label = "<unknown>")
 
 &nbsp;
 
-- `bru_input(bru_obs_list)`: A list of mapper input values, with one
-  entry for each observation model, each containing a list of inputs for
-  the components used by the corresponding observation model.
+- `bru_input(bru_obs)`: A list of mapper input values, for each of the
+  components used by the corresponding observation model.
 
 &nbsp;
 
 - `bru_input(bru_obs_list)`: A list of mapper input values, with one
   entry for each observation model, each containing a list of inputs for
   the components used by the corresponding observation model.
+
+&nbsp;
+
+- `bru_input(bru_mapper)`: The evaluated input associated with a mapper;
+  see
+  [ibm_input](https://inlabru-org.github.io/inlabru/reference/ibm_input.md)
+  for details on how to associate a `bru_input` with a `bru_mapper`.
 
 ## Methods (by class)
 

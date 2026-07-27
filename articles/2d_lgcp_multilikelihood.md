@@ -14,6 +14,7 @@ intercept but have employ different spatial smoothers.
 Load libraries
 
 ``` r
+
 library(inlabru)
 library(INLA)
 library(ggplot2)
@@ -26,6 +27,7 @@ obtained from the `R` package `spatstat`, which contains the locations
 of 647 gorilla nests. We load the dataset like this:
 
 ``` r
+
 data(gorillas_sf, package = "inlabru")
 ```
 
@@ -33,6 +35,7 @@ Plot the nests and visualize the group membership (major/minor) by
 color:
 
 ``` r
+
 ggplot() +
   gg(gorillas_sf$mesh) +
   gg(gorillas_sf$nests, aes(color = group)) +
@@ -49,6 +52,7 @@ intercept that is common to both LGCPs and the two different spatial
 smoothers, one for each nest group.
 
 ``` r
+
 matern <- inla.spde2.pcmatern(gorillas_sf$mesh,
   prior.range = c(0.1, 0.01),
   prior.sigma = c(1, 0.01)
@@ -67,6 +71,7 @@ include/exclude options for
 to indicate which components are actively involved in each model.)
 
 ``` r
+
 fml.major <- geometry ~ Intercept + Common + Difference / 2
 fml.minor <- geometry ~ Intercept + Common - Difference / 2
 ```
@@ -75,6 +80,7 @@ Setting up the Cox process likelihoods is easy in this example. Both
 nest types were observed within the same window:
 
 ``` r
+
 lik_minor <- bru_obs("cp",
   formula = fml.major,
   data = gorillas_sf$nests[gorillas_sf$nests$group == "major", ],
@@ -92,6 +98,7 @@ lik_major <- bru_obs("cp",
 … which we provide to the ´bru´ function.
 
 ``` r
+
 jfit <- bru(cmp, lik_major, lik_minor,
   options = list(
     control.inla = list(
@@ -103,6 +110,7 @@ jfit <- bru(cmp, lik_major, lik_minor,
 ```
 
 ``` r
+
 library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas_sf$mesh,
@@ -127,11 +135,13 @@ Rerunning with the previous estimate as starting point sometimes
 improves the accuracy of the posterior distribution estimation.
 
 ``` r
+
 jfit0 <- jfit
 jfit <- bru_rerun(jfit)
 ```
 
 ``` r
+
 pl.major <- ggplot() +
   gg(gorillas_sf$mesh,
     mask = gorillas_sf$boundary,
@@ -150,9 +160,10 @@ pl.minor <- ggplot() +
 ![](2d_lgcp_multilikelihood_files/figure-html/unnamed-chunk-11-1.png)
 
 ``` r
+
 summary(jfit0)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> Common: main = spde(geometry)
 #> Difference: main = spde(geometry)
@@ -173,10 +184,10 @@ summary(jfit0)
 #>     Additive/Linear/Rowwise: FALSE/FALSE/TRUE
 #>     Used components: effect[Common, Difference, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.782, Running = 17.4, Post = 0.128, Total = 18.3 
+#>     Pre = 0.526, Running = 11.8, Post = 0.0832, Total = 12.4 
 #> Fixed effects:
-#>             mean   sd 0.025quant 0.5quant 0.975quant   mode kld
-#> Intercept -1.338 1.25     -3.788   -1.338      1.112 -1.338   0
+#>             mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+#> Intercept -1.346 1.258     -3.811   -1.346      1.119 -1.346   0
 #> 
 #> Random effects:
 #>   Name     Model
@@ -185,21 +196,22 @@ summary(jfit0)
 #> 
 #> Model hyperparameters:
 #>                       mean    sd 0.025quant 0.5quant 0.975quant  mode
-#> Range for Common     3.163 0.633      2.128    3.092      4.609 2.942
-#> Stdev for Common     2.191 0.364      1.576    2.157      3.007 2.081
-#> Range for Difference 1.874 2.562      0.147    1.106      8.356 0.386
-#> Stdev for Difference 0.159 0.101      0.033    0.136      0.412 0.089
+#> Range for Common     3.161 0.632      2.122    3.092       4.60 2.949
+#> Stdev for Common     2.192 0.365      1.573    2.158       3.00 2.087
+#> Range for Difference 1.932 2.683      0.139    1.125       8.70 0.368
+#> Stdev for Difference 0.158 0.106      0.031    0.133       0.43 0.084
 #> 
-#> Marginal log-Likelihood:  1901.47 
+#> Marginal log-Likelihood:  1901.54 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
 ```
 
 ``` r
+
 summary(jfit)
-#> inlabru version: 2.14.1 
-#> INLA version: 26.05.21 
+#> inlabru version: 2.15.0 
+#> INLA version: 26.06.08 
 #> Latent components:
 #> Common: main = spde(geometry)
 #> Difference: main = spde(geometry)
@@ -220,10 +232,10 @@ summary(jfit)
 #>     Additive/Linear/Rowwise: FALSE/FALSE/TRUE
 #>     Used components: effect[Common, Difference, Intercept], latent[] 
 #> Time used:
-#>     Pre = 0.411, Running = 4.08, Post = 0.0599, Total = 4.55 
+#>     Pre = 0.706, Running = 4.29, Post = 0.0538, Total = 5.05 
 #> Fixed effects:
 #>             mean    sd 0.025quant 0.5quant 0.975quant   mode kld
-#> Intercept -1.343 1.254       -3.8   -1.343      1.115 -1.343   0
+#> Intercept -1.342 1.254     -3.801   -1.342      1.116 -1.342   0
 #> 
 #> Random effects:
 #>   Name     Model
@@ -231,13 +243,13 @@ summary(jfit)
 #>    Difference SPDE2 model
 #> 
 #> Model hyperparameters:
-#>                      mean    sd 0.025quant 0.5quant 0.975quant  mode
-#> Range for Common     3.16 0.633      2.124     3.09      4.605 2.945
-#> Stdev for Common     2.19 0.365      1.574     2.16      3.006 2.084
-#> Range for Difference 1.94 2.530      0.166     1.18      8.398 0.436
-#> Stdev for Difference 0.16 0.094      0.035     0.14      0.392 0.097
+#>                       mean    sd 0.025quant 0.5quant 0.975quant  mode
+#> Range for Common     3.162 0.633      2.124    3.093      4.605 2.946
+#> Stdev for Common     2.191 0.365      1.574    2.157      3.005 2.084
+#> Range for Difference 1.945 2.588      0.160    1.168      8.531 0.422
+#> Stdev for Difference 0.159 0.096      0.035    0.139      0.397 0.095
 #> 
-#> Marginal log-Likelihood:  1901.39 
+#> Marginal log-Likelihood:  1901.42 
 #>  is computed 
 #> Posterior summaries for the linear predictor and the fitted values are computed
 #> (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
@@ -252,11 +264,13 @@ group variable to a 0/1 variable, `group_major <- group == "major"`,
 which is also useful in the predictor expression:
 
 ``` r
+
 fml.joint <-
   geometry + group_major ~ Intercept + Common + (group_major - 0.5) * Difference
 ```
 
 ``` r
+
 gorillas_sf$nests$group_major <- gorillas_sf$nests$group == "major"
 lik_joint <- bru_obs("cp",
   formula = fml.joint,
@@ -270,6 +284,7 @@ lik_joint <- bru_obs("cp",
 ```
 
 ``` r
+
 # Approximate with "eb" for faster vignette
 jfit_joint <- bru(cmp, lik_joint,
   options = list(
@@ -286,6 +301,7 @@ new fit and the old confirms that the results are the same up to small
 numerical differences.
 
 ``` r
+
 library(patchwork)
 pl.major <- ggplot() +
   gg(gorillas_sf$mesh,

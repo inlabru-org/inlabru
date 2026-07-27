@@ -42,6 +42,7 @@ u: \begin{aligned} \frac{\partial\lambda(u)}{\partial u} &=
 +\frac{\lambda'(u)}{\lambda(u)} \right\\ \end{aligned}
 
 ``` r
+
 lambda <- function(u, gamma) {
   -pnorm(u, lower.tail = FALSE, log.p = TRUE) / gamma
 }
@@ -97,6 +98,7 @@ log-posterior density is \begin{aligned} \left.\frac{\partial^2\ln
 \frac{\lambda'(u_0)^2}{\lambda(u_0)} . \end{aligned}
 
 ``` r
+
 log_p <- function(u, y, gamma) {
   L <- lambda(u, gamma)
   n <- length(y)
@@ -115,6 +117,7 @@ D2log_p <- function(u, y, gamma) {
 ```
 
 ``` r
+
 g <- 1
 y <- c(0, 1, 2)
 y <- c(0, 0, 0, 0, 0)
@@ -133,6 +136,7 @@ lambda0 <- lambda(mu_quad, gamma = g)
 ### Posterior densities
 
 ``` r
+
 ggplot() +
   xlim(
     lambda(mu_quad - 4 * sd_quad, gamma = g),
@@ -184,6 +188,7 @@ ggplot() +
 ![](linearapprox_files/figure-html/unnamed-chunk-5-1.png)
 
 ``` r
+
 ggplot() +
   xlim(
     lambda_inv(lambda0, gamma = g) - 4 * sd_quad,
@@ -248,6 +253,7 @@ ggplot() +
 ### Posterior CDFs
 
 ``` r
+
 ggplot() +
   xlim(
     lambda(mu_quad - 4 * sd_quad, gamma = g),
@@ -286,6 +292,7 @@ ggplot() +
 ![](linearapprox_files/figure-html/unnamed-chunk-7-1.png)
 
 ``` r
+
 ggplot() +
   xlim(
     lambda_inv(lambda0, gamma = g) - 4 * sd_quad,

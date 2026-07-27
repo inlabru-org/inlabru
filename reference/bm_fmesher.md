@@ -57,6 +57,7 @@ Other mappers:
 [`bm_aggregate()`](https://inlabru-org.github.io/inlabru/reference/bm_aggregate.md),
 [`bm_collect()`](https://inlabru-org.github.io/inlabru/reference/bm_collect.md),
 [`bm_const()`](https://inlabru-org.github.io/inlabru/reference/bm_const.md),
+[`bm_expr()`](https://inlabru-org.github.io/inlabru/reference/bm_expr.md),
 [`bm_factor()`](https://inlabru-org.github.io/inlabru/reference/bm_factor.md),
 [`bm_fm_mesh_1d`](https://inlabru-org.github.io/inlabru/reference/bm_fm_mesh_1d.md),
 [`bm_harmonics()`](https://inlabru-org.github.io/inlabru/reference/bm_harmonics.md),
