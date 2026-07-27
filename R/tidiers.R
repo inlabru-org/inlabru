@@ -31,7 +31,12 @@ NULL
 }
 
 
-#' Tidy a bru model fit
+#' @title Extract a bru model fit into a tidy tibble
+#'
+#' @description This function extracts the fixed effect coefficients or
+#'   hyperparameters from a fitted `bru` object and returns them in a tidy
+#'   tibble format. See [generics::tidy()] for more details on the tidy data
+#'   format.
 #'
 #' @param x A fitted `bru` object.
 #' @param effects `"fixed"` (default) or `"hyperpar"`.
@@ -72,7 +77,11 @@ tidy.bru <- function(x, effects = "fixed", ...) {
   }
 }
 
-#' Glance at a bru model fit
+#' @title Glance at a bru model fit
+#'
+#' @description This function returns a one-row tibble of model summaries from a
+#'   fitted `bru` object. See [generics::glance()] for more details on the
+#'   glance format.
 #'
 #' @param x A fitted `bru` object.
 #' @param ... Unused.
@@ -125,11 +134,12 @@ glance.bru <- function(x, ...) {
   )
 }
 
-#' Augment a bru model fit with fitted values
+#' @title Augment a bru model fit with fitted values
 #'
-#' Adds posterior mean and credible interval columns to `data`. The user must
-#' supply `pred_formula` because inlabru prediction expressions are arbitrary R
-#' and cannot be recovered from the fit object alone.
+#' @description Adds posterior mean and credible interval columns to `data`. The
+#'   user must supply `pred_formula` because inlabru prediction expressions are
+#'   arbitrary R and cannot be recovered from the fit object alone. Also see
+#'   [generics::augment()].
 #'
 #' @param x A fitted `bru` object.
 #' @param data A data frame of covariate values.
