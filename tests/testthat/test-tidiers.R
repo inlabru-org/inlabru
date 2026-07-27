@@ -27,7 +27,14 @@ test_that("tidy.bru returns correct columns for fixed effects", {
 })
 
 test_that("tidy.bru errors on unknown effects argument", {
-  fake_fit <- structure(list(summary.fixed = NULL), class = c("bru", "inla"))
+  fit <- bru(
+    components = y ~ Intercept(1) + x1(main = x),
+    family = "gaussian",
+    data = data.frame(x = 1:10, y = rnorm(10)),
+    options = list(bru_run = FALSE)
+  )
+  fake_fit <- fit
+
   expect_error(tidy(fake_fit, effects = "latent"), "must be")
 })
 
