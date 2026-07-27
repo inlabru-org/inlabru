@@ -18,10 +18,11 @@ NULL
 #' @method tidy bru
 #' @export
 tidy.bru <- function(x, effects = "fixed", ...) {
+  x <- bru_check_object_bru(x)
   if (effects == "fixed") {
     fe <- x$summary.fixed
     if (is.null(fe)) {
-      stop("No fixed effects found on bru fit.")
+      stop("No fixed effects found in bru fit.")
     }
     tibble(
       term = rownames(fe),
@@ -33,7 +34,7 @@ tidy.bru <- function(x, effects = "fixed", ...) {
   } else if (effects == "hyperpar") {
     hp <- x$summary.hyperpar
     if (is.null(hp)) {
-      stop("No hyperparameters found on bru fit.")
+      stop("No hyperparameters found in bru fit.")
     }
     tibble(
       term = rownames(hp),
@@ -59,9 +60,14 @@ tidy.bru <- function(x, effects = "fixed", ...) {
 #' @method glance bru
 #' @export
 glance.bru <- function(x, ...) {
+  x <- bru_check_object_bru(x)
   dic_val <- x$dic$dic %||% NA_real_
   waic_val <- x$waic$waic %||% NA_real_
   mlik_val <- tryCatch(x$mlik[1, 1], error = function(e) NA_real_) %||% NA_real_
+
+  if (any(bru_obs_family(x) == "cp")) {
+    waic_val <- NA_real_
+  }
 
   nobs_val <- tryCatch(
     {
@@ -123,6 +129,7 @@ augment.bru <- function(
   seed = NULL,
   ...
 ) {
+  x <- bru_check_object_bru(x)
   preds <- .with_seed(
     seed,
     predict(
