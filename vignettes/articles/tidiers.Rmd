@@ -83,7 +83,6 @@ fit <- bru(
 posterior mean, standard deviation, and 95 % credible interval.
 
 ```{r tidy-fixed, eval=inla_available}
-library(generics)
 tidy(fit)
 ```
 
@@ -218,11 +217,13 @@ names(fit$summary.random)
 ## Calling tidiers with the `broom` package
 
 The tidiers are registered as S3 methods on `bru` objects through the
-[generics](https://cran.r-project.org/package=generics) package, so they work
-automatically when you load either `generics` or `broom`.
+[generics](https://cran.r-project.org/package=generics) package, and are
+re-exported by `inlabru` so they work whether `generics` or
+`broom` are explicitly loaded or not.
 
 ```{r broom, eval=inla_available && requireNamespace("broom", quietly = TRUE)}
-library(broom)
 tidy(fit)
 glance(fit)
+generics::glance(fit)
+broom::glance(fit)
 ```

@@ -142,6 +142,7 @@ Collate:
     'hierarchical_basis.R'
     'inla.R'
     'inlabru-package.R'
+    'inlabru-reexports.R'
     'legacy_methods.R'
     'local_testthat.R'
     'mapper_collect.R'

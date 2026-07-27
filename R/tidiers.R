@@ -1,6 +1,4 @@
 #' @importFrom generics tidy glance augment
-#' @importFrom tibble tibble
-#' @importFrom dplyr bind_cols
 #' @importFrom rlang %||%
 #' @importFrom stats predict
 NULL
@@ -25,7 +23,7 @@ NULL
     return(NULL)
   }
   quant_probs <- as.numeric(
-    sub("quant$", "", quant_names)
+    sub("^q", "", quant_names)
   )
   quant_names[c(which.min(quant_probs), which.max(quant_probs))]
 }
@@ -52,7 +50,7 @@ tidy.bru <- function(x, effects = "fixed", ...) {
       stop("No fixed effects found in bru fit.")
     }
     loup <- .find_quant_lo_up_inla(fe)
-    tibble(
+    tibble::tibble(
       term = rownames(fe),
       estimate = fe$mean,
       std.error = fe$sd,
@@ -65,7 +63,7 @@ tidy.bru <- function(x, effects = "fixed", ...) {
       stop("No hyperparameters found in bru fit.")
     }
     loup <- .find_quant_lo_up_inla(hp)
-    tibble(
+    tibble::tibble(
       term = rownames(hp),
       estimate = hp$mean,
       std.error = hp$sd,
@@ -125,7 +123,7 @@ glance.bru <- function(x, ...) {
     error = function(e) NA_real_
   )
 
-  tibble(
+  tibble::tibble(
     dic = dic_val,
     waic = waic_val,
     marginal_loglik = mlik_val,
@@ -182,9 +180,9 @@ augment.bru <- function(
     c(".fitted", ".fitted_low", ".fitted_high", ".fitted_sd")
   )] <- NULL
   loup <- .find_quant_lo_up_bru(preds)
-  bind_cols(
+  dplyr::bind_cols(
     data,
-    tibble(
+    tibble::tibble(
       .fitted = preds$mean,
       .fitted_low = preds[[loup[1]]],
       .fitted_high = preds[[loup[2]]],

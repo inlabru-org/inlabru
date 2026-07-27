@@ -1,72 +1,3 @@
-#' Generate samples from fitted bru models
-#'
-#' @description
-#'
-#' Generic function for sampling for fitted models. The function invokes
-#' particular methods which depend on the class of the first argument.
-#'
-#' @name generate
-#' @export
-#' @family sample generators
-#' @param object a fitted model.
-#' @param \dots additional arguments affecting the samples produced.
-#' @return The form of the value returned by `generate()` depends on the data
-#' class and prediction formula. Normally, a data.frame is returned, or a list
-#' of data.frames (if the prediction formula generates a list)
-#' @examples
-#' \donttest{
-#' if (
-#'   bru_safe_inla() &&
-#'     requireNamespace("sn", quietly = TRUE)
-#' ) {
-#'   # Generate data for a simple linear model
-#'
-#'   input.df <- data.frame(x = cos(1:10))
-#'   input.df <- within(
-#'     input.df,
-#'     {
-#'       y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
-#'     }
-#'   )
-#'
-#'   # Fit the model
-#'
-#'   fit <- bru(
-#'     y ~ xeff(main = x, model = "linear"),
-#'     family = "gaussian",
-#'     data = input.df
-#'   )
-#'   summary(fit)
-#'
-#'   # Generate samples for some predefined x
-#'
-#'   df <- data.frame(x = seq(-4, 4, by = 0.1))
-#'   smp <- generate(fit, df, ~ xeff + Intercept, n.samples = 10)
-#'
-#'   # Plot the resulting realizations
-#'
-#'   plot(df$x, smp[, 1], type = "l")
-#'   for (k in 2:ncol(smp)) {
-#'     points(df$x, smp[, k], type = "l")
-#'   }
-#'
-#'   # We can also draw samples form the joint posterior
-#'
-#'   df <- data.frame(x = 1)
-#'   smp <- generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
-#'   smp[[1]]
-#'
-#'   # ... and plot them
-#'   if (require(ggplot2, quietly = TRUE)) {
-#'     plot(do.call(rbind, smp))
-#'   }
-#' }
-#' }
-#'
-generate <- function(object, ...) {
-  UseMethod("generate")
-}
-
 #' @title Methods for bru_info objects
 #' @description The `bru_info` class is used to store metadata about `bru`
 #'   models.
@@ -3536,7 +3467,6 @@ expand_to_dataframe <- function(x, data = NULL) {
 }
 
 
-#
 #' Prediction from fitted bru model
 #'
 #' Takes a fitted `bru` object produced by the function [bru()] and produces
@@ -3545,11 +3475,9 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' R expression that is valid given these values/covariates and the joint
 #' posterior of the estimated random effects.
 #'
-#' Mean value predictions are accompanied by the standard errors, upper and
-#' lower 2.5% quantiles, the
-#' median, variance, coefficient of variation as well as the variance and
-#' minimum and maximum sample
-#' value drawn in course of estimating the statistics.
+#' Mean value predictions are accompanied by the standard deviation, median,
+#' upper and lower 2.5% quantiles (configurable), as well as the Monte Carlo
+#' standard deviation estimates for the mean and standard deviation.
 #'
 #' Internally, this method calls [generate.bru()] in order to draw samples from
 #' the model.
@@ -3596,6 +3524,8 @@ expand_to_dataframe <- function(x, data = NULL) {
 #' @return a `data.frame`, `sf`, or `Spatial*` object with predicted mean values
 #'   and other summary statistics attached. Non-S4 object outputs have the class
 #'   "bru_prediction" added at the front of the class list.
+#' @rdname predict
+#' @seealso [generate.bru()]
 #' @examples
 #' \donttest{
 #' if (bru_safe_inla() &&
@@ -3905,18 +3835,18 @@ bru_generate_check_used_deprecation <- function(
   list(include = include, exclude = exclude)
 }
 
-#' Sampling based on bru posteriors
+#' @title Sampling based on bru posteriors
 #'
 #' @description
 #' Takes a fitted `bru` object produced by the function [bru()] and produces
 #' samples given a new set of values for the model covariates or the original
 #' values used for the model fit. The samples can be based on any R expression
-#' that is valid given these values/covariates and the joint
-#' posterior of the estimated random effects.
+#' that is valid given these values/covariates and the joint posterior of the
+#' estimated random effects.  Called via the [generics::generate()] generic.
 #'
 #' @export
 #' @family sample generators
-#' @param object A `bru` object obtained by calling [bru()].
+#' @param x A `bru` object obtained by calling [bru()].
 #' @param newdata A `data.frame` or `SpatialPointsDataFrame` of covariates
 #'   needed for sampling.
 #' @param formula A formula where the right hand side defines an R expression
@@ -3949,13 +3879,64 @@ bru_generate_check_used_deprecation <- function(
 #' For "iid" models with `mapper = bm_index(n)`, `rnorm()` is used to
 #' generate new realisations for indices greater than `n`, if accessed
 #' via `<name>_eval(...)`.
-#'
-#' @return List of generated samples
-#' @seealso [predict.bru]
+#' @return The form of the value returned by `generate()` depends on the data
+#' class and prediction formula. Normally, a data.frame is returned, or a list
+#' of data.frames (if the prediction formula generates a list)
+#' @seealso [predict.bru()]
 #' @rdname generate
+#' @examples
+#' \donttest{
+#' if (
+#'   bru_safe_inla() &&
+#'     requireNamespace("sn", quietly = TRUE)
+#' ) {
+#'   # Generate data for a simple linear model
+#'
+#'   input.df <- data.frame(x = cos(1:10))
+#'   input.df <- within(
+#'     input.df,
+#'     {
+#'       y <- 5 + 2 * cos(1:10) + rnorm(10, mean = 0, sd = 0.1)
+#'     }
+#'   )
+#'
+#'   # Fit the model
+#'
+#'   fit <- bru(
+#'     y ~ xeff(main = x, model = "linear"),
+#'     family = "gaussian",
+#'     data = input.df
+#'   )
+#'   summary(fit)
+#'
+#'   # Generate samples for some predefined x
+#'
+#'   df <- data.frame(x = seq(-4, 4, by = 0.1))
+#'   smp <- generate(fit, df, ~ xeff + Intercept, n.samples = 10)
+#'
+#'   # Plot the resulting realizations
+#'
+#'   plot(df$x, smp[, 1], type = "l")
+#'   for (k in 2:ncol(smp)) {
+#'     points(df$x, smp[, k], type = "l")
+#'   }
+#'
+#'   # We can also draw samples form the joint posterior
+#'
+#'   df <- data.frame(x = 1)
+#'   smp <- generate(fit, df, ~ data.frame(xeff, Intercept), n.samples = 10)
+#'   smp[[1]]
+#'
+#'   # ... and plot them
+#'   if (require(ggplot2, quietly = TRUE)) {
+#'     plot(do.call(rbind, smp))
+#'   }
+#' }
+#' }
+#'
 
 generate.bru <- function(
-  object,
+  x,
   newdata = NULL,
   formula = NULL,
   n.samples = 100,
@@ -3967,8 +3948,8 @@ generate.bru <- function(
   include = deprecated(),
   exclude = deprecated()
 ) {
-  object <- bru_check_object_bru(object)
-  info <- object[["bru_info"]]
+  x <- bru_check_object_bru(x)
+  info <- x[["bru_info"]]
 
   info[["options"]] <- bru_call_options(
     bru_options(
@@ -3992,8 +3973,8 @@ generate.bru <- function(
 
   if (method == "pandemic") {
     state <- evaluate_state(
-      as_bru_model(object),
-      result = object,
+      as_bru_model(x),
+      result = x,
       property = "sample",
       n = n.samples,
       seed = seed,
@@ -4002,7 +3983,7 @@ generate.bru <- function(
     )
   } else {
     state <- bru_state(
-      object,
+      x,
       property = "sample",
       n = n.samples,
       seed = seed,
@@ -4032,7 +4013,7 @@ generate.bru <- function(
           latent = NULL
         )
     }
-    used <- bru_used_update(used, labels = names(as_bru_comp_list(object)))
+    used <- bru_used_update(used, labels = names(as_bru_comp_list(x)))
 
     pred <- new_bru_pred_expr(formula, used = used)
 
@@ -4043,14 +4024,14 @@ generate.bru <- function(
 
     if (method == "pandemic") {
       vals <- evaluate_model(
-        model = as_bru_model(object),
+        model = as_bru_model(x),
         state = state,
         data = newdata,
         predictor = pred
       )
     } else {
       vals <- bru_eval(
-        model = as_bru_model(object),
+        model = as_bru_model(x),
         state = state,
         data = newdata,
         predictor = pred
