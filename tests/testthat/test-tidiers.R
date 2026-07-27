@@ -1,4 +1,6 @@
 test_that("tidy.bru returns correct columns for fixed effects", {
+  local_bru_safe_inla()
+
   fit <- bru(
     components = y ~ Intercept(1) + x1(main = x),
     family = "gaussian",
@@ -27,6 +29,8 @@ test_that("tidy.bru returns correct columns for fixed effects", {
 })
 
 test_that("tidy.bru errors on unknown effects argument", {
+  local_bru_safe_inla()
+
   fit <- bru(
     components = y ~ Intercept(1) + x1(main = x),
     family = "gaussian",
@@ -39,6 +43,8 @@ test_that("tidy.bru errors on unknown effects argument", {
 })
 
 test_that("glance.bru returns one-row tibble with expected columns", {
+  local_bru_safe_inla()
+
   fit <- bru(
     components = y ~ Intercept(1) + x1(main = x),
     family = "gaussian",
@@ -63,6 +69,8 @@ test_that("glance.bru returns one-row tibble with expected columns", {
 })
 
 test_that("glance.bru returns NA nobs for any point process fit", {
+  local_bru_safe_inla()
+
   # nobs is ill-defined for "cp" likelihoods.
   fit <- bru(
     components = y ~ Intercept(1) + x1(main = y),
@@ -75,6 +83,8 @@ test_that("glance.bru returns NA nobs for any point process fit", {
 })
 
 test_that("glance.bru returns NA for missing fields gracefully", {
+  local_bru_safe_inla()
+
   fit <- bru(
     components = y ~ Intercept(1) + x1(main = x),
     family = "gaussian",
