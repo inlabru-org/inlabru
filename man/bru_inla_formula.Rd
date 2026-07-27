@@ -3,6 +3,7 @@
 \name{bru_inla_formula}
 \alias{bru_inla_formula}
 \alias{bru_inla_formula.bru}
+\alias{bru_inla_formula.bru_model}
 \alias{bru_inla_formula.bru_info}
 \alias{bru_inla_formula.bru_comp_list}
 \title{Extract INLA formula}
@@ -10,6 +11,8 @@
 bru_inla_formula(x, ...)
 
 \method{bru_inla_formula}{bru}(x, ...)
+
+\method{bru_inla_formula}{bru_model}(x, ...)
 
 \method{bru_inla_formula}{bru_info}(x, ...)
 

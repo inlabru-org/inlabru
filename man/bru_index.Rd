@@ -6,9 +6,9 @@
 \alias{bru_index.bru_obs_list}
 \alias{bru_index.bru}
 \alias{bru_index.bru_info}
+\alias{bru_index.bru_model}
 \alias{bru_index.bru_comp}
 \alias{bru_index.bru_comp_list}
-\alias{bru_index.bru_model}
 \alias{index_eval}
 \title{Extract predictor or component index information}
 \usage{
@@ -22,11 +22,11 @@ bru_index(object, ...)
 
 \method{bru_index}{bru_info}(object, tag = NULL, what = NULL, ...)
 
+\method{bru_index}{bru_model}(object, used, ...)
+
 \method{bru_index}{bru_comp}(object, inla_f, ...)
 
 \method{bru_index}{bru_comp_list}(object, inla_f, ...)
-
-\method{bru_index}{bru_model}(object, used, ...)
 
 index_eval(...)
 }
@@ -46,11 +46,11 @@ the tags of one or more of the \code{\link[=bru_obs]{bru_obs()}} observation mod
 integer vector identifying models by their \code{\link[=bru]{bru()}} specification order. If
 \code{NULL} (default) computes indices for all sub-models.}
 
+\item{used}{A \code{\link[=bru_used]{bru_used()}} object}
+
 \item{inla_f}{logical; when \code{TRUE}, must result in
 values compatible with \code{INLA::f(...)}
 an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
-
-\item{used}{A \code{\link[=bru_used]{bru_used()}} object}
 }
 \value{
 \itemize{
@@ -70,6 +70,13 @@ an specification and corresponding \code{INLA::inla.stack(...)} constructions.}
 }
 
 \itemize{
+\item \code{bru_index(bru_model)}: A named list of \code{idx_full} and \code{idx_inla},
+named list of indices, and \code{inla_subset}, and \code{inla_subset},
+a named list of logical subset specifications for extracting the \code{INLA::f()}
+compatible index subsets.
+}
+
+\itemize{
 \item \code{bru_index(bru_comp)}:
 A list of indices into the latent variables compatible with the
 component mapper.
@@ -79,13 +86,6 @@ component mapper.
 \item \code{bru_index(bru_comp_list)}:
 A list of list of indices into the latent variables compatible with each
 component mapper.
-}
-
-\itemize{
-\item \code{bru_index(bru_model)}: A named list of \code{idx_full} and \code{idx_inla},
-named list of indices, and \code{inla_subset}, and \code{inla_subset},
-a named list of logical subset specifications for extracting the \code{INLA::f()}
-compatible index subsets.
 }
 }
 \description{

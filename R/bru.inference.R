@@ -202,16 +202,21 @@ bru_inla_formula.bru <- function(x, ...) {
 }
 #' @rdname bru_inla_formula
 #' @export
-bru_inla_formula.bru_info <- function(x, ...) {
-  formula <- x[["model"]][["formula"]]
+bru_inla_formula.bru_model <- function(x, ...) {
+  formula <- x[["formula"]]
   if (is.null(formula)) {
-    components <- x[["model"]][["effects"]]
+    components <- x[["effects"]]
     used <- bru_used(x)
     included <- union(used$effect, used$latent)
     formula <- bru_inla_formula(components[included])
     formula <- update.formula(formula, BRU_response ~ .)
   }
   formula
+}
+#' @rdname bru_inla_formula
+#' @export
+bru_inla_formula.bru_info <- function(x, ...) {
+  bru_inla_formula(as_bru_model(x), ...)
 }
 
 #' @rdname bru_inla_formula
@@ -670,7 +675,7 @@ bru_set_missing.bru_model <- function(object, keep = FALSE, ...) {
 #' @export
 #' @rdname bru_set_missing
 bru_set_missing.bru_info <- function(object, keep = FALSE, ...) {
-  bru_set_missing(object[["model"]][["lhoods"]], ...) <- keep
+  bru_set_missing(object[["model"]], ...) <- keep
   object
 }
 #' @export
@@ -2897,8 +2902,15 @@ bru_response_size.bru_obs_list <- function(object) {
 #' @describeIn bru_response_size Extract the number of observations from a
 #' `bru_info` object, as a vector with one value per observation model.
 #' @export
-bru_response_size.bru_info <- function(object) {
+bru_response_size.bru_model <- function(object) {
   bru_response_size(object[["lhoods"]])
+}
+
+#' @describeIn bru_response_size Extract the number of observations from a
+#' `bru_info` object, as a vector with one value per observation model.
+#' @export
+bru_response_size.bru_info <- function(object) {
+  bru_response_size(object[["model"]])
 }
 
 #' @describeIn bru_response_size Extract the number of observations from a

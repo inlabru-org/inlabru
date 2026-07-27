@@ -60,18 +60,12 @@ as_bru_obs_list.bru <- function(x, .tag = NULL) {
 #' @rdname as_bru_obs
 #' @export
 as_bru_obs_list.bru_info <- function(x, .tag = NULL) {
-  # When/if lhoods is moved to the bru_model class, this code can be simplified.
-  if (is.null(x[["lhoods"]])) {
-    as_bru_obs_list(x[["model"]])
-  } else {
-    bru_obs_list(x[["lhoods"]])
-  }
+  as_bru_obs_list(x[["model"]])
 }
 
 #' @rdname as_bru_obs
 #' @export
 as_bru_obs_list.bru_model <- function(x, .tag = NULL) {
-  # When/if lhoods is moved to the bru_model class, this code can be simplified.
   if (is.null(x[["lhoods"]])) {
     bru_obs_list(list())
   } else {
@@ -126,14 +120,14 @@ as_bru_comp_list.bru_comp <- function(x, ...) {
 #' @describeIn as_bru_comp Extract the component list from a [bru()] object.
 #' @export
 as_bru_comp_list.bru <- function(x, ...) {
-  as_bru_comp_list(x[["bru_info"]], ...)
+  as_bru_comp_list(as_bru_info(x), ...)
 }
 
 #' @describeIn as_bru_comp Extract the component list from a [bru_info()]
 #'   object.
 #' @export
 as_bru_comp_list.bru_info <- function(x, ...) {
-  as_bru_comp_list(x[["model"]], ...)
+  as_bru_comp_list(as_bru_model(x), ...)
 }
 
 #' @describeIn as_bru_comp Extract the component list from a [bru_model()]
