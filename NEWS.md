@@ -31,11 +31,13 @@
 * Fix layer indexing in `bru_fill_missing()` for `SpatRaster` data that resulted
   in an error for layers beyond the first layer (`2.14.1.9006`)
 
-## Other changes
+## Namespace changes
 
 * Remove dependency on `plyr`. Fixes #301 (`2.14.1.9004`)
 * Move `stats` from `Depends:` to `Imports:` to avoid unnecessary namespace
   clashes (`2.14.1.9013`)
+* Reexport generics `tidy()`, `glance()`, `augment()`, and `generate()` from
+  `generics` and `predict()` from `stats` (`2.14.1.9014`)
 
 # inlabru 2.14.1
 
