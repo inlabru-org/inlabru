@@ -167,7 +167,7 @@ bincount <- function(
   )
   pint$inside <-
     (pint$counts >= pint[[miname]]) &
-      (pint$counts <= pint[[mxname]])
+    (pint$counts <= pint[[mxname]])
 
   ggp <- ggplot2::ggplot() +
     ggplot2::geom_crossbar(
@@ -242,8 +242,8 @@ bincount <- function(
 #'   require("sf", quietly = TRUE) &&
 #'   require("RColorBrewer", quietly = TRUE) &&
 #'   require("dplyr", quietly = TRUE)) {
+#'   doplot <- FALSE
 #'   # Load Gorilla data
-#'
 #'   gorillas <- gorillas_sf
 #'   gorillas$gcov <- gorillas_sf_gcov()
 #'
@@ -264,9 +264,16 @@ bincount <- function(
 #'     spde(geometry, model = pcmatern) +
 #'     Intercept(1)
 #'
+#'   # Random thinning to speed up the example:
+#'   thinned_nests <- gorillas$nests[
+#'     sample(nrow(gorillas$nests), 20, replace = FALSE),
+#'    ,
+#'     drop = FALSE
+#'   ]
+#'
 #'   fit <- lgcp(
 #'     cmp,
-#'     gorillas$nests,
+#'     thinned_nests,
 #'     samplers = gorillas$boundary,
 #'     domain = list(geometry = gorillas$mesh),
 #'     options = list(control.inla = list(int.strategy = "eb"))
@@ -297,6 +304,7 @@ bincount <- function(
 #'     ) |>
 #'     dplyr::mutate(var = sd^2)
 #'
+#'   if (doplot) {
 #'   # Plot component mean
 #'
 #'   ggplot(pred_collect) +
@@ -316,6 +324,7 @@ bincount <- function(
 #'     coord_equal() +
 #'     facet_wrap(~component, nrow = 1) +
 #'     theme(legend.position = "bottom")
+#'   }
 #'
 #'   # Calculate variance and correlation measure
 #'
@@ -341,6 +350,7 @@ bincount <- function(
 #'     limits = lprange
 #'   )
 #'
+#'   if (doplot) {
 #'   vm_ <- dplyr::filter(vm, component %in% c("var.joint", "var1", "var2"))
 #'   ggplot(vm_) +
 #'     geom_tile(aes(geometry = geometry, fill = value),
@@ -350,11 +360,13 @@ bincount <- function(
 #'     coord_equal() +
 #'     facet_wrap(~component, nrow = 1) +
 #'     theme(legend.position = "bottom")
+#'   }
 #'
 #'   # Relative variance contribution of the components
 #'   # When bo
 #'
 #'   vm_ <- dplyr::filter(vm, component %in% c("var1_rel", "var2_rel"))
+#'   if (doplot) {
 #'   ggplot(vm_) +
 #'     geom_tile(aes(geometry = geometry, fill = value),
 #'       stat = "sf_coordinates"
@@ -365,12 +377,13 @@ bincount <- function(
 #'     ) +
 #'     coord_equal() +
 #'     facet_wrap(~component, nrow = 1)
+#'   }
 #'
 #'   # Where both relative contributions are larger than 1, the posterior
 #'   # correlations are strongly negative.
 #'
+#'   if (doplot) {
 #'   # Covariance and correlation of field and vegetation
-#'
 #'   vm_cov <- dplyr::filter(vm, component %in% "cov")
 #'   vm_cor <- dplyr::filter(vm, component %in% "cor")
 #'   (ggplot(vm_cov) +
@@ -396,6 +409,7 @@ bincount <- function(
 #'       theme(legend.position = "bottom") +
 #'       ggtitle("Correlations")
 #'   )
+#'   }
 #'
 #'   # Variance and correlation integrated over space
 #'
@@ -449,8 +463,8 @@ devel.cvmeasure <- function(
     # PRESENTED TO YOU BY HACKY McHACKERSON
     #
 
-    wips <- fm_int(mesh, samplers)
-    A <- fm_basis(mesh, loc = wips)
+    wips <- fmesher::fm_int(mesh, samplers)
+    A <- fmesher::fm_basis(mesh, loc = wips)
 
     weights <- wips$weight
     weights <- weights / sum(weights)

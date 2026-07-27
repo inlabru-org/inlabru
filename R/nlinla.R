@@ -7,6 +7,7 @@
 #' @rdname bru_compute_linearisation
 #' @keywords internal
 bru_compute_linearisation <- function(...) {
+  stopifnot(identical(bru_options_get("bru_method")$autodiff, "pandemic"))
   UseMethod("bru_compute_linearisation")
 }
 
@@ -36,21 +37,24 @@ bru_compute_linearisation <- function(...) {
 #'
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_comp <- function(cmp,
-                                               model,
-                                               lhood_expr,
-                                               data,
-                                               data_extra,
-                                               input,
-                                               state,
-                                               comp_simple,
-                                               effects,
-                                               pred0,
-                                               used,
-                                               is_rowwise,
-                                               eps,
-                                               n_pred = NULL,
-                                               ...) {
+bru_compute_linearisation.bru_comp <- function(
+  cmp,
+  model,
+  lhood_expr,
+  data,
+  data_extra,
+  input,
+  state,
+  comp_simple,
+  effects,
+  pred0,
+  used,
+  is_rowwise,
+  eps,
+  n_pred = NULL,
+  finite_diff = "forward",
+  ...
+) {
   label <- cmp[["label"]]
   bru_log_message(
     paste0("Linearise with respect to component '", label, "'"),
@@ -84,13 +88,11 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     if (assume_rowwise) {
       if (!is.null(n_pred) && (NROW(pred0) != n_pred)) {
         stop(
-          "Number of rows (",
-          NROW(pred0),
-          ") in the predictor for component '",
-          label,
-          "' does not match the length implied by the response data (",
-          n_pred,
-          ")."
+          glue(
+            "The number of values ({NROW(pred0)}) in the predictor for ",
+            "observation model ",
+            "<unknown> does not match the expected length ({n_pred})."
+          )
         )
       }
       if (NROW(A) == 1L) {
@@ -100,9 +102,9 @@ bru_compute_linearisation.bru_comp <- function(cmp,
   }
 
   triplets <- list(
-    i = integer(0),
-    j = integer(0),
-    x = numeric(0)
+    i = vector("list", NROW(state[[label]])),
+    j = vector("list", NROW(state[[label]])),
+    x = vector("list", NROW(state[[label]]))
   )
 
   if (!all(is.finite(pred0))) {
@@ -112,7 +114,7 @@ bru_compute_linearisation.bru_comp <- function(cmp,
     )
   }
 
-  symmetric_diffs <- FALSE
+  symmetric_diffs <- identical(finite_diff, "central")
   for (k in seq_len(NROW(state[[label]]))) {
     if (is.null(A)) {
       row_subset <- seq_len(NROW(pred0))
@@ -190,28 +192,25 @@ bru_compute_linearisation.bru_comp <- function(cmp,
         } else {
           list(state_eps)
         },
-        data =
-          if (assume_rowwise) {
-            data[row_subset, , drop = FALSE]
-          } else {
-            data
-          },
+        data = if (assume_rowwise) {
+          data[row_subset, , drop = FALSE]
+        } else {
+          data
+        },
         data_extra = data_extra,
-        effects =
-          if (symmetric_diffs) {
-            effects_eps
-          } else {
-            list(effects_eps)
-          },
+        effects = if (symmetric_diffs) {
+          effects_eps
+        } else {
+          list(effects_eps)
+        },
         predictor = lhood_expr,
         used = used,
         format = "matrix",
-        n_pred =
-          if (assume_rowwise) {
-            length(row_subset)
-          } else {
-            n_pred
-          }
+        n_pred = if (assume_rowwise) {
+          length(row_subset)
+        } else {
+          n_pred
+        }
       )
       # Store sparse triplet information
       if (symmetric_diffs) {
@@ -247,18 +246,18 @@ bru_compute_linearisation.bru_comp <- function(cmp,
       }
       nonzero[nonzero] <- (values[nonzero] != 0.0) # Detect exact (non)zeros
       if (assume_rowwise) {
-        triplets$i <- c(triplets$i, row_subset[nonzero])
+        triplets$i[[k]] <- row_subset[nonzero]
       } else {
-        triplets$i <- c(triplets$i, which(nonzero))
+        triplets$i[[k]] <- which(nonzero)
       }
-      triplets$j <- c(triplets$j, rep(k, sum(nonzero)))
-      triplets$x <- c(triplets$x, values[nonzero] / eps)
+      triplets$j[[k]] <- rep(k, sum(nonzero))
+      triplets$x[[k]] <- values[nonzero] / eps
     }
   }
   B <- Matrix::sparseMatrix(
-    i = triplets$i,
-    j = triplets$j,
-    x = triplets$x,
+    i = unlist(triplets$i),
+    j = unlist(triplets$j),
+    x = unlist(triplets$x),
     dims = c(NROW(pred0), NROW(state[[label]]))
   )
   if (NROW(B) != NROW(pred0)) {
@@ -279,20 +278,23 @@ bru_compute_linearisation.bru_comp <- function(cmp,
 #' @param model A `bru_model` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_obs <- function(lhood,
-                                              model,
-                                              data,
-                                              input,
-                                              state,
-                                              comp_simple,
-                                              eps,
-                                              ...) {
+bru_compute_linearisation.bru_obs <- function(
+  lhood,
+  model,
+  data,
+  input,
+  state,
+  comp_simple,
+  eps,
+  ...
+) {
+  comp_input <- input[["comp"]]
   used <- bru_used(lhood)
   pred_expr <- bru_pred_expr(lhood)
   is_rowwise <- bru_is_rowwise(pred_expr)
   effects <- evaluate_effect_single_state(
     comp_simple[used[["effect"]]],
-    input = input[used[["effect"]]],
+    input = comp_input[used[["effect"]]],
     state = state[used[["effect"]]]
   )
 
@@ -325,7 +327,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
         # non-offset A matrix, and possibly expand to full size
         A <- ibm_jacobian(
           comp_simple[[label]],
-          input[[label]],
+          comp_input[[label]],
           state[[label]]
         )
         if (NROW(A) == 1) {
@@ -345,7 +347,7 @@ bru_compute_linearisation.bru_obs <- function(lhood,
             lhood_expr = lhood_expr,
             data = data,
             data_extra = lhood[["data_extra"]],
-            input = input,
+            input = comp_input,
             state = state,
             comp_simple = comp_simple[[label]],
             effects = effects,
@@ -370,13 +372,15 @@ bru_compute_linearisation.bru_obs <- function(lhood,
 #' @param lhoods A `bru_obs_list` object
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_obs_list <- function(lhoods,
-                                                   model,
-                                                   input,
-                                                   state,
-                                                   comp_simple,
-                                                   eps = 1e-5,
-                                                   ...) {
+bru_compute_linearisation.bru_obs_list <- function(
+  lhoods,
+  model,
+  input,
+  state,
+  comp_simple,
+  eps = 1e-5,
+  ...
+) {
   # TODO: set the eps default more intelligently
   lapply(seq_along(lhoods), function(idx) {
     x <- lhoods[[idx]]
@@ -395,12 +399,20 @@ bru_compute_linearisation.bru_obs_list <- function(lhoods,
 
 #' @export
 #' @rdname bru_compute_linearisation
-bru_compute_linearisation.bru_model <- function(model, lhoods,
-                                                input, state,
-                                                comp_simple, ...) {
-  bru_compute_linearisation(lhoods,
+bru_compute_linearisation.bru_model <- function(
+  model,
+  lhoods,
+  input,
+  state,
+  comp_simple,
+  ...
+) {
+  bru_compute_linearisation(
+    lhoods,
     model = model,
-    input = input, state = state,
-    comp_simple = comp_simple, ...
+    input = input,
+    state = state,
+    comp_simple = comp_simple,
+    ...
   )
 }

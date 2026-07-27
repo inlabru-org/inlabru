@@ -105,13 +105,15 @@
 #' }
 #' }
 #'
-sample.lgcp <- function(mesh,
-                        loglambda,
-                        strategy = NULL,
-                        R = NULL,
-                        samplers = NULL,
-                        ignore.CRS = FALSE) {
-  mesh <- fm_as_fm(mesh)
+sample.lgcp <- function(
+  mesh,
+  loglambda,
+  strategy = NULL,
+  R = NULL,
+  samplers = NULL,
+  ignore.CRS = FALSE
+) {
+  mesh <- fmesher::fm_as_fm(mesh)
   if (inherits(mesh, "fm_mesh_1d")) {
     xmin <- mesh$interval[1]
     xmax <- mesh$interval[2]
@@ -140,11 +142,14 @@ sample.lgcp <- function(mesh,
       Npoints <- rpois(1, lambda = area * exp(wmax))
       if (Npoints > 0) {
         points <- runif(n = Npoints, min = xmin, max = xmax)
-        proj <- fm_basis(mesh, points, full = TRUE)
+        proj <- fmesher::fm_basis(mesh, points, full = TRUE)
         if (length(loglambda) == 1) {
-          lambda_ratio <- exp(as.vector(
-            Matrix::rowSums(proj$A) * loglambda
-          ) - wmax)
+          lambda_ratio <- exp(
+            as.vector(
+              Matrix::rowSums(proj$A) * loglambda
+            ) -
+              wmax
+          )
         } else {
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - wmax)
         }
@@ -192,7 +197,7 @@ sample.lgcp <- function(mesh,
     if (ignore.CRS) {
       mesh$crs <- NULL
     }
-    input.crs <- fm_crs(mesh)
+    input.crs <- fmesher::fm_crs(mesh)
     use.crs <- !is.na(input.crs) && !ignore.CRS
     is.geocent <- fmesher::fm_crs_is_geocent(mesh)
 
@@ -217,14 +222,14 @@ sample.lgcp <- function(mesh,
 
     if (is.geocent) {
       space.R <- mean(rowSums(mesh$loc^2)^0.5)
-      internal.crs <- fm_crs("sphere")
+      internal.crs <- fmesher::fm_crs("sphere")
       mesh$loc <- mesh$loc / space.R
       mesh$crs <- internal.crs
     } else {
       if (use.crs) {
-        internal.crs <- fm_crs("sphere")
+        internal.crs <- fmesher::fm_crs("sphere")
       } else {
-        internal.crs <- fm_crs(NA_character_)
+        internal.crs <- fmesher::fm_crs(NA_character_)
         mesh$crs <- NULL
       }
     }
@@ -235,13 +240,14 @@ sample.lgcp <- function(mesh,
     } else {
       if (use.crs) {
         #        if (is.na(input.crs)) {
-        #          space.units <- fm_length_unit(input.crs)
+        #          space.units <- fmesher::fm_length_unit(input.crs)
         #        }
         area.R <- 6371
         if (is.geocent) {
           if (abs(1 - space.R / area.R) > 1e-2) {
             warning(
-              "The mesh has radius '", space.R,
+              "The mesh has radius '",
+              space.R,
               "', but crs information is available. ",
               "Using radius 6371 for area calculations."
             )
@@ -261,12 +267,12 @@ sample.lgcp <- function(mesh,
         if (is.geocent) {
           area.mesh <- mesh
         } else if (use.crs) {
-          area.mesh <- fm_transform(mesh, crs = internal.crs)
+          area.mesh <- fmesher::fm_transform(mesh, crs = internal.crs)
         } else {
           area.mesh <- mesh
           area.R <- 1
         }
-        areas <- fm_fem(area.mesh, order = 0)$ta * area.R^2
+        areas <- fmesher::fm_fem(area.mesh, order = 0)$ta * area.R^2
 
         loglambda_tri <- matrix(
           loglambda[mesh$graph$tv],
@@ -302,9 +308,9 @@ sample.lgcp <- function(mesh,
         if (is.geocent) {
           target.crs <- internal.crs
         } else if (use.crs) {
-          target.crs <- fm_crs(input.crs)
+          target.crs <- fmesher::fm_crs(input.crs)
         } else {
-          target.crs <- fm_crs(NA_character_)
+          target.crs <- fmesher::fm_crs(NA_character_)
         }
         if (sum(Npoints) > 0) {
           points <- sf::st_as_sf(
@@ -313,9 +319,11 @@ sample.lgcp <- function(mesh,
             crs = target.crs
           )
 
-          A <- fm_basis(mesh, points)
-          lambda_ratio <- exp(as.vector(A %*% loglambda) -
-            loglambda_max[triangle])
+          A <- fmesher::fm_basis(mesh, points)
+          lambda_ratio <- exp(
+            as.vector(A %*% loglambda) -
+              loglambda_max[triangle]
+          )
           keep <- (runif(sum(Npoints)) <= lambda_ratio)
           ret <- points[keep, , drop = FALSE]
           waste_ratio <- sum(keep) / length(keep)
@@ -360,7 +368,7 @@ sample.lgcp <- function(mesh,
           )
 
           # Do some thinning
-          proj <- fm_basis(mesh, points, full = TRUE)
+          proj <- fmesher::fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep, , drop = FALSE]
@@ -397,7 +405,7 @@ sample.lgcp <- function(mesh,
             crs = internal.crs
           )
 
-          proj <- fm_basis(mesh, points, full = TRUE)
+          proj <- fmesher::fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           ret <- points[keep, , drop = FALSE]
@@ -460,7 +468,7 @@ sample.lgcp <- function(mesh,
             crs = internal.crs
           )
 
-          proj <- fm_basis(mesh, points, full = TRUE)
+          proj <- fmesher::fm_basis(mesh, points, full = TRUE)
           lambda_ratio <- exp(as.vector(proj$A %*% loglambda) - lambda_max)
           keep <- proj$ok & (runif(Npoints) <= lambda_ratio)
           sampled.points[[k]] <- points[keep, , drop = FALSE]
@@ -488,12 +496,12 @@ sample.lgcp <- function(mesh,
 
     if (is.geocent) {
       if (NROW(ret) > 0) {
-        ret <- fm_transform(ret, crs = fm_crs("globe"))
+        ret <- fmesher::fm_transform(ret, crs = fmesher::fm_crs("globe"))
       } else if (multi.samples) {
         if (use.crs) {
-          ret_crs <- fm_crs(input.crs)
+          ret_crs <- fmesher::fm_crs(input.crs)
         } else {
-          ret_crs <- fm_crs(NA_character_)
+          ret_crs <- fmesher::fm_crs(NA_character_)
         }
         ret <- sf::st_as_sf(
           cbind(as.data.frame(matrix(0, 1, 3)), sample = 1),
@@ -510,47 +518,47 @@ sample.lgcp <- function(mesh,
     } else {
       if (use.crs) {
         if (NROW(ret) > 0) {
-          ret <- fm_transform(ret, input.crs)
+          ret <- fmesher::fm_transform(ret, input.crs)
         } else if (multi.samples) {
           ret <- sf::st_as_sf(
             cbind(as.data.frame(matrix(0, 1, 2)), sample = 1),
             coords = seq_len(2),
-            crs = fm_crs(input.crs)
+            crs = fmesher::fm_crs(input.crs)
           )[-1, , drop = FALSE]
         } else {
           ret <- sf::st_as_sf(
             as.data.frame(matrix(0, 1, 2)),
             coords = seq_len(2),
-            crs = fm_crs(input.crs)
+            crs = fmesher::fm_crs(input.crs)
           )[-1, , drop = FALSE]
         }
       } else {
-        sf::st_crs(ret) <- fm_crs(NA_character_)
+        sf::st_crs(ret) <- fmesher::fm_crs(NA_character_)
       }
     }
 
     # Only retain points within the samplers
     if (!is.null(samplers) && (NROW(ret) > 0)) {
       if (inherits(samplers, "fm_mesh_2d")) {
-        proj <- fm_basis(samplers, ret, full = TRUE)
+        proj <- fmesher::fm_basis(samplers, ret, full = TRUE)
         ret <- ret[proj$ok, , drop = FALSE]
       } else if (inherits(samplers, "Spatial")) {
         ret_ <- sf::as_Spatial(ret)
         if (use.crs) {
-          ret_ <- fm_transform(ret_, fm_crs(samplers))
+          ret_ <- fmesher::fm_transform(ret_, fmesher::fm_crs(samplers))
         } else {
-          fm_crs(ret_) <- fm_crs(NA_character_)
-          fm_crs(samplers) <- fm_crs(NA_character_)
+          fmesher::fm_crs(ret_) <- fmesher::fm_crs(NA_character_)
+          fmesher::fm_crs(samplers) <- fmesher::fm_crs(NA_character_)
         }
         ok <- !is.na(sp::over(ret_, samplers))
         ret <- ret[ok, , drop = FALSE]
       } else {
         ret_ <- sf::st_as_sf(ret)
         if (use.crs) {
-          ret_ <- fm_transform(ret_, fm_crs(samplers))
+          ret_ <- fmesher::fm_transform(ret_, fmesher::fm_crs(samplers))
         } else {
-          fm_crs(ret_) <- fm_crs(NA_character_)
-          fm_crs(samplers) <- fm_crs(NA_character_)
+          fmesher::fm_crs(ret_) <- fmesher::fm_crs(NA_character_)
+          fmesher::fm_crs(samplers) <- fmesher::fm_crs(NA_character_)
         }
         idx <- sf::st_within(ret_, samplers)
         ok <- vapply(idx, function(x) length(x) > 0, TRUE)

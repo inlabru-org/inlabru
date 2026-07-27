@@ -1,4 +1,10 @@
-ibm_jacobian.bm_harmonics.sparseMatrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
+ibm_jacobian.bm_harmonics.sparseMatrix <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   # Indexing into sparseMatrix is slower than into a dense Matrix,
   # so make sure we create a dense Matrix
   A <- Matrix::Matrix(0.0, NROW(input), ibm_n(mapper))
@@ -19,7 +25,13 @@ ibm_jacobian.bm_harmonics.sparseMatrix <- function(mapper, input, state = NULL, 
   }
   A
 }
-ibm_jacobian.bm_harmonics.Matrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
+ibm_jacobian.bm_harmonics.Matrix <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   # Indexing into sparseMatrix is slower than into a dense Matrix,
   # so make sure we create a dense Matrix
   A <- Matrix::Matrix(1.0, NROW(input), ibm_n(mapper))
@@ -40,7 +52,13 @@ ibm_jacobian.bm_harmonics.Matrix <- function(mapper, input, state = NULL, inla_f
   }
   A
 }
-ibm_jacobian.bm_harmonics.matrix <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
+ibm_jacobian.bm_harmonics.matrix <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   # Indexing into sparseMatrix is slower than into a dense Matrix,
   # so make sure we create a dense Matrix
   A <- matrix(0.0, NROW(input), ibm_n(mapper))
@@ -76,7 +94,10 @@ for (ord in ords) {
       cbind(
         as.data.frame(
           bench::mark(
-            "Matrix(0)" = ibm_jacobian.bm_harmonics.sparseMatrix(m, input = input),
+            "Matrix(0)" = ibm_jacobian.bm_harmonics.sparseMatrix(
+              m,
+              input = input
+            ),
             "Matrix(1)" = ibm_jacobian.bm_harmonics.Matrix(m, input = input),
             "matrix" = ibm_jacobian.bm_harmonics.matrix(m, input = input),
             "package" = ibm_jacobian(m, input = input),
@@ -114,7 +135,7 @@ ggplot(timings, aes(N, 1 / `itr/sec`, col = expression, shape = order)) +
   scale_x_log10() +
   scale_y_log10() +
   ylab("sec/itr") +
-  facet_wrap(~ order)
+  facet_wrap(~order)
 
 htmlwidgets::saveWidget(pv, "misc/profile.html")
 browseURL("misc/profile.html")

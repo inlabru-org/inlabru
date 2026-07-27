@@ -29,9 +29,11 @@
 #' }
 #'
 #' @keywords internal
-bru_safe_inla <- function(multicore = NULL,
-                          quietly = FALSE,
-                          minimum_version = "23.1.31") {
+bru_safe_inla <- function(
+  multicore = NULL,
+  quietly = FALSE,
+  minimum_version = "23.1.31"
+) {
   inla_version <-
     check_package_version_and_load(
       pkg = "INLA",
@@ -62,7 +64,9 @@ bru_safe_inla <- function(multicore = NULL,
       if (!quietly) {
         message(
           paste0(
-            "INLA binary '", inla.binary, "' not found. ",
+            "INLA binary '",
+            inla.binary,
+            "' not found. ",
             "INLA not installed correctly, or with platform mismatch."
           )
         )
@@ -91,7 +95,9 @@ bru_safe_inla <- function(multicore = NULL,
     if (!identical(n.t, "1:1:1")) {
       if (!quietly) {
         message(paste0(
-          "Changing INLA option num.threads from '", n.t, "' to '1:1:1'."
+          "Changing INLA option num.threads from '",
+          n.t,
+          "' to '1:1:1'."
         ))
       }
       INLA::inla.setOption(num.threads = "1:1:1")
@@ -101,14 +107,11 @@ bru_safe_inla <- function(multicore = NULL,
 }
 
 
-
-
-
 check_package_version_and_load <-
   function(pkg, minimum_version, quietly = FALSE) {
-    version <- tryCatch(utils::packageVersion(pkg),
-      error = function(e) NA_character_
-    )
+    version <- tryCatch(utils::packageVersion(pkg), error = function(e) {
+      NA_character_
+    })
     if (is.na(version)) {
       if (!quietly) {
         message(paste0("Package '", pkg, "' is not installed."))
@@ -118,8 +121,14 @@ check_package_version_and_load <-
     if (version < minimum_version) {
       if (!quietly) {
         message(paste0(
-          "Installed '", pkg, "' version is ", version, " but ",
-          "version >= ", minimum_version, " is required."
+          "Installed '",
+          pkg,
+          "' version is ",
+          version,
+          " but ",
+          "version >= ",
+          minimum_version,
+          " is required."
         ))
       }
       return(NA_character_)
@@ -161,9 +170,11 @@ check_package_version_and_load <-
 #' }
 #'
 #' @keywords internal
-bru_safe_sp <- function(quietly = FALSE,
-                        force = FALSE,
-                        minimum_version = "2.1") {
+bru_safe_sp <- function(
+  quietly = FALSE,
+  force = FALSE,
+  minimum_version = "2.1"
+) {
   sp_version <-
     check_package_version_and_load(
       pkg = "sp",
@@ -186,7 +197,8 @@ bru_safe_sp <- function(quietly = FALSE,
       error = function(e) 2L,
       warning = function(e) 2L
     )
-    rgdal_version <- tryCatch(utils::packageVersion("rgdal"),
+    rgdal_version <- tryCatch(
+      utils::packageVersion("rgdal"),
       error = function(e) NA_character_
     )
     if ((evolution_status < 2L) && is.na(rgdal_version)) {
@@ -245,8 +257,7 @@ bru_safe_sp <- function(quietly = FALSE,
 #' }
 #'
 #' @keywords internal
-bru_safe_terra <- function(quietly = FALSE,
-                           minimum_version = "1.7-66") {
+bru_safe_terra <- function(quietly = FALSE, minimum_version = "1.7-66") {
   terra_version <-
     check_package_version_and_load(
       pkg = "terra",
@@ -335,7 +346,10 @@ check_layer <- function(data, where, layer) {
           "Input layer(s) nr ",
           paste0(unique(layer[!ok_layer]), collapse = ", "),
           " not in the valid range, [",
-          1, ", ", length(names_data), "]"
+          1,
+          ", ",
+          length(names_data),
+          "]"
         )
       )
     }
@@ -375,7 +389,8 @@ extract_selector <- function(where, selector) {
 extract_layer <- function(where, layer, selector) {
   if (!is.null(layer)) {
     if (!is.null(selector)) {
-      warning("Both layer and selector specified. Ignoring selector",
+      warning(
+        "Both layer and selector specified. Ignoring selector",
         immediate. = TRUE
       )
     }
@@ -409,10 +424,12 @@ eval_spatial <- function(data, where, layer = NULL, selector = NULL) {
 
 #' @export
 #' @describeIn eval_spatial Compatibility wrapper for `eval_spatial.sf`
-eval_spatial.SpatialPolygonsDataFrame <- function(data,
-                                                  where,
-                                                  layer = NULL,
-                                                  selector = NULL) {
+eval_spatial.SpatialPolygonsDataFrame <- function(
+  data,
+  where,
+  layer = NULL,
+  selector = NULL
+) {
   eval_spatial(
     sf::st_as_sf(data),
     where = where,
@@ -423,10 +440,12 @@ eval_spatial.SpatialPolygonsDataFrame <- function(data,
 
 #' @export
 #' @rdname eval_spatial
-eval_spatial.SpatialPixelsDataFrame <- function(data,
-                                                where,
-                                                layer = NULL,
-                                                selector = NULL) {
+eval_spatial.SpatialPixelsDataFrame <- function(
+  data,
+  where,
+  layer = NULL,
+  selector = NULL
+) {
   eval_spatial_Spatial(
     data = data,
     where = where,
@@ -437,10 +456,12 @@ eval_spatial.SpatialPixelsDataFrame <- function(data,
 
 #' @export
 #' @rdname eval_spatial
-eval_spatial.SpatialGridDataFrame <- function(data,
-                                              where,
-                                              layer = NULL,
-                                              selector = NULL) {
+eval_spatial.SpatialGridDataFrame <- function(
+  data,
+  where,
+  layer = NULL,
+  selector = NULL
+) {
   eval_spatial_Spatial(
     data = data,
     where = where,
@@ -462,11 +483,15 @@ eval_spatial_Spatial <- function(data, where, layer = NULL, selector = NULL) {
   }
 
   if (inherits(where, "SpatialPoints")) {
-    where <- fm_transform(where, crs = fm_CRS(data), passthrough = TRUE)
+    where <- fmesher::fm_transform(
+      where,
+      crs = fmesher::fm_CRS(data),
+      passthrough = TRUE
+    )
     if (ncol(sp::coordinates(where)) >= 3) {
       where <- sp::SpatialPoints(
         coords = sp::coordinates(where)[, 1:2, drop = FALSE],
-        proj4string = fm_CRS(where)
+        proj4string = fmesher::fm_CRS(where)
       )
     }
   }
@@ -498,7 +523,11 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
   if (!inherits(where, c("sf", "sfc", "sfg"))) {
     where <- sf::st_as_sf(where)
   }
-  where <- fm_transform(where, crs = sf::st_crs(data), passthrough = TRUE)
+  where <- fmesher::fm_transform(
+    where,
+    crs = sf::st_crs(data),
+    passthrough = TRUE
+  )
 
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
@@ -538,7 +567,6 @@ eval_spatial.sf <- function(data, where, layer = NULL, selector = NULL) {
   }
   val
 }
-
 
 
 terra_factor_levels <- function(data) {
@@ -589,27 +617,32 @@ terra_factor_levels <- function(data) {
 
 #' @export
 #' @rdname eval_spatial
-eval_spatial.SpatRaster <- function(data,
-                                    where,
-                                    layer = NULL,
-                                    selector = NULL) {
+eval_spatial.SpatRaster <- function(
+  data,
+  where,
+  layer = NULL,
+  selector = NULL
+) {
   requireNamespace("terra")
   layer <- extract_layer(where, layer, selector)
   check_layer(data, where, layer)
   if (!inherits(where, "SpatVector")) {
-    handle_crs <- (!fm_crs_is_null(fm_crs(where)) &&
-      !fm_crs_is_null(fm_crs(data)))
+    handle_crs <- (!fmesher::fm_crs_is_null(fmesher::fm_crs(where)) &&
+      !fmesher::fm_crs_is_null(fmesher::fm_crs(data)))
     if (handle_crs) {
-      where <- fmesher::fm_transform(where, fm_crs(data))
+      where <- fmesher::fm_transform(where, fmesher::fm_crs(data))
     }
     where <- terra::vect(where)
     if (handle_crs) {
-      # Terra's data crs might not be detected as the same as fm_crs(data)
+      # Terra's data crs might not be detected as the same as
+      # fmesher::fm_crs(data)
       where <- terra::project(where, data)
     }
   } else {
-    if (!fm_crs_is_null(fm_crs(where)) &&
-      !fm_crs_is_null(fm_crs(data))) {
+    if (
+      !fmesher::fm_crs_is_null(fmesher::fm_crs(where)) &&
+        !fmesher::fm_crs_is_null(fmesher::fm_crs(data))
+    ) {
       where <- terra::project(where, data)
     }
   }
@@ -713,9 +746,14 @@ eval_spatial.stars <- function(data, where, layer = NULL, selector = NULL) {
 #'   print(input$val[c(3, 30)])
 #' }
 #' }
-bru_fill_missing <- function(data, where, values,
-                             layer = NULL, selector = NULL,
-                             batch_size = deprecated()) {
+bru_fill_missing <- function(
+  data,
+  where,
+  values,
+  layer = NULL,
+  selector = NULL,
+  batch_size = deprecated()
+) {
   stopifnot(inherits(
     data,
     c(
@@ -766,16 +804,17 @@ bru_fill_missing <- function(data, where, values,
   # Only one layer from here on.
   layer <- layers
 
-  data_crs <- fm_crs(data)
+  data_crs <- fmesher::fm_crs(data)
   if (inherits(data, "SpatRaster")) {
     requireNamespace("terra")
     data_values <- terra::values(
       data[[layer]],
       dataframe = TRUE,
       na.rm = TRUE
-    )[[layer]]
+    )[[1]]
     data_coord <- as.data.frame(terra::crds(data[[layer]], na.rm = TRUE))
-    data_coord <- sf::st_as_sf(data_coord,
+    data_coord <- sf::st_as_sf(
+      data_coord,
       coords = seq_len(ncol(data_coord)),
       crs = data_crs
     )
@@ -794,7 +833,7 @@ bru_fill_missing <- function(data, where, values,
     data_coord <- data_coord[!data_notok, , drop = FALSE]
   }
 
-  where <- fm_transform(where, crs = data_crs, passthrough = TRUE)
+  where <- fmesher::fm_transform(where, crs = data_crs, passthrough = TRUE)
 
   values_notok <- is.na(values)
 
@@ -812,10 +851,14 @@ bru_fill_missing <- function(data, where, values,
 # Resave data
 resave_package_data <- function() {
   name_list <- c(
-    "gorillas_sf", "mexdolphin_sf",
+    "gorillas_sf",
+    "mexdolphin_sf",
     "mrsea",
-    "Poisson1_1D", "Poisson2_1D", "Poisson3_1D",
-    "shrimp", "toygroups",
+    "Poisson1_1D",
+    "Poisson2_1D",
+    "Poisson3_1D",
+    "shrimp",
+    "toygroups",
     "robins_subset",
     "toypoints"
   )
@@ -826,7 +869,9 @@ resave_package_data <- function() {
       thetext <- paste0(
         "usethis::use_data(",
         paste0(names(env), collapse = ", "),
-        ", compress = '", compress, "', overwrite = TRUE)"
+        ", compress = '",
+        compress,
+        "', overwrite = TRUE)"
       )
     } else {
       thetext <- paste0(
@@ -834,7 +879,9 @@ resave_package_data <- function() {
         paste0(names(env), collapse = ", "),
         ", file = '",
         the_path,
-        "', compress = '", compress, "')"
+        "', compress = '",
+        compress,
+        "')"
       )
     }
     eval(
@@ -915,5 +962,11 @@ row_kron <- function(M1, M2, repl = NULL, n.repl = NULL, weights = NULL) {
     "row_kron()",
     "fmesher::fm_row_kron()"
   )
-  fm_row_kron(M1 = M1, M2 = M2, repl = repl, n.repl = n.repl, weights = weights)
+  fmesher::fm_row_kron(
+    M1 = M1,
+    M2 = M2,
+    repl = repl,
+    n.repl = n.repl,
+    weights = weights
+  )
 }

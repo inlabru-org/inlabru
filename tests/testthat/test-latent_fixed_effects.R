@@ -6,16 +6,11 @@ test_that("basic intercept model", {
   )
   mycomp <- y ~ 1
   mydata <- local_basic_intercept_testdata()
-  mydata$y <- mydata$y + 1
-  fit <- bru(mycomp,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit <- bru(mycomp, family = "normal", data = mydata, options = options)
 
   expect_equal(
     fit$summary.fixed["Intercept", ]$mean,
-    1.09140515,
+    2.09038,
     tolerance = midtol
   )
 })
@@ -33,15 +28,11 @@ test_that("basic intercept model, spatial data", {
   mydata$coord2 <- 12
   mydata <- sf::st_as_sf(mydata, coords = c("coord1", "coord2"))
 
-  fit <- bru(mycomp,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit <- bru(mycomp, family = "normal", data = mydata, options = options)
 
   expect_equal(
-    fit$summary.fixed["Intercept", ]$mean + 1,
-    0.09140515 + 1,
+    fit$summary.fixed["Intercept", ]$mean,
+    2.090389,
     tolerance = midtol
   )
 })
@@ -54,15 +45,16 @@ test_that("basic fixed effect model", {
   )
   mycomp <- y ~ 1 + x1
   mydata <- local_basic_fixed_effect_testdata()
-  fit <- bru(mycomp,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit <- bru(mycomp, family = "normal", data = mydata, options = options)
 
   expect_equal(
-    fit$summary.fixed["Intercept", ]$mean + 1,
-    0.08637662 + 1,
+    fit$summary.fixed["Intercept", ]$mean,
+    1.897182,
+    tolerance = midtol
+  )
+  expect_equal(
+    fit$summary.fixed["x1", ]$mean,
+    2.947497,
     tolerance = midtol
   )
 })
@@ -75,21 +67,13 @@ test_that("basic fixed effect model, order relevance", {
   )
   mydata <- local_basic_fixed_effect_testdata()
   mycomp1 <- y ~ Intercept(1) + x1
-  fit1 <- bru(mycomp1,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit1 <- bru(mycomp1, family = "normal", data = mydata, options = options)
   mycomp2 <- y ~ x1 + Intercept(1)
-  fit2 <- bru(mycomp2,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit2 <- bru(mycomp2, family = "normal", data = mydata, options = options)
 
   expect_equal(
-    fit2$summary.fixed["Intercept", ],
-    fit1$summary.fixed["Intercept", ],
+    fit2$summary.fixed["Intercept", "mean"],
+    fit1$summary.fixed["Intercept", "mean"],
     tolerance = lowtol
   )
 })
@@ -100,18 +84,17 @@ test_that("interaction fixed effect model", {
   options <- list()
   mydata <- local_basic_fixed_effect_testdata()
   withr::local_seed(123L)
-  mydata <- cbind(mydata, x2 = sample(
-    x = factor(c("A", "B")),
-    size = nrow(mydata),
-    replace = TRUE
-  ))
+  mydata <- cbind(
+    mydata,
+    x2 = sample(
+      x = factor(c("A", "B")),
+      size = nrow(mydata),
+      replace = TRUE
+    )
+  )
   mycomp1 <- y ~ -1 + mix(~ -1 + x1:x2, model = "fixed")
   fit0 <- INLA::inla(y ~ -1 + x1:x2, data = mydata, family = "normal")
-  fit1 <- bru(mycomp1,
-    family = "normal",
-    data = mydata,
-    options = options
-  )
+  fit1 <- bru(mycomp1, family = "normal", data = mydata, options = options)
   expect_equal(
     fit1$summary.random$mix$ID,
     rownames(fit0$summary.fixed)

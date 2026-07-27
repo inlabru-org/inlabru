@@ -72,14 +72,12 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   track_data <- fit$bru_iinla$track
   if (!is.null(from)) {
-    stopifnot(is.numeric(from))
-    stopifnot(from >= 0)
+    stopifnot(is.numeric(from), from >= 0)
   } else {
     from <- min(track_data$iteration)
   }
   if (!is.null(to)) {
-    stopifnot(is.numeric(to))
-    stopifnot(to >= 0)
+    stopifnot(is.numeric(to), to >= 0)
   } else {
     to <- max(track_data$iteration)
   }
@@ -91,13 +89,12 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
 
   alpha_value_lin_scale <- 0.8
 
-  lty_ <- factor(c("Mode", "Lin", "Mode-Lin", "SD"),
+  lty_ <- factor(
+    c("Mode", "Lin", "Mode-Lin", "SD"),
     levels = c("Mode", "Lin", "Mode-Lin", "SD")
   )
   names(lty_) <- levels(lty_)
-  col_ <- factor(c("Max", "Mean", "Min"),
-    levels = c("Max", "Mean", "Min")
-  )
+  col_ <- factor(c("Max", "Mean", "Min"), levels = c("Max", "Mean", "Min"))
   names(col_) <- levels(col_)
 
   sc <- ggplot2::scale_linetype_discrete(
@@ -367,7 +364,9 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
     .data$iteration < max(.data$iteration)
   )
   track_data_prev$iteration <- track_data_prev$iteration + 1
-  track_data <- dplyr::left_join(track_data, track_data_prev,
+  track_data <- dplyr::left_join(
+    track_data,
+    track_data_prev,
     by = c("effect", "iteration", "index"),
     suffix = c("", ".prev")
   )
@@ -383,19 +382,32 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
           .data$effect,
           .data$iteration
         ) |>
-        dplyr::mutate(sd = dplyr::if_else(is.finite(.data$sd),
-          .data$sd, 1.0
-        )) |>
+        dplyr::mutate(
+          sd = dplyr::if_else(is.finite(.data$sd), .data$sd, 1.0)
+        ) |>
         dplyr::summarise(
           MaxMode = max(abs(.data$mode - .data$mode.prev) / .data$sd),
           MeanMode = mean(abs(.data$mode - .data$mode.prev) / .data$sd),
           RMSMode = mean((.data$mode - .data$mode.prev)^2 / .data$sd^2)^0.5,
-          MaxLin = max(abs(.data$new_linearisation -
-            .data$new_linearisation.prev) / .data$sd),
-          MeanLin = mean(abs(.data$new_linearisation -
-            .data$new_linearisation.prev) / .data$sd),
-          RMSLin = mean((.data$new_linearisation -
-            .data$new_linearisation.prev)^2 / .data$sd^2)^0.5,
+          MaxLin = max(
+            abs(
+              .data$new_linearisation -
+                .data$new_linearisation.prev
+            ) /
+              .data$sd
+          ),
+          MeanLin = mean(
+            abs(
+              .data$new_linearisation -
+                .data$new_linearisation.prev
+            ) /
+              .data$sd
+          ),
+          RMSLin = mean(
+            (.data$new_linearisation -
+              .data$new_linearisation.prev)^2 /
+              .data$sd^2
+          )^0.5,
           .groups = "drop"
         ) |>
         dplyr::mutate(
@@ -467,12 +479,18 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
           MaxMode = max(.data$mode - .data$mode.prev),
           MeanMode = mean(.data$mode - .data$mode.prev),
           MinMode = min(.data$mode - .data$mode.prev),
-          MaxLin = max(.data$new_linearisation -
-            .data$new_linearisation.prev),
-          MeanLin = mean(.data$new_linearisation -
-            .data$new_linearisation.prev),
-          MinLin = min(.data$new_linearisation -
-            .data$new_linearisation.prev),
+          MaxLin = max(
+            .data$new_linearisation -
+              .data$new_linearisation.prev
+          ),
+          MeanLin = mean(
+            .data$new_linearisation -
+              .data$new_linearisation.prev
+          ),
+          MinLin = min(
+            .data$new_linearisation -
+              .data$new_linearisation.prev
+          ),
           .groups = "drop"
         )
     ) +
@@ -617,27 +635,21 @@ make_bru_track_plots <- function(fit, from = 1, to = NULL) {
     ggplot2::ggtitle("Change & sd")
 
   pl_combined <-
-    ((
-      pl_tracks +
-        ggplot2::geom_line(
-          ggplot2::aes(.data$iteration, NA_real_, lty = lty_["Mode-Lin"]),
-          na.rm = TRUE
-        ) +
-        ggplot2::geom_line(
-          ggplot2::aes(.data$iteration, NA_real_, lty = lty_["SD"]),
-          na.rm = TRUE
-        ) |
-        pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")
-    ) /
-      (
-        pl_relative_change +
-          ggplot2::guides(linetype = "none", color = "none") |
-          pl_change + ggplot2::guides(linetype = "none", color = "none")
-      )
-    ) +
-      patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "bottom")
-
+    ((pl_tracks +
+      ggplot2::geom_line(
+        ggplot2::aes(.data$iteration, NA_real_, lty = lty_["Mode-Lin"]),
+        na.rm = TRUE
+      ) +
+      ggplot2::geom_line(
+        ggplot2::aes(.data$iteration, NA_real_, lty = lty_["SD"]),
+        na.rm = TRUE
+      ) |
+      pl_mode_lin + ggplot2::guides(linetype = "none", color = "none")) /
+      (pl_relative_change +
+        ggplot2::guides(linetype = "none", color = "none") |
+        pl_change + ggplot2::guides(linetype = "none", color = "none"))) +
+    patchwork::plot_layout(guides = "collect") &
+    ggplot2::theme(legend.position = "bottom")
 
   list(
     tracks = pl_tracks,
@@ -670,14 +682,18 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 
   track_data <- fit$bru_iinla$inla_track
   if (!is.null(from)) {
-    stopifnot(is.numeric(from))
-    stopifnot(from >= 0)
+    stopifnot(
+      is.numeric(from),
+      from >= 0
+    )
   } else {
     from <- min(track_data$iteration)
   }
   if (!is.null(to)) {
-    stopifnot(is.numeric(to))
-    stopifnot(to >= 0)
+    stopifnot(
+      is.numeric(to),
+      to >= 0
+    )
   } else {
     to <- max(track_data$iteration)
   }
@@ -741,13 +757,10 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
     ggplot2::ggtitle("theta values")
 
   pl_trace_combined <-
-    (
-      pl_trace1a | pl_trace1b
-      #        ggplot2::guides(linetype = "none", color = "none")
-    ) +
-      patchwork::plot_layout(guides = "collect") &
-      ggplot2::theme(legend.position = "bottom")
-
+    (pl_trace1a | pl_trace1b) +
+    #        ggplot2::guides(linetype = "none", color = "none")
+    patchwork::plot_layout(guides = "collect") &
+    ggplot2::theme(legend.position = "bottom")
 
   tr <- track_data |>
     dplyr::select(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total)
@@ -755,16 +768,18 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
   tr1 <- cbind(tr[-nrow(tr), ], theta = th[-nrow(tr), ])
   tr2 <- cbind(tr[-nrow(tr), ], theta = th[-1, ])
 
-  track1 <- tr1 |> tidyr::pivot_longer(
-    cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
-    names_to = "theta",
-    values_to = "value"
-  )
-  track2 <- tr2 |> tidyr::pivot_longer(
-    cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
-    names_to = "theta",
-    values_to = "value"
-  )
+  track1 <- tr1 |>
+    tidyr::pivot_longer(
+      cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+      names_to = "theta",
+      values_to = "value"
+    )
+  track2 <- tr2 |>
+    tidyr::pivot_longer(
+      cols = -c(.data$iteration, .data$f, .data$nfunc, .data$nfunc_total),
+      names_to = "theta",
+      values_to = "value"
+    )
   track1$value_next <- track2$value
 
   pl_trace2 <-
@@ -793,6 +808,8 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 #'
 #' @param x a [bru] object, typically a result from [bru()] for a nonlinear
 #' predictor model
+#' @param log logical; if `TRUE`, the y-axis is on a log scale.
+#' Default is `FALSE`.
 #'
 #' @details Requires the "ggplot2" package to be installed.
 #' @export
@@ -801,7 +818,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 #' fit <- bru(...)
 #' bru_timings_plot(fit)
 #' }
-bru_timings_plot <- function(x) {
+bru_timings_plot <- function(x, log = FALSE) {
   needed <- c("ggplot2")
   are_installed <-
     vapply(
@@ -823,13 +840,22 @@ bru_timings_plot <- function(x) {
 
   timings <- bru_timings(x)
 
+  scale_y <- function(..., log = FALSE) {
+    if (log) {
+      ggplot2::scale_y_log10(...)
+    } else {
+      ggplot2::scale_y_continuous(...)
+    }
+  }
+
   ggplot2::ggplot(
     tidyr::pivot_longer(
       dplyr::rename(timings, CPU = .data$Time),
       cols = c("CPU", "System", "Elapsed"),
       names_to = "Time",
       values_to = "Value"
-    )
+    ) |>
+      dplyr::mutate(Value = as.numeric(.data$Value))
   ) +
     ggplot2::geom_point(ggplot2::aes(
       .data$Iteration,
@@ -843,7 +869,7 @@ bru_timings_plot <- function(x) {
       col = .data$Task,
       linetype = .data$Time
     )) +
-    ggplot2::scale_y_continuous() +
+    scale_y(log = log) +
     ggplot2::ylab("Time (s)") +
     ggplot2::guides(
       color = ggplot2::guide_legend(title = "Task"),

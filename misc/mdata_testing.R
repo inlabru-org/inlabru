@@ -22,8 +22,8 @@ dat2_ <- as_tibble(unclass(with(
   inla.mdata(time_to_event, cure_covar)
 )))
 
-stk1 <- inla.stack(dat1_, A = list(diag(4)), effects=list(Intercept=1))
-stk2 <- inla.stack(dat2_, A = list(diag(3)), effects=list(Intercept=1))
+stk1 <- inla.stack(dat1_, A = list(diag(4)), effects = list(Intercept = 1))
+stk2 <- inla.stack(dat2_, A = list(diag(3)), effects = list(Intercept = 1))
 inla.stack.LHS(stk1)
 inla.stack.RHS(stk1)
 inla.stack.LHS(stk2)
@@ -34,40 +34,52 @@ inla.stack.LHS(stk)
 inla.stack.RHS(stk)
 
 
-fit <- inla(formula = list(inla.stack.LHS(stk), inla.stack.LHS(stk)) ~ 0 + Intercept,
-            family = c("exponentialsurv", "agaussian"),
-            data = inla.stack.RHS(stk),
-            control.predictor = list(A = inla.stack.A(stk)),
-            safe = FALSE)
+fit <- inla(
+  formula = list(inla.stack.LHS(stk), inla.stack.LHS(stk)) ~ 0 + Intercept,
+  family = c("exponentialsurv", "agaussian"),
+  data = inla.stack.RHS(stk),
+  control.predictor = list(A = inla.stack.A(stk)),
+  safe = FALSE
+)
 
-fit <- inla(formula = list(inla.stack.LHS(stk1), inla.stack.LHS(stk2)) ~ 0 + Intercept,
-            family = c("exponentialsurv", "agaussian"),
-            data = inla.stack.RHS(stk),
-            control.predictor = list(A = inla.stack.A(stk)),
-            safe = FALSE)
+fit <- inla(
+  formula = list(inla.stack.LHS(stk1), inla.stack.LHS(stk2)) ~ 0 + Intercept,
+  family = c("exponentialsurv", "agaussian"),
+  data = inla.stack.RHS(stk),
+  control.predictor = list(A = inla.stack.A(stk)),
+  safe = FALSE
+)
 
 
 fitb1 <- bru(
   components = ~ 0 + Intercept(1),
-  bru_obs(formula = dat1_ ~ .,
-       family = "exponentialsurv",
-       response_data = list(dat1_ = dat1_)),
+  bru_obs(
+    formula = dat1_ ~ .,
+    family = "exponentialsurv",
+    response_data = list(dat1_ = dat1_)
+  ),
   options = list(safe = FALSE)
 )
 fitb2 <- bru(
   components = ~ 0 + Intercept(1),
-  bru_obs(formula = dat2_ ~ .,
-       family = "agaussian",
-       data = dat2),
+  bru_obs(formula = dat2_ ~ ., family = "agaussian", data = dat2),
   options = list(safe = FALSE)
 )
 fitb <- bru(
   components = ~ 0 + Intercept(1),
-  bru_obs(formula = as.data.frame(unclass(inla.surv(time = time_to_event, event = event_type, cure = cure_covar))[-7]) ~ .,
-       family = "exponentialsurv",
-       data = dat1),
-  bru_obs(formula = inla.mdata(time_to_event, cure_covar) ~ .,
-       family = "agaussian",
-       data = dat2),
+  bru_obs(
+    formula = as.data.frame(unclass(inla.surv(
+      time = time_to_event,
+      event = event_type,
+      cure = cure_covar
+    ))[-7]) ~ .,
+    family = "exponentialsurv",
+    data = dat1
+  ),
+  bru_obs(
+    formula = inla.mdata(time_to_event, cure_covar) ~ .,
+    family = "agaussian",
+    data = dat2
+  ),
   options = list(safe = FALSE)
 )

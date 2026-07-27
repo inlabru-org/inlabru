@@ -58,7 +58,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   # distdata[1:2, ]
 
-
   # Generate location for detections if location missing
   # Use do.plot=T to see the location generated for each detection
   if (!("x" %in% colnames(distdata))) {
@@ -77,7 +76,6 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   newdata$strat <- 1
   # newdata[1:3, ]
 
-
   # Automated mesh construction
   loc <- rbind(
     as.matrix(segdata[, c("start.x", "start.y")]),
@@ -88,15 +86,15 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   )
   ok <- rowSums(is.na(loc)) == 0
   loc <- loc[ok, , drop = FALSE]
-  inner <- fm_nonconvex_hull(
+  inner <- fmesher::fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
   )
-  outer <- fm_nonconvex_hull(
+  outer <- fmesher::fm_nonconvex_hull(
     loc,
     convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
   )
-  mesh <- fm_mesh_2d_inla(
+  mesh <- fmesher::fm_mesh_2d_inla(
     boundary = list(inner, outer),
     max.edge = c(
       min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 10,

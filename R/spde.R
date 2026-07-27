@@ -37,9 +37,16 @@
 #'
 #' @author Finn Lindgren \email{Finn.Lindgren@@ed.ac.uk}
 #' @export
-materncov.bands <- function(manifold, dist, log.range,
-                            log.variance = NULL, alpha = 2,
-                            quantile = 0.95, n = 64, S1.L = NULL) {
+materncov.bands <- function(
+  manifold,
+  dist,
+  log.range,
+  log.variance = NULL,
+  alpha = 2,
+  quantile = 0.95,
+  n = 64,
+  S1.L = NULL
+) {
   stopifnot(bru_safe_inla(multicore = TRUE))
   calc.cov.R <- function(dist, kappa, var) {
     INLA::inla.matern.cov(nu = nu, kappa, x = dist, d = d, corr = TRUE) * var
@@ -47,18 +54,20 @@ materncov.bands <- function(manifold, dist, log.range,
   ## Do the right thing for _nominal_ variance
   calc.cov.S1 <- function(dist, kappa, var) {
     dist <- dist %% S1.L
-    out <- calc.cov.R(abs(dist), kappa, var) + calc.cov.R(
-      abs(dist - S1.L),
-      kappa,
-      var
-    )
+    out <- calc.cov.R(abs(dist), kappa, var) +
+      calc.cov.R(
+        abs(dist - S1.L),
+        kappa,
+        var
+      )
     # Measure the relative contribution of each term:
     cov0 <- calc.cov.R(0, kappa, 1)
     loop <- 0
     max.loop <- 10
     while ((cov0 > 1e-3) && (loop < max.loop)) {
       loop <- loop + 1
-      out <- out + calc.cov.R(abs(dist + S1.L * loop), kappa, var) +
+      out <- out +
+        calc.cov.R(abs(dist + S1.L * loop), kappa, var) +
         calc.cov.R(abs(dist - S1.L - S1.L * loop), kappa, var)
       cov0 <- calc.cov.R(S1.L * loop, kappa, 1)
     }
@@ -67,7 +76,8 @@ materncov.bands <- function(manifold, dist, log.range,
   ## Do the right thing for _nominal_ variance
   calc.cov.S2 <- function(dist, kappa, var) {
     INLA::inla.matern.cov.s2(nu = nu, kappa, x = dist, norm.corr = FALSE) /
-      INLA::inla.matern.cov(nu = nu, kappa, x = 0, d = 2, corr = FALSE) * var
+      INLA::inla.matern.cov(nu = nu, kappa, x = 0, d = 2, corr = FALSE) *
+      var
   }
   calc.corr.R <- function(dist, kappa) {
     INLA::inla.matern.cov(nu = nu, kappa, x = dist, d = d, corr = TRUE)
@@ -82,13 +92,13 @@ materncov.bands <- function(manifold, dist, log.range,
       INLA::inla.matern.cov.s2(nu = nu, kappa, x = 0, norm.corr = FALSE)
   }
   if (!is.character(manifold)) {
-    if (fm_manifold(manifold, "S1") && is.null(S1.L)) {
+    if (fmesher::fm_manifold(manifold, "S1") && is.null(S1.L)) {
       S1.L <- diff(manifold$interval)
     }
-    manifold <- fm_manifold(manifold)
+    manifold <- fmesher::fm_manifold(manifold)
   }
-  if (fm_manifold(manifold, "R")) {
-    d <- fm_manifold_dim(manifold)
+  if (fmesher::fm_manifold(manifold, "R")) {
+    d <- fmesher::fm_manifold_dim(manifold)
     calc.corr <- calc.corr.R
     calc.cov <- calc.cov.R
   } else if (manifold == "S1") {
@@ -121,7 +131,8 @@ materncov.bands <- function(manifold, dist, log.range,
       median = calc.corr(dist, kappas[2]),
       upper = calc.corr(dist, kappas[3])
     )
-  } else { ## !is.null(log.variance)
+  } else {
+    ## !is.null(log.variance)
     if (!is.list(log.variance)) {
       log.variance <- list(mean = log.variance, sd = 0)
     }
@@ -136,18 +147,17 @@ materncov.bands <- function(manifold, dist, log.range,
       out$upper <- out$median
     } else {
       qq <- qchisq(quantile, 2)^0.5
-      log.kappas <- log(sqrt(8 * nu)) - (log.range$mean +
-        log.range$sd * c(qq, -qq))
+      log.kappas <- log(sqrt(8 * nu)) -
+        (log.range$mean +
+          log.range$sd * c(qq, -qq))
       log.variances <- log.variance$mean + log.variance$sd * c(-qq, qq)
       for (angle in 2 * pi * (1:n) / n) {
         ca <- cos(angle)
         sa <- sin(angle)
         the.corr <- calc.cov(
           dist,
-          exp(log.kappas[1] * (1 - ca) / 2 +
-            log.kappas[2] * (ca + 1) / 2),
-          exp(log.variances[1] * (1 - sa) / 2 +
-            log.variances[2] * (sa + 1) / 2)
+          exp(log.kappas[1] * (1 - ca) / 2 + log.kappas[2] * (ca + 1) / 2),
+          exp(log.variances[1] * (1 - sa) / 2 + log.variances[2] * (sa + 1) / 2)
         )
         out$lower <- pmin(out$lower, the.corr)
         out$upper <- pmax(out$upper, the.corr)
@@ -237,8 +247,7 @@ materncov.bands <- function(manifold, dist, log.range,
 #' }
 #' }
 #'
-spde.posterior <- function(result, name, what = "range",
-                           quantile = 0.95) {
+spde.posterior <- function(result, name, what = "range", quantile = 0.95) {
   stopifnot(bru_safe_inla(multicore = TRUE))
 
   spdespec <- as_bru_comp_list(result)[[name]]$main$model
@@ -263,7 +272,8 @@ spde.posterior <- function(result, name, what = "range",
         dist = x,
         log.range = log.range,
         log.variance = NULL,
-        alpha = 2, quantile = quantile
+        alpha = 2,
+        quantile = quantile
       )
     } else {
       corr <- FALSE
@@ -273,13 +283,16 @@ spde.posterior <- function(result, name, what = "range",
         dist = x,
         log.range = log.range,
         log.variance = log.variance,
-        alpha = 2, quantile = quantile
+        alpha = 2,
+        quantile = quantile
       )
     }
 
-
     df <- data.frame(
-      x = x, q0.5 = out$median, lower = out$lower, upper = out$upper,
+      x = x,
+      q0.5 = out$median,
+      lower = out$lower,
+      upper = out$upper,
       median = out$median
     )
     colnames(df)[3] <- paste0("q", paste0(round((1 - quantile) / 2, 5), ""))
@@ -290,16 +303,21 @@ spde.posterior <- function(result, name, what = "range",
     class(df) <- list("prediction", "data.frame")
     df
   } else {
-    marg <- switch(what,
+    marg <- switch(
+      what,
       range = spderesult$marginals.range.nominal[[1]],
       log.range = spderesult$marginals.log.range.nominal[[1]],
       variance = spderesult$marginals.variance.nominal[[1]],
       log.variance = spderesult$marginals.log.variance.nominal[[1]]
     )
     if (is.null(marg)) {
-      stop("Invalid varname: ", what, ". must be one of 'range',
+      stop(
+        "Invalid varname: ",
+        what,
+        ". must be one of 'range',
                            'log.range',  'variance',  'log.variance',
-                           'matern.correlation', matern.covariance")
+                           'matern.correlation', matern.covariance"
+      )
     }
 
     med <- INLA::inla.qmarginal(0.5, marg)

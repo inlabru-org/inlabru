@@ -6,6 +6,7 @@
 \alias{bru_pred_expr.bru_obs}
 \alias{bru_pred_expr.bru_obs_list}
 \alias{bru_pred_expr.bru_info}
+\alias{bru_pred_expr.bru_model}
 \alias{bru_pred_expr.bru}
 \alias{bru_pred_expr.bru_pred_expr}
 \alias{format.bru_pred_expr}
@@ -28,9 +29,11 @@ bru_pred_expr(x, ...)
 
 \method{bru_pred_expr}{bru_info}(x, ...)
 
+\method{bru_pred_expr}{bru_model}(x, ...)
+
 \method{bru_pred_expr}{bru}(x, ...)
 
-\method{bru_pred_expr}{bru_pred_expr}(x, ..., format = "object")
+\method{bru_pred_expr}{bru_pred_expr}(x, ..., format = "object", raw = FALSE)
 
 \method{format}{bru_pred_expr}(x, ...)
 
@@ -62,9 +65,12 @@ needs to be set before use. Default: \code{NULL}}
 \item \code{"formula"} (the original formula input if available, otherwise
 constructed from the expression),
 \item \code{"formula_text"} (a text version of the "formula"),
-\item \code{"text_raw"} (plain text, without substituting \code{BRU_EXPRESSION}), or
 \item \code{"resp_text"} (plain text of the response side of the formula).
 }}
+
+\item{raw}{Logical; whether to return the raw expression without
+substituting \code{BRU_EXPRESSION} with the used latent variables.
+Default: \code{FALSE}}
 }
 \description{
 Create and access predictor expression information, keeping track of what
@@ -80,6 +86,9 @@ inside a \code{bru_obs_list} object.
 
 \item \code{bru_pred_expr(bru_info)}: Accessor for the \code{bru_pred_expr} object stored
 inside a \code{bru_info} object.
+
+\item \code{bru_pred_expr(bru_model)}: Accessor for the \code{bru_pred_expr} object stored
+inside a \code{bru_model} object.
 
 \item \code{bru_pred_expr(bru)}: Accessor for the \code{bru_pred_expr} object stored
 inside a \code{bru} object.

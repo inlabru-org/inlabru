@@ -11,15 +11,9 @@ latent_ar1_testdata <- function() {
   data3 <- data1[c(2, 5, 4, 3, 1), , drop = FALSE]
 
   cmp <- obs ~ time(time, model = "ar1") - Intercept
-  fit1 <- bru(cmp,
-    data = data1, family = "gaussian"
-  )
-  fit2 <- bru(cmp,
-    data = data2, family = "gaussian"
-  )
-  fit3 <- bru(cmp,
-    data = data3, family = "gaussian"
-  )
+  fit1 <- bru(cmp, data = data1, family = "gaussian")
+  fit2 <- bru(cmp, data = data2, family = "gaussian")
+  fit3 <- bru(cmp, data = data3, family = "gaussian")
 
   list(
     data = list(data1 = data1, data2 = data2, data3 = data3),
@@ -48,14 +42,20 @@ old <- function() {
   )
 
   fit$fit_inla <- list(
-    INLA::inla(obs ~ f(time, model = "ar1") - 1,
-      data = fit$data[[1]], family = "gaussian"
+    INLA::inla(
+      obs ~ f(time, model = "ar1") - 1,
+      data = fit$data[[1]],
+      family = "gaussian"
     ),
-    INLA::inla(obs ~ f(time, model = "ar1") - 1,
-      data = fit$data[[2]], family = "gaussian"
+    INLA::inla(
+      obs ~ f(time, model = "ar1") - 1,
+      data = fit$data[[2]],
+      family = "gaussian"
     ),
-    INLA::inla(obs ~ f(time, model = "ar1") - 1,
-      data = fit$data[[3]], family = "gaussian"
+    INLA::inla(
+      obs ~ f(time, model = "ar1") - 1,
+      data = fit$data[[3]],
+      family = "gaussian"
     )
   )
 

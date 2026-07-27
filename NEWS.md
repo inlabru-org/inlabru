@@ -1,3 +1,44 @@
+# inlabru 2.15.0
+
+## New features
+
+* New predictor evaluation and linearisation implementation (`2.14.1.9008`)
+* Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
+  support the `broom` package tidying framework. Thanks to Novica Nakov
+  (`2.14.1.9005`)
+* Add observation `family` options `nzbinomial`, `nznbinomial`, `nzcenpoisson`,
+  and `nzbetabinomial` for non-zero truncated models, acting like `nzpoisson`.
+  Will automatically switch to INLA implementations if available, otherwise
+  uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
+  (`2.14.1.9007`)
+* Improved `bru_used` variable detection, supporting pronoun and container
+  object access detection. (`2.14.1.9010`)
+* Add `log` argument to `bru_timings_plot()` to allow logarithmic scaling of
+  the time axis (`2.14.1.9014`)
+
+## Bug fixes
+
+* Fix issue #298, where `weights` input to `copy = ...` components was not
+  consistently passed to the component mapper construction. This could be
+  partly worked around by specifying `weights = 1` in the source component, but
+  only for estimation, so post-estimation computations would still ignore the
+  weights.
+  Now enforces that the same inputs are present in both the source and copy
+  definitions, ensuring a consistent mapper construction, and post-estimation
+  consistency. (`2.14.1.9002`)
+* (Re)enable non-integer point weights for `family = "cp"` models, by using
+  `family = "xpoisson"` (`2.14.1.9003`)
+* Fix layer indexing in `bru_fill_missing()` for `SpatRaster` data that resulted
+  in an error for layers beyond the first layer (`2.14.1.9006`)
+
+## Namespace changes
+
+* Remove dependency on `plyr`. Fixes #301 (`2.14.1.9004`)
+* Move `stats` from `Depends:` to `Imports:` to avoid unnecessary namespace
+  clashes (`2.14.1.9013`)
+* Reexport generics `tidy()`, `glance()`, `augment()`, and `generate()` from
+  `generics` and `predict()` from `stats` (`2.14.1.9014`)
+
 # inlabru 2.14.1
 
 ## Bug fixes

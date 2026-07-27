@@ -14,15 +14,10 @@ test_that("eval_spatial.SpatRaster", {
 
   # Multirow
   where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
-  A_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("A", nrow(where))
-  )
-  B_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("B", nrow(where))
-  )
-  AB_val <- eval_spatial(covs,
+  A_val <- eval_spatial(covs, where = where, layer = rep("A", nrow(where)))
+  B_val <- eval_spatial(covs, where = where, layer = rep("B", nrow(where)))
+  AB_val <- eval_spatial(
+    covs,
     where = where,
     layer = rep(
       c("A", "B"),
@@ -35,28 +30,16 @@ test_that("eval_spatial.SpatRaster", {
 
   # Multirow
   where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
-  A1_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B1_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A1_val <- eval_spatial(covs, where = where, layer = "A")
+  B1_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A1_val, A_val)
   expect_equal(B1_val, B_val)
 
   # Single row
   where <- gorillas_sf$nests[5, , drop = FALSE]
-  A2_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B2_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A2_val <- eval_spatial(covs, where = where, layer = "A")
+  B2_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A2_val, A_val[5])
   expect_equal(B2_val, B_val[5])
@@ -77,15 +60,10 @@ test_that("eval_spatial.Spatial*", {
 
   # Multirow
   where <- gorillas$nests[seq_len(5), , drop = FALSE]
-  A_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("A", nrow(where))
-  )
-  B_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("B", nrow(where))
-  )
-  AB_val <- eval_spatial(covs,
+  A_val <- eval_spatial(covs, where = where, layer = rep("A", nrow(where)))
+  B_val <- eval_spatial(covs, where = where, layer = rep("B", nrow(where)))
+  AB_val <- eval_spatial(
+    covs,
     where = where,
     layer = rep(
       c("A", "B"),
@@ -98,28 +76,16 @@ test_that("eval_spatial.Spatial*", {
 
   # Multirow
   where <- gorillas$nests[seq_len(5), , drop = FALSE]
-  A1_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B1_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A1_val <- eval_spatial(covs, where = where, layer = "A")
+  B1_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A1_val, A_val)
   expect_equal(B1_val, B_val)
 
   # Single row
   where <- gorillas$nests[5, , drop = FALSE]
-  A2_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B2_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A2_val <- eval_spatial(covs, where = where, layer = "A")
+  B2_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A2_val, A_val[5])
   expect_equal(B2_val, B_val[5])
@@ -165,15 +131,10 @@ test_that("eval_spatial.stars", {
 
   # Multirow
   where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
-  A_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("A", nrow(where))
-  )
-  B_val <- eval_spatial(covs,
-    where = where,
-    layer = rep("B", nrow(where))
-  )
-  AB_val <- eval_spatial(covs,
+  A_val <- eval_spatial(covs, where = where, layer = rep("A", nrow(where)))
+  B_val <- eval_spatial(covs, where = where, layer = rep("B", nrow(where)))
+  AB_val <- eval_spatial(
+    covs,
     where = where,
     layer = rep(
       c("A", "B"),
@@ -186,28 +147,16 @@ test_that("eval_spatial.stars", {
 
   # Multirow
   where <- gorillas_sf$nests[seq_len(5), , drop = FALSE]
-  A1_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B1_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A1_val <- eval_spatial(covs, where = where, layer = "A")
+  B1_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A1_val, A_val)
   expect_equal(B1_val, B_val)
 
   # Single row
   where <- gorillas_sf$nests[5, , drop = FALSE]
-  A2_val <- eval_spatial(covs,
-    where = where,
-    layer = "A"
-  )
-  B2_val <- eval_spatial(covs,
-    where = where,
-    layer = "B"
-  )
+  A2_val <- eval_spatial(covs, where = where, layer = "A")
+  B2_val <- eval_spatial(covs, where = where, layer = "B")
 
   expect_equal(A2_val, A_val[5], ignore_attr = "class")
   expect_equal(B2_val, B_val[5], ignore_attr = "class")

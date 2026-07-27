@@ -57,7 +57,7 @@ if (require("ggplot2", quietly = TRUE)) {
     gg(mexdolphin_sf$mesh) +
     gg(mexdolphin_sf$ppoly, color = "blue", alpha = 0, linewidth = 1) +
     gg(mexdolphin_sf$samplers) +
-    gg(mexdolphin_sf$points, aes(size = size), color = "red") +
+    gg(mexdolphin_sf$points, aes(size = size), color = "red", stroke = 0) +
     scale_size_area()
 
   ggplot() +
@@ -75,7 +75,7 @@ if (require("ggplot2", quietly = TRUE) &&
     gg(mexdolphin$mesh) +
     gg(mexdolphin$ppoly, color = "blue") +
     gg(mexdolphin$samplers) +
-    gg(mexdolphin$points, aes(size = size), color = "red") +
+    gg(mexdolphin$points, aes(size = size), color = "red", stroke = 0) +
     scale_size_area() +
     coord_equal()
 

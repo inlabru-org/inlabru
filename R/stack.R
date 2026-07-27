@@ -20,10 +20,12 @@ bru_make_stack <- function(...) {
 #' @export
 #' @rdname bru_make_stack
 bru_make_stack.bru_obs <- function(lhood, lin, idx, ..., family_index = 1L) {
-  stopifnot(inherits(lin, c("bm_taylor", "bru_mapper_taylor")))
-  stopifnot(!is.null(lin[["offset"]]))
-  stopifnot(is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]))
-  stopifnot(is.null(lin[["state0"]]))
+  stopifnot(
+    inherits(lin, c("bm_taylor", "bru_mapper_taylor")),
+    !is.null(lin[["offset"]]),
+    is.null(lin[["jacobian"]]) || is.list(lin[["jacobian"]]),
+    is.null(lin[["state0"]])
+  )
 
   if (is.null(lhood[["response_data"]])) {
     BRU.response <- lhood$data[[lhood$response]]

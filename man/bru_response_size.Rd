@@ -7,6 +7,7 @@
 \alias{bru_response_size.inla.surv}
 \alias{bru_response_size.bru_obs}
 \alias{bru_response_size.bru_obs_list}
+\alias{bru_response_size.bru_model}
 \alias{bru_response_size.bru_info}
 \alias{bru_response_size.bru}
 \title{Response size queries}
@@ -22,6 +23,8 @@ bru_response_size(object)
 \method{bru_response_size}{bru_obs}(object)
 
 \method{bru_response_size}{bru_obs_list}(object)
+
+\method{bru_response_size}{bru_model}(object)
 
 \method{bru_response_size}{bru_info}(object)
 
@@ -52,6 +55,9 @@ object supporting \code{NROW(object[[1]])}.
 
 \item \code{bru_response_size(bru_obs_list)}: Extract the number of observations from a
 \code{bru_obs_list} object, as a vector with one value per observation model.
+
+\item \code{bru_response_size(bru_model)}: Extract the number of observations from a
+\code{bru_info} object, as a vector with one value per observation model.
 
 \item \code{bru_response_size(bru_info)}: Extract the number of observations from a
 \code{bru_info} object, as a vector with one value per observation model.

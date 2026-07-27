@@ -33,13 +33,15 @@ import.seals <- function(
   #' Change CRS
 
   target.p4s <- "+proj=utm +zone=27 +units=km"
-  seals <- fm_transform(seals, fm_crs(target.p4s))
+  seals <- fmesher::fm_transform(seals, fmesher::fm_crs(target.p4s))
   sp::coordnames(seals) <- c("x", "y")
 
   #' Select a strip
 
-  seals <- seals[(sp::coordinates(seals)[, 2] > 7947) &
-    (sp::coordinates(seals)[, 2] < 7954), ] # strip 9
+  seals <- seals[
+    (sp::coordinates(seals)[, 2] > 7947) &
+      (sp::coordinates(seals)[, 2] < 7954),
+  ] # strip 9
   # seals = seals[(sp::coordinates(seals)[,2]>7931) &
   #  (sp::coordinates(seals)[,2]<7938.5), ] # strip 12
   # seals = seals[(sp::coordinates(seals)[,2]>7925) &
@@ -57,11 +59,11 @@ import.seals <- function(
   #' Build a mesh. This mesh will be fine at the photo locations but coarse
   #' elsewhere
 
-  bnd <- fm_extensions(sp::coordinates(seals), convex = c(0.5, 0.7))
-  mesh <- fm_mesh_2d_inla(
+  bnd <- fmesher::fm_extensions(sp::coordinates(seals), convex = c(0.5, 0.7))
+  mesh <- fmesher::fm_mesh_2d_inla(
     boundary = bnd,
     max.edge = c(0.2, 3),
-    crs = fm_CRS(projargs = sp::CRS(target.p4s))
+    crs = fmesher::fm_CRS(projargs = sp::CRS(target.p4s))
   )
   # ggplot() + gg(mesh) + gg(seals) + coord_equal()
   # mesh$n
@@ -74,8 +76,8 @@ import.seals <- function(
   #' Ice Covariate
 
   ice <- sf::read_sf(icefile)
-  ice <- fm_transform(ice, fm_crs(target.p4s))
-  ii <- fm_is_within(ice, mesh)
+  ice <- fmesher::fm_transform(ice, fmesher::fm_crs(target.p4s))
+  ii <- fmesher::fm_is_within(ice, mesh)
   ice <- ice[as.vector(ii), ]
 
   # ggplot() +  gg(ice, mapping = aes(x, y, color = band1), size = 1) + gg(mesh)
@@ -119,13 +121,12 @@ import.seals_sf <- function() {
   seals <- inlabru::seals_sp
 
   seals$points <- sf::st_as_sf(seals$points)
-  seals$mesh <- fm_as_fm(seals$mesh)
+  seals$mesh <- fmesher::fm_as_fm(seals$mesh)
   seals$ice.data <- sf::st_as_sf(seals$ice.data)
-  seals$ice.cv$mesh <- fm_as_fm(seals$ice.cv$mesh)
+  seals$ice.cv$mesh <- fmesher::fm_as_fm(seals$ice.cv$mesh)
 
   seals
 }
-
 
 # seals_sf <- import.seals_sf()
 # usethis::use_data(seals_sf, overwrite = TRUE, compress = "xz")
@@ -141,9 +142,9 @@ import.seals_sf <- function() {
 
 # seals_sp <- import.seals(...)
 #
-# seals_sp$mesh <- fm_as_fm(seals_sp$mesh)
-# seals_sp$ice.cv$mesh <- fm_as_fm(seals_sp$ice.cv$mesh)
-# sp::proj4string(seals_sp$points) <- fm_CRS(seals_sp$mesh)
-# sp::proj4string(seals_sp$ice.data) <- fm_CRS(seals_sp$mesh)
+# seals_sp$mesh <- fmesher::fm_as_fm(seals_sp$mesh)
+# seals_sp$ice.cv$mesh <- fmesher::fm_as_fm(seals_sp$ice.cv$mesh)
+# sp::proj4string(seals_sp$points) <- fmesher::fm_CRS(seals_sp$mesh)
+# sp::proj4string(seals_sp$ice.data) <- fmesher::fm_CRS(seals_sp$mesh)
 #
 # use_data(seals_sp, compress = "xz")

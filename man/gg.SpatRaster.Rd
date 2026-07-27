@@ -19,6 +19,7 @@ Convenience wrapper function for \code{tidyterra::geom_spatraster()}.
 Requires the \code{ggplot2} and \code{tidyterra} packages.
 }
 \examples{
+\donttest{
 if (require("ggplot2", quietly = TRUE) &&
   bru_safe_terra(quietly = TRUE) &&
   require("tidyterra", quietly = TRUE)) {
@@ -31,15 +32,16 @@ if (require("ggplot2", quietly = TRUE) &&
     gg(gcov$elevation)
 }
 }
+}
 \seealso{
-Other geomes: 
-\code{\link{gg}()},
-\code{\link{gg.RasterLayer}()},
+Other geomes:
+\code{\link[=gg]{gg()}},
+\code{\link[=gg.RasterLayer]{gg.RasterLayer()}},
 \code{\link{gg.Spatial}},
-\code{\link{gg.data.frame}()},
-\code{\link{gg.fm_mesh_1d}()},
-\code{\link{gg.fm_mesh_2d}()},
-\code{\link{gg.matrix}()},
-\code{\link{gg.sf}()}
+\code{\link[=gg.data.frame]{gg.data.frame()}},
+\code{\link[=gg.fm_mesh_1d]{gg.fm_mesh_1d()}},
+\code{\link[=gg.fm_mesh_2d]{gg.fm_mesh_2d()}},
+\code{\link[=gg.matrix]{gg.matrix()}},
+\code{\link[=gg.sf]{gg.sf()}}
 }
 \concept{geomes}

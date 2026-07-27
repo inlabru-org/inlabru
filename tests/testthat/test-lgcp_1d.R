@@ -1,7 +1,7 @@
 test_data <- function() {
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length = 50)
-  mesh1D <- fm_mesh_1d(x, boundary = "free", degree = 2)
+  mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free", degree = 2)
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(150, 0.75),
@@ -62,7 +62,7 @@ test_that("1D LGCP fitting", {
   skip_if_not_installed("sn")
 
   # predicted intensity integral
-  ips <- fm_int(mesh1D, name = "x")
+  ips <- fmesher::fm_int(mesh1D, name = "x")
   Lambda <- predict(
     fit,
     ips,
@@ -80,14 +80,16 @@ test_data_discrete <- function() {
   xx <- ceiling(pts2$x)
   data <- data.frame(x = xx)
   x <- seq(1, 55, length = 55)
-  mesh1D <- fm_mesh_1d(x, boundary = "free")
-  matern <- INLA::inla.spde2.pcmatern(mesh1D,
+  mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh1D,
     prior.range = c(0.01, 0.01),
     prior.sigma = c(1, 0.01),
     constr = TRUE
   )
   mdl <- x ~ spde1D(main = x, model = matern) + Intercept(1)
-  fit <- lgcp(mdl,
+  fit <- lgcp(
+    mdl,
     data = data,
     domain = list(x = x),
     options = list(
@@ -161,7 +163,7 @@ test_that("1D LGCP fitting, compressed format", {
 
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length.out = 50)
-  mesh1D <- fm_mesh_1d(x, boundary = "free")
+  mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
   matern <- INLA::inla.spde2.pcmatern(
     mesh1D,
     prior.range = c(1, 0.01),

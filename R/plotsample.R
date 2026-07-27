@@ -15,13 +15,19 @@
 makepoly <- function(start, width, height) {
   poly <- matrix(
     c(
-      start[1], start[2],
-      start[1], start[2] + height,
-      start[1] + width, start[2] + height,
-      start[1] + width, start[2],
-      start[1], start[2]
+      start[1],
+      start[2],
+      start[1],
+      start[2] + height,
+      start[1] + width,
+      start[2] + height,
+      start[1] + width,
+      start[2],
+      start[1],
+      start[2]
     ),
-    ncol = 2, byrow = TRUE
+    ncol = 2,
+    byrow = TRUE
   )
   sp::Polygon(poly)
 }
@@ -81,18 +87,24 @@ makepoly <- function(start, width, height) {
 #'
 #' @export
 #'
-plotsample <- function(spdf,
-                       boundary,
-                       x.ppn = 0.25,
-                       y.ppn = 0.25,
-                       nx = 5,
-                       ny = 5) {
-  if (x.ppn <= 0 ||
-    x.ppn >= 1) {
+plotsample <- function(
+  spdf,
+  boundary,
+  x.ppn = 0.25,
+  y.ppn = 0.25,
+  nx = 5,
+  ny = 5
+) {
+  if (
+    x.ppn <= 0 ||
+      x.ppn >= 1
+  ) {
     stop("'x.ppn' must greater than 0 and less than 1")
   }
-  if (y.ppn <= 0 ||
-    y.ppn >= 1) {
+  if (
+    y.ppn <= 0 ||
+      y.ppn >= 1
+  ) {
     stop("'y.ppn' must greater than 0 and less than 1")
   }
 
@@ -134,7 +146,7 @@ plotsample <- function(spdf,
       i
     )
   }
-  plots <- sp::SpatialPolygons(polys, proj4string = fm_CRS(spdf))
+  plots <- sp::SpatialPolygons(polys, proj4string = fmesher::fm_CRS(spdf))
   # remove bits of plot outside boundary
   plots <- raster::intersect(boundary, plots)
   # extract only those nests inside the polygons (neat!)

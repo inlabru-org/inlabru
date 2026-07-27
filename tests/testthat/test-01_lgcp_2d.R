@@ -15,7 +15,8 @@ test_that("2D LGCP fitting (sf)", {
 
   gorillas <- gorillas_sf
 
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(
+    gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(5, 0.01)
   )
@@ -68,11 +69,15 @@ test_that("2D LGCP fitting (sf)", {
   )
 
   # test_that("2D LGCP fitting: predicted random field", {
-  loc <- sf::st_sf(geometry = fm_as_sfc(gorillas$mesh, format = "loc"))
+  loc <- sf::st_sf(geometry = fmesher::fm_as_sfc(gorillas$mesh, format = "loc"))
   withr::local_seed(123L)
   skip_if_not_installed("sn")
-  pr <- predict(fit, loc, ~mySmooth,
-    n.samples = 5, seed = 5657L,
+  pr <- predict(
+    fit,
+    loc,
+    ~mySmooth,
+    n.samples = 5,
+    seed = 5657L,
     parallel.configs = FALSE
   )
   # Prediction variability includes reordering differences, so need large
@@ -89,10 +94,14 @@ test_that("2D LGCP fitting (sf)", {
   )
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
-  ips <- fm_int(gorillas$mesh, gorillas$boundary)
+  ips <- fmesher::fm_int(gorillas$mesh, gorillas$boundary)
   withr::local_seed(123L)
-  Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
-    n.samples = 10, seed = 5657L
+  Lambda <- predict(
+    fit,
+    ips,
+    ~ sum(weight * exp(mySmooth + Intercept)),
+    n.samples = 10,
+    seed = 5657L
   )
 
   expect_equal(
@@ -155,14 +164,15 @@ test_that("2D LGCP fitting (sp)", {
 
   gorillas <- gorillas_sp()
 
-  matern <- INLA::inla.spde2.pcmatern(gorillas$mesh,
+  matern <- INLA::inla.spde2.pcmatern(
+    gorillas$mesh,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(5, 0.01)
   )
   cmp <- coordinates ~ mySmooth(main = sp::coordinates, model = matern) +
     Intercept(1)
 
-  ips <- fm_int(gorillas$mesh, gorillas$boundary)
+  ips <- fmesher::fm_int(gorillas$mesh, gorillas$boundary)
   fit <- lgcp(
     cmp,
     data = gorillas$nests,
@@ -210,12 +220,16 @@ test_that("2D LGCP fitting (sp)", {
   # test_that("2D LGCP fitting: predicted random field", {
   loc <- sp::SpatialPoints(
     gorillas$mesh$loc[, c(1, 2)],
-    proj4string = fm_CRS(gorillas$nests)
+    proj4string = fmesher::fm_CRS(gorillas$nests)
   )
   withr::local_seed(123L)
   skip_if_not_installed("sn")
-  pr <- predict(fit, loc, ~mySmooth,
-    n.samples = 5, seed = 5657L,
+  pr <- predict(
+    fit,
+    loc,
+    ~mySmooth,
+    n.samples = 5,
+    seed = 5657L,
     parallel.configs = FALSE
   )
   # Prediction variability includes reordering differences, so need large
@@ -233,8 +247,12 @@ test_that("2D LGCP fitting (sp)", {
 
   # test_that("2D LGCP fitting: predicted intensity integral", {
   withr::local_seed(123L)
-  Lambda <- predict(fit, ips, ~ sum(weight * exp(mySmooth + Intercept)),
-    n.samples = 10, seed = 5657L
+  Lambda <- predict(
+    fit,
+    ips,
+    ~ sum(weight * exp(mySmooth + Intercept)),
+    n.samples = 10,
+    seed = 5657L
   )
 
   expect_equal(

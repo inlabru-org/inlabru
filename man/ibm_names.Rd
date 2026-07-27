@@ -47,6 +47,9 @@ of mappers in the multi-mapper x}
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+A character vector or \code{NULL}
+}
 \description{
 Implementations must return a character vector of sub-mapper names, or
 \code{NULL}. Intended for providing information about multi-mappers and mapper
@@ -75,36 +78,24 @@ mapper <- bm_multi(list(A = bm_index(2), B = bm_index(2)))
 ibm_names(mapper)
 ibm_names(mapper) <- c("new", "names")
 ibm_names(mapper)
+m <- bm_multi(list(A = bm_linear(), B = bm_linear()))
+ibm_names(m)
+
 }
 \seealso{
-Other mapper methods: 
+Other mapper methods:
 \code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_inla_subset}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
-
-Other mapper methods: 
-\code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_inla_subset}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
+\code{\link[=ibm_eval]{ibm_eval()}},
+\code{\link[=ibm_eval2]{ibm_eval2()}},
+\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
+\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
+\code{\link[=ibm_is_linear]{ibm_is_linear()}},
+\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
+\code{\link[=ibm_jacobian]{ibm_jacobian()}},
+\code{\link[=ibm_n]{ibm_n()}},
+\code{\link[=ibm_n_output]{ibm_n_output()}},
+\code{\link[=ibm_simplify]{ibm_simplify()}},
+\code{\link[=ibm_values]{ibm_values()}}
 }
 \concept{mapper methods}

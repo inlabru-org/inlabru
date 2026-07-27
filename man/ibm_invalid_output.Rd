@@ -46,6 +46,10 @@ as "bym2", which can be handled by \code{bm_collect}.}
 \item{multi}{logical;
 If \code{TRUE} (or positive), recurse one level into sub-mappers}
 }
+\value{
+A logical vector of length \code{ibm_n_output(mapper, input, state, ...)}
+indicating which, if any, output elements of \code{ibm_eval(mapper, input, state, ...)} are known to be invalid.
+}
 \description{
 Implementations should return a logical vector of length
 \code{ibm_n_output(mapper, input, state, ...)} indicating which, if any,
@@ -88,20 +92,24 @@ data.frame with named columns, a matrix with named columns, or a matrix
 with unnamed but ordered columns.
 
 }}
+\examples{
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_invalid_output(m, input = list(A = 1, B = 2), state = c(1, 2))
+}
 \seealso{
-Other mapper methods: 
+Other mapper methods:
 \code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_inla_subset}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
+\code{\link[=ibm_eval]{ibm_eval()}},
+\code{\link[=ibm_eval2]{ibm_eval2()}},
+\code{\link[=ibm_inla_subset]{ibm_inla_subset()}},
+\code{\link[=ibm_is_linear]{ibm_is_linear()}},
+\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
+\code{\link[=ibm_jacobian]{ibm_jacobian()}},
+\code{\link[=ibm_n]{ibm_n()}},
+\code{\link[=ibm_n_output]{ibm_n_output()}},
+\code{\link[=ibm_names]{ibm_names()}},
+\code{\link[=ibm_simplify]{ibm_simplify()}},
+\code{\link[=ibm_values]{ibm_values()}}
 }
 \concept{mapper methods}

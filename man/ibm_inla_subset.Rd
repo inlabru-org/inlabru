@@ -14,33 +14,43 @@ ibm_inla_subset(mapper, ...)
 
 \item{...}{Arguments passed on to other methods}
 }
+\value{
+A logical vector of \code{TRUE/FALSE} for the subset such that, given the
+full A matrix and values output, \code{A[, subset, drop = FALSE]} and
+\code{values[subset]} (or \code{values[subset, , drop = FALSE]} for data.frame
+values) are equal to the \code{inla_f = TRUE} version of A and values.
+}
 \description{
-Implementations must return a logical vector of \code{TRUE/FALSE} for
-the subset such that, given the full A matrix and values output,
-\code{A[, subset, drop = FALSE]} and \code{values[subset]}
-(or \code{values[subset, , drop = FALSE]} for data.frame values) are equal
-to the \code{inla_f = TRUE} version of A and values. The default method uses
-the \code{ibm_values} output to construct the subset indexing.
+Implementations must return a logical vector of \code{TRUE/FALSE} for the subset
+such that, given the full A matrix and values output, \code{A[, subset, drop = FALSE]} and \code{values[subset]} (or \code{values[subset, , drop = FALSE]} for
+data.frame values) are equal to the \code{inla_f = TRUE} version of A and values.
+The default method uses the \code{ibm_values} output to construct the subset
+indexing.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{ibm_inla_subset(default)}: Uses the [ibm_values\verb{()] output to construct the inla subset indexing as the difference between }inla_f=FALSE\code{and}inla_f=TRUE\verb{. Extra arguments such as }multi\verb{are passed on to [ibm_values()]. This means it supports both regular vector values and}multi=1` data.frame values.
 
 }}
+\examples{
+m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+ibm_inla_subset(m)
+
+}
 \seealso{
-Other mapper methods: 
+Other mapper methods:
 \code{\link{bru_mapper_generics}},
-\code{\link{ibm_eval}()},
-\code{\link{ibm_eval2}()},
-\code{\link{ibm_invalid_output}()},
-\code{\link{ibm_is_linear}()},
-\code{\link{ibm_is_rowwise}()},
-\code{\link{ibm_jacobian}()},
-\code{\link{ibm_linear}()},
-\code{\link{ibm_n}()},
-\code{\link{ibm_n_output}()},
-\code{\link{ibm_names}()},
-\code{\link{ibm_simplify}()},
-\code{\link{ibm_values}()}
+\code{\link[=ibm_as_taylor]{ibm_as_taylor()}},
+\code{\link[=ibm_eval]{ibm_eval()}},
+\code{\link[=ibm_eval2]{ibm_eval2()}},
+\code{\link[=ibm_invalid_output]{ibm_invalid_output()}},
+\code{\link[=ibm_is_linear]{ibm_is_linear()}},
+\code{\link[=ibm_is_rowwise]{ibm_is_rowwise()}},
+\code{\link[=ibm_jacobian]{ibm_jacobian()}},
+\code{\link[=ibm_n]{ibm_n()}},
+\code{\link[=ibm_n_output]{ibm_n_output()}},
+\code{\link[=ibm_names]{ibm_names()}},
+\code{\link[=ibm_simplify]{ibm_simplify()}},
+\code{\link[=ibm_values]{ibm_values()}}
 }
 \concept{mapper methods}

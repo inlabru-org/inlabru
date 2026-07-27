@@ -1,5 +1,7 @@
-bru_check_object_bru <- function(object,
-                                 new_version = getNamespaceVersion("inlabru")) {
+bru_check_object_bru <- function(
+  object,
+  new_version = getNamespaceVersion("inlabru")
+) {
   object <-
     bru_info_upgrade(
       object,
@@ -11,8 +13,10 @@ bru_check_object_bru <- function(object,
 # Used for upgrading from versions <= 2.7.0.9017 to >= 2.7.0.2021
 bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
   for (k in seq_along(lhoods)) {
-    if (is.null(lhoods[[k]][["used"]]) &&
-      is.null(lhoods[[k]][["used_components"]])) {
+    if (
+      is.null(lhoods[[k]][["used"]]) &&
+        is.null(lhoods[[k]][["used_components"]])
+    ) {
       used <- bru_used(
         NULL,
         effect = lhoods[[k]][["include_components"]],
@@ -231,7 +235,7 @@ bru_info_upgrade_functions <- function() {
       # Update log format to new format
 
       object_full[["bru_iinla"]][["log"]] <-
-        bru_log_new(
+        new_bru_log(
           object_full[["bru_iinla"]][["log"]][["log"]],
           bookmarks = object_full[["bru_iinla"]][["log"]][["bookmarks"]]
         )
@@ -483,13 +487,95 @@ bru_info_upgrade_functions <- function() {
       }
 
       object
+    },
+    "2.14.1.9008" = function(object) {
+      if (is.null(object[["model"]][["inputs"]])) {
+        object[["model"]][["inputs"]] <- object[["inputs"]]
+      }
+      if (is.null(object[["model"]][["lhoods"]])) {
+        object[["model"]][["lhoods"]] <- as_bru_obs_list(object[["lhoods"]])
+      }
+      if (!is.null(object[["model"]][["inputs"]])) {
+        # bru_model input changed from list of <component inputs>)
+        # list of list(comp = <component inputs>,
+        #              post = <postprocessing input>)
+        object[["model"]][["inputs"]] <- lapply(
+          object[["model"]][["inputs"]],
+          function(x) {
+            list(comp = x, post = NULL)
+          }
+        )
+      }
+
+      object
+    },
+    "2.14.1.9011" = function(object) {
+      if (is.null(object[["model"]][["inputs"]])) {
+        object[["model"]][["inputs"]] <- object[["inputs"]]
+      }
+      if (is.null(object[["model"]][["lhoods"]])) {
+        object[["model"]][["lhoods"]] <- object[["lhoods"]]
+      }
+
+      object
+    },
+    "2.14.1.9012" = function(object) {
+      # Update lhoods to new bru_pred_expr object storage format
+      if (!is.null(object[["model"]][["lhoods"]])) {
+        lhood_upgrader <- function(x) {
+          pe <- x[["pred_expr"]]
+          if (is.null(pe[["pred_expr"]])) {
+            pred_quo <- NULL
+          } else {
+            pred_quo <- rlang::new_quosure(
+              pe[["pred_expr"]],
+              env = pe[[".envir"]]
+            )
+          }
+          if (is.null(pe[["resp_text"]])) {
+            resp_quo <- NULL
+          } else {
+            resp_quo <- rlang::parse_quo(
+              pe[["resp_text"]],
+              env = pe[[".envir"]]
+            )
+          }
+          x[["pred_expr"]] <- structure(
+            list(
+              type = "expr",
+              pred_quo = pred_quo,
+              is_additive = pe[["is_additive"]],
+              is_rowwise = pe[["is_rowwise"]],
+              used = pe[["used"]],
+              .envir = pe[[".envir"]],
+              resp_quo = resp_quo
+            ),
+            class = "bru_pred_expr"
+          )
+          x
+        }
+        object[["model"]][["lhoods"]] <-
+          as_bru_obs_list(
+            lapply(object[["model"]][["lhoods"]], lhood_upgrader)
+          )
+      }
+
+      object
     }
   )
 }
-bru_info_upgrade <- function(object,
-                             new_version = getNamespaceVersion("inlabru")) {
-  object_full <- object
-  object <- object[["bru_info"]]
+bru_info_upgrade <- function(
+  object,
+  new_version = getNamespaceVersion("inlabru")
+) {
+  if (inherits(object, "bru_info")) {
+    return_bru_info <- TRUE
+    object_full <- list()
+  } else {
+    return_bru_info <- FALSE
+    object_full <- object
+    object <- object[["bru_info"]]
+  }
   msg <- NULL
   if (!is.list(object)) {
     msg <- "Not a list"
@@ -505,31 +591,59 @@ bru_info_upgrade <- function(object,
   }
 
   old_ver <- object[["inlabru_version"]]
-  if (utils::compareVersion(new_version, old_ver) > 0) {
-    warning(
-      glue("Old bru_info object version {old_ver} detected.
-            Attempting upgrade to version {new_version}.")
-    )
-
-    upgrade_functions <- bru_info_upgrade_functions()
-
-    message("Detected bru_info version ", old_ver)
-    for (ver in names(upgrade_functions)) {
-      if (utils::compareVersion(ver, old_ver) > 0) {
-        message("Upgrading bru_info to ", ver)
-        if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
-          object_full <- upgrade_functions[[ver]](object_full = object_full)
-        } else {
-          object <- upgrade_functions[[ver]](object)
-        }
-        object[["inlabru_version"]] <- ver
-        object_full[["bru_info"]] <- object
-      }
+  compare_version <- utils::compareVersion(new_version, old_ver)
+  if (compare_version == 0) {
+    if (return_bru_info) {
+      return(object)
     }
-
-    object[["inlabru_version"]] <- new_version
-    object_full[["bru_info"]] <- object
-    message(glue("Upgraded bru_info to {new_version}"))
+    return(object_full)
   }
+
+  if (compare_version < 0) {
+    warning(
+      glue(
+        "Found bru_info object of version {old_ver}, ",
+        "which is newer than the running version {new_version}."
+      )
+    )
+    if (return_bru_info) {
+      return(object)
+    }
+    return(object_full)
+  }
+
+  # compare_version > 0, so we need to upgrade
+  warning(
+    glue(
+      "Old bru_info object version {old_ver} detected.
+            Attempting upgrade to version {new_version}."
+    )
+  )
+
+  upgrade_functions <- bru_info_upgrade_functions()
+
+  message("Detected bru_info version ", old_ver)
+  for (ver in names(upgrade_functions)) {
+    if (utils::compareVersion(ver, old_ver) > 0) {
+      message("Upgrading bru_info to ", ver)
+      if ("object_full" %in% names(formals(upgrade_functions[[ver]]))) {
+        if (!return_bru_info) {
+          object_full <- upgrade_functions[[ver]](object_full = object_full)
+        }
+      } else {
+        object <- upgrade_functions[[ver]](object)
+      }
+      object[["inlabru_version"]] <- ver
+      object_full[["bru_info"]] <- object
+    }
+  }
+
+  object[["inlabru_version"]] <- new_version
+  message(glue("Upgraded bru_info to {new_version}"))
+  if (return_bru_info) {
+    return(object)
+  }
+
+  object_full[["bru_info"]] <- object
   object_full
 }

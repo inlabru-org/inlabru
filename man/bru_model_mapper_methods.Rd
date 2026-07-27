@@ -2,18 +2,34 @@
 % Please edit documentation in R/model.R
 \name{bru_model_mapper_methods}
 \alias{bru_model_mapper_methods}
-\alias{ibm_linear.bru_model}
-\alias{ibm_linear.bru_comp_list}
+\alias{ibm_as_taylor.bru_model}
+\alias{ibm_as_taylor.bru_comp_list}
 \alias{ibm_simplify.bru_model}
 \alias{ibm_simplify.bru_comp}
 \alias{ibm_simplify.bru_comp_list}
-\alias{ibm_linear.bm_list}
+\alias{ibm_as_taylor.bm_list}
 \alias{ibm_simplify.bm_list}
+\alias{ibm_eval2.bm_list}
+\alias{ibm_eval.bm_list}
+\alias{ibm_jacobian.bm_list}
+\alias{ibm_eval2.bru_model}
+\alias{ibm_eval.bru_comp_list}
+\alias{ibm_eval.bru_comp}
+\alias{ibm_eval.bru_model}
+\alias{ibm_jacobian.bru_model}
 \title{Mapper methods for model objects}
 \usage{
-\method{ibm_linear}{bru_model}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
 
-\method{ibm_linear}{bru_comp_list}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bru_comp_list}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bru_model}(mapper, input = NULL, state = NULL, ...)
 
@@ -21,9 +37,49 @@
 
 \method{ibm_simplify}{bru_comp_list}(mapper, input = NULL, state = NULL, ...)
 
-\method{ibm_linear}{bm_list}(mapper, input, state = NULL, ...)
+\method{ibm_as_taylor}{bm_list}(mapper, input, state = NULL, ...)
 
 \method{ibm_simplify}{bm_list}(mapper, input = NULL, state = NULL, ...)
+
+\method{ibm_eval2}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_jacobian}{bm_list}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval2}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
+
+\method{ibm_eval}{bru_comp_list}(mapper, input, state = NULL, ..., comp_mappers = NULL)
+
+\method{ibm_eval}{bru_comp}(mapper, input, state = NULL, ...)
+
+\method{ibm_eval}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
+
+\method{ibm_jacobian}{bru_model}(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  options = NULL,
+  comp_mappers = NULL,
+  eval_fun = NULL
+)
 }
 \arguments{
 \item{mapper}{A mapper S3 object, inheriting from \code{bru_mapper}.}
@@ -34,16 +90,30 @@
 of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{...}{Arguments passed on to other methods}
+
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
+
+\item{comp_mappers}{A \code{\link[=bm_list]{bm_list()}} of mappers, either the original component
+mappers, or simplified mappers.}
+
+\item{eval_fun}{A list of functions, typically from
+\code{\link[=bru_eval_fun]{bru_eval_fun()}}.}
 }
 \description{
-Methods for the \code{ibm_linear()} and \code{ibm_simplify()} methods for
+Methods for the \code{ibm_as_taylor()} and \code{ibm_simplify()} methods for
 \link{bru} model objects and related classes.
 }
 \section{Functions}{
 \itemize{
-\item \code{ibm_linear(bru_model)}: Returns a list (one element per
+\item \code{ibm_as_taylor(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bm_taylor}
-entry for each included component.
+entry for each included component. (autodiff == "pandemic")
+
+If \code{autodiff} is not "pandemic", returns a list of \link{bm_taylor} objects, one
+for each observation model, with the offset and jacobians evaluated for the
+predictor of the observation model, and the component mappers passed on as
+\code{comp_mappers} for the evaluation of the jacobians.
 
 \item \code{ibm_simplify(bru_model)}: Returns a list (one element per
 observation model) of \link{bm_list} objects, each with one \link{bru_mapper}

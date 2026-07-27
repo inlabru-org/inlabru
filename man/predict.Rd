@@ -14,6 +14,7 @@
   num.threads = NULL,
   used = NULL,
   drop = FALSE,
+  options = NULL,
   ...,
   include = deprecated(),
   exclude = deprecated()
@@ -50,6 +51,9 @@ Default, \code{NULL}, uses auto-detection of used variables in the formula.}
 the prediction summary has the same number of rows as \code{newdata}, then the
 output is a joined object. Default \code{FALSE}.}
 
+\item{options}{A \link{bru_options} options object or a list of options passed
+on to \code{\link[=bru_options]{bru_options()}}}
+
 \item{\dots}{Additional arguments passed on to \code{inla.posterior.sample()}}
 
 \item{include, exclude}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} If auto-detection
@@ -68,11 +72,9 @@ R expression that is valid given these values/covariates and the joint
 posterior of the estimated random effects.
 }
 \details{
-Mean value predictions are accompanied by the standard errors, upper and
-lower 2.5\% quantiles, the
-median, variance, coefficient of variation as well as the variance and
-minimum and maximum sample
-value drawn in course of estimating the statistics.
+Mean value predictions are accompanied by the standard deviation, median,
+upper and lower 2.5\% quantiles (configurable), as well as the Monte Carlo
+standard deviation estimates for the mean and standard deviation.
 
 Internally, this method calls \code{\link[=generate.bru]{generate.bru()}} in order to draw samples from
 the model.
@@ -205,4 +207,7 @@ if (bru_safe_inla() &&
 }
 }
 
+}
+\seealso{
+\code{\link[=generate.bru]{generate.bru()}}
 }

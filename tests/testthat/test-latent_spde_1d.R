@@ -2,17 +2,20 @@ latent_spde1D_testdata <- function() {
   local_bru_safe_inla()
   data(Poisson2_1D, package = "inlabru", envir = environment())
   x <- seq(0, 55, length.out = 50)
-  mesh1D <- fm_mesh_1d(x, boundary = "free")
+  mesh1D <- fmesher::fm_mesh_1d(x, boundary = "free")
 
-  matern <- INLA::inla.spde2.pcmatern(mesh1D,
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh1D,
     prior.range = c(1, 0.01),
     prior.sigma = c(1, 0.01)
   )
 
   cmp <- count ~ field(main = x, model = matern) + Intercept(1)
   # This model is sensitive to the integration strategy; "eb" is too smooth.
-  fit <- bru(cmp,
-    data = countdata2, family = "poisson",
+  fit <- bru(
+    cmp,
+    data = countdata2,
+    family = "poisson",
     options = list(
       E = countdata2$exposure,
       control.inla = list(h = 0.005)

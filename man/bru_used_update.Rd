@@ -8,13 +8,13 @@
 \alias{bru_used_update.bru_used}
 \title{Update used_component information objects}
 \usage{
-bru_used_update(x, labels, ...)
+bru_used_update(x, labels)
 
-\method{bru_used_update}{bru_obs_list}(x, labels, ...)
+\method{bru_used_update}{bru_obs_list}(x, labels)
 
 \method{bru_used_update}{bru_obs}(x, labels, ...)
 
-\method{bru_used_update}{bru_pred_expr}(x, labels, ...)
+\method{bru_used_update}{bru_pred_expr}(x, labels)
 
 \method{bru_used_update}{bru_used}(x, labels, ...)
 }
@@ -22,21 +22,24 @@ bru_used_update(x, labels, ...)
 \item{x}{Object to be updated}
 
 \item{labels}{character vector of component labels}
-
-\item{\dots}{Unused}
 }
 \value{
-An updated version of \code{x}
+An updated version of \code{x}. In the \code{bru_used} information, only
+components that are in \code{labels} are retained. If the ".effect", ".effect.",
+".latent", or ".latent." pronoun/container object names are present in the
+input \code{effect} part, all labels will be included in the output \code{effect} and
+\code{latent} parts, respectively, except for those that are specifically
+excluded in an \code{effect_exclude} part.
 }
 \description{
 Merge available component labels information with used components
 information.
 }
 \seealso{
-Other bru_used: 
-\code{\link{bru_used}()},
-\code{\link{bru_used_vars}()},
-\code{\link{new_bru_used}()}
+Other bru_used:
+\code{\link[=bru_used]{bru_used()}},
+\code{\link[=bru_used_vars]{bru_used_vars()}},
+\code{\link[=new_bru_used]{new_bru_used()}}
 }
 \concept{bru_used}
 \keyword{internal}

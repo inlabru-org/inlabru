@@ -5,16 +5,18 @@ test_that("fm_pixels sp vs sf", {
   skip_if_not_installed("sn")
   withr::local_options(lifecycle_verbosity = "quiet")
 
-  mesh <- fm_mesh_2d_inla(cbind(0, 0),
-    offset = 10, max.edge = 1,
-    crs = fm_CRS("longlat_globe")
+  mesh <- fmesher::fm_mesh_2d_inla(
+    cbind(0, 0),
+    offset = 10,
+    max.edge = 1,
+    crs = fmesher::fm_CRS("longlat_globe")
   )
 
   withr::local_seed(12345L)
   mydata <- sp::SpatialPointsDataFrame(
     mesh$loc,
     data = data.frame(y = rnorm(mesh$n) + 10),
-    proj4string = fm_CRS("longlat_globe")
+    proj4string = fmesher::fm_CRS("longlat_globe")
   )
 
   fit <- bru(
@@ -37,8 +39,14 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     withr::local_seed(1234L)
-    surface1 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sp")
-    density1 <- predict(fit,
+    surface1 <- fmesher::fm_pixels(
+      mesh,
+      dims = c(5, 5),
+      mask = TRUE,
+      format = "sp"
+    )
+    density1 <- predict(
+      fit,
       surface1,
       ~ exp(field_eval(sp::coordinates(.data.)) + Intercept),
       n.samples = 10,
@@ -48,8 +56,14 @@ test_that("fm_pixels sp vs sf", {
 
   system.time({
     withr::local_seed(1234L)
-    surface2 <- fm_pixels(mesh, dims = c(5, 5), mask = TRUE, format = "sf")
-    density2 <- predict(fit,
+    surface2 <- fmesher::fm_pixels(
+      mesh,
+      dims = c(5, 5),
+      mask = TRUE,
+      format = "sf"
+    )
+    density2 <- predict(
+      fit,
       surface2,
       ~ exp(field_eval(geometry) + Intercept),
       n.samples = 10,

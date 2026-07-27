@@ -5,7 +5,10 @@ test_that("mdata", {
   set.seed(12345L)
 
   sim.poisson <- function(prob, m) {
-    stopifnot(length(prob) == length(m) && length(prob) > 0)
+    stopifnot(
+      length(prob) == length(m),
+      length(prob) > 0
+    )
     n <- length(m)
     y <- numeric(n)
     event <- (runif(n) < prob)
@@ -80,11 +83,12 @@ test_that("mdata", {
   #
 
   r_bru <- bru(
-    ~ 0 + fix(
-      ~ 1 + xx + zz + xx * zz,
-      model = "fixed",
-      hyper = list(prec = list(initial = 0, fixed = TRUE))
-    ),
+    ~ 0 +
+      fix(
+        ~ 1 + xx + zz + xx * zz,
+        model = "fixed",
+        hyper = list(prec = list(initial = 0, fixed = TRUE))
+      ),
     bru_obs(
       INLA::inla.mdata(cbind(y, E), cbind(1, x, z, x * z)) ~ .,
       family = "0poisson",
@@ -114,7 +118,6 @@ test_that("mdata", {
     tolerance = lowtol
   )
 
-
   if (FALSE) {
     rr <- inla(
       inla.mdata(cbind(y, E), cbind(1, xx, zz, xx * zz)) ~ 1 + x + z + x * z,
@@ -141,7 +144,8 @@ test_that("mdata", {
       "0poisson" = c(r$summary.fixed$mean, r$summary.hyperpar$mean),
       "0poissonS" = c(rr$summary.hyperpar$mean, rr$summary.fixed$mean)
     )
-    res <- cbind(res,
+    res <- cbind(
+      res,
       diff = (res[, 2] - beta),
       diffS = (res[, 3] - beta),
       "diff/sd" = (res[, 2] - beta) /
@@ -233,10 +237,10 @@ test_that("surv", {
     multi.family = TRUE
   )
 
-
   stk_data <- INLA::inla.stack.data(stk, .response.name = "response")
   r2_inla <- INLA::inla(
-    response ~ 0 + f(Intercept, model = "linear", prec.linear = 0) +
+    response ~ 0 +
+      f(Intercept, model = "linear", prec.linear = 0) +
       f(xx, model = "linear"),
     family = c("exponentialsurv", "weibullsurv"),
     data = stk_data,

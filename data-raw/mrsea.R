@@ -23,10 +23,10 @@ import.mrsea <- function(format = c("sf", "sp")) {
   format <- match.arg(format)
   pkg <- "MRSea"
   if (!requireNamespace(pkg, quietly = TRUE)) {
-    stop(paste0(
+    stop(
       "This package development function require the MRSea package ",
       "from https://github.com/lindesaysh/MRSea"
-    ))
+    )
   }
 
   # library(MRSea)
@@ -85,7 +85,7 @@ import.mrsea <- function(format = c("sf", "sp")) {
   if (format == "sp") {
     ############ FORMAT USING sp objects ##############
 
-    crs <- fm_CRS("+proj=utm +zone=32 +units=km")
+    crs <- fmesher::fm_CRS("+proj=utm +zone=32 +units=km")
 
     # Transects lines
     lns <- subset(dset$effort, is.na(det))
@@ -101,17 +101,18 @@ import.mrsea <- function(format = c("sf", "sp")) {
 
     # Mesh
     mesh <- dset$mesh
-    mesh$crs <- fm_crs(crs)
-
+    mesh$crs <- fmesher::fm_crs(crs)
 
     # Boundary
-    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+    boundary <- spoly(
+      dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
       cols = c(1, 2),
       crs = crs
     )
 
     # Covariates
-    covar <- sp::SpatialPointsDataFrame(depth[, c("x", "y")],
+    covar <- sp::SpatialPointsDataFrame(
+      depth[, c("x", "y")],
       data = depth[, "depth", drop = FALSE],
       proj4string = crs
     )
@@ -121,12 +122,15 @@ import.mrsea <- function(format = c("sf", "sp")) {
   } else {
     ############ FORMAT USING sf objects ##############
 
-    crs <- fm_crs("+proj=utm +zone=32 +units=km")
+    crs <- fmesher::fm_crs("+proj=utm +zone=32 +units=km")
 
     # Transects lines
     lns <- subset(dset$effort, is.na(det))
     class(lns) <- "data.frame"
-    lns <- sline(lns, c("start.x", "start.y"), c("end.x", "end.y"),
+    lns <- sline(
+      lns,
+      c("start.x", "start.y"),
+      c("end.x", "end.y"),
       crs = crs,
       format = "sf"
     )
@@ -142,7 +146,8 @@ import.mrsea <- function(format = c("sf", "sp")) {
     mesh$crs <- crs
 
     # Boundary
-    boundary <- spoly(dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
+    boundary <- spoly(
+      dset$mesh$loc[dset$mesh$segm$int$idx[, 1], 1:2],
       cols = c(1, 2),
       crs = crs,
       format = "sf"

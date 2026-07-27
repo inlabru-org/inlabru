@@ -34,9 +34,8 @@ bru_options_set(inla.mode = "compact")
 # The relative change is also shown in the lower left panel of the convergence plot.
 
 fit <- bru(
-  components = ~
-    Intercept(1) +
-      X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
+  components = ~ Intercept(1) +
+    X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
   bru_obs(
     formula = y ~ Intercept + X,
     family = "gaussian",
@@ -47,28 +46,6 @@ fit <- bru(
 summary(fit)
 
 bru_convergence_plot(fit)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 set.seed(1234L)
@@ -97,9 +74,8 @@ bru_options_set(inla.mode = "compact")
 # The relative change is also shown in the lower left panel of the convergence plot.
 
 fit2 <- bru(
-  components = ~
-    Intercept(1) +
-      X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
+  components = ~ Intercept(1) +
+    X(time, model = "rw2", constr = TRUE, scale.model = TRUE),
   bru_obs(
     formula = y ~ exp(Intercept) + X,
     family = "gaussian",
@@ -115,21 +91,25 @@ bru_convergence_plot(fit2)
 bru_options_set(control.inla = list(tolerance = 0.0001))
 
 fit3c <- bru(
-  components = ~
-    Intercept(1) +
-      X(time,
-        model = "rw2", constr = TRUE, scale.model = TRUE,
-        hyper = list(prec = list(prior = "pc.prec", param = c(0.1, 0.01)))
-      ),
+  components = ~ Intercept(1) +
+    X(
+      time,
+      model = "rw2",
+      constr = TRUE,
+      scale.model = TRUE,
+      hyper = list(prec = list(prior = "pc.prec", param = c(0.1, 0.01)))
+    ),
   bru_obs(
     formula = y ~ Intercept + exp(X),
     family = "gaussian",
     data = df,
     control.family = list(
-      hyper = list(prec = list(
-        prior = "pc.prec",
-        param = c(1, 0.01)
-      ))
+      hyper = list(
+        prec = list(
+          prior = "pc.prec",
+          param = c(1, 0.01)
+        )
+      )
     )
   ),
   options = list(

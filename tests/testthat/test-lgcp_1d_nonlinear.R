@@ -25,7 +25,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -64,7 +64,7 @@ test_that("Mexdolphin: Hazard rate detection function", {
       formula = form_list,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,
@@ -176,8 +176,8 @@ test_that("Marginal parameter transformation", {
   log_hr <- function(distance, sigma) {
     log1p(-exp(-(distance / sigma)^-1))
   }
-  cmp <- bru_comp_list(~
-    sigma(
+  cmp <- bru_comp_list(
+    ~ sigma(
       1,
       prec.linear = 1,
       marginal = bm_marginal(
@@ -186,7 +186,9 @@ test_that("Marginal parameter transformation", {
         dfun = dexp,
         rate = 1 / 8
       )
-    ) + Intercept(1))
+    ) +
+      Intercept(1)
+  )
   form <- distance ~ log_hr(distance, sigma = sigma) + Intercept
 
   pts <- mexdolphin_sf$points
@@ -197,7 +199,7 @@ test_that("Marginal parameter transformation", {
       formula = form,
       family = "cp",
       data = pts,
-      domain = list(distance = fm_mesh_1d(seq(0, 8, by = 0.1)))
+      domain = list(distance = fmesher::fm_mesh_1d(seq(0, 8, by = 0.1)))
     ),
     options = list(
       bru_verbose = 0,

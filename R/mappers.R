@@ -58,7 +58,8 @@ NULL
 #' @title Size of the latent vector of a mapping
 #' @description
 #' Implementations must return the size of the latent vector
-#' being mapped to.
+#' being mapped.
+#' @returns An integer denoting the size of the latent vector being mapped.
 #' @export
 #' @inheritParams ibm_n_output
 #' @family mapper methods
@@ -76,10 +77,15 @@ ibm_n <- function(mapper, inla_f = FALSE, ...) {
 #' @param state A vector of latent state values for the mapping,
 #' of length `ibm_n(mapper, inla_f = FALSE)`
 #' @param input Data input for the mapper.
+#' @returns An integer denoting the mapper output length.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_n_output(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_n_output")
 }
@@ -91,9 +97,14 @@ ibm_n_output <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' would be interpretable by an `INLA::f(..., values = ...)` specification.
 #' The exception is the method for `bm_multi`, that returns a
 #' multi-column data frame if `multi=TRUE`.
+#' @returns A vector  of length `ibm_n(mapper, inla_f = FALSE)`
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_index(4)
+#' ibm_values(m)
+#'
 ibm_values <- function(mapper, inla_f = FALSE, ...) {
   UseMethod("ibm_values")
 }
@@ -105,9 +116,14 @@ ibm_values <- function(mapper, inla_f = FALSE, ...) {
 #' If `TRUE` (returned by the default method unless the mapper
 #' contains an `is_linear` variable), users of the mapper
 #' may assume the mapper is linear/affine.
+#' @returns logical; `TRUE` if the mapper is linear/affine, `FALSE` otherwise.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_linear()
+#' ibm_is_linear(m)
+#'
 ibm_is_linear <- function(mapper, ...) {
   UseMethod("ibm_is_linear")
 }
@@ -118,9 +134,14 @@ ibm_is_linear <- function(mapper, ...) {
 #' contains an `is_rowwise` variable), users of the mapper
 #' may assume the mapper uses its inputs in "rowwise" manner, so that
 #' blockwise evaluation is always possible.
+#' @returns logical; `TRUE` if the mapper is rowwise, `FALSE` otherwise.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_linear()
+#' ibm_is_rowwise(m)
+#'
 ibm_is_rowwise <- function(mapper, ...) {
   UseMethod("ibm_is_rowwise")
 }
@@ -131,11 +152,17 @@ ibm_is_rowwise <- function(mapper, ...) {
 #' `ibm_n_output(mapper, input, inla_f)`
 #' by `ibm_n(mapper, inla_f = FALSE)`. The `inla_f=TRUE` argument should
 #' only affect the allowed type of input format.
+#' @returns A (sparse) matrix of size `ibm_n_output(mapper, input, inla_f)` by
+#'   `ibm_n(mapper, inla_f = FALSE)`.
 #' @export
 #' @family mapper methods
 #' @param sub_lin Internal, optional pre-computed sub-mapper information
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_jacobian(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
   UseMethod("ibm_jacobian")
 }
@@ -152,25 +179,44 @@ ibm_jacobian <- function(mapper, input, state = NULL, inla_f = FALSE, ...) {
 #' effect(input, state) =
 #'   offset(input, state0) + jacobian(input, state0) %*% (state - state0)
 #' ```
-#' The default method calls [ibm_eval()] and [ibm_jacobian()] to generate
+#' The default method calls [ibm_eval2()] to generate
 #' the needed information.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
-ibm_linear <- function(mapper, input, state = NULL, ...) {
-  UseMethod("ibm_linear")
+#' @examples
+#' m <- bm_linear()
+#' ibm_as_taylor(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
+ibm_as_taylor <- function(mapper, input, state = NULL, ...) {
+  UseMethod("ibm_as_taylor")
+}
+
+#' @describeIn inlabru-deprecated Deprecated alias for [ibm_as_taylor()].
+#' @export
+ibm_linear <- function(...) {
+  lifecycle::deprecate_warn(
+    "2.14.1.9000",
+    "ibm_linear()",
+    "ibm_as_taylor()"
+  )
+  ibm_as_taylor(...)
 }
 
 #' @title Simplify a mapper
 #' @description
 #' Implementations must return a [bru_mapper] object.
-#' The default method returns the result of [ibm_linear()] for linear/affine
+#' The default method returns the result of [ibm_as_taylor()] for linear/affine
 #' mappers, and the original `mapper` for non-linear mappers.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_linear()
+#' ibm_simplify(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
   UseMethod("ibm_simplify")
 }
@@ -181,13 +227,30 @@ ibm_simplify <- function(mapper, input = NULL, state = NULL, ...) {
 #' The `input` contents must
 #' be in a format accepted by [ibm_jacobian()]
 #' for the mapper.
+#'
+#' Specific implementations for `r doclisting::methods_inline("ibm_eval")`.
 #' @export
 #' @family mapper methods
+#' @inheritDotParams ibm_eval_methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @returns A vector of length `ibm_n_output(mapper, input, state, ...)`.
+#' @examples
+#' m <- bm_linear()
+#' ibm_eval(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_eval <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval")
 }
+
+#' @title Specific `ibm_eval` method implementations
+#' @description Specific [ibm_eval()] method implementations.
+#' @inheritParams ibm_eval
+#' @inheritParams ibm_n
+#' @rdname ibm_eval_methods
+#' @name ibm_eval_methods
+NULL
+
 
 #' @title Evaluate a mapper and its Jacobian
 #' @description
@@ -199,6 +262,14 @@ ibm_eval <- function(mapper, input, state = NULL, ...) {
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @returns A list with elements `offset` and `jacobian`, where `offset` is a
+#'   vector of length `ibm_n_output(mapper, input, state, ...)`, and `jacobian`
+#'   is a matrix of size `ibm_n_output(mapper, input, state, ...)` by
+#'   `ibm_n(mapper, inla_f = FALSE)`.
+#' @examples
+#' m <- bm_linear()
+#' ibm_eval2(m, input = c(1, 3, 4, 5, 2), state = 2)
+#'
 ibm_eval2 <- function(mapper, input, state = NULL, ...) {
   UseMethod("ibm_eval2")
 }
@@ -208,6 +279,7 @@ ibm_eval2 <- function(mapper, input, state = NULL, ...) {
 #' Implementations must return a character vector of sub-mapper names, or
 #' `NULL`. Intended for providing information about multi-mappers and mapper
 #' collections.
+#' @returns A character vector or `NULL`
 #' @export
 #' @examples
 #' # ibm_names
@@ -217,6 +289,10 @@ ibm_eval2 <- function(mapper, input, state = NULL, ...) {
 #' ibm_names(mapper)
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_multi(list(A = bm_linear(), B = bm_linear()))
+#' ibm_names(m)
+#'
 ibm_names <- function(mapper) {
   UseMethod("ibm_names")
 }
@@ -234,15 +310,23 @@ ibm_names <- function(mapper) {
 
 #' @title Find index subset of INLA visible states
 #' @description
-#' Implementations must return a logical vector of `TRUE/FALSE` for
-#' the subset such that, given the full A matrix and values output,
-#' `A[, subset, drop = FALSE]` and `values[subset]`
-#' (or `values[subset, , drop = FALSE]` for data.frame values) are equal
-#' to the `inla_f = TRUE` version of A and values. The default method uses
-#' the `ibm_values` output to construct the subset indexing.
+#' Implementations must return a logical vector of `TRUE/FALSE` for the subset
+#' such that, given the full A matrix and values output, `A[, subset, drop =
+#' FALSE]` and `values[subset]` (or `values[subset, , drop = FALSE]` for
+#' data.frame values) are equal to the `inla_f = TRUE` version of A and values.
+#' The default method uses the `ibm_values` output to construct the subset
+#' indexing.
+#' @returns A logical vector of `TRUE/FALSE` for the subset such that, given the
+#'   full A matrix and values output, `A[, subset, drop = FALSE]` and
+#'   `values[subset]` (or `values[subset, , drop = FALSE]` for data.frame
+#'   values) are equal to the `inla_f = TRUE` version of A and values.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
+#' @examples
+#' m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+#' ibm_inla_subset(m)
+#'
 ibm_inla_subset <- function(mapper, ...) {
   UseMethod("ibm_inla_subset")
 }
@@ -254,10 +338,16 @@ ibm_inla_subset <- function(mapper, ...) {
 #' output elements of `ibm_eval(mapper, input, state, ...)` are known to be
 #' invalid.
 #' For for multi/collect mappers, a list, when given a `multi=TRUE` argument.
+#' @returns A logical vector of length `ibm_n_output(mapper, input, state, ...)`
+#'   indicating which, if any, output elements of `ibm_eval(mapper, input,
+#'   state, ...)` are known to be invalid.
 #' @export
 #' @family mapper methods
 #' @inheritParams ibm_n
 #' @inheritParams ibm_n_output
+#' @examples
+#' m <- bm_collect(list(A = bm_linear(), B = bm_linear()), hidden = TRUE)
+#' ibm_invalid_output(m, input = list(A = 1, B = 2), state = c(1, 2))
 ibm_invalid_output <- function(mapper, input, state, ...) {
   UseMethod("ibm_invalid_output")
 }
@@ -296,9 +386,13 @@ as_bm_list.bm_list <- function(x) {
 #' @export
 as_bm_list.bru_comp_list <- function(x) {
   if (is.null(names(x))) {
-    names(x) <- vapply(x, function(y) {
-      y[["label"]]
-    }, "")
+    names(x) <- vapply(
+      x,
+      function(y) {
+        y[["label"]]
+      },
+      ""
+    )
   }
   mappers <- as_bm_list(lapply(x, function(y) {
     y[["mapper"]]
@@ -404,12 +498,16 @@ ibm_shortname <- function(mapper, ...) {
 #' @param depth The recursion depth for multi/collection/pipe mappers. Default
 #'   1, to only show the collection, and not the contents of the sub-mappers.
 #' @export
+#' @returns * `format` character.
 #' @method format bru_mapper
 #' @rdname bm_summary
-format.bru_mapper <- function(x, ...,
-                              prefix = "",
-                              initial = prefix,
-                              depth = 1) {
+format.bru_mapper <- function(
+  x,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1
+) {
   mapper_new <- make_bm_class_from_old(x)
   if (!is.null(mapper_new)) {
     return(format(
@@ -435,12 +533,15 @@ format.bru_mapper <- function(x, ...,
 #'   Default `TRUE`
 #'
 #' @rdname bm_summary
-format.bm_list <- function(x, ...,
-                           prefix = "",
-                           initial = prefix,
-                           depth = 1,
-                           collapse = ", ",
-                           labels = TRUE) {
+format.bm_list <- function(
+  x,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1,
+  collapse = ", ",
+  labels = TRUE
+) {
   if (labels) {
     paste0(
       vapply(
@@ -452,13 +553,14 @@ format.bm_list <- function(x, ...,
           }
           paste0(
             nm,
-            " = ",
+            " = {",
             format(
               x[[k]],
               prefix = prefix,
               initial = initial,
               depth = depth
-            )
+            ),
+            "}"
           )
         },
         ""
@@ -489,10 +591,13 @@ format.bm_list <- function(x, ...,
 #' @rdname bm_summary
 #' @export
 #' @method summary bru_mapper
-summary.bru_mapper <- function(object, ...,
-                               prefix = "",
-                               initial = prefix,
-                               depth = 1) {
+summary.bru_mapper <- function(
+  object,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1
+) {
   mapper_new <- make_bm_class_from_old(object)
   if (!is.null(mapper_new)) {
     return(summary(
@@ -531,10 +636,7 @@ summary.bru_mapper <- function(object, ...,
 #'     )
 #'   )
 #' summary(mapper, depth = 2)
-format.bm_multi <- function(x, ...,
-                            prefix = "",
-                            initial = prefix,
-                            depth = 1) {
+format.bm_multi <- function(x, ..., prefix = "", initial = prefix, depth = 1) {
   txt <- NextMethod()
   if (depth <= 0) {
     return(txt)
@@ -544,7 +646,8 @@ format.bm_multi <- function(x, ...,
     paste0(
       txt,
       "(",
-      format(x[["mappers"]],
+      format(
+        x[["mappers"]],
         prefix = sub_prefix,
         initial = "",
         depth = depth - 1,
@@ -559,10 +662,7 @@ format.bm_multi <- function(x, ...,
 #' @export
 #' @method format bm_pipe
 #' @rdname bm_summary
-format.bm_pipe <- function(x, ...,
-                           prefix = "",
-                           initial = prefix,
-                           depth = 1) {
+format.bm_pipe <- function(x, ..., prefix = "", initial = prefix, depth = 1) {
   txt <- NextMethod()
   if (depth <= 0) {
     return(txt)
@@ -572,7 +672,8 @@ format.bm_pipe <- function(x, ...,
     paste0(
       txt,
       " = ",
-      format(x[["mappers"]],
+      format(
+        x[["mappers"]],
         prefix = sub_prefix,
         initial = "",
         depth = depth - 1,
@@ -586,10 +687,13 @@ format.bm_pipe <- function(x, ...,
 #' @export
 #' @method format bm_collect
 #' @rdname bm_summary
-format.bm_collect <- function(x, ...,
-                              prefix = "",
-                              initial = prefix,
-                              depth = 1) {
+format.bm_collect <- function(
+  x,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1
+) {
   txt <- NextMethod()
   if (depth <= 0) {
     return(txt)
@@ -635,10 +739,7 @@ format.bm_collect <- function(x, ...,
 #' @export
 #' @method format bm_sum
 #' @rdname bm_summary
-format.bm_sum <- function(x, ...,
-                          prefix = "",
-                          initial = prefix,
-                          depth = 1) {
+format.bm_sum <- function(x, ..., prefix = "", initial = prefix, depth = 1) {
   txt <- NextMethod()
   if (depth <= 0) {
     return(txt)
@@ -676,10 +777,7 @@ format.bm_sum <- function(x, ...,
 #'   )
 #' summary(mapper)
 #' summary(mapper, depth = 0)
-format.bm_repeat <- function(x, ...,
-                             prefix = "",
-                             initial = prefix,
-                             depth = 1) {
+format.bm_repeat <- function(x, ..., prefix = "", initial = prefix, depth = 1) {
   txt <- NextMethod()
   sub_prefix <- paste0(prefix, "      ")
   txt <-
@@ -722,10 +820,13 @@ format.bm_repeat <- function(x, ...,
 #'   )
 #' summary(mapper)
 #' summary(mapper, depth = 0)
-format.bm_reparam <- function(x, ...,
-                              prefix = "",
-                              initial = prefix,
-                              depth = 1) {
+format.bm_reparam <- function(
+  x,
+  ...,
+  prefix = "",
+  initial = prefix,
+  depth = 1
+) {
   txt <- NextMethod()
   sub_prefix <- paste0(prefix, "      ")
   txt <-
@@ -758,17 +859,16 @@ print.summary_bru_mapper <- function(x, ..., sep = "\n") {
 #' @export
 #' @method print bru_mapper
 #' @rdname bm_summary
-print.bru_mapper <- function(x, ...,
-                             sep = "\n",
-                             prefix = "",
-                             initial = prefix,
-                             depth = 1) {
+print.bru_mapper <- function(
+  x,
+  ...,
+  sep = "\n",
+  prefix = "",
+  initial = prefix,
+  depth = 1
+) {
   cat(
-    format(x,
-      prefix = "",
-      initial = prefix,
-      depth = depth
-    ),
+    format(x, prefix = "", initial = prefix, depth = depth),
     sep = sep
   )
   invisible(x)
@@ -777,15 +877,19 @@ print.bru_mapper <- function(x, ...,
 #' @export
 #' @method print bm_list
 #' @rdname bm_summary
-print.bm_list <- function(x, ...,
-                          sep = "\n",
-                          prefix = "",
-                          initial = prefix,
-                          depth = 1,
-                          labels = TRUE,
-                          collapse = ", ") {
+print.bm_list <- function(
+  x,
+  ...,
+  sep = "\n",
+  prefix = "",
+  initial = prefix,
+  depth = 1,
+  labels = TRUE,
+  collapse = ", "
+) {
   cat(
-    format(x,
+    format(
+      x,
       prefix = "",
       initial = prefix,
       depth = depth,
@@ -830,10 +934,12 @@ print.bm_list <- function(x, ...,
 #' etc., which semi-automates it.
 #'
 #' @export
-bru_mapper_define <- function(mapper,
-                              new_class = NULL,
-                              remove_class = "list",
-                              ...) {
+bru_mapper_define <- function(
+  mapper,
+  new_class = NULL,
+  remove_class = "list",
+  ...
+) {
   old_cls <- class(mapper)
 
   if ((length(remove_class) > 0) && (length(old_cls) > 0)) {
@@ -858,45 +964,51 @@ bru_mapper_define <- function(mapper,
 # Returns NULL if no conversion was needed.
 make_bm_class_from_old <- function(mapper) {
   cls <- class(mapper)
-  idx <- grepl(paste0("^bru_mapper_",
-    c(
-      "aggregate",
-      "collect",
-      "const",
-      "factor",
-      "fmesher",
-      "harmonics",
-      "index",
-      "linear",
-      "logsumexp",
-      "marginal",
-      "matrix",
-      "mesh_B",
-      "multi",
-      "pipe",
-      "repeat",
-      "scale",
-      "shift",
-      "sum",
-      "taylor",
-      "fm_mesh_1d",
-      "fm_mesh_2d",
-      "inla_mesh_1d",
-      "inla_mesh_2d"
+  idx <- grepl(
+    paste0(
+      "^bru_mapper_",
+      c(
+        "aggregate",
+        "collect",
+        "const",
+        "factor",
+        "fmesher",
+        "harmonics",
+        "index",
+        "linear",
+        "logsumexp",
+        "marginal",
+        "matrix",
+        "mesh_B",
+        "multi",
+        "pipe",
+        "repeat",
+        "scale",
+        "shift",
+        "sum",
+        "taylor",
+        "fm_mesh_1d",
+        "fm_mesh_2d",
+        "inla_mesh_1d",
+        "inla_mesh_2d"
+      ),
+      "$",
+      collapse = "|"
     ),
-    "$",
-    collapse = "|"
-  ), cls)
+    cls
+  )
   if (any(idx)) {
     idx <- min(which(idx))
     # Remove the bru_mapper_ prefix, and add bm_ prefix
     cls[idx] <- sub("^bru_mapper_", "bm_", cls[idx])
     class(mapper) <- cls
 
-    if (inherits(
-      mapper,
-      c("bm_aggregate", "bm_multi", "bm_collect", "bm_sum", "bm_pipe")
-    )) {
+    if (
+      inherits(
+        mapper,
+        c("bm_aggregate", "bm_multi", "bm_collect", "bm_sum", "bm_pipe")
+      )
+    ) {
       mapper[["is_rowwise"]] <- FALSE
     }
 
@@ -930,11 +1042,13 @@ ibm_n.default <- function(mapper, inla_f = FALSE, ...) {
 
 #' @export
 #' @describeIn ibm_n_output Returns `NROW(input)`
-ibm_n_output.default <- function(mapper,
-                                 input,
-                                 state = NULL,
-                                 inla_f = FALSE,
-                                 ...) {
+ibm_n_output.default <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
     return(ibm_n_output(
@@ -1020,7 +1134,7 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
   ))
 }
 
-#' @describeIn ibm_linear
+#' @describeIn ibm_as_taylor
 #' Calls [ibm_eval2()] and returns a [bm_taylor] object.
 #' @returns A [bm_taylor] object.
 #' The `state0` information in the affine mapper indicates for which state
@@ -1030,10 +1144,10 @@ ibm_jacobian.default <- function(mapper, input, state = NULL, ...) {
 #'   offset(input, state0) + jacobian(input, state0) %*% (state - state0)
 #' ```
 #' @export
-ibm_linear.default <- function(mapper, input, state, ...) {
+ibm_as_taylor.default <- function(mapper, input, state, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
-    return(ibm_linear(mapper_new, input = input, state = state, ...))
+    return(ibm_as_taylor(mapper_new, input = input, state = state, ...))
   }
   eval2 <- ibm_eval2(mapper, input = input, state = state, ...)
   bm_taylor(
@@ -1045,10 +1159,10 @@ ibm_linear.default <- function(mapper, input, state, ...) {
 }
 
 #' @describeIn ibm_simplify
-#' Calls [ibm_linear()] for linear mappers, and returns the original mapper
+#' Calls [ibm_as_taylor()] for linear mappers, and returns the original mapper
 #' for non-linear mappers.
 #' @returns The original mapper is returned for non-linear mappers, and the
-#' output of [ibm_linear()] is returned for linear mappers.
+#' output of [ibm_as_taylor()] is returned for linear mappers.
 #' @export
 ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
@@ -1059,7 +1173,7 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
     if (is.null(state)) {
       state <- rep(0, ibm_n(mapper, input = input, state = NULL, ...))
     }
-    return(ibm_linear(mapper, input = input, state = state, ...))
+    return(ibm_as_taylor(mapper, input = input, state = state, ...))
   }
   mapper
 }
@@ -1074,11 +1188,13 @@ ibm_simplify.default <- function(mapper, input = NULL, state = NULL, ...) {
 #' For [ibm_eval()] methods, an optional pre-computed Jacobian, typically
 #' supplied by internal methods that already have the Jacobian.
 #' @export
-ibm_eval.default <- function(mapper,
-                             input,
-                             state = NULL,
-                             ...,
-                             jacobian = NULL) {
+ibm_eval.default <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  jacobian = NULL
+) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
     return(ibm_eval(
@@ -1110,26 +1226,25 @@ ibm_eval.default <- function(mapper,
 #' Calls `jacobian <- ibm_jacobian(...)` and
 #' `offset <- ibm_eval(..., jacobian = jacobian)`
 #' and returns a list with elements `offset` and `jacobian`, as needed by
-#' [ibm_linear.default()] and similar methods. Mapper classes can implement
+#' [ibm_as_taylor.default()] and similar methods. Mapper classes can implement
 #' their own `ibm_eval2` method if joint construction of evaluation and Jacobian
 #' is more efficient than separate or sequential construction.
 #' @export
-ibm_eval2.default <- function(mapper, input, state, ...) {
+ibm_eval2.default <- function(mapper, input, state = NULL, ...) {
   mapper_new <- make_bm_class_from_old(mapper)
   if (!is.null(mapper_new)) {
     return(ibm_eval2(mapper_new, input = input, state = state, ...))
   }
-  jacobian <- ibm_jacobian(mapper, input, state, ...)
+  jacobian <- ibm_jacobian(mapper = mapper, input = input, state = state, ...)
   offset <- ibm_eval(
-    mapper,
-    input,
-    state,
+    mapper = mapper,
+    input = input,
+    state = state,
     ...,
     jacobian = jacobian
   )
   list(offset = offset, jacobian = jacobian)
 }
-
 
 #' @export
 #' @describeIn ibm_names Returns `NULL`
@@ -1159,13 +1274,13 @@ ibm_inla_subset.default <- function(mapper, ...) {
     subset <- logical(NROW(values_full))
     if (length(subset) > 0) {
       subset[
-        plyr::match_df(
+        dplyr::semi_join(
           cbind(
             .inla_subset = seq_len(NROW(values_full)),
             values_full
           ),
           values_inla,
-          on = names(values_full)
+          by = names(values_full)
         )[[".inla_subset"]]
       ] <- TRUE
     }
@@ -1289,7 +1404,7 @@ ibm_jacobian.bm_fm_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -1310,7 +1425,7 @@ ibm_jacobian.bm_inla_mesh_2d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 
@@ -1392,7 +1507,7 @@ ibm_jacobian.bm_fm_mesh_1d <- function(mapper, input, ...) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
   # Note: Handles NA input from fmesher 0.2.0.9002, with fixes in 0.4.0.9003
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## The following methods are only used for old stored mapper objects
@@ -1417,7 +1532,7 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  fm_basis(mapper[["mesh"]], input)
+  fmesher::fm_basis(mapper[["mesh"]], input)
 }
 
 ## _index ####
@@ -1425,7 +1540,8 @@ ibm_jacobian.bm_inla_mesh_1d <- function(mapper, input, ...) {
 #' @title Mapper for indexed variables
 #' @param n Size of a model for `bm_index`
 #' @export
-#' @description Create a an indexing mapper
+#' @description Create an indexing mapper
+#' @returns A `bm_index` mapper object.
 #' @rdname bm_index
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1498,6 +1614,7 @@ ibm_jacobian.bm_index <- function(mapper, input, state, ...) {
 #' evaluated;
 #' The affine mapper output is defined as
 #' `effect(state) = offset + jacobian %*% (state - state0)`
+#' @returns A `bm_taylor` mapper object.
 #' @export
 #' @rdname bm_taylor
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -1510,8 +1627,12 @@ ibm_jacobian.bm_index <- function(mapper, input, state, ...) {
 #'   state0 = c(1, 2)
 #' )
 #' ibm_eval2(m, state = 2:3)
-bm_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
-                      values_mapper = NULL) {
+bm_taylor <- function(
+  offset = NULL,
+  jacobian = NULL,
+  state0 = NULL,
+  values_mapper = NULL
+) {
   stopifnot(!is.null(offset) || !is.null(jacobian))
   if (is.null(state0)) {
     n_state <- 0
@@ -1522,10 +1643,7 @@ bm_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
     n_state <- vapply(
       state0,
       function(x) {
-        ifelse(is.null(x),
-          0L,
-          length(x)
-        )
+        ifelse(is.null(x), 0L, length(x))
       },
       0L
     )
@@ -1542,15 +1660,12 @@ bm_taylor <- function(offset = NULL, jacobian = NULL, state0 = NULL,
     n_jacobian <- vapply(
       jacobian,
       function(x) {
-        ifelse(is.null(x),
-          0L,
-          ncol(x)
-        )
+        ifelse(is.null(x), 0L, NCOL(x))
       },
       0L
     )
   } else {
-    n_jacobian <- ncol(jacobian)
+    n_jacobian <- NCOL(jacobian)
   }
 
   if (!is.null(state0)) {
@@ -1620,10 +1735,7 @@ bru_mapper_taylor <- function(...) {
 #' @rdname ibm_n
 #' @inheritParams bm_multi
 #'
-ibm_n.bm_taylor <- function(mapper,
-                            inla_f = FALSE,
-                            multi = FALSE,
-                            ...) {
+ibm_n.bm_taylor <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_n.bm_taylor should not be used with inla_f = TRUE")
   } else if (multi) {
@@ -1644,10 +1756,7 @@ ibm_n_output.bm_taylor <- function(mapper, input, ...) {
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_taylor <- function(mapper,
-                                 inla_f = FALSE,
-                                 multi = FALSE,
-                                 ...) {
+ibm_values.bm_taylor <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (inla_f && !is.null(mapper[["values_mapper"]])) {
     stop("ibm_values.bm_taylor should not be used with inla_f = TRUE")
   } else if (multi) {
@@ -1674,7 +1783,7 @@ ibm_jacobian.bm_taylor <- function(mapper, ..., multi = FALSE) {
 }
 
 
-#' @describeIn ibm_eval
+#' @describeIn ibm_eval_methods
 #' Evaluates linearised
 #' mapper information at the given `state`. The `input` argument is ignored,
 #' so that the usual argument order
@@ -1684,26 +1793,38 @@ ibm_jacobian.bm_taylor <- function(mapper, ..., multi = FALSE) {
 #' all-zero is assumed.
 #' @export
 #'
-ibm_eval.bm_taylor <- function(mapper,
-                               input = NULL,
-                               state = NULL,
-                               ...) {
-  if (is.null(mapper[["jacobian"]]) ||
-    (mapper[["n"]] == 0) ||
-    (is.null(state) && is.null(mapper[["state0"]]))) {
+ibm_eval.bm_taylor <- function(mapper, input = NULL, state = NULL, ...) {
+  if (
+    is.null(mapper[["jacobian"]]) ||
+      (mapper[["n"]] == 0) ||
+      (is.null(state) && is.null(mapper[["state0"]]))
+  ) {
     val <- mapper[["offset"]]
   } else if (is.list(mapper[["jacobian"]])) {
     stopifnot(is.null(state) || is.list(state))
     val <- mapper[["offset"]]
     if (is.null(mapper[["state0"]])) {
+      the_names <- intersect(names(mapper[["jacobian"]]), names(state))
       missing_names <- setdiff(names(mapper[["jacobian"]]), names(state))
       if (length(missing_names) > 0) {
-        stop(
-          "Names in jacobian list missing from state list: ",
-          paste0(missing_names, collapse = ", ")
-        )
+        if (
+          any(
+            vapply(
+              missing_names,
+              function(nm) {
+                NCOL(mapper[["jacobian"]][[nm]]) > 0
+              },
+              logical(1)
+            )
+          )
+        ) {
+          stop(paste0(
+            "Names in jacobian list missing from state list: ",
+            nm
+          ))
+        }
       }
-      for (nm in names(mapper[["jacobian"]])) {
+      for (nm in the_names) {
         val <- val + mapper[["jacobian"]][[nm]] %*% state[[nm]]
       }
     } else if (is.null(state)) {
@@ -1712,8 +1833,9 @@ ibm_eval.bm_taylor <- function(mapper,
       }
     } else {
       for (nm in names(mapper[["jacobian"]])) {
-        val <- val + mapper[["jacobian"]][[nm]] %*%
-          (state[[nm]] - mapper[["state0"]][[nm]])
+        val <- val +
+          mapper[["jacobian"]][[nm]] %*%
+            (state[[nm]] - mapper[["state0"]][[nm]])
       }
     }
   } else {
@@ -1736,6 +1858,7 @@ ibm_eval.bm_taylor <- function(mapper,
 #' @title Mapper for a linear effect
 #' @export
 #' @description Create a mapper for linear effects
+#' @returns A `bm_linear` mapper object.
 #' @rdname bm_linear
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1773,10 +1896,12 @@ ibm_jacobian.bm_linear <- function(mapper, input, ...) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }
-  if (!is.null(input) &&
-    !(is.numeric(input) ||
-      is.logical(input) ||
-      is(input, "Matrix"))) {
+  if (
+    !is.null(input) &&
+      !(is.numeric(input) ||
+        is.logical(input) ||
+        is(input, "Matrix"))
+  ) {
     stop(paste0(
       "The input to a bm_linear evaluation must be numeric or logical."
     ))
@@ -1799,6 +1924,7 @@ ibm_jacobian.bm_linear <- function(mapper, input, ...) {
 #'   indexing.
 #' @export
 #' @description Create a matrix mapper, for a given number of columns
+#' @returns A `bm_matrix` mapper object.
 #' @rdname bm_matrix
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1858,8 +1984,13 @@ ibm_values.bm_matrix <- function(mapper, ...) {
 #' @describeIn ibm_jacobian Accepts `input` as a matrix, `Matrix`, `Spatial`,
 #' or `sfc_POINT` object.
 #'
-ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
-                                   inla_f = FALSE, ...) {
+ibm_jacobian.bm_matrix <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   } else if (is.matrix(input)) {
@@ -1876,10 +2007,12 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
   } else {
     A <- as(input, "Matrix")
   }
-  if (ncol(A) != ibm_n(mapper)) {
+  if (NCOL(A) != ibm_n(mapper)) {
     stop(paste0(
-      "Input to matrix mapper has ", ncol(A),
-      " columns but should have ", ibm_n(mapper),
+      "Input to matrix mapper has ",
+      NCOL(A),
+      " columns but should have ",
+      ibm_n(mapper),
       " columns."
     ))
   }
@@ -1903,6 +2036,7 @@ ibm_jacobian.bm_matrix <- function(mapper, input, state = NULL,
 #' will set it the required setting.
 #' @export
 #' @description Create a factor mapper
+#' @returns A `bm_factor` mapper object.
 #' @rdname bm_factor
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -1936,7 +2070,8 @@ bm_factor <- function(values, factor_mapping, indexed = FALSE) {
   }
   mapper$n <- length(mapper$levels) - identical(factor_mapping, "contrast")
   if (indexed) {
-    bru_mapper_define(mapper,
+    bru_mapper_define(
+      mapper,
       new_class = c(
         "bm_factor_index",
         "bm_factor"
@@ -2017,6 +2152,7 @@ ibm_jacobian.bm_factor <- function(mapper, input, ...) {
 #' @title Constant mapper
 #' @export
 #' @description Create a constant mapper
+#' @returns A `bm_const` mapper object.
 #' @rdname bm_const
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2055,7 +2191,7 @@ ibm_jacobian.bm_const <- function(mapper, input, ...) {
 }
 
 #' @export
-#' @describeIn ibm_eval Returns the input values, with NA replaced by 0.
+#' @describeIn ibm_eval_methods Returns the input values, with NA replaced by 0.
 #'
 ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
   if (is.null(input)) {
@@ -2078,6 +2214,7 @@ ibm_eval.bm_const <- function(mapper, input, state = NULL, ...) {
 #' returns
 #' `bm_pipe(list(mapper = mapper, shift = bm_shift()))`
 #' @param mapper If non-NULL, a `bru_mapper` to be shifted.
+#' @returns A `bm_shift` mapper object.
 #' @rdname bm_shift
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2121,8 +2258,13 @@ ibm_n.bm_shift <- function(mapper, ..., state = NULL, n_state = NULL) {
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_shift <- function(mapper, input, state = NULL, ...,
-                                  n_state = NULL) {
+ibm_n_output.bm_shift <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  n_state = NULL
+) {
   if (!is.null(state)) {
     length(state)
   } else if (is.null(n_state)) {
@@ -2135,8 +2277,7 @@ ibm_n_output.bm_shift <- function(mapper, input, state = NULL, ...,
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_shift <- function(mapper, ...,
-                                state = NULL, n_state = NULL) {
+ibm_values.bm_shift <- function(mapper, ..., state = NULL, n_state = NULL) {
   n_state <- ibm_n(mapper, state = state, n_state = n_state)
   if (is.na(n_state)) {
     # Don't know how big the mapper will be
@@ -2156,8 +2297,7 @@ ibm_jacobian.bm_shift <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
-#' @inheritParams ibm_jacobian
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
   stopifnot(!is.null(state))
@@ -2180,6 +2320,7 @@ ibm_eval.bm_shift <- function(mapper, input, state = NULL, ...) {
 #' If `mapper` is non-null, the `bm_scale()` constructor
 #' returns
 #' `bm_pipe(list(mapper = mapper, scale = bm_scale()))`
+#' @returns A `bm_scale` mapper object.
 #' @rdname bm_scale
 #' @param mapper An optional `bru_mapper` to be scaled.
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2224,8 +2365,13 @@ ibm_n.bm_scale <- function(mapper, ..., state = NULL, n_state = NULL) {
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_scale <- function(mapper, input, state = NULL, ...,
-                                  n_state = NULL) {
+ibm_n_output.bm_scale <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  n_state = NULL
+) {
   if (!is.null(state)) {
     length(state)
   } else if (is.null(n_state)) {
@@ -2238,8 +2384,7 @@ ibm_n_output.bm_scale <- function(mapper, input, state = NULL, ...,
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_scale <- function(mapper, ...,
-                                state = NULL, n_state = NULL) {
+ibm_values.bm_scale <- function(mapper, ..., state = NULL, n_state = NULL) {
   n_state <- ibm_n(mapper, state = state, n_state = n_state)
   if (is.na(n_state)) {
     # Don't know how big the mapper will be
@@ -2259,9 +2404,11 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
     # No scaling
     return(Matrix::Diagonal(n = length(state), 1.0))
   }
-  if (!(is.numeric(input) ||
-    is.logical(input) ||
-    is(input, "Matrix"))) {
+  if (
+    !(is.numeric(input) ||
+      is.logical(input) ||
+      is(input, "Matrix"))
+  ) {
     stop(
       "The input to a bm_scale evaluation must be numeric or logical."
     )
@@ -2274,17 +2421,19 @@ ibm_jacobian.bm_scale <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
   stopifnot(!is.null(state))
   if (is.null(input)) {
     return(state)
   }
-  if (!is.null(input) &&
-    !(is.numeric(input) ||
-      is.logical(input) ||
-      is(input, "Matrix"))) {
+  if (
+    !is.null(input) &&
+      !(is.numeric(input) ||
+        is.logical(input) ||
+        is(input, "Matrix"))
+  ) {
     stop(
       "The input to a bm_scale evaluation must be numeric or logical."
     )
@@ -2321,6 +2470,7 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
 #' Constructs a mapper
 #' that aggregates elements of the input state, so it can be used e.g.
 #' for weighted summation or integration over blocks of values.
+#' @returns A `bm_aggregate` mapper object.
 #' @rdname bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -2329,9 +2479,7 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
-bm_aggregate <- function(rescale = FALSE,
-                         n_block = NULL,
-                         type = NULL) {
+bm_aggregate <- function(rescale = FALSE, n_block = NULL, type = NULL) {
   if (!is.null(type)) {
     type <- match.arg(
       type,
@@ -2379,19 +2527,24 @@ bru_mapper_aggregate <- function(...) {
 #' @export
 #' @rdname ibm_n
 #'
-ibm_n.bm_aggregate <- function(mapper, ...,
-                               input = NULL,
-                               state = NULL,
-                               n_state = NULL) {
+ibm_n.bm_aggregate <- function(
+  mapper,
+  ...,
+  input = NULL,
+  state = NULL,
+  n_state = NULL
+) {
   # Output size depends on the state size
   if (!is.null(state)) {
     length(state)
   } else if (!is.null(n_state)) {
     n_state
-  } else if (!is.null(input) &&
-    (!is.null(input[["block"]]) ||
-      !is.null(input[["weights"]]) ||
-      !is.null(input[["log_weights"]]))) {
+  } else if (
+    !is.null(input) &&
+      (!is.null(input[["block"]]) ||
+        !is.null(input[["weights"]]) ||
+        !is.null(input[["log_weights"]]))
+  ) {
     max(
       length(input[["block"]]),
       length(input[["weights"]]),
@@ -2427,8 +2580,7 @@ bm_aggregate_n_block <- function(mapper, input = NULL) {
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_aggregate <- function(mapper,
-                                      input = NULL, ...) {
+ibm_n_output.bm_aggregate <- function(mapper, input = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   if (is.null(n_block)) {
     return(NA_integer_)
@@ -2438,9 +2590,7 @@ ibm_n_output.bm_aggregate <- function(mapper,
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_aggregate <- function(mapper, ...,
-                                    state = NULL,
-                                    n_state = NULL) {
+ibm_values.bm_aggregate <- function(mapper, ..., state = NULL, n_state = NULL) {
   n_state <- ibm_n(mapper, state = state, n_state = n_state)
   if (is.na(n_state)) {
     # Don't know how big the mapper will be
@@ -2459,12 +2609,9 @@ ibm_values.bm_aggregate <- function(mapper, ...,
 #' equivalent to all-1.
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #'
-ibm_jacobian.bm_aggregate <- function(mapper,
-                                      input,
-                                      state = NULL,
-                                      ...) {
+ibm_jacobian.bm_aggregate <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  fm_block(
+  fmesher::fm_block(
     block = input[["block"]],
     weights = input[["weights"]],
     log_weights = input[["log_weights"]],
@@ -2475,12 +2622,12 @@ ibm_jacobian.bm_aggregate <- function(mapper,
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
-    fm_block_eval(
+    fmesher::fm_block_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2512,6 +2659,7 @@ ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
 #' }{log(blocksum(w*exp(state)))},
 #' where \eqn{s_k=\max_{i\in I_k} u_i + \log(w_i)}{s=blockmax(u+log(w))} is the
 #' shift for block \eqn{k}{k}.
+#' @returns A `bm_logsumexp/bm_aggregate` mapper object.
 #' @rdname bm_logsumexp
 #' @inheritParams bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2521,8 +2669,7 @@ ibm_eval.bm_aggregate <- function(mapper, input, state = NULL, ...) {
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
 #' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
 #'
-bm_logsumexp <- function(rescale = FALSE,
-                         n_block = NULL) {
+bm_logsumexp <- function(rescale = FALSE, n_block = NULL) {
   # Arguments documented for bm_aggregate
   # Inherit class bm_aggregate to reuse common methods
   bru_mapper_define(
@@ -2550,12 +2697,9 @@ bru_mapper_logsumexp <- function(...) {
 #'   `state`, or `NULL`, with `NULL` equivalent to all-1.
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #'
-ibm_jacobian.bm_logsumexp <- function(mapper,
-                                      input,
-                                      state = NULL,
-                                      ...) {
+ibm_jacobian.bm_logsumexp <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  input <- fm_block_prep(
+  input <- fmesher::fm_block_prep(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2567,7 +2711,7 @@ ibm_jacobian.bm_logsumexp <- function(mapper,
   n_state <- length(input$block)
   n_out <- input$n_block
 
-  log_weights <- fm_block_log_weights(
+  log_weights <- fmesher::fm_block_log_weights(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2577,7 +2721,7 @@ ibm_jacobian.bm_logsumexp <- function(mapper,
 
   # Compute shift for stable log-sum-exp
   w_state <- state + log_weights
-  shift <- fm_block_log_shift(
+  shift <- fmesher::fm_block_log_shift(
     log_weights = w_state,
     block = input[["block"]],
     n_block = n_out
@@ -2605,15 +2749,20 @@ ibm_jacobian.bm_logsumexp <- function(mapper,
 #' @export
 #' @param log logical; control `log` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logsumexp` mappers.
-#' @describeIn ibm_eval When `log` is `TRUE` (default), `ibm_eval()`
+#' @describeIn ibm_eval_methods When `log` is `TRUE` (default), `ibm_eval()`
 #'   for `logsumexp` returns the log-sum-weight-exp value. If `FALSE`, the
 #'   `sum-weight-exp` value is returned.
 #'
-ibm_eval.bm_logsumexp <- function(mapper, input, state = NULL,
-                                  log = TRUE, ...) {
+ibm_eval.bm_logsumexp <- function(
+  mapper,
+  input,
+  state = NULL,
+  log = TRUE,
+  ...
+) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   val <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2640,6 +2789,7 @@ ibm_eval.bm_logsumexp <- function(mapper, input, state = NULL,
 #'
 #' \eqn{p_k=\sum_{i\in I_k} w_i / (1+e^{-\eta_i}) / \sum_{i\in I_k} w_i
 #' }{p[k]=sum(w[i] * plogis(eta[i])) / sum(w[i])}
+#' @returns A `bm_logitaverage/bm_aggregate` mapper object.
 #' @rdname bm_logitaverage
 #' @inheritParams bm_aggregate
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -2669,12 +2819,9 @@ bm_logitaverage <- function(n_block = NULL) {
 #'   `state`, or `NULL`, with `NULL` equivalent to all-1.
 #' If `weights` is `NULL`, it's interpreted as all-1.
 #'
-ibm_jacobian.bm_logitaverage <- function(mapper,
-                                         input,
-                                         state = NULL,
-                                         ...) {
+ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
-  input <- fm_block_prep(
+  input <- fmesher::fm_block_prep(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2686,7 +2833,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
   n_state <- length(input$block)
   n_out <- input$n_block
 
-  log_weights <- fm_block_log_weights(
+  log_weights <- fmesher::fm_block_log_weights(
     block = input[["block"]],
     log_weights = input[["log_weights"]],
     weights = input[["weights"]],
@@ -2700,12 +2847,12 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
   # Compute shift for stable log-sum-exp
   w_state1 <- state1 + log_weights
   w_state2 <- state2 + log_weights
-  shift1 <- fm_block_log_shift(
+  shift1 <- fmesher::fm_block_log_shift(
     log_weights = w_state1,
     block = input[["block"]],
     n_block = n_out
   )
-  shift2 <- fm_block_log_shift(
+  shift2 <- fmesher::fm_block_log_shift(
     log_weights = w_state2,
     block = input[["block"]],
     n_block = n_out
@@ -2735,7 +2882,8 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
   A <- Matrix::sparseMatrix(
     i = input[["block"]],
     j = seq_len(n_state),
-    x = exp(w_state1 - shift1[input[["block"]]]) * scale1 -
+    x = exp(w_state1 - shift1[input[["block"]]]) *
+      scale1 -
       exp(w_state2 - shift2[input[["block"]]]) * scale2,
     dims = c(n_out, n_state)
   )
@@ -2745,17 +2893,22 @@ ibm_jacobian.bm_logitaverage <- function(mapper,
 #' @export
 #' @param logit logical; control `logit` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logitaverage` mappers.
-#' @describeIn ibm_eval When `logit` is `TRUE` (default), `ibm_eval()`
+#' @describeIn ibm_eval_methods When `logit` is `TRUE` (default), `ibm_eval()`
 #'   for `logitaverage` returns the logit-sum-weight-inverse-logit value.
 #'   If `FALSE`, the `sum-weights=invere-logit` value is returned.
 #'
-ibm_eval.bm_logitaverage <- function(mapper, input, state = NULL,
-                                     logit = TRUE, ...) {
+ibm_eval.bm_logitaverage <- function(
+  mapper,
+  input,
+  state = NULL,
+  logit = TRUE,
+  ...
+) {
   n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
   state1 <- plogis(state, log.p = TRUE)
   state2 <- plogis(-state, log.p = TRUE)
   val_1 <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2765,7 +2918,7 @@ ibm_eval.bm_logitaverage <- function(mapper, input, state = NULL,
       log = TRUE
     )
   val_2 <-
-    fm_block_logsumexp_eval(
+    fmesher::fm_block_logsumexp_eval(
       block = input[["block"]],
       log_weights = input[["log_weights"]],
       weights = input[["weights"]],
@@ -2794,7 +2947,9 @@ require_args <- function(fun, req) {
   if (!all(subset)) {
     subset <- req[!subset]
     stop(paste0(
-      "The '", label, "' function is missing the argument",
+      "The '",
+      label,
+      "' function is missing the argument",
       if (length(subset) > 1) "s" else "",
       " ",
       paste0("'", subset, "'", collapse = ", "),
@@ -2828,6 +2983,7 @@ require_args <- function(fun, req) {
 #' defines a mapping from standard Normal to a specified distribution.
 #' If `TRUE`, it defines a mapping from the specified distribution to a standard
 #' Normal.
+#' @returns A `bm_marginal` mapper object.
 #' @examples
 #' m <- bm_marginal(qexp, pexp, rate = 1 / 8)
 #' (val <- ibm_eval(m, state = -5:5))
@@ -2839,12 +2995,14 @@ require_args <- function(fun, req) {
 #' m <- bm_marginal(qexp, pexp, dexp, rate = 1 / 8)
 #' ibm_eval2(m, state = -3:3)
 #'
-bm_marginal <- function(qfun,
-                        pfun = NULL,
-                        dfun = NULL,
-                        dqfun = NULL,
-                        ...,
-                        inverse = FALSE) {
+bm_marginal <- function(
+  qfun,
+  pfun = NULL,
+  dfun = NULL,
+  dqfun = NULL,
+  ...,
+  inverse = FALSE
+) {
   arg_names <- ...names()
   require_args(qfun, c("p", "lower.tail", "log.p", arg_names))
   require_args(pfun, c("q", "lower.tail", "log.p", arg_names))
@@ -2874,10 +3032,7 @@ bru_mapper_marginal <- function(...) {
 #' @export
 #' @rdname ibm_n
 #'
-ibm_n.bm_marginal <- function(mapper,
-                              ...,
-                              state = NULL,
-                              n_state = NULL) {
+ibm_n.bm_marginal <- function(mapper, ..., state = NULL, n_state = NULL) {
   # Output size depends on the state size
   if (!is.null(state)) {
     length(state)
@@ -2890,11 +3045,13 @@ ibm_n.bm_marginal <- function(mapper,
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_marginal <- function(mapper,
-                                     input,
-                                     state = NULL,
-                                     ...,
-                                     n_state = NULL) {
+ibm_n_output.bm_marginal <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  n_state = NULL
+) {
   if (!is.null(state)) {
     length(state)
   } else if (is.null(n_state)) {
@@ -2907,8 +3064,7 @@ ibm_n_output.bm_marginal <- function(mapper,
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_marginal <- function(mapper, ...,
-                                   state = NULL, n_state = NULL) {
+ibm_values.bm_marginal <- function(mapper, ..., state = NULL, n_state = NULL) {
   n_state <- ibm_n(mapper, state = state, n_state = n_state)
   if (is.na(n_state)) {
     # Don't know how big the mapper will be
@@ -2925,9 +3081,13 @@ ibm_values.bm_marginal <- function(mapper, ...,
 #' @describeIn ibm_jacobian Non-NULL `input` values are interpreted
 #' as a parameter list for `qfun`, overriding that of the mapper itself.
 #'
-ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
-                                     ...,
-                                     reverse = FALSE) {
+ibm_jacobian.bm_marginal <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  reverse = FALSE
+) {
   stopifnot(!is.null(state))
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
@@ -2951,8 +3111,10 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
     } else {
       der <- NULL
     }
-  } else if (!is.null(mapper[["dqfun"]]) ||
-    !is.null(mapper[["dfun"]])) {
+  } else if (
+    !is.null(mapper[["dqfun"]]) ||
+      !is.null(mapper[["dfun"]])
+  ) {
     mapper[["inverse"]] <- FALSE
     val <- ibm_eval(
       mapper,
@@ -2963,7 +3125,8 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
     if (!is.null(mapper[["dqfun"]])) {
       dq <- do.call(mapper[["dqfun"]], c(list(val), mapper$param))
       der <- dq / dnorm(val)
-    } else { # if (!is.null(mapper[["dfun"]])) {
+    } else {
+      # if (!is.null(mapper[["dfun"]])) {
       log_dens <-
         do.call(mapper[["dfun"]], c(list(state, log = TRUE), mapper$param))
       der <- exp(log_dens - dnorm(val, log = TRUE))
@@ -2974,45 +3137,50 @@ ibm_jacobian.bm_marginal <- function(mapper, input, state = NULL,
   if (is.null(der)) {
     eps <- 1e-4 * (1 + abs(state))
     der <-
-      (
+      (ibm_eval(
+        mapper,
+        input = NULL,
+        state = state + eps,
+        reverse = reverse
+      ) -
         ibm_eval(
           mapper,
           input = NULL,
-          state = state + eps,
+          state = state - eps,
           reverse = reverse
-        ) -
-          ibm_eval(
-            mapper,
-            input = NULL,
-            state = state - eps,
-            reverse = reverse
-          )
-      ) /
-        (2 * eps)
+        )) /
+      (2 * eps)
   }
   Matrix::Diagonal(n = length(state), der)
 }
 
 
 #' @export
-#' @describeIn ibm_eval When `xor(mapper[["inverse"]], reverse)` is
+#' @describeIn ibm_eval_methods When `xor(mapper[["inverse"]], reverse)` is
 #' `FALSE`, `ibm_eval()`
 #' for `marginal` returns `qfun(pnorm(x), param)`, evaluated in a numerically
 #' stable way. Otherwise, evaluates the inverse `qnorm(pfun(x, param))` instead.
 #'
-ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
-                                 ...,
-                                 reverse = FALSE) {
+#' @param reverse logical; control `bm_marginal` evaluation. Default
+#'   `FALSE`. When `TRUE`, reverses the direction of the mapping, see details
+#'   for `marginal` mappers.
+ibm_eval.bm_marginal <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  reverse = FALSE
+) {
   stopifnot(!is.null(state))
   if (!missing(input) && !is.null(input)) {
     mapper$param <- input
   }
-  if (!xor(isTRUE(mapper[["inverse"]]), reverse)) {
+  if (xor(isTRUE(mapper[["inverse"]]), reverse)) {
     val <- do.call(
-      bru_forward_transformation,
+      bru_inverse_transformation,
       c(
         list(
-          qfun = mapper[["qfun"]],
+          pfun = mapper[["pfun"]],
           x = state
         ),
         mapper[["param"]]
@@ -3020,10 +3188,10 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
     )
   } else {
     val <- do.call(
-      bru_inverse_transformation,
+      bru_forward_transformation,
       c(
         list(
-          pfun = mapper[["pfun"]],
+          qfun = mapper[["qfun"]],
           x = state
         ),
         mapper[["param"]]
@@ -3044,6 +3212,7 @@ ibm_eval.bm_marginal <- function(mapper, input, state = NULL,
 #' mapper.
 #' The `input` format for the `ibm_eval` and `ibm_jacobian` methods is
 #' a list of inputs, one for each mapper.
+#' @returns A `bm_pipe` mapper object.
 #' @rdname bm_pipe
 #' @inheritParams bm_multi
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -3104,7 +3273,9 @@ ibm_n.bm_pipe <- function(mapper, ..., input = NULL, state = NULL) {
   if (!is.null(input) && is.null(names(input))) {
     names(input) <- mapper[["names"]][seq_along(input)]
   }
-  ibm_n(mapper[["mappers"]][[1]], ...,
+  ibm_n(
+    mapper[["mappers"]][[1]],
+    ...,
     input = input[[names(mapper[["mappers"]])[1]]],
     state = state
   )
@@ -3113,11 +3284,13 @@ ibm_n.bm_pipe <- function(mapper, ..., input = NULL, state = NULL) {
 #' @export
 #' @rdname ibm_n_output
 #'
-ibm_n_output.bm_pipe <- function(mapper,
-                                 input,
-                                 state = NULL,
-                                 ...,
-                                 n_state = NULL) {
+ibm_n_output.bm_pipe <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  n_state = NULL
+) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
   }
@@ -3135,7 +3308,8 @@ ibm_n_output.bm_pipe <- function(mapper,
     n <- ibm_n_output(
       mapper[["mappers"]][[k]],
       input = input[[k]],
-      ..., n_state = n
+      ...,
+      n_state = n
     )
   }
   n
@@ -3157,7 +3331,7 @@ ibm_jacobian.bm_pipe <- function(mapper, input, state = NULL, ...) {
 
 
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
 ibm_eval.bm_pipe <- function(mapper, input, state = NULL, ...) {
   if (is.null(mapper[["names"]])) {
@@ -3201,6 +3375,10 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
     state_k <- eval2_k$offset
     if (k == first) {
       A <- eval2_k$jacobian
+    } else if (is.list(A)) {
+      # Multi-root-state case, where A is a list of Jacobian matrices, one for
+      # each root state. Used when the first mapper is a bm_expr.
+      A <- lapply(A, function(A_mat) eval2_k$jacobian %*% A_mat)
     } else {
       A <- eval2_k$jacobian %*% A
     }
@@ -3211,7 +3389,7 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
 
 #' @describeIn ibm_simplify
 #' Constructs a simplified `pipe` mapper. For fully linear pipes, calls
-#' [ibm_linear()].
+#' [ibm_as_taylor()].
 #' For partially non-linear pipes, replaces each sequence of linear mappers with
 #' a single [bm_taylor()] mapper, while keeping the full list of
 #' original mapper names, allowing the original `input` structure to be used
@@ -3219,12 +3397,14 @@ ibm_eval2.bm_pipe <- function(mapper, input, state = NULL, ...) {
 #' dependent on inputs.
 #' @export
 #'
-ibm_simplify.bm_pipe <- function(mapper,
-                                 input = NULL,
-                                 state = NULL,
-                                 inla_f = FALSE,
-                                 ...,
-                                 n_state = NULL) {
+ibm_simplify.bm_pipe <- function(
+  mapper,
+  input = NULL,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  n_state = NULL
+) {
   if (is.null(mapper[["names"]])) {
     mapper[["names"]] <- names(mapper[["mappers"]])
   }
@@ -3233,7 +3413,8 @@ ibm_simplify.bm_pipe <- function(mapper,
   }
   if (ibm_is_linear(mapper)) {
     if (is.null(state)) {
-      n <- ibm_n(mapper[["mappers"]][[1]],
+      n <- ibm_n(
+        mapper[["mappers"]][[1]],
         ...,
         inla_f = FALSE,
         input = input[[names(mapper[["mappers"]])[1]]],
@@ -3241,9 +3422,13 @@ ibm_simplify.bm_pipe <- function(mapper,
       )
       state <- rep(0, n)
     }
-    return(ibm_linear(mapper,
-      input = input, state = state, ...,
-      inla_f = inla_f, n_state = n_state
+    return(ibm_as_taylor(
+      mapper,
+      input = input,
+      state = state,
+      ...,
+      inla_f = inla_f,
+      n_state = n_state
     ))
   }
 
@@ -3290,6 +3475,7 @@ ibm_simplify.bm_pipe <- function(mapper,
 #' @description Constructs a row-wise Kronecker product mapping of linear/affine
 #'   mappers. Any offset in sub-mappers is added into a combined offset. Only
 #'   linear/affine sub-mappers are allowed.
+#' @returns A `bm_multi` mapper object.
 #' @rdname bm_multi
 #' @export
 #' @seealso [bru_mapper], [bru_mapper_generics]
@@ -3310,9 +3496,13 @@ bm_multi <- function(mappers, simplify = FALSE) {
   mappers <- as_bm_list(mappers)
 
   if (simplify) {
-    trivial <- vapply(mappers, function(x) {
-      inherits(x, "bm_index") && (ibm_n(x) == 1L)
-    }, logical(1))
+    trivial <- vapply(
+      mappers,
+      function(x) {
+        inherits(x, "bm_index") && (ibm_n(x) == 1L)
+      },
+      logical(1)
+    )
     if (any(trivial)) {
       if (is.null(names(mappers))) {
         warning("Not removing trivial sub-mappers in unnamed bm_multi.")
@@ -3325,13 +3515,9 @@ bm_multi <- function(mappers, simplify = FALSE) {
   mapper <- list(
     mappers = mappers,
     n_multi = lapply(mappers, ibm_n),
-    n_inla_multi = lapply(mappers, function(x) {
-      ibm_n(x, inla_f = TRUE)
-    }),
+    n_inla_multi = lapply(mappers, ibm_n, inla_f = TRUE),
     values_multi = lapply(mappers, ibm_values),
-    values_inla_multi = lapply(mappers, function(x) {
-      ibm_values(x, inla_f = TRUE)
-    }),
+    values_inla_multi = lapply(mappers, ibm_values, inla_f = TRUE),
     is_linear_multi = lapply(mappers, ibm_is_linear),
     is_rowwise_multi = lapply(mappers, ibm_is_rowwise)
   )
@@ -3391,10 +3577,7 @@ ibm_n_output.bm_multi <- function(mapper, input, ...) {
 #' @export
 #' @rdname ibm_values
 #'
-ibm_values.bm_multi <- function(mapper,
-                                inla_f = FALSE,
-                                multi = FALSE,
-                                ...) {
+ibm_values.bm_multi <- function(mapper, inla_f = FALSE, multi = FALSE, ...) {
   if (multi) {
     vals <- if (inla_f) {
       mapper[["values_inla_multi"]]
@@ -3467,13 +3650,15 @@ bm_multi_prepare_input <- function(mapper, input) {
 #' @param sub_A Internal; precomputed Jacobian matrices.
 #' @export
 #'
-ibm_jacobian.bm_multi <- function(mapper,
-                                  input,
-                                  state = NULL,
-                                  inla_f = FALSE,
-                                  multi = FALSE,
-                                  ...,
-                                  sub_A = NULL) {
+ibm_jacobian.bm_multi <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...,
+  sub_A = NULL
+) {
   input <- bm_multi_prepare_input(mapper, input)
 
   # Note: the multi-mapper only handles linear/affine sub-mappers.
@@ -3482,7 +3667,8 @@ ibm_jacobian.bm_multi <- function(mapper,
       lapply(
         names(mapper[["mappers"]]),
         function(x) {
-          ibm_jacobian(mapper[["mappers"]][[x]],
+          ibm_jacobian(
+            mapper[["mappers"]][[x]],
             input = input[[x]],
             state = NULL,
             inla_f = inla_f,
@@ -3498,20 +3684,19 @@ ibm_jacobian.bm_multi <- function(mapper,
   # (A1, A2, A3) -> rowkron(A3, rowkron(A2, A1))
   A_ <- sub_A[[1]]
   for (k in seq_len(length(mapper[["mappers"]]) - 1)) {
-    A_ <- fm_row_kron(sub_A[[k + 1]], A_)
+    A_ <- fmesher::fm_row_kron(sub_A[[k + 1]], A_)
   }
   A_
 }
 
 
 #' @export
-#' @rdname ibm_linear
+#' @rdname ibm_as_taylor
 #'
-ibm_linear.bm_multi <- function(mapper, input, state,
-                                inla_f = FALSE,
-                                ...) {
+ibm_as_taylor.bm_multi <- function(mapper, input, state, inla_f = FALSE, ...) {
   eval2 <- ibm_eval2(
-    mapper, input,
+    mapper,
+    input,
     state = state,
     inla_f = inla_f,
     multi = FALSE,
@@ -3531,12 +3716,17 @@ ibm_linear.bm_multi <- function(mapper, input, state,
 #' supplied by internal methods that already have the Jacobian.
 #' @param pre_A `r lifecycle::badge("deprecated")` in favour of `jacobian`.
 #' @export
-#' @rdname ibm_eval
+#' @rdname ibm_eval_methods
 #'
-ibm_eval.bm_multi <- function(mapper, input, state = NULL,
-                              inla_f = FALSE, ...,
-                              jacobian = NULL,
-                              pre_A = deprecated()) {
+ibm_eval.bm_multi <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...,
+  jacobian = NULL,
+  pre_A = deprecated()
+) {
   input <- bm_multi_prepare_input(mapper, input)
 
   if (ibm_n(mapper) == 0L) {
@@ -3544,7 +3734,8 @@ ibm_eval.bm_multi <- function(mapper, input, state = NULL,
     # is constant (mapper_const or a pipe that is state-invariant)
     val <- 0
     m <- names(mapper[["mappers"]])[1]
-    val_add <- ibm_eval(mapper[["mappers"]][[m]],
+    val_add <- ibm_eval(
+      mapper[["mappers"]][[m]],
       input = input[[m]],
       state = NULL,
       inla_f = inla_f,
@@ -3556,7 +3747,8 @@ ibm_eval.bm_multi <- function(mapper, input, state = NULL,
 
   val <- rep(0, ibm_n_output(mapper, input, state = state, inla_f = inla_f))
   for (m in names(mapper[["mappers"]])) {
-    val_add <- ibm_eval(mapper[["mappers"]][[m]],
+    val_add <- ibm_eval(
+      mapper[["mappers"]][[m]],
       input = input[[m]],
       state = NULL,
       inla_f = inla_f,
@@ -3566,9 +3758,13 @@ ibm_eval.bm_multi <- function(mapper, input, state = NULL,
   }
   if ((ibm_n(mapper) > 0) && !is.null(state)) {
     if (is.null(jacobian)) {
-      jacobian <- ibm_jacobian(mapper,
-        input = input, state = state,
-        inla_f = inla_f, multi = FALSE, ...
+      jacobian <- ibm_jacobian(
+        mapper,
+        input = input,
+        state = state,
+        inla_f = inla_f,
+        multi = FALSE,
+        ...
       )
     }
     val <- val + jacobian %*% state
@@ -3608,12 +3804,14 @@ bm_multi_indexing <- function(mapper, input) {
 #' with unnamed but ordered columns.
 #' @export
 #'
-ibm_invalid_output.bm_multi <- function(mapper,
-                                        input,
-                                        state,
-                                        inla_f = FALSE,
-                                        multi = FALSE,
-                                        ...) {
+ibm_invalid_output.bm_multi <- function(
+  mapper,
+  input,
+  state,
+  inla_f = FALSE,
+  multi = FALSE,
+  ...
+) {
   indexing <- bm_multi_indexing(mapper, input)
   if (is.matrix(input)) {
     invalid <-
@@ -3772,6 +3970,7 @@ ibm_invalid_output.bm_multi <- function(mapper,
 #'
 #'   The period for the first order harmonics is shifted and scaled to match
 #'   `interval`.
+#' @returns A `bm_harmonics` mapper object.
 #' @export
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
@@ -3781,10 +3980,12 @@ ibm_invalid_output.bm_multi <- function(mapper,
 #'
 #' @rdname bm_harmonics
 #'
-bm_harmonics <- function(order = 1,
-                         scaling = 1,
-                         intercept = TRUE,
-                         interval = c(0, 1)) {
+bm_harmonics <- function(
+  order = 1,
+  scaling = 1,
+  intercept = TRUE,
+  interval = c(0, 1)
+) {
   if (length(scaling) == 1) {
     scaling <- rep(scaling, intercept + order)
   } else {
@@ -3816,11 +4017,13 @@ ibm_n.bm_harmonics <- function(mapper, inla_f = FALSE, ...) {
 #' @export
 #' @rdname ibm_jacobian
 #'
-ibm_jacobian.bm_harmonics <- function(mapper,
-                                      input,
-                                      state = NULL,
-                                      inla_f = FALSE,
-                                      ...) {
+ibm_jacobian.bm_harmonics <- function(
+  mapper,
+  input,
+  state = NULL,
+  inla_f = FALSE,
+  ...
+) {
   # Indexing into sparseMatrix is slower than into a dense Matrix,
   # and indexing into a dense Matrix is slower than for a plain matrix(),
   # including conversion to dense Matrix afterwards.
@@ -3855,6 +4058,7 @@ ibm_jacobian.bm_harmonics <- function(mapper,
 #'   equivalent to `bm_pipe(list(bm_matrix(ncol(B)), mapper))`, but with an
 #'   internally stored matrix input `B` for efficiency, and allowing the mapper
 #'   `input` format to be identical to that of the original `mapper`.
+#' @returns A `bm_reparam` mapper object.
 #' @seealso [bru_mapper], [bru_mapper_generics]
 #' @family mappers
 #' @rdname bm_reparam
@@ -3881,8 +4085,7 @@ bm_reparam <- function(mapper, B) {
 }
 
 
-#' @title Deprecated basis conversion mapper
-#' @description `r lifecycle::badge("deprecated")`
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")`
 #'  Old deprecated name for [bm_reparam()]
 #' @param mesh Object supported by a [bru_mapper()] method.
 #' @param B a square or tall basis conversion matrix
@@ -3893,7 +4096,7 @@ bm_mesh_B <- function(mesh, B) {
 }
 
 #' @export
-#' @describeIn bm_mesh_B `r lifecycle::badge("deprecated")`
+#' @describeIn inlabru-deprecated `r lifecycle::badge("deprecated")`
 #'   Deprecated name for `bm_mesh_B`
 bru_mapper_mesh_B <- function(...) {
   bm_mesh_B(...)
@@ -3928,9 +4131,14 @@ ibm_jacobian.bm_reparam <- function(mapper, input, state = NULL, ...) {
   A %*% mapper[["B"]]
 }
 #' @export
-#' @rdname ibm_eval
-ibm_eval.bm_reparam <- function(mapper, input, state = NULL, ...,
-                                jacobian = NULL) {
+#' @rdname ibm_eval_methods
+ibm_eval.bm_reparam <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  jacobian = NULL
+) {
   if (is.null(input)) {
     return(Matrix::Matrix(0, 0, ibm_n(mapper)))
   }

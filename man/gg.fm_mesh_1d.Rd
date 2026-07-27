@@ -55,14 +55,14 @@ if (require("fmesher", quietly = TRUE) &&
 
 }
 \seealso{
-Other geomes: 
-\code{\link{gg}()},
-\code{\link{gg.RasterLayer}()},
-\code{\link{gg.SpatRaster}()},
+Other geomes:
+\code{\link[=gg]{gg()}},
+\code{\link[=gg.RasterLayer]{gg.RasterLayer()}},
+\code{\link[=gg.SpatRaster]{gg.SpatRaster()}},
 \code{\link{gg.Spatial}},
-\code{\link{gg.data.frame}()},
-\code{\link{gg.fm_mesh_2d}()},
-\code{\link{gg.matrix}()},
-\code{\link{gg.sf}()}
+\code{\link[=gg.data.frame]{gg.data.frame()}},
+\code{\link[=gg.fm_mesh_2d]{gg.fm_mesh_2d()}},
+\code{\link[=gg.matrix]{gg.matrix()}},
+\code{\link[=gg.sf]{gg.sf()}}
 }
 \concept{geomes}

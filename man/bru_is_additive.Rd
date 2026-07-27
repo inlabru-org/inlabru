@@ -2,9 +2,14 @@
 % Please edit documentation in R/bru_is.R
 \name{bru_is_additive}
 \alias{bru_is_additive}
-\alias{bru_is_additive.character}
+\alias{bru_is_additive.default}
+\alias{bru_is_additive.numeric}
+\alias{bru_is_additive.name}
+\alias{bru_is_additive.call}
 \alias{bru_is_additive.expression}
+\alias{bru_is_additive.quosure}
 \alias{bru_is_additive.formula}
+\alias{bru_is_additive.character}
 \alias{bru_is_additive.bru_pred_expr}
 \alias{bru_is_additive.bru_obs}
 \alias{bru_is_additive.bru_obs_list}
@@ -12,11 +17,21 @@
 \usage{
 bru_is_additive(x, ...)
 
-\method{bru_is_additive}{character}(x, ..., verbose = FALSE)
+\method{bru_is_additive}{default}(x, ..., verbose = FALSE)
+
+\method{bru_is_additive}{numeric}(x, ..., verbose = FALSE)
+
+\method{bru_is_additive}{name}(x, ..., verbose = FALSE)
+
+\method{bru_is_additive}{call}(x, ..., verbose = FALSE)
 
 \method{bru_is_additive}{expression}(x, ..., verbose = FALSE)
 
+\method{bru_is_additive}{quosure}(x, ..., verbose = FALSE)
+
 \method{bru_is_additive}{formula}(x, ..., verbose = FALSE)
+
+\method{bru_is_additive}{character}(x, ..., verbose = FALSE)
 
 \method{bru_is_additive}{bru_pred_expr}(x, ...)
 

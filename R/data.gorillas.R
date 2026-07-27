@@ -132,7 +132,7 @@ gorillas_sp <- function() {
     gcov_sp[[nm]] <- sp::SpatialPixelsDataFrame(
       cbind(gcov_$x, gcov_$y),
       data = gcov_[, nm, drop = FALSE],
-      proj4string = fm_CRS(gcov)
+      proj4string = fmesher::fm_CRS(gcov)
     )
   }
 

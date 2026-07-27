@@ -10,7 +10,7 @@ test_that("2D modelling on the globe", {
     )
   )
 
-  mesh <- fm_rcdt_2d_inla(globe = 2)
+  mesh <- fmesher::fm_rcdt_2d_inla(globe = 2)
 
   data <- data.frame(
     Long = rep(seq(-179, 179, length.out = 10), times = 10),
@@ -22,11 +22,12 @@ test_that("2D modelling on the globe", {
       y <- rpois(nrow(data), exp(1 + sin(Lat / 180 * pi) * 2))
     }
   )
-  data <- sf::st_as_sf(data,
+  data <- sf::st_as_sf(
+    data,
     coords = c("Long", "Lat"),
-    crs = fm_crs("longlat_globe")
+    crs = fmesher::fm_crs("longlat_globe")
   )
-  data <- fm_transform(data, crs = fm_crs("sphere"))
+  data <- fmesher::fm_transform(data, crs = fmesher::fm_crs("sphere"))
 
   matern <- INLA::inla.spde2.pcmatern(
     mesh,
@@ -70,27 +71,30 @@ test_that("2D LGCP modelling on the globe", {
     )
   )
 
-  mesh <- fm_rcdt_2d_inla(globe = 2, crs = fm_crs("sphere"))
+  mesh <- fmesher::fm_rcdt_2d_inla(globe = 2, crs = fmesher::fm_crs("sphere"))
 
   data <- data.frame(
     Long = rep(seq(0, 360 * 9 / 10, length.out = 10), times = 10),
-    Lat = 180 / pi * asin(rep(
-      seq(1 / 90, 89 / 90, length.out = 10)^0.5,
-      each = 10
-    ))
+    Lat = 180 /
+      pi *
+      asin(rep(
+        seq(1 / 90, 89 / 90, length.out = 10)^0.5,
+        each = 10
+      ))
   )
-  data <- sf::st_as_sf(data,
+  data <- sf::st_as_sf(
+    data,
     coords = c("Long", "Lat"),
-    crs = fm_crs("longlat_globe")
+    crs = fmesher::fm_crs("longlat_globe")
   )
-  data <- fm_transform(data, crs = fm_crs("sphere"))
+  data <- fmesher::fm_transform(data, crs = fmesher::fm_crs("sphere"))
 
   cmp <- geometry ~
     field(main = sf::st_coordinates(geometry), model = "fixed") +
     Intercept(1)
 
   expect_equal(
-    sum(fm_int(mesh)$weight),
+    sum(fmesher::fm_int(mesh)$weight),
     4 * pi
   )
 

@@ -126,45 +126,8 @@ bru_index.bru <- function(object, tag = NULL, what = NULL, ...) {
 #' @export
 #' @returns * `bru_index(bru_info)`: An `integer` vector.
 bru_index.bru_info <- function(object, tag = NULL, what = NULL, ...) {
-  bru_index(object[["lhoods"]], tag = tag, what = what, ...)
+  bru_index(as_bru_obs_list(object), tag = tag, what = what, ...)
 }
-
-#' @export
-#' @param object A [component].
-#' @param inla_f logical; when `TRUE`, must result in
-#' values compatible with `INLA::f(...)`
-#' an specification and corresponding `INLA::inla.stack(...)` constructions.
-#' @returns * `bru_index(bru_comp)`:
-#'   A list of indices into the latent variables compatible with the
-#'   component mapper.
-#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
-#'   Finn Lindgren \email{finn.lindgren@@gmail.com}
-#' @rdname bru_index
-
-bru_index.bru_comp <- function(object, inla_f, ...) {
-  idx <- ibm_values(object[["mapper"]], inla_f = inla_f, multi = TRUE)
-  if (is.null(idx)) {
-    return(list())
-  }
-  nms <- names(idx)
-  present <- match(nms, c("main", "group", "replicate"))
-  names(idx) <-
-    glue("{object[['label']]}{suffix}",
-      suffix = c("", ".group", ".repl")[present]
-    )
-  idx
-}
-
-
-#' @export
-#' @rdname bru_index
-#' @returns * `bru_index(bru_comp_list)`:
-#'   A list of list of indices into the latent variables compatible with each
-#'   component mapper.
-bru_index.bru_comp_list <- function(object, inla_f, ...) {
-  lapply(object, function(x) bru_index(x, inla_f = inla_f, ...))
-}
-
 
 #' @describeIn bru_index Compute all index values for a [bru_model()] object.
 #' Computes the index value matrices for included components according to the
@@ -186,6 +149,44 @@ bru_index.bru_model <- function(object, used, ...) {
     idx_inla = bru_index(comp_lst, inla_f = TRUE),
     inla_subset = inla_subset_eval(comp_lst)
   )
+}
+
+
+#' @export
+#' @param object A [component].
+#' @param inla_f logical; when `TRUE`, must result in
+#' values compatible with `INLA::f(...)`
+#' an specification and corresponding `INLA::inla.stack(...)` constructions.
+#' @returns * `bru_index(bru_comp)`:
+#'   A list of indices into the latent variables compatible with the
+#'   component mapper.
+#' @author Fabian E. Bachl \email{bachlfab@@gmail.com},
+#'   Finn Lindgren \email{finn.lindgren@@gmail.com}
+#' @rdname bru_index
+
+bru_index.bru_comp <- function(object, inla_f, ...) {
+  idx <- ibm_values(object[["mapper"]], inla_f = inla_f, multi = TRUE)
+  if (is.null(idx)) {
+    return(list())
+  }
+  nms <- names(idx)
+  present <- match(nms, c("main", "group", "replicate"))
+  names(idx) <-
+    glue(
+      "{object[['label']]}{suffix}",
+      suffix = c("", ".group", ".repl")[present]
+    )
+  idx
+}
+
+
+#' @export
+#' @rdname bru_index
+#' @returns * `bru_index(bru_comp_list)`:
+#'   A list of list of indices into the latent variables compatible with each
+#'   component mapper.
+bru_index.bru_comp_list <- function(object, inla_f, ...) {
+  lapply(object, bru_index, inla_f = inla_f, ...)
 }
 
 

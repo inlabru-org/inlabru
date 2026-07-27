@@ -44,17 +44,16 @@ glplot <- function(object, ...) {
 #'   plot.
 #' @param color vector of R color characters. See material3d() for details.
 
-
 glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
   if (length(sp::coordnames(object)) < 3) {
     ll <- data.frame(object)
     ll$TMP.ZCOORD <- 0
     sp::coordinates(ll) <- c(sp::coordnames(object), "TMP.ZCOORD")
-    sp::proj4string(ll) <- fm_CRS(object)
+    sp::proj4string(ll) <- fmesher::fm_CRS(object)
     object <- ll
   }
 
-  object <- fm_transform(object, crs = fm_crs("sphere"))
+  object <- fmesher::fm_transform(object, crs = fmesher::fm_crs("sphere"))
   cc <- sp::coordinates(object)
   requireNamespace("rgl")
   rgl::points3d(
@@ -74,32 +73,45 @@ glplot.SpatialPoints <- function(object, add = TRUE, color = "red", ...) {
 
 glplot.SpatialLines <- function(object, add = TRUE, ...) {
   qq <- sp::coordinates(object)
-  sp <- do.call(rbind, lapply(qq, function(k) {
-    do.call(rbind, lapply(k, function(x) {
-      x[1:(nrow(x) - 1), ]
-    }))
-  }))
-  ep <- do.call(rbind, lapply(qq, function(k) {
-    do.call(rbind, lapply(k, function(x) {
-      x[2:(nrow(x)), ]
-    }))
-  }))
+  sp <- do.call(
+    rbind,
+    lapply(qq, function(k) {
+      do.call(
+        rbind,
+        lapply(k, function(x) {
+          x[1:(nrow(x) - 1), ]
+        })
+      )
+    })
+  )
+  ep <- do.call(
+    rbind,
+    lapply(qq, function(k) {
+      do.call(
+        rbind,
+        lapply(k, function(x) {
+          x[2:(nrow(x)), ]
+        })
+      )
+    })
+  )
   sp <- data.frame(x = sp[, 1], y = sp[, 2], z = 0)
   ep <- data.frame(x = ep[, 1], y = ep[, 2], z = 0)
 
   sp::coordinates(sp) <- c("x", "y", "z")
   sp::coordinates(ep) <- c("x", "y", "z")
-  sp::proj4string(sp) <- fm_CRS(object)
-  sp::proj4string(ep) <- fm_CRS(object)
+  sp::proj4string(sp) <- fmesher::fm_CRS(object)
+  sp::proj4string(ep) <- fmesher::fm_CRS(object)
 
-  sp <- fm_transform(sp, crs = fm_crs("sphere"))
-  ep <- fm_transform(ep, crs = fm_crs("sphere"))
+  sp <- fmesher::fm_transform(sp, crs = fmesher::fm_crs("sphere"))
+  ep <- fmesher::fm_transform(ep, crs = fmesher::fm_crs("sphere"))
 
   cs <- sp::coordinates(sp)
   ce <- sp::coordinates(ep)
   na <- matrix(NA, ncol = 3, nrow = nrow(cs))
 
-  mm <- matrix(t(cbind(cs, ce, na)),
+  mm <- matrix(
+    t(cbind(cs, ce, na)),
     ncol = 3,
     nrow = 3 * nrow(ce),
     byrow = TRUE
@@ -124,7 +136,11 @@ glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
   if (object$manifold == "S2") {
     # mesh$loc = mesh$loc
   } else {
-    object <- fm_transform(object, crs = fm_crs("sphere"), passthrough = TRUE)
+    object <- fmesher::fm_transform(
+      object,
+      crs = fmesher::fm_crs("sphere"),
+      passthrough = TRUE
+    )
   }
 
   if (is.null(col)) {
@@ -146,15 +162,20 @@ glplot.fm_mesh_2d <- function(object, add = TRUE, col = NULL, ...) {
 #' @param axes If TRUE, plot x, y and z axes.
 #' @param box If TRUE, plot a box around the globe.
 #' @param xlab,ylab,zlab Axes labels
-globe <- function(R = 1,
-                  R.grid = 1.05,
-                  specular = "black",
-                  axes = FALSE,
-                  box = FALSE,
-                  xlab = "", ylab = "", zlab = "") {
+globe <- function(
+  R = 1,
+  R.grid = 1.05,
+  specular = "black",
+  axes = FALSE,
+  box = FALSE,
+  xlab = "",
+  ylab = "",
+  zlab = ""
+) {
   # coordinates for texture
   n.smp <- 50
-  lat <- matrix(-asin(seq(-1, 1, length.out = n.smp)),
+  lat <- matrix(
+    -asin(seq(-1, 1, length.out = n.smp)),
     n.smp,
     n.smp,
     byrow = TRUE
@@ -166,7 +187,10 @@ globe <- function(R = 1,
 
   # globe and texture
   requireNamespace("rgl")
-  rgl::persp3d(x, y, z,
+  rgl::persp3d(
+    x,
+    y,
+    z,
     col = "white",
     texture = system.file("misc", "Lambert_ocean.png", package = "inlabru"),
     specular = "black",

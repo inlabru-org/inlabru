@@ -19,7 +19,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
   fit <- bru(
     comp,
     bru_obs(
-      z ~ fm_block_eval(
+      z ~ fmesher::fm_block_eval(
         block = grp,
         n_block = nrow(obs),
         weights = weights,
@@ -57,7 +57,7 @@ test_that("Aggregated Gaussian observations, using fm_block_eval", {
   fit_sf <- bru(
     comp_sf,
     bru_obs(
-      z ~ fm_block_eval(
+      z ~ fmesher::fm_block_eval(
         block = grp,
         weights = weights,
         rescale = TRUE,
@@ -102,6 +102,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   domain <- list()
 
   comp <- ~ Intercept(1) + x + y
+  comp_list <- bru_comp_list(comp)
 
   fit <- bru(
     comp,
@@ -158,7 +159,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   # Missing block information
   expect_error(
     {
-      bru_obs(
+      obs_ <- bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
@@ -177,6 +178,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
           )
         )
       )
+      inp <- bru_input(obs_, comp_list)
     },
     paste0(
       "Aggregation requested, but `aggregate_input[['block']]` ",
@@ -188,7 +190,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
   # Character block information without matching response block information
   expect_error(
     {
-      bru_obs(
+      obs_ <- bru_obs(
         z ~ Intercept + x + y,
         family = "normal",
         response_data = obs,
@@ -208,6 +210,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
           )
         )
       )
+      inp <- bru_input(obs_, comp_list)
     },
     paste0(
       "'character' aggregation block information detected."
@@ -215,7 +218,38 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     fixed = TRUE
   )
 
-  # Character block information without match response block information
+  # Character block information with matching response block information
+  local_bru_options_set(bru_method = list(agg = "pandemic"))
+  expect_warning(
+    {
+      expect_no_error({
+        bru_obs(
+          z ~ Intercept + x + y,
+          family = "normal",
+          response_data = obs,
+          data = pred,
+          aggregate = "average",
+          aggregate_input = list(
+            weights = weights,
+            block = grp_char,
+            n_block = bru_response_size(.response_data.),
+            block_response = "the_group_char"
+          ),
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = 6,
+                fixed = TRUE
+              )
+            )
+          )
+        )
+      })
+    },
+    "Using `block_response` in `aggregate_input` was deprecated in inlabru",
+    fixed = TRUE
+  )
+
   expect_no_error({
     bru_obs(
       z ~ Intercept + x + y,
@@ -226,9 +260,9 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
       aggregate_input = list(
         weights = weights,
         block = grp_char,
-        n_block = bru_response_size(.response_data.),
-        block_response = "the_group_char"
+        n_block = bru_response_size(.response_data.)
       ),
+      response_block = the_group_char,
       control.family = list(
         hyper = list(
           prec = list(
@@ -239,6 +273,36 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
       )
     )
   })
+
+  local_bru_options_set(bru_method = list(autodiff = "fullchain"))
+  expect_warning(
+    {
+      expect_no_error({
+        bru_obs(
+          z ~ Intercept + x + y,
+          family = "normal",
+          response_data = obs,
+          data = pred,
+          aggregate = "average",
+          aggregate_input = list(
+            weights = weights,
+            block = grp_char,
+            n_block = bru_response_size(.response_data.),
+            block_response = "the_group_char"
+          ),
+          control.family = list(
+            hyper = list(
+              prec = list(
+                initial = 6,
+                fixed = TRUE
+              )
+            )
+          )
+        )
+      })
+    },
+    "Using `block_response` in `aggregate_input` was deprecated in inlabru"
+  )
 })
 
 
@@ -277,9 +341,11 @@ test_that("Aggregated Gaussian observations, using domain/samplers feature", {
         )
       )
     ),
-    options = list(control.inla = list(
-      int.strategy = "eb"
-    ))
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
   )
 
   expect_equal(
@@ -468,4 +534,261 @@ test_that("Aggregated Gaussian observations, using mapper", {
     c(3.033, 4.426),
     tolerance = midtol
   )
+})
+
+
+test_that("New method `fullchain` works", {
+  skip_on_cran()
+  local_bru_safe_inla()
+
+  obs <- data.frame(
+    x = c(10, 20, 30),
+    z = c(10, 20, 30)
+  )
+  pred <- data.frame(
+    y = c((1 + 20) / 2, (3 + 40 + 5) / 3, 60)
+  )
+  domain <- list(x = 1:6)
+  samplers <- list(x = list(1:2, 3:5, 6))
+
+  comp <- ~ Intercept(1) + x + y
+
+  local_bru_options_set(
+    bru_method = list(
+      agg = "pandemic",
+      autodiff = "pandemic"
+    )
+  )
+  fit <- bru(
+    comp,
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      domain = domain,
+      samplers = samplers,
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    ),
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+
+  expect_equal(
+    fit$summary.fixed$mean,
+    c(3.636, 3.889, 0.0505),
+    tolerance = midtol
+  )
+
+  obs_list <- as_bru_obs_list(fit)
+  comp_list <- as_bru_comp_list(fit)
+  comp_mappers <- as_bm_list(comp_list)
+  ibm_eval(
+    obs_list,
+    bru_input(
+      fit$bru_info$model
+    ),
+    state = list(Intercept = 1, x = 2, y = 3),
+    comp_mappers = comp_mappers
+  )
+
+  local_bru_options_set(
+    bru_method = list(
+      agg = "pandemic",
+      autodiff = "fullchain"
+    )
+  )
+  fit2 <- bru(
+    comp,
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      domain = domain,
+      samplers = samplers,
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    ),
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+
+  expect_equal(
+    fit2$summary.fixed$mean,
+    c(3.636, 3.889, 0.0505),
+    tolerance = midtol
+  )
+
+  obs2_list <- as_bru_obs_list(fit2)
+  comp2_list <- as_bru_comp_list(fit2)
+  comp2_mappers <- as_bm_list(comp2_list)
+  ibm_eval(
+    obs2_list,
+    bru_input(
+      fit2$bru_info$model
+    ),
+    state = list(Intercept = 1, x = 2, y = 3),
+    comp_mappers = comp2_mappers
+  )
+
+  local_bru_options_set(
+    bru_method = list(
+      agg = "fullchain",
+      autodiff = "fullchain"
+    )
+  )
+  fit3 <- bru(
+    comp,
+    bru_obs(
+      z ~ Intercept + x + y,
+      family = "normal",
+      response_data = obs,
+      data = pred,
+      aggregate = "average",
+      domain = domain,
+      samplers = samplers,
+      control.family = list(
+        hyper = list(
+          prec = list(
+            initial = 6,
+            fixed = TRUE
+          )
+        )
+      )
+    ),
+    options = list(
+      control.inla = list(
+        int.strategy = "eb"
+      )
+    )
+  )
+
+  expect_equal(
+    fit3$summary.fixed$mean,
+    c(3.636, 3.889, 0.0505),
+    tolerance = midtol
+  )
+
+  obs3_list <- as_bru_obs_list(fit3)
+  comp3_list <- as_bru_comp_list(fit3)
+  comp3_mappers <- as_bm_list(comp3_list)
+  ibm_eval(
+    obs3_list,
+    bru_input(
+      fit3$bru_info$model
+    ),
+    state = list(Intercept = 1, x = 2, y = 3),
+    comp_mappers = comp3_mappers
+  )
+
+  # bench::mark(A={
+  # local_bru_options_set(bru_method = list(
+  #   agg = "pandemic",
+  #   autodiff = "pandemic"
+  # ))
+  #   fit <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # B={local_bru_options_set(bru_method = list(
+  #     agg = "pandemic",
+  #     autodiff = "fullchain"
+  #   ))
+  #   fit2 <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # C={
+  #   local_bru_options_set(bru_method = list(
+  #     agg = "fullchain",
+  #     autodiff = "fullchain"
+  #   ))
+  #   fit3 <- bru(
+  #     comp,
+  #     bru_obs(
+  #       z ~ Intercept + exp(x) + y,
+  #       family = "normal",
+  #       response_data = obs,
+  #       data = pred,
+  #       aggregate = "average",
+  #       domain = domain,
+  #       samplers = samplers,
+  #       control.family = list(
+  #         hyper = list(
+  #           prec = list(
+  #             initial = 6,
+  #             fixed = TRUE
+  #           )
+  #         )
+  #       )
+  #     ),
+  #     options = list(control.inla = list(
+  #       int.strategy = "eb"
+  #     ))
+  #   )
+  # },
+  # check = FALSE
+  # )
 })

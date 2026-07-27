@@ -51,6 +51,10 @@ from \code{\link[=bru_input.bru_obs_list]{bru_input.bru_obs_list()}}.}
 
 \item{i}{indices specifying elements to extract}
 }
+\value{
+A \code{bru_comp_list} object, which is a named list of \code{bru_comp}
+objects.
+}
 \description{
 Constructor methods for inlabru component lists. Syntax details are given in
 \code{\link[=bru_comp]{bru_comp()}}.
@@ -99,11 +103,8 @@ eff <- bru_comp_list(~ myLinearEffectOfX(x))
 eff <- bru_comp("myLinearEffectOfX", main = x, model = "linear")
 }
 \seealso{
-Other component constructors: 
-\code{\link{bru_comp}()}
-
-Other component constructors: 
-\code{\link{bru_comp}()}
+Other component constructors:
+\code{\link[=bru_comp]{bru_comp()}}
 }
 \author{
 Fabian E. Bachl \email{bachlfab@gmail.com} and

@@ -4,11 +4,14 @@
 \alias{bru_timings_plot}
 \title{Plot inlabru iteration timings}
 \usage{
-bru_timings_plot(x)
+bru_timings_plot(x, log = FALSE)
 }
 \arguments{
 \item{x}{a \link{bru} object, typically a result from \code{\link[=bru]{bru()}} for a nonlinear
 predictor model}
+
+\item{log}{logical; if \code{TRUE}, the y-axis is on a log scale.
+Default is \code{FALSE}.}
 }
 \description{
 Draws the time per iteration for preprocessing (including linearisation),

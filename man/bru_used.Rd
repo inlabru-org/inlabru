@@ -5,6 +5,7 @@
 \alias{bru_used.NULL}
 \alias{bru_used.default}
 \alias{bru_used.bru}
+\alias{bru_used.bru_model}
 \alias{bru_used.bru_info}
 \alias{bru_used.list}
 \alias{bru_used.bru_obs}
@@ -22,6 +23,8 @@ bru_used(x = NULL, ...)
 \method{bru_used}{default}(x, ...)
 
 \method{bru_used}{bru}(x, ..., join = TRUE)
+
+\method{bru_used}{bru_model}(x, ..., join = TRUE)
 
 \method{bru_used}{bru_info}(x, ..., join = TRUE)
 
@@ -69,6 +72,9 @@ supplied, also calls \code{\link[=bru_used_update]{bru_used_update()}} on the \c
 \item \code{bru_used(bru)}: Extract the \code{bru_used} information for the collection
 of observation models used in a \code{bru} object.
 
+\item \code{bru_used(bru_model)}: Extract the \code{bru_used} information for the collection
+of observation models used in a \code{bru_model} object.
+
 \item \code{bru_used(bru_info)}: Extract the \code{bru_used} information for the collection
 of observation models used in a \code{bru_info} object.
 
@@ -100,15 +106,15 @@ if \code{labels} is non-NULL.
 bru_used(used, labels = c("a", "c"))
 (used <- new_bru_used(~ a + b + c_latent + d_latent))
 bru_used(used, labels = c("a", "c"))
-(used <- new_bru_used(expression(a + b + c_latent + d_latent)))
+(used <- new_bru_used(~ a_eval(.latent$c)))
 bru_used(used, labels = c("a", "c"))
 
 }
 \seealso{
-Other bru_used: 
-\code{\link{bru_used_update}()},
-\code{\link{bru_used_vars}()},
-\code{\link{new_bru_used}()}
+Other bru_used:
+\code{\link[=bru_used_update]{bru_used_update()}},
+\code{\link[=bru_used_vars]{bru_used_vars()}},
+\code{\link[=new_bru_used]{new_bru_used()}}
 }
 \concept{bru_used}
 \keyword{internal}

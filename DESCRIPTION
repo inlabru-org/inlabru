@@ -1,7 +1,7 @@
 Package: inlabru
 Type: Package
 Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
-Version: 2.14.1
+Version: 2.15.0
 Authors@R: c(
   person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
          role = c("aut", "cre", "cph"),
@@ -19,28 +19,34 @@ Authors@R: c(
   person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk",
          role = c("ctb", "dtc", "cph"),
          comment = "Lindesay Scott-Howard provided MRSea data import code"),
-  person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"),
+  person("Andy", "Seaton", email = "andy.e.seaton@gmail.com", role = c("ctb"),
          comment = "Andy Seaton provided testing, bugfixes, and vignettes"),
-  person("Suen", "Man Ho", email = "m.suen19@imperial.ac.uk", role = c("ctb", "cph"),
+  person("Man Ho", "Suen", email = "m.suen19@imperial.ac.uk", role = c("ctb", "cph"),
          comment = c(ORCID = "0009-0003-2281-0776",
                      "Man Ho Suen contributed features for aggregated responses and vignette updates")),
-  person("Roudier", "Pierre", email = "", role = c("ctb", "cph"),
+  person("Pierre", "Roudier", email = "", role = c("ctb", "cph"),
          comment = "Pierre Roudier contributed general quantile summaries"),
-  person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
+  person("Tim", "Meehan", email = "tmeeha@gmail.com", role = c("ctb", "cph"),
          comment = "Tim Meehan contributed the SVC vignette and robins data"),
-  person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"),
+  person("Niharika", "Reddy Peddinenikalva", role = c("ctb", "cph"),
          comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette"),
-  person("Perepolkin", "Dmytro", email = "dperepolkin@gmail.com",
+  person("Dmytro", "Perepolkin", email = "dperepolkin@gmail.com",
          role = c("ctb", "cph"),
-         comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette")
+         comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette"),
+  person("Novica", "Nakov", email = "nnovica@gmail.com", role = c("ctb"),
+         comment = c(ORCID = "0009-0005-7773-7718")),
+  person("Hans", "Montcho", email = "hansmontcho@yahoo.fr",
+         role = c("ctb", "cph"),
+         comment = c(ORCID = "0000-0003-2510-2102",
+                     "Hans Montcho contributed features for joint cross validation"))       
   )
 URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
 BugReports: https://github.com/inlabru-org/inlabru/issues
-Description: Facilitates spatial and general latent Gaussian modeling using
+Description: Facilitates spatial and general latent Gaussian modelling using
   integrated nested Laplace approximation via the INLA package (<https://www.r-inla.org>).
   Additionally, extends the GAM-like model class to more general nonlinear predictor
   expressions, and implements a log Gaussian Cox process likelihood for 
-  modeling univariate and spatial point processes based on ecological survey data.
+  modelling univariate and spatial point processes based on ecological survey data.
   Model components are specified with general inputs and mapping methods to the
   latent variables, and the predictors are specified via general R expressions,
   with separate expressions for each observation likelihood model in
@@ -50,26 +56,25 @@ Description: Facilitates spatial and general latent Gaussian modeling using
   <doi:10.1111/2041-210X.13168>.
 License: GPL (>= 2)
 Additional_repositories: https://inla.r-inla-download.org/R/testing
-RoxygenNote: 7.3.3
 Encoding: UTF-8
 Depends:
     methods,
-    R (>= 4.1.0),
-    stats
+    R (>= 4.1.0)
 Imports:
     dplyr,
     fmesher (>= 0.7.0),
+    generics,
     glue,
     lifecycle,
     MatrixModels,
     Matrix,
-    plyr,
+    Rcpp,
     rlang,
     sf,
+    stats,
     tibble,
     utils,
-    withr,
-    Rcpp
+    withr
 Suggests:
     covr,
     ggplot2,
@@ -96,7 +101,8 @@ Suggests:
     tidyterra,
     testthat (>= 3.2.0),
     tidyr,
-    DiagrammeR
+    DiagrammeR,
+    doclisting
 Enhances:
     stars
 Roxygen: list(markdown = TRUE)
@@ -129,14 +135,18 @@ Collate:
     'effect.R'
     'environment.R'
     'fmesher.R'
+    'gcpo.R'
     'ggplot.R'
     'hexagon_tiling.R'
     'mappers.R'
     'hierarchical_basis.R'
     'inla.R'
     'inlabru-package.R'
+    'inlabru-reexports.R'
+    'legacy_methods.R'
     'local_testthat.R'
     'mapper_collect.R'
+    'mapper_expr.R'
     'mapper_repeat.R'
     'mapper_sum.R'
     'model.R'
@@ -149,6 +159,7 @@ Collate:
     'spatstat.R'
     'spde.R'
     'stack.R'
+    'tidiers.R'
     'track_plotting.R'
     'transformation.R'
     'used.R'
@@ -159,3 +170,4 @@ LazyData: true
 LazyDataCompression: xz
 LinkingTo: 
     Rcpp
+Config/roxygen2/version: 8.0.0

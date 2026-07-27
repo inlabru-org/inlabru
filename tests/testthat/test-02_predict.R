@@ -7,15 +7,18 @@ test_that("bru: factor component", {
 
   input.df <- data.frame(x = cos(1:10), zz = rep(c(1, 10), each = 5))
   input.df <- within(input.df, {
-    y <- 5 + 2 * cos(1:10) +
+    y <- 5 +
+      2 * cos(1:10) +
       rnorm(10, mean = 0, sd = 1)[zz] +
       rnorm(10, mean = 0, sd = 0.1)
   })
 
   # Fit a model with fixed effect 'x' and intercept 'Intercept'
 
-  fit <- bru(y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
-    family = "gaussian", data = input.df
+  fit <- bru(
+    y ~ x + z(zz, model = "iid", mapper = bm_index(10)),
+    family = "gaussian",
+    data = input.df
   )
 
   # Predict posterior statistics of 'x'
@@ -60,13 +63,14 @@ test_that("bru: factor component", {
   # The default statistics include mean, standard deviation,
   # the 2.5% quantile, the median, the 97.5% quantile
   expect_true(is.data.frame(xpost))
-  expect_equal(nrow(xpost), 1)
+  expect_identical(nrow(xpost), 1L)
 
   expect_true(is.data.frame(xpost2))
-  expect_equal(nrow(xpost2), 4)
-  expect_equal(rownames(xpost2), c("a", "b", "a_b", "c"))
+  expect_identical(nrow(xpost2), 4L)
+  expect_identical(rownames(xpost2), c("a", "b", "a_b", "c"))
 
-  xipost <- generate(fit,
+  xipost <- generate(
+    fit,
     newdata = NULL,
     formula = ~ c(
       Intercept = Intercept_latent,
@@ -77,8 +81,7 @@ test_that("bru: factor component", {
   )
 
   expect_true(is.matrix(xipost))
-  expect_equal(rownames(xipost), c("Intercept", "x"))
-
+  expect_identical(rownames(xipost), c("Intercept", "x"))
 
   # Evaluate effect with _eval feature
 
@@ -94,12 +97,12 @@ test_that("bru: factor component", {
   )
 
   # The first four rows should equal the last 5 rows.
-  expect_equal(
+  expect_identical(
     xpost4[1:5, , drop = FALSE],
     xpost4[6:10, , drop = FALSE]
   )
   # The index 12 values should be equal.
-  expect_equal(
+  expect_identical(
     xpost4[4, , drop = FALSE],
     xpost4[5, , drop = FALSE]
   )
@@ -108,7 +111,6 @@ test_that("bru: factor component", {
     sum(xpost4[, 1] == xpost4[, 2]),
     0
   )
-
 
   xpost5 <- predict(
     fit,
@@ -119,10 +121,7 @@ test_that("bru: factor component", {
   )
 
   # sd for z(11) should be close to 1
-  expect_equal(mean(xpost5[2, "sd"]),
-    1,
-    tolerance = hitol
-  )
+  expect_equal(mean(xpost5[2, "sd"]), 1, tolerance = hitol)
 })
 
 
@@ -134,11 +133,11 @@ test_that("bru: predict with _eval", {
   withr::local_seed(1234L)
 
   data <- data.frame(
-    z = rnorm(5),
-    u = 1:5
+    z = rnorm(501),
+    u = seq(1, 5, length.out = 501)
   )
   u_mapper <- bru_mapper(
-    fm_mesh_1d(
+    fmesher::fm_mesh_1d(
       seq(1, 5, length.out = 51)
     ),
     indexed = FALSE
@@ -150,15 +149,19 @@ test_that("bru: predict with _eval", {
   )
 
   skip_if_not_installed("sn")
-  pred <- predict(
-    fit,
-    newdata = data.frame(u = seq(-1, 6, by = 0.1)),
-    formula = ~ data.frame(
-      A = fun,
-      B = fun_eval(u)
-    ),
-    n.samples = 10L
-  )
+  pred <- {
+    set.seed(123L)
+    predict(
+      fit,
+      newdata = data.frame(u = seq(-1, 6, by = 0.1)),
+      formula = ~ data.frame(
+        A = fun,
+        B = fun_eval(u)
+      ),
+      seed = 1234L,
+      n.samples = 10L
+    )
+  }
 
   expect_equal(pred$B, pred$A)
 })

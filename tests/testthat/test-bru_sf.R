@@ -33,7 +33,7 @@ test_that("sf gorillas lgcp vignette", {
   )
 
   ## Build the mesh:
-  mesh_sf <- fm_mesh_2d_inla(
+  mesh_sf <- fmesher::fm_mesh_2d_inla(
     boundary = boundary,
     max.edge = c(0.54, 0.97),
     min.angle = c(30, 21),
@@ -46,7 +46,7 @@ test_that("sf gorillas lgcp vignette", {
     ## Offset for extra boundaries, if needed.
     offset = c(0.73, 1.55),
     ## Build mesh in this crs:
-    crs = fm_crs(gorillas_sf$nests)
+    crs = fmesher::fm_crs(gorillas_sf$nests)
   )
 
   # library(ggplot2)
@@ -54,7 +54,8 @@ test_that("sf gorillas lgcp vignette", {
   #   gg(mesh_sf) +
   #   geom_sf(data = gorillas_sf$boundary, alpha = 0.2, fill = "blue")
 
-  matern <- INLA::inla.spde2.pcmatern(mesh_sf,
+  matern <- INLA::inla.spde2.pcmatern(
+    mesh_sf,
     prior.sigma = c(0.1, 0.01),
     prior.range = c(0.1, 0.01)
   )
