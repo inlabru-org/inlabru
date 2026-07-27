@@ -9,6 +9,28 @@ NULL
   if (is.null(seed)) expr else withr::with_seed(seed, expr)
 }
 
+.find_quant_lo_up_inla <- function(data) {
+  quant_names <- names(data)[grepl("^[01]\\.?[0-9]*quant$", names(data))]
+  if (length(quant_names) == 0) {
+    return(NULL)
+  }
+  quant_probs <- as.numeric(
+    sub("quant$", "", quant_names)
+  )
+  quant_names[c(which.min(quant_probs), which.max(quant_probs))]
+}
+.find_quant_lo_up_bru <- function(data) {
+  quant_names <- names(data)[grepl("^q[01]\\.?[0-9]*$", names(data))]
+  if (length(quant_names) == 0) {
+    return(NULL)
+  }
+  quant_probs <- as.numeric(
+    sub("quant$", "", quant_names)
+  )
+  quant_names[c(which.min(quant_probs), which.max(quant_probs))]
+}
+
+
 #' Tidy a bru model fit
 #'
 #' @param x A fitted `bru` object.
@@ -24,24 +46,26 @@ tidy.bru <- function(x, effects = "fixed", ...) {
     if (is.null(fe)) {
       stop("No fixed effects found in bru fit.")
     }
+    loup <- .find_quant_lo_up_inla(fe)
     tibble(
       term = rownames(fe),
       estimate = fe$mean,
       std.error = fe$sd,
-      conf.low = fe$`0.025quant`,
-      conf.high = fe$`0.975quant`
+      conf.low = fe[[loup[1]]],
+      conf.high = fe[[loup[2]]]
     )
   } else if (effects == "hyperpar") {
     hp <- x$summary.hyperpar
     if (is.null(hp)) {
       stop("No hyperparameters found in bru fit.")
     }
+    loup <- .find_quant_lo_up_inla(hp)
     tibble(
       term = rownames(hp),
       estimate = hp$mean,
       std.error = hp$sd,
-      conf.low = hp$`0.025quant`,
-      conf.high = hp$`0.975quant`
+      conf.low = hp[[loup[1]]],
+      conf.high = hp[[loup[2]]]
     )
   } else {
     stop("`effects` must be \"fixed\" or \"hyperpar\".")
@@ -147,12 +171,13 @@ augment.bru <- function(
     names(data),
     c(".fitted", ".fitted_low", ".fitted_high", ".fitted_sd")
   )] <- NULL
+  loup <- .find_quant_lo_up_bru(preds)
   bind_cols(
     data,
     tibble(
       .fitted = preds$mean,
-      .fitted_low = preds$q0.025,
-      .fitted_high = preds$q0.975,
+      .fitted_low = preds[[loup[1]]],
+      .fitted_high = preds[[loup[2]]],
       .fitted_sd = preds$sd
     )
   )
