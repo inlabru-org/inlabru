@@ -10,6 +10,7 @@
 # fmesher::fm_cprod
 # @export
 # fmesher::fm_crs
+#' @importFrom fmesher fm_int
 #' @export
 fmesher::fm_int
 # @export

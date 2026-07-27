@@ -67,7 +67,7 @@ if (require("ggplot2", quietly = TRUE)) {
     )
 }
 }
-\dontrun{
+\donttest{
 if (require("ggplot2", quietly = TRUE) &&
   require("sp", quietly = TRUE)) {
   mexdolphin <- mexdolphin_sp()
