@@ -808,6 +808,8 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 #'
 #' @param x a [bru] object, typically a result from [bru()] for a nonlinear
 #' predictor model
+#' @param log logical; if `TRUE`, the y-axis is on a log scale.
+#' Default is `FALSE`.
 #'
 #' @details Requires the "ggplot2" package to be installed.
 #' @export
@@ -816,7 +818,7 @@ make_inla_track_plots <- function(fit, from = 1, to = NULL) {
 #' fit <- bru(...)
 #' bru_timings_plot(fit)
 #' }
-bru_timings_plot <- function(x) {
+bru_timings_plot <- function(x, log = FALSE) {
   needed <- c("ggplot2")
   are_installed <-
     vapply(
@@ -838,13 +840,22 @@ bru_timings_plot <- function(x) {
 
   timings <- bru_timings(x)
 
+  scale_y <- function(..., log = FALSE) {
+    if (log) {
+      ggplot2::scale_y_log10(...)
+    } else {
+      ggplot2::scale_y_continuous(...)
+    }
+  }
+
   ggplot2::ggplot(
     tidyr::pivot_longer(
       dplyr::rename(timings, CPU = .data$Time),
       cols = c("CPU", "System", "Elapsed"),
       names_to = "Time",
       values_to = "Value"
-    )
+    ) |>
+      dplyr::mutate(Value = as.numeric(.data$Value))
   ) +
     ggplot2::geom_point(ggplot2::aes(
       .data$Iteration,
@@ -858,7 +869,7 @@ bru_timings_plot <- function(x) {
       col = .data$Task,
       linetype = .data$Time
     )) +
-    ggplot2::scale_y_continuous() +
+    scale_y(log = log) +
     ggplot2::ylab("Time (s)") +
     ggplot2::guides(
       color = ggplot2::guide_legend(title = "Task"),

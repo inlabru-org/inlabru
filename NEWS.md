@@ -2,6 +2,7 @@
 
 ## New features
 
+* New predictor evaluation and linearisation implementation (`2.14.1.9008`)
 * Add `tidy()`, `glance()`, and `augment()` methods for `bru` objects, to
   support the `broom` package tidying framework. Thanks to Novica Nakov
   (`2.14.1.9005`)
@@ -10,9 +11,10 @@
   Will automatically switch to INLA implementations if available, otherwise
   uses `zeroinflated*0` with the zero-probability fixed to `2e-9`.
   (`2.14.1.9007`)
-* New predictor evaluation and linearisation implementation (`2.14.1.9008`)
 * Improved `bru_used` variable detection, supporting pronoun and container
   object access detection. (`2.14.1.9010`)
+* Add `log` argument to `bru_timings_plot()` to allow logarithmic scaling of
+  the time axis (`2.14.1.9014`)
 
 ## Bug fixes
 
