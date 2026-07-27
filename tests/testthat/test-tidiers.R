@@ -1,4 +1,5 @@
-# TODO: Replace the brittle mockups with actual bru/bru_info/bru_model/bru_obs/etc
+# TODO: Replace the brittle mockups with actual
+# bru/bru_info/bru_model/bru_obs_list/etc
 # objects so that accessor methods can work properly when the data structure
 # templates change.
 
