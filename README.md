@@ -20,13 +20,13 @@ coverage](https://codecov.io/gh/inlabru-org/inlabru/graph/badge.svg)](https://ap
 <!-- badges: end -->
 
 The goal of [inlabru](http://inlabru.org) is to facilitate spatial
-modeling using integrated nested Laplace approximation via the [R-INLA
+modelling using integrated nested Laplace approximation via the [R-INLA
 package](https://www.r-inla.org). Additionally, extends the GAM-like
 model class to more general nonlinear predictor expressions, and
-implements a log Gaussian Cox process likelihood for modeling univariate
-and spatial point processes based on ecological survey data. Model
-components are specified with general inputs and mapping methods to the
-latent variables, and the predictors are specified via general R
+implements a log Gaussian Cox process likelihood for modelling
+univariate and spatial point processes based on ecological survey data.
+Model components are specified with general inputs and mapping methods
+to the latent variables, and the predictors are specified via general R
 expressions, with separate expressions for each observation likelihood
 model in multi-likelihood models. A prediction method based on fast
 Monte Carlo sampling allows posterior prediction of general expressions
@@ -40,7 +40,10 @@ and `citation("inlabru")`.
 The [inlabru.org](http://inlabru.org) website has links to old tutorials
 with code examples for versions up to 2.1.13. For later versions,
 updated versions of these tutorials, as well as new examples, can be
-found at <https://inlabru-org.github.io/inlabru/articles/>
+found at <https://inlabru-org.github.io/inlabru/articles/> for the
+latest CRAN/stable release, and at
+<https://inlabru-org.github.io/inlabru/dev/articles/> for the latest
+development version.
 
 ## Online documentation
 
@@ -66,13 +69,13 @@ matern <- inla.spde2.pcmatern(
   prior.sigma = c(0.1, 0.01),
   prior.range = c(0.01, 0.01)
 )
-cmp <- ~ mySmooth(geometry, model = matern) + Intercept(1)
+cmp <- ~ field(geometry, model = matern) + Intercept(1)
 # Fit LGCP model
 # This particular bru/bru_obs combination has a shortcut function lgcp() as well
 fit <- bru(
   cmp,
   bru_obs(
-    formula = geometry ~ .,
+    formula = geometry ~ ., # ~ . is a shortcut for adding all components
     family = "cp",
     data = gorillas_sf$nests,
     samplers = gorillas_sf$boundary,
@@ -85,7 +88,7 @@ fit <- bru(
 lambda <- predict(
   fit,
   fm_pixels(gorillas_sf$mesh, mask = gorillas_sf$boundary),
-  ~ exp(mySmooth + Intercept)
+  ~ exp(field + Intercept)
 )
 ```
 
