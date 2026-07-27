@@ -1,3 +1,7 @@
+# TODO: Replace the brittle mockups with actual bru/bru_info/bru_model/bru_obs/etc
+# objects so that accessor methods can work properly when the data structure
+# templates change.
+
 test_that("tidy.bru returns correct columns for fixed effects", {
   fe <- data.frame(
     mean = c(0.5, 1.2),
@@ -8,7 +12,7 @@ test_that("tidy.bru returns correct columns for fixed effects", {
     row.names = c("Intercept", "x1")
   )
   fake_fit <- structure(
-    list(summary.fixed = fe, bru_info = list(lhoods = list())),
+    list(summary.fixed = fe, bru_info = list(model = list(lhoods = list()))),
     class = c("bru", "inla")
   )
 
@@ -39,18 +43,23 @@ test_that("glance.bru returns one-row tibble with expected columns", {
       bru_info = structure(
         list(
           inlabru_version = as.character(utils::packageVersion("inlabru")),
-          lhoods = structure(
+          model = structure(
             list(
-              structure(
+              lhoods = structure(
                 list(
-                  response_data = data.frame(x = 1:15),
-                  response = "x",
-                  family = "normal"
+                  structure(
+                    list(
+                      response_data = data.frame(x = 1:15),
+                      response = "x",
+                      family = "normal"
+                    ),
+                    class = "bru_obs"
+                  )
                 ),
-                class = "bru_obs"
+                class = "bru_obs_list"
               )
             ),
-            class = "bru_obs_list"
+            class = "bru_model"
           )
         ),
         class = "bru_info"
@@ -76,19 +85,24 @@ test_that("glance.bru returns NA nobs for any point process fit", {
       bru_info = structure(
         list(
           inlabru_version = bru_ver,
-          lhoods = structure(
+          model = structure(
             list(
-              structure(
+              lhoods = structure(
                 list(
-                  response_data = data.frame(x = 1:10),
-                  response = "x",
-                  family = "cp",
-                  inla.family = "xpoisson"
+                  structure(
+                    list(
+                      response_data = data.frame(x = 1:10),
+                      response = "x",
+                      family = "cp",
+                      inla.family = "xpoisson"
+                    ),
+                    class = "bru_obs"
+                  )
                 ),
-                class = "bru_obs"
+                class = "bru_obs_list"
               )
             ),
-            class = "bru_obs_list"
+            class = "bru_model"
           )
         ),
         class = "bru_info"
@@ -105,7 +119,12 @@ test_that("glance.bru returns NA for missing fields gracefully", {
       bru_info = structure(
         list(
           inlabru_version = as.character(utils::packageVersion("inlabru")),
-          lhoods = list()
+          model = structure(
+            list(
+              lhoods = list()
+            )
+          ),
+          class = "bru_model"
         ),
         class = "bru_info"
       )
