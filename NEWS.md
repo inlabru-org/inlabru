@@ -1,5 +1,7 @@
 # inlabru (development version)
 
+* Improve default `is_rowwise` detection logic for `bru_obs()` (`2.15.0.9001`)
+
 # inlabru 2.15.0
 
 ## New features

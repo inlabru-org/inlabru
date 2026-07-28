@@ -2265,9 +2265,7 @@ bru_obs_handle_is_rowwise <- function(
     is_rowwise <- !allow_combine
   }
   if (!is.logical(is_rowwise)) {
-    if (!is.null(aggregate)) {
-      is_rowwise <- FALSE
-    } else if (!is.null(response_data)) {
+    if (is.null(aggregate) && !is.null(response_data)) {
       bru_log_warn(
         paste0(
           "Non-null response data supplied; ",

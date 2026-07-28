@@ -264,7 +264,11 @@ format.bru_pred_expr <- function(x, ...) {
     "    Used components: {format(used)}",
     predictor = bru_pred_expr(x, format = "formula_text"),
     is_additive = bru_is_additive(x),
-    is_rowwise = bru_is_rowwise(x),
+    is_rowwise = if (is.null(x[["is_rowwise"]])) {
+      "<Not set>"
+    } else {
+      bru_is_rowwise(x)
+    },
     used = bru_used(x)
   )
 }
