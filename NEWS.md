@@ -1,7 +1,8 @@
 # inlabru (development version)
 
 * Improve default `is_rowwise` detection logic for `bru_obs()` (`2.15.0.9001`)
-* Fix crash in multilikelihood aggregation model linearisation (`2.15.0.9002`)
+* Fix crash (issue #315) in multilikelihood aggregation model linearisation
+  (`2.15.0.9002`)
 
 # inlabru 2.15.0
 
