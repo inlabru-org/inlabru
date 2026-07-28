@@ -1104,7 +1104,7 @@ ibm_eval2.bru_obs <- function(
   # Combine jacobians from the expression mapper and the aggregate mapper.
   offset <- res3$offset
   B <- list()
-  for (nm in names(state)) {
+  for (nm in intersect(names(state), names(res2$jacobian))) {
     B[[nm]] <- res2$jacobian[[nm]]
     if (is.null(res3$jacobian)) {
       if (extended_scalar) {
