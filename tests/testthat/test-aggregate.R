@@ -161,6 +161,7 @@ test_that("Aggregated Gaussian observations, using aggregate feature", {
     {
       obs_ <- bru_obs(
         z ~ Intercept + x + y,
+        is_rowwise = TRUE,
         family = "normal",
         response_data = obs,
         data = c(as.list(pred), list(.block = NULL)),
