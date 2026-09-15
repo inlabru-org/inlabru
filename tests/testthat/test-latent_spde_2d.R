@@ -25,7 +25,8 @@ test_that("Georeferenced data with sf", {
   )
 
   # Check that mistaken empty or unnamed arguments are detected
-  cmp <- obs ~ Intercept(1) + field(geometry, model = matern)
+  # jarl-ignore missing_argument: Special debug use
+  cmp <- obs ~ Intercept(1) + field(geometry, model = matern, )
   expect_error(
     bru_comp_list(cmp),
     "Unnamed arguments detected in component .* position\\(s\\) 3"
