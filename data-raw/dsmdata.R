@@ -88,11 +88,11 @@ import.dsmdata <- function(dsmdata, covar.col = NA) {
   loc <- loc[ok, , drop = FALSE]
   inner <- fmesher::fm_nonconvex_hull(
     loc,
-    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20,
+    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 20
   )
   outer <- fmesher::fm_nonconvex_hull(
     loc,
-    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2,
+    convex = min(diff(range(loc[, 1])), diff(range(loc[, 2]))) / 2
   )
   mesh <- fmesher::fm_mesh_2d_inla(
     boundary = list(inner, outer),

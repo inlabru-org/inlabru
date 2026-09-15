@@ -62,10 +62,10 @@ test_that("bru: factor component", {
 
   # The default statistics include mean, standard deviation,
   # the 2.5% quantile, the median, the 97.5% quantile
-  expect_true(is.data.frame(xpost))
+  expect_s3_class(xpost, "data.frame")
   expect_identical(nrow(xpost), 1L)
 
-  expect_true(is.data.frame(xpost2))
+  expect_s3_class(xpost, "data.frame")
   expect_identical(nrow(xpost2), 4L)
   expect_identical(rownames(xpost2), c("a", "b", "a_b", "c"))
 

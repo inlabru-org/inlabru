@@ -275,7 +275,7 @@ ggplot(data = Nest) +
       x = N,
       ymin = mean - 2 * mean.mc_std_err,
       ymax = mean + 2 * mean.mc_std_err,
-      fill = Method,
+      fill = Method
     ),
     alpha = 0.2
   ) +

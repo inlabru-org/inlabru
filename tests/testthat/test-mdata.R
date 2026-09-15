@@ -260,7 +260,7 @@ test_that("surv", {
     bru_obs(
       INLA::inla.surv(time, event) ~ .,
       family = "weibullsurv",
-      data = df,
+      data = df
     )
   )
 

@@ -1227,7 +1227,7 @@ bru_agg_input_pandemic <- function(
       )
     } else {
       response_block <- rlang::parse_expr(
-        glue('.response_data.[[".block"]]')
+        '.response_data.[[".block"]]'
       )
     }
 
@@ -1346,9 +1346,7 @@ bru_agg_input <- function(mapper, mask, .envir) {
       "2.14.1.9008",
       I("Using `block_response` in `aggregate_input`"),
       "bru_obs(response_block)",
-      details = glue(
-        "The `block_response` element is ignored."
-      )
+      details = "The `block_response` element is ignored."
     )
   }
   if (!is.null(response_block_val)) {

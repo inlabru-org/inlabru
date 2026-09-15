@@ -21,7 +21,7 @@ bru_used_upgrade_2.7.0.9017_to_2.7.0.9021 <- function(lhoods, labels) {
         NULL,
         effect = lhoods[[k]][["include_components"]],
         latent = lhoods[[k]][["include_latent"]],
-        effect_exclude = lhoods[[k]][["exclude_components"]],
+        effect_exclude = lhoods[[k]][["exclude_components"]]
       )
 
       lhoods[[k]][["include_components"]] <- NULL
@@ -211,12 +211,11 @@ bru_info_upgrade_functions <- function() {
       # Update timings info to difftime format
 
       warning(
-        glue(
-          "
-           From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.
-             Copying old elapsed time to both Elapsed and Time,
-             setting System to zero;
-             Do not over-interpret."
+        paste0(
+          "From 2.10.1.9007, elapsed time is in Elapsed, Time is CPU time.\n",
+          "  Copying old elapsed time to both Elapsed and Time, ",
+          "setting System to zero;\n",
+          "  Do not over-interpret."
         ),
         immediate. = TRUE
       )
