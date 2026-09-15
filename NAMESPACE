@@ -647,41 +647,51 @@ export(tidy)
 import(methods)
 importFrom(Matrix,diag)
 importFrom(Rcpp,sourceCpp)
-importFrom(fmesher,fm_crs)
-importFrom(fmesher,fm_int)
-importFrom(generics,augment)
-importFrom(generics,generate)
-importFrom(generics,glance)
-importFrom(generics,tidy)
-importFrom(glue,glue)
-importFrom(glue,glue_collapse)
-importFrom(glue,glue_data)
+importFrom(fmesher,
+  fm_crs,
+  fm_int
+)
+importFrom(generics,
+  augment,
+  generate,
+  glance,
+  tidy
+)
+importFrom(glue,
+  glue,
+  glue_collapse,
+  glue_data
+)
 importFrom(graphics,hist)
 importFrom(lifecycle,deprecated)
-importFrom(rlang,"%||%")
-importFrom(rlang,.data)
-importFrom(rlang,.env)
-importFrom(stats,as.formula)
-importFrom(stats,dnorm)
-importFrom(stats,median)
-importFrom(stats,na.omit)
-importFrom(stats,optimise)
-importFrom(stats,pbinom)
-importFrom(stats,pexp)
-importFrom(stats,plogis)
-importFrom(stats,pnorm)
-importFrom(stats,predict)
-importFrom(stats,qchisq)
-importFrom(stats,qexp)
-importFrom(stats,qlogis)
-importFrom(stats,qnorm)
-importFrom(stats,quantile)
-importFrom(stats,rnorm)
-importFrom(stats,rpois)
-importFrom(stats,runif)
-importFrom(stats,sd)
-importFrom(stats,setNames)
-importFrom(stats,terms)
-importFrom(stats,update.formula)
+importFrom(rlang,
+  "%||%",
+  .data,
+  .env
+)
+importFrom(stats,
+  as.formula,
+  dnorm,
+  median,
+  na.omit,
+  optimise,
+  pbinom,
+  pexp,
+  plogis,
+  pnorm,
+  predict,
+  qchisq,
+  qexp,
+  qlogis,
+  qnorm,
+  quantile,
+  rnorm,
+  rpois,
+  runif,
+  sd,
+  setNames,
+  terms,
+  update.formula
+)
 importFrom(utils,modifyList)
 useDynLib(inlabru, .registration = TRUE)

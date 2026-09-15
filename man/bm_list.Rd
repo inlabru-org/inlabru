@@ -43,7 +43,7 @@ A \code{bm_list} object
 \item \code{c(bm_list)}: The \code{...} arguments should be \code{bm_list}
 objects.
 
-\item \code{[}: Extract sub-list
+\item \code{bm_list[]}: Extract sub-list
 
 }}
 \section{Functions}{

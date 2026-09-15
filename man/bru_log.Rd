@@ -75,7 +75,7 @@ If \code{verbosity} is \code{TRUE}, include the verbosity level of each message.
 
 \item \code{as.character(bru_log)}: Convert \code{bru_log} object to a plain \code{character} vector
 
-\item \code{[}: Extract a subset of a \code{bru_log} object
+\item \code{bru_log[]}: Extract a subset of a \code{bru_log} object
 
 \item \code{c(bru_log)}: Concatenate several \code{bru_log} or \code{character} objects
 into a \code{bru_log} object.
