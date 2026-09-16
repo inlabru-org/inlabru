@@ -281,7 +281,10 @@ bru_log_index <- function(x = NULL, i, verbosity = NULL) {
 
 #' @title Access methods for `bru_log` objects
 #' @description Access method for `bru_log` objects.
-#' Note: Up to version `2.8.0`, `bru_log()` was a deprecated alias for
+#' Use `bru_log()` to access the global log, and
+#' `bru_log(fit)` to access a stored estimation log.
+#' @section Pre-2.8.0 compatibility:
+#' Up to version `2.8.0`, `bru_log()` was a deprecated alias for
 #' `bru_log_message()`. When running on `2.8.0` or earlier, use `bru_log_get()`
 #' to access the global log, and `cat(fit$bru_iinla$log, sep = "\n")` to print a
 #' stored estimation object log.

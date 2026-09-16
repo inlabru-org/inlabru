@@ -58,11 +58,7 @@ character vector of log messages, and potentially a vector of bookmarks.
 }
 \description{
 Access method for \code{bru_log} objects.
-Note: Up to version \verb{2.8.0}, \code{bru_log()} was a deprecated alias for
-\code{bru_log_message()}. When running on \verb{2.8.0} or earlier, use \code{bru_log_get()}
-to access the global log, and \code{cat(fit$bru_iinla$log, sep = "\\n")} to print a
-stored estimation object log.
-After version \verb{2.8.0}, use \code{bru_log()} to access the global log, and
+Use \code{bru_log()} to access the global log, and
 \code{bru_log(fit)} to access a stored estimation log.
 }
 \section{Methods (by generic)}{
@@ -91,6 +87,16 @@ into a \code{bru_log} object.
 to extract.
 
 }}
+\section{Pre-2.8.0 compatibility}{
+
+Up to version \verb{2.8.0}, \code{bru_log()} was a deprecated alias for
+\code{bru_log_message()}. When running on \verb{2.8.0} or earlier, use \code{bru_log_get()}
+to access the global log, and \code{cat(fit$bru_iinla$log, sep = "\\n")} to print a
+stored estimation object log.
+After version \verb{2.8.0}, use \code{bru_log()} to access the global log, and
+\code{bru_log(fit)} to access a stored estimation log.
+}
+
 \examples{
 bru_log(verbosity = 2L)
 format(bru_log())
