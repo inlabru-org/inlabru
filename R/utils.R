@@ -58,6 +58,17 @@ bru_safe_inla <- function(
     }
     return(FALSE)
   }
+  if (is.null(inla.call)) {
+    if (!quietly) {
+      message(
+        paste0(
+          "  INLA binary 'NULL' not found. ",
+          "  INLA not installed correctly, or with platform mismatch."
+        )
+      )
+    }
+    return(FALSE)
+  }
   if (all(grepl("\\.run$", inla.call))) {
     inla.binary <- gsub("\\.run$", "", inla.call)
     if (!file.exists(inla.binary)) {

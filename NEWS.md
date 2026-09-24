@@ -3,6 +3,9 @@
 * Improve default `is_rowwise` detection logic for `bru_obs()` (`2.15.0.9001`)
 * Fix crash (issue #315) in multilikelihood aggregation model linearisation
   (`2.15.0.9002`)
+* Namespace cleanup (`2.15.0.9003`)
+* More robust detection of INLA installation issues in `bru_safe_inla()`and
+  `local_bru_safe_inla()` (`2.15.0.9004`)
 
 # inlabru 2.15.0
 

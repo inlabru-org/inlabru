@@ -151,6 +151,15 @@ local_bru_safe_inla <- function(
       ))
     }
 
+    if (is.null(inla.call)) {
+      return(testthat::skip(
+        paste0(
+          "INLA binary 'NULL' not found. ",
+          "INLA not installed correctly, or with platform mismatch.\n",
+          "Skipping INLA tests."
+        )
+      ))
+    }
     if (all(grepl("\\.run$", inla.call))) {
       inla.binary <- gsub("\\.run$", "", inla.call)
       if (!file.exists(inla.binary)) {
@@ -209,7 +218,8 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
-    control.compute = list(smtp = "taucs"),
+#    control.compute =list(smtp = "stiles"),
+#    inla.call = "/home/finn/local/inla/bin/inla",
     inla.mode = "compact",
     bru_compat_pre_2_14_enable = FALSE,
     envir = envir
