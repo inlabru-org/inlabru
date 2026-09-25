@@ -139,6 +139,23 @@ local_bru_safe_inla <- function(
   envir = parent.frame()
 ) {
   if (requireNamespace("INLA", quietly = TRUE)) {
+    if (!is.null(bru_options_get("inla.call"))) {
+      res <- tryCatch(
+        local_inla_options_set(
+          inla.call = bru_options_get("inla.call"),
+          .envir = envir,
+          .save_only = FALSE
+        ),
+        error = function(e) {
+          e
+        }
+      )
+      if (inherits(res, "error")) {
+        return(testthat::skip(
+          "inla.setOption(inla.call = ...) failed, skipping INLA tests."
+        ))
+      }
+    }
     inla.call <- tryCatch(
       INLA::inla.getOption("inla.call"),
       error = function(e) {
@@ -218,8 +235,8 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
     # To specifically test pardiso, need to override locally
-#    control.compute =list(smtp = "stiles"),
-#    inla.call = "/home/finn/local/inla/bin/inla",
+    #    control.compute = list(smtp = "stiles"),
+    #    inla.call = "/home/finn/.cache/R/INLA/stiles-binary/latest/bin/inla.run",
     inla.mode = "compact",
     bru_compat_pre_2_14_enable = FALSE,
     envir = envir
