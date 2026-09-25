@@ -80,6 +80,9 @@ local_basic_fixed_effect_testdata <- function() {
 
 # @returns logical; If the option setting was successful, `TRUE` is returned,
 # otherwise `FALSE`.
+# @param .envir The environment used for `withr` scoping. If NULL, the
+#   `withr::defer()` is skipped, making the options permanent within the current
+#   R session. Default: [parent.frame()]
 local_inla_options_set <- function(
   ...,
   .envir = parent.frame(),
@@ -113,10 +116,12 @@ local_inla_options_set <- function(
         }
       }
 
-      withr::defer(
-        INLA::inla.setOption(name, old_inla_options[[name]]),
-        .envir
-      )
+      if (!is.null(.envir)) {
+        withr::defer(
+          INLA::inla.setOption(name, old_inla_options[[name]]),
+          .envir
+        )
+      }
     }
   }
   TRUE
@@ -138,89 +143,38 @@ local_bru_safe_inla <- function(
   quietly = TRUE,
   envir = parent.frame()
 ) {
-  if (requireNamespace("INLA", quietly = TRUE)) {
-    if (!is.null(bru_options_get("inla.call"))) {
-      res <- tryCatch(
-        local_inla_options_set(
-          inla.call = bru_options_get("inla.call"),
-          .envir = envir,
-          .save_only = FALSE
-        ),
-        error = function(e) {
-          e
-        }
+  res <-
+    bru_safe_inla(
+      multicore = multicore,
+      quietly = quietly,
+      .envir = envir
+    )
+  if (!res) {
+    testthat::skip(
+      paste0(
+        "INLA loading failed. ",
+        attr(res, "msg")
       )
-      if (inherits(res, "error")) {
-        return(testthat::skip(
-          "inla.setOption(inla.call = ...) failed, skipping INLA tests."
-        ))
-      }
-    }
-    inla.call <- tryCatch(
-      INLA::inla.getOption("inla.call"),
-      error = function(e) {
-        e
-      }
     )
-    if (inherits(inla.call, "error")) {
-      return(testthat::skip(
-        "inla.getOption('inla.call') failed, skipping INLA tests."
-      ))
-    }
-
-    if (is.null(inla.call)) {
-      return(testthat::skip(
-        paste0(
-          "INLA binary 'NULL' not found. ",
-          "INLA not installed correctly, or with platform mismatch.\n",
-          "Skipping INLA tests."
-        )
-      ))
-    }
-    if (all(grepl("\\.run$", inla.call))) {
-      inla.binary <- gsub("\\.run$", "", inla.call)
-      if (!file.exists(inla.binary)) {
-        return(testthat::skip(
-          paste0(
-            "INLA binary '",
-            inla.binary,
-            "' not found. ",
-            "INLA not installed correctly, or with platform mismatch.\n",
-            "Skipping INLA tests."
-          )
-        ))
-      }
-    }
-
-    # Save the num.threads option so it can be restored
-    local_inla_options_set(
-      num.threads = NULL,
-      .envir = envir,
-      .save_only = TRUE
-    )
-
-    local_inla_options_set(
-      inla.timeout = 60,
-      fmesher.evolution = 2L,
-      fmesher.evolution.warn = TRUE,
-      fmesher.evolution.verbosity = "stop",
-      .envir = envir,
-      .save_only = FALSE
-    )
-
-    # withr::local_options(lifecycle_verbosity = "quiet", .local_envir = envir)
   }
 
-  if (!multicore) {
-    local_bru_options_set(num.threads = "1:1:1", envir = envir)
-  }
-  testthat::skip_if_not(bru_safe_inla(multicore = multicore, quietly = quietly))
+  local_inla_options_set(
+    inla.timeout = 60,
+    fmesher.evolution = 2L,
+    fmesher.evolution.warn = TRUE,
+    fmesher.evolution.verbosity = "stop",
+    .envir = envir,
+    .save_only = FALSE
+  )
+
   # Ignore spurious warnings for INLA 23.12.17. Is fixed in later INLA versions:
   assign(
     "processed.status.for.model.scopy.in.section.latent",
     TRUE,
     INLA::inla.get.inlaEnv()
   )
+
+  TRUE
 }
 
 
@@ -234,9 +188,8 @@ local_bru_testthat_setup <- function(envir = parent.frame()) {
   local_bru_testthat_tolerances(envir = envir)
   local_bru_options_set(
     # Need to specify specific smtp to ensure consistent tests.
-    # To specifically test pardiso, need to override locally
-    #    control.compute = list(smtp = "stiles"),
-    #    inla.call = "/home/finn/.cache/R/INLA/stiles-binary/latest/bin/inla.run",
+    # control.compute = list(smtp = "stiles"),
+    # inla.call = "/home/finn/.cache/R/INLA/stiles-binary/latest/bin/inla.run",
     inla.mode = "compact",
     bru_compat_pre_2_14_enable = FALSE,
     envir = envir

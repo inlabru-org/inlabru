@@ -4,7 +4,12 @@
 \alias{bru_safe_inla}
 \title{Load INLA safely for examples and tests}
 \usage{
-bru_safe_inla(multicore = NULL, quietly = FALSE, minimum_version = "23.1.31")
+bru_safe_inla(
+  multicore = NULL,
+  quietly = FALSE,
+  minimum_version = "23.1.31",
+  .envir = NULL
+)
 }
 \arguments{
 \item{multicore}{logical; if \code{TRUE}, multiple cores are allowed, and the
@@ -21,6 +26,10 @@ Default: FALSE.}
 \item{minimum_version}{character; the minimum required INLA version.
 Default 23.1.31 (should always match the requirement in the package
 DESCRIPTION)}
+
+\item{.envir}{The environment used for \code{withr} scoping. If NULL, the
+\code{withr::defer()} is skipped, making the options permanent within the
+current R session. Default: NULL}
 }
 \value{
 logical; \code{TRUE} if INLA was loaded safely, otherwise FALSE

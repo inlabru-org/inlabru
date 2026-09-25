@@ -18,6 +18,9 @@
 #' @param minimum_version character; the minimum required INLA version.
 #' Default 23.1.31 (should always match the requirement in the package
 #' DESCRIPTION)
+#' @param .envir The environment used for `withr` scoping. If NULL, the
+#'   `withr::defer()` is skipped, making the options permanent within the
+#'   current R session. Default: NULL
 #' @export
 #' @return logical; `TRUE` if INLA was loaded safely, otherwise FALSE
 #'
@@ -32,8 +35,17 @@
 bru_safe_inla <- function(
   multicore = NULL,
   quietly = FALSE,
-  minimum_version = "23.1.31"
+  minimum_version = "23.1.31",
+  .envir = NULL
 ) {
+  handle_msg <- function(result, msg) {
+    attr(result, "msg") <- msg
+    if (!quietly) {
+      message(msg)
+    }
+    result
+  }
+
   inla_version <-
     check_package_version_and_load(
       pkg = "INLA",
@@ -41,7 +53,29 @@ bru_safe_inla <- function(
       quietly = quietly
     )
   if (is.na(inla_version)) {
-    return(FALSE)
+    return(handle_msg(
+      FALSE,
+      "Unknown or outdated INLA version, or INLA not installed."
+    ))
+  }
+
+  if (!is.null(bru_options_get("inla.call"))) {
+    res <- tryCatch(
+      local_inla_options_set(
+        inla.call = bru_options_get("inla.call"),
+        .envir = .envir,
+        .save_only = FALSE
+      ),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(res, "error")) {
+      return(handle_msg(
+        FALSE,
+        "inla.SetOption(inla.call = ...) failed. INLA not installed correctly."
+      ))
+    }
   }
 
   inla.call <- tryCatch(
@@ -51,46 +85,60 @@ bru_safe_inla <- function(
     }
   )
   if (inherits(inla.call, "error")) {
-    if (!quietly) {
-      message(
-        "inla.getOption('inla.call') failed. INLA not installed correctly."
-      )
-    }
-    return(FALSE)
+    return(handle_msg(
+      FALSE,
+      "inla.getOption('inla.call') failed. INLA not installed correctly."
+    ))
   }
-  if (is.null(inla.call)) {
-    if (!quietly) {
-      message(
-        paste0(
-          "  INLA binary 'NULL' not found. ",
-          "  INLA not installed correctly, or with platform mismatch."
-        )
-      )
+  if (is.null(inla.call) && (inla_version >= "26.09.19")) {
+    res <- tryCatch(
+      eval(parse(
+        text = "INLA::inla.stiles.status(ping = FALSE, verbose = FALSE)"
+      )),
+      error = function(e) {
+        e
+      }
+    )
+    if (inherits(res, "error")) {
+      # Assume old-style build
+      inla.call <- ""
+    } else {
+      inla.call <- res[["inla.call"]]
     }
-    return(FALSE)
   }
-  if (all(grepl("\\.run$", inla.call))) {
-    inla.binary <- gsub("\\.run$", "", inla.call)
-    if (!file.exists(inla.binary)) {
-      if (!quietly) {
-        message(
+  if (!is.null(inla.call) && (nzchar(inla.call) > 0)) {
+    if (all(grepl("\\.run$", inla.call))) {
+      inla.binary <- gsub("\\.run$", "", inla.call)
+      if (!file.exists(inla.binary)) {
+        return(handle_msg(
+          FALSE,
           paste0(
             "INLA binary '",
             inla.binary,
             "' not found. ",
             "INLA not installed correctly, or with platform mismatch."
           )
-        )
+        ))
       }
-      return(FALSE)
     }
   }
 
-  if (is.null(multicore)) {
-    multicore <-
-      interactive() && !identical(Sys.getenv("TESTTHAT"), "true")
-  }
+  multicore <- multicore %||%
+    (interactive() && !identical(Sys.getenv("TESTTHAT"), "true"))
   if (!multicore) {
+    if (
+      !local_inla_options_set(
+        num.threads = NULL,
+        .envir = .envir,
+        .save_only = TRUE
+      )
+    ) {
+      return(handle_msg(
+        FALSE,
+        "Unable to access num.threads option. INLA not installed correctly."
+      ))
+    }
+
     n.t <- tryCatch(
       INLA::inla.getOption("num.threads"),
       error = function(e) {
@@ -98,20 +146,25 @@ bru_safe_inla <- function(
       }
     )
     if (inherits(n.t, "error")) {
-      if (!quietly) {
-        message("inla.getOption() failed. INLA not installed correctly.")
-      }
-      return(FALSE)
+      return(handle_msg(
+        FALSE,
+        "inla.getOption() failed. INLA not installed correctly."
+      ))
     }
     if (!identical(n.t, "1:1:1")) {
-      if (!quietly) {
-        message(paste0(
+      result <- handle_msg(
+        TRUE,
+        paste0(
           "Changing INLA option num.threads from '",
           n.t,
           "' to '1:1:1'."
-        ))
-      }
-      INLA::inla.setOption(num.threads = "1:1:1")
+        )
+      )
+      local_inla_options_set(
+        num.threads = "1:1:1",
+        .envir = .envir,
+        .save_only = FALSE
+      )
     }
   }
   TRUE
