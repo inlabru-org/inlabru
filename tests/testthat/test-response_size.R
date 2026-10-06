@@ -93,7 +93,7 @@ test_that("Complex list data handling", {
   skip_on_cran()
   local_bru_safe_inla()
   withr::local_seed(12345L)
-  n <- 6
+  n <- 60
   m <- 3
   data <- list(
     x1 = rnorm(m * n),
