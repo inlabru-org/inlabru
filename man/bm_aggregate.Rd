@@ -34,11 +34,12 @@ values are
 \item{"average"}{\link{bm_aggregate}\code{(rescale = TRUE)}}
 \item{"logsumexp"}{\link{bm_logsumexp}\code{(rescale = FALSE)}}
 \item{"logaverageexp"}{\link{bm_logsumexp}\code{(rescale = TRUE)}}
-\item{"average"}{\link{bm_logitaverage}\verb{()}, like \code{type = "logitsum_logit"}
-with \code{rescale = TRUE}.}
+\item{"logitaverage"}{\link{bm_logitaverage}\verb{()}, like
+\code{type = "logitsum_logit"} with \code{rescale = TRUE}.}
 \item{"logitsum_logit"}{
 \link{bm_logitsum}\verb{(rescale = rescale, link = "logit")}}
-\item{"logitsum_log"}{\link{bm_logitsum}\verb{(rescale = rescale, link = "log")}}
+\item{"logitsum_log"}{
+\link{bm_logitsum}\verb{(rescale = rescale, link = "log")}}
 \item{"logitsum_identity"}{
 \link{bm_logitsum}\verb{(rescale = rescale, link = "identity")}}
 }}

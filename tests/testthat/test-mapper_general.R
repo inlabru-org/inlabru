@@ -1171,24 +1171,24 @@ test_that("Reparam mapper works", {
 test_that("Jacobian method matches numerical jacobian", {
   block1 <- list(block = c(2, 1, 1, 3, 2), weights = 1:5)
   state1 <- 2:5
+  # fmt: skip
   mappers <- tibble::tribble(
-    ~mapper                                                      , ~input     , ~state ,
-    bm_index(5)                                                  ,
-    c(2, 1, 1, 3, 5)                                             , NULL       ,
-    bm_linear()                                                  , c(3, 1, 2) , NULL   ,
-    bm_factor(c("b", "a"), factor_mapping = "full")              ,
-    c("a", "a", "b", "a")                                        , NULL       ,
-    bm_shift()                                                   ,          2 , state1 ,
-    bm_scale()                                                   ,          2 , state1 ,
-    bm_marginal(qexp, rate = 3)                                  , NULL       , state1 ,
-    bm_logsumexp(rescale = FALSE, n_block = 3)                   , block1     , NULL   ,
-    bm_logsumexp(rescale = TRUE, n_block = 3)                    , block1     , NULL   ,
-    bm_logitaverage(n_block = 3)                                 , block1     , NULL   ,
-    bm_logitsum(rescale = TRUE, n_block = 3, link = "logit")     , block1     , NULL   ,
-    bm_logitsum(rescale = FALSE, n_block = 3, link = "log")      , block1     , NULL   ,
-    bm_logitsum(rescale = TRUE, n_block = 3, link = "log")       , block1     , NULL   ,
-    bm_logitsum(rescale = FALSE, n_block = 3, link = "identity") , block1     , NULL   ,
-    bm_logitsum(rescale = TRUE, n_block = 3, link = "identity")  , block1     , NULL
+    ~mapper, ~input, ~state,
+    bm_index(5), c(2, 1, 1, 3, 5), NULL,
+    bm_linear(), c(3, 1, 2), NULL,
+    bm_factor(c("b", "a"), factor_mapping = "full"), c("a", "a", "b", "a"),
+    NULL,
+    bm_shift(), 2, state1,
+    bm_scale(), 2, state1,
+    bm_marginal(qexp, rate = 3), NULL, state1,
+    bm_logsumexp(rescale = FALSE, n_block = 3), block1, NULL,
+    bm_logsumexp(rescale = TRUE, n_block = 3), block1, NULL,
+    bm_logitaverage(n_block = 3), block1, NULL,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "logit"), block1, NULL,
+    bm_logitsum(rescale = FALSE, n_block = 3, link = "log"), block1, NULL,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "log"), block1, NULL,
+    bm_logitsum(rescale = FALSE, n_block = 3, link = "identity"), block1, NULL,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "identity"), block1, NULL
   )
 
   for (k in seq_len(nrow(mappers))) {

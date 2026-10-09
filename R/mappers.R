@@ -2523,8 +2523,8 @@ bm_aggregate <- function(rescale = FALSE, n_block = NULL, type = NULL) {
         n_block = n_block
       ))
     } else if (type == "logitaverage") {
-      #' \item{"logitaverage"}{[bm_logitaverage]`()`, like `type = "logitsum_logit"`
-      #' with `rescale = TRUE`.}
+      #' \item{"logitaverage"}{[bm_logitaverage]`()`, like
+      #' `type = "logitsum_logit"` with `rescale = TRUE`.}
       return(bm_logitaverage(
         n_block = n_block
       ))
@@ -2537,7 +2537,8 @@ bm_aggregate <- function(rescale = FALSE, n_block = NULL, type = NULL) {
         link = "logit"
       ))
     } else if (type == "logitsum_log") {
-      #' \item{"logitsum_log"}{[bm_logitsum]`(rescale = rescale, link = "log")`}
+      #' \item{"logitsum_log"}{
+      #' [bm_logitsum]`(rescale = rescale, link = "log")`}
       return(bm_logitsum(
         n_block = n_block,
         rescale = rescale,
@@ -3150,9 +3151,9 @@ ibm_jacobian.bm_logitsum <- function(mapper, input, state = NULL, ...) {
 #' @export
 #' @param apply_link logical; control `logit` output. Default `TRUE`, see the
 #'   `ibm_eval()` details for `logitsum` mappers.
-#' @describeIn ibm_eval_methods When `apply_link` is `TRUE` (default), `ibm_eval()`
-#'   for `logitsume` returns the link-sum-weight-inverse-logit value.
-#'   If `FALSE`, the `sum-weights-inverse-logit` value is returned.
+#' @describeIn ibm_eval_methods When `apply_link` is `TRUE` (default),
+#'   `ibm_eval()` for `logitsume` returns the link-sum-weight-inverse-logit
+#'   value. If `FALSE`, the `sum-weights-inverse-logit` value is returned.
 #'
 ibm_eval.bm_logitsum <- function(
   mapper,

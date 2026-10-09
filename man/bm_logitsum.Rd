@@ -28,10 +28,10 @@ the same as dividing by the number of entries in each block.
 
 \item{link}{character; Either "logit", "log", or "identity".
 The combination \verb{rescale = TRUE, link = "logit"} is
-equivalent to the \link{bm_logitaverage} mapper. When
-\verb{rescale = FALSE, link = "logit"}, the model
-is only valid if the weights sum to at most 1. When \code{link = "identity"}, no
-link function is applied.}
+equivalent to the \link{bm_logitaverage} mapper. The combination
+\verb{rescale = FALSE, link = "logit"} is not allowed, as the model is only valid
+if the weights sum to at most 1, and the \verb{< 1} cas has not been implemented.
+When \code{link = "identity"}, no link function is applied.}
 }
 \value{
 A \code{bm_logitsum/bm_aggregate} mapper object.

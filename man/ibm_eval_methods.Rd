@@ -157,9 +157,9 @@ for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
 for \code{logitaverage} returns the logit-sum-weight-inverse-logit value.
 If \code{FALSE}, the \code{sum-weights=invere-logit} value is returned.
 
-\item \code{ibm_eval(bm_logitsum)}: When \code{apply_link} is \code{TRUE} (default), \code{ibm_eval()}
-for \code{logitsume} returns the link-sum-weight-inverse-logit value.
-If \code{FALSE}, the \code{sum-weights-inverse-logit} value is returned.
+\item \code{ibm_eval(bm_logitsum)}: When \code{apply_link} is \code{TRUE} (default),
+\code{ibm_eval()} for \code{logitsume} returns the link-sum-weight-inverse-logit
+value. If \code{FALSE}, the \code{sum-weights-inverse-logit} value is returned.
 
 \item \code{ibm_eval(bm_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
 \code{FALSE}, \code{ibm_eval()}
