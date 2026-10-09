@@ -4429,7 +4429,8 @@ ibm_validate_jacobian <- function(
   input,
   state = NULL,
   ...,
-  .delta = 1e-4
+  .delta = 1e-4,
+  .format = c("error", "matrix")
 ) {
   if (is.null(state)) {
     state <- rnorm(ibm_n(mapper, input = input))
@@ -4444,7 +4445,16 @@ ibm_validate_jacobian <- function(
     return(0.0)
   }
 
-  err <- numeric(N)
+  .format <- match.arg(.format)
+  if (.format == "error") {
+    err <- numeric(N)
+  } else {
+    err <- Matrix::Matrix(
+      0.0,
+      ibm_n_output(mapper, input = input, state = state),
+      N
+    )
+  }
   for (j in seq_len(N)) {
     state_eps <- state
     state_eps[j] <- state[j] + .delta
@@ -4452,8 +4462,19 @@ ibm_validate_jacobian <- function(
     state_eps[j] <- state[j] - .delta
     v_minus <- ibm_eval(mapper, input = input, state = state_eps)
     J_from_numerics <- (v_plus - v_minus) / (2 * .delta)
-    err[j] <- max(abs(J_from_method[, j] - J_from_numerics))
+    if (.format == "error") {
+      err[j] <- max(abs(J_from_method[, j] - J_from_numerics))
+    } else {
+      err[, j] <- J_from_numerics
+    }
   }
 
-  max(err)
+  if (.format == "error") {
+    max(err)
+  } else {
+    list(
+      method = as(as(J_from_method, "generalMatrix"), "dgCMatrix"),
+      numeric = as(as(err, "generalMatrix"), "dgCMatrix")
+    )
+  }
 }

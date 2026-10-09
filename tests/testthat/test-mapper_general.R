@@ -1192,13 +1192,16 @@ test_that("Jacobian method matches numerical jacobian", {
   )
 
   for (k in seq_len(nrow(mappers))) {
-    expect_lt(
-      ibm_validate_jacobian(
-        mappers$mapper[[k]],
-        input = mappers$input[[k]],
-        state = mappers$state[[k]]
-      ),
-      1e-9,
+    res <- ibm_validate_jacobian(
+      mappers$mapper[[k]],
+      input = mappers$input[[k]],
+      state = mappers$state[[k]],
+      .format = "matrix"
+    )
+    expect_equal(
+      res$method,
+      res$numeric,
+      tolerance = 1e-9,
       label = glue::glue(
         "jacobian method for '{ibm_shortname(mappers$mapper[[k]])}' ",
         "(mapper #{k})"
