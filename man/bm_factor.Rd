@@ -55,6 +55,7 @@ Other mappers:
 \code{\link[=bm_index]{bm_index()}},
 \code{\link[=bm_linear]{bm_linear()}},
 \code{\link[=bm_logitaverage]{bm_logitaverage()}},
+\code{\link[=bm_logitsum]{bm_logitsum()}},
 \code{\link[=bm_logsumexp]{bm_logsumexp()}},
 \code{\link[=bm_marginal]{bm_marginal()}},
 \code{\link[=bm_matrix]{bm_matrix()}},

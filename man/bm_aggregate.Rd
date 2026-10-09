@@ -25,11 +25,23 @@ the same as dividing by the number of entries in each block.
 the maximum block index in the inputs. The priority order is \code{input$n_block},
 the mapper definition \code{n_block}, then \code{max(input$block)}.}
 
-\item{type}{character; if non-NULL, overrides the \code{rescale} argument, and
-constructs an aggregation mapper of the given type instead. Supported
-values are "sum", "average" (for regular \code{\link[=bm_aggregate]{bm_aggregate()}}),
-"logsumexp", "logaverageexp" (for \code{\link[=bm_logsumexp]{bm_logsumexp()}}), and
-"logitaverage" (for \code{\link[=bm_logitaverage]{bm_logitaverage()}}).}
+\item{type}{character; if non-NULL,
+constructs an aggregation mapper of the given type, potentially
+potentially overriding the \code{rescale} argument. Supported
+values are
+\describe{
+\item{"sum"}{\link{bm_aggregate}\code{(rescale = FALSE)}}
+\item{"average"}{\link{bm_aggregate}\code{(rescale = TRUE)}}
+\item{"logsumexp"}{\link{bm_logsumexp}\code{(rescale = FALSE)}}
+\item{"logaverageexp"}{\link{bm_logsumexp}\code{(rescale = TRUE)}}
+\item{"average"}{\link{bm_logitaverage}\verb{()}, like \code{type = "logitsum_logit"}
+with \code{rescale = TRUE}.}
+\item{"logitsum_logit"}{
+\link{bm_logitsum}\verb{(rescale = rescale, link = "logit")}}
+\item{"logitsum_log"}{\link{bm_logitsum}\verb{(rescale = rescale, link = "log")}}
+\item{"logitsum_identity"}{
+\link{bm_logitsum}\verb{(rescale = rescale, link = "identity")}}
+}}
 
 \item{\dots}{Arguments passed on to \code{\link[=bm_aggregate]{bm_aggregate()}}}
 }
@@ -61,6 +73,7 @@ Other mappers:
 \code{\link[=bm_index]{bm_index()}},
 \code{\link[=bm_linear]{bm_linear()}},
 \code{\link[=bm_logitaverage]{bm_logitaverage()}},
+\code{\link[=bm_logitsum]{bm_logitsum()}},
 \code{\link[=bm_logsumexp]{bm_logsumexp()}},
 \code{\link[=bm_marginal]{bm_marginal()}},
 \code{\link[=bm_matrix]{bm_matrix()}},

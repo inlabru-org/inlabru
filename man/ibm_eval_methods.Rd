@@ -10,6 +10,7 @@
 \alias{ibm_eval.bm_aggregate}
 \alias{ibm_eval.bm_logsumexp}
 \alias{ibm_eval.bm_logitaverage}
+\alias{ibm_eval.bm_logitsum}
 \alias{ibm_eval.bm_marginal}
 \alias{ibm_eval.bm_pipe}
 \alias{ibm_eval.bm_multi}
@@ -33,6 +34,8 @@
 \method{ibm_eval}{bm_logsumexp}(mapper, input, state = NULL, log = TRUE, ...)
 
 \method{ibm_eval}{bm_logitaverage}(mapper, input, state = NULL, logit = TRUE, ...)
+
+\method{ibm_eval}{bm_logitsum}(mapper, input, state = NULL, apply_link = TRUE, ...)
 
 \method{ibm_eval}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
@@ -90,6 +93,9 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 
 \item{logit}{logical; control \code{logit} output. Default \code{TRUE}, see the
 \code{ibm_eval()} details for \code{logitaverage} mappers.}
+
+\item{apply_link}{logical; control \code{logit} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logitsum} mappers.}
 
 \item{reverse}{logical; control \code{bm_marginal} evaluation. Default
 \code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
@@ -150,6 +156,10 @@ for \code{logsumexp} returns the log-sum-weight-exp value. If \code{FALSE}, the
 \item \code{ibm_eval(bm_logitaverage)}: When \code{logit} is \code{TRUE} (default), \code{ibm_eval()}
 for \code{logitaverage} returns the logit-sum-weight-inverse-logit value.
 If \code{FALSE}, the \code{sum-weights=invere-logit} value is returned.
+
+\item \code{ibm_eval(bm_logitsum)}: When \code{apply_link} is \code{TRUE} (default), \code{ibm_eval()}
+for \code{logitsume} returns the link-sum-weight-inverse-logit value.
+If \code{FALSE}, the \code{sum-weights-inverse-logit} value is returned.
 
 \item \code{ibm_eval(bm_marginal)}: When \code{xor(mapper[["inverse"]], reverse)} is
 \code{FALSE}, \code{ibm_eval()}

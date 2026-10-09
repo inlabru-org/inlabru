@@ -17,6 +17,7 @@
 \alias{ibm_jacobian.bm_aggregate}
 \alias{ibm_jacobian.bm_logsumexp}
 \alias{ibm_jacobian.bm_logitaverage}
+\alias{ibm_jacobian.bm_logitsum}
 \alias{ibm_jacobian.bm_marginal}
 \alias{ibm_jacobian.bm_pipe}
 \alias{ibm_jacobian.bm_multi}
@@ -59,6 +60,8 @@ ibm_jacobian(mapper, input, state = NULL, inla_f = FALSE, ...)
 \method{ibm_jacobian}{bm_logsumexp}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_logitaverage}(mapper, input, state = NULL, ...)
+
+\method{ibm_jacobian}{bm_logitsum}(mapper, input, state = NULL, ...)
 
 \method{ibm_jacobian}{bm_marginal}(mapper, input, state = NULL, ..., reverse = FALSE)
 
@@ -239,6 +242,11 @@ If \code{weights} is \code{NULL}, it's interpreted as all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.
 
 \item \code{ibm_jacobian(bm_logitaverage)}: \code{input} should be a list with elements
+\code{block} and \code{weights}. \code{block} should be a vector of the same length as the
+\code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
+If \code{weights} is \code{NULL}, it's interpreted as all-1.
+
+\item \code{ibm_jacobian(bm_logitsum)}: \code{input} should be a list with elements
 \code{block} and \code{weights}. \code{block} should be a vector of the same length as the
 \code{state}, or \code{NULL}, with \code{NULL} equivalent to all-1.
 If \code{weights} is \code{NULL}, it's interpreted as all-1.

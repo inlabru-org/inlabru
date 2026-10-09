@@ -6,6 +6,8 @@
 * Namespace cleanup (`2.15.0.9003`)
 * More robust detection of INLA installation issues in `bru_safe_inla()`and
   `local_bru_safe_inla()` (`2.15.0.9004`)
+* Bugfix for `ibm_jacobian<bm_logitaverage>`, where parts of the calculations
+  linked incorrect state elements (`2.15.0.9005`)
 
 # inlabru 2.15.0
 

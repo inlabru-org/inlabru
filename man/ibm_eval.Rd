@@ -46,6 +46,8 @@ of length \code{ibm_n(mapper, inla_f = FALSE)}}
 \code{ibm_eval()} details for \code{logsumexp} mappers.}
     \item{\code{logit}}{logical; control \code{logit} output. Default \code{TRUE}, see the
 \code{ibm_eval()} details for \code{logitaverage} mappers.}
+    \item{\code{apply_link}}{logical; control \code{logit} output. Default \code{TRUE}, see the
+\code{ibm_eval()} details for \code{logitsum} mappers.}
     \item{\code{reverse}}{logical; control \code{bm_marginal} evaluation. Default
 \code{FALSE}. When \code{TRUE}, reverses the direction of the mapping, see details
 for \code{marginal} mappers.}
@@ -98,6 +100,7 @@ Specific implementations for \code{\link[=ibm_eval_methods]{bm_aggregate}},
 \code{\link[=ibm_eval_methods]{bm_expr}},
 \code{\link[=bru_model_mapper_methods]{bm_list}},
 \code{\link[=ibm_eval_methods]{bm_logitaverage}},
+\code{\link[=ibm_eval_methods]{bm_logitsum}},
 \code{\link[=ibm_eval_methods]{bm_logsumexp}},
 \code{\link[=ibm_eval_methods]{bm_marginal}},
 \code{\link[=ibm_eval_methods]{bm_multi}},

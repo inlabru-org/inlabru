@@ -420,6 +420,162 @@ test_that("logsumexp mapper", {
 })
 
 
+test_that("logitsum logit mapper", {
+  mapper <- bm_logitsum(rescale = TRUE, link = "logit")
+
+  expect_equal(ibm_n(mapper), NA_integer_)
+  expect_equal(
+    ibm_n(mapper, state = c(1, 1)),
+    2
+  )
+  expect_equal(
+    ibm_n_output(mapper, input = list(block = c(1, 2, 2))),
+    2
+  )
+  expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
+
+  state <- c(1, 2, 3, 4, 5)
+
+  # Test default input handling
+  # Should treat NULL group and weights as all-1, but input needs to be supplied
+  expect_equal(
+    ibm_eval(mapper, input = NULL, state = state),
+    qlogis(sum(plogis(state)) / length(state)),
+    tolerance = lowtol
+  )
+
+  input <-
+    list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
+
+  val <- c(
+    qlogis(
+      sum((input$weights * plogis(state))[input$block == 1]) /
+        sum(input$weights[input$block == 1])
+    ),
+    qlogis(
+      sum((input$weights * plogis(state))[input$block == 2]) /
+        sum(input$weights[input$block == 2])
+    ),
+    qlogis(
+      sum((input$weights * plogis(state))[input$block == 3]) /
+        sum(input$weights[input$block == 3])
+    )
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state),
+    val,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state, apply_link = FALSE),
+    plogis(val),
+    tolerance = lowtol
+  )
+})
+
+
+test_that("logitsum log mapper", {
+  mapper <- bm_logitsum(rescale = TRUE, link = "log")
+
+  expect_equal(ibm_n(mapper), NA_integer_)
+  expect_equal(
+    ibm_n(mapper, state = c(1, 1)),
+    2
+  )
+  expect_equal(
+    ibm_n_output(mapper, input = list(block = c(1, 2, 2))),
+    2
+  )
+  expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
+
+  state <- c(1, 2, 3, 4, 5)
+
+  # Test default input handling
+  # Should treat NULL group and weights as all-1, but input needs to be supplied
+  expect_equal(
+    ibm_eval(mapper, input = NULL, state = state),
+    log(sum(plogis(state)) / length(state)),
+    tolerance = lowtol
+  )
+
+  input <-
+    list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
+
+  val <- c(
+    log(
+      sum((input$weights * plogis(state))[input$block == 1]) /
+        sum(input$weights[input$block == 1])
+    ),
+    log(
+      sum((input$weights * plogis(state))[input$block == 2]) /
+        sum(input$weights[input$block == 2])
+    ),
+    log(
+      sum((input$weights * plogis(state))[input$block == 3]) /
+        sum(input$weights[input$block == 3])
+    )
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state),
+    val,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state, apply_link = FALSE),
+    exp(val),
+    tolerance = lowtol
+  )
+})
+
+
+test_that("logitsum identity mapper", {
+  mapper <- bm_logitsum(rescale = TRUE, link = "identity")
+
+  expect_equal(ibm_n(mapper), NA_integer_)
+  expect_equal(
+    ibm_n(mapper, state = c(1, 1)),
+    2
+  )
+  expect_equal(
+    ibm_n_output(mapper, input = list(block = c(1, 2, 2))),
+    2
+  )
+  expect_equal(ibm_values(mapper, state = c(1, 1)), seq_len(2))
+
+  state <- c(1, 2, 3, 4, 5)
+
+  # Test default input handling
+  # Should treat NULL group and weights as all-1, but input needs to be supplied
+  expect_equal(
+    ibm_eval(mapper, input = NULL, state = state),
+    (sum(plogis(state)) / length(state)),
+    tolerance = lowtol
+  )
+
+  input <-
+    list(block = c(1, 2, 2, 1, 3), weights = c(1, 1, 1, 2, 3))
+
+  val <- c(
+    (sum((input$weights * plogis(state))[input$block == 1]) /
+      sum(input$weights[input$block == 1])),
+    (sum((input$weights * plogis(state))[input$block == 2]) /
+      sum(input$weights[input$block == 2])),
+    (sum((input$weights * plogis(state))[input$block == 3]) /
+      sum(input$weights[input$block == 3]))
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state),
+    val,
+    tolerance = lowtol
+  )
+  expect_equal(
+    ibm_eval(mapper, input = input, state = state, apply_link = FALSE),
+    val,
+    tolerance = lowtol
+  )
+})
+
+
 test_that("Multi-mapper bru input", {
   mapper <- bm_multi(list(
     space = bm_index(4),
@@ -1009,4 +1165,45 @@ test_that("Reparam mapper works", {
     fit_bru_reparam$summary.hyperpar,
     tolerance = midtol
   )
+})
+
+
+test_that("Jacobian method matches numerical jacobian", {
+  block1 <- list(block = c(2, 1, 1, 3, 2), weights = 1:5)
+  state1 <- 2:5
+  mappers <- tibble::tribble(
+    ~mapper                                                      , ~input     , ~state ,
+    bm_index(5)                                                  ,
+    c(2, 1, 1, 3, 5)                                             , NULL       ,
+    bm_linear()                                                  , c(3, 1, 2) , NULL   ,
+    bm_factor(c("b", "a"), factor_mapping = "full")              ,
+    c("a", "a", "b", "a")                                        , NULL       ,
+    bm_shift()                                                   ,          2 , state1 ,
+    bm_scale()                                                   ,          2 , state1 ,
+    bm_marginal(qexp, rate = 3)                                  , NULL       , state1 ,
+    bm_logsumexp(rescale = FALSE, n_block = 3)                   , block1     , NULL   ,
+    bm_logsumexp(rescale = TRUE, n_block = 3)                    , block1     , NULL   ,
+    bm_logitaverage(n_block = 3)                                 , block1     , NULL   ,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "logit")     , block1     , NULL   ,
+    bm_logitsum(rescale = FALSE, n_block = 3, link = "log")      , block1     , NULL   ,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "log")       , block1     , NULL   ,
+    bm_logitsum(rescale = FALSE, n_block = 3, link = "identity") , block1     , NULL   ,
+    bm_logitsum(rescale = TRUE, n_block = 3, link = "identity")  , block1     , NULL
+  )
+
+  for (k in seq_len(nrow(mappers))) {
+    expect_lt(
+      ibm_validate_jacobian(
+        mappers$mapper[[k]],
+        input = mappers$input[[k]],
+        state = mappers$state[[k]]
+      ),
+      1e-9,
+      label = glue::glue(
+        "jacobian method for '{ibm_shortname(mappers$mapper[[k]])}' ",
+        "(mapper #{k})"
+      ),
+      expected.label = "numerical approximation"
+    )
+  }
 })

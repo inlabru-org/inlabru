@@ -2461,9 +2461,14 @@ ibm_eval.bm_scale <- function(mapper, input, state = NULL, ...) {
 #' @param n_block Predetermined number of output blocks. If `NULL`, overrides
 #' the maximum block index in the inputs. The priority order is `input$n_block`,
 #' the mapper definition `n_block`, then `max(input$block)`.
-#' @param type character; if non-NULL, overrides the `rescale` argument, and
-#' constructs an aggregation mapper of the given type instead. Supported
-#' values are "sum", "average" (for regular [bm_aggregate()]),
+#' @param type character; if non-NULL,
+#' constructs an aggregation mapper of the given type, potentially
+#' potentially overriding the `rescale` argument. Supported
+#' values are
+#' \describe{
+#' \item{"sum"}{[bm_aggregate]`(rescale = FALSE)`}
+#' \item{"average"}{[bm_aggregate]`(rescale = TRUE)`}
+#' }
 #' "logsumexp", "logaverageexp" (for [bm_logsumexp()]), and
 #' "logitaverage" (for [bm_logitaverage()]).
 #' @description
@@ -2483,27 +2488,71 @@ bm_aggregate <- function(rescale = FALSE, n_block = NULL, type = NULL) {
   if (!is.null(type)) {
     type <- match.arg(
       type,
-      c("sum", "average", "logsumexp", "logaverageexp", "logitaverage")
+      c(
+        "sum",
+        "average",
+        "logsumexp",
+        "logaverageexp",
+        "logitaverage",
+        "logitsum_logit",
+        "logitsum_log",
+        "logitsum_identity"
+      )
     )
+    #' @param type character; if non-NULL,
+    #' constructs an aggregation mapper of the given type, potentially
+    #' potentially overriding the `rescale` argument. Supported
+    #' values are
+    #' \describe{
     if (type == "sum") {
+      #' \item{"sum"}{[bm_aggregate]`(rescale = FALSE)`}
       rescale <- FALSE
     } else if (type == "average") {
+      #' \item{"average"}{[bm_aggregate]`(rescale = TRUE)`}
       rescale <- TRUE
     } else if (type == "logsumexp") {
+      #' \item{"logsumexp"}{[bm_logsumexp]`(rescale = FALSE)`}
       return(bm_logsumexp(
         rescale = FALSE,
         n_block = n_block
       ))
     } else if (type == "logaverageexp") {
+      #' \item{"logaverageexp"}{[bm_logsumexp]`(rescale = TRUE)`}
       return(bm_logsumexp(
         rescale = TRUE,
         n_block = n_block
       ))
     } else if (type == "logitaverage") {
+      #' \item{"logitaverage"}{[bm_logitaverage]`()`, like `type = "logitsum_logit"`
+      #' with `rescale = TRUE`.}
       return(bm_logitaverage(
         n_block = n_block
       ))
+    } else if (type == "logitsum_logit") {
+      #' \item{"logitsum_logit"}{
+      #' [bm_logitsum]`(rescale = rescale, link = "logit")`}
+      return(bm_logitsum(
+        n_block = n_block,
+        rescale = rescale,
+        link = "logit"
+      ))
+    } else if (type == "logitsum_log") {
+      #' \item{"logitsum_log"}{[bm_logitsum]`(rescale = rescale, link = "log")`}
+      return(bm_logitsum(
+        n_block = n_block,
+        rescale = rescale,
+        link = "log"
+      ))
+    } else if (type == "logitsum_identity") {
+      #' \item{"logitsum_identity"}{
+      #' [bm_logitsum]`(rescale = rescale, link = "identity")`}
+      return(bm_logitsum(
+        n_block = n_block,
+        rescale = rescale,
+        link = "identity"
+      ))
     }
+    #' }
   }
   bru_mapper_define(
     list(
@@ -2867,7 +2916,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
         dims = c(n_out, 1)
       )
     )
-  scale1 <- exp(state2[input[["block"]]]) / sum_values1[input[["block"]]]
+  scale1 <- exp(state2) / sum_values1[input[["block"]]]
   sum_values2 <-
     as.vector(
       Matrix::sparseMatrix(
@@ -2877,7 +2926,7 @@ ibm_jacobian.bm_logitaverage <- function(mapper, input, state = NULL, ...) {
         dims = c(n_out, 1)
       )
     )
-  scale2 <- -exp(state1[input[["block"]]]) / sum_values2[input[["block"]]]
+  scale2 <- -exp(state1) / sum_values2[input[["block"]]]
 
   A <- Matrix::sparseMatrix(
     i = input[["block"]],
@@ -2930,6 +2979,227 @@ ibm_eval.bm_logitaverage <- function(
   val <- val_1 - val_2
   if (!logit) {
     val <- plogis(val)
+  }
+  val
+}
+
+
+## _logitsum ####
+
+#' @title Mapper for link-sum-inverse-logit aggregation
+#' @export
+#' @description `r lifecycle::badge("experimental")`
+#' Constructs a mapper that adds elements of `plogis(state)`, with optional
+#' non-negative weighting, and then optionally takes the `qlogis()`.
+#' Relies on the input
+#' handling methods for `bm_aggregate`. To avoid numerical issues, it uses
+#' `plogis(x, log.p = TRUE)`, `plogis(-x, log.p = TRUE)`, and the equivalent of
+#' one or two applications of [bm_logsumexp()] to evaluate either
+#' \eqn{\log(p_k)-\log(1-p_k)}{log(p[k])-log(1-p[k])},
+#' \eqn{\log(p_k)}{log(p[k])}, or
+#' \eqn{p_k}{p[k]} where
+#'
+#' \eqn{p_k=\sum_{i\in I_k} w_i / (1+e^{-\eta_i}) / \sum_{i\in I_k} w_i
+#' }{p[k]=sum(w[i] * plogis(eta[i])) / sum(w[i])}
+#'
+#' or, for `rescale = FALSE`,
+#'
+#' \eqn{p_k=\sum_{i\in I_k} w_i / (1+e^{-\eta_i})
+#' }{p[k]=sum(w[i] * plogis(eta[i]))}
+#' @returns A `bm_logitsum/bm_aggregate` mapper object.
+#' @rdname bm_logitsum
+#' @param link character; Either "logit", "log", or "identity".
+#' The combination `rescale = TRUE, link = "logit"` is
+#' equivalent to the [bm_logitaverage] mapper. The combination
+#' `rescale = FALSE, link = "logit"` is not allowed, as the model is only valid
+#' if the weights sum to at most 1, and the `< 1` cas has not been implemented.
+#' When `link = "identity"`, no link function is applied.
+#' @inheritParams bm_aggregate
+#' @seealso [bru_mapper], [bru_mapper_generics]
+#' @family mappers
+#' @examples
+#' m <- bm_logitsum(rescale = FALSE, link = "identity")
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4), 11:14)
+#' ibm_eval2(m, list(block = c(1, 2, 1, 2), weights = 1:4, n_block = 3), 11:14)
+#'
+bm_logitsum <- function(
+  n_block = NULL,
+  rescale = FALSE,
+  link = c("logit", "log", "identity")
+) {
+  link <- match.arg(link)
+  if ((link %in% "logit") && !rescale) {
+    stop("bm_logitsum(link = 'logit') is only defined for 'rescale = TRUE'")
+  }
+  # Arguments documented for bm_aggregate
+  # Inherit class bm_aggregate to reuse common methods
+  bru_mapper_define(
+    list(
+      rescale = rescale,
+      n_block = n_block,
+      is_rowwise = FALSE,
+      is_linear = FALSE,
+      link = link
+    ),
+    new_class = c("bm_logitsum", "bm_aggregate")
+  )
+}
+
+#' @export
+#' @describeIn ibm_jacobian `input` should be a list with elements
+#'   `block` and `weights`. `block` should be a vector of the same length as the
+#'   `state`, or `NULL`, with `NULL` equivalent to all-1.
+#' If `weights` is `NULL`, it's interpreted as all-1.
+#'
+ibm_jacobian.bm_logitsum <- function(mapper, input, state = NULL, ...) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
+  input <- fmesher::fm_block_prep(
+    block = input[["block"]],
+    log_weights = input[["log_weights"]],
+    weights = input[["weights"]],
+    force_log = TRUE,
+    values = state,
+    n_block = n_block
+  )
+
+  n_state <- length(input$block)
+  n_out <- input$n_block
+
+  log_weights <- fmesher::fm_block_log_weights(
+    block = input[["block"]],
+    log_weights = input[["log_weights"]],
+    weights = input[["weights"]],
+    n_block = n_out,
+    rescale = mapper[["rescale"]]
+  )
+
+  state1 <- plogis(state, log.p = TRUE)
+  state2 <- plogis(-state, log.p = TRUE)
+
+  # Compute shift for stable log-sum-exp
+  w_state1 <- state1 + log_weights
+  if (mapper[["link"]] %in% "logit") {
+    w_state2 <- state2 + log_weights
+  }
+  shift1 <- fmesher::fm_block_log_shift(
+    log_weights = w_state1,
+    block = input[["block"]],
+    n_block = n_out
+  )
+  if (mapper[["link"]] %in% "logit") {
+    shift2 <- fmesher::fm_block_log_shift(
+      log_weights = w_state2,
+      block = input[["block"]],
+      n_block = n_out
+    )
+  }
+
+  if (mapper[["link"]] %in% "identity") {} else {
+    sum_values1 <-
+      as.vector(
+        Matrix::sparseMatrix(
+          i = input[["block"]],
+          j = rep(1L, n_state),
+          x = exp(w_state1 - shift1[input[["block"]]]),
+          dims = c(n_out, 1)
+        )
+      )
+    scale1 <- exp(state2) / sum_values1[input[["block"]]]
+  }
+  if (mapper[["link"]] %in% "logit") {
+    sum_values2 <-
+      as.vector(
+        Matrix::sparseMatrix(
+          i = input[["block"]],
+          j = rep(1L, n_state),
+          x = exp(w_state2 - shift2[input[["block"]]]),
+          dims = c(n_out, 1)
+        )
+      )
+    scale2 <- -exp(state1) / sum_values2[input[["block"]]]
+  }
+
+  if (mapper[["link"]] %in% "logit") {
+    A <- Matrix::sparseMatrix(
+      i = input[["block"]],
+      j = seq_len(n_state),
+      x = exp(w_state1 - shift1[input[["block"]]]) *
+        scale1 -
+        exp(w_state2 - shift2[input[["block"]]]) * scale2,
+      dims = c(n_out, n_state)
+    )
+  } else if (mapper[["link"]] %in% "log") {
+    A <- Matrix::sparseMatrix(
+      i = input[["block"]],
+      j = seq_len(n_state),
+      x = exp(w_state1 - shift1[input[["block"]]]) *
+        scale1,
+      dims = c(n_out, n_state)
+    )
+  } else {
+    A <- Matrix::sparseMatrix(
+      i = input[["block"]],
+      j = seq_len(n_state),
+      x = exp(w_state1 + state2),
+      dims = c(n_out, n_state)
+    )
+  }
+  A
+}
+
+#' @export
+#' @param apply_link logical; control `logit` output. Default `TRUE`, see the
+#'   `ibm_eval()` details for `logitsum` mappers.
+#' @describeIn ibm_eval_methods When `apply_link` is `TRUE` (default), `ibm_eval()`
+#'   for `logitsume` returns the link-sum-weight-inverse-logit value.
+#'   If `FALSE`, the `sum-weights-inverse-logit` value is returned.
+#'
+ibm_eval.bm_logitsum <- function(
+  mapper,
+  input,
+  state = NULL,
+  apply_link = TRUE,
+  ...
+) {
+  n_block <- bm_aggregate_n_block(mapper = mapper, input = input)
+  state1 <- plogis(state, log.p = TRUE)
+  val_1 <-
+    fmesher::fm_block_logsumexp_eval(
+      block = input[["block"]],
+      log_weights = input[["log_weights"]],
+      weights = input[["weights"]],
+      rescale = mapper[["rescale"]],
+      n_block = n_block,
+      values = state1,
+      log = TRUE
+    )
+  if (mapper[["link"]] %in% "logit") {
+    state2 <- plogis(-state, log.p = TRUE)
+    val_2 <-
+      fmesher::fm_block_logsumexp_eval(
+        block = input[["block"]],
+        log_weights = input[["log_weights"]],
+        weights = input[["weights"]],
+        rescale = mapper[["rescale"]],
+        n_block = n_block,
+        values = state2,
+        log = TRUE
+      )
+  }
+  if (mapper[["link"]] %in% "logit") {
+    val <- val_1 - val_2
+    if (!apply_link) {
+      val <- plogis(val)
+    }
+  }
+  if (mapper[["link"]] %in% "log") {
+    val <- val_1
+    if (!apply_link) {
+      val <- exp(val)
+    }
+  }
+  if (mapper[["link"]] %in% "identity") {
+    val <- exp(val_1)
   }
   val
 }
@@ -4149,4 +4419,40 @@ ibm_eval.bm_reparam <- function(
   # for the remapped state, not the original state.
   val <- ibm_eval(mapper[["mapper"]], input = input, state = state, ...)
   val
+}
+
+
+# Numerically validate the [ibm_jacobian()] method for a mapper.
+ibm_validate_jacobian <- function(
+  mapper,
+  input,
+  state = NULL,
+  ...,
+  .delta = 1e-4
+) {
+  if (is.null(state)) {
+    state <- rnorm(ibm_n(mapper, input = input))
+  }
+  J_from_method <- ibm_jacobian(mapper, input = input, state = state)
+  if (ncol(J_from_method) != length(state)) {
+    return(Inf)
+  }
+
+  N <- ibm_n(mapper, input = input, state = state)
+  if (N == 0L) {
+    return(0.0)
+  }
+
+  err <- numeric(N)
+  for (j in seq_len(N)) {
+    state_eps <- state
+    state_eps[j] <- state[j] + .delta
+    v_plus <- ibm_eval(mapper, input = input, state = state_eps)
+    state_eps[j] <- state[j] - .delta
+    v_minus <- ibm_eval(mapper, input = input, state = state_eps)
+    J_from_numerics <- (v_plus - v_minus) / (2 * .delta)
+    err[j] <- max(abs(J_from_method[, j] - J_from_numerics))
+  }
+
+  max(err)
 }
