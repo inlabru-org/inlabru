@@ -2254,11 +2254,31 @@ bru_obs_check_used_deprecation <- function(
 bru_obs_handle_is_rowwise <- function(
   pred_expr,
   is_rowwise = NULL,
-  allow_combine = NULL,
+  allow_combine,
   data,
   response_data,
-  aggregate
+  aggregate,
+  env = rlang::caller_env(),
+  user_env = rlang::caller_env(2)
 ) {
+  if (lifecycle::is_present(allow_combine)) {
+    bru_log_message(
+      paste0(
+        "The `allow_combine` argument to `bru_obs()` is deprecated. ",
+        "Use `is_rowwise` instead, with `is_rowwise = !allow_combine`."
+      ),
+      verbosity = 1L
+    )
+    lifecycle::deprecate_warn(
+      "2.13.0.9017",
+      "bru_obs(allow_combine)",
+      "bru_obs(is_rowwise)",
+      env = env,
+      user_env = user_env
+    )
+  } else {
+    allow_combine <- NULL
+  }
   if (is.null(is_rowwise) && is.logical(allow_combine)) {
     is_rowwise <- !allow_combine
   }
@@ -2644,7 +2664,7 @@ bru_obs <- function(
   pred_expr <- bru_obs_handle_is_rowwise(
     pred_expr = pred_expr,
     is_rowwise = is_rowwise,
-    allow_combine = allow_combine,
+    allow_combine = rlang::maybe_missing(allow_combine),
     data = data,
     response_data = response_data,
     aggregate = aggregate
